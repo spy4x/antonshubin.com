@@ -1,0 +1,13 @@
+block variables
+html(lang="en").h-full.bg-gray-100
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    meta(name='description' content=description)
+    title #{title}
+    link(rel="stylesheet" href="style.css")
+    script(defer src="js/script.js")
+  body.h-full
+    include menu.pug
+    main.py-6
+      block content
