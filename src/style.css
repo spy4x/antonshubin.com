@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@screen sm {
+  #menu {
+    width: 100vh;
+  }
+}

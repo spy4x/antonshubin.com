@@ -1,10 +1,14 @@
+const url = location.href;
+const isHomepage = !location.href.endsWith('.html');
+
 highlightMobileMenu();
 highlightDesktopMenu();
 listenToMobileMenu();
 
 function highlightMobileMenu() {
   document.querySelectorAll(`#mobile-menu a`).forEach(item => {
-    if (location.href.indexOf(item.getAttribute('href')) > -1) {
+    const href = item.getAttribute('href');
+    if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
       item.className = 'bg-orange-500 text-white block px-3 py-2 rounded-md text-base font-medium';
     } else {
       item.className = 'text-gray-300 block px-3 py-2 rounded-md text-base font-medium';
@@ -14,7 +18,8 @@ function highlightMobileMenu() {
 
 function highlightDesktopMenu() {
   document.querySelectorAll(`#desktop-menu a`).forEach(item => {
-    if (location.href.indexOf(item.getAttribute('href')) > -1) {
+    const href = item.getAttribute('href');
+    if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
       item.className = 'bg-orange-500 text-white px-3 py-2 rounded-md text-sm font-medium';
     } else {
       item.className = 'text-gray-300 px-3 py-2 rounded-md text-sm font-medium';
