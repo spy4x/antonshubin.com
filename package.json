@@ -11,7 +11,7 @@
     "watch:templates": "onchange \"src/**/*.pug\" -- run-s build:templates build:styles",
     "watch:styles": "onchange \"src/**/*.css\" -- run-s build:styles",
     "watch:assets": "onchange \"src/assets/**/*\" -- run-s build:assets",
-    "build": "run-s build:templates build:styles",
+    "build": "run-s build:*",
     "build:templates": "pug -O pug.json src/views --out dist",
     "build:styles": "tailwindcss -i ./src/style.css -o ./dist/style.css",
     "build:assets": "cp -R src/assets/* dist/",
