@@ -1,5 +1,71 @@
 {
   "doctype": "html",
   "pretty": true,
-  "basedir": "src"
+  "basedir": "src",
+  "projects": {
+    "my": [
+      {
+        "title": "Toread.today",
+        "imageURL": "https://loremflickr.com/640/360?random=1",
+        "description": "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
+        "url": "https://toread-today.web.app"
+      },
+      {
+        "title": "The Seed",
+        "imageURL": "https://loremflickr.com/640/360?random=2",
+        "description": "A one-person SaaS application codebase template. Ship your project idea in days instead of months. ⚠️ It is addictive.",
+        "url": "https://seed.io"
+      },
+      {
+        "title": "Blog",
+        "imageURL": "https://loremflickr.com/640/360?random=3",
+        "description": "Classic blog where I talk mostly about technical aspects of developing a SaaS, but also about Arduino and travel stuff.",
+        "url": "https://antonshubin.com/blog.html"
+      },
+      {
+        "title": "YouTube Tech Channel",
+        "imageURL": "https://loremflickr.com/640/360?random=4",
+        "description": "Short tech videos about software development and SaaS.",
+        "url": "https://www.youtube.com/channel/UCzHggR9W9OdquYOvBuEORiQ/videos"
+      },
+      {
+        "title": "Arduino DIY",
+        "imageURL": "https://loremflickr.com/640/360?random=5",
+        "description": "In my free time I do some small DIY electronic devices just for fun or to solve a personal itch.",
+        "url": "https://www.instagram.com/spy4x"
+      }
+    ],
+    "freelance": [
+      {
+        "title": "Toread.today",
+        "imageURL": "https://loremflickr.com/640/360?random=6",
+        "description": "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
+        "url": "https://toread-today.web.app"
+      },
+      {
+        "title": "The Seed",
+        "imageURL": "https://loremflickr.com/640/360?random=7",
+        "description": "A one-person SaaS application codebase template. Ship your project idea in days instead of months. ⚠️ It is addictive.",
+        "url": "https://seed.io"
+      },
+      {
+        "title": "Blog",
+        "imageURL": "https://loremflickr.com/640/360?random=8",
+        "description": "Classic blog where I talk mostly about technical aspects of developing a SaaS, but also about Arduino and travel stuff.",
+        "url": "https://antonshubin.com/blog.html"
+      },
+      {
+        "title": "YouTube Tech Channel",
+        "imageURL": "https://loremflickr.com/640/360?random=9",
+        "description": "Short tech videos about software development and SaaS.",
+        "url": "https://www.youtube.com/channel/UCzHggR9W9OdquYOvBuEORiQ/videos"
+      },
+      {
+        "title": "Arduino DIY",
+        "imageURL": "https://loremflickr.com/640/360?random=10",
+        "description": "In my free time I do some small DIY electronic devices just for fun or to solve a personal itch.",
+        "url": "https://www.instagram.com/spy4x"
+      }
+    ]
+  }
 }
