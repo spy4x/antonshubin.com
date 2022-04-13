@@ -1,6 +1,9 @@
 const url = location.href;
 const isHomepage = !location.href.endsWith('.html');
 
+const desktopMenuItemClassesActive = ['bg-orange-500', 'text-white'];
+const desktopMenuItemClassesDefault = ['text-gray-300', 'hover:bg-gray-700', 'hover:text-white'];
+
 highlightMobileMenu();
 highlightDesktopMenu();
 listenToMobileMenu();
@@ -20,9 +23,11 @@ function highlightDesktopMenu() {
   document.querySelectorAll(`#desktop-menu a`).forEach(item => {
     const href = item.getAttribute('href');
     if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
-      item.className = 'bg-orange-500 text-white px-3 py-2 rounded-md text-sm font-medium';
+      desktopMenuItemClassesActive.forEach(cl => item.classList.add(cl));
+      desktopMenuItemClassesDefault.forEach(cl => item.classList.remove(cl));
     } else {
-      item.className = 'text-gray-300 px-3 py-2 rounded-md text-sm font-medium';
+      desktopMenuItemClassesActive.forEach(cl => item.classList.remove(cl));
+      desktopMenuItemClassesDefault.forEach(cl => item.classList.add(cl));
     }
   });
 }
