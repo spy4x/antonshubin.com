@@ -15,30 +15,12 @@ block content
             .text-base.text-gray-200(class='sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-8 md:text-2xl lg:mx-0')
               p.mb-4
                 | I develop
-                span.inline-flex.items-center.rounded-md.font-medium.bg-orange-500(class='px-2 py-0.5 mx-2') SaaS-applications 
+                span.inline-flex.items-center.rounded-md.font-medium.bg-orange-500(class='px-2 py-0.5 mx-2') SaaS-applications
                 | from top to bottom for my freelance clients and also for myself.
               p  Oh, and I love travel, skiing and tinkering devices using Arduino.
     div(class='lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2')
       img.h-56.w-full.object-cover.rounded-lg(class='sm:h-72 md:h-96 lg:w-full lg:h-full' src='img/photo-big.webp' alt='Anton Shubin')
-      
-  main.mx-auto.max-w-7xl.mb-4(class='sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28')
-    div.text-base.text-gray-200.w-84.text-left(class='sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-8 md:text-2xl lg:mx-0')
-      span I'm currently working on:
-      ul.list-disc
-        li 
-          a.underline(href="/blog.html" target="_blank") this blog ✍️
-        li
-          a.underline(href="https://www.youtube.com/channel/UCzHggR9W9OdquYOvBuEORiQ/videos" target="_blank") my YouTube channel 🎥
-        li one-man SaaS template codebase The Seed 🌱
-        li
-          span a cloud tool to organise things to read/watch later 
-          a.underline(href="https://toread-today.web.app/" target="_blank") Toread.Today
-          
-  #contact-form.flex.flex-col.w-72
-    h1.text-2xl.text-gray-200.mx-auto.max-w-7xl Feel free to contact me using this form.
-    input.form-input.rounded.border-gray-300(type='email' class='focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' placeholder="Email")
-    textarea.form-textarea(placeholder="Message")
-    button.w-32.bg-white.py-2.px-3.border.border-gray-300.rounded-md.shadow-sm.text-sm.leading-4.font-medium.text-gray-700(type='button' class='hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500') Send
-    
-    
-  
+
+  include ../partials/current-work
+
+  include ../partials/contact-form

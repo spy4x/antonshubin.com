@@ -1,0 +1,15 @@
+section.text-gray-400.bg-gray-900.body-font.relative.pt-8(class='md:pt-12')
+    .container.px-5.py-8.mx-auto
+        .flex.flex-col.text-center.w-full.mb-8
+            h1.text-2xl.font-medium.title-font.mb-2.text-white(class='sm:text-3xl') Contact Me
+            p.mx-auto.leading-relaxed.text-base(class='lg:w-2/3') Feel free to contact me using this form.
+        .mx-auto(class='lg:w-1/3 md:w-2/3')
+            .flex.flex-wrap.-m-2
+                .p-2.w-full
+                    .relative
+                        input#email.w-full.bg-gray-800.rounded.border.border-gray-700.text-base.outline-none.text-gray-100.py-1.px-3.leading-8.transition-colors.duration-200.ease-in-out(type='email' placeholder='Email' name='email' class='focus:border-orange-500 focus:bg-gray-900 focus:ring-0')
+                .p-2.w-full
+                    .relative
+                        textarea#message.w-full.bg-gray-800.rounded.border.border-gray-700.h-32.text-base.outline-none.text-gray-100.py-1.px-3.resize-none.leading-6.transition-colors.duration-200.ease-in-out(name='message' placeholder='Message' class='focus:border-orange-500 focus:bg-gray-900 focus:ring-0')
+                .p-2.w-full
+                    button.flex.mx-auto.text-white.bg-orange-500.border-0.py-2.px-12.rounded.text-lg.font-medium(class='focus:outline-none hover:bg-orange-600') Send
