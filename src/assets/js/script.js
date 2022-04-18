@@ -38,11 +38,11 @@ function highlightDesktopMenu() {
 
 function listenToMobileMenu() {
   let isMobileMenuOpened = false;
-  const button = document.querySelector(`#mobile-menu-button`);
-  const closedIcon = button.querySelector(`#mobile-menu-closed-icon`);
-  const openedIcon = button.querySelector(`#mobile-menu-opened-icon`);
+  const buttons = [...document.querySelectorAll(`[data-mobile-menu-button]`)];
+  const closedIcon = document.querySelector(`#mobile-menu-closed-icon`);
+  const openedIcon = document.querySelector(`#mobile-menu-opened-icon`);
   const mobileMenu = document.querySelector(`#mobile-menu`);
-  button.onclick = () => {
+  const mobileMenuButtonClickHandler = () => {
     isMobileMenuOpened = !isMobileMenuOpened;
     if (isMobileMenuOpened) {
       mobileMenu.classList.remove('hidden');
@@ -58,4 +58,5 @@ function listenToMobileMenu() {
       openedIcon.classList.add('hidden');
     }
   };
+  buttons.forEach(button => (button.onclick = mobileMenuButtonClickHandler));
 }
