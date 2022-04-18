@@ -1,5 +1,5 @@
 const url = location.href;
-const isHomepage = !location.href.endsWith('.html');
+const isHomepage = location.href.includes('index.html') || !location.href.includes('.html');
 
 const menuItemClasses = {
   active: ['bg-orange-500', 'text-white'],
