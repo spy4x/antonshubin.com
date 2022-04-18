@@ -1,8 +1,10 @@
 const url = location.href;
 const isHomepage = !location.href.endsWith('.html');
 
-const desktopMenuItemClassesActive = ['bg-orange-500', 'text-white'];
-const desktopMenuItemClassesDefault = ['text-gray-300', 'hover:bg-gray-700', 'hover:text-white'];
+const menuItemClasses = {
+  active: ['bg-orange-500', 'text-white'],
+  default: ['text-gray-300', 'hover:bg-gray-700', 'hover:text-white'],
+};
 
 highlightMobileMenu();
 highlightDesktopMenu();
@@ -12,9 +14,11 @@ function highlightMobileMenu() {
   document.querySelectorAll(`#mobile-menu a`).forEach(item => {
     const href = item.getAttribute('href');
     if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
-      item.className = 'bg-orange-500 text-white block px-3 py-2 rounded-md text-base font-medium';
+      menuItemClasses.active.forEach(cl => item.classList.add(cl));
+      menuItemClasses.default.forEach(cl => item.classList.remove(cl));
     } else {
-      item.className = 'text-gray-300 block px-3 py-2 rounded-md text-base font-medium';
+      menuItemClasses.active.forEach(cl => item.classList.remove(cl));
+      menuItemClasses.default.forEach(cl => item.classList.add(cl));
     }
   });
 }
@@ -23,11 +27,11 @@ function highlightDesktopMenu() {
   document.querySelectorAll(`#desktop-menu a`).forEach(item => {
     const href = item.getAttribute('href');
     if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
-      desktopMenuItemClassesActive.forEach(cl => item.classList.add(cl));
-      desktopMenuItemClassesDefault.forEach(cl => item.classList.remove(cl));
+      menuItemClasses.active.forEach(cl => item.classList.add(cl));
+      menuItemClasses.default.forEach(cl => item.classList.remove(cl));
     } else {
-      desktopMenuItemClassesActive.forEach(cl => item.classList.remove(cl));
-      desktopMenuItemClassesDefault.forEach(cl => item.classList.add(cl));
+      menuItemClasses.active.forEach(cl => item.classList.remove(cl));
+      menuItemClasses.default.forEach(cl => item.classList.add(cl));
     }
   });
 }

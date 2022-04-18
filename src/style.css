@@ -7,3 +7,11 @@
     width: 100vh;
   }
 }
+
+/* About me */
+.current-work {
+  @apply border-2 border-gray-700;
+  @apply bg-gray-800;
+  @apply px-4 py-6;
+  @apply rounded-lg;
+}
