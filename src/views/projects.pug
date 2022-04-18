@@ -2,19 +2,26 @@ extends ../partials/layout
 block variables
   - var title = 'Projects | Anton Shubin'
   - var description = 'Projects I\'m working onn or participated into.'
-    
+
 mixin projectList(title, items)
   .flex.flex-col.text-center.w-full.mt-16.mb-10
     h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') #{title}
-  .flex.flex-wrap.justify-center.items-stretch.gap-5
+  .flex.flex-wrap.justify-center.items-stretch.gap-5.w-full
     each project in items
-      a.border-2.border-gray-700.bg-gray-800.rounded-md(class="sm:w-96 hover:border-orange-500" href=project.url target="_blank")
-        img.rounded-t-md.mb-3(src=project.imageURL alt=project.title + ' preview' loading="lazy")
-        .p-3
-          h2.text-lg.font-bold.text-gray-100.mb-1.text-center #{project.title}
-          p.text-base.text-gray-200.mb-1 #{project.description} 
-          p.text-base.text-gray-200.truncate.w-72.font-bold.underline #{project.url}
-    
+      .border-2.border-gray-700.bg-gray-800.rounded-md.w-80.overflow-hidden
+        img.mb-3(src=project.previewURL alt=project.title + ' preview' loading="lazy")
+        a.block.p-3(href=project.url target="_blank")
+          h2.text-lg.font-bold.text-gray-100.mb-1 #{project.title}
+          if project.role || project.tags
+            .flex.flex-wrap.gap-1.mb-1
+              if project.role
+                span.inline-flex.items-center.px-2.rounded.text-xs.font-medium.bg-slate-900.text-orange-500(class='py-0.5') #{project.role}
+              if project.tags
+                each tag in project.tags
+                  span.inline-flex.items-center.px-2.rounded.text-xs.font-medium.bg-slate-900.text-gray-100(class='py-0.5') #{tag}
+          p.text-base.text-gray-200.mb-1 #{project.description}
+          .text-base.text-gray-200.truncate.w-72.font-bold.underline #{project.url}
+
 block content
   .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
     +projectList('My Projects', projects.my)
