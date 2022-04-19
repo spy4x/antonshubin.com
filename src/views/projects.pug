@@ -4,7 +4,7 @@ block variables
   - var description = 'Projects I\'m working onn or participated into.'
 
 mixin projectList(title, items, id)
-  .flex.flex-col.text-center.w-full.mt-16.mb-10(id=id)
+  .flex.flex-col.text-center.w-full.mb-12(id=id)
     h1.h1 #{title}
   .flex.flex-wrap.justify-center.items-stretch.gap-6.w-full.mb-8
     each project in items
