@@ -2,6 +2,7 @@
   "hosting": {
     "public": "dist",
     "predeploy": ["yarn build"],
+    "cleanUrls": true,
     "headers": [
       {
         "source": "/api{,/**}",
@@ -13,7 +14,7 @@
         ]
       },
       {
-        "source": "**/*.@(html|js|css|jpg|jpeg|gif|png|svg|ico|eot|ttf|woff|woff2|txt)",
+        "source": "**/*.@(html|js|css|webp|jpg|jpeg|gif|png|svg|ico|eot|ttf|woff|woff2|txt)",
         "headers": [
           {
             "key": "Cache-Control",

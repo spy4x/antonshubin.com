@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "run-p server watch:*",
-    "server": "browser-sync start --server 'dist' --files \"dist/**/*.css, dist/**/*.js, dist/**/*.html, !node_modules/**/*.html\"",
+    "server": "browser-sync start --server 'dist' --files \"dist/**/*.css, dist/**/*.js, dist/**/*.html, !node_modules/**/*.html\" --extensions \"html\"",
     "watch:templates": "onchange \"src/**/*.pug\" \"pug.json\" -- run-s build:templates build:styles",
     "watch:styles": "onchange \"src/**/*.css\" -- run-s build:styles",
     "watch:assets": "onchange \"src/assets/**/*\" -- run-s build:assets",
