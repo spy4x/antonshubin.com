@@ -6,13 +6,13 @@
     "my": [
       {
         "title": "Toread.today",
-        "previewURL": "https://via.placeholder.com/320",
+        "previewURL": "/img/projects/toread.today/logo.png",
         "description": "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
         "url": "https://toread-today.web.app"
       },
       {
         "title": "The Seed",
-        "previewURL": "https://via.placeholder.com/320",
+        "previewURL": "/img/projects/seed/logo.png",
         "description": "A one-person SaaS application codebase template. Ship your project idea in days instead of months. ⚠️ It is addictive.",
         "url": "https://seed.io"
       },
@@ -28,7 +28,7 @@
         "title": "Corecircle",
         "role": "Tech Lead",
         "tags": ["Node.js", "Nest.js", "Nx monorepo", "GCP", "Firebase", "PostgreSQL", "Redis"],
-        "previewURL": "https://via.placeholder.com/320",
+        "previewURL": "/img/projects/corecircle/logo.jpeg",
         "imageURLs": [
           "/img/projects/corecircle/1.webp",
           "/img/projects/corecircle/2.webp",
@@ -42,7 +42,8 @@
         "title": "Connectful",
         "role": "Tech Lead",
         "tags": ["Node.js", "Nest.js", "Nx monorepo", "GCP", "Firebase", "Firestore"],
-        "previewURL": "/img/projects/connectful/preview.webp",
+//        "previewURL": "/img/projects/connectful/preview.webp",
+        "previewURL": "https://connectful.com/wp-content/uploads/2020/12/header-logo.svg",
         "imageURLs": [
           "/img/projects/connectful/1.webp",
           "/img/projects/connectful/2.webp",
@@ -55,7 +56,7 @@
         "title": "FoodRazor",
         "role": "Tech Lead",
         "tags": ["Angular", "Node.js", "Express.js", "GCP", "Firebase", "Firestore"],
-        "previewURL": "https://via.placeholder.com/320",
+        "previewURL": "/img/projects/foodrazor/logo.svg",
         "imageURLs": [
           "/img/projects/foodrazor/1.webp",
           "/img/projects/foodrazor/2.webp",
