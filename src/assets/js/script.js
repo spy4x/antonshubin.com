@@ -9,7 +9,8 @@ listenToMobileMenu();
 
 function highlightActiveMenuItem(element) {
   const href = element.getAttribute('href');
-  if (location.pathname === href) {
+  const isBlog = href === '/blog' && location.pathname.includes('/blog');
+  if (location.pathname === href || isBlog) {
     menuItemClasses.active.forEach(cl => element.classList.add(cl));
     menuItemClasses.default.forEach(cl => element.classList.remove(cl));
   } else {

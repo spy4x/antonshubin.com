@@ -24,5 +24,5 @@ mixin projectList(title, items, id)
 
 block content
   .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
-    +projectList('My Projects', projects.my, 'my')
-    +projectList('Freelance Projects', projects.freelance, 'freelance')
+    +projectList('My Projects', data.projects.my, 'my')
+    +projectList('Freelance Projects', data.projects.freelance, 'freelance')

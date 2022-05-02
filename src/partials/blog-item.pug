@@ -1,0 +1,7 @@
+extends layout
+block content
+  .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
+    h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') #{title}
+    p.text-gray-400.mb-6 Read time: #{readTime} minutes. Published at #{publishedAt}
+    img.mb-6(src=previewURL alt="Article preview")
+    .text-white.blog-content!= content
