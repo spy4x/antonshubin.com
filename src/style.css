@@ -16,14 +16,19 @@
   @apply rounded-lg;
 }
 
-.h1{
+.h1 {
   @apply text-2xl sm:text-3xl;
   @apply tracking-wide text-white font-medium;
 }
 
-.h2{
+.h2 {
   @apply text-xl sm:text-2xl;
   @apply tracking-wide text-white font-medium;
+}
+
+/* Projects */
+.project-badge {
+  @apply tracking-wide inline-flex items-center px-2 rounded text-sm bg-orange-500 text-white py-0.5 my-1 mr-2;
 }
 
 /* Blog */
@@ -78,7 +83,7 @@
   max-width: 80%;
 }
 .blog-content > .well.well--warning {
-  /*@apply border-orange-500;*/
+  @apply border-orange-500;
 }
 .blog-content > .well.well--warning > p:before {
   @apply text-orange-500;
@@ -87,7 +92,7 @@
 .blog-content > blockquote {
   @apply text-gray-50 italic text-2xl font-light;
   @apply relative py-8 px-6 bg-gray-800/50 md:px-10;
-  @apply mt-2 mb-12 ml-32 mr-10;
+  @apply mt-2 mb-12 mx-4 md:mx-28;
   @apply border-l-4 border-orange-500;
   letter-spacing: 0.0125rem;
 }

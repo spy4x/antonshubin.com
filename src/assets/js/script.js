@@ -3,14 +3,14 @@ const menuItemClasses = {
   default: ['text-gray-300', 'hover:bg-gray-700', 'hover:text-white'],
 };
 
-document.querySelectorAll(`#mobile-menu a`).forEach(highlightActiveMenuItem);
-document.querySelectorAll(`#desktop-menu a`).forEach(highlightActiveMenuItem);
+document.querySelectorAll(`#menu [data-highlight]`).forEach(highlightActiveMenuItem);
 listenToMobileMenu();
 
 function highlightActiveMenuItem(element) {
   const href = element.getAttribute('href');
   const isBlog = href === '/blog' && location.pathname.includes('/blog');
-  if (location.pathname === href || isBlog) {
+  const isProjects = href === '/projects' && location.pathname.includes('/projects');
+  if (location.pathname === href || isBlog || isProjects) {
     menuItemClasses.active.forEach(cl => element.classList.add(cl));
     menuItemClasses.default.forEach(cl => element.classList.remove(cl));
   } else {

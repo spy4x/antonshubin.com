@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  section.max-w-2xl.mx-auto.text-center
+    .mb-6
+      h1.h1 #{title}
+      p.text-orange-500
+        a(href=url target="_blank")
+          span #{url}
+          svg.inline.w-4.feather.feather-share(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
+            path(d='M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8')
+            polyline(points='16 6 12 2 8 6')
+            line(x1='12' y1='2' x2='12' y2='15')
+    p
+      each tag in tags
+        span.project-badge #{tag}
+    h2.tracking-wide.mt-6.text-xl.text-gray-100 #{description}
+
+  section.max-w-4xl.mx-auto.p-6.flex.gap-8.flex-wrap.justify-center
+    if videoURL
+      .w-full.aspect-w-16.aspect-h-9.rounded-lg
+        iframe(src=videoURL frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen='')
+
+    each screenshotURL in screenshotURLs
+      img.rounded-lg(src="/img/projects/"+slug+"/"+screenshotURL alt=title loading="lazy" style="max-height: 600px")
