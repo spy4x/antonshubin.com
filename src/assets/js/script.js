@@ -1,39 +1,22 @@
-const url = location.href;
-const isHomepage = location.href.includes('index.html') || !location.href.includes('.html');
-
 const menuItemClasses = {
   active: ['bg-orange-500', 'text-white'],
   default: ['text-gray-300', 'hover:bg-gray-700', 'hover:text-white'],
 };
 
-highlightMobileMenu();
-highlightDesktopMenu();
+document.querySelectorAll(`#menu [data-highlight]`).forEach(highlightActiveMenuItem);
 listenToMobileMenu();
 
-function highlightMobileMenu() {
-  document.querySelectorAll(`#mobile-menu a`).forEach(item => {
-    const href = item.getAttribute('href');
-    if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
-      menuItemClasses.active.forEach(cl => item.classList.add(cl));
-      menuItemClasses.default.forEach(cl => item.classList.remove(cl));
-    } else {
-      menuItemClasses.active.forEach(cl => item.classList.remove(cl));
-      menuItemClasses.default.forEach(cl => item.classList.add(cl));
-    }
-  });
-}
-
-function highlightDesktopMenu() {
-  document.querySelectorAll(`#desktop-menu a`).forEach(item => {
-    const href = item.getAttribute('href');
-    if (url.indexOf(href) > -1 || (isHomepage && href.includes('index.html'))) {
-      menuItemClasses.active.forEach(cl => item.classList.add(cl));
-      menuItemClasses.default.forEach(cl => item.classList.remove(cl));
-    } else {
-      menuItemClasses.active.forEach(cl => item.classList.remove(cl));
-      menuItemClasses.default.forEach(cl => item.classList.add(cl));
-    }
-  });
+function highlightActiveMenuItem(element) {
+  const href = element.getAttribute('href');
+  const isBlog = href === '/blog' && location.pathname.includes('/blog');
+  const isProjects = href === '/projects' && location.pathname.includes('/projects');
+  if (location.pathname === href || isBlog || isProjects) {
+    menuItemClasses.active.forEach(cl => element.classList.add(cl));
+    menuItemClasses.default.forEach(cl => element.classList.remove(cl));
+  } else {
+    menuItemClasses.active.forEach(cl => element.classList.remove(cl));
+    menuItemClasses.default.forEach(cl => element.classList.add(cl));
+  }
 }
 
 function listenToMobileMenu() {
