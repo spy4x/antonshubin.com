@@ -12,7 +12,7 @@ mixin blogArticlePreview(article, index)
         span #{article.title}
       .flex.text-gray-400.items-center
         span Time to read: #{article.readTime} min
-        span.ml-auto #{article.publishedAt}
+        span.ml-auto #{prettyDate(article.publishedAt)}
 
 
 block content

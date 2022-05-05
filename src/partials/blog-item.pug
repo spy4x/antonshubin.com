@@ -4,7 +4,7 @@ block content
     h1.h1.text-left #{title}
     .flex.text-gray-400.my-4.items-center
       span Time to read: #{readTime} min
-      span.ml-auto #{publishedAt}
+      span.ml-auto #{prettyDate(publishedAt)}
 
     img.rounded-md.mb-6(src=previewImageURL alt="Article preview")
     .text-slate-200.blog-content!= content

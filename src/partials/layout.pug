@@ -5,8 +5,8 @@ html(lang="en").h-full.bg-slate-900
     meta(name='viewport' content='width=device-width, initial-scale=1')
     meta(name='description' content=description)
     title #{title}
-    link(rel="stylesheet" href="/style.css")
-    script(defer src="/js/script.js")
+    link(rel="stylesheet" href="/style.css?v1")
+    script(defer src="/js/script.js?v1")
     link(rel='apple-touch-icon' sizes='57x57' href='/apple-icon-57x57.png')
     link(rel='apple-touch-icon' sizes='60x60' href='/apple-icon-60x60.png')
     link(rel='apple-touch-icon' sizes='72x72' href='/apple-icon-72x72.png')
@@ -26,3 +26,13 @@ html(lang="en").h-full.bg-slate-900
     include menu.pug
     main.p-6.pb-24(class="sm:ml-16 md:p-12")
       block content
+
+
+-function prettyDate(dateString){
+    -var date = new Date(dateString);
+    -var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+    -var d = date.getDate();
+    -var m = monthNames[date.getMonth()];
+    -var y = date.getFullYear();
+    -return d+' '+m+' '+y;
+-}
