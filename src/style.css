@@ -16,6 +16,15 @@
   @apply rounded-lg;
 }
 
+/* Projects */
+.h1 {
+  @apply text-2xl sm:text-3xl;
+  @apply tracking-wide text-white text-center font-medium;
+}
+.project-badge {
+  @apply tracking-wide inline-flex items-center px-2 rounded text-sm bg-orange-500 text-white py-0.5 my-1 mr-2;
+}
+
 /* Blog */
 .blog-content {
   max-width: 640px;

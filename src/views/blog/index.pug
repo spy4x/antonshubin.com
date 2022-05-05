@@ -5,8 +5,8 @@ block variables
 
 mixin blogArticlePreview(article)
   .flex.flex-col.text-center.w-full.mt-16.mb-10
-    a(href='/blog/'+article.url)
-      img(src=article.previewURL alt="Article preview")
+    a(href='/blog/'+article.slug)
+      img(src=article.previewImageURL alt="Article preview")
       h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') #{article.title}
 
 
