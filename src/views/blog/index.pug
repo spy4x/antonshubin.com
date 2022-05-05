@@ -4,14 +4,17 @@ block variables
   - var description = 'Aggregation of my thoughts regarding web development, SaaS-startups and Arduino'
 
 mixin blogArticlePreview(article)
-  .flex.flex-col.text-center.w-full.mt-16.mb-10
+  .mt-16.mb-10
     a(href='/blog/'+article.url)
-      img(src=article.previewURL alt="Article preview")
-      h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') #{article.title}
+      img.rounded-lg(src=article.previewURL alt="Article preview")
+      .flex.text-gray-400.my-4.items-center
+        p May 02, 2022
+        .ml-auto Time reading: 5 min
+      h1.h2 #{article.title}
 
 
 block content
-  .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
-    h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') Blog
-     each article in data.blogArticles
-       +blogArticlePreview(article)
+  .max-w-xl.mx-auto
+    h1.h1.text-center Blog
+    each article in data.blogArticles
+      +blogArticlePreview(article)

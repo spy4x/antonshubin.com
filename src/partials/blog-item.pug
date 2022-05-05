@@ -1,7 +1,22 @@
 extends layout
 block content
-  .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
-    h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') #{title}
-    p.text-gray-400.mb-6 Read time: #{readTime} minutes. Published at #{publishedAt}
-    img.mb-6(src=previewURL alt="Article preview")
-    .text-white.blog-content!= content
+  article.max-w-3xl.mx-auto
+    h1.h1.text-left #{title}
+    .flex.text-gray-400.my-4.items-center
+      .mr-2 #{publishedAt}
+      .ml-auto Time reading: #{readTime} min
+
+    img.rounded-md.mb-6(src=previewURL alt="Article preview")
+    .text-slate-200.blog-content!= content
+
+    .flex.text-gray-400.my-4.items-center
+      .mr-10 Author: Anton Shubin
+      .ml-auto
+        .flex.items-center
+          svg.feather.feather-share-2(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
+            circle(cx='18' cy='5' r='3')
+            circle(cx='6' cy='12' r='3')
+            circle(cx='18' cy='19' r='3')
+            line(x1='8.59' y1='13.51' x2='15.42' y2='17.49')
+            line(x1='15.41' y1='6.51' x2='8.59' y2='10.49')
+          span.ml-2 Share article
