@@ -43,3 +43,10 @@ function listenToMobileMenu() {
   };
   buttons.forEach(button => (button.onclick = mobileMenuButtonClickHandler));
 }
+
+// Add e ma il after some delay to avoid spam (or at least try)
+setTimeout(() => {
+  document
+    .querySelectorAll('.contact-link')
+    .forEach(el => el.setAttribute('href', 'mai' + 'lto' + ':' + '2sp' + 'y' + 4 + 'x+ws@' + 'gm' + 'ail.' + 'com'));
+}, 3000);

@@ -2,10 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shared */
 @screen sm {
   #menu {
     width: 100vh;
   }
+}
+.h1 {
+  @apply text-2xl sm:text-3xl;
+  @apply tracking-wide text-white font-medium;
+}
+.h2 {
+  @apply text-xl sm:text-2xl;
+  @apply tracking-wide text-white font-medium;
 }
 
 /* About me */
@@ -14,16 +23,6 @@
   @apply bg-gray-800;
   @apply px-4 py-6;
   @apply rounded-lg;
-}
-
-.h1 {
-  @apply text-2xl sm:text-3xl;
-  @apply tracking-wide text-white font-medium;
-}
-
-.h2 {
-  @apply text-xl sm:text-2xl;
-  @apply tracking-wide text-white font-medium;
 }
 
 /* Projects */
@@ -47,16 +46,13 @@
   @apply mb-10;
   @apply text-xl font-light leading-8;
 }
-
 .blog-content > ol,
 .blog-content > ul {
   @apply my-2 mb-10;
   @apply px-12;
-
   @apply text-lg font-light;
   letter-spacing: 0.00625rem;
 }
-
 .blog-content > ol li,
 .blog-content > ul li {
   @apply mb-4;
