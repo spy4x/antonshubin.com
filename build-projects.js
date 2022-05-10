@@ -8,6 +8,7 @@ function buildProjectPage(project) {
   if (!project.slug) {
     return;
   }
+  project.url = '/projects/' + project.slug;
   const html = projectTemplate(project);
   fs.writeFileSync(`dist/projects/${project.slug}.html`, html);
 }

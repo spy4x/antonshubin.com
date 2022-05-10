@@ -7,6 +7,7 @@ const blogArticleTemplate = pug.compileFile('./src/partials/blog-item.pug', { pr
 
 for (let article of pugJSON.data.blogArticles) {
   article.content = marked(article.mdContent);
+  article.url = '/blog/' + article.slug;
   const html = blogArticleTemplate(article);
   fs.writeFileSync(`dist/blog/${article.slug}.html`, html);
 }
