@@ -50,3 +50,18 @@ setTimeout(() => {
     .querySelectorAll('.contact-link')
     .forEach(el => el.setAttribute('href', 'mai' + 'lto' + ':' + '2sp' + 'y' + 4 + 'x+ws@' + 'gm' + 'ail.' + 'com'));
 }, 3000);
+
+window.addEventListener('load', () => {
+  const script = document.createElement('script');
+  script.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-R9W8GJC3FZ');
+  script.setAttribute('defer', '');
+  script.onload = () => {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'G-R9W8GJC3FZ');
+  };
+  document.body.appendChild(script);
+});
