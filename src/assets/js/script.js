@@ -68,9 +68,11 @@ function addScript(url, onLoadFn) {
 // Add Google Analytics
 addScript('https://www.googletagmanager.com/gtag/js?id=G-R9W8GJC3FZ', () => {
   window.dataLayer = window.dataLayer || [];
+
   function gtag() {
     dataLayer.push(arguments);
   }
+
   gtag('js', new Date());
   gtag('config', 'G-R9W8GJC3FZ');
 });
@@ -100,20 +102,52 @@ function subscribeEmail(event) {
       subscribeEmailValidationEl.style.display = 'block';
       return;
     }
-    // updateSubscribeButtonState('in-progress');
+    updateButtonLoadingState('loading');
     const response = await fetch('/api/subscribe-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, recaptchaToken }),
     });
     const json = await response.json();
-    if (response.status === 200 && json.success) {
-      // updateSubscribeButtonState('subscribed');
-      return json;
+    if (response.status === 200) {
+      updateButtonLoadingState('success');
     } else {
-      // updateSubscribeButtonState('error');
+      updateButtonLoadingState('error');
       console.error(json);
-      return json;
     }
   });
+}
+
+function updateButtonLoadingState(state) {
+  switch (state) {
+    case 'loading': {
+      const button = document.querySelector('#subscribe-email-button');
+      const loading = button.querySelector('.loading');
+      loading.classList.remove('hidden', 'loading--success', 'loading--error');
+      const span = button.querySelector('span');
+      span.classList.add('hidden');
+      break;
+    }
+    case 'success': {
+      const button = document.querySelector('#subscribe-email-button');
+      const loading = button.querySelector('.loading');
+      loading.classList.add('loading--success');
+      const span = button.querySelector('span');
+      span.classList.remove('hidden');
+      span.innerText = 'Done';
+      break;
+    }
+    case 'error': {
+      const button = document.querySelector('#subscribe-email-button');
+      const loading = button.querySelector('.loading');
+      loading.classList.add('loading--error');
+      const span = button.querySelector('span');
+      span.classList.remove('hidden');
+      span.innerText = 'Error';
+      break;
+    }
+    default: {
+      console.error(`Function "updateButtonLoadingState(state)" was invoked with incorrect argument "${state}".`);
+    }
+  }
 }
