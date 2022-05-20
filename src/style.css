@@ -99,3 +99,7 @@
     max-width: 80%;
   }
 }
+
+.grecaptcha-badge {
+  display: none !important;
+}
