@@ -19,7 +19,9 @@
     "build:projects": "node build-projects.js",
     "build:styles": "tailwindcss -i ./src/style.css -o ./dist/style.css",
     "build:assets": "cp -R src/assets/* dist/",
-    "deploy": "firebase deploy"
+    "deploy": "firebase deploy",
+    "emulator": "yarn emulator:kill && firebase emulators:start",
+    "emulator:kill": "lsof -t -i :5001 -i:5002 | xargs kill -9"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.0",

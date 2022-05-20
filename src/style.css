@@ -99,3 +99,46 @@
     max-width: 80%;
   }
 }
+
+.grecaptcha-badge {
+  display: none !important;
+}
+
+.loading {
+  border: 3px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: loading 1s linear infinite;
+  font-family: monospace;
+}
+.loading.loading--success,
+.loading.loading--error {
+  border-top-color: transparent;
+  animation: loading--result 1s;
+  transform: translateY(-5px);
+}
+.loading.loading--success:before {
+  content: '✔';
+  font-size: 200%;
+}
+.loading.loading--error:before {
+  content: 'x';
+  font-size: 200%;
+}
+@keyframes loading {
+  /* Safari support */
+  from {
+    transform: rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes loading--result {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1) translateY(-5px);
+  }
+}
