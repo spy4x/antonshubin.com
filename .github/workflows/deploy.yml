@@ -11,6 +11,4 @@ jobs:
       - uses: actions/checkout@v2
       - run: yarn install --frozen-lockfile --non-interactive
       - name: deploy
-        run: yarn firebase deploy --project antonshubin-production
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ANTONSHUBIN_PRODUCTION }}
+        run: yarn firebase deploy --project ${{ secrets.FIREBASE_PROJECT }} --token ${{ secrets.FIREBASE_TOKEN }}
