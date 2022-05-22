@@ -21,7 +21,8 @@
     "build:assets": "cp -R src/assets/* dist/",
     "deploy": "firebase deploy",
     "emulator": "yarn emulator:kill && firebase emulators:start",
-    "emulator:kill": "lsof -t -i :5001 -i:5002 | xargs kill -9"
+    "emulator:kill": "lsof -t -i :5001 -i:5002 | xargs kill -9",
+    "postinstall": "yarn --cwd functions install --frozen-lockfile --non-interactive"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.0",
