@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: yarn install --frozen-lockfile --non-interactive
-      - name: deploy
+      - name: Install deps
+        run: yarn install --frozen-lockfile --non-interactive
+      - name: Deploy
         run: yarn firebase deploy --project ${{ secrets.FIREBASE_PROJECT }} --token ${{ secrets.FIREBASE_TOKEN }}
