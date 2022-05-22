@@ -29,4 +29,4 @@ jobs:
 #      - name: install firebase
 #        run: npm i firebase-tools -g
       - name: deploy
-        run: yarn firebase use --add ${{secrets.FIREBASE_PROJECT}} && yarn firebase deploy --project ${{secrets.FIREBASE_PROJECT}} --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ANTONSHUBIN_PRODUCTION }}
+        run: yarn firebase use --add ${{secrets.FIREBASE_PROJECT}} --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ANTONSHUBIN_PRODUCTION }} && yarn firebase deploy --project ${{secrets.FIREBASE_PROJECT}} --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ANTONSHUBIN_PRODUCTION }}
