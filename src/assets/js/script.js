@@ -88,10 +88,12 @@ function isEmailValid(email) {
 }
 
 // Blog subscribe form
-onInit(() => document.querySelector('#subscribe-email-button').addEventListener('click', subscribeEmail));
+onInit(() => {
+  document.querySelector('#subscribe-email-button').addEventListener('click', subscribeEmail);
+  document.querySelector('#subscribe-email-input').addEventListener('keyup', e => e.keyCode === 13 && subscribeEmail());
+});
 
-function subscribeEmail(event) {
-  event.preventDefault();
+function subscribeEmail() {
   grecaptcha.ready(async () => {
     const recaptchaToken = await grecaptcha.execute(RECAPTCHA_PUBLIC_KEY, { action: 'subscribeEmail' });
     const email = document.querySelector('#subscribe-email-input').value.trim();
