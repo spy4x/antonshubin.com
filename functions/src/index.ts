@@ -70,22 +70,23 @@ async function validateRequestForSubscription(body: {
 }
 
 async function validateRecaptcha(token: string): Promise<ValidationError | false> {
+  const error: ValidationError = {
+    type: 'validation',
+    field: 'recaptchaToken',
+    message: 'Google Recaptcha check failed. Try again',
+  };
   if (!token) {
-    return false;
+    return error;
   }
   const url = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaApiKey}&response=${token}`;
   logInfo({ url });
   const response = await Axios.post(url);
 
   logInfo({ status: response.status, data: response.data });
-  if (response.status === 200 && response.data.success) {
+  if (response.status === 200 && response.data.success && response.data.action === 'subscribeEmail') {
     return false;
   }
-  return {
-    type: 'validation',
-    field: 'recaptchaToken',
-    message: 'Google Recaptcha not passed. Try again',
-  };
+  return error;
 }
 
 function logInfo(json: Object): void {

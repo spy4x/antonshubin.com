@@ -110,17 +110,32 @@
   border-radius: 50%;
   animation: loading 1s linear infinite;
   font-family: monospace;
+  display: none;
 }
+
+.loading--running > .loading,
+.loading.loading--running,
+.loading--success > .loading,
 .loading.loading--success,
+.loading--error > .loading,
+.loading.loading--error {
+  display: block;
+}
+
+.loading--success > .loading,
+.loading.loading--success,
+.loading--error > .loading,
 .loading.loading--error {
   border-top-color: transparent;
   animation: loading--result 1s;
   transform: translateY(-5px);
 }
+.loading--success > .loading:before,
 .loading.loading--success:before {
   content: '✔';
   font-size: 200%;
 }
+.loading--error > .loading:before,
 .loading.loading--error:before {
   content: 'x';
   font-size: 200%;
@@ -141,4 +156,25 @@
   100% {
     transform: scale(1) translateY(-5px);
   }
+}
+
+.btn {
+  position: relative;
+  @apply flex items-center gap-2;
+  @apply text-white text-base font-medium;
+  @apply bg-orange-500 border-0 py-2 px-6 rounded;
+  @apply focus:outline-none hover:bg-orange-600;
+}
+.loading--running > .btn__text,
+.loading--success > .btn__text,
+.loading--error > .btn__text {
+  visibility: hidden;
+}
+.btn > .loading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
 }

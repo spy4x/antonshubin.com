@@ -88,64 +88,73 @@ function isEmailValid(email) {
 }
 
 // Blog subscribe form
+const subscribeEmailEls = {
+  button: undefined,
+  input: undefined,
+  validation: undefined,
+};
 onInit(() => {
-  document.querySelector('#subscribe-email-button').addEventListener('click', subscribeEmail);
-  document.querySelector('#subscribe-email-input').addEventListener('keyup', e => e.keyCode === 13 && subscribeEmail());
+  subscribeEmailEls.button = document.querySelector('#subscribe-email-button');
+  subscribeEmailEls.input = document.querySelector('#subscribe-email-input');
+  subscribeEmailEls.validation = document.querySelector('#subscribe-email-validation');
+  subscribeEmailEls.button.addEventListener('click', subscribeEmail);
+  subscribeEmailEls.input.addEventListener('keyup', e => e.keyCode === 13 && subscribeEmail());
 });
 
 function subscribeEmail() {
   grecaptcha.ready(async () => {
     const recaptchaToken = await grecaptcha.execute(RECAPTCHA_PUBLIC_KEY, { action: 'subscribeEmail' });
     const email = document.querySelector('#subscribe-email-input').value.trim();
-    const subscribeEmailValidationEl = document.querySelector('#subscribe-email-validation');
-    if (isEmailValid(email)) {
-      subscribeEmailValidationEl.style.display = 'none';
-    } else {
-      subscribeEmailValidationEl.style.display = 'block';
+    const isValid = isEmailValid(email);
+    displayErrorMessage(isValid ? undefined : 'Please enter a valid email');
+    if (!isValid) {
       return;
     }
     updateButtonLoadingState('loading');
-    const response = await fetch('/api/subscribe-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, recaptchaToken }),
-    });
-    const json = await response.json();
-    if (response.status === 200) {
-      updateButtonLoadingState('success');
-    } else {
-      updateButtonLoadingState('error');
-      console.error(json);
+    try {
+      const response = await fetch('https://antonshubin.com/api/subscribe-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, recaptchaToken }),
+      });
+      const json = await response.json();
+      if (response.status === 200) {
+        updateButtonLoadingState('success');
+      } else {
+        updateButtonLoadingState('error');
+        displayErrorMessage(json.message);
+        console.error(json);
+      }
+    } catch (error) {
+      console.error(error);
+      displayErrorMessage(error.message);
     }
   });
+}
+
+function displayErrorMessage(message = '') {
+  if (!message) {
+    subscribeEmailEls.validation.style.display = 'none';
+    return;
+  }
+  subscribeEmailEls.validation.innerText = message;
+  subscribeEmailEls.validation.style.display = 'block';
 }
 
 function updateButtonLoadingState(state) {
   switch (state) {
     case 'loading': {
-      const button = document.querySelector('#subscribe-email-button');
-      const loading = button.querySelector('.loading');
-      loading.classList.remove('hidden', 'loading--success', 'loading--error');
-      const span = button.querySelector('span');
-      span.classList.add('hidden');
+      subscribeEmailEls.button.classList.add('loading--running');
       break;
     }
     case 'success': {
-      const button = document.querySelector('#subscribe-email-button');
-      const loading = button.querySelector('.loading');
-      loading.classList.add('loading--success');
-      const span = button.querySelector('span');
-      span.classList.remove('hidden');
-      span.innerText = 'Done';
+      subscribeEmailEls.button.classList.remove('loading--running');
+      subscribeEmailEls.button.classList.add('loading--success');
       break;
     }
     case 'error': {
-      const button = document.querySelector('#subscribe-email-button');
-      const loading = button.querySelector('.loading');
-      loading.classList.add('loading--error');
-      const span = button.querySelector('span');
-      span.classList.remove('hidden');
-      span.innerText = 'Error';
+      subscribeEmailEls.button.classList.remove('loading--running');
+      subscribeEmailEls.button.classList.add('loading--error');
       break;
     }
     default: {
