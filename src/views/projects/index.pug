@@ -9,8 +9,8 @@ mixin projectList(title, items, id)
     h1.h1 #{title}
   .flex.flex-wrap.justify-center.items-stretch.gap-6.w-full.mb-8
     each project in items
-      div.w-80.mb-6
-        a.py-4.flex.justify-center.items-center.bg-gray-800.rounded-md.h-48.border.border-2.border-gray-800(href=(project.slug ? ("/projects/"+project.slug) : project.externalURL) target=(project.slug ? "_self" :"_blank") class="hover:border-orange-500")
+      a.w-80.mb-6(href=(project.slug ? ("/projects/"+project.slug) : project.externalURL) target=(project.slug ? "_self" :"_blank"))
+        .py-4.flex.justify-center.items-center.bg-gray-800.rounded-md.h-48.border.border-2.border-gray-800(class=(project.externalURL || project.slug) && "hover:border-orange-500")
           if project.logoImageURL
             img.inline-block.max-h-full(src=project.logoImageURL style=project.logoImageStyle alt=project.title + ' preview' loading="lazy")
           if project.logoText
