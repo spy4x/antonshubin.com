@@ -8,7 +8,7 @@
         {
           "title": "Toread.today",
           "slug": "toread-today",
-          "externalURL": "https://toread-today.web.app",
+          "externalURL": "https://toread.today",
           "description": "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
           "logoImageURL": "/img/projects/toread-today/logo.svg",
           "logoImageStyle": "padding: 3rem 0;",
