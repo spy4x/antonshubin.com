@@ -18,8 +18,7 @@
           "screenshotURLs": ["1.webp", "2.webp", "3.webp"]
         },
         {
-          "title": "The Seed",
-          "externalURL": "https://seed.io",
+          "title": "The Seed [private beta]",
           "description": "A one-person SaaS application codebase template. Ship your project idea in days instead of months. ⚠️ It is addictive.",
           "logoImageURL": "/img/projects/seed/logo.webp"
         },
