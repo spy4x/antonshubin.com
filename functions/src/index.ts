@@ -4,6 +4,7 @@ import Axios from 'axios';
 
 const sendGridApiKey = functions.config().sendgrid.apikey;
 const recaptchaApiKey = functions.config().recaptcha.apikey;
+const slackWebhookURL = functions.config().slack.webhookurl;
 
 interface ValidationError {
   type: 'validation';
@@ -28,6 +29,7 @@ export const subscribeEmail = functions.https.onRequest(async (request: Request,
   }
 
   await saveEmailToDatabase(request.body.email);
+  notifySlackAboutNewEmailSubscription(request.body.email).catch(logError);
   response.json({ timeMs: Date.now() - timeStart });
 });
 
@@ -43,7 +45,7 @@ async function saveEmailToDatabase(email: string): Promise<void | SendGridError>
     },
   );
 
-  logInfo({ status: response.status, data: response.data });
+  logInfo({ operation: 'saveEmailToDatabase', status: response.status, data: response.data });
   if (response.status !== 202) {
     return {
       type: 'sendgrid',
@@ -87,6 +89,19 @@ async function validateRecaptcha(token: string): Promise<ValidationError | false
     return false;
   }
   return error;
+}
+
+async function notifySlackAboutNewEmailSubscription(email: string): Promise<void> {
+  const response = await Axios.put(
+    slackWebhookURL,
+    { text: `New email subscription: ${email}` },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+  logInfo({ operation: 'notifySlackAboutNewEmailSubscription', status: response.status, data: response.data });
 }
 
 function logInfo(json: Object): void {
