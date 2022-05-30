@@ -27,7 +27,7 @@
 
 /* Projects */
 .project-badge {
-  @apply tracking-wide inline-flex items-center px-2 rounded text-sm bg-orange-500 text-white py-0.5 my-1 mr-2;
+  @apply tracking-wide inline-flex items-center px-2 rounded text-sm bg-orange-500 text-gray-50 py-0.5 my-1 mr-2;
 }
 
 /* Blog */
