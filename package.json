@@ -26,9 +26,9 @@
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.0",
-    "browser-sync": "^2.27.9",
-    "firebase-tools": "^10.8.0",
-    "jstransformer-marked": "^1.1.0",
+    "browser-sync": "^2.27.10",
+    "firebase-tools": "^11.0.1",
+    "marked": "^4.0.16",
     "npm-run-all": "^4.1.5",
     "onchange": "^7.1.0",
     "prettier": "^2.6.2",
