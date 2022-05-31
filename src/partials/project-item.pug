@@ -10,6 +10,10 @@ block content
       each tag in tags
         span.project-badge #{tag}
     h2.tracking-wide.mt-6.text-xl.text-slate-300 #{description}
+    if madeForName && madeForURL
+      h4.my-2.text-sm.text-slate-500
+        span.mr-1 made for
+        a.underline(href=madeForURL target="_blank") #{madeForName}
 
   section.max-w-4xl.mx-auto.p-6.flex.gap-8.flex-wrap.justify-center
     if videoURL

@@ -38,7 +38,9 @@
           "logoImageURL": "/img/projects/corecircle/logo.svg",
           "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp"],
           "description": "Fitness-focused social network with exercise tracking features and ML for recommendation system.",
-          "externalURL": "https://corecircle.com"
+          "externalURL": "https://corecircle.com",
+          "madeForName": "Nastassia Ponomarenko",
+          "madeForURL": "https://www.linkedin.com/in/nastassia-ponomarenko/"
         },
         {
           "title": "Connectful",
@@ -48,7 +50,9 @@
           "logoImageURL": "/img/projects/connectful/logo.svg",
           "screenshotURLs": ["1.webp", "2.webp", "3.webp"],
           "description": "Networking app with Tinder-like UI and Machine Learning algorithm to match like-minded people.",
-          "externalURL": "https://connectful.com"
+          "externalURL": "https://connectful.com",
+          "madeForName": "Nastassia Ponomarenko",
+          "madeForURL": "https://www.linkedin.com/in/nastassia-ponomarenko/"
         },
         {
           "title": "FoodRazor",
@@ -59,7 +63,9 @@
           "tags": ["Angular", "Node.js", "Express.js", "GCP", "Firebase", "Firestore"],
           "logoImageURL": "/img/projects/foodrazor/logo.svg",
           "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp", "6.webp"],
-          "videoURL": "https://youtube.com/embed/IL3M0A7g0SE"
+          "videoURL": "https://youtube.com/embed/IL3M0A7g0SE",
+          "madeForName": "Michael Distel",
+          "madeForURL": "https://www.linkedin.com/in/michaeldistel/"
         },
         {
           "title": "GoPingu",
@@ -69,7 +75,9 @@
           "logoImageURL": "/img/projects/gopingu/logo.svg",
           "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
           "description": "Manage marketing teams via a Trello-like app that utilized a marketplace for project templates.",
-          "externalURL": "https://app.gopingu.com"
+          "externalURL": "https://app.gopingu.com",
+          "madeForName": "Peter Visser",
+          "madeForURL": "https://www.linkedin.com/in/peter-visser-04331820a/"
         },
         {
           "title": "Microwork",
@@ -80,7 +88,9 @@
           "tags": ["Angular", "Node.js", "Express.js", "Firebase", "Firestore"],
           "logoText": "ｍｉｃｒｏｗｏｒｋ.ｉｏ",
           "logoTextStyle": "color: white; font-weight: bold; font-size: 1.3rem;",
-          "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"]
+          "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
+          "madeForName": "Andy Gough",
+          "madeForURL": "https://www.linkedin.com/in/andy-gough-bb262b55/"
         },
         {
           "title": "Code review",
@@ -101,7 +111,9 @@
           "tags": ["Angular"],
           "logoImageURL": "/img/projects/sajari/logo.svg",
           "logoImageStyle": "padding: 3rem;",
-          "screenshotURLs": ["1.webp", "2.webp", "3.webp"]
+          "screenshotURLs": ["1.webp", "2.webp", "3.webp"],
+          "madeForName": "Hamish Ogilvy",
+          "madeForURL": "https://www.linkedin.com/in/hamishogilvy/"
         },
         {
           "title": "CallTrack",
@@ -112,7 +124,9 @@
           "tags": ["Angular"],
           "logoText": "\uD835\uDE8C\uD835\uDE9D\uD835\uDE9B\uD835\uDE94.\uD835\uDE97\uD835\uDE8E\uD835\uDE9D",
           "logoTextStyle": "color: white; font-size: 2.5rem;",
-          "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp", "6.webp", "7.webp"]
+          "screenshotURLs": ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp", "6.webp", "7.webp"],
+          "madeForName": "Thomas Wusatiuk",
+          "madeForURL": "https://www.linkedin.com/in/wusatiuk/"
         }
       ]
     },

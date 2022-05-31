@@ -5,21 +5,28 @@ block variables
   - var description = 'Something I\'m working on or participated into in the past.'
 
 mixin projectList(title, items, id)
-  .flex.flex-col.text-center.w-full.mb-12(id=id)
-    h1.h1 #{title}
-  .flex.flex-wrap.justify-center.items-stretch.gap-6.w-full.mb-8
-    each project in items
-      a.w-80.mb-6(href=(project.slug ? ("/projects/"+project.slug) : project.externalURL) target=(project.slug ? "_self" :"_blank"))
-        .py-4.flex.justify-center.items-center.bg-gray-800.rounded-md.h-48.border.border-2.border-gray-800(class=(project.externalURL || project.slug) && "hover:border-orange-500")
-          if project.logoImageURL
-            img.inline-block.max-h-full(src=project.logoImageURL style=project.logoImageStyle alt=project.title + ' preview' loading="lazy")
-          if project.logoText
-            span(style=project.logoTextStyle) #{project.logoText}
-        .text-white.text-center
-          h3.mt-6.text-base #{project.title}
-          p.mt-4.px-4.text-base.text-gray-500 #{project.description}
+  div
+    .sticky.top-0.flex.flex-col.text-center.w-full.mb-12.bg-slate-900.py-2(id=id class="sm:py-4")
+      h1.h1 #{title}
+    .flex.flex-wrap.justify-center.items-stretch.gap-6.w-full.mb-8
+      each project in items
+        .w-80.mb-6.text-center
+          a(href=(project.slug ? ("/projects/"+project.slug) : project.externalURL) target=(project.slug ? "_self" :"_blank"))
+            .py-4.flex.justify-center.items-center.bg-gray-800.rounded-md.h-48.border.border-2.border-gray-800(class=(project.externalURL || project.slug) && "hover:border-orange-500")
+              if project.logoImageURL
+                img.inline-block.max-h-full(src=project.logoImageURL style=project.logoImageStyle alt=project.title + ' preview' loading="lazy")
+              if project.logoText
+                span(style=project.logoTextStyle) #{project.logoText}
+            .text-white
+              h3.mt-6.text-base.underline #{project.title}
+
+              p.mt-4.px-4.text-base.text-gray-500 #{project.description}
+          if project.madeForName && project.madeForURL
+            h4.mt-2.text-sm.text-slate-500
+              span.mr-1 made for
+              a.underline(href=project.madeForURL target="_blank") #{project.madeForName}
 
 block content
   .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
-    +projectList('My Projects', data.projects.my, 'my')
-    +projectList('Freelance Projects', data.projects.freelance, 'freelance')
+    +projectList("Projects I'm working on now", data.projects.my, 'my')
+    +projectList("Projects I made for my freelance clients", data.projects.freelance, 'freelance')
