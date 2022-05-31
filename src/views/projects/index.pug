@@ -28,5 +28,5 @@ mixin projectList(title, items, id)
 
 block content
   .flex.flex-col.max-w-7xl.mx-auto.justify-center.items-center
-    +projectList("Projects I'm working on now", data.projects.my, 'my')
-    +projectList("Projects I made for my freelance clients", data.projects.freelance, 'freelance')
+    +projectList("Personal projects", data.projects.my, 'my')
+    +projectList("Projects I made for my clients", data.projects.freelance, 'freelance')
