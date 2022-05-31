@@ -23,8 +23,8 @@ function highlightActiveMenuItem(element) {
   }
 }
 
+let isMobileMenuOpened = false;
 function listenToMobileMenu() {
-  let isMobileMenuOpened = false;
   const buttons = [...document.querySelectorAll(`[data-mobile-menu-button]`)];
   const closedIcon = document.querySelector(`#mobile-menu-closed-icon`);
   const openedIcon = document.querySelector(`#mobile-menu-opened-icon`);
@@ -76,3 +76,59 @@ addScript('https://www.googletagmanager.com/gtag/js?id=G-R9W8GJC3FZ', () => {
   gtag('js', new Date());
   gtag('config', 'G-R9W8GJC3FZ');
 });
+
+hideMenuOnMobileOnScroll();
+function hideMenuOnMobileOnScroll() {
+  let wasScrolled = false;
+  let lastScrollTop = 0;
+  let delta = 5;
+  const minimalScrollDistance = 100;
+  const mobileWidth = 640;
+
+  window.addEventListener('scroll', () => (wasScrolled = true));
+
+  setInterval(function () {
+    if (wasScrolled) {
+      onScroll();
+      wasScrolled = false;
+    }
+  }, 250);
+
+  function onScroll() {
+    let scrollHeight = 0,
+      scrollTop = 0,
+      scrollThreshold = 0;
+    if (document.body.scrollTop > 0) {
+      scrollHeight = document.body.scrollHeight;
+      scrollTop = document.body.scrollTop;
+      scrollThreshold = 15;
+    } else {
+      scrollHeight = document.documentElement.scrollHeight;
+      scrollTop = document.documentElement.scrollTop;
+      scrollThreshold = 30;
+    }
+
+    // Make sure they scroll more than delta
+    if (Math.abs(lastScrollTop - scrollTop) <= delta) {
+      return;
+    }
+
+    const isMinimalScrollThresholdPassed = scrollTop > minimalScrollDistance;
+    const isScrollDown = scrollTop > lastScrollTop;
+    const isMobileMenuHidden = !isMobileMenuOpened;
+    const isMobileScreen = document.body.clientWidth < mobileWidth;
+    const percentageScrollLeft = ((scrollHeight - scrollTop) * 100) / scrollHeight;
+    const isFarToBottom = percentageScrollLeft > scrollThreshold;
+    const shouldHideMenu =
+      isMinimalScrollThresholdPassed && isScrollDown && isMobileMenuHidden && isMobileScreen && isFarToBottom;
+    if (shouldHideMenu) {
+      // Scroll Down
+      document.body.classList.add('mobile-menu-hidden');
+    } else {
+      // Scroll Up
+      document.body.classList.remove('mobile-menu-hidden');
+    }
+
+    lastScrollTop = scrollTop;
+  }
+}

@@ -178,3 +178,11 @@
   left: 0;
   margin: auto;
 }
+
+#menu {
+  transition: transform 0.2s ease;
+}
+
+body.mobile-menu-hidden > #menu {
+  @apply translate-y-20;
+}

@@ -6,7 +6,7 @@ block variables
 
 mixin projectList(title, items, id)
   div
-    .sticky.top-0.flex.flex-col.text-center.w-full.mb-12.bg-slate-900.py-2(id=id class="sm:py-4")
+    .flex.flex-col.text-center.w-full.mb-12.bg-slate-900(id=id)
       h1.h1 #{title}
     .flex.flex-wrap.justify-center.items-stretch.gap-6.w-full.mb-8
       each project in items
@@ -18,7 +18,7 @@ mixin projectList(title, items, id)
               if project.logoText
                 span(style=project.logoTextStyle) #{project.logoText}
             .text-white
-              h3.mt-6.text-base.underline #{project.title}
+              h3.mt-6.text-base(class=(project.slug || project.externalURL) && "underline") #{project.title}
 
               p.mt-4.px-4.text-base.text-gray-500 #{project.description}
           if project.madeForName && project.madeForURL
