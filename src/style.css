@@ -43,8 +43,12 @@
   @apply text-2xl text-slate-50;
 }
 .blog-content > p {
-  @apply mb-10;
+  @apply mb-5;
   @apply text-xl font-light leading-8;
+}
+.blog-content > p > br {
+  @apply mb-2 block;
+  content: ' ';
 }
 .blog-content > ol,
 .blog-content > ul {
