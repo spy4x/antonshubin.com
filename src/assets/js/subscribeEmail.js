@@ -27,6 +27,7 @@ function subscribeEmail() {
     }
     updateButtonLoadingState('loading');
     try {
+      gtag('event', 'blog-subscription', { event_category: 'engagement', event_label: 'Email subscription' });
       const response = await fetch('https://antonshubin.com/api/subscribe-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

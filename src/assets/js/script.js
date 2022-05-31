@@ -69,13 +69,11 @@ function addScript(url, onLoadFn) {
 }
 
 // Add Google Analytics
+window.dataLayer = window.dataLayer || [];
+function gtag() {
+  dataLayer.push(arguments);
+}
 addScript('https://www.googletagmanager.com/gtag/js?id=G-R9W8GJC3FZ', () => {
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
   gtag('js', new Date());
   gtag('config', 'G-R9W8GJC3FZ');
 });
