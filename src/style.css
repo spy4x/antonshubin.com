@@ -184,9 +184,15 @@
 }
 
 #menu {
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
 body.mobile-menu-hidden > #menu {
   @apply translate-y-20;
+}
+
+#mobile-menu-shadow {
+  @apply fixed inset-0 z-20;
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.3);
 }

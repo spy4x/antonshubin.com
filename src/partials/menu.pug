@@ -1,10 +1,11 @@
+#mobile-menu-shadow.hidden(data-mobile-menu-button)
 nav#menu.bg-gray-800.fixed.inset-x-0.bottom-0.z-30.whitespace-nowrap(class="sm:fixed sm:origin-top-left sm:-rotate-90 sm:translate-y-full sm:border-b sm:border-gray-700")
   // Mobile menu, show/hide based on menu state.
   #mobile-menu.text-center.hidden.border-t.border-gray-700(class='sm:hidden')
     .px-2.pt-2.space-y-1
       // Current: "bg-orange-500 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
       a.text-gray-300.block.px-3.py-2.rounded-md.text-base.font-medium(href='/' data-highlight class='hover:bg-gray-700 hover:text-white') About me
-      a.text-gray-300.block.px-3.py-2.rounded-md.text-base.font-medium(href='/projects' data-highlight class='hover:bg-gray-700 hover:text-white') Projects
+      a.text-gray-300.block.px-3.py-2.rounded-md.text-base.font-medium(href='/projects' data-highlight class='hover:bg-gray-700 hover:text-white') My Projects
       a.text-gray-300.block.px-3.py-2.rounded-md.text-base.font-medium(href='/blog' data-highlight class='hover:bg-gray-700 hover:text-white') Blog
       .flex.justify-center.items-center.gap-3.py-2
         a.text-gray-300.px-3.py-2.rounded-md.text-base.font-medium(href='https://www.upwork.com/freelancers/~01bad246d7ab0effef' class='hover:bg-gray-700 hover:text-white' target="_blank")
@@ -52,10 +53,11 @@ nav#menu.bg-gray-800.fixed.inset-x-0.bottom-0.z-30.whitespace-nowrap(class="sm:f
             Menu open: "block", Menu closed: "hidden"
           svg#mobile-menu-opened-icon.hidden.h-6.w-6(xmlns='http://www.w3.org/2000/svg' fill='none' viewbox='0 0 24 24' stroke='currentColor' aria-hidden='true')
             path(stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12')
-      .flex-1.flex.flex-row-reverse.items-center.justify-center(class='sm:items-stretch sm:justify-start')
-        .flex-shrink-0.flex.items-center(class="sm:pl-6" data-mobile-menu-button)
-          img.h-10.w-10.rounded-full.border.border-gray-100(src="/img/photo-64.webp" alt="Photo of Anton Shubin" class="sm:rotate-90")
-          p.text-white.text-xl.ml-3(class="sm:hidden") Anton Shubin
+      .flex-1.flex.flex-row-reverse.items-center.justify-center(class='sm:items-stretch sm:justify-start' data-mobile-menu-button)
+        .flex-shrink-0.flex.items-center(class="sm:pl-6")
+          .absolute.inset-y-0.left-0.flex.items-center(class="sm:relative")
+            img.h-10.w-10.rounded-full.border.border-gray-100(src="/img/photo-64.webp" alt="Photo of Anton Shubin" class="sm:rotate-90")
+          p.text-white.text-xl.ml-3.justify-self-center(class="sm:hidden") Menu
         #desktop-menu.hidden(class='sm:flex sm:ml-6 justify-center')
           .flex.flex-row-reverse.items-center.gap-3
             // Current: "bg-orange-500 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white"

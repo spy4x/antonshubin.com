@@ -29,6 +29,7 @@ function listenToMobileMenu() {
   const closedIcon = document.querySelector(`#mobile-menu-closed-icon`);
   const openedIcon = document.querySelector(`#mobile-menu-opened-icon`);
   const mobileMenu = document.querySelector(`#mobile-menu`);
+  const mobileMenuShadow = document.querySelector(`#mobile-menu-shadow`);
   const mobileMenuButtonClickHandler = () => {
     isMobileMenuOpened = !isMobileMenuOpened;
     if (isMobileMenuOpened) {
@@ -37,12 +38,14 @@ function listenToMobileMenu() {
       closedIcon.classList.add('hidden');
       openedIcon.classList.remove('hidden');
       openedIcon.classList.add('block');
+      mobileMenuShadow.classList.remove('hidden');
     } else {
       mobileMenu.classList.add('hidden');
       closedIcon.classList.remove('hidden');
       closedIcon.classList.add('block');
       openedIcon.classList.remove('block');
       openedIcon.classList.add('hidden');
+      mobileMenuShadow.classList.add('hidden');
     }
   };
   buttons.forEach(button => (button.onclick = mobileMenuButtonClickHandler));
