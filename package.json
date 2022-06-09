@@ -9,7 +9,7 @@
     "start": "run-p server watch:*",
     "server": "browser-sync start --server 'dist' --files \"dist/**/*.css, dist/**/*.js, dist/**/*.html, !node_modules/**/*.html\" --extensions \"html\"",
     "watch:templates": "onchange \"src/**/*.pug\" \"src/pug.json\" -- run-s build:templates build:styles",
-    "watch:blog": "onchange \"src/partials/*.pug\" \"src/pug.json\" -- run-s build:blog",
+    "watch:blog": "onchange \"src/partials/*.pug\" \"src/views/blog/posts/*.md\" \"src/pug.json\" -- run-s build:blog",
     "watch:projects": "onchange \"src/partials/*.pug\" \"src/pug.json\" -- run-s build:projects",
     "watch:styles": "onchange \"src/**/*.css\" -- run-s build:styles",
     "watch:assets": "onchange \"src/assets/**/*\" -- run-s build:assets",

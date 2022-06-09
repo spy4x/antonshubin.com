@@ -1,10 +1,11 @@
 block variables
+doctype html
 html(lang="en").h-full.bg-slate-900
   head
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no')
-    meta(name='description' content=description)
-    title #{title}
+    meta(name='description' content=pageDescription)
+    title #{pageTitle}
     link(rel="stylesheet" href="/style.css?v11")
     script(defer src="/js/script.js?v15")
     link(rel='apple-touch-icon' sizes='57x57' href='/apple-icon-57x57.png')
@@ -23,11 +24,11 @@ html(lang="en").h-full.bg-slate-900
     link(rel='manifest' href='/manifest.json')
     meta(name='msapplication-TileImage' content='/ms-icon-144x144.png')
 
-    meta(property='og:type' content='article')
-    meta(property='og:title' content=title)
-    meta(property='og:description' content=description)
-    meta(property='og:url' content='https://antonshubin.com'+url)
-    meta(property='og:image' content='https://antonshubin.com'+(previewImageURL || '/img/photo-big.webp'))
+    meta(property='og:type' content=pageType || 'profile')
+    meta(property='og:title' content=pageTitle)
+    meta(property='og:description' content=pageDescription)
+    meta(property='og:url' content='https://antonshubin.com'+pageRelativeUrl)
+    meta(property='og:image' content='https://antonshubin.com'+(pagePreviewImageRelativeURL || '/img/photo-big.webp'))
     block head
   body.h-full
     include menu.pug

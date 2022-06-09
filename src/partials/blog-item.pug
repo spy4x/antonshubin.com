@@ -1,14 +1,30 @@
 extends layout
+block variables
+  - var pageTitle = 'Blog post #' + index + ' - ' + title + ' | Anton Shubin'
+  - var pageDescription = description
+  - var pageType = 'article'
+  - var pageRelativeUrl = '/blog/' + slug
+  - var pagePreviewImageRelativeURL = '/img/blog/' + slug + '/' + previewImageURL
+
 block head
   script(defer src="/js/subscribeEmail.js?v2")
 block content
-  article.max-w-3xl.mx-auto
-    h1.h1.text-left #{title}
+  article.max-w-3xl.mx-auto.mb-32
+    h1.h1.text-left
+      a.mr-2.text-gray-400.underline(href='/blog') Blog
+      span.mr-2.text-gray-400 >
+      span.mr-2.text-gray-400 ##{index}
+      span #{title}
     .flex.text-gray-400.my-4.items-center
       span Time to read: #{readTime} min
       span.ml-auto #{prettyDate(publishedAt)}
 
-    img.rounded-md.mb-6(src=previewImageURL alt="Article preview")
-    .text-slate-200.blog-content!= content
+    img.rounded-md.mb-16(src=pagePreviewImageRelativeURL alt="Article preview")
+    .text-slate-200.blog-content
+      p
+        span.mr-1 Hey, I am Anton! I'm consulting startups as a tech lead, and I'm building
+        a.mr-1(href="https://toread.today" target="_blank") Toread.Today
+        span , an online tool that keeps your links organized for later reading. I want to help people like me (tech geeks and shy nerds) start allocating more time for building their projects.
+      != content
 
   include subscribeEmail

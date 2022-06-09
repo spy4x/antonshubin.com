@@ -1,8 +1,9 @@
 extends ../../partials/layout
 
 block variables
-  - var title = 'Projects | Anton Shubin'
-  - var description = 'Something I\'m working on or participated into in the past.'
+  - var pageTitle = 'Projects | Anton Shubin'
+  - var pageDescription = 'Something I\'m working on or participated into in the past.'
+  - var pageRelativeUrl = '/projects'
 
 mixin projectList(title, items, id)
   div

@@ -1,4 +1,11 @@
 extends layout
+block variables
+  - var pageTitle = 'Projects > ' + title + ' | Anton Shubin'
+  - var pageDescription = description
+  - var pageType = 'website'
+  - var pageRelativeUrl = '/projects/' + slug
+  - var pagePreviewImageRelativeURL = logoImageURL
+
 
 block content
   section.max-w-2xl.mx-auto.text-center

@@ -44,13 +44,13 @@
 }
 .blog-content > p {
   @apply mb-4;
-  @apply text-xl font-light leading-8;
+  @apply text-xl font-normal leading-8;
 }
 .blog-content > ol,
 .blog-content > ul {
   @apply my-2 mb-10;
   @apply px-12;
-  @apply text-lg font-light;
+  @apply text-lg font-normal;
   letter-spacing: 0.00625rem;
 }
 .blog-content > ol li,
@@ -66,6 +66,10 @@
 .blog-content img {
   @apply my-8 mx-auto;
   @apply rounded-md;
+}
+.blog-content .img-title {
+  @apply -translate-y-6;
+  @apply text-slate-500 text-center;
 }
 .blog-content > .well {
   @apply px-6 py-4 my-6 mx-auto;
