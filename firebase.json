@@ -40,11 +40,11 @@
     "predeploy": ["yarn --cwd \"$RESOURCE_DIR\" build"]
   },
   "emulators": {
+    "hosting": {
+      "port": 5000
+    },
     "functions": {
       "port": 5001
-    },
-    "hosting": {
-      "port": 5002
     },
     "ui": {
       "enabled": true

@@ -78,8 +78,8 @@ addScript('https://www.googletagmanager.com/gtag/js?id=G-R9W8GJC3FZ', () => {
   gtag('config', 'G-R9W8GJC3FZ');
 });
 
-hideMenuOnMobileOnScroll();
-function hideMenuOnMobileOnScroll() {
+// Hide mobile menu on scroll
+onInit(() => {
   let wasScrolled = false;
   let lastScrollTop = 0;
   let delta = 5;
@@ -132,4 +132,18 @@ function hideMenuOnMobileOnScroll() {
 
     lastScrollTop = scrollTop;
   }
-}
+});
+
+// Handle "data-scroll-to='#target'" attributes
+onInit(() => {
+  const selector = `[data-scroll-to]`;
+  const anchors = Array.from(document.querySelectorAll(selector));
+
+  anchors.forEach(
+    a =>
+      (a.onclick = () => {
+        const target = document.querySelector(a.dataset.scrollTo);
+        target && target.scrollIntoView({ behavior: 'smooth' });
+      }),
+  );
+});

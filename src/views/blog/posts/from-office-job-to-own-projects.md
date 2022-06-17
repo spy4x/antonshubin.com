@@ -1,9 +1,13 @@
 ## What is it about?
-In my <a href="ship-it-today" target="_blank">previous blog post</a>, I shared my opinion on why you should be brave and publish your project straight away. Today I share my story of progressively switching from office job to freelance and then to personal projects. 
+In my <a href="ship-it-today" target="_blank">previous blog post</a>, I shared my opinion on why you should be brave and publish your project straight away. 
+
+Today I share:
+- My story of progressively switching from office job to freelance and then to personal projects.
+- Obstacles I met and lessons learned. 
+- My income levels for each year of the journey.
 
 Please note that it's just my way to allocate more time to my projects. It's not ideal, it's not the only one, and it's definitely not the easiest one (I'll write another article on how I would do it now). 
 
-I'll tell you about obstacles I met and lessons learned. I'll also share my income levels for each year of my professional work.
 
 ## Who is it for?
 It would be interesting for those who love making things themselves and want more spare time. Also, suppose you are considering moving from an office job to a freelance one. In that case, you may be wondering what benefits and downsides are hiding in the shadows.
@@ -41,7 +45,7 @@ I took a bank loan with a $500/month payment for 3 years.
 ![My favorite car and a reason why I almost got bankrupt](/img/blog/maximize-time-for-your-projects/citroen.webp)
 <p class="img-title">My favorite car and a reason why I almost got bankrupt</p> 
 
-During stable office job time it was fine - I lived with my parents, my expenses were low, and I used free money for early repayment of the load.
+During stable office job time it was fine - I lived with my parents, my expenses were low, and I used free money for early repayment of the loan.
 ![Plan was as reliable as swiss watch until I...](/img/blog/maximize-time-for-your-projects/lebowski.webp)
 <p class="img-title">Plan was <a href="https://www.imdb.com/title/tt0118715/" target="_blank">as reliable as swiss watch</a> until I...</p>
 
@@ -53,7 +57,7 @@ I won't lie; leaving the office job was scary. It was like a leap of faith into 
 Here is a list of obstacles that stood in my way.
 
 ### Obstacle 1: Limited funds
-I was dreaming of leaving my office job. But I couldn't dare until a person I was working with said they tried freelance, and it was not that bad experience. Inspired by their story, I decided to try. I collected money for 4 months of living and left my job. I was it would be enough. So naive.
+I was dreaming of leaving my office job. But I couldn't dare until a person I was working with said they tried freelance, and it was not that bad experience. Inspired by their story, I decided to try. I collected money for 4 months of living and left my job. I thought it would be enough. So naive.
 
 It took months to figure out where to look for a job, how to position myself, how to apply, how to fill in profile information to look professional, and dozen other things. But I was running out of money and still couldn't find a job. I was desperate. 
 
@@ -207,7 +211,7 @@ I'm now on my way to getting my first paying users. My next milestone is to reac
 
 ![Own business](/img/blog/from-office-job-to-own-projects/own-business.webp)
 
-In one of the following articles, I'll keep you updated about my obstacles to that milestone. Make sure you are subscribed to avoid missing it!
+In one of the following articles, I'll keep you updated about my obstacles to that milestone. Make sure you are <a href="javascript:;" data-scroll-to="#subscribe">subscribed</a> to avoid missing it!
 
 ## Bonus
 To ensure you have enough money when you reduce your income – I highly recommend changing the way of living with some degree of minimalism approach.
