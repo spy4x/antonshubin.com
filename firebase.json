@@ -33,6 +33,13 @@
         ]
       }
     ],
+    "redirects": [
+      {
+        "source": "/blog/from-office-job-to-own-projects",
+        "destination": "/blog/from-office-job-to-freelance-to-my-startups",
+        "type": 301
+      }
+    ],
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   },
   "functions": {

@@ -14,7 +14,7 @@ It would be interesting for those who love making things themselves and want mor
 
 Let me tell you about myself to better understand my character and determine if my goals and values are relevant to you. Far before I became a developer - I was 14 and spent a lot of time playing computer games. As any child - I wanted to create my own game. With my rules and mechanics. Thanks to <a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reign_of_Chaos" target="_blank">WarCraft 3</a> Map Editor I was able to customize game resources and make scripts before I knew how to write code.
 
-![Young developer](/img/blog/from-office-job-to-own-projects/young-developer.webp)
+![Young developer](/img/blog/from-office-job-to-freelance-to-my-startups/young-developer.webp)
 
 Time passed, and I grew up and worked for other people helping them build their projects. Over the years, I observed my clients' actions. I saw things that I would do differently. My wish to make my own product strengthened, and during the last 5 years, I kept thinking and talking with my friends about my dream.
 
@@ -27,7 +27,7 @@ Once I gained some experience in building apps and a "senior" prefix to my job t
 
 I lacked experience managing teams and had to learn fast to keep the title. It was tough. To hold the position, I even read a non-technical book to gain knowledge for the first time. But the skills I got became quite helpful for my future.
 
-![Team leading is tough](/img/blog/from-office-job-to-own-projects/teamlead.webp)
+![Team leading is tough](/img/blog/from-office-job-to-freelance-to-my-startups/teamlead.webp)
 
 After some time, in 2012, I reached the salary limit in that company, and there was not much new tech stuff to learn or soft skills to develop. My salary was about $1000 per month - the above-average salary in a non-capital city in Russia at that time.
 
@@ -47,7 +47,7 @@ I took a bank loan with a $500/month payment for 3 years.
 
 During stable office job time it was fine - I lived with my parents, my expenses were low, and I used free money for early repayment of the loan.
 ![Plan was as reliable as swiss watch until I...](/img/blog/maximize-time-for-your-projects/lebowski.webp)
-<p class="img-title">Plan was <a href="https://www.imdb.com/title/tt0118715/" target="_blank">as reliable as swiss watch</a> until I...</p>
+<p class="img-title">Plan was <a href="https://www.imdb.com/title/tt0118715/" target="_blank">as reliable as swiss watch</a>...</p>
 
 ## Switch from office to freelance job to be more flexible and better control your career path.
 In 2013, after three years of office job, I found enough bravery to switch from my office job to freelance. I was not too fond of traffic jams (I'm still not) and wanted more freedom in my work schedule.
@@ -63,7 +63,7 @@ It took months to figure out where to look for a job, how to position myself, ho
 
 I remember a moment when I had just a couple bucks in my pocket, and I was frightened when my girlfriend wanted to buy a pizza. I couldn't afford a pizza! And I still had to pay my car loan every month somehow...
 
-![Will code for food](/img/blog/from-office-job-to-own-projects/code-for-food.webp)
+![Will code for food](/img/blog/from-office-job-to-freelance-to-my-startups/code-for-food.webp)
 
 Remediless, I got help from my parents. Although, they had one condition. I had one month to find a contract. Otherwise, they wanted me to return to the "stable" office job. This stimulated me a lot!
 
@@ -80,7 +80,7 @@ I decided to avoid them and used <a href="https://upwork.com" target="_blank">Up
 ### Obstacle 3: I didn't speak English.
 As a non-native speaker, I only learned English in school and additional courses, but no actual **speaking** practice. I had no problems texting, but many clients wanted to hop on a call to discuss their projects. Without the ability to discuss projects on call, I was limited in the number of freelance jobs available.
 
-![English](/img/blog/from-office-job-to-own-projects/english.webp)
+![English](/img/blog/from-office-job-to-freelance-to-my-startups/english.webp)
 
 **Lesson learned**: Practice speaking English! Find speaking clubs in your city, hire a tutor or join <a href="https://ef.com" target="_blank">one of English camps</a>. You don't have to speak perfectly and without a mistake. No! The only rule is - you have to be able to speak without fear. Making mistakes is fine. You'll fix them later.
 
@@ -92,9 +92,9 @@ The interview was quite fun. I understood everything the client said but could b
 ![Rollercoaster of emotions](/img/blog/maximize-time-for-your-projects/rollercoaster.webp)
 <p class="img-title">Something that you might feel a lot when you start something new.</p>
 
-Once I got my first money - I paid back my parents, who had supported me over the last months. Without their support, I wouldn't do it. Hey mom! Thank you!
+Once I got my first money - I paid back my parents, who had supported me over the last months. Without their support, I wouldn't do it. Hey mom and dad! Thank you!
 
-**Lesson learned**: Sometimes, it's only luck that decides if you succeed or not. That doesn't mean you don't have to work hard. Try to explore opportunities and experiment even if it looks scary. You never know where it might lead you.
+**Lesson learned**: Sometimes, you need both - work smart and luck, to succeed. I don't know a way to increase luck yet. But exploring opportunities and experimenting definitely leads to big changes.
 
 Over the next 4 months, I worked with that client, and we were on a Skype call for 9 hours every day except Sunday. Listening to the way my interlocutor speaks - I learned. Slowly I talked more and more. I realized that my fear of talking was leaving me. I'm still grateful to that client for the opportunity. It was a turning point in my life. I was even able to pay out my car debt.
 
@@ -103,7 +103,7 @@ After this contract, I found another one and switched to hourly-based pricing fo
 **Income State**:
 - 2013, 1st year of freelance, $5.2/hour, 192 hours, $1000/month
 
-![Money, finally](/img/blog/from-office-job-to-own-projects/dog-money.webp)
+![Money, finally](/img/blog/from-office-job-to-freelance-to-my-startups/dog-money.webp)
 <p class="img-title">Money, finally</p>
 
 
@@ -119,7 +119,7 @@ They are happy when you are proactive, give suggestions, and share your opinion 
 
 I even got myself a couple of raises. One of my clients said it was because for a simple reason - I was the only one willing to sit on a call with them explaining technical things. Things that were confusing them until everything became clear.
 
-![Soft skills](/img/blog/from-office-job-to-own-projects/soft-skills.webp)
+![Soft skills](/img/blog/from-office-job-to-freelance-to-my-startups/soft-skills.webp)
 
 **Lesson learned**: Don't leave the communication side of the job to managers. You may lock your growth ability. Always ask your clients for feedback. Simple questions like "Are you satisfied with my job?", "How can I improve my service quality for you?" or "Could you give me advice on how I can grow up as a professional?". It won't hurt asking. Sometimes you can spot a pressure point that your client held inside themselves and was unwilling to tell you directly.
 
@@ -133,7 +133,7 @@ There were a lot of tech frameworks, programming languages, and other hype thing
 It is, of course, possible to change the technical stack and earn quite a lot (hello ML and Crypto guys!).
 But a hype thing can also quickly lose popularity, and you can waste time.
 
-![Hype](/img/blog/from-office-job-to-own-projects/hype.webp)
+![Hype](/img/blog/from-office-job-to-freelance-to-my-startups/hype.webp)
 
 It's hard to figure out whether a new thing is a hype.
 But if something remains popular for some time - you may check it out.
@@ -190,7 +190,7 @@ I raised my hourly rate to meet my desired level of $100 per hour and reduced ho
 It took me eight years to achieve this level.
 
 
-![Consultant](/img/blog/from-office-job-to-own-projects/consultant.webp)
+![Consultant](/img/blog/from-office-job-to-freelance-to-my-startups/consultant.webp)
 
 And I finally had 30+ hours of free time every week.
 It felt natural to use that time for something greater.
@@ -209,7 +209,7 @@ Honestly, I could start working on it a couple of years earlier. But I was too r
 
 I'm now on my way to getting my first paying users. My next milestone is to reach $2000 of stable monthly income from my projects to leave freelance consultations and entirely focus on my projects. And I know that won't be an easy goal to achieve.
 
-![Own business](/img/blog/from-office-job-to-own-projects/own-business.webp)
+![Own business](/img/blog/from-office-job-to-freelance-to-my-startups/own-business.webp)
 
 In one of the following articles, I'll keep you updated about my obstacles to that milestone. Make sure you are <a href="javascript:;" data-scroll-to="#subscribe">subscribed</a> to avoid missing it!
 

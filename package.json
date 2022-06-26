@@ -6,7 +6,7 @@
   "author": "Anton Shubin <2spy4x@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "run-p server watch:*",
+    "start": "run-p build:* server watch:*",
     "server": "browser-sync start --server 'dist' --files \"dist/**/*.css, dist/**/*.js, dist/**/*.html, !node_modules/**/*.html\" --extensions \"html\"",
     "watch:templates": "onchange \"src/**/*.pug\" \"src/pug.json\" -- run-s build:templates build:styles",
     "watch:blog": "onchange \"src/partials/*.pug\" \"src/views/blog/posts/*.md\" \"src/pug.json\" -- run-s build:blog",

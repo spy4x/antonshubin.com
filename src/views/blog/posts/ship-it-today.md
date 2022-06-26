@@ -13,7 +13,7 @@ Perhaps you have started dreaming about launching your startup: your big thing, 
 
 Maybe you even have your notes highlighting the  ideas of what you can build. You are all set for your sailing.  
 
-By the way, if you want to know how I maximized time for my projects, <a href="from-office-job-to-own-projects" target="_blank">you can read it here</a>. 
+By the way, if you want to know how I maximized time for my startups, <a href="from-office-job-to-freelance-to-my-startups" target="_blank">you can read about it here</a>. 
 
 Ok, so what's next?
 
