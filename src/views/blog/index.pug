@@ -6,7 +6,7 @@ block variables
   - var pageRelativeUrl = '/blog'
 
 mixin blogArticlePreview(article)
-  .mt-16.mb-10
+  article.mt-16.mb-10
     a(href='/blog/'+article.slug)
       img.rounded-lg.mb-4(src=('/img/blog/'+article.slug+'/'+article.previewImageURL) alt="Article preview")
       h1.h2.mb-2

@@ -8,7 +8,19 @@ const menuItemClasses = {
 };
 
 const mobileWidth = 640;
-const isMobileScreen = document.body.clientWidth < mobileWidth;
+let isMobileScreen = true;
+const menuEl = document.querySelector('#menu');
+const menuClassReadyForAnimation = 'menu-ready-for-animation';
+function adaptForMobile() {
+  isMobileScreen = document.body.clientWidth < mobileWidth;
+  if (isMobileScreen) {
+    menuEl.classList.add(menuClassReadyForAnimation);
+  } else {
+    menuEl.classList.remove(menuClassReadyForAnimation);
+  }
+}
+adaptForMobile();
+window.onresize = adaptForMobile;
 
 onInit(() => {
   setTimeout(() => {
