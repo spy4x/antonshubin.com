@@ -7,6 +7,15 @@ const menuItemClasses = {
   default: ['text-gray-300', 'hover:bg-gray-700', 'hover:text-white'],
 };
 
+const mobileWidth = 640;
+const isMobileScreen = document.body.clientWidth < mobileWidth;
+
+onInit(() => {
+  setTimeout(() => {
+    document.querySelector('#menu').classList.add('menu-ready-for-animation');
+  }, 1000);
+});
+
 document.querySelectorAll(`#menu [data-highlight]`).forEach(highlightActiveMenuItem);
 listenToMobileMenu();
 
@@ -32,7 +41,7 @@ function listenToMobileMenu() {
   const mobileMenuShadow = document.querySelector(`#mobile-menu-shadow`);
   const mobileMenuButtonClickHandler = () => {
     isMobileMenuOpened = !isMobileMenuOpened;
-    if (isMobileMenuOpened) {
+    if (isMobileMenuOpened && isMobileScreen) {
       mobileMenu.classList.remove('hidden');
       closedIcon.classList.remove('block');
       closedIcon.classList.add('hidden');
@@ -84,7 +93,6 @@ onInit(() => {
   let lastScrollTop = 0;
   let delta = 5;
   const minimalScrollDistance = 100;
-  const mobileWidth = 640;
 
   window.addEventListener('scroll', () => (wasScrolled = true));
 
