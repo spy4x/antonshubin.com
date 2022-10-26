@@ -11,4 +11,4 @@ jobs:
       - name: Install deps
         run: yarn install --frozen-lockfile --non-interactive
       - name: Deploy
-        run: yarn firebase deploy --project ${{ secrets.FIREBASE_PROJECT }} --token ${{ secrets.FIREBASE_TOKEN }}
+        run: FIREBASE_PROJECT=${{secrets.FIREBASE_PROJECT}} yarn firebase deploy --project $FIREBASE_PROJECT --token ${{ secrets.FIREBASE_TOKEN }} --except functions:aqs,functions:aqsPushNotifications

@@ -7,3 +7,4 @@ Thumbs.db
 .firebaserc
 .runtimeconfig.json
 *.log
+.env*
