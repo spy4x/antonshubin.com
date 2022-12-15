@@ -8,7 +8,8 @@ block variables
 mixin blogArticlePreview(article)
   article.mt-16.mb-10
     a(href='/blog/'+article.slug)
-      img.rounded-lg.mb-4(src=('/img/blog/'+article.slug+'/'+article.previewImageURL) alt="Article preview")
+      .flex.justify-center
+        img.rounded-lg.mb-4(src=('/img/blog/'+article.slug+'/'+article.previewImageURL) alt="Article preview")
       h1.h2.mb-2
         span.mr-2.text-gray-400 ##{article.index}
         span #{article.title}

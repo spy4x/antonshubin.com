@@ -148,6 +148,15 @@
         "readTime": 15,
         "publishedAt": "2022.06.07",
         "previewImageURL": "preview2.webp"
+      },
+      {
+        "index": 2,
+        "title": "How to Keep Sane When Developing a SaaS Startup Solo? Part 1: Mindset and Mental Health",
+        "slug": "how-to-keep-sane-while-developing-saas-alone-part-1-mental-health",
+        "description": "Take care of yourself first and work hard then",
+        "readTime": 7,
+        "publishedAt": "2022.12.15",
+        "previewImageURL": "preview.webp"
       }
     ]
   }
