@@ -157,6 +157,15 @@
         "readTime": 7,
         "publishedAt": "2022.12.15",
         "previewImageURL": "preview.webp"
+      },
+      {
+        "index": 3,
+        "title": "Dev tricks, Part 1: The Importance of Code Formatting with Prettier",
+        "slug": "the-importance-of-code-formatting-with-prettier",
+        "description": "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day! In this hilarious and informative article, you'll learn all about the importance of code formatting and how Prettier can help you take your code from a hot mess to a work of art. Trust us, your code (and your sanity) will thank you.",
+        "readTime": 7,
+        "publishedAt": "2022.12.21",
+        "previewImageURL": "preview.webp"
       }
     ]
   }

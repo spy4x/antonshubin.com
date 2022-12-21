@@ -2,8 +2,16 @@ const pug = require('pug');
 const pugJSON = require('./src/pug.json');
 const fs = require('fs');
 const { marked } = require('marked');
+const hljs = require('highlight.js');
 
 const blogArticleTemplate = pug.compileFile('./src/partials/blog-item.pug', { pretty: true });
+
+// code highlighting
+marked.setOptions({
+  highlight: function (code, language) {
+    return hljs.highlight(code, { language }).value;
+  },
+});
 
 // lazy loading images
 marked.use({

@@ -94,6 +94,14 @@
   @apply font-bold;
 }
 
+.blog-content > pre {
+  @apply overflow-x-auto p-4 rounded-md bg-gray-800 text-gray-300 mb-4 font-mono;
+}
+
+.blog-content > p > code {
+  @apply font-mono bg-orange-500 rounded py-0.5 px-1 text-orange-100 text-base;
+}
+
 @screen sm {
   .blog-content img {
     max-width: 80%;
