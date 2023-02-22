@@ -1,28 +1,33 @@
 section.text-gray-400.bg-gray-900.body-font.container.mx-auto.mb-12(class="md:mb-20")
   h1.h1.mb-10.text-center I'm currently working on:
+
   .grid.text-center.gap-4.mb-6(class="sm:grid-cols-2 lg:grid-cols-4")
-    a.current-work(href="https://toread.today/" target="_blank" class='hover:border-orange-500')
-      .text-orange-500.w-12.h-12.mb-3.inline-block
-        include ../assets/img/projects/toread-today/logo.svg
-      h3.text-lg.text-gray-50 Toread.Today
-      p.text-grey-100 A cloud tool to organise things to read/watch later
-    .current-work
+    a.current-work(href="https://www.youtube.com/@neatsoft" target="_blank" class='hover:border-orange-500')
       svg.text-orange-500.w-12.h-12.mb-3.inline-block(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
-        polyline(points='16 18 22 12 16 6')
-        polyline(points='8 6 2 12 8 18')
-      h3.text-lg.text-gray-50 The Seed [private beta]
-      p.text-grey-100 A one-person SaaS application codebase template.
+        path(d='M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z')
+        polygon(points='9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02')
+      h3.text-lg.text-gray-50 YouTube channel
+      p.text-grey-100 Live-coding, sharing tips & tricks and entrepreneur experience in startups
+
     a.current-work(href="/blog" target="_blank" class='hover:border-orange-500')
       svg.text-orange-500.w-12.h-12.mb-3.inline-block(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
         path(d='M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z')
       h3.text-lg.text-gray-50 Blog
       p.text-grey-100 About SaaS startups and how to survive in them
-    a.current-work(href="https://www.youtube.com/channel/UCzHggR9W9OdquYOvBuEORiQ/videos" target="_blank" class='hover:border-orange-500')
+
+    a.current-work(href="https://toread.today/" target="_blank" class='hover:border-orange-500')
+      .text-orange-500.w-12.h-12.mb-3.inline-block
+        include ../assets/img/projects/toread-today/logo.svg
+      h3.text-lg.text-gray-50 Toread.Today
+      p.text-grey-100 A cloud tool to organise things to read/watch later
+
+    a.current-work(href="https://github.com/spy4x/seed" target="_blank" class='hover:border-orange-500')
       svg.text-orange-500.w-12.h-12.mb-3.inline-block(xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
-        path(d='M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z')
-        polygon(points='9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02')
-      h3.text-lg.text-gray-50 YouTube channel
-      p.text-grey-100 Dev tips and entrepreneur experience in startups
+        polyline(points='16 18 22 12 16 6')
+        polyline(points='8 6 2 12 8 18')
+      h3.text-lg.text-gray-50 The Seed
+      p.text-grey-100 A one-person SaaS application codebase template.
+
   .text-center.mb-6
     a.text-xl.title-font.text-slate-500(href="/projects#freelance" class='sm:text-2xl')
       span.mr-1 You can also check projects I made for my clients
