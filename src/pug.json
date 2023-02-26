@@ -24,7 +24,7 @@
         },
         {
           "title": "YouTube Tech Channel",
-          "externalURL": "https://www.youtube.com/channel/UCzHggR9W9OdquYOvBuEORiQ/videos",
+          "externalURL": "https://www.youtube.com/@neatsoft",
           "description": "Short tech videos about software development and SaaS.",
           "logoImageURL": "/img/projects/youtube-channel/logo.svg"
         }
@@ -165,6 +165,15 @@
         "description": "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day! In this hilarious and informative article, you'll learn all about the importance of code formatting and how Prettier can help you take your code from a hot mess to a work of art. Trust us, your code (and your sanity) will thank you.",
         "readTime": 7,
         "publishedAt": "2022.12.21",
+        "previewImageURL": "preview.webp"
+      },
+      {
+        "index": 5,
+        "title": "Setting Up Your Own CI/CD Server with Drone CI",
+        "slug": "setting-up-your-own-ci-cd-server-with-drone-ci",
+        "description": "Streamline your software development process with Drone CI. Learn how to set up your own CI/CD server using Drone CI and take advantage of its open-source flexibility, ease of use, and scalability. Read now and find out why Drone CI is the right choice for your organization.",
+        "readTime": 5,
+        "publishedAt": "2023.02.12",
         "previewImageURL": "preview.webp"
       }
     ]
