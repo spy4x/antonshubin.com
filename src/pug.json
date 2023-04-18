@@ -180,8 +180,8 @@
       {
         "index": 6,
         "title": "🤖 How ChatGPT Can Help You Design System Architecture for Your Applications👷‍♂️",
-        "slug": "how-chatgpt-can-help-you-design-sysytem-architecture",
-        "description": "ChatGPT is a chatbot that uses Generative Pre-trained Transformer neural network models to generate responses to user input. It can be used to help you design system architecture for your applications. Read now and find out how!",
+        "slug": "how-chatgpt-can-help-you-design-system-architecture",
+        "description": "Designing system architecture can be challenging for new developers. ChatGPT's language model can simplify the process, highlighting pros and cons of your approach, suggesting alternatives and generating sequence diagrams using PlantUML. Make software development a breeze!",
         "readTime": 5,
         "publishedAt": "2023.04.18",
         "previewImageURL": "preview.webp",

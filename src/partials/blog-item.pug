@@ -19,14 +19,14 @@ block content
       span Time to read: #{readTime} min
       span.ml-auto #{prettyDate(publishedAt)}
 
-    .flex.justify-center
+    .flex.justify-center.mb-16
       if youtubeVideoId
         // Render YouTube video player
         .w-full.aspect-w-16.aspect-h-9
           iframe(src=`https://www.youtube.com/embed/${youtubeVideoId}`, frameborder="0", allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture", allowfullscreen)
       else
         // Render article preview image
-        img.rounded-md.mb-16(src=pagePreviewImageRelativeURL, alt="Article preview")
+        img.rounded-md(src=pagePreviewImageRelativeURL, alt="Article preview")
 
 
     .text-slate-200.blog-content
