@@ -42,11 +42,11 @@ It was the first time I had made a big mistake. As a 22yo guy - I wanted a fancy
 
 I took a bank loan with a $500/month payment for 3 years.
 
-![My favorite car and a reason why I almost got bankrupt](/img/blog/maximize-time-for-your-projects/citroen.webp)
+![My favorite car and a reason why I almost got bankrupt](/img/blog/from-office-job-to-freelance-to-my-startups/citroen.webp)
 <p class="img-title">My favorite car and a reason why I almost got bankrupt</p> 
 
 During stable office job time it was fine - I lived with my parents, my expenses were low, and I used free money for early repayment of the loan.
-![Plan was as reliable as swiss watch until I...](/img/blog/maximize-time-for-your-projects/lebowski.webp)
+![Plan was as reliable as swiss watch until I...](/img/blog/from-office-job-to-freelance-to-my-startups/lebowski.webp)
 <p class="img-title">Plan was <a href="https://www.imdb.com/title/tt0118715/" target="_blank">as reliable as swiss watch</a>...</p>
 
 ## Switch from office to freelance job to be more flexible and better control your career path.
@@ -89,7 +89,7 @@ I want to be honest - my life could be completely different if I wasn't lucky at
 
 The interview was quite fun. I understood everything the client said but could barely answer. Surprisingly, they were satisfied with my Yes, No, and Maybe, and I got the job! I got a $1000/month income and finally reached my office job salary level! I could pay my bills! I was excited again because it was the fourth month without a stable income, and I was about to abandon my dream.
 
-![Rollercoaster of emotions](/img/blog/maximize-time-for-your-projects/rollercoaster.webp)
+![Rollercoaster of emotions](/img/blog/from-office-job-to-freelance-to-my-startups/rollercoaster.webp)
 <p class="img-title">Something that you might feel a lot when you start something new.</p>
 
 Once I got my first money - I paid back my parents, who had supported me over the last months. Without their support, I wouldn't do it. Hey mom and dad! Thank you!
