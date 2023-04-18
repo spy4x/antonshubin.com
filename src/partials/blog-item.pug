@@ -20,7 +20,14 @@ block content
       span.ml-auto #{prettyDate(publishedAt)}
 
     .flex.justify-center
-      img.rounded-md.mb-16(src=pagePreviewImageRelativeURL alt="Article preview")
+      if youtubeVideoId
+        // Render YouTube video player
+        iframe(width="560", height="315", src=`https://www.youtube.com/embed/${youtubeVideoId}`, allow="autoplay; encrypted-media", allowfullscreen)
+      else
+        // Render article preview image
+        img.rounded-md.mb-16(src=pagePreviewImageRelativeURL, alt="Article preview")
+
+
     .text-slate-200.blog-content
       != content
 

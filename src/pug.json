@@ -165,7 +165,8 @@
         "description": "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day! In this hilarious and informative article, you'll learn all about the importance of code formatting and how Prettier can help you take your code from a hot mess to a work of art. Trust us, your code (and your sanity) will thank you.",
         "readTime": 7,
         "publishedAt": "2022.12.21",
-        "previewImageURL": "preview.webp"
+        "previewImageURL": "preview.webp",
+        "youtubeVideoId": "uaqFYlfOZeE"
       },
       {
         "index": 5,
@@ -175,6 +176,16 @@
         "readTime": 5,
         "publishedAt": "2023.02.12",
         "previewImageURL": "preview.webp"
+      },
+      {
+        "index": 6,
+        "title": "🤖 How Chat GPT Can Help You Design System Architecture for Your Applications👷‍♂️",
+        "slug": "how-chatgpt-can-help-you-design-sysytem-architecture",
+        "description": "Chat GPT is a chatbot that uses GPT-3 to generate responses to user input. It can be used to help you design system architecture for your applications. Read now and find out how!",
+        "readTime": 5,
+        "publishedAt": "2023.04.18",
+        "previewImageURL": "preview.webp",
+        "youtubeVideoId": "Ri3TLTKvSYQ"
       }
     ]
   }

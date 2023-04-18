@@ -9,6 +9,9 @@ const blogArticleTemplate = pug.compileFile('./src/partials/blog-item.pug', { pr
 // code highlighting
 marked.setOptions({
   highlight: function (code, language) {
+    if (!language) {
+      return hljs.highlightAuto(code).value;
+    }
     return hljs.highlight(code, { language }).value;
   },
 });
