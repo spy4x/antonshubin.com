@@ -1,8 +1,10 @@
 import { define } from "../utils.ts";
+import { Layout } from "../components/Layout.tsx";
 
 export default define.page(function Pay() {
   return (
-    <div class="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6">
+    <Layout currentPath="/pay">
+      <div class="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6">
       <div class="max-w-xl mx-auto text-center space-y-8">
         {/* Stripe Payment */}
         <a
@@ -70,6 +72,7 @@ export default define.page(function Pay() {
           Back to home
         </a>
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 });
