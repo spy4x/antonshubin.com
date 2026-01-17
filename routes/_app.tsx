@@ -24,7 +24,6 @@ export default define.page(function App({ Component }: AppProps) {
         />
         <meta name="description" content={description} />
         <title>{title}</title>
-        <link rel="stylesheet" href="/styles.css" />
         <link
           rel="apple-touch-icon"
           sizes="57x57"
