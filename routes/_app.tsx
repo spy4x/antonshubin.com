@@ -25,13 +25,13 @@ export default define.page(function App({ Component }: AppProps) {
         <meta name="description" content={description} />
         <meta name="theme-color" content="#0f172a" />
         <title>{title}</title>
-        
+
         {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://www.youtube.com" />
         <link rel="preconnect" href="https://www.upwork.com" />
         <link rel="dns-prefetch" href="https://www.youtube.com" />
         <link rel="dns-prefetch" href="https://www.upwork.com" />
-        
+
         <link
           rel="apple-touch-icon"
           sizes="57x57"

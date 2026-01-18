@@ -1,12 +1,12 @@
 import { useSignal } from "@preact/signals";
 import {
+  CloseIcon,
+  EmailIcon,
+  GitHubIcon,
+  MenuIcon,
+  TwitterIcon,
   UpworkIcon,
   YouTubeIcon,
-  GitHubIcon,
-  TwitterIcon,
-  EmailIcon,
-  MenuIcon,
-  CloseIcon,
 } from "../components/Icons.tsx";
 
 interface MobileMenuProps {
@@ -120,9 +120,7 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
             </div>
 
             {/* Logo and mobile label */}
-            <div
-              class="flex-1 flex flex-row-reverse items-center justify-center sm:items-stretch sm:justify-start"
-            >
+            <div class="flex-1 flex flex-row-reverse items-center justify-center sm:items-stretch sm:justify-start">
               <div class="flex-shrink-0 flex items-center sm:pl-6">
                 <div class="absolute inset-y-0 left-0 flex items-center sm:relative">
                   <a href="/" class="flex items-center">

@@ -27,14 +27,15 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
 
   const goPrev = () => {
     if (activeIndex.value !== null) {
-      activeIndex.value = (activeIndex.value - 1 + images.length) % images.length;
+      activeIndex.value = (activeIndex.value - 1 + images.length) %
+        images.length;
     }
   };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeIndex.value === null) return;
-      
+
       switch (e.key) {
         case "ArrowRight":
           goNext();
@@ -90,8 +91,18 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
               class="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
               aria-label="Close"
             >
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
@@ -103,8 +114,18 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                 class="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
                 aria-label="Previous image"
               >
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                <svg
+                  class="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
             )}
@@ -124,8 +145,18 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                 class="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
                 aria-label="Next image"
               >
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <svg
+                  class="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             )}

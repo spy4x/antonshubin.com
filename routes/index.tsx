@@ -1,16 +1,16 @@
 import { define } from "../utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import {
-  YouTubeIcon,
-  PenIcon,
-  StarIcon,
-  QuoteIcon,
-  UpworkIcon,
-  UpworkBadgeIcon,
-  ServerIcon,
-  WalletIcon,
   GithubIcon,
   LinkedInIcon,
+  PenIcon,
+  QuoteIcon,
+  ServerIcon,
+  StarIcon,
+  UpworkBadgeIcon,
+  UpworkIcon,
+  WalletIcon,
+  YouTubeIcon,
 } from "../components/Icons.tsx";
 
 export default define.page(function Home(ctx) {
@@ -65,7 +65,7 @@ export default define.page(function Home(ctx) {
               </div>
             </div>
             {/* Hero Image */}
-            <div class="lg:w-80 lg:flex-shrink-0">
+            <div class="lg:w-[320px] lg:flex-shrink-0">
               <picture>
                 <source
                   media="(max-width: 640px)"
@@ -78,6 +78,7 @@ export default define.page(function Home(ctx) {
                   alt="Anton Shubin"
                   width="800"
                   height="600"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
                   fetchpriority="high"
                   loading="eager"
                   decoding="async"
@@ -105,12 +106,19 @@ export default define.page(function Home(ctx) {
                 </h3>
               </div>
               <p class="text-gray-300 text-sm mb-4">
-                Infrastructure-as-code framework for self-hosting 20+ services with Docker, Traefik, automated backups, and monitoring.
+                Infrastructure-as-code framework for self-hosting 20+ services
+                with Docker, Traefik, automated backups, and monitoring.
               </p>
               <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">Deno</span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">Docker</span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">Ansible</span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Deno
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Docker
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Ansible
+                </span>
               </div>
             </a>
 
@@ -128,12 +136,19 @@ export default define.page(function Home(ctx) {
                 </h3>
               </div>
               <p class="text-gray-300 text-sm mb-4">
-                Self-hostable finance tracking with double-entry accounting, multi-currency, real-time collaboration, and PWA support.
+                Self-hostable finance tracking with double-entry accounting,
+                multi-currency, real-time collaboration, and PWA support.
               </p>
               <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">Deno</span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">Preact</span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">PostgreSQL</span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Deno
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Preact
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  PostgreSQL
+                </span>
               </div>
             </a>
           </div>
@@ -145,8 +160,19 @@ export default define.page(function Home(ctx) {
               class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               View all projects
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
               </svg>
             </a>
           </div>
@@ -169,7 +195,8 @@ export default define.page(function Home(ctx) {
                   YouTube Channel
                 </h3>
                 <p class="text-gray-300 text-sm">
-                  Live-coding sessions, dev tips & tricks, and startup journey sharing.
+                  Live-coding sessions, dev tips & tricks, and startup journey
+                  sharing.
                 </p>
               </div>
             </a>
@@ -185,7 +212,8 @@ export default define.page(function Home(ctx) {
                   Blog
                 </h3>
                 <p class="text-gray-300 text-sm">
-                  Articles about SaaS development, productivity, and indie hacking.
+                  Articles about SaaS development, productivity, and indie
+                  hacking.
                 </p>
               </div>
             </a>
@@ -202,7 +230,9 @@ export default define.page(function Home(ctx) {
           >
             <div class="mb-6 md:flex md:justify-between md:items-center">
               <div>
-                <p class="font-medium text-white">Technical Lead for a Startup</p>
+                <p class="font-medium text-white">
+                  Technical Lead for a Startup
+                </p>
                 <p class="text-gray-400 text-sm">Jul 6, 2020 - Feb 28, 2021</p>
               </div>
               <div class="flex gap-1 items-center mt-2 md:mt-0">
@@ -216,15 +246,15 @@ export default define.page(function Home(ctx) {
             </div>
             <blockquote class="text-sm italic text-gray-300">
               <p class="mb-3">
-                "Anton is the greatest developer I've ever worked with hands down.
-                He's taken a role in our startup as tech lead and has been doing a
-                beyond excellent job with communication, honesty, hard work and
-                accuracy."
+                "Anton is the greatest developer I've ever worked with hands
+                down. He's taken a role in our startup as tech lead and has been
+                doing a beyond excellent job with communication, honesty, hard
+                work and accuracy."
               </p>
               <p class="mb-3">
-                "He isn't one of the type of developers that just says,
-                'sure, I can do that.' He's thoughtful and will give his honest
-                feedback and advice on everything."
+                "He isn't one of the type of developers that just says, 'sure, I
+                can do that.' He's thoughtful and will give his honest feedback
+                and advice on everything."
               </p>
               <p>
                 "Overall, 12/10 of a developer. I really got lucky with Anton."

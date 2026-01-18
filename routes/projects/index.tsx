@@ -1,6 +1,6 @@
 import { define } from "../../utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { projects, type Project } from "../../lib/data.ts";
+import { type Project, projects } from "../../lib/data.ts";
 import { ArchiveIcon } from "../../components/Icons.tsx";
 
 function ProjectCard({ project }: { project: Project }) {
@@ -26,19 +26,19 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       )}
       <div class="h-32 flex items-center justify-center mb-4 bg-gray-700 rounded-lg overflow-hidden">
-        {project.logoImageURL ? (
-          <img
-            src={project.logoImageURL}
-            alt={`${project.title} preview`}
-            class="max-h-full max-w-full object-contain p-4"
-            style={project.logoImageStyle}
-            loading="lazy"
-          />
-        ) : project.logoText ? (
-          <span style={project.logoTextStyle}>{project.logoText}</span>
-        ) : (
-          <span class="text-white text-xl font-bold">{project.title}</span>
-        )}
+        {project.logoImageURL
+          ? (
+            <img
+              src={project.logoImageURL}
+              alt={`${project.title} preview`}
+              class="max-h-full max-w-full object-contain p-4"
+              style={project.logoImageStyle}
+              loading="lazy"
+            />
+          )
+          : project.logoText
+          ? <span style={project.logoTextStyle}>{project.logoText}</span>
+          : <span class="text-white text-xl font-bold">{project.title}</span>}
       </div>
       <h3 class="h2 mb-2">{project.title}</h3>
       <p class="text-gray-300 text-sm">{project.description}</p>

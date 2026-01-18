@@ -1,7 +1,7 @@
 import { page } from "fresh";
 import { define } from "../../utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { blogArticles, prettyDate, type BlogArticle } from "../../lib/data.ts";
+import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { marked } from "marked";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
 
@@ -123,19 +123,21 @@ export default define.page<PageData>(function BlogArticle(ctx) {
         )}
 
         {/* Content */}
-        {content ? (
-          <>
-            <div
-              class="blog-content text-gray-200"
-              dangerouslySetInnerHTML={{ __html: content }}
-            />
-            <BlogImageEnhancer />
-          </>
-        ) : (
-          <p class="text-gray-400">
-            Content not available. Please check back later.
-          </p>
-        )}
+        {content
+          ? (
+            <>
+              <div
+                class="blog-content text-gray-200"
+                dangerouslySetInnerHTML={{ __html: content }}
+              />
+              <BlogImageEnhancer />
+            </>
+          )
+          : (
+            <p class="text-gray-400">
+              Content not available. Please check back later.
+            </p>
+          )}
 
         {/* Footer */}
         <footer class="mt-12 pt-8 border-t border-gray-700">

@@ -45,7 +45,8 @@
 
 /* Projects */
 .project-badge {
-  @apply tracking-wide inline-flex items-center px-2 rounded text-sm bg-orange-500 text-gray-50 py-0.5 my-1 mr-2;
+  @apply tracking-wide inline-flex items-center px-2 rounded text-sm
+    bg-orange-500 text-gray-50 py-0.5 my-1 mr-2;
 }
 
 /* Blog */
@@ -127,7 +128,8 @@
 }
 
 .blog-content > pre {
-  @apply overflow-x-auto p-4 rounded-md bg-gray-800 text-gray-300 mb-4 font-mono;
+  @apply overflow-x-auto p-4 rounded-md bg-gray-800 text-gray-300 mb-4
+    font-mono;
 }
 
 .blog-content > p > code {
