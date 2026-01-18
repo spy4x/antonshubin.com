@@ -2,6 +2,7 @@ import { define } from "../../utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { projects, type Project } from "../../lib/data.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
+import { CTASection } from "../../components/CTASection.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -191,6 +192,9 @@ export default define.page(function ProjectDetail(ctx) {
             />
           </div>
         )}
+
+        {/* CTA Section */}
+        <CTASection />
       </div>
     </Layout>
   );
