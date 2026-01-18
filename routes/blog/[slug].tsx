@@ -3,6 +3,7 @@ import { define } from "../../utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { blogArticles, prettyDate, type BlogArticle } from "../../lib/data.ts";
 import { marked } from "marked";
+import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -121,10 +122,13 @@ export default define.page<PageData>(function BlogArticle(ctx) {
 
         {/* Content */}
         {content ? (
-          <div
-            class="blog-content text-gray-200"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          <>
+            <div
+              class="blog-content text-gray-200"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
+            <BlogImageEnhancer />
+          </>
         ) : (
           <p class="text-gray-400">
             Content not available. Please check back later.
