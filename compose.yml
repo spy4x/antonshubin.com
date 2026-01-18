@@ -24,3 +24,13 @@ services:
         limits:
           cpus: "0.5"
           memory: 256M
+    develop:
+      watch:
+        # Rebuild and restart container when source files change
+        - action: rebuild
+          path: .
+          ignore:
+            - .git/
+            - _fresh/
+            - node_modules/
+            - "*.md"
