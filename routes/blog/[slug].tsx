@@ -103,6 +103,7 @@ export default define.page<PageData>(function BlogArticle(ctx) {
             src={`/img/blog/${article.slug}/${article.previewImageURL}`}
             alt={article.title}
             class="w-full h-auto"
+            fetchpriority="high"
           />
         </div>
 
@@ -115,6 +116,7 @@ export default define.page<PageData>(function BlogArticle(ctx) {
                 class="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                loading="lazy"
               />
             </div>
           </div>

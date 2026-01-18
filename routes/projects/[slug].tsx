@@ -69,6 +69,7 @@ export default define.page(function ProjectDetail(ctx) {
                 alt={`${project.title} logo`}
                 class="max-h-full max-w-full object-contain p-4"
                 style={project.logoImageStyle}
+                loading="lazy"
               />
             ) : project.logoText ? (
               <span style={project.logoTextStyle}>{project.logoText}</span>
@@ -175,6 +176,7 @@ export default define.page(function ProjectDetail(ctx) {
                 class="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                loading="lazy"
               />
             </div>
           </div>

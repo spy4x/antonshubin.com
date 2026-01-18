@@ -134,6 +134,8 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
                     class="h-10 w-10 rounded-full border border-gray-100 sm:rotate-90"
                     src="/img/photo-64.webp"
                     alt="Photo of Anton Shubin"
+                    width="40"
+                    height="40"
                   />
                 </div>
                 <p class="text-white text-xl ml-3 justify-self-center sm:hidden">

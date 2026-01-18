@@ -64,6 +64,9 @@ export default define.page(function Home(ctx) {
             class="h-56 w-full object-cover rounded-lg sm:h-72 md:h-96 lg:w-full lg:h-full"
             src="/img/photo-big.webp"
             alt="Anton Shubin"
+            width="800"
+            height="600"
+            fetchpriority="high"
           />
         </div>
       </div>
