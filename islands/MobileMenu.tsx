@@ -121,10 +121,14 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
 
             {/* Logo and mobile label */}
             <div
-              class="flex-1 flex flex-row-reverse items-center justify-center sm:items-stretch sm:justify-start cursor-pointer sm:cursor-default"
-              onClick={toggleMenu}
+              class="flex-1 flex flex-row-reverse items-center justify-center sm:items-stretch sm:justify-start"
             >
-              <div class="flex-shrink-0 flex items-center sm:pl-6">
+              <div class="flex-shrink-0 flex items-center sm:pl-6 cursor-pointer sm:cursor-default" onClick={(e) => {
+                // Only toggle on mobile (when sm breakpoint is not active)
+                if (window.innerWidth < 640) {
+                  toggleMenu();
+                }
+              }}>
                 <div class="absolute inset-y-0 left-0 flex items-center sm:relative">
                   <img
                     class="h-10 w-10 rounded-full border border-gray-100 sm:rotate-90"
