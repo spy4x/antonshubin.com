@@ -15,10 +15,15 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.services.antonshubincom.loadbalancer.server.port=8000"
-      - "traefik.http.routers.antonshubincom.rule=Host(`new.antonshubin.com`)"
+      - "traefik.http.routers.antonshubincom.rule=Host(`antonshubin.com`) || Host(`www.antonshubin.com`)"
       - "traefik.http.routers.antonshubincom.entrypoints=websecure"
       - "traefik.http.routers.antonshubincom.tls=true"
       - "traefik.http.routers.antonshubincom.tls.certresolver=myresolver"
+      # Redirect www to non-www
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.regex=^https://www\\.antonshubin\\.com/(.*)"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.replacement=https://antonshubin.com/$${1}"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.antonshubincom.middlewares=antonshubincom-redirect"
     deploy:
       resources:
         limits:
