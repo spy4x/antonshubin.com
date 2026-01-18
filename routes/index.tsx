@@ -65,7 +65,7 @@ export default define.page(function Home(ctx) {
               </div>
             </div>
             {/* Hero Image */}
-            <div class="lg:w-[320px] lg:flex-shrink-0">
+            <div class="lg:w-[400px] lg:flex-shrink-0">
               <picture>
                 <source
                   media="(max-width: 640px)"
