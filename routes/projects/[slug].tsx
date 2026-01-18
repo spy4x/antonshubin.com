@@ -1,6 +1,7 @@
 import { define } from "../../utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { projects, type Project } from "../../lib/data.ts";
+import ImageGallery from "../../islands/ImageGallery.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -182,16 +183,12 @@ export default define.page(function ProjectDetail(ctx) {
         {project.screenshotURLs && project.screenshotURLs.length > 0 && (
           <div class="mb-8">
             <h2 class="text-lg font-medium text-white mb-3">Screenshots</h2>
-            <div class="grid gap-4 md:grid-cols-2">
-              {project.screenshotURLs.map((screenshot, index) => (
-                <img
-                  key={index}
-                  src={`/img/projects/${project.slug}/${screenshot}`}
-                  alt={`${project.title} screenshot ${index + 1}`}
-                  class="w-full rounded-lg border border-gray-700"
-                />
-              ))}
-            </div>
+            <ImageGallery
+              images={project.screenshotURLs.map((screenshot, index) => ({
+                src: `/img/projects/${project.slug}/${screenshot}`,
+                alt: `${project.title} screenshot ${index + 1}`,
+              }))}
+            />
           </div>
         )}
       </div>
