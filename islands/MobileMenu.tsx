@@ -95,7 +95,7 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
                 </a>
                 <a
                   class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white contact-link"
-                  href="mailto:2spy4x+ws@gmail.com"
+                  href="mailto:anton@antonshubin.com"
                 >
                   <EmailIcon />
                 </a>
@@ -208,7 +208,7 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white contact-link"
-                    href="mailto:2spy4x+ws@gmail.com"
+                    href="mailto:anton@antonshubin.com"
                   >
                     <EmailIcon />
                   </a>

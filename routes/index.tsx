@@ -1,5 +1,6 @@
 import { define } from "../utils.ts";
 import { Layout } from "../components/Layout.tsx";
+import { CTASection } from "../components/CTASection.tsx";
 import {
   GithubIcon,
   LinkedInIcon,
@@ -286,52 +287,7 @@ export default define.page(function Home(ctx) {
         </section>
 
         {/* CTA Section */}
-        <section class="mb-16 md:mb-24">
-          <div class="flex flex-wrap gap-4 justify-center">
-            <a
-              href="mailto:2spy4x+ws@gmail.com"
-              class="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-white bg-gray-700 hover:bg-gray-600 transition-colors"
-            >
-              <svg
-                class="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
-              Contact Me
-            </a>
-            <a
-              href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
-              target="_blank"
-              class="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-500 transition-colors"
-            >
-              <UpworkIcon class="w-auto h-4" />
-              Hire on Upwork
-            </a>
-            <a
-              href="/pay"
-              class="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-500 transition-colors"
-            >
-              <svg
-                class="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                <line x1="1" y1="10" x2="23" y2="10" />
-              </svg>
-              Pay Me
-            </a>
-          </div>
-        </section>
+        <CTASection variant="full" />
       </div>
     </Layout>
   );
