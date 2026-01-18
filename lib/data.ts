@@ -2,6 +2,7 @@ export interface Project {
   title: string;
   slug?: string;
   externalURL?: string;
+  externalURLDead?: boolean;
   description: string;
   logoImageURL?: string;
   logoImageStyle?: string;
@@ -32,6 +33,7 @@ export const projects = {
       title: "Toread.today",
       slug: "toread-today",
       externalURL: "https://toread.today",
+      externalURLDead: true,
       description:
         "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
       logoImageURL: "/img/projects/toread-today/logo.svg",
@@ -100,6 +102,7 @@ export const projects = {
       description:
         "Networking app with Tinder-like UI and Machine Learning algorithm to match like-minded people.",
       externalURL: "https://connectful.com",
+      externalURLDead: true,
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
     },
@@ -141,6 +144,7 @@ export const projects = {
       description:
         "Manage marketing teams via a Trello-like app that utilized a marketplace for project templates.",
       externalURL: "https://app.gopingu.com",
+      externalURLDead: true,
       madeForName: "Peter Visser",
       madeForURL: "https://www.linkedin.com/in/peter-visser-04331820a/",
     },
@@ -148,6 +152,7 @@ export const projects = {
       title: "Microwork",
       slug: "microwork",
       externalURL: "https://microwork.io",
+      externalURLDead: true,
       description:
         "Human text classification service freelance platform. Earn money by classifying things.",
       role: "Full-stack",
@@ -175,6 +180,7 @@ export const projects = {
       slug: "sajari",
       role: "Frontend",
       externalURL: "https://sajari.com",
+      externalURLDead: true,
       description:
         "Dashboard single-page application for search and recommendations engine as a service.",
       tags: ["Angular"],

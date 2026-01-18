@@ -121,26 +121,45 @@ export default define.page(function ProjectDetail(ctx) {
         {/* External Link */}
         {project.externalURL && (
           <div class="mb-8">
-            <a
-              href={project.externalURL}
-              target="_blank"
-              class="btn inline-flex items-center gap-2"
-            >
-              Visit Website
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {project.externalURLDead ? (
+              <span class="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-400 rounded-md text-sm">
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                  />
+                </svg>
+                {project.externalURL.replace(/^https?:\/\//, '')} [link is dead]
+              </span>
+            ) : (
+              <a
+                href={project.externalURL}
+                target="_blank"
+                class="btn inline-flex items-center gap-2"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-            </a>
+                Visit {project.externalURL.replace(/^https?:\/\//, '')}
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </a>
+            )}
           </div>
         )}
 
