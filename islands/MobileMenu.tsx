@@ -123,24 +123,25 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
             <div
               class="flex-1 flex flex-row-reverse items-center justify-center sm:items-stretch sm:justify-start"
             >
-              <div class="flex-shrink-0 flex items-center sm:pl-6 cursor-pointer sm:cursor-default" onClick={(e) => {
-                // Only toggle on mobile (when sm breakpoint is not active)
-                if (window.innerWidth < 640) {
-                  toggleMenu();
-                }
-              }}>
+              <div class="flex-shrink-0 flex items-center sm:pl-6">
                 <div class="absolute inset-y-0 left-0 flex items-center sm:relative">
-                  <img
-                    class="h-10 w-10 rounded-full border border-gray-100 sm:rotate-90"
-                    src="/img/photo-64.webp"
-                    alt="Photo of Anton Shubin"
-                    width="40"
-                    height="40"
-                  />
+                  <a href="/" class="flex items-center">
+                    <img
+                      class="h-10 w-10 rounded-full border border-gray-100 sm:rotate-90"
+                      src="/img/photo-64.webp"
+                      alt="Photo of Anton Shubin"
+                      width="40"
+                      height="40"
+                    />
+                  </a>
                 </div>
-                <p class="text-white text-xl ml-3 justify-self-center sm:hidden">
+                <button
+                  type="button"
+                  class="text-white text-xl ml-3 justify-self-center sm:hidden"
+                  onClick={toggleMenu}
+                >
                   Menu
-                </p>
+                </button>
               </div>
 
               {/* Desktop menu */}
@@ -180,7 +181,7 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
                     Blog
                   </a>
                   <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
+                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white"
                     href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
                     target="_blank"
                   >

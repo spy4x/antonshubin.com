@@ -7,7 +7,7 @@ export function CTASection() {
       <div class="flex flex-wrap gap-3 justify-center">
         <a
           href="mailto:2spy4x+ws@gmail.com"
-          class="inline-flex items-center pl-6 pr-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+          class="inline-flex items-center px-5 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
         >
           <span class="mr-1">Contact me</span>
           <svg
@@ -29,7 +29,7 @@ export function CTASection() {
         <a
           href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
           target="_blank"
-          class="inline-flex items-center pl-6 pr-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400"
+          class="inline-flex items-center px-5 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400"
         >
           <span class="mr-1">Hire me</span>
           <svg

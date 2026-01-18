@@ -14,6 +14,7 @@ export interface Project {
   videoURL?: string;
   madeForName?: string;
   madeForURL?: string;
+  archived?: boolean;
 }
 
 export interface BlogArticle {
@@ -30,10 +31,66 @@ export interface BlogArticle {
 export const projects = {
   my: [
     {
-      title: "Toread.today",
+      title: "Homelab",
+      slug: "homelab",
+      externalURL: "https://github.com/spy4x/homelab",
+      description:
+        "Open-source infrastructure-as-code framework for managing multi-server Docker-based services with automated deployment, monitoring, and backups. Self-host your own cloud with Traefik, Immich, Jellyfin, Vaultwarden, Home Assistant, and 20+ more services.",
+      logoText: "Homelab",
+      logoTextStyle: "color: #22c55e; font-size: 2rem; font-weight: bold;",
+      tags: [
+        "Deno",
+        "TypeScript",
+        "Docker",
+        "Ansible",
+        "Traefik",
+        "Self-hosted",
+      ],
+    },
+    {
+      title: "Financy",
+      slug: "financy",
+      externalURL: "https://financy.dev",
+      description:
+        "Open-source, self-hostable finance tracking for individuals, families, and small businesses. Features double-entry accounting, multi-currency support, real-time collaboration, and PWA capabilities.",
+      logoText: "Financy",
+      logoTextStyle: "color: #7c3aed; font-size: 2rem; font-weight: bold;",
+      tags: [
+        "Deno",
+        "Preact",
+        "Hono",
+        "PostgreSQL",
+        "Docker",
+        "PWA",
+      ],
+    },
+    {
+      title: "Air Quality Sensor",
+      slug: "air-quality-sensor",
+      externalURL: "https://github.com/spy4x/air-quality-sensor",
+      description:
+        "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
+      logoText: "AQS",
+      logoTextStyle: "color: #06b6d4; font-size: 2rem; font-weight: bold;",
+      tags: [
+        "ESP32",
+        "C++",
+        "Svelte",
+        "Firebase",
+        "Home Assistant",
+        "IoT",
+      ],
+    },
+    {
+      title: "YouTube Tech Channel",
+      externalURL: "https://www.youtube.com/@anton-shubin",
+      description: "Short tech videos about software development and SaaS.",
+      logoImageURL: "/img/projects/youtube-channel/logo.svg",
+    },
+    {
+      title: "Toread.Today",
       slug: "toread-today",
-      externalURL: "https://toread.today",
-      externalURLDead: true,
+      externalURL: "https://toread-today.web.app",
       description:
         "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
       logoImageURL: "/img/projects/toread-today/logo.svg",
@@ -49,18 +106,15 @@ export const projects = {
         "Firestore",
       ],
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],
+      archived: true,
     },
     {
-      title: "The Seed [private beta]",
+      title: "The Seed",
+      externalURL: "https://github.com/spy4x/seed",
       description:
         "A one-person SaaS application codebase template. Ship your project idea in days instead of months. It is addictive.",
       logoImageURL: "/img/projects/seed/logo.webp",
-    },
-    {
-      title: "YouTube Tech Channel",
-      externalURL: "https://www.youtube.com/@anton-shubin",
-      description: "Short tech videos about software development and SaaS.",
-      logoImageURL: "/img/projects/youtube-channel/logo.svg",
+      archived: true,
     },
   ] as Project[],
   freelance: [

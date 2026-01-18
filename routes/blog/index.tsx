@@ -8,30 +8,33 @@ export default define.page(function Blog(ctx) {
 
   return (
     <Layout currentPath={ctx.url.pathname}>
-      <h1 class="h1 mb-8">Blog</h1>
-      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {sortedArticles.map((article) => (
-          <a
-            key={article.slug}
-            href={`/blog/${article.slug}`}
-            class="block current-work hover:border-orange-500 transition-colors"
-          >
-            <div class="h-48 mb-4 overflow-hidden rounded-lg bg-gray-700">
-              <img
-                src={`/img/blog/${article.slug}/${article.previewImageURL}`}
-                alt="Article preview"
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <h2 class="text-xl font-medium text-white mb-2">
-              #{article.index} {article.title}
-            </h2>
-            <p class="text-gray-400 text-sm">
-              Time to read: {article.readTime} min |{" "}
-              {prettyDate(article.publishedAt)}
-            </p>
-          </a>
-        ))}
+      <div class="max-w-4xl mx-auto">
+        <h1 class="h1 mb-8">Blog</h1>
+        <div class="grid gap-8 md:grid-cols-2">
+          {sortedArticles.map((article) => (
+            <a
+              key={article.slug}
+              href={`/blog/${article.slug}`}
+              class="block current-work hover:border-orange-500 transition-colors"
+            >
+              <div class="h-48 mb-4 overflow-hidden rounded-lg bg-gray-700">
+                <img
+                  src={`/img/blog/${article.slug}/${article.previewImageURL}`}
+                  alt="Article preview"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <h2 class="text-xl font-medium text-white mb-2">
+                #{article.index} {article.title}
+              </h2>
+              <p class="text-gray-400 text-sm">
+                Time to read: {article.readTime} min |{" "}
+                {prettyDate(article.publishedAt)}
+              </p>
+            </a>
+          ))}
+        </div>
       </div>
     </Layout>
   );

@@ -7,6 +7,9 @@
 
 # Fresh build directory
 _fresh/
+
+# Local todos
+todos.md
 # npm + other dependencies
 node_modules/
 vendor/
