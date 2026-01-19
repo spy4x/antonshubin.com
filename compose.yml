@@ -1,0 +1,41 @@
+name: antonshubincom
+
+networks:
+  proxy:
+    external: true
+
+services:
+  web:
+    build: .
+    container_name: antonshubincom-web
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.services.antonshubincom.loadbalancer.server.port=8000"
+      - "traefik.http.routers.antonshubincom.rule=Host(`antonshubin.com`) || Host(`www.antonshubin.com`)"
+      - "traefik.http.routers.antonshubincom.entrypoints=websecure"
+      - "traefik.http.routers.antonshubincom.tls=true"
+      - "traefik.http.routers.antonshubincom.tls.certresolver=myresolver"
+      # Redirect www to non-www
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.regex=^https://www\\.antonshubin\\.com/(.*)"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.replacement=https://antonshubin.com/$${1}"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.antonshubincom.middlewares=antonshubincom-redirect"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    develop:
+      watch:
+        # Rebuild and restart container when source files change
+        - action: rebuild
+          path: .
+          ignore:
+            - .git/
+            - _fresh/
+            - node_modules/
+            - "*.md"

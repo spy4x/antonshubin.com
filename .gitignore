@@ -1,10 +1,16 @@
-dist/
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Fresh build directory
+_fresh/
+
+# Local todos
+todos.md
+# npm + other dependencies
 node_modules/
-/.idea
-.DS_Store
-Thumbs.db
-.firebase/
-.firebaserc
-.runtimeconfig.json
-*.log
-.env*
+vendor/
+
