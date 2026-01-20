@@ -1,4 +1,4 @@
-import { define } from "../utils.ts";
+import { define } from "../lib/utils.ts";
 
 interface AppProps {
   Component: preact.ComponentType;
@@ -25,6 +25,22 @@ export default define.page(function App({ Component }: AppProps) {
         <meta name="description" content={description} />
         <meta name="theme-color" content="#0f172a" />
         <title>{title}</title>
+
+        {/* Preload critical images for LCP optimization */}
+        <link
+          rel="preload"
+          href="/img/photo-mobile.webp"
+          as="image"
+          type="image/webp"
+          media="(max-width: 640px)"
+        />
+        <link
+          rel="preload"
+          href="/img/photo-big.webp"
+          as="image"
+          type="image/webp"
+          media="(min-width: 641px)"
+        />
 
         {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://www.youtube.com" />
