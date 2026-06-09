@@ -1,4 +1,4 @@
-import { define } from "../../utils.ts";
+import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { blogArticles, prettyDate } from "../../lib/data.ts";
 

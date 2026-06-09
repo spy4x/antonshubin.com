@@ -1,4 +1,4 @@
-import { define } from "../../utils.ts";
+import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";
 import { ArchiveIcon } from "../../components/Icons.tsx";

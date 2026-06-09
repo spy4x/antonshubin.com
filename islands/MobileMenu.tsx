@@ -1,5 +1,6 @@
 import { useSignal } from "@preact/signals";
 import {
+  CalendarIcon,
   CloseIcon,
   EmailIcon,
   GitHubIcon,
@@ -11,9 +12,12 @@ import {
 
 interface MobileMenuProps {
   currentPath: string;
+  scheduleUrl: string;
 }
 
-export default function MobileMenu({ currentPath }: MobileMenuProps) {
+export default function MobileMenu(
+  { currentPath, scheduleUrl }: MobileMenuProps,
+) {
   const isOpen = useSignal(false);
 
   const toggleMenu = () => {
@@ -65,6 +69,13 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
                 Blog
               </a>
               <div class="flex justify-center items-center gap-3 py-2">
+                <a
+                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
+                  href={scheduleUrl}
+                  target="_blank"
+                >
+                  <CalendarIcon />
+                </a>
                 <a
                   class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
                   href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
@@ -184,6 +195,14 @@ export default function MobileMenu({ currentPath }: MobileMenuProps) {
                     target="_blank"
                   >
                     <UpworkIcon />
+                  </a>
+                  <a
+                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
+                    href={scheduleUrl}
+                    target="_blank"
+                    title="Schedule a call"
+                  >
+                    <CalendarIcon class="w-4 h-4" />
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"

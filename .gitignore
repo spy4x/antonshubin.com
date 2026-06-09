@@ -10,6 +10,8 @@ _fresh/
 
 # Local todos
 todos.md
+.playwright-mcp/
+
 # npm + other dependencies
 node_modules/
 vendor/

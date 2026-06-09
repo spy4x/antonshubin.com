@@ -9,19 +9,22 @@ services:
     build: .
     container_name: antonshubincom-web
     restart: unless-stopped
+    env_file: .env
+    environment:
+      - SCHEDULE_URL=${SCHEDULE_URL}
     networks:
       - proxy
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.services.antonshubincom.loadbalancer.server.port=8000"
-      - "traefik.http.routers.antonshubincom.rule=Host(`antonshubin.com`) || Host(`www.antonshubin.com`)"
+      - "traefik.http.routers.antonshubincom.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
       - "traefik.http.routers.antonshubincom.entrypoints=websecure"
       - "traefik.http.routers.antonshubincom.tls=true"
       - "traefik.http.routers.antonshubincom.tls.certresolver=myresolver"
       # Redirect www to non-www
-      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.regex=^https://www\\.antonshubin\\.com/(.*)"
-      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.replacement=https://antonshubin.com/$${1}"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.regex=^https://www\\.${DOMAIN}/(.*)"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.replacement=https://${DOMAIN}/$${1}"
       - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.permanent=true"
       - "traefik.http.routers.antonshubincom.middlewares=antonshubincom-redirect"
     deploy:
@@ -31,7 +34,6 @@ services:
           memory: 256M
     develop:
       watch:
-        # Rebuild and restart container when source files change
         - action: rebuild
           path: .
           ignore:

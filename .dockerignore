@@ -1,0 +1,10 @@
+.git/
+.gitignore
+_fresh/
+node_modules/
+vendor/
+.playwright-mcp/
+*.md
+todos.md
+.env
+.env.*

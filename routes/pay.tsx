@@ -1,4 +1,4 @@
-import { define } from "../utils.ts";
+import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 
 export default define.page(function Pay() {

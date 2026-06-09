@@ -1,5 +1,5 @@
 import { page } from "fresh";
-import { define } from "../../utils.ts";
+import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { marked } from "marked";

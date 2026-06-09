@@ -1,5 +1,5 @@
 function onInit(fn) {
-  window.addEventListener("load", fn);
+  globalThis.addEventListener("load", fn);
 }
 
 const menuItemClasses = {
@@ -20,7 +20,7 @@ function adaptForMobile() {
   }
 }
 adaptForMobile();
-window.onresize = adaptForMobile;
+globalThis.onresize = adaptForMobile;
 
 onInit(() => {
   setTimeout(() => {
@@ -98,7 +98,7 @@ function addScript(url, onLoadFn) {
 }
 
 // Add Google Analytics
-window.dataLayer = window.dataLayer || [];
+globalThis.dataLayer = globalThis.dataLayer || [];
 function gtag() {
   dataLayer.push(arguments);
 }
@@ -111,10 +111,10 @@ addScript("https://www.googletagmanager.com/gtag/js?id=G-R9W8GJC3FZ", () => {
 onInit(() => {
   let wasScrolled = false;
   let lastScrollTop = 0;
-  let delta = 5;
+  const delta = 5;
   const minimalScrollDistance = 100;
 
-  window.addEventListener("scroll", () => (wasScrolled = true));
+  globalThis.addEventListener("scroll", () => (wasScrolled = true));
 
   setInterval(function () {
     if (wasScrolled) {

@@ -1,4 +1,4 @@
-import { define } from "../../utils.ts";
+import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
@@ -31,8 +31,6 @@ export default define.page(function ProjectDetail(ctx) {
       </Layout>
     );
   }
-
-  const isFreelance = projects.freelance.some((p) => p.slug === slug);
 
   return (
     <Layout currentPath="/projects">
