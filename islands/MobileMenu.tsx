@@ -6,7 +6,6 @@ import {
   GitHubIcon,
   MenuIcon,
   TelegramIcon,
-  TwitterIcon,
   UpworkIcon,
   YouTubeIcon,
 } from "../components/Icons.tsx";
@@ -97,13 +96,6 @@ export default function MobileMenu(
                   target="_blank"
                 >
                   <GitHubIcon />
-                </a>
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
-                  href="https://twitter.com/spy4x"
-                  target="_blank"
-                >
-                  <TwitterIcon />
                 </a>
                 <a
                   class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
@@ -225,13 +217,6 @@ export default function MobileMenu(
                     target="_blank"
                   >
                     <GitHubIcon />
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
-                    href="https://twitter.com/spy4x"
-                    target="_blank"
-                  >
-                    <TwitterIcon />
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
