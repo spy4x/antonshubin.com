@@ -5,6 +5,7 @@ import {
   EmailIcon,
   GitHubIcon,
   MenuIcon,
+  TelegramIcon,
   TwitterIcon,
   UpworkIcon,
   YouTubeIcon,
@@ -103,6 +104,13 @@ export default function MobileMenu(
                   target="_blank"
                 >
                   <TwitterIcon />
+                </a>
+                <a
+                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
+                  href="https://t.me/spy4x"
+                  target="_blank"
+                >
+                  <TelegramIcon />
                 </a>
                 <a
                   class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white contact-link"
@@ -224,6 +232,13 @@ export default function MobileMenu(
                     target="_blank"
                   >
                     <TwitterIcon />
+                  </a>
+                  <a
+                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
+                    href="https://t.me/spy4x"
+                    target="_blank"
+                  >
+                    <TelegramIcon />
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white contact-link"

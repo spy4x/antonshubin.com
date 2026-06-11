@@ -47,6 +47,7 @@ export default define.page(function App({ Component }: AppProps) {
         <link rel="preconnect" href="https://www.upwork.com" />
         <link rel="dns-prefetch" href="https://www.youtube.com" />
         <link rel="dns-prefetch" href="https://www.upwork.com" />
+        <link rel="dns-prefetch" href="https://t.me" />
 
         <link
           rel="apple-touch-icon"

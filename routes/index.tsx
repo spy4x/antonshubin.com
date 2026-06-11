@@ -10,6 +10,7 @@ import {
   QuoteIcon,
   ServerIcon,
   StarIcon,
+  TelegramIcon,
   UpworkBadgeIcon,
   UpworkIcon,
   WalletIcon,
@@ -64,6 +65,14 @@ export default define.page(function Home(ctx) {
                 >
                   <YouTubeIcon class="w-4 h-4" />
                   YouTube
+                </a>
+                <a
+                  href="https://t.me/spy4x"
+                  target="_blank"
+                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-500 transition-colors"
+                >
+                  <TelegramIcon class="w-4 h-4" />
+                  Telegram
                 </a>
               </div>
               <div class="mt-4 flex flex-wrap gap-2">
