@@ -5,7 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",
-    "update": "deno run -A -r jsr:@fresh/update ."
+    "update": "deno run -A -r jsr:@fresh/update .",
+    "deploy": "rsync -avz --delete --exclude='.git/' --exclude='node_modules/' --exclude='_fresh/' --exclude='*.md' --filter=':- .dockerignore' ./ homelab:~/ssd-2tb/apps/anton/antonshubin.com/ && ssh homelab 'cd ~/ssd-2tb/apps/anton/antonshubin.com && docker compose up -d --build'"
   },
   "lint": {
     "rules": {

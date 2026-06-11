@@ -26,13 +26,15 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
           href={SCHEDULE_URL}
           target="_blank"
           class={`inline-flex items-center ${
-            isCompact ? "px-5 py-3" : "gap-2 px-6 py-3"
-          } border border-transparent text-base font-medium rounded-${
+            isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
+          } border border-transparent ${
+            isCompact ? "text-base" : "text-lg font-semibold"
+          } rounded-${
             isCompact ? "md" : "lg"
-          } shadow-sm text-white ${
+          } text-white ${
             isCompact
               ? "bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400"
-              : "bg-green-600 hover:bg-green-500 transition-colors"
+              : "bg-gradient-to-r from-green-600 to-emerald-500 shadow-lg shadow-green-500/25 hover:scale-105 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200"
           }`}
         >
           {isCompact && <span class="mr-1">Schedule a call</span>}
@@ -42,13 +44,15 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
         <a
           href="mailto:anton@antonshubin.com"
           class={`inline-flex items-center ${
-            isCompact ? "px-5 py-3" : "gap-2 px-6 py-3"
-          } border border-transparent text-base font-medium rounded-${
+            isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
+          } border border-transparent ${
+            isCompact ? "text-base" : "text-lg font-semibold"
+          } rounded-${
             isCompact ? "md" : "lg"
-          } shadow-sm text-white ${
+          } text-white ${
             isCompact
               ? "bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
-              : "bg-gray-700 hover:bg-gray-600 transition-colors"
+              : "bg-gradient-to-r from-gray-600 to-gray-500 shadow-lg shadow-gray-500/20 hover:scale-105 hover:shadow-xl hover:shadow-gray-500/25 transition-all duration-200"
           }`}
         >
           {isCompact && <span class="mr-1">Contact me</span>}
@@ -73,13 +77,15 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
           href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
           target="_blank"
           class={`inline-flex items-center ${
-            isCompact ? "px-5 py-3" : "gap-2 px-6 py-3"
-          } border border-transparent text-base font-medium rounded-${
+            isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
+          } border border-transparent ${
+            isCompact ? "text-base" : "text-lg font-semibold"
+          } rounded-${
             isCompact ? "md" : "lg"
-          } shadow-sm text-white ${
+          } text-white ${
             isCompact
               ? "bg-orange-500 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400"
-              : "bg-orange-600 hover:bg-orange-500 transition-colors"
+              : "bg-gradient-to-r from-orange-600 to-amber-500 shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-200"
           }`}
         >
           {isCompact && <span class="mr-1">Hire me</span>}
@@ -139,7 +145,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
         {!isCompact && (
           <a
             href="/pay"
-            class="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-500 transition-colors"
+            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200"
           >
             <svg
               class="w-5 h-5"

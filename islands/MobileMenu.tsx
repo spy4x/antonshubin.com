@@ -202,7 +202,7 @@ export default function MobileMenu(
                     target="_blank"
                     title="Schedule a call"
                   >
-                    <CalendarIcon class="w-4 h-4" />
+                    <CalendarIcon class="w-5 h-5" />
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
