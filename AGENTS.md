@@ -10,11 +10,13 @@ Guidelines for AI agents working on this project.
 
 **Types:** `feat`, `fix`, `refactor`, `chore`, `docs`, `style`, `perf`
 
-**Scope:** Component/area (e.g. `cta`, `menu`, `icons`, `deploy`). Omit if broad.
+**Scope:** Component/area (e.g. `cta`, `menu`, `icons`, `deploy`). Omit if
+broad.
 
 **Summary:** lowercase, no period, imperative mood.
 
 Examples:
+
 ```
 fix(menu): match calendar icon size to neighbours
 feat(cta): add gradient backgrounds and scale hover
@@ -66,8 +68,8 @@ deno task deploy    # Rsync to homelab + Docker rebuild
 deno task deploy
 ```
 
-Manual: rsync to homelab, then `docker compose up -d --build`.
-See [docs/deploy.md](docs/deploy.md) for details.
+Manual: rsync to homelab, then `docker compose up -d --build`. See
+[docs/deploy.md](docs/deploy.md) for details.
 
 ## Key Principles
 

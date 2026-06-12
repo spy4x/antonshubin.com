@@ -10,9 +10,9 @@ interface AppProps {
 }
 
 export default define.page(function App({ Component }: AppProps) {
-  const title = "Anton Shubin | Full-stack web developer and entrepreneur";
+  const title = "Anton Shubin | Fractional CTO & SaaS Architect for Startups";
   const description =
-    "Anton Shubin is a web developer and entrepreneur. He is passionate about creating web applications and tools.";
+    "Fractional CTO and Lead Architect. I take your SaaS from napkin sketch to production — fixed-price milestones, zero-bloat architecture, no dev-team drama.";
 
   return (
     <html lang="en" class="h-full bg-slate-900">

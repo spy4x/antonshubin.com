@@ -4,18 +4,19 @@ Production architecture on homelab.
 
 ## Stack
 
-| Layer | What |
-|---|---|
-| Runtime | `denoland/deno:2.3.1` |
-| Framework | Fresh 2.2 (SSR) |
-| Build | Vite 7 + Tailwind 4 |
-| Container | Docker Compose |
-| Proxy | Traefik (external, shared `proxy` network) |
-| Host | Homelab (Fedora, Hetzner) |
+| Layer     | What                                       |
+| --------- | ------------------------------------------ |
+| Runtime   | `denoland/deno:2.3.1`                      |
+| Framework | Fresh 2.2 (SSR)                            |
+| Build     | Vite 7 + Tailwind 4                        |
+| Container | Docker Compose                             |
+| Proxy     | Traefik (external, shared `proxy` network) |
+| Host      | Homelab (Fedora, Hetzner)                  |
 
 ## Docker Compose
 
 `compose.yml`:
+
 - Builds image with `deno install` + `vite build`
 - Connects to shared `proxy` Docker network (external)
 - Traefik reads Docker labels for routing

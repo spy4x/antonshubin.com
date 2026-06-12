@@ -27,18 +27,19 @@ export default define.page(function Home(ctx) {
             {/* Text Content */}
             <div class="flex-1 mb-8 lg:mb-0">
               <h1 class="text-4xl font-bold text-gray-100 mb-6 sm:text-5xl">
-                Hey, I'm Anton!
+                Anton Shubin — Fractional CTO & Lead Architect
               </h1>
               <div class="text-base text-gray-300 sm:text-lg md:text-xl">
                 <p class="mb-4">
-                  Full-stack developer building{" "}
+                  I take your SaaS from{" "}
                   <span class="text-white font-semibold bg-orange-600 px-2 py-0.5 rounded-md whitespace-nowrap">
-                    SaaS applications
+                    napkin sketch to production
                   </span>{" "}
-                  and open-source tools.
+                  — without the dev-team drama.
                 </p>
                 <p class="text-gray-300">
-                  I love self-hosting, home automation, traveling, and skiing.
+                  Autonomous technical partner. Fixed-price milestones.
+                  Zero-bloat architecture.
                 </p>
               </div>
               <div class="mt-8 flex flex-wrap gap-2">
@@ -125,7 +126,7 @@ export default define.page(function Home(ctx) {
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />
                   </svg>
-                  Hire me
+                  Start project
                 </a>
               </div>
             </div>
