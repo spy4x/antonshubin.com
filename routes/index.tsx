@@ -36,45 +36,45 @@ export default define.page(function Home(ctx) {
                     napkin sketch to production
                   </span>
                 </p>
-                <ul class="space-y-2 text-gray-300">
-                  <li class="flex items-start gap-2">
-                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                <ul class="space-y-1 text-gray-300">
+                  <li class="flex items-baseline gap-2">
+                    <span class="text-orange-500 shrink-0">—</span>
                     <span>Without the dev-team drama</span>
                   </li>
-                  <li class="flex items-start gap-2">
-                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                  <li class="flex items-baseline gap-2">
+                    <span class="text-orange-500 shrink-0">—</span>
                     <span>Autonomous technical partner</span>
                   </li>
-                  <li class="flex items-start gap-2">
-                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                  <li class="flex items-baseline gap-2">
+                    <span class="text-orange-500 shrink-0">—</span>
                     <span>Fixed-price milestones</span>
                   </li>
-                  <li class="flex items-start gap-2">
-                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                  <li class="flex items-baseline gap-2">
+                    <span class="text-orange-500 shrink-0">—</span>
                     <span>Zero-bloat architecture</span>
                   </li>
                 </ul>
               </div>
 
               {/* Metrics Bar */}
-              <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:text-base text-gray-400">
-                <span class="inline-flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              <div class="mt-6 grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-row sm:items-center sm:gap-x-4 text-sm sm:text-base text-gray-400">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   Expert-Vetted (Top 1%)
                 </span>
-                <span class="text-gray-600 hidden sm:inline">|</span>
-                <span class="inline-flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                <span class="hidden sm:inline text-gray-600">|</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   $395K+ Earned
                 </span>
-                <span class="text-gray-600 hidden sm:inline">|</span>
-                <span class="inline-flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                <span class="hidden sm:inline text-gray-600">|</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   80+ Projects
                 </span>
-                <span class="text-gray-600 hidden sm:inline">|</span>
-                <span class="inline-flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                <span class="hidden sm:inline text-gray-600">|</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   100% Job Success
                 </span>
               </div>

@@ -69,7 +69,7 @@ export default function MobileMenu(
                 Blog
               </a>
               <a href="/contact-me" class={linkClass("/contact-me")}>
-                Contact
+                Contact me
               </a>
               <div class="flex justify-center items-center gap-3 py-2">
                 <a
@@ -200,7 +200,7 @@ export default function MobileMenu(
                     }`}
                     href="/contact-me"
                   >
-                    Contact
+                    Contact me
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white"

@@ -20,14 +20,14 @@ export default define.page(function Pay() {
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
           {/* --- Crypto Card --- */}
           <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
-            <div class="p-5 sm:p-6">
+            <div class="p-5 sm:p-6 flex flex-col items-center text-center">
               <div class="text-3xl mb-3">🪙</div>
               <h2 class="text-xl font-semibold text-white mb-1">Crypto</h2>
               <p class="text-gray-400 text-sm mb-5">
                 Instant. No fees. Send from any wallet.
               </p>
 
-              <div class="space-y-4">
+              <div class="space-y-4 text-left self-stretch w-full">
                 {/* EVM */}
                 <div>
                   <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
@@ -95,7 +95,7 @@ export default define.page(function Pay() {
 
           {/* --- SWIFT / Bank Transfer Card --- */}
           <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
-            <div class="p-5 sm:p-6">
+            <div class="p-5 sm:p-6 flex flex-col items-center text-center">
               <div class="text-3xl mb-3">🏦</div>
               <h2 class="text-xl font-semibold text-white mb-1">
                 Bank Transfer
@@ -105,7 +105,7 @@ export default define.page(function Pay() {
               </p>
 
               {/* Domestic US */}
-              <div class="space-y-2.5 text-sm">
+              <div class="space-y-2.5 text-sm text-left self-stretch w-full">
                 <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">
                   From US (ACH / Fedwire)
                 </p>
