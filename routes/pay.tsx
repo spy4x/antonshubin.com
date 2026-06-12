@@ -1,75 +1,173 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
+import CopyButton from "../islands/CopyButton.tsx";
 
 export default define.page(function Pay() {
   return (
     <Layout currentPath="/pay">
-      <div class="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] sm:min-h-[calc(100vh-3rem)]">
-        <div class="max-w-xl mx-auto text-center space-y-8">
-          {/* Stripe Payment */}
-          <a
-            href="https://buy.stripe.com/4gw171g4hcwC06IdQS"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block"
-          >
-            <span class="text-4xl tracking-wide text-white font-medium">
-              Pay with <span class="text-blue-500 underline">Stripe</span>
-            </span>
-            <p class="text-slate-300 text-sm mt-2">
-              click this link or scan the QR-code
-            </p>
-            <img
-              class="w-full max-w-xs mx-auto mt-4 object-cover"
-              src="/img/qr-stripe.svg"
-              alt="QR-code to pay with Stripe"
-            />
-          </a>
+      <div class="max-w-5xl mx-auto px-4 py-12">
+        <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
+          Choose Your Payment Method
+        </h1>
+        <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg">
+          Pay however works best for you — crypto, bank transfer, or card.
+        </p>
 
-          <p class="text-slate-300 text-xl">OR</p>
-
-          {/* SWIFT Transfer */}
-          <div class="flex flex-col gap-3 mx-auto mt-4 max-w-xs text-left">
-            <p class="text-4xl tracking-wide text-white font-medium text-center">
-              Transfer USD through <span class="text-orange-500">SWIFT:</span>
-            </p>
-
-            <div>
-              <p class="text-slate-400">Account holder full name</p>
-              <p class="text-white">NEATSOFT PTE. LTD.</p>
-            </div>
-
-            <div>
-              <p class="text-slate-400">Account number/IBAN</p>
-              <p class="text-white">GB21TCCL04140420871198</p>
-            </div>
-
-            <div>
-              <p class="text-slate-400">Bank name</p>
-              <p class="text-white">The Currency Cloud Limited</p>
-            </div>
-
-            <div>
-              <p class="text-slate-400">Bank SWIFT/BIC</p>
-              <p class="text-white">TCCLGB3L</p>
-            </div>
-
-            <div>
-              <p class="text-slate-400">Bank address</p>
-              <p class="text-white">
-                12 Steward Street, The Steward Building, London, E1 6FQ, GB
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+          {/* --- Crypto Card --- */}
+          <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-5 sm:p-6">
+              <div class="text-3xl mb-3">🪙</div>
+              <h2 class="text-xl font-semibold text-white mb-1">Crypto</h2>
+              <p class="text-gray-400 text-sm mb-5">
+                Instant. No fees. Send from any wallet.
               </p>
-            </div>
 
-            <div>
-              <p class="text-slate-400">Bank country</p>
-              <p class="text-white">GB</p>
+              <div class="space-y-4">
+                {/* EVM */}
+                <div>
+                  <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                    ETH / Linea / Base / BNB / Polygon / OP / Arbitrum / Tron
+                  </p>
+                  <p
+                    id="evm-addr"
+                    class="text-white text-xs sm:text-sm break-all font-mono bg-gray-900 rounded p-2"
+                  >
+                    0xDC68c304B29a85360E364Faf8b828b77a1B8439C
+                  </p>
+                  <CopyButton addressId="evm-addr" />
+                </div>
+
+                {/* BTC */}
+                <div>
+                  <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                    Bitcoin
+                  </p>
+                  <p
+                    id="btc-addr"
+                    class="text-white text-xs sm:text-sm break-all font-mono bg-gray-900 rounded p-2"
+                  >
+                    bc1qlp05rhq99uhu6anzkzymeedgjsee605hp25knl
+                  </p>
+                  <CopyButton addressId="btc-addr" />
+                </div>
+
+                {/* Solana */}
+                <div>
+                  <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                    Solana
+                  </p>
+                  <p
+                    id="sol-addr"
+                    class="text-white text-xs sm:text-sm break-all font-mono bg-gray-900 rounded p-2"
+                  >
+                    J5dXRN3Rip1TuadSf8zAui72HY7osVvaMJZ7xXPmkuQo
+                  </p>
+                  <CopyButton addressId="sol-addr" />
+                </div>
+              </div>
+            </div>
+            <div class="mt-auto px-5 sm:px-6 pb-5 sm:pb-6">
+              <p class="text-gray-500 text-xs">
+                No minimum. Send any network. Confirm with me after sending.
+              </p>
             </div>
           </div>
 
-          {/* Back link */}
-          <a href="/" class="text-orange-500 hover:underline inline-block mt-8">
-            Back to home
+          {/* --- SWIFT / Bank Transfer Card --- */}
+          <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-5 sm:p-6">
+              <div class="text-3xl mb-3">🏦</div>
+              <h2 class="text-xl font-semibold text-white mb-1">
+                Bank Transfer
+              </h2>
+              <p class="text-gray-400 text-sm mb-5">
+                USD via ACH or Fedwire from the US.
+              </p>
+
+              {/* Domestic US */}
+              <div class="space-y-2.5 text-sm">
+                <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">
+                  From US (ACH / Fedwire)
+                </p>
+                <div>
+                  <p class="text-gray-500 text-xs">Account holder</p>
+                  <p class="text-white">NEATSOFT PTE. LTD.</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">Account number</p>
+                  <p class="text-white font-mono">8331896611</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">Bank</p>
+                  <p class="text-white">Community Federal Savings Bank</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">Bank address</p>
+                  <p class="text-white text-xs">
+                    5 Penn Plaza, 14th Floor, New York, NY 10001
+                  </p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">ACH routing</p>
+                  <p class="text-white font-mono">026073150</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">ABA / Fedwire</p>
+                  <p class="text-white font-mono">026073008</p>
+                </div>
+
+                <div class="pt-3 border-t border-gray-700 mt-4">
+                  <p class="text-amber-400 text-xs font-medium">
+                    ✗ Do not use for collections from outside US
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-auto px-5 sm:px-6 pb-5 sm:pb-6">
+              <a
+                href="/contact-me"
+                class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 text-sm transition-colors"
+              >
+                From outside US? Contact me →
+              </a>
+            </div>
+          </div>
+
+          {/* --- Stripe / Card Payment Card --- */}
+          <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-5 sm:p-6 flex flex-col items-center text-center">
+              <div class="text-3xl mb-3">💳</div>
+              <h2 class="text-xl font-semibold text-white mb-1">
+                Card Payment
+              </h2>
+              <p class="text-gray-400 text-sm mb-6">
+                Fast checkout. Credit or debit card.
+              </p>
+              <a
+                href="https://buy.stripe.com/4gw171g4hcwC06IdQS"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+              >
+                Pay with Stripe →
+              </a>
+              <img
+                class="w-full max-w-[200px] mx-auto mt-6 object-cover"
+                src="/img/qr-stripe.svg"
+                alt="QR-code to pay with Stripe"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Back link */}
+        <div class="text-center mt-10">
+          <a
+            href="/"
+            class="text-gray-400 hover:text-white transition-colors text-sm"
+          >
+            ← Back to home
           </a>
         </div>
       </div>

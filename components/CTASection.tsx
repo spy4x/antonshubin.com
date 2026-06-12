@@ -82,7 +82,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
               : "bg-gradient-to-r from-orange-600 to-amber-500 shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-200"
           }`}
         >
-          {isCompact && <span class="mr-1">Hire me</span>}
+          {isCompact && <span class="mr-1">Start project</span>}
           {isCompact
             ? (
               <svg
@@ -132,7 +132,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
                     d="M91.47,14.13h.84l5.09,7.69h4.11l-5.85-8.53a7.66,7.66,0,0,0,4.74-7.11H96.77c0,3.37-2.66,4.65-5.3,4.65V0H87.82V21.82h3.64Z"
                   />
                 </svg>
-                Hire me
+                Start project
               </>
             )}
         </a>
@@ -152,7 +152,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
               <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
               <line x1="1" y1="10" x2="23" y2="10" />
             </svg>
-            Pay Me
+            Pay
           </a>
         )}
       </div>

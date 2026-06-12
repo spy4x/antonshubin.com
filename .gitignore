@@ -8,8 +8,11 @@
 # Fresh build directory
 _fresh/
 
-# Local todos
+# Local private files
 todos.md
+marketing-refactoring.md
+anton-tasks.md
+neatsoft.dev.md
 .playwright-mcp/
 
 # npm + other dependencies
