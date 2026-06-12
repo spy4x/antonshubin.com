@@ -115,7 +115,18 @@ export default define.page(function Pay() {
                 </div>
                 <div>
                   <p class="text-gray-500 text-xs">Account number</p>
-                  <p class="text-white font-mono">8331896611</p>
+                  <div class="flex items-center gap-2">
+                    <p id="swift-acct" class="text-white font-mono">
+                      8331896611
+                    </p>
+                    <button
+                      {...copyAttr("swift-acct")}
+                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0"
+                      title="Copy account number"
+                    >
+                      📋
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <p class="text-gray-500 text-xs">Bank</p>
@@ -123,17 +134,44 @@ export default define.page(function Pay() {
                 </div>
                 <div>
                   <p class="text-gray-500 text-xs">Bank address</p>
-                  <p class="text-white text-xs">
-                    5 Penn Plaza, 14th Floor, New York, NY 10001
-                  </p>
+                  <div class="flex items-start gap-2">
+                    <p id="swift-addr" class="text-white text-xs">
+                      5 Penn Plaza, 14th Floor, New York, NY 10001
+                    </p>
+                    <button
+                      {...copyAttr("swift-addr")}
+                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0 mt-0.5"
+                      title="Copy bank address"
+                    >
+                      📋
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <p class="text-gray-500 text-xs">ACH routing</p>
-                  <p class="text-white font-mono">026073150</p>
+                  <div class="flex items-center gap-2">
+                    <p id="swift-ach" class="text-white font-mono">026073150</p>
+                    <button
+                      {...copyAttr("swift-ach")}
+                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0"
+                      title="Copy ACH routing"
+                    >
+                      📋
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <p class="text-gray-500 text-xs">ABA / Fedwire</p>
-                  <p class="text-white font-mono">026073008</p>
+                  <div class="flex items-center gap-2">
+                    <p id="swift-aba" class="text-white font-mono">026073008</p>
+                    <button
+                      {...copyAttr("swift-aba")}
+                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0"
+                      title="Copy ABA / Fedwire"
+                    >
+                      📋
+                    </button>
+                  </div>
                 </div>
 
                 <div class="pt-3 border-t border-gray-700 mt-4">

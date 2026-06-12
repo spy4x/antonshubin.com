@@ -65,6 +65,9 @@ export default function MobileMenu(
               <a href="/projects" class={linkClass("/projects")}>
                 My Projects
               </a>
+              <a href="/catalog" class={linkClass("/catalog")}>
+                Catalog
+              </a>
               <a href="/blog" class={linkClass("/blog")}>
                 Blog
               </a>
@@ -181,6 +184,16 @@ export default function MobileMenu(
                     href="/projects"
                   >
                     Projects
+                  </a>
+                  <a
+                    class={`px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive("/catalog")
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    }`}
+                    href="/catalog"
+                  >
+                    Catalog
                   </a>
                   <a
                     class={`px-3 py-2 rounded-md text-sm font-medium ${

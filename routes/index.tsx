@@ -234,7 +234,7 @@ export default define.page(function Home(ctx) {
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">How I Deliver — The Terms of Engagement</h2>
           <p class="text-gray-400 mb-8 text-base sm:text-lg">
-            Fixed-price milestones. Zero micromanagement. Complete transparency.
+            Zero micromanagement. Complete transparency.
           </p>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
@@ -287,6 +287,61 @@ export default define.page(function Home(ctx) {
                 post-launch.
               </p>
             </div>
+
+            {/* Policy 6: No Jargon Guarantee */}
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+              <div class="text-2xl mb-2">💬</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                No Jargon Guarantee
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Every technical decision gets a plain-English explanation.
+                You'll never hear "we need to refactor the microservices layer"
+                without a clear translation of what it means for your product,
+                timeline, and budget.
+              </p>
+            </div>
+
+            {/* Policy 7: Community-Driven Architecture */}
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+              <div class="text-2xl mb-2">🌐</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                Community-Driven Architecture
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                I build on proven open-source technologies (Deno, Postgres,
+                Valkey) with active communities. No proprietary frameworks. No
+                single-vendor risk. If we part ways, you can find developers
+                anywhere who know this stack.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* G1: Free Architecture Audit Lead Magnet */}
+        <section class="mb-16 md:mb-24">
+          <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-8 sm:p-10 text-center">
+            <div class="text-3xl mb-4">🔍</div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
+              Not sure where to start?
+            </h2>
+            <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
+              Send me your current tech stack or idea — I'll send back 3
+              concrete architectural improvements within 48 hours.
+              <span class="text-orange-400 font-semibold">
+                No cost. No commitment.
+              </span>
+            </p>
+            <a
+              href="mailto:anton@antonshubin.com?subject=Free%20Architecture%20Audit"
+              class="inline-block px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+            >
+              Send my stack for audit →
+            </a>
+            <p class="text-gray-500 text-xs mt-3">
+              I'll respond within 48 hours. No sales pitch — just honest
+              architectural feedback.
+            </p>
           </div>
         </section>
 
