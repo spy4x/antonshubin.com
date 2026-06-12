@@ -191,6 +191,105 @@ export default define.page(function Home(ctx) {
           </div>
         </div>
 
+        {/* B2: Pain Point Recognition Section */}
+        <section class="mb-16 md:mb-24">
+          <h2 class="h1 mb-8">
+            Are you a non-technical founder who's been burned by developers?
+          </h2>
+          <div class="grid gap-5 md:grid-cols-3">
+            <div class="p-6 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
+              <div class="text-2xl mb-3">🔥</div>
+              <h3 class="text-lg font-semibold text-white mb-2">
+                Overpromised, underdelivered
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                You've hired devs who promised the world and delivered a
+                nightmare. I've fixed those messes.
+              </p>
+            </div>
+            <div class="p-6 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
+              <div class="text-2xl mb-3">💰</div>
+              <h3 class="text-lg font-semibold text-white mb-2">
+                Bloated costs, slow progress
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Your SaaS is running on $500/month AWS when it should cost $40
+                on Hetzner.
+              </p>
+            </div>
+            <div class="p-6 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
+              <div class="text-2xl mb-3">🎯</div>
+              <h3 class="text-lg font-semibold text-white mb-2">
+                No ownership, no clarity
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                You need a technical partner who owns the outcome — not a
+                time-tracker who owns the hours.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* B3: Engagement Terms Section */}
+        <section class="mb-16 md:mb-24">
+          <h2 class="h1 mb-8">How I Deliver — The Terms of Engagement</h2>
+          <p class="text-gray-400 mb-8 text-base sm:text-lg">
+            Fixed-price milestones. Zero micromanagement. Complete transparency.
+          </p>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+              <div class="text-2xl mb-2">🛡️</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                14-Day Mutual Alignment Guarantee
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                If we're not a perfect fit within 2 weeks, I issue a 100% refund
+                — no questions asked.
+              </p>
+            </div>
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+              <div class="text-2xl mb-2">⏱️</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                Async-First Execution
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                One weekly alignment call. All daily updates async via text or
+                Loom. You pay for engineering throughput, not meeting bloat.
+              </p>
+            </div>
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+              <div class="text-2xl mb-2">🔑</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                Clean Handoff & IP Sovereignty
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                You hold the root keys and own 100% of source code from Day 1.
+                No proprietary lock-in, no vendor hostage.
+              </p>
+            </div>
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+              <div class="text-2xl mb-2">🎯</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                Fixed-Price Milestones
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Once a milestone is funded, scope is locked. New ideas go into a
+                V2 Backlog — quoted after launch.
+              </p>
+            </div>
+            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700 sm:col-span-2 lg:col-span-1">
+              <div class="text-2xl mb-2">🔧</div>
+              <h3 class="text-base font-semibold text-white mb-1">
+                30-Day Code Warranty
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                I patch any bugs within the delivered scope for free for 30 days
+                post-launch.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Featured Projects Section */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">Open Source Projects</h2>
