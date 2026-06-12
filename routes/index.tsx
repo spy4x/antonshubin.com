@@ -34,17 +34,30 @@ export default define.page(function Home(ctx) {
                   I take your SaaS from{" "}
                   <span class="text-white font-semibold bg-orange-600 px-2 py-0.5 rounded-md whitespace-nowrap">
                     napkin sketch to production
-                  </span>{" "}
-                  — without the dev-team drama.
+                  </span>
                 </p>
-                <p class="text-gray-300">
-                  Autonomous technical partner. Fixed-price milestones.
-                  Zero-bloat architecture.
-                </p>
+                <ul class="space-y-2 text-gray-300">
+                  <li class="flex items-start gap-2">
+                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                    <span>Without the dev-team drama</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                    <span>Autonomous technical partner</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                    <span>Fixed-price milestones</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-orange-500 mt-1.5 shrink-0">—</span>
+                    <span>Zero-bloat architecture</span>
+                  </li>
+                </ul>
               </div>
 
               {/* Metrics Bar */}
-              <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-400">
+              <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:text-base text-gray-400">
                 <span class="inline-flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
                   Expert-Vetted (Top 1%)

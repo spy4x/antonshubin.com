@@ -68,6 +68,9 @@ export default function MobileMenu(
               <a href="/blog" class={linkClass("/blog")}>
                 Blog
               </a>
+              <a href="/contact-me" class={linkClass("/contact-me")}>
+                Contact
+              </a>
               <div class="flex justify-center items-center gap-3 py-2">
                 <a
                   class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
@@ -188,6 +191,16 @@ export default function MobileMenu(
                     href="/blog"
                   >
                     Blog
+                  </a>
+                  <a
+                    class={`px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive("/contact-me")
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    }`}
+                    href="/contact-me"
+                  >
+                    Contact
                   </a>
                   <a
                     class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white"

@@ -1,6 +1,10 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
-import CopyButton from "../islands/CopyButton.tsx";
+
+// Helper to add native onclick attr bypassing Preact type strictness
+function copyAttr(id: string) {
+  return { onclick: `copyAddr('${id}')`, "data-copy": id };
+}
 
 export default define.page(function Pay() {
   return (
@@ -35,7 +39,12 @@ export default define.page(function Pay() {
                   >
                     0xDC68c304B29a85360E364Faf8b828b77a1B8439C
                   </p>
-                  <CopyButton addressId="evm-addr" />
+                  <button
+                    {...copyAttr("evm-addr")}
+                    class="mt-2 text-xs text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-1"
+                  >
+                    📋 Copy address
+                  </button>
                 </div>
 
                 {/* BTC */}
@@ -49,7 +58,12 @@ export default define.page(function Pay() {
                   >
                     bc1qlp05rhq99uhu6anzkzymeedgjsee605hp25knl
                   </p>
-                  <CopyButton addressId="btc-addr" />
+                  <button
+                    {...copyAttr("btc-addr")}
+                    class="mt-2 text-xs text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-1"
+                  >
+                    📋 Copy address
+                  </button>
                 </div>
 
                 {/* Solana */}
@@ -63,7 +77,12 @@ export default define.page(function Pay() {
                   >
                     J5dXRN3Rip1TuadSf8zAui72HY7osVvaMJZ7xXPmkuQo
                   </p>
-                  <CopyButton addressId="sol-addr" />
+                  <button
+                    {...copyAttr("sol-addr")}
+                    class="mt-2 text-xs text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-1"
+                  >
+                    📋 Copy address
+                  </button>
                 </div>
               </div>
             </div>
@@ -171,6 +190,34 @@ export default define.page(function Pay() {
           </a>
         </div>
       </div>
+
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            function copyAddr(id) {
+              var el = document.getElementById(id);
+              if (!el) return;
+              var txt = el.textContent.trim();
+              if (navigator.clipboard) {
+                navigator.clipboard.writeText(txt);
+              } else {
+                var ta = document.createElement("textarea");
+                ta.value = txt;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+              }
+              var btns = document.querySelectorAll('[data-copy="' + id + '"]');
+              btns.forEach(function(b) {
+                var orig = b.textContent;
+                b.textContent = "✅ Copied!";
+                setTimeout(function() { b.textContent = orig; }, 10000);
+              });
+            }
+          `,
+        }}
+      />
     </Layout>
   );
 });
