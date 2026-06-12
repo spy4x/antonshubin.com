@@ -42,7 +42,31 @@ export default define.page(function Home(ctx) {
                   Zero-bloat architecture.
                 </p>
               </div>
-              <div class="mt-8 flex flex-wrap gap-2">
+
+              {/* Metrics Bar */}
+              <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-400">
+                <span class="inline-flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  Expert-Vetted (Top 1%)
+                </span>
+                <span class="text-gray-600 hidden sm:inline">|</span>
+                <span class="inline-flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  $395K+ Earned
+                </span>
+                <span class="text-gray-600 hidden sm:inline">|</span>
+                <span class="inline-flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  80+ Projects
+                </span>
+                <span class="text-gray-600 hidden sm:inline">|</span>
+                <span class="inline-flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  100% Job Success
+                </span>
+              </div>
+
+              <div class="mt-6 flex flex-wrap gap-2">
                 <a
                   href="https://github.com/spy4x"
                   target="_blank"
@@ -261,8 +285,8 @@ export default define.page(function Home(ctx) {
                   YouTube Channel
                 </h3>
                 <p class="text-gray-300 text-sm">
-                  Live-coding sessions, dev tips & tricks, and startup journey
-                  sharing.
+                  Architecture deep-dives, cost optimization strategies, and
+                  startup engineering from a Fractional CTO.
                 </p>
               </div>
             </a>
@@ -278,8 +302,8 @@ export default define.page(function Home(ctx) {
                   Blog
                 </h3>
                 <p class="text-gray-300 text-sm">
-                  Articles about SaaS development, productivity, and indie
-                  hacking.
+                  SaaS architecture, production patterns, and lessons from 80+
+                  shipped projects.
                 </p>
               </div>
             </a>
