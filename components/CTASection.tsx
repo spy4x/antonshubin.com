@@ -40,7 +40,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
           {!isCompact && "Schedule a call"}
         </a>
         <a
-          href="mailto:anton@antonshubin.com"
+          href="/contact-me"
           class={`inline-flex items-center ${
             isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
           } border border-transparent ${

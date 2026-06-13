@@ -156,7 +156,7 @@ export default define.page(function Projects(ctx) {
         {activeProjects.length > 0 && (
           <>
             <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-orange-400">🔧</span> Completed Projects
+              <span class="text-orange-400">🔧</span> Personal Projects
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {activeProjects.map((project) => (

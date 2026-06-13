@@ -664,8 +664,8 @@ export default define.page(function Home(ctx) {
                 🛠️ Infrastructure & IoT
               </h3>
               <ul class="space-y-3 text-gray-400 text-sm">
-                <li class="flex items-start gap-2">
-                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
                   <span>
                     Self-host 20+ services on Fedora with{" "}
                     <a
@@ -677,8 +677,8 @@ export default define.page(function Home(ctx) {
                     </a>
                   </span>
                 </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
                   <span>
                     Custom{" "}
                     <a
@@ -691,10 +691,18 @@ export default define.page(function Home(ctx) {
                     in Home Assistant
                   </span>
                 </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
                   <span>
-                    Open-source finance tracker (double-entry accounting, PWA)
+                    Open-source{" "}
+                    <a
+                      href="https://financy.dev"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      finance tracker
+                    </a>{" "}
+                    (double-entry accounting, PWA)
                   </span>
                 </li>
               </ul>
@@ -704,8 +712,8 @@ export default define.page(function Home(ctx) {
                 🏍️ Adventure
               </h3>
               <ul class="space-y-3 text-gray-400 text-sm">
-                <li class="flex items-start gap-2">
-                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
                   <span>
                     <a
                       href="https://www.youtube.com/@anton-shubin-live"
@@ -716,14 +724,14 @@ export default define.page(function Home(ctx) {
                     </a>
                   </span>
                 </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
                   <span>
                     Traveled 25+ countries across Asia and Europe
                   </span>
                 </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
                   <span>
                     Currently based in{" "}
                     <a
