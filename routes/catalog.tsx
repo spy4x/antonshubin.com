@@ -86,6 +86,24 @@ const items: CatalogItem[] = [
     tech: ["Any stack", "Security audit", "Performance profiling"],
     upworkUrl: "https://www.upwork.com/freelancers/~01bad246d7ab0effef",
   },
+  {
+    icon: "🛟",
+    title: "Post-Launch Support & Maintenance",
+    price: "$400/month",
+    delivery: "Ongoing",
+    desc:
+      "Ongoing infrastructure oversight after your project ships. I keep a hand on the pulse — server monitoring, backup verification, disk space tracking, security patches — so you can focus on growing your business.",
+    includes: [
+      "Server health & performance monitoring",
+      "Automated backup verification",
+      "Disk space & resource tracking",
+      "Security patch updates",
+      "Monthly status report",
+      "8-hour response for critical issues",
+      "Priority email support",
+    ],
+    tech: ["Deno/Node.js", "PostgreSQL", "Docker", "Linux", "Monitoring"],
+  },
 ];
 
 export default define.page(function Catalog() {

@@ -1,14 +1,5 @@
 import { useSignal } from "@preact/signals";
-import {
-  CalendarIcon,
-  CloseIcon,
-  EmailIcon,
-  GitHubIcon,
-  MenuIcon,
-  TelegramIcon,
-  UpworkIcon,
-  YouTubeIcon,
-} from "../components/Icons.tsx";
+import { CloseIcon, MenuIcon } from "../components/Icons.tsx";
 
 interface MobileMenuProps {
   currentPath: string;
@@ -71,52 +62,12 @@ export default function MobileMenu(
               <a href="/blog" class={linkClass("/blog")}>
                 Blog
               </a>
+              <a href="/how-i-work" class={linkClass("/how-i-work")}>
+                How I work
+              </a>
               <a href="/contact-me" class={linkClass("/contact-me")}>
                 Contact me
               </a>
-              <div class="flex justify-center items-center gap-3 py-2">
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
-                  href={scheduleUrl}
-                  target="_blank"
-                >
-                  <CalendarIcon />
-                </a>
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
-                  href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
-                  target="_blank"
-                >
-                  <UpworkIcon />
-                </a>
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
-                  href="https://www.youtube.com/@anton-shubin"
-                  target="_blank"
-                >
-                  <YouTubeIcon />
-                </a>
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
-                  href="https://github.com/spy4x"
-                  target="_blank"
-                >
-                  <GitHubIcon />
-                </a>
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white"
-                  href="https://t.me/spy4x"
-                  target="_blank"
-                >
-                  <TelegramIcon />
-                </a>
-                <a
-                  class="text-gray-300 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white contact-link"
-                  href="mailto:anton@antonshubin.com"
-                >
-                  <EmailIcon />
-                </a>
-              </div>
             </div>
           </div>
         )}
@@ -207,6 +158,16 @@ export default function MobileMenu(
                   </a>
                   <a
                     class={`px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive("/how-i-work")
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    }`}
+                    href="/how-i-work"
+                  >
+                    How I work
+                  </a>
+                  <a
+                    class={`px-3 py-2 rounded-md text-sm font-medium ${
                       isActive("/contact-me")
                         ? "bg-orange-500 text-white"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -214,48 +175,6 @@ export default function MobileMenu(
                     href="/contact-me"
                   >
                     Contact me
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white"
-                    href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
-                    target="_blank"
-                  >
-                    <UpworkIcon />
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
-                    href={scheduleUrl}
-                    target="_blank"
-                    title="Schedule a call"
-                  >
-                    <CalendarIcon class="w-5 h-5" />
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
-                    href="https://www.youtube.com/@anton-shubin"
-                    target="_blank"
-                  >
-                    <YouTubeIcon />
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
-                    href="https://github.com/spy4x"
-                    target="_blank"
-                  >
-                    <GitHubIcon />
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white"
-                    href="https://t.me/spy4x"
-                    target="_blank"
-                  >
-                    <TelegramIcon />
-                  </a>
-                  <a
-                    class="text-gray-300 px-3 py-2 rounded-md text-sm font-medium rotate-90 hover:bg-gray-700 hover:text-white contact-link"
-                    href="mailto:anton@antonshubin.com"
-                  >
-                    <EmailIcon />
                   </a>
                 </div>
               </div>

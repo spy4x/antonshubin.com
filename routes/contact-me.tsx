@@ -22,6 +22,26 @@ const contacts = [
     btnText: "Book now",
   },
   {
+    icon: <YouTubeIcon class="w-6 h-6" />,
+    title: "YouTube",
+    desc: "Architecture deep-dives and dev tips from a Fractional CTO.",
+    href: "https://www.youtube.com/@anton-shubin",
+    color: "bg-red-600/20 text-red-400 border-red-600/30 hover:border-red-500",
+    btnClass:
+      "bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+    btnText: "Watch videos",
+  },
+  {
+    icon: <GithubIcon class="w-6 h-6" />,
+    title: "GitHub",
+    desc: "Open-source projects and code contributions.",
+    href: "https://github.com/spy4x",
+    color: "bg-gray-600/20 text-gray-300 border-gray-600/30 hover:border-white",
+    btnClass:
+      "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+    btnText: "View profile",
+  },
+  {
     icon: (
       <svg
         class="w-6 h-6"
@@ -64,26 +84,6 @@ const contacts = [
     btnClass:
       "bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Connect",
-  },
-  {
-    icon: <GithubIcon class="w-6 h-6" />,
-    title: "GitHub",
-    desc: "Open-source projects and code contributions.",
-    href: "https://github.com/spy4x",
-    color: "bg-gray-600/20 text-gray-300 border-gray-600/30 hover:border-white",
-    btnClass:
-      "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "View profile",
-  },
-  {
-    icon: <YouTubeIcon class="w-6 h-6" />,
-    title: "YouTube",
-    desc: "Architecture deep-dives and dev tips from a Fractional CTO.",
-    href: "https://www.youtube.com/@anton-shubin",
-    color: "bg-red-600/20 text-red-400 border-red-600/30 hover:border-red-500",
-    btnClass:
-      "bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "Watch videos",
   },
 ];
 

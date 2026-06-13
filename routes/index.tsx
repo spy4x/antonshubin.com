@@ -7,11 +7,9 @@ import {
   GithubIcon,
   LinkedInIcon,
   PenIcon,
-  QuoteIcon,
   ServerIcon,
   StarIcon,
   TelegramIcon,
-  UpworkBadgeIcon,
   UpworkIcon,
   WalletIcon,
   YouTubeIcon,
@@ -301,20 +299,29 @@ export default define.page(function Home(ctx) {
                 timeline, and budget.
               </p>
             </div>
+          </div>
 
-            {/* Policy 7: Community-Driven Architecture */}
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
-              <div class="text-2xl mb-2">🌐</div>
-              <h3 class="text-base font-semibold text-white mb-1">
-                Community-Driven Architecture
-              </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                I build on proven open-source technologies (Deno, Postgres,
-                Valkey) with active communities. No proprietary frameworks. No
-                single-vendor risk. If we part ways, you can find developers
-                anywhere who know this stack.
-              </p>
-            </div>
+          <div class="mt-6 text-right">
+            <a
+              href="/how-i-work"
+              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+            >
+              Read more about how I work
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
+              </svg>
+            </a>
           </div>
         </section>
 
@@ -328,8 +335,11 @@ export default define.page(function Home(ctx) {
             <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
               Send me your current tech stack or idea — I'll send back 3
               concrete architectural improvements within 48 hours.
-              <span class="text-orange-400 font-semibold">
-                No cost. No commitment.
+              <span class="text-orange-400 font-semibold block sm:inline">
+                No cost.
+              </span>
+              <span class="text-orange-400 font-semibold block sm:inline">
+                No commitment.
               </span>
             </p>
             <a
@@ -480,66 +490,104 @@ export default define.page(function Home(ctx) {
         {/* Testimonial Section */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">What Clients Say</h2>
-          <a
-            href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
-            target="_blank"
-            class="block relative py-8 px-6 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-orange-500 transition-colors md:px-10"
-          >
-            <div class="mb-6 md:flex md:justify-between md:items-center">
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Testimonial 1: MVP Development */}
+            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+              <div class="flex gap-1 items-center mb-3">
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <span class="ml-1 text-white font-medium text-sm">5.0</span>
+              </div>
+              <p class="text-sm italic text-gray-300 mb-4 leading-relaxed flex-1">
+                "Anton was a terrific partner to me in developing an MVP of a
+                web app I've been dreaming of for ages. He is a highly skilled
+                developer, a super resourceful problem-solver, and a
+                conscientious and communicative collaborator."
+              </p>
               <div>
-                <p class="font-medium text-white">
-                  Technical Lead for a Startup
+                <p class="font-medium text-white text-sm">Startup Founder</p>
+                <p class="text-gray-500 text-xs">
+                  MVP Development • $4,000 fixed price
                 </p>
-                <p class="text-gray-400 text-sm">Jul 6, 2020 - Feb 28, 2021</p>
-              </div>
-              <div class="flex gap-1 items-center mt-2 md:mt-0">
-                <StarIcon class="text-orange-500 w-5 h-5" filled />
-                <StarIcon class="text-orange-500 w-5 h-5" filled />
-                <StarIcon class="text-orange-500 w-5 h-5" filled />
-                <StarIcon class="text-orange-500 w-5 h-5" filled />
-                <StarIcon class="text-orange-500 w-5 h-5" filled />
-                <span class="ml-2 text-white font-medium">5.00</span>
               </div>
             </div>
-            <blockquote class="text-sm italic text-gray-300">
-              <p class="mb-3">
-                "Anton is the greatest developer I've ever worked with hands
-                down. He's taken a role in our startup as tech lead and has been
-                doing a beyond excellent job with communication, honesty, hard
-                work and accuracy."
-              </p>
-              <p class="mb-3">
-                "He isn't one of the type of developers that just says, 'sure, I
+
+            {/* Testimonial 2: Technical Lead */}
+            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+              <div class="flex gap-1 items-center mb-3">
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <span class="ml-1 text-white font-medium text-sm">5.0</span>
+              </div>
+              <p class="text-sm italic text-gray-300 mb-4 leading-relaxed flex-1">
+                "He isn't one of the type of developers that just says 'sure, I
                 can do that.' He's thoughtful and will give his honest feedback
-                and advice on everything."
+                and advice on everything. Overall, 12/10 of a developer. I
+                really got lucky with Anton."
               </p>
-              <p>
-                "Overall, 12/10 of a developer. I really got lucky with Anton."
-              </p>
-            </blockquote>
-            <div class="h-1 w-24 rounded bg-orange-500 my-6 mx-auto" />
-            <div class="flex flex-col items-center gap-2 text-gray-300">
-              <div class="flex items-center">
-                <span class="font-medium text-white mr-1">5900+</span>
-                <span class="mr-2">hours on</span>
-                <UpworkIcon class="w-auto h-5 text-white" />
-              </div>
-              <div class="flex items-center gap-2">
-                <span>100% Job Success</span>
-                <span class="text-gray-500">|</span>
-                <UpworkBadgeIcon class="w-5" />
-                <span>Expert-vetted</span>
+              <div>
+                <p class="font-medium text-white text-sm">Product Owner</p>
+                <p class="text-gray-500 text-xs">
+                  Tech Lead • $55,749 • 7+ months
+                </p>
               </div>
             </div>
-            <div class="hidden md:block">
-              <p class="absolute top-6 left-0 -ml-4 lg:-ml-12">
-                <QuoteIcon class="w-8 h-8 text-orange-500" />
+
+            {/* Testimonial 3: Consultation */}
+            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+              <div class="flex gap-1 items-center mb-3">
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <StarIcon class="text-orange-500 w-4 h-4" filled />
+                <span class="ml-1 text-white font-medium text-sm">5.0</span>
+              </div>
+              <p class="text-sm italic text-gray-300 mb-4 leading-relaxed flex-1">
+                "On an hour consultation, he killed it. He didn't just talk, we
+                got work done during the call. He was very knowledgeable on
+                pretty much everything I needed and I'll certainly be going back
+                more than a few times."
               </p>
-              <p class="absolute bottom-6 right-0 -mr-4 lg:-mr-12">
-                <QuoteIcon class="w-8 h-8 text-orange-500" />
-              </p>
+              <div>
+                <p class="font-medium text-white text-sm">Startup Founder</p>
+                <p class="text-gray-500 text-xs">
+                  Technical Consultation • $115 fixed price
+                </p>
+              </div>
             </div>
-          </a>
+          </div>
+
+          {/* Link to Upwork */}
+          <div class="mt-6 text-center">
+            <a
+              href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
+              target="_blank"
+              class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+            >
+              View all reviews on <UpworkIcon class="w-auto h-4 text-white" />
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
+              </svg>
+            </a>
+          </div>
         </section>
 
         {/* CTA Section */}

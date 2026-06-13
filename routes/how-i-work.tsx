@@ -47,17 +47,25 @@ const policies = [
     icon: "💬",
     title: "No Jargon Guarantee",
     desc:
-      "Every technical decision gets a plain-English explanation. You will never hear 'we need to refactor the microservices orchestration layer' without a clear translation of what it means for your product, timeline, and budget.",
+      "Every technical decision gets a plain-English explanation. You will never hear opaque jargon without a clear translation of what it means for your product, timeline, and budget.",
     why:
-      "Non-technical founders shouldn't need a translator. I speak both business and engineering — fluently.",
+      "Non-technical founders should not need a translator. I speak both business and engineering fluently.",
   },
   {
     icon: "🌐",
     title: "Community-Driven Architecture",
     desc:
-      "I build on proven open-source technologies with active communities: Deno, TypeScript, Preact, PostgreSQL, Valkey. No proprietary frameworks, no single-vendor risk. If we part ways, you can find developers anywhere who know this stack.",
+      "I build with proven technologies: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman. AI integrations via OpenAI, Claude, and DeepSeek APIs. No proprietary frameworks. No single-vendor risk. If we part ways, you can find developers anywhere who know this stack.",
     why:
-      "Your product shouldn't be held hostage by a niche technology choice. Open-source means portable, auditable, and sustainable.",
+      "Your product should not be held hostage by a niche technology choice. Open-source means portable, auditable, and sustainable.",
+  },
+  {
+    icon: "🛟",
+    title: "Post-Launch Support & Maintenance",
+    desc:
+      "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patch updates, and monthly status reports. Critical issues get an 8-hour response time.",
+    why:
+      "Your software is your asset — it deserves care after launch. This is not just bug fixes; it is peace of mind that your product stays healthy, secure, and fast.",
   },
 ];
 
@@ -87,8 +95,11 @@ export default define.page(function HowIWork() {
                   <p class="text-gray-300 text-sm sm:text-base leading-relaxed mb-3">
                     {p.desc}
                   </p>
-                  <p class="text-gray-500 text-sm italic">
-                    Why: {p.why}
+                  <p class="text-gray-400 text-base leading-relaxed border-l-2 border-gray-600 pl-3">
+                    <span class="text-gray-500 font-medium">
+                      Why this matters:
+                    </span>{" "}
+                    {p.why}
                   </p>
                 </div>
               </div>
