@@ -55,7 +55,7 @@ const policies = [
     icon: "🌐",
     title: "Community-Driven Architecture",
     desc:
-      "I build with proven technologies: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman. AI integrations via OpenAI, Claude, and DeepSeek APIs. No proprietary frameworks. No single-vendor risk. If we part ways, you can find developers anywhere who know this stack.",
+      "I build with proven technologies: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman. AI integrations via OpenAI, Claude, and DeepSeek APIs. No proprietary frameworks. No single-vendor risk. Developers everywhere already know these tools — there is no research or retraining needed.",
     why:
       "Your product should not be held hostage by a niche technology choice. Open-source means portable, auditable, and sustainable.",
   },
@@ -114,15 +114,6 @@ export default define.page(function HowIWork() {
             class="inline-block px-8 py-3.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
           >
             Book a strategy call
-          </a>
-        </div>
-
-        <div class="text-center mt-6">
-          <a
-            href="/"
-            class="text-gray-400 hover:text-white transition-colors text-sm"
-          >
-            ← Back to home
           </a>
         </div>
       </div>

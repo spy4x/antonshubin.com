@@ -70,7 +70,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
           {!isCompact && "Contact Me"}
         </a>
         <a
-          href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
+          href="https://www.upwork.com/freelancers/ashubin"
           target="_blank"
           class={`inline-flex items-center ${
             isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"

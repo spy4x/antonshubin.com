@@ -30,7 +30,7 @@ export default define.page(function Pay() {
               <div class="space-y-4 text-left self-stretch w-full">
                 {/* EVM */}
                 <div>
-                  <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                  <p class="text-gray-400 text-sm uppercase tracking-wide mb-1">
                     ETH / Linea / Base / BNB / Polygon / OP / Arbitrum / Tron
                   </p>
                   <p
@@ -49,7 +49,7 @@ export default define.page(function Pay() {
 
                 {/* BTC */}
                 <div>
-                  <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                  <p class="text-gray-400 text-sm uppercase tracking-wide mb-1">
                     Bitcoin
                   </p>
                   <p
@@ -68,7 +68,7 @@ export default define.page(function Pay() {
 
                 {/* Solana */}
                 <div>
-                  <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                  <p class="text-gray-400 text-sm uppercase tracking-wide mb-1">
                     Solana
                   </p>
                   <p
@@ -87,7 +87,7 @@ export default define.page(function Pay() {
               </div>
             </div>
             <div class="mt-auto px-5 sm:px-6 pb-5 sm:pb-6">
-              <p class="text-gray-500 text-xs">
+              <p class="text-gray-400 text-sm">
                 No minimum. Send any network. Confirm with me after sending.
               </p>
             </div>
@@ -110,11 +110,11 @@ export default define.page(function Pay() {
                   From US (ACH / Fedwire)
                 </p>
                 <div>
-                  <p class="text-gray-500 text-xs">Account holder</p>
+                  <p class="text-gray-400 text-sm">Account holder</p>
                   <p class="text-white">NEATSOFT PTE. LTD.</p>
                 </div>
                 <div>
-                  <p class="text-gray-500 text-xs">Account number</p>
+                  <p class="text-gray-400 text-sm">Account number</p>
                   <div class="flex items-center gap-2">
                     <p id="swift-acct" class="text-white font-mono">
                       8331896611
@@ -129,11 +129,11 @@ export default define.page(function Pay() {
                   </div>
                 </div>
                 <div>
-                  <p class="text-gray-500 text-xs">Bank</p>
+                  <p class="text-gray-400 text-sm">Bank</p>
                   <p class="text-white">Community Federal Savings Bank</p>
                 </div>
                 <div>
-                  <p class="text-gray-500 text-xs">Bank address</p>
+                  <p class="text-gray-400 text-sm">Bank address</p>
                   <div class="flex items-start gap-2">
                     <p id="swift-addr" class="text-white text-xs">
                       5 Penn Plaza, 14th Floor, New York, NY 10001
@@ -148,7 +148,7 @@ export default define.page(function Pay() {
                   </div>
                 </div>
                 <div>
-                  <p class="text-gray-500 text-xs">ACH routing</p>
+                  <p class="text-gray-400 text-sm">ACH routing</p>
                   <div class="flex items-center gap-2">
                     <p id="swift-ach" class="text-white font-mono">026073150</p>
                     <button
@@ -161,7 +161,7 @@ export default define.page(function Pay() {
                   </div>
                 </div>
                 <div>
-                  <p class="text-gray-500 text-xs">ABA / Fedwire</p>
+                  <p class="text-gray-400 text-sm">ABA / Fedwire</p>
                   <div class="flex items-center gap-2">
                     <p id="swift-aba" class="text-white font-mono">026073008</p>
                     <button
@@ -216,16 +216,6 @@ export default define.page(function Pay() {
               />
             </div>
           </div>
-        </div>
-
-        {/* Back link */}
-        <div class="text-center mt-10">
-          <a
-            href="/"
-            class="text-gray-400 hover:text-white transition-colors text-sm"
-          >
-            ← Back to home
-          </a>
         </div>
       </div>
 

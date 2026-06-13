@@ -142,7 +142,7 @@ export default define.page(function Home(ctx) {
                   Contact me
                 </a>
                 <a
-                  href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
+                  href="https://www.upwork.com/freelancers/ashubin"
                   target="_blank"
                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-500 transition-colors"
                 >
@@ -337,7 +337,7 @@ export default define.page(function Home(ctx) {
               concrete architectural improvements within 48 hours.
               <span class="text-orange-400 font-semibold block sm:inline">
                 No cost.
-              </span>
+              </span>{" "}
               <span class="text-orange-400 font-semibold block sm:inline">
                 No commitment.
               </span>
@@ -348,7 +348,7 @@ export default define.page(function Home(ctx) {
             >
               Send my stack for audit →
             </a>
-            <p class="text-gray-500 text-xs mt-3">
+            <p class="text-gray-400 text-sm mt-3">
               I'll respond within 48 hours. No sales pitch — just honest
               architectural feedback.
             </p>
@@ -421,10 +421,10 @@ export default define.page(function Home(ctx) {
           </div>
 
           {/* View All Projects Link */}
-          <div class="mt-6 text-center">
+          <div class="mt-6 text-right">
             <a
               href="/projects"
-              class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
             >
               View all projects
               <svg
@@ -509,7 +509,7 @@ export default define.page(function Home(ctx) {
               </p>
               <div>
                 <p class="font-medium text-white text-sm">Startup Founder</p>
-                <p class="text-gray-500 text-xs">
+                <p class="text-gray-400 text-sm">
                   MVP Development • $4,000 fixed price
                 </p>
               </div>
@@ -533,7 +533,7 @@ export default define.page(function Home(ctx) {
               </p>
               <div>
                 <p class="font-medium text-white text-sm">Product Owner</p>
-                <p class="text-gray-500 text-xs">
+                <p class="text-gray-400 text-sm">
                   Tech Lead • $55,749 • 7+ months
                 </p>
               </div>
@@ -557,7 +557,7 @@ export default define.page(function Home(ctx) {
               </p>
               <div>
                 <p class="font-medium text-white text-sm">Startup Founder</p>
-                <p class="text-gray-500 text-xs">
+                <p class="text-gray-400 text-sm">
                   Technical Consultation • $115 fixed price
                 </p>
               </div>
@@ -565,11 +565,11 @@ export default define.page(function Home(ctx) {
           </div>
 
           {/* Link to Upwork */}
-          <div class="mt-6 text-center">
+          <div class="mt-6 text-right">
             <a
-              href="https://www.upwork.com/freelancers/~01bad246d7ab0effef"
+              href="https://www.upwork.com/freelancers/ashubin"
               target="_blank"
-              class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
             >
               View all reviews on <UpworkIcon class="w-auto h-4 text-white" />
               <svg

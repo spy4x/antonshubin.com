@@ -1,9 +1,10 @@
-import { define } from "../lib/utils.ts";
-import { Layout } from "../components/Layout.tsx";
-import { SCHEDULE_URL } from "../lib/config.ts";
+import { define } from "../../lib/utils.ts";
+import { Layout } from "../../components/Layout.tsx";
+import { SCHEDULE_URL, UPWORK_URL } from "../../lib/config.ts";
 
-interface CatalogItem {
+export interface CatalogItem {
   icon: string;
+  slug: string;
   title: string;
   price: string;
   delivery: string;
@@ -13,9 +14,10 @@ interface CatalogItem {
   upworkUrl?: string;
 }
 
-const items: CatalogItem[] = [
+export const items: CatalogItem[] = [
   {
     icon: "🚀",
+    slug: "zero-to-production-saas-mvp",
     title: "Zero-to-Production SaaS MVP",
     price: "From $8,000",
     delivery: "21 days",
@@ -30,10 +32,11 @@ const items: CatalogItem[] = [
       "30-day code warranty",
     ],
     tech: ["Deno", "Preact", "PostgreSQL", "Docker", "Stripe"],
-    upworkUrl: "https://www.upwork.com/freelancers/~01bad246d7ab0effef",
+    upworkUrl: UPWORK_URL,
   },
   {
     icon: "⚡",
+    slug: "bulletproof-backend-api",
     title: "Bulletproof Backend API & Infrastructure",
     price: "From $4,000",
     delivery: "14 days",
@@ -48,10 +51,11 @@ const items: CatalogItem[] = [
       "CI/CD pipeline",
     ],
     tech: ["Deno", "Hono", "PostgreSQL", "Docker", "Traefik"],
-    upworkUrl: "https://www.upwork.com/freelancers/~01bad246d7ab0effef",
+    upworkUrl: UPWORK_URL,
   },
   {
     icon: "🤖",
+    slug: "surgical-ai-integration",
     title: "Surgical AI Integration & LLM Pipelines",
     price: "From $4,000",
     delivery: "14 days",
@@ -65,11 +69,12 @@ const items: CatalogItem[] = [
       "Monitoring & logging",
       "Integration with your existing backend",
     ],
-    tech: ["Deno", "LLM APIs", "Vector DB", "Docker"],
-    upworkUrl: "https://www.upwork.com/freelancers/~01bad246d7ab0effef",
+    tech: ["Deno", "OpenAI/Claude/DeepSeek", "Vector DB", "Docker"],
+    upworkUrl: UPWORK_URL,
   },
   {
     icon: "🔍",
+    slug: "codebase-health-audit",
     title: "Codebase Health Audit & Refactoring Roadmap",
     price: "From $1,500",
     delivery: "3 days",
@@ -84,15 +89,16 @@ const items: CatalogItem[] = [
       "30-min walkthrough call",
     ],
     tech: ["Any stack", "Security audit", "Performance profiling"],
-    upworkUrl: "https://www.upwork.com/freelancers/~01bad246d7ab0effef",
+    upworkUrl: UPWORK_URL,
   },
   {
     icon: "🛟",
+    slug: "post-launch-support-maintenance",
     title: "Post-Launch Support & Maintenance",
     price: "$400/month",
     delivery: "Ongoing",
     desc:
-      "Ongoing infrastructure oversight after your project ships. I keep a hand on the pulse — server monitoring, backup verification, disk space tracking, security patches — so you can focus on growing your business.",
+      "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patches, and monthly reports — so you can focus on growing your business. This is a separate service from the initial build, designed for clients who want ongoing peace of mind.",
     includes: [
       "Server health & performance monitoring",
       "Automated backup verification",
@@ -124,10 +130,13 @@ export default define.page(function Catalog() {
               class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden"
             >
               <div class="p-6 sm:p-8">
-                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                <a
+                  href={`/catalog/${item.slug}`}
+                  class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 group"
+                >
                   <div class="flex items-center gap-3">
                     <span class="text-3xl">{item.icon}</span>
-                    <h2 class="text-xl font-semibold text-white">
+                    <h2 class="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors">
                       {item.title}
                     </h2>
                   </div>
@@ -139,7 +148,7 @@ export default define.page(function Catalog() {
                       {item.delivery}
                     </span>
                   </div>
-                </div>
+                </a>
 
                 <p class="text-gray-300 text-sm mb-4 leading-relaxed">
                   {item.desc}
@@ -162,7 +171,7 @@ export default define.page(function Catalog() {
                   </ul>
                 </details>
 
-                <div class="flex flex-wrap gap-2 mb-4">
+                <div class="flex flex-wrap gap-2 mb-5">
                   {item.tech.map((t, j) => (
                     <span
                       key={j}
@@ -173,22 +182,28 @@ export default define.page(function Catalog() {
                   ))}
                 </div>
 
-                <div class="flex flex-wrap gap-3">
+                <div class="flex flex-wrap items-center gap-3">
+                  <a
+                    href="/contact-me"
+                    class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                  >
+                    Start this project
+                  </a>
+                  <a
+                    href={`/catalog/${item.slug}`}
+                    class="inline-flex items-center gap-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Details
+                  </a>
                   {item.upworkUrl && (
                     <a
                       href={item.upworkUrl}
                       target="_blank"
-                      class="inline-flex items-center gap-1 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-lg transition-colors"
+                      class="text-gray-500 hover:text-gray-300 text-xs transition-colors"
                     >
-                      Start on Upwork →
+                      Also available on Upwork
                     </a>
                   )}
-                  <a
-                    href="/contact-me"
-                    class="inline-flex items-center gap-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    Pay directly
-                  </a>
                 </div>
               </div>
             </div>
@@ -205,15 +220,6 @@ export default define.page(function Catalog() {
             class="inline-block px-8 py-3.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
           >
             Book a free strategy call
-          </a>
-        </div>
-
-        <div class="text-center mt-6">
-          <a
-            href="/"
-            class="text-gray-400 hover:text-white transition-colors text-sm"
-          >
-            ← Back to home
           </a>
         </div>
       </div>

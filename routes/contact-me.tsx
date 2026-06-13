@@ -119,16 +119,6 @@ export default define.page(function ContactMe() {
             </a>
           ))}
         </div>
-
-        {/* Divider or back */}
-        <div class="text-center mt-10">
-          <a
-            href="/"
-            class="text-gray-400 hover:text-white transition-colors text-sm"
-          >
-            ← Back to home
-          </a>
-        </div>
       </div>
     </Layout>
   );
