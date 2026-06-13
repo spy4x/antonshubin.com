@@ -113,7 +113,7 @@ export default define.page(function HowIWork() {
             target="_blank"
             class="inline-block px-8 py-3.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
           >
-            Book a strategy call
+            Book a free 30-min intro call
           </a>
         </div>
       </div>

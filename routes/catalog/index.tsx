@@ -20,16 +20,17 @@ export const items: CatalogItem[] = [
   {
     icon: "🎯",
     slug: "strategy-call",
-    title: "Strategy Call — 30 Minutes",
-    price: "$100",
-    delivery: "30 min",
+    title: "Technical Consultation — 60 Minutes",
+    price: "$150",
+    delivery: "60 min",
     desc:
-      "A focused 30-minute video call where I give you honest architectural feedback on your project or idea. No pitch, no commitment — just actionable advice from an experienced Fractional CTO.",
+      "A focused 60-minute video call where we dive deep into your project or idea. I give you honest architectural feedback, answer your questions, and help you plan the technical path forward. No pitch, no commitment — just actionable advice from an experienced Fractional CTO.",
     includes: [
-      "30-minute structured video call",
-      "Honest technical assessment of your project",
+      "60-minute structured video call",
+      "Honest technical assessment of your project or idea",
       "Tech stack recommendations tailored to your needs",
       "Infrastructure approach and cost estimates",
+      "Architecture diagram and notes after the call",
       "No commitment required — actionable advice either way",
     ],
     tech: ["Any stack", "Architecture", "Strategy"],
@@ -37,9 +38,32 @@ export const items: CatalogItem[] = [
     audience:
       "Non-technical founders with an idea who need guidance, startup teams evaluating tech choices, or anyone wanting a second opinion from an experienced CTO.",
     examples: [
-      "A first-time founder needing help choosing the right tech stack for their MVP",
-      "An existing startup evaluating whether to migrate from AWS to self-hosted infrastructure",
-      "A product owner wondering why their server bill is too high and how to fix it",
+      "I have a business idea but I do not know where to start with the technology — what should I build first?",
+      "I need someone to look at my current setup and tell me if I am on the right track before I invest more money",
+      "I want to build a web app for my business but I do not understand the technical terms — can you explain what I actually need?",
+    ],
+  },
+  {
+    icon: "🔍",
+    slug: "free-architecture-audit",
+    title: "Free Architecture Audit",
+    price: "Free",
+    delivery: "48 hours",
+    desc:
+      "Send me your current tech stack or idea — I will send back 3 concrete architectural improvements within 48 hours. No cost, no commitment. Just honest, actionable feedback from an experienced architect.",
+    includes: [
+      "Review of your current tech stack or project description",
+      "3 specific architectural improvements or recommendations",
+      "Prioritized based on impact and effort",
+      "Delivered via email within 48 hours",
+    ],
+    tech: ["Any stack", "Architecture review"],
+    audience:
+      "Anyone building software who wants a second opinion on their architecture before committing to a technical direction.",
+    examples: [
+      "I have been building my MVP with a freelance team and want to know if the architecture is solid before launching",
+      "I am choosing between different technologies and need an expert opinion on what fits my use case best",
+      "I inherited an existing codebase and want to know what needs to be fixed urgently versus what can wait",
     ],
   },
   {
@@ -257,15 +281,6 @@ export default define.page(function Catalog() {
                   >
                     Details
                   </a>
-                  {item.upworkUrl && (
-                    <a
-                      href={item.upworkUrl}
-                      target="_blank"
-                      class="text-gray-500 hover:text-gray-300 text-xs transition-colors"
-                    >
-                      Also available on Upwork
-                    </a>
-                  )}
                 </div>
               </div>
             </div>
@@ -281,7 +296,7 @@ export default define.page(function Catalog() {
             target="_blank"
             class="inline-block px-8 py-3.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
           >
-            Book a free strategy call
+            Book a free 30-min intro call
           </a>
         </div>
       </div>

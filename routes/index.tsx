@@ -97,10 +97,10 @@ export default define.page(function Home(ctx) {
                 <a
                   href="https://www.upwork.com/freelancers/ashubin"
                   target="_blank"
-                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-green-700 hover:bg-green-600 transition-colors"
+                  class="inline-flex items-center justify-center px-3 py-2 rounded-md text-white bg-green-700 hover:bg-green-600 transition-colors"
+                  title="Upwork profile"
                 >
                   <UpworkIcon class="w-auto h-4 text-white" />
-                  Upwork
                 </a>
               </div>
               <div class="mt-4 flex flex-wrap gap-2">
@@ -204,61 +204,79 @@ export default define.page(function Home(ctx) {
             Zero micromanagement. Complete transparency.
           </p>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+            <a
+              href="/how-i-work"
+              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
               <div class="text-2xl mb-2">🛡️</div>
-              <h3 class="text-base font-semibold text-white mb-1">
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 14-Day Mutual Alignment Guarantee
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
                 If we're not a perfect fit within 2 weeks, I issue a 100% refund
                 — no questions asked.
               </p>
-            </div>
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+            </a>
+            <a
+              href="/how-i-work"
+              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
               <div class="text-2xl mb-2">⏱️</div>
-              <h3 class="text-base font-semibold text-white mb-1">
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 Async-First Execution
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
                 One weekly alignment call. All daily updates async via text or
                 Loom. You pay for engineering throughput, not meeting bloat.
               </p>
-            </div>
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+            </a>
+            <a
+              href="/how-i-work"
+              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
               <div class="text-2xl mb-2">🔑</div>
-              <h3 class="text-base font-semibold text-white mb-1">
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 Clean Handoff & IP Sovereignty
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
                 You hold the root keys and own 100% of source code from Day 1.
                 No proprietary lock-in, no vendor hostage.
               </p>
-            </div>
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+            </a>
+            <a
+              href="/how-i-work"
+              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
               <div class="text-2xl mb-2">🎯</div>
-              <h3 class="text-base font-semibold text-white mb-1">
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 Fixed-Price Milestones
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
                 Once a milestone is funded, scope is locked. New ideas go into a
                 V2 Backlog — quoted after launch.
               </p>
-            </div>
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700 sm:col-span-2 lg:col-span-1">
+            </a>
+            <a
+              href="/how-i-work"
+              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group sm:col-span-2 lg:col-span-1"
+            >
               <div class="text-2xl mb-2">🔧</div>
-              <h3 class="text-base font-semibold text-white mb-1">
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 30-Day Code Warranty
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
                 I patch any bugs within the delivered scope for free for 30 days
                 post-launch.
               </p>
-            </div>
+            </a>
 
             {/* Policy 6: No Jargon Guarantee */}
-            <div class="p-5 bg-gray-800 rounded-xl border border-gray-700">
+            <a
+              href="/how-i-work"
+              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
               <div class="text-2xl mb-2">💬</div>
-              <h3 class="text-base font-semibold text-white mb-1">
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 No Jargon Guarantee
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
@@ -267,7 +285,7 @@ export default define.page(function Home(ctx) {
                 without a clear translation of what it means for your product,
                 timeline, and budget.
               </p>
-            </div>
+            </a>
           </div>
 
           <div class="mt-6 text-right">
@@ -304,14 +322,14 @@ export default define.page(function Home(ctx) {
             >
               <div class="text-3xl mb-3">🎯</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
-                Strategy Call
+                Technical Consultation
               </h3>
               <p class="text-gray-400 text-sm mb-3 leading-relaxed">
-                30-minute video call. Honest architectural feedback. No pitch,
-                no commitment.
+                60-minute video call. Deep-dive into your project. Honest
+                feedback and a clear technical path forward.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
-                $100 — 30 min
+                $150 — 60 min
               </span>
             </a>
             <a
@@ -331,19 +349,19 @@ export default define.page(function Home(ctx) {
               </span>
             </a>
             <a
-              href="/catalog/post-launch-support-maintenance"
+              href="/catalog/free-architecture-audit"
               class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
             >
-              <div class="text-3xl mb-3">🛟</div>
+              <div class="text-3xl mb-3">🔍</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
-                Support & Maintenance
+                Free Architecture Audit
               </h3>
               <p class="text-gray-400 text-sm mb-3 leading-relaxed">
-                Ongoing oversight after launch. Monitoring, backups, security
-                patches, monthly reports.
+                Send your tech stack or idea. I'll send back 3 concrete
+                improvements within 48 hours. No cost.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
-                $400/month — Ongoing
+                Free — 48 hours
               </span>
             </a>
           </div>

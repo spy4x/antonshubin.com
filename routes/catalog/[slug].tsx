@@ -31,7 +31,7 @@ export default define.page(function CatalogDetail(ctx) {
       <div class="max-w-3xl mx-auto px-4 py-12">
         <a
           href="/catalog"
-          class="inline-flex items-center gap-1 text-gray-400 hover:text-white transition-colors text-sm mb-8"
+          class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
         >
           ← Back to catalog
         </a>
@@ -120,29 +120,42 @@ export default define.page(function CatalogDetail(ctx) {
           </div>
 
           {/* CTA buttons — same height */}
-          <div class="flex flex-wrap items-stretch gap-4 pt-6 border-t border-gray-700">
-            <a
-              href="/contact-me"
-              class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
-            >
-              Start this project
-            </a>
-            <a
-              href={SCHEDULE_URL}
-              target="_blank"
-              class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors"
-            >
-              Book a free call
-            </a>
-            {item.upworkUrl && (
+          <div class="flex flex-wrap items-stretch justify-between gap-4 pt-6 border-t border-gray-700">
+            <div class="flex flex-wrap items-stretch gap-4">
               <a
-                href={item.upworkUrl}
-                target="_blank"
-                class="inline-flex items-center text-gray-500 hover:text-gray-300 text-sm transition-colors"
+                href="/contact-me"
+                class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
               >
-                Also available on Upwork
+                Start this project
               </a>
-            )}
+              <a
+                href={SCHEDULE_URL}
+                target="_blank"
+                class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors"
+              >
+                Book a free intro call
+              </a>
+            </div>
+            <a
+              href="/how-i-work"
+              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
+            >
+              How I work
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
