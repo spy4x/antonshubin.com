@@ -87,14 +87,6 @@ export default define.page(function Home(ctx) {
                   GitHub
                 </a>
                 <a
-                  href="https://www.linkedin.com/in/anton-shubin"
-                  target="_blank"
-                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-600 transition-colors"
-                >
-                  <LinkedInIcon class="w-4 h-4" />
-                  LinkedIn
-                </a>
-                <a
                   href="https://www.youtube.com/@anton-shubin"
                   target="_blank"
                   class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-500 transition-colors"
@@ -103,12 +95,12 @@ export default define.page(function Home(ctx) {
                   YouTube
                 </a>
                 <a
-                  href="https://t.me/spy4x"
+                  href="https://www.upwork.com/freelancers/ashubin"
                   target="_blank"
-                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-500 transition-colors"
+                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-green-700 hover:bg-green-600 transition-colors"
                 >
-                  <TelegramIcon class="w-4 h-4" />
-                  Telegram
+                  <UpworkIcon class="w-auto h-4 text-white" />
+                  Upwork
                 </a>
               </div>
               <div class="mt-4 flex flex-wrap gap-2">
@@ -121,47 +113,24 @@ export default define.page(function Home(ctx) {
                   Schedule a call
                 </a>
                 <a
-                  href="mailto:anton@antonshubin.com"
+                  href="/contact-me"
                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-500 transition-colors"
                 >
                   <svg
                     class="w-4 h-4"
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
                     fill="none"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                     stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
                   >
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                    />
                   </svg>
                   Contact me
-                </a>
-                <a
-                  href="https://www.upwork.com/freelancers/ashubin"
-                  target="_blank"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-500 transition-colors"
-                >
-                  <svg
-                    class="w-4 h-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                  Start project
                 </a>
               </div>
             </div>
@@ -307,6 +276,83 @@ export default define.page(function Home(ctx) {
               class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
             >
               Read more about how I work
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
+              </svg>
+            </a>
+          </div>
+        </section>
+
+        {/* Featured Services — from Catalog */}
+        <section class="mb-16 md:mb-24">
+          <h2 class="h1 mb-8">How to Work Together</h2>
+          <div class="grid gap-5 md:grid-cols-3">
+            <a
+              href="/catalog/strategy-call"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
+            >
+              <div class="text-3xl mb-3">🎯</div>
+              <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+                Strategy Call
+              </h3>
+              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+                30-minute video call. Honest architectural feedback. No pitch,
+                no commitment.
+              </p>
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
+                $100 — 30 min
+              </span>
+            </a>
+            <a
+              href="/catalog/zero-to-production-saas-mvp"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
+            >
+              <div class="text-3xl mb-3">🚀</div>
+              <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+                SaaS MVP
+              </h3>
+              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+                Full MVP from idea to live deployment. Auth, payments, API,
+                admin panel. Built to scale.
+              </p>
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
+                From $8,000 — 21 days
+              </span>
+            </a>
+            <a
+              href="/catalog/post-launch-support-maintenance"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
+            >
+              <div class="text-3xl mb-3">🛟</div>
+              <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+                Support & Maintenance
+              </h3>
+              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+                Ongoing oversight after launch. Monitoring, backups, security
+                patches, monthly reports.
+              </p>
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
+                $400/month — Ongoing
+              </span>
+            </a>
+          </div>
+          <div class="mt-6 text-right">
+            <a
+              href="/catalog"
+              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+            >
+              View all services
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -569,7 +615,7 @@ export default define.page(function Home(ctx) {
             <a
               href="https://www.upwork.com/freelancers/ashubin"
               target="_blank"
-              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
+              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
             >
               View all reviews on <UpworkIcon class="w-auto h-4 text-white" />
               <svg

@@ -12,9 +12,36 @@ export interface CatalogItem {
   includes: string[];
   tech: string[];
   upworkUrl?: string;
+  audience: string;
+  examples: string[];
 }
 
 export const items: CatalogItem[] = [
+  {
+    icon: "🎯",
+    slug: "strategy-call",
+    title: "Strategy Call — 30 Minutes",
+    price: "$100",
+    delivery: "30 min",
+    desc:
+      "A focused 30-minute video call where I give you honest architectural feedback on your project or idea. No pitch, no commitment — just actionable advice from an experienced Fractional CTO.",
+    includes: [
+      "30-minute structured video call",
+      "Honest technical assessment of your project",
+      "Tech stack recommendations tailored to your needs",
+      "Infrastructure approach and cost estimates",
+      "No commitment required — actionable advice either way",
+    ],
+    tech: ["Any stack", "Architecture", "Strategy"],
+    upworkUrl: UPWORK_URL,
+    audience:
+      "Non-technical founders with an idea who need guidance, startup teams evaluating tech choices, or anyone wanting a second opinion from an experienced CTO.",
+    examples: [
+      "A first-time founder needing help choosing the right tech stack for their MVP",
+      "An existing startup evaluating whether to migrate from AWS to self-hosted infrastructure",
+      "A product owner wondering why their server bill is too high and how to fix it",
+    ],
+  },
   {
     icon: "🚀",
     slug: "zero-to-production-saas-mvp",
@@ -33,6 +60,13 @@ export const items: CatalogItem[] = [
     ],
     tech: ["Deno", "Preact", "PostgreSQL", "Docker", "Stripe"],
     upworkUrl: UPWORK_URL,
+    audience:
+      "Non-technical founders with a validated idea who need a production-ready MVP without building an in-house team.",
+    examples: [
+      "A fitness social network with user profiles, workout tracking, and social feed",
+      "A marketplace platform connecting freelancers with clients, including payments and escrow",
+      "A booking and scheduling SaaS with calendar sync, invoicing, and admin dashboard",
+    ],
   },
   {
     icon: "⚡",
@@ -52,6 +86,13 @@ export const items: CatalogItem[] = [
     ],
     tech: ["Deno", "Hono", "PostgreSQL", "Docker", "Traefik"],
     upworkUrl: UPWORK_URL,
+    audience:
+      "Mobile app founders who need a scalable backend, or teams looking to replace Firebase with a self-hosted solution.",
+    examples: [
+      "Backend API for a cross-platform mobile app with real-time sync",
+      "SaaS platform API handling authentication, billing, and multi-tenant data",
+      "Real-time data service with WebSocket connections for live dashboards",
+    ],
   },
   {
     icon: "🤖",
@@ -71,6 +112,13 @@ export const items: CatalogItem[] = [
     ],
     tech: ["Deno", "OpenAI/Claude/DeepSeek", "Vector DB", "Docker"],
     upworkUrl: UPWORK_URL,
+    audience:
+      "Founders who want to add AI features without the research overhead, or teams needing production-grade LLM pipelines.",
+    examples: [
+      "A customer support chatbot integrated with your knowledge base and ticket system",
+      "An automated document processing pipeline for invoices, contracts, or reports",
+      "A personalized recommendation engine for an e-commerce or content platform",
+    ],
   },
   {
     icon: "🔍",
@@ -90,6 +138,13 @@ export const items: CatalogItem[] = [
     ],
     tech: ["Any stack", "Security audit", "Performance profiling"],
     upworkUrl: UPWORK_URL,
+    audience:
+      "Founders who inherited a messy codebase, or teams planning a major rewrite who need a clear roadmap first.",
+    examples: [
+      "Pre-acquisition technical due diligence to assess code quality and security",
+      "Post-MVP codebase review before scaling to production-grade infrastructure",
+      "Performance audit for a SaaS platform experiencing slow response times and frequent outages",
+    ],
   },
   {
     icon: "🛟",
@@ -109,6 +164,13 @@ export const items: CatalogItem[] = [
       "Priority email support",
     ],
     tech: ["Deno/Node.js", "PostgreSQL", "Docker", "Linux", "Monitoring"],
+    audience:
+      "Founders who just launched and want infrastructure peace of mind without hiring a full-time DevOps person.",
+    examples: [
+      "Ongoing server monitoring for a growing SaaS handling sensitive user data",
+      "Monthly health reports and security patching for a compliance-critical platform",
+      "Infrastructure oversight while you focus on fundraising and business development",
+    ],
   },
 ];
 

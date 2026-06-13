@@ -192,7 +192,7 @@ export default function MobileMenu(
                   class={linkClass(link.href)}
                 >
                   <span class="inline-flex items-center gap-3">
-                    <span class="shrink-0 text-gray-400">{link.icon}</span>
+                    <span class="shrink-0">{link.icon}</span>
                     <span>{link.label}</span>
                   </span>
                 </a>
@@ -245,7 +245,7 @@ export default function MobileMenu(
                 class="hidden sm:flex sm:ml-6 justify-center"
               >
                 <div class="flex items-center gap-1">
-                  {links.map((link) => (
+                  {[...links].reverse().map((link) => (
                     <a
                       key={link.href}
                       href={link.href}

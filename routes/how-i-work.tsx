@@ -96,7 +96,7 @@ export default define.page(function HowIWork() {
                     {p.desc}
                   </p>
                   <p class="text-gray-400 text-base leading-relaxed border-l-2 border-gray-600 pl-3">
-                    <span class="text-gray-500 font-medium">
+                    <span class="text-orange-400 font-medium">
                       Why this matters:
                     </span>{" "}
                     {p.why}
