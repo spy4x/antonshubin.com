@@ -66,6 +66,7 @@ const policies = [
       "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patch updates, and monthly status reports. Critical issues get an 8-hour response time.",
     why:
       "Your software is your asset — it deserves care after launch. This is not just bug fixes; it is peace of mind that your product stays healthy, secure, and fast.",
+    link: "/catalog/post-launch-support-maintenance",
   },
 ];
 
@@ -101,6 +102,14 @@ export default define.page(function HowIWork() {
                     </span>{" "}
                     {p.why}
                   </p>
+                  {(p as any).link && (
+                    <a
+                      href={(p as any).link}
+                      class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium mt-3"
+                    >
+                      View details and pricing →
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

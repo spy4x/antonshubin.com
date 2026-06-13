@@ -15,6 +15,7 @@ export interface Project {
   madeForName?: string;
   madeForURL?: string;
   archived?: boolean;
+  outcome?: string;
 }
 
 export interface BlogArticle {
@@ -138,6 +139,7 @@ export const projects = {
       externalURL: "https://corecircle.com",
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
+      outcome: "Scaled to 200K+ online users; acquired in 2024",
     },
     {
       title: "Connectful",
@@ -159,6 +161,7 @@ export const projects = {
       externalURLDead: true,
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
+      outcome: "Showed fast growth during the COVID-19 pandemic",
     },
     {
       title: "FoodRazor",
@@ -187,6 +190,8 @@ export const projects = {
       videoURL: "https://youtube.com/embed/IL3M0A7g0SE",
       madeForName: "Michael Distel",
       madeForURL: "https://www.linkedin.com/in/michaeldistel/",
+      outcome:
+        "Scaled across 10 countries and hundreds of restaurants; acquired in 2023",
     },
     {
       title: "GoPingu",
@@ -201,6 +206,8 @@ export const projects = {
       externalURLDead: true,
       madeForName: "Peter Visser",
       madeForURL: "https://www.linkedin.com/in/peter-visser-04331820a/",
+      outcome:
+        "Architected a real-time collaborative SaaS platform; delivered task orchestration modules",
     },
     {
       title: "Microwork",

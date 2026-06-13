@@ -19,7 +19,7 @@ function ProjectCard({
     <Wrapper
       href={href}
       target={project.externalURL && !project.slug ? "_blank" : undefined}
-      class={`block p-6 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group ${
+      class={`block relative p-6 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group ${
         project.archived
           ? "opacity-75 hover:opacity-100 hover:border-gray-500"
           : "hover:border-orange-500"
@@ -32,19 +32,14 @@ function ProjectCard({
         </div>
       )}
 
-      {client && project.madeForName && (
-        <p class="text-xs text-gray-500 mb-2">
-          Built for <span class="text-orange-400">{project.madeForName}</span>
-        </p>
-      )}
-
-      <div class="flex items-center gap-3 mb-3">
+      {/* Logo — top right corner */}
+      <div class="absolute top-4 right-4">
         {project.logoImageURL
           ? (
             <img
               src={project.logoImageURL}
               alt={`${project.title} preview`}
-              class="w-10 h-10 rounded object-contain"
+              class="max-w-[56px] max-h-[56px] w-auto h-auto object-contain"
               loading="lazy"
             />
           )
@@ -54,26 +49,41 @@ function ProjectCard({
               {project.logoText}
             </span>
           )
-          : <span class="text-2xl">{project.title.charAt(0)}</span>}
-        <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors">
-          {project.title}
-        </h3>
+          : null}
       </div>
 
-      <p class="text-gray-400 text-sm leading-relaxed mb-4">
+      {client && project.madeForName && (
+        <p class="text-xs text-gray-500 mb-2 pr-14">
+          Built for <span class="text-orange-400">{project.madeForName}</span>
+        </p>
+      )}
+
+      <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2 pr-14">
+        {project.title}
+      </h3>
+
+      <p class="text-gray-400 text-sm leading-relaxed mb-3">
         {project.description}
       </p>
 
-      {project.tags && project.tags.length > 0 && (
-        <div class="flex flex-wrap gap-1.5 mb-4">
-          {project.tags.slice(0, 4).map((tag) => (
-            <span
-              key={tag}
-              class="px-2 py-0.5 text-xs rounded bg-gray-700 text-gray-300"
-            >
-              {tag}
-            </span>
-          ))}
+      {/* Outcome badge */}
+      {project.outcome && (
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full mb-4">
+          <svg
+            class="w-3.5 h-3.5 shrink-0"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          {project.outcome}
         </div>
       )}
 
@@ -146,7 +156,7 @@ export default define.page(function Projects(ctx) {
         {activeProjects.length > 0 && (
           <>
             <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-orange-400">🔧</span> Personal Projects
+              <span class="text-orange-400">🔧</span> Completed Projects
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {activeProjects.map((project) => (

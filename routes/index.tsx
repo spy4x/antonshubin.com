@@ -318,49 +318,49 @@ export default define.page(function Home(ctx) {
           <div class="grid gap-5 md:grid-cols-3">
             <a
               href="/catalog/strategy-call"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🎯</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
                 Technical Consultation
               </h3>
-              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+              <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
                 60-minute video call. Deep-dive into your project. Honest
                 feedback and a clear technical path forward.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full mt-auto">
                 $150 — 60 min
               </span>
             </a>
             <a
               href="/catalog/zero-to-production-saas-mvp"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🚀</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
                 SaaS MVP
               </h3>
-              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+              <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
                 Full MVP from idea to live deployment. Auth, payments, API,
                 admin panel. Built to scale.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full mt-auto">
                 From $8,000 — 21 days
               </span>
             </a>
             <a
               href="/catalog/free-architecture-audit"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🔍</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
                 Free Architecture Audit
               </h3>
-              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+              <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
                 Send your tech stack or idea. I'll send back 3 concrete
                 improvements within 48 hours. No cost.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full mt-auto">
                 Free — 48 hours
               </span>
             </a>
@@ -656,6 +656,7 @@ export default define.page(function Home(ctx) {
 
         {/* CTA Section */}
         <CTASection variant="full" />
+        <div class="h-[40vh]" />
       </div>
     </Layout>
   );

@@ -17,7 +17,7 @@ const links: NavLink[] = [
   { href: "/how-i-work", label: "How I work", icon: BriefcaseIcon() },
   { href: "/catalog", label: "Catalog", icon: GridIcon() },
   { href: "/contact-me", label: "Contact me", icon: MailIcon() },
-  { href: "/projects", label: "My projects", icon: FolderIcon() },
+  { href: "/projects", label: "Completed Projects", icon: FolderIcon() },
   { href: "/blog", label: "Blog", icon: PenIcon() },
 ];
 
