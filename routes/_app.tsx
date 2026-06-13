@@ -119,6 +119,11 @@ export default define.page(function App({ Component }: AppProps) {
           href="/favicon-16x16.png"
         />
         <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <meta property="og:type" content="profile" />
         <meta property="og:title" content={title} />
@@ -131,6 +136,12 @@ export default define.page(function App({ Component }: AppProps) {
       </head>
       <body class="h-full">
         <Component />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              `if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");`,
+          }}
+        />
       </body>
     </html>
   );
