@@ -98,6 +98,25 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
           </svg>
           {!isCompact && "View catalog"}
         </a>
+        {!isCompact && (
+          <a
+            href="/pay"
+            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200"
+          >
+            <svg
+              class="w-5 h-5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+            Pay
+          </a>
+        )}
       </div>
     </div>
   );

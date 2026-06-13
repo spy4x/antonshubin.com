@@ -251,7 +251,6 @@ export default function MobileMenu(
                       href={link.href}
                       class={desktopLinkClass(link.href)}
                     >
-                      {link.icon}
                       <span>{link.label}</span>
                     </a>
                   ))}

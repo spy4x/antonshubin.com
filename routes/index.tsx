@@ -655,6 +655,91 @@ export default define.page(function Home(ctx) {
         </section>
 
         {/* CTA Section */}
+        {/* Beyond the Code Section */}
+        <section class="mb-16 md:mb-24">
+          <h2 class="h1 mb-8">Beyond the Code</h2>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 class="text-lg font-semibold text-white mb-3">
+                🛠️ Infrastructure & IoT
+              </h3>
+              <ul class="space-y-3 text-gray-400 text-sm">
+                <li class="flex items-start gap-2">
+                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                  <span>
+                    Self-host 20+ services on Fedora with{" "}
+                    <a
+                      href="https://uptime-cloud.antonshubin.com"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      Docker/Podman
+                    </a>
+                  </span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                  <span>
+                    Custom{" "}
+                    <a
+                      href="https://www.instagram.com/p/ChWl-7Vr_nU/?img_index=1"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      ESP32 air quality sensor
+                    </a>{" "}
+                    in Home Assistant
+                  </span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                  <span>
+                    Open-source finance tracker (double-entry accounting, PWA)
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 class="text-lg font-semibold text-white mb-3">
+                🏍️ Adventure
+              </h3>
+              <ul class="space-y-3 text-gray-400 text-sm">
+                <li class="flex items-start gap-2">
+                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                  <span>
+                    <a
+                      href="https://www.youtube.com/@anton-shubin-live"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      Enduro, skiing, and scuba diving
+                    </a>
+                  </span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                  <span>
+                    Traveled 25+ countries across Asia and Europe
+                  </span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-orange-400 shrink-0 mt-0.5">→</span>
+                  <span>
+                    Currently based in{" "}
+                    <a
+                      href="https://www.google.com/maps/@16.3078576,107.9941552,7.28z?entry=ttu&g_ep=EgoyMDI2MDYxMC4wIKXMDSoASAFQAw%3D%3D"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      Da Nang, Vietnam
+                    </a>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
         <CTASection variant="full" />
         <div class="h-[40vh]" />
       </div>
