@@ -124,6 +124,35 @@ export default define.page(function App({ Component }: AppProps) {
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Anton Shubin",
+              "jobTitle": "Fractional CTO & Lead Architect",
+              "description":
+                "I take non-technical founders from napkin sketch to production. Fixed-price milestones. Zero-bloat architecture. No dev-team drama.",
+              "url": "https://antonshubin.com",
+              "knowsAbout": [
+                "Software Architecture",
+                "SaaS Development",
+                "Backend Engineering",
+                "AI Integration",
+                "Cloud Infrastructure",
+                "Deno",
+                "PostgreSQL",
+                "System Design",
+              ],
+              "worksFor": {
+                "@type": "Organization",
+                "name": "NeatSoft PTE LTD",
+                "url": "https://neatsoft.dev",
+              },
+            }),
+          }}
+        />
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <meta property="og:type" content="profile" />
         <meta property="og:title" content={title} />

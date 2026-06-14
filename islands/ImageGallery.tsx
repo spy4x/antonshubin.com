@@ -67,7 +67,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             <img
               src={image.src}
               alt={image.alt}
-              class="h-48 sm:h-56 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
+              class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
               loading="lazy"
             />
           </button>
