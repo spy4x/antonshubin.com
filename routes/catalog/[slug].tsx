@@ -57,6 +57,33 @@ export default define.page(function CatalogDetail(ctx) {
           }),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Who is this service for?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": item.audience,
+                },
+              },
+              ...item.examples.map((ex) => ({
+                "@type": "Question",
+                "name": ex.split(" — ")[0],
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": ex,
+                },
+              })),
+            ],
+          }),
+        }}
+      />
       <div class="max-w-3xl mx-auto px-4 py-12">
         <a
           href="/catalog"

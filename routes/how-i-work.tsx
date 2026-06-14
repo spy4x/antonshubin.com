@@ -142,6 +142,219 @@ export default define.page(function HowIWork() {
             Book a free 30-min intro call
           </a>
         </div>
+
+        {/* FAQ Section */}
+        <section class="mt-16">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-gray-400 text-center mb-10 text-base">
+            Honest answers to the questions I get most often.
+          </p>
+          <div class="space-y-4 max-w-3xl mx-auto">
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>
+                  What if we start working together and it is not a good fit?
+                </span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                That is exactly why I offer the 14-Day Mutual Alignment
+                Guarantee. If within the first two weeks either of us feels the
+                communication style, workflow, or technical approach is not
+                working, I issue a 100% refund — no questions asked. I would
+                rather lose a project than force a partnership that does not
+                click.
+              </p>
+            </details>
+
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>How do you handle scope changes mid-project?</span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                Once a milestone is funded, the scope is locked to guarantee
+                delivery dates. New ideas or features that come up during
+                development are automatically captured in a structured V2
+                Backlog — quoted separately after the current version is
+                deployed. This protects your timeline and your budget.
+              </p>
+            </details>
+
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>
+                  Do you work with clients who already have a development team?
+                </span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                Yes, that is one of the most common scenarios. Founders come to
+                me when their existing team is moving too slow, building the
+                wrong thing, or the technical debt is piling up. I step in as a
+                Tech Lead or Architect to set direction, review code, and get
+                things back on track — without replacing your entire team.
+              </p>
+            </details>
+
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>What kind of projects do you NOT take?</span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                I do not take hourly time-tracked engagements, staff
+                augmentation roles, or projects where the client wants to
+                micromanage the development process. I also avoid projects that
+                require proprietary vendor lock-in — I build everything on
+                open-source, self-hostable technology so you own your stack
+                completely.
+              </p>
+            </details>
+
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>
+                  How do you communicate with clients during a project?
+                </span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                We hold one structured weekly alignment call (30-60 minutes).
+                All daily updates, code demonstrations, and questions are
+                handled asynchronously via text or Loom video. This means you
+                are always in the loop without having to sit through daily
+                standup meetings. You pay for engineering throughput, not
+                meeting bloat.
+              </p>
+            </details>
+
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>What if my project needs more work after launch?</span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                Every project comes with a 30-Day Code Warranty — I fix any bugs
+                within the delivered scope for free. For ongoing needs, I offer
+                a Post-Launch Support & Maintenance package ($400/month) that
+                covers server monitoring, backup verification, security patches,
+                and priority support. You can also fund additional milestones
+                from the V2 Backlog at any time.
+              </p>
+            </details>
+
+            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>
+                  How do I know you are the right person for my project?
+                </span>
+                <svg
+                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              </summary>
+              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+                Start with a free architecture audit — send me your tech stack
+                or idea, and I will send back 3 concrete improvements within 48
+                hours. No cost, no pitch. If you like the quality of the
+                feedback, we can schedule a consultation. If not, you have lost
+                nothing except an email. I have done this for 80+ projects
+                across 15 years, and I am confident I can help you too.
+              </p>
+            </details>
+          </div>
+        </section>
       </div>
     </Layout>
   );
