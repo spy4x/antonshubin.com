@@ -64,6 +64,15 @@ Three schemas in a `@graph` array:
 - Keywords: 15 targeted keywords for AI crawler parsing
 - Robots: index, follow, max-snippet:-1, max-image-preview:large
 
+## Analytics Configuration
+
+Analytics (Plausible + Umami) are configured via environment variables in `lib/config.ts`:
+- `PLAUSIBLE_URL` — Plausible script URL (e.g. `https://analytics.antonshubin.com/js/script.js`)
+- `UMAMI_URL` — Umami script URL (e.g. `https://stats.antonshubin.com/script.js`)
+- `UMAMI_ID` — Umami website ID
+
+Set these in `.env`. Never hardcode them in `_app.tsx`.
+
 ## Update Rules
 
 Whenever any of these change, update the corresponding AI crawler files:
