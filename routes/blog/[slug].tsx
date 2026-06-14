@@ -191,7 +191,7 @@ export default define.page<PageData>(function BlogArticle(ctx) {
                     href={`/blog/${prev.slug}`}
                     class="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group"
                   >
-                    <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-700">
+                    <div class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-700">
                       <img
                         src={`/img/blog/${prev.slug}/${prev.previewImageURL}`}
                         alt=""
@@ -200,8 +200,8 @@ export default define.page<PageData>(function BlogArticle(ctx) {
                       />
                     </div>
                     <div class="min-w-0">
-                      <p class="text-gray-500 text-xs mb-1">← Previous</p>
-                      <p class="text-white text-sm font-medium truncate group-hover:text-orange-400 transition-colors">
+                      <p class="text-gray-500 text-sm mb-1">← Previous</p>
+                      <p class="text-white text-base font-medium group-hover:text-orange-400 transition-colors">
                         {prev.title}
                       </p>
                     </div>
