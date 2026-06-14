@@ -2,16 +2,57 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 
+const services = [
+  ["Traefik", "Reverse proxy + auto SSL", "🌐"],
+  ["Grafana + Prometheus", "Self-hosted monitoring stack", "📈"],
+  ["Docker Compose", "Container orchestration", "🐳"],
+  ["PostgreSQL", "Relational database", "🗄️"],
+  ["Authentik", "SSO / Identity provider", "🔑"],
+  ["Home Assistant", "Smart home automation", "🏠"],
+  ["Jellyfin", "Media streaming", "🎬"],
+  ["Immich", "Photo backup (Google Photos alt)", "📸"],
+  ["VaultWarden", "Password manager (Bitwarden)", "🔐"],
+  ["Syncthing", "File sync across devices", "🔄"],
+  ["Paperless-ngx", "Document management + OCR", "📄"],
+  ["Gitea", "Self-hosted Git", "🦊"],
+  ["Woodpecker CI", "CI/CD pipelines", "⚡"],
+  ["Ollama + Open WebUI", "Local LLM inference", "🤖"],
+  ["SearXNG", "Private metasearch engine", "🔍"],
+  ["Ntfy", "Push notifications", "🔔"],
+  ["WireGuard", "VPN server", "🔒"],
+  ["AdGuard Home", "DNS-level ad blocking", "🛡️"],
+  ["MinIO", "S3-compatible storage", "💾"],
+  ["Stirling PDF", "PDF manipulation tools", "📄"],
+  ["Uptime Kuma / Gatus", "Service health monitoring", "❤️"],
+  ["Transmission", "Torrent client", "⬇️"],
+  ["Metube", "YouTube downloading", "🎥"],
+  ["Healthchecks", "Cron job monitoring", "⏱️"],
+  ["Calendly / Radicale", "Calendar sync", "📅"],
+  ["Firefly III", "Finance tracking", "💰"],
+  ["Monica", "CRM / relationship manager", "👥"],
+  ["Plausible + Umami", "Web analytics", "📊"],
+  ["Watchtower", "Auto container updates", "🔄"],
+  ["Cloudflared", "Cloudflare Tunnel", "☁️"],
+  ["Stalwart Mail", "Mail server", "📧"],
+  ["Akaunting", "Accounting", "📊"],
+  ["IT Tools", "Developer utilities", "🧰"],
+  ["Mailer", "Email sending", "📨"],
+  ["Piped", "YouTube frontend (alt interface)", "▶️"],
+  ["Usememos", "Lightweight notes", "📝"],
+  ["Audiobookshelf", "Audiobook server", "🎧"],
+  ["Mirotalk", "Video calls (self-hosted Meet)", "📹"],
+];
+
 export default define.page(function Infrastructure() {
   return (
     <Layout currentPath="/infrastructure">
       <div class="max-w-4xl mx-auto px-4 py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
-          My Infrastructure Laboratory
+          Infrastructure Laboratory
         </h1>
         <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg max-w-2xl mx-auto">
-          This is where I develop and test the architecture patterns that keep
-          client SaaS costs near zero.
+          Where I develop and test the architecture patterns that keep client
+          SaaS costs near zero. 40+ services. One server. $50/month.
         </p>
 
         {/* Cost comparison hero */}
@@ -19,55 +60,74 @@ export default define.page(function Infrastructure() {
           <div class="grid gap-6 sm:grid-cols-2">
             <div class="text-center p-6 bg-gray-900/50 rounded-lg">
               <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Typical AWS setup for 20 services
+                Typical AWS setup for 40+ services
               </p>
-              <p class="text-4xl font-bold text-red-400">$2,800</p>
-              <p class="text-gray-500 text-xs mt-1">per month</p>
+              <p class="text-4xl font-bold text-red-400">$3,000+</p>
+              <p class="text-gray-500 text-xs mt-1">
+                per month (shared CPU/RAM VMs)
+              </p>
             </div>
             <div class="text-center p-6 bg-gray-900/50 rounded-lg">
               <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                What I run on (Hetzner)
+                What I run on (Hetzner dedicated)
               </p>
               <p class="text-4xl font-bold text-green-400">$50</p>
-              <p class="text-gray-500 text-xs mt-1">per month</p>
+              <p class="text-gray-500 text-xs mt-1">
+                per month (dedicated CPU/RAM/NVMe)
+              </p>
             </div>
           </div>
           <p class="text-center text-gray-400 text-sm mt-4">
-            98% cost reduction. Same reliability, same performance.
+            ~20x better performance on a dedicated CPU/RAM/NVMe server vs shared
+            EC2 VMs. Same reliability. 98% cost reduction.
           </p>
         </div>
 
-        {/* Architecture overview */}
+        {/* Architecture Diagram */}
         <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
           <h2 class="text-xl font-semibold text-white mb-4">
-            🏗️ Architecture Overview
+            🏗️ Architecture
           </h2>
-          <p class="text-gray-400 text-sm leading-relaxed mb-4">
-            Single Hetzner dedicated server running Fedora Linux with Docker
-            Compose and Traefik as the reverse proxy. All services are
-            containerized, auto-restart on failure, and monitored via Grafana.
-          </p>
-          {/* Arch diagram placeholder */}
-          <div class="bg-gray-900/50 rounded-lg p-8 text-center border-2 border-dashed border-gray-700">
-            <div class="text-4xl mb-3">📊</div>
-            <p class="text-gray-500 text-sm">
-              Architecture diagram — coming soon
-            </p>
-            <p class="text-gray-600 text-xs mt-1">
-              [Image: Traefik → Docker Compose → Service Mesh diagram]
-            </p>
+          <div class="bg-gray-900/50 rounded-lg p-6 overflow-x-auto">
+            <pre class="text-green-400 text-xs sm:text-sm font-mono leading-relaxed">
+{`┌─────────────────────────────────────────────────────┐
+│                  Cloudflare (DNS + CDN)               │
+└────────────────────┬────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────┐
+│                   Traefik (Reverse Proxy)            │
+│              Automatic SSL (Let's Encrypt)           │
+└────────────────────┬────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────┐
+│              Docker Compose (Dedicated Server)        │
+│  ┌─────────────┬──────────────┬──────────────────┐   │
+│  │  Core Infra │   Services   │  Monitoring       │   │
+│  │  PostgreSQL │   Jellyfin   │  Grafana          │   │
+│  │  MinIO      │   Immich     │  Prometheus       │   │
+│  │  Authentik  │   VaultWard.│  Gatus            │   │
+│  │  Redis      │   Paperless  │  Healthchecks     │   │
+│  ├─────────────┼──────────────┼──────────────────┤   │
+│  │  Ollama     │   Gitea     │  WireGuard        │   │
+│  │  SearXNG    │   CI/CD     │  Cloudflared      │   │
+│  └─────────────┴──────────────┴──────────────────┘   │
+└────────────────────┬────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────┐
+│  Offsite: Syncthing + restic → other servers,        │
+│  mini PCs, laptop, Android phone (auto backups)      │
+└─────────────────────────────────────────────────────┘`}</pre>
           </div>
         </div>
 
         {/* Live dashboard */}
         <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
           <h2 class="text-xl font-semibold text-white mb-4">
-            📡 Live Status Dashboard
+            📡 Live Status
           </h2>
           <p class="text-gray-400 text-sm leading-relaxed mb-4">
-            Real-time uptime and health status for all my self-hosted services.
-            This dashboard runs on the same server and monitoring stack I deploy
-            for client projects.
+            Real-time health status for all services. Runs on the same
+            monitoring stack I deploy for client projects.
           </p>
           <a
             href="https://uptime-cloud.antonshubin.com"
@@ -78,34 +138,21 @@ export default define.page(function Infrastructure() {
           </a>
         </div>
 
-        {/* Services */}
+        {/* All services */}
         <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
           <h2 class="text-xl font-semibold text-white mb-4">
-            📦 Services Running
+            📦 40+ Services Running
           </h2>
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              ["Home Assistant", "Smart home automation", "🏠"],
-              ["Jellyfin", "Media streaming", "🎬"],
-              ["Immich", "Photo backup", "📸"],
-              ["VaultWarden", "Password manager", "🔑"],
-              ["Syncthing", "File sync", "🔄"],
-              ["Grafana", "Monitoring", "📈"],
-              ["Nginx", "Reverse proxy", "🌐"],
-              ["PostgreSQL", "Database", "🗄️"],
-              ["MinIO", "Object storage", "💾"],
-              ["Paperless-ngx", "Document management", "📄"],
-              ["Firefly III", "Finance tracking", "💰"],
-              ["Joplin Server", "Notes sync", "📝"],
-            ].map(([name, desc, icon]) => (
+          <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map(([name, desc, icon]) => (
               <div
                 key={name}
-                class="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg"
+                class="flex items-center gap-2 p-2.5 bg-gray-900/50 rounded-lg"
               >
-                <span class="text-xl">{icon}</span>
-                <div>
-                  <p class="text-white text-sm font-medium">{name}</p>
-                  <p class="text-gray-500 text-xs">{desc}</p>
+                <span class="text-lg shrink-0">{icon}</span>
+                <div class="min-w-0">
+                  <p class="text-white text-sm font-medium truncate">{name}</p>
+                  <p class="text-gray-500 text-xs truncate">{desc}</p>
                 </div>
               </div>
             ))}
@@ -118,24 +165,50 @@ export default define.page(function Infrastructure() {
             💰 Real Cost Breakdown
           </h2>
           <div class="space-y-3">
-            {[
-              ["Hetzner dedicated server (AX102)", "$47/mo"],
-              ["Domain names", "$12/year"],
-              ["Cloudflare (free tier)", "$0"],
-              ["SSL certificates (Let's Encrypt)", "$0"],
-              ["Monitoring (Grafana Cloud free tier)", "$0"],
-              ["Backup storage (Backblaze B2)", "~$3/mo"],
-            ].map(([item, cost]) => (
-              <div
-                key={item}
-                class="flex justify-between items-center py-2 border-b border-gray-700 last:border-0"
-              >
-                <span class="text-gray-300 text-sm">{item}</span>
-                <span class="text-green-400 text-sm font-mono font-medium">
-                  {cost}
-                </span>
-              </div>
-            ))}
+            <div class="flex justify-between items-center py-2 border-b border-gray-700">
+              <span class="text-gray-300 text-sm">
+                Hetzner dedicated server
+              </span>
+              <span class="text-green-400 text-sm font-mono font-medium">
+                $47/mo
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-700">
+              <span class="text-gray-300 text-sm">Domain names</span>
+              <span class="text-green-400 text-sm font-mono font-medium">
+                $12/year
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-700">
+              <span class="text-gray-300 text-sm">Cloudflare (free tier)</span>
+              <span class="text-green-400 text-sm font-mono font-medium">
+                $0
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-700">
+              <span class="text-gray-300 text-sm">
+                SSL (Let's Encrypt, auto via Traefik)
+              </span>
+              <span class="text-green-400 text-sm font-mono font-medium">
+                $0
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-700">
+              <span class="text-gray-300 text-sm">
+                Monitoring (self-hosted Grafana + Prometheus)
+              </span>
+              <span class="text-green-400 text-sm font-mono font-medium">
+                $0
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-700">
+              <span class="text-gray-300 text-sm">
+                Backups (Syncthing + restic → other devices)
+              </span>
+              <span class="text-green-400 text-sm font-mono font-medium">
+                $0
+              </span>
+            </div>
             <div class="flex justify-between items-center py-2 font-bold">
               <span class="text-white">Total</span>
               <span class="text-green-400 font-mono">~$50/month</span>
@@ -150,8 +223,8 @@ export default define.page(function Infrastructure() {
           </h2>
           <p class="text-gray-400 text-sm max-w-lg mx-auto mb-6">
             Every client SaaS I build uses the same infrastructure patterns —
-            Docker Compose, Traefik, Hetzner. Your MVP does not need a
-            $500/month AWS bill.
+            Docker Compose, Traefik, dedicated server. Your MVP does not need a
+            $500/month cloud bill with shared CPU.
           </p>
           <div class="flex flex-wrap justify-center gap-4">
             <a

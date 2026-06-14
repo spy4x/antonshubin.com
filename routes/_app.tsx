@@ -1,5 +1,5 @@
 import { define } from "../lib/utils.ts";
-import { PLAUSIBLE_URL, UMAMI_ID, UMAMI_URL } from "../lib/config.ts";
+import { UMAMI_ID, UMAMI_URL } from "../lib/config.ts";
 
 interface AppProps {
   Component: preact.ComponentType;
@@ -247,13 +247,11 @@ export default define.page(function App({ Component }: AppProps) {
             }),
           }}
         />
-        {PLAUSIBLE_URL && (
-          <script
-            defer
-            data-domain={PLAUSIBLE_URL}
-            src="https://plausible.io/js/script.js"
-          />
-        )}
+        <script
+          defer
+          data-domain="antonshubin.com"
+          src="https://analytics.antonshubin.com/js/script.js"
+        />
         {UMAMI_URL && UMAMI_ID && (
           <script
             defer

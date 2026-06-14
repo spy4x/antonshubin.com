@@ -49,6 +49,12 @@ export const handler = define.handlers({
         changefreq: "monthly",
         lastmod: undefined,
       },
+      {
+        loc: "/infrastructure",
+        priority: "0.7",
+        changefreq: "monthly",
+        lastmod: undefined,
+      },
     ];
 
     const blogUrls = blogArticles.map((a) => ({

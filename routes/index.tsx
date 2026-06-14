@@ -63,11 +63,6 @@ export default define.page(function Home(ctx) {
                 <span class="hidden sm:inline text-gray-600">|</span>
                 <span class="inline-flex items-center gap-1.5">
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                  $395K+ Earned
-                </span>
-                <span class="hidden sm:inline text-gray-600">|</span>
-                <span class="inline-flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   80+ Projects
                 </span>
                 <span class="hidden sm:inline text-gray-600">|</span>
@@ -322,22 +317,30 @@ export default define.page(function Home(ctx) {
                   Why I Do This
                 </h2>
                 <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
-                  I have been on both sides. I have built startups that failed
-                  because of bad technical decisions. I have fixed products that
-                  were dying because of bad developers and over-engineered
-                  architectures.
+                  I started as an enterprise dev in 2010. Became a team lead.
+                  Hit the salary ceiling at $1000/month. Quit to freelance —
+                  almost went bankrupt. Couldn't afford a pizza. Parents gave me
+                  an ultimatum: one month to find a contract or go back to the
+                  office.
+                </p>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                  Found work on Upwork. Over eight years I went from $2/hour
+                  with zero English to $100/hour as a system architect leading
+                  teams. The secret? Taking responsibility for outcomes, not
+                  hours. One client told me I was the only dev willing to sit on
+                  a call and explain things until they made sense.
+                </p>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                  Built my own startups too. Some failed — bad tech choices,
+                  over-engineering. I also fixed products dying because devs hid
+                  behind jargon or thought complexity was the goal.
                 </p>
                 <p class="text-gray-400 leading-relaxed">
-                  Now I build systems that do not need fixing. I work with
-                  non-technical founders to turn their ideas into production
-                  software — without the jargon, without the drama, and without
-                  the bloated AWS bills. I have done it 80+ times, and I know
-                  exactly what works and what does not.
+                  I've been the employee, the freelancer, the founder, the
+                  fixer. Now I build systems that don't need fixing — straight
+                  talk, lean architecture, someone who owns the result. 80+
+                  projects. Still going.
                 </p>
-                <div class="flex items-center gap-2 mt-4 text-sm text-orange-400 font-medium">
-                  <span class="w-2 h-2 rounded-full bg-orange-400" />
-                  Founder → Developer → CTO. I understand the whole picture.
-                </div>
               </div>
             </div>
           </div>
@@ -359,7 +362,7 @@ export default define.page(function Home(ctx) {
                 60-minute video call. Deep-dive into your project. Honest
                 feedback and a clear technical path forward.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full mt-auto">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto">
                 $150 — 60 min
               </span>
             </a>
@@ -375,7 +378,7 @@ export default define.page(function Home(ctx) {
                 Full MVP from idea to live deployment. Auth, payments, API,
                 admin panel. Built to scale.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full mt-auto">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto">
                 From $8,000 — 21 days
               </span>
             </a>
@@ -391,7 +394,7 @@ export default define.page(function Home(ctx) {
                 Send your tech stack or idea. I'll send back 3 concrete
                 improvements within 48 hours. No cost.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/20 text-green-400 text-xs font-medium rounded-full mt-auto">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto">
                 Free — 48 hours
               </span>
             </a>
@@ -514,7 +517,6 @@ export default define.page(function Home(ctx) {
                     d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                $395K+ earned
               </span>
             </div>
           </div>
@@ -777,6 +779,15 @@ export default define.page(function Home(ctx) {
                       Docker/Podman
                     </a>
                   </span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <a
+                    href="/infrastructure"
+                    class="text-orange-400 hover:text-orange-300 underline"
+                  >
+                    Full infrastructure breakdown ($50/mo, 40+ services)
+                  </a>
                 </li>
                 <li class="flex items-baseline gap-2">
                   <span class="text-orange-400 shrink-0">→</span>
