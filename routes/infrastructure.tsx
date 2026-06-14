@@ -88,36 +88,12 @@ export default define.page(function Infrastructure() {
           <h2 class="text-xl font-semibold text-white mb-4">
             🏗️ Architecture
           </h2>
-          <div class="bg-gray-900/50 rounded-lg p-6 overflow-x-auto">
-            <pre class="text-green-400 text-xs sm:text-sm font-mono leading-relaxed">
-{`┌─────────────────────────────────────────────────────┐
-│                  Cloudflare (DNS + CDN)               │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│                   Traefik (Reverse Proxy)            │
-│              Automatic SSL (Let's Encrypt)           │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│              Docker Compose (Dedicated Server)        │
-│  ┌─────────────┬──────────────┬──────────────────┐   │
-│  │  Core Infra │   Services   │  Monitoring       │   │
-│  │  PostgreSQL │   Jellyfin   │  Grafana          │   │
-│  │  MinIO      │   Immich     │  Prometheus       │   │
-│  │  Authentik  │   VaultWard.│  Gatus            │   │
-│  │  Redis      │   Paperless  │  Healthchecks     │   │
-│  ├─────────────┼──────────────┼──────────────────┤   │
-│  │  Ollama     │   Gitea     │  WireGuard        │   │
-│  │  SearXNG    │   CI/CD     │  Cloudflared      │   │
-│  └─────────────┴──────────────┴──────────────────┘   │
-└────────────────────┬────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────┐
-│  Offsite: Syncthing + restic → other servers,        │
-│  mini PCs, laptop, Android phone (auto backups)      │
-└─────────────────────────────────────────────────────┘`}</pre>
-          </div>
+          <img
+            src="/img/infrastructure-architecture.svg"
+            alt="Infrastructure architecture diagram showing Cloudflare → Traefik → Docker Compose → Backups flow"
+            class="w-full rounded-lg"
+            loading="lazy"
+          />
         </div>
 
         {/* Live dashboard */}

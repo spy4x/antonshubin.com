@@ -54,22 +54,34 @@ export default define.page(function Home(ctx) {
                 </ul>
               </div>
 
-              {/* Metrics Bar */}
+              {/* Metrics Bar — linked to Upwork for proof */}
               <div class="mt-6 grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-row sm:items-center sm:gap-x-4 text-sm sm:text-base text-gray-400">
-                <span class="inline-flex items-center gap-1.5">
+                <a
+                  href="https://www.upwork.com/freelancers/ashubin"
+                  target="_blank"
+                  class="inline-flex items-center gap-1.5 hover:text-orange-400 transition-colors"
+                >
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   Expert-Vetted (Top 1%)
-                </span>
+                </a>
                 <span class="hidden sm:inline text-gray-600">|</span>
-                <span class="inline-flex items-center gap-1.5">
+                <a
+                  href="https://www.upwork.com/freelancers/ashubin"
+                  target="_blank"
+                  class="inline-flex items-center gap-1.5 hover:text-orange-400 transition-colors"
+                >
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   80+ Projects
-                </span>
+                </a>
                 <span class="hidden sm:inline text-gray-600">|</span>
-                <span class="inline-flex items-center gap-1.5">
+                <a
+                  href="https://www.upwork.com/freelancers/ashubin"
+                  target="_blank"
+                  class="inline-flex items-center gap-1.5 hover:text-orange-400 transition-colors"
+                >
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                   100% Job Success
-                </span>
+                </a>
               </div>
 
               <div class="mt-6 flex flex-wrap gap-2">
@@ -325,7 +337,7 @@ export default define.page(function Home(ctx) {
                 </p>
                 <p class="text-gray-400 leading-relaxed mb-4">
                   Found work on Upwork. Over eight years I went from $2/hour
-                  with zero English to $100/hour as a system architect leading
+                  with zero English to $150/hour as a system architect leading
                   teams. The secret? Taking responsibility for outcomes, not
                   hours. One client told me I was the only dev willing to sit on
                   a call and explain things until they made sense.
@@ -362,7 +374,7 @@ export default define.page(function Home(ctx) {
                 60-minute video call. Deep-dive into your project. Honest
                 feedback and a clear technical path forward.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 $150 — 60 min
               </span>
             </a>
@@ -378,7 +390,7 @@ export default define.page(function Home(ctx) {
                 Full MVP from idea to live deployment. Auth, payments, API,
                 admin panel. Built to scale.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 From $8,000 — 21 days
               </span>
             </a>
@@ -394,7 +406,7 @@ export default define.page(function Home(ctx) {
                 Send your tech stack or idea. I'll send back 3 concrete
                 improvements within 48 hours. No cost.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto">
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 Free — 48 hours
               </span>
             </a>
