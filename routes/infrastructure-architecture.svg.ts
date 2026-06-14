@@ -60,7 +60,7 @@ export const handler = define.handlers({
   <text x="310" y="506" fill="#cbd5e1" font-family="system-ui" font-size="11">+ 30 more services</text>
 
   <rect x="504" y="325" width="195" height="310" rx="8" fill="#334155" stroke="#475569" stroke-width="1"/>
-  <text x="602" y="350" text-anchor="middle" fill="#fbbf24" font-family="system-ui" font-size="12" font-weight="600">Monitoring & AI</text>
+  <text x="602" y="350" text-anchor="middle" fill="#fbbf24" font-family="system-ui" font-size="12" font-weight="600">Monitoring &amp; AI</text>
   <line x1="514" y1="360" x2="689" y2="360" stroke="#475569" stroke-width="1"/>
   <text x="510" y="380" fill="#cbd5e1" font-family="system-ui" font-size="11">Grafana + Prometheus</text>
   <text x="510" y="398" fill="#cbd5e1" font-family="system-ui" font-size="11">Gatus (health checks)</text>
