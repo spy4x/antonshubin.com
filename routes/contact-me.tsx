@@ -65,6 +65,32 @@ const contacts = [
     btnText: "Send email",
   },
   {
+    icon: (
+      <svg
+        class="w-6 h-6"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"
+        />
+      </svg>
+    ),
+    title: "NeatSoft",
+    desc: "My Singapore-based software agency. Same quality, company backing.",
+    href: "https://neatsoft.dev",
+    color:
+      "bg-indigo-600/20 text-indigo-400 border-indigo-600/30 hover:border-indigo-500",
+    btnClass:
+      "bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+    btnText: "Visit website",
+  },
+  {
     icon: <TelegramIcon class="w-6 h-6" />,
     title: "Telegram",
     desc: "Quick messages. Best for async chat and file sharing.",

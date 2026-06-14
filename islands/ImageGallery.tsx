@@ -55,19 +55,19 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
 
   return (
     <>
-      {/* Masonry Grid using CSS columns */}
-      <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+      {/* Horizontal scrollable gallery */}
+      <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
         {images.map((image, index) => (
           <button
             key={index}
             type="button"
             onClick={() => openLightbox(index)}
-            class="w-full break-inside-avoid cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden"
+            class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
           >
             <img
               src={image.src}
               alt={image.alt}
-              class="w-full rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
+              class="h-48 sm:h-56 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
               loading="lazy"
             />
           </button>

@@ -748,6 +748,19 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
+        <div class="text-center mb-8">
+          <p class="text-gray-500 text-sm">
+            Also available through my Singapore-based agency{" "}
+            <a
+              href="https://neatsoft.dev"
+              target="_blank"
+              class="text-orange-400 hover:text-orange-300 underline"
+            >
+              NeatSoft PTE LTD
+            </a>
+          </p>
+        </div>
+
         <CTASection variant="full" />
         <div class="h-[40vh]" />
       </div>
