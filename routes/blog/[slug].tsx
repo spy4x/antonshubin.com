@@ -22,6 +22,8 @@ async function getArticleContent(slug: string): Promise<string | null> {
 interface PageData {
   article: BlogArticle | null;
   content: string | null;
+  prev: BlogArticle | null;
+  next: BlogArticle | null;
 }
 
 export const handler = define.handlers({
@@ -30,18 +32,30 @@ export const handler = define.handlers({
     const article = getArticleBySlug(slug);
 
     if (!article) {
-      return page<PageData>({ article: null, content: null });
+      return page<PageData>({
+        article: null,
+        content: null,
+        prev: null,
+        next: null,
+      });
     }
 
-    const markdown = await getArticleContent(slug);
-    const content = markdown ? await marked(markdown) : null;
+    const sorted = [...blogArticles].sort((a, b) => b.index - a.index);
+    const idx = sorted.findIndex((a) => a.slug === slug);
+    const prev = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+    const next = idx > 0 ? sorted[idx - 1] : null;
 
-    return page<PageData>({ article, content });
+    const markdown = await getArticleContent(slug);
+    // Strip YAML front matter (between first pair of --- delimiters)
+    const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null;
+    const content = body ? await marked(body) : null;
+
+    return page<PageData>({ article, content, prev, next });
   },
 });
 
 export default define.page<PageData>(function BlogArticle(ctx) {
-  const { article, content } = ctx.data;
+  const { article, content, prev, next } = ctx.data;
 
   if (!article) {
     return (
@@ -167,6 +181,58 @@ export default define.page<PageData>(function BlogArticle(ctx) {
                 </p>
               )}
           </div>
+
+          {/* Previous / Next article navigation */}
+          {(prev || next) && (
+            <div class="grid gap-4 sm:grid-cols-2 p-6 bg-gray-800 border-t border-gray-700">
+              {prev
+                ? (
+                  <a
+                    href={`/blog/${prev.slug}`}
+                    class="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group"
+                  >
+                    <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-700">
+                      <img
+                        src={`/img/blog/${prev.slug}/${prev.previewImageURL}`}
+                        alt=""
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-gray-500 text-xs mb-1">← Previous</p>
+                      <p class="text-white text-sm font-medium truncate group-hover:text-orange-400 transition-colors">
+                        {prev.title}
+                      </p>
+                    </div>
+                  </a>
+                )
+                : <div />}
+              {next
+                ? (
+                  <a
+                    href={`/blog/${next.slug}`}
+                    class="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group sm:text-right sm:flex-row-reverse"
+                  >
+                    <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-700">
+                      <img
+                        src={`/img/blog/${next.slug}/${next.previewImageURL}`}
+                        alt=""
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-gray-500 text-xs mb-1">Next →</p>
+                      <p class="text-white text-sm font-medium truncate group-hover:text-orange-400 transition-colors">
+                        {next.title}
+                      </p>
+                    </div>
+                  </a>
+                )
+                : <div />}
+            </div>
+          )}
 
           {/* Footer CTA */}
           <div class="px-8 py-6 bg-gray-900/50 border-t border-gray-700">

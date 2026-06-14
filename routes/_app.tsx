@@ -1,4 +1,5 @@
 import { define } from "../lib/utils.ts";
+import { PLAUSIBLE_URL, UMAMI_ID, UMAMI_URL } from "../lib/config.ts";
 
 interface AppProps {
   Component: preact.ComponentType;
@@ -246,16 +247,12 @@ export default define.page(function App({ Component }: AppProps) {
             }),
           }}
         />
-        <script
-          defer
-          data-domain="antonshubin.com"
-          src="https://analytics.antonshubin.com/js/script.js"
-        />
-        <script
-          defer
-          src="https://stats.antonshubin.com/script.js"
-          data-website-id="288aa145-0bba-48d8-960e-94bc4f8e17a1"
-        />
+        {PLAUSIBLE_URL && (
+          <script defer data-domain="antonshubin.com" src={PLAUSIBLE_URL} />
+        )}
+        {UMAMI_URL && UMAMI_ID && (
+          <script defer src={UMAMI_URL} data-website-id={UMAMI_ID} />
+        )}
       </head>
       <body class="h-full">
         <a

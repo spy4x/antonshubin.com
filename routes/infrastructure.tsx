@@ -89,7 +89,7 @@ export default define.page(function Infrastructure() {
             🏗️ Architecture
           </h2>
           <img
-            src="/img/infrastructure-architecture.svg"
+            src="/infrastructure-architecture.svg"
             alt="Infrastructure architecture diagram showing Cloudflare → Traefik → Docker Compose → Backups flow"
             class="w-full rounded-lg"
             loading="lazy"
