@@ -80,3 +80,23 @@ Manual: rsync to homelab, then `docker compose up -d --build`. See
 5. **Docker** — everything runs in a container on homelab
 6. **Traefik** — reverse proxy with auto-SSL (external)
 7. **Auditability** — small, focused commits
+
+## AI Crawler Optimization (SEO)
+
+This site uses an aggressive AI crawler strategy. When adding features or
+content, ALWAYS update the corresponding files:
+
+| Asset           | File                                 | Update when                                     |
+| --------------- | ------------------------------------ | ----------------------------------------------- |
+| AI summary      | `routes/llms.txt.ts`                 | Site positioning, offerings, or policies change |
+| AI full index   | `routes/llms-full.txt.ts`            | New pages, catalog items, or blog posts added   |
+| Site structure  | `routes/sitemap.xml.ts`              | New routes or pages added                       |
+| Crawler rules   | `routes/robots.txt.ts`               | Adding/removing crawler permissions             |
+| Structured data | `routes/_app.tsx` (JSON-LD)          | Identity, skills, or company info changes       |
+| FAQ data        | `routes/how-i-work.tsx` (FAQ schema) | Policies or terms change                        |
+| Docs reference  | `docs/seo-ai-crawlers.md`            | Any of the above changes                        |
+
+**Rule:** Every PR that adds/modifies routes, content, or positioning MUST also
+update the corresponding AI crawler files. The `llms*.txt` files are parsed by
+GPTBot, Claude, Perplexity, and other AI crawlers — they are a primary traffic
+source.
