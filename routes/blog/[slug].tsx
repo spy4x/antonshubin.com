@@ -64,6 +64,24 @@ export default define.page<PageData>(function BlogArticle(ctx) {
 
   return (
     <Layout currentPath="/blog">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": article.title,
+            "description": article.description,
+            "datePublished": article.publishedAt,
+            "timeRequired": `PT${article.readTime}M`,
+            "author": {
+              "@type": "Person",
+              "name": "Anton Shubin",
+              "url": "https://antonshubin.com",
+            },
+          }),
+        }}
+      />
       <article class="max-w-3xl mx-auto px-4 py-12">
         <a
           href="/blog"

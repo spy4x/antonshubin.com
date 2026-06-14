@@ -263,6 +263,12 @@ export default define.page(function App({ Component }: AppProps) {
         )}
       </head>
       <body class="h-full">
+        <a
+          href="#main-content"
+          class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-orange-600 focus:text-white focus:font-semibold"
+        >
+          Skip to main content
+        </a>
         <Component />
         <script
           dangerouslySetInnerHTML={{

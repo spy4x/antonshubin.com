@@ -26,8 +26,37 @@ export default define.page(function CatalogDetail(ctx) {
     );
   }
 
+  // Parse price for schema (strip non-numeric)
+  const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+  const priceCurrency = item.price.includes("$") ? "USD" : "USD";
+
   return (
     <Layout currentPath="/catalog">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": item.title,
+            "description": item.desc,
+            "offers": {
+              "@type": "Offer",
+              "price": priceNum || 0,
+              "priceCurrency": priceCurrency,
+              "availability": "https://schema.org/InStock",
+              "priceValidUntil": new Date(
+                Date.now() + 365 * 24 * 60 * 60 * 1000,
+              ).toISOString().split("T")[0],
+            },
+            "category": item.slug === "strategy-call"
+              ? "Consultation"
+              : item.slug === "free-architecture-audit"
+              ? "Audit"
+              : "Development",
+          }),
+        }}
+      />
       <div class="max-w-3xl mx-auto px-4 py-12">
         <a
           href="/catalog"

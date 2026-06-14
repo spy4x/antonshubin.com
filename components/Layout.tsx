@@ -11,7 +11,9 @@ export function Layout({ children, currentPath }: LayoutProps) {
   return (
     <>
       <MobileMenu currentPath={currentPath} scheduleUrl={SCHEDULE_URL} />
-      <main class="p-6 pb-24 sm:ml-16 md:p-12">{children}</main>
+      <main id="main-content" class="p-6 pb-24 sm:ml-16 md:p-12">
+        {children}
+      </main>
     </>
   );
 }
