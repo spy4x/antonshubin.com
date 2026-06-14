@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0f172a"/>
+  <text x="70" y="200" font-family="system-ui" font-size="48" font-weight="bold" fill="#f97316">$50/mo</text>
+  <text x="70" y="270" font-family="system-ui" font-size="32" font-weight="600" fill="#e2e8f0">20+ Production Services</text>
+  <text x="70" y="330" font-family="system-ui" font-size="22" fill="#94a3b8">Self-hosted infrastructure lab</text>
+  <text x="70" y="380" font-family="system-ui" font-size="22" fill="#94a3b8">Cost optimization patterns for your SaaS</text>
+  <rect x="70" y="420" width="200" height="4" rx="2" fill="#f97316"/>
+  <text x="70" y="470" font-family="system-ui" font-size="16" fill="#64748b">Anton Shubin — Fractional CTO</text>
+  <circle cx="1050" cy="315" r="200" fill="none" stroke="#f97316" stroke-width="2" opacity="0.3"/>
+  <circle cx="1050" cy="315" r="140" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.5"/>
+  <circle cx="1050" cy="315" r="80" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.7"/>
+  <text x="1050" y="320" font-family="system-ui" font-size="14" fill="#64748b" text-anchor="middle">Infrastructure</text>
+</svg>

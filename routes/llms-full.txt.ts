@@ -46,8 +46,9 @@ export const handler = define.handlers({
 
 1. **Free Architecture Audit** — send your stack/idea, get 3 improvements in 48h, no cost
 2. **Technical Consultation** — $150 for a 60-minute deep-dive with actionable advice
-3. **Fixed-Price Milestones** — scope locked on funding, predictable delivery
-4. **V2 Backlog** — new features captured for later, no scope creep
+3. **Fixed-Price Milestones** — scope locked on funding, predictable delivery (preferred for new projects, MVPs, audits, catalog items)
+4. **Hourly Engagement** — available for staff augmentation, code reviews, advisory, or when scope is not fully clear yet. Transparent rate, no screen tracking.
+5. **V2 Backlog** — new features captured for later, no scope creep
 
 ## Policies (Why Founders Trust Me)
 

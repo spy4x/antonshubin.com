@@ -342,6 +342,16 @@ export const blogArticles: BlogArticle[] = [
     previewImageURL: "preview.webp",
     youtubeVideoId: "Ri3TLTKvSYQ",
   },
+  {
+    index: 7,
+    title: "How I Run 20+ Production Services on a Single $50/Month Server",
+    slug: "cost-optimization-laboratory",
+    description:
+      "My homelab runs 20+ services on a single $50/month Hetzner server. Here is the exact architecture, cost breakdown, and why your SaaS can use the same patterns to slash infrastructure costs by 90%.",
+    readTime: 12,
+    publishedAt: "2026.06.15",
+    previewImageURL: "cover.svg",
+  },
 ];
 
 export function prettyDate(dateString: string): string {

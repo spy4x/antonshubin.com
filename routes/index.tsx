@@ -312,6 +312,37 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
+        {/* Why I Do This — psychologist recommendation */}
+        <section class="mb-16 md:mb-24">
+          <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 sm:p-10">
+            <div class="flex flex-col sm:flex-row items-start gap-6">
+              <div class="text-4xl shrink-0">👨‍💻</div>
+              <div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
+                  Why I Do This
+                </h2>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
+                  I have been on both sides. I have built startups that failed
+                  because of bad technical decisions. I have fixed products that
+                  were dying because of bad developers and over-engineered
+                  architectures.
+                </p>
+                <p class="text-gray-400 leading-relaxed">
+                  Now I build systems that do not need fixing. I work with
+                  non-technical founders to turn their ideas into production
+                  software — without the jargon, without the drama, and without
+                  the bloated AWS bills. I have done it 80+ times, and I know
+                  exactly what works and what does not.
+                </p>
+                <div class="flex items-center gap-2 mt-4 text-sm text-orange-400 font-medium">
+                  <span class="w-2 h-2 rounded-full bg-orange-400" />
+                  Founder → Developer → CTO. I understand the whole picture.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Featured Services — from Catalog */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">How to Work Together</h2>

@@ -67,6 +67,31 @@ export const items: CatalogItem[] = [
     ],
   },
   {
+    icon: "📐",
+    slug: "technical-discovery-sprint",
+    title: "Technical Discovery Sprint — 3 Days",
+    price: "$1,500",
+    delivery: "3 days",
+    desc:
+      "A structured 3-day deep-dive where I analyze your idea, existing codebase, or infrastructure and deliver a detailed architecture blueprint. You get system diagrams, tech stack recommendations, cost estimates, and a phased build roadmap — everything you need to move forward with confidence.",
+    includes: [
+      "System architecture diagram (Excalidraw or draw.io)",
+      "Tech stack recommendation with rationale",
+      "Infrastructure cost estimate (server, database, third-party services)",
+      "Phased build roadmap with timeline estimates",
+      "Key risk factors and mitigation strategies",
+      "30-minute walkthrough call to review the blueprint",
+    ],
+    tech: ["Any stack", "Architecture", "Strategy", "Cost optimization"],
+    audience:
+      "Founders who have an idea or existing codebase and need a clear technical plan before committing to a full build. Perfect bridge between a consultation call and a full development milestone.",
+    examples: [
+      "I have a SaaS idea and want to know exactly what to build, in what order, and how much it will cost before I commit to a full development project",
+      "I have an existing MVP that is falling apart — I need an architect to tell me what to fix, what to rewrite, and what to keep",
+      "I want to migrate from AWS to self-hosted infrastructure but need a detailed migration plan with cost comparisons and risk assessment",
+    ],
+  },
+  {
     icon: "🚀",
     slug: "zero-to-production-saas-mvp",
     title: "Zero-to-Production SaaS MVP",

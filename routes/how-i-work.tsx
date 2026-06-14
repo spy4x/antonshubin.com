@@ -1,6 +1,36 @@
+import type { ComponentChildren } from "preact";
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
+
+function FaqItem(
+  { q, children }: { q: string; children: ComponentChildren },
+) {
+  return (
+    <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+      <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+        <span>{q}</span>
+        <svg
+          class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+          />
+        </svg>
+      </summary>
+      <p class="text-gray-400 text-sm mt-3 leading-relaxed">
+        {children}
+      </p>
+    </details>
+  );
+}
 
 const policies = [
   {
@@ -152,207 +182,102 @@ export default define.page(function HowIWork() {
             Honest answers to the questions I get most often.
           </p>
           <div class="space-y-4 max-w-3xl mx-auto">
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>
-                  What if we start working together and it is not a good fit?
-                </span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                That is exactly why I offer the 14-Day Mutual Alignment
-                Guarantee. If within the first two weeks either of us feels the
-                communication style, workflow, or technical approach is not
-                working, I issue a 100% refund — no questions asked. I would
-                rather lose a project than force a partnership that does not
-                click.
-              </p>
-            </details>
+            <FaqItem q="What if we start working together and it is not a good fit?">
+              That is exactly why I offer the 14-Day Mutual Alignment Guarantee.
+              If within the first two weeks either of us feels the communication
+              style, workflow, or technical approach is not working, I issue a
+              100% refund — no questions asked. I would rather lose a project
+              than force a partnership that does not click.
+            </FaqItem>
 
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>How do you handle scope changes mid-project?</span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                Once a milestone is funded, the scope is locked to guarantee
-                delivery dates. New ideas or features that come up during
-                development are automatically captured in a structured V2
-                Backlog — quoted separately after the current version is
-                deployed. This protects your timeline and your budget.
-              </p>
-            </details>
+            <FaqItem q="How do you handle scope changes mid-project?">
+              Once a milestone is funded, the scope is locked to guarantee
+              delivery dates. New ideas or features that come up during
+              development are automatically captured in a structured V2 Backlog
+              — quoted separately after the current version is deployed. This
+              protects your timeline and your budget.
+            </FaqItem>
 
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>
-                  Do you work with clients who already have a development team?
-                </span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                Yes, that is one of the most common scenarios. Founders come to
-                me when their existing team is moving too slow, building the
-                wrong thing, or the technical debt is piling up. I step in as a
-                Tech Lead or Architect to set direction, review code, and get
-                things back on track — without replacing your entire team.
-              </p>
-            </details>
+            <FaqItem q="Do you work with clients who already have a development team?">
+              Yes, that is one of the most common scenarios. Founders come to me
+              when their existing team is moving too slow, building the wrong
+              thing, or the technical debt is piling up. I step in as a Tech
+              Lead or Architect to set direction, review code, and get things
+              back on track — without replacing your entire team.
+            </FaqItem>
 
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>What kind of projects do you NOT take?</span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                I do not take hourly time-tracked engagements, staff
-                augmentation roles, or projects where the client wants to
-                micromanage the development process. I also avoid projects that
-                require proprietary vendor lock-in — I build everything on
-                open-source, self-hostable technology so you own your stack
-                completely.
-              </p>
-            </details>
+            <FaqItem q="What kind of projects do you take on an hourly basis?">
+              I prefer fixed-price for clearly defined projects from our catalog
+              (MVPs, audits, API builds). But I am open to hourly for staff
+              augmentation, consulting, or when the scope is not fully clear yet
+              — such as helping your existing team, reviewing code, or advising
+              on architecture decisions. The key is transparency: you will know
+              upfront whether a project fits better as fixed-price or hourly.
+            </FaqItem>
 
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>
-                  How do you communicate with clients during a project?
-                </span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                We hold one structured weekly alignment call (30-60 minutes).
-                All daily updates, code demonstrations, and questions are
-                handled asynchronously via text or Loom video. This means you
-                are always in the loop without having to sit through daily
-                standup meetings. You pay for engineering throughput, not
-                meeting bloat.
-              </p>
-            </details>
+            <FaqItem q="How do you communicate during a project?">
+              We hold one structured weekly alignment call (30-60 minutes). All
+              daily updates, code demonstrations, and questions are handled
+              asynchronously via text or Loom video. You are always in the loop
+              without sitting through daily standups. You pay for engineering
+              throughput, not meeting bloat.
+            </FaqItem>
 
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>What if my project needs more work after launch?</span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                Every project comes with a 30-Day Code Warranty — I fix any bugs
-                within the delivered scope for free. For ongoing needs, I offer
-                a Post-Launch Support & Maintenance package ($400/month) that
-                covers server monitoring, backup verification, security patches,
-                and priority support. You can also fund additional milestones
-                from the V2 Backlog at any time.
-              </p>
-            </details>
+            <FaqItem q="How long does a typical project take?">
+              It depends on the scope. A Codebase Health Audit takes 3 days. A
+              Backend API takes around 14 days. A full SaaS MVP is typically 21
+              days. The Technical Discovery Sprint (3 days) helps us define the
+              exact timeline before committing to a larger milestone. Every
+              project ships in weeks, not months.
+            </FaqItem>
 
-            <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
-              <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>
-                  How do I know you are the right person for my project?
-                </span>
-                <svg
-                  class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </summary>
-              <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-                Start with a free architecture audit — send me your tech stack
-                or idea, and I will send back 3 concrete improvements within 48
-                hours. No cost, no pitch. If you like the quality of the
-                feedback, we can schedule a consultation. If not, you have lost
-                nothing except an email. I have done this for 80+ projects
-                across 15 years, and I am confident I can help you too.
-              </p>
-            </details>
+            <FaqItem q="What technologies do you use?">
+              My core stack is Deno/Node.js, TypeScript, Preact/React,
+              PostgreSQL, Valkey/Redis, Docker/Podman, and Traefik. For AI work,
+              I integrate OpenAI, Claude, and DeepSeek APIs. Everything is
+              open-source and self-hostable — no proprietary frameworks, no
+              vendor lock-in.
+            </FaqItem>
+
+            <FaqItem q="Can you work with my existing codebase?">
+              Yes, I regularly take over existing projects that need
+              architecture improvements, performance fixes, or new features. The
+              Codebase Health Audit is specifically designed for this — I review
+              your code and deliver a prioritized roadmap of what to fix, what
+              to keep, and what to rewrite.
+            </FaqItem>
+
+            <FaqItem q="What if I don't have a clear idea yet?">
+              That is what the Free Architecture Audit is for. Send me a
+              paragraph about your idea or problem, and I will send back 3
+              concrete recommendations within 48 hours. No cost, no pitch. From
+              there, we can decide if a consultation or discovery sprint makes
+              sense.
+            </FaqItem>
+
+            <FaqItem q="What if my project needs more work after launch?">
+              Every project comes with a 30-Day Code Warranty — I fix any bugs
+              within the delivered scope for free. For ongoing needs, I offer a
+              {" "}
+              <a
+                href="/catalog/post-launch-support-maintenance"
+                class="text-orange-400 hover:text-orange-300 underline"
+              >
+                Post-Launch Support & Maintenance
+              </a>{" "}
+              package that covers server monitoring, backup verification,
+              security patches, and priority support. You can also fund
+              additional milestones from the V2 Backlog at any time.
+            </FaqItem>
+
+            <FaqItem q="How do I know you are the right person for my project?">
+              Start with a free architecture audit — send me your tech stack or
+              idea, and I will send back 3 concrete improvements within 48
+              hours. No cost, no pitch. If you like the quality of the feedback,
+              we can schedule a consultation. If not, you have lost nothing
+              except an email. I have done this for 80+ projects across 15
+              years, and I am confident I can help you too.
+            </FaqItem>
           </div>
         </section>
       </div>
