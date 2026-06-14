@@ -73,6 +73,23 @@ const policies = [
 export default define.page(function HowIWork() {
   return (
     <Layout currentPath="/how-i-work">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": policies.map((p) => ({
+              "@type": "Question",
+              "name": p.title,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": p.desc + " " + p.why,
+              },
+            })),
+          }),
+        }}
+      />
       <div class="max-w-4xl mx-auto px-4 py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           How I Deliver
