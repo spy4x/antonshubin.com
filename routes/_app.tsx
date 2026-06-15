@@ -64,13 +64,17 @@ export default define.page(function App({ Component }: AppProps) {
         <meta property="og:site_name" content="Anton Shubin" />
         <meta property="og:locale" content="en_US" />
 
-        {/* Preload critical images for LCP optimization */}
+        {/* Minimal critical CSS to prevent FOUC while CSS loads */}
+        <style>{`html,body{background-color:#0f172a}body,a,button{color:#e2e8f0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}</style>
+
+        {/* Preload LCP hero image with fetchpriority */}
         <link
           rel="preload"
           href="/img/photo-mobile.webp"
           as="image"
           type="image/webp"
           media="(max-width: 640px)"
+          fetchpriority="high"
         />
         <link
           rel="preload"
@@ -78,84 +82,13 @@ export default define.page(function App({ Component }: AppProps) {
           as="image"
           type="image/webp"
           media="(min-width: 641px)"
+          fetchpriority="high"
         />
 
-        {/* Preconnect to external domains */}
-        <link rel="preconnect" href="https://www.youtube.com" />
-        <link rel="preconnect" href="https://www.upwork.com" />
-        <link rel="dns-prefetch" href="https://www.youtube.com" />
-        <link rel="dns-prefetch" href="https://www.upwork.com" />
-
-        {/* Favicon / Apple Touch Icons */}
-        <link
-          rel="apple-touch-icon"
-          sizes="57x57"
-          href="/apple-icon-57x57.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="60x60"
-          href="/apple-icon-60x60.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="72x72"
-          href="/apple-icon-72x72.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="76x76"
-          href="/apple-icon-76x76.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="114x114"
-          href="/apple-icon-114x114.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="120x120"
-          href="/apple-icon-120x120.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="144x144"
-          href="/apple-icon-144x144.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="152x152"
-          href="/apple-icon-152x152.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-icon-180x180.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="192x192"
-          href="/android-icon-192x192.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="96x96"
-          href="/favicon-96x96.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
+        {/* Favicon + Apple Touch Icons (modern sizes only) */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
 
         {/* PWA */}
         <link rel="manifest" href="/manifest.json" />
@@ -164,7 +97,6 @@ export default define.page(function App({ Component }: AppProps) {
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
 
         {/* JSON-LD Structured Data — multiple schemas for AI crawlers */}
         <script
