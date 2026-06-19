@@ -15,13 +15,13 @@ export const handler = define.handlers({
 - Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: Expert-Vetted (Top 1%), 100% Job Success, $395K+ earned, 80+ projects
-- Pricing: Fixed-price milestones ($1,500-$25,000+)
+- Pricing: Fixed-price milestones ($3,000-$25,000+)
 - Location: Da Nang, Vietnam (Singapore-based entity)
 
 ## Engagement Model
 
 1. Free Architecture Audit — 48h turnaround, no cost
-2. Technical Consultation — $150 for 60 min deep-dive
+2. Strategy Session — $350 for 60 min deep-dive
 3. Fixed-Price Milestones — scope locked on funding (preferred for MVPs, audits, catalog items)
 4. Hourly Engagement — available for staff augmentation, code reviews, advisory when scope is unclear
 5. V2 Backlog — new features captured for later

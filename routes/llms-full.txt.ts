@@ -46,7 +46,7 @@ export const handler = define.handlers({
 ## Engagement Model
 
 1. **Free Architecture Audit** — send your stack/idea, get 3 improvements in 48h, no cost
-2. **Technical Consultation** — $150 for a 60-minute deep-dive with actionable advice
+2. **Strategy Session** — $350 for a 60-minute deep-dive with actionable advice
 3. **Fixed-Price Milestones** — scope locked on funding, predictable delivery (preferred for new projects, MVPs, audits, catalog items)
 4. **Hourly Engagement** — available for staff augmentation, code reviews, advisory, or when scope is not fully clear yet. Transparent rate, no screen tracking.
 5. **V2 Backlog** — new features captured for later, no scope creep
@@ -66,7 +66,7 @@ export const handler = define.handlers({
 ### Pages
 - **Home:** ${DOMAIN}/ — Main landing page with pain points, engagement terms, featured services
 - **Catalog:** ${DOMAIN}/catalog — 7 fixed-price offerings
-  - /catalog/strategy-call — Technical Consultation ($150, 60 min)
+  - /catalog/strategy-call — Strategy Session ($350, 60 min)
   - /catalog/free-architecture-audit — Free Architecture Audit (free, 48h)
   - /catalog/zero-to-production-saas-mvp — SaaS MVP (from $8K, 21 days)
   - /catalog/bulletproof-backend-api — Backend API (from $4K, 14 days)

@@ -20,8 +20,8 @@ export const items: CatalogItem[] = [
   {
     icon: "🎯",
     slug: "strategy-call",
-    title: "Technical Consultation — 60 Minutes",
-    price: "$150",
+    title: "Strategy Session — 60 Minutes",
+    price: "$350",
     delivery: "60 min",
     desc:
       "A focused 60-minute video call where we dive deep into your project or idea. I give you honest architectural feedback, answer your questions, and help you plan the technical path forward. No pitch, no commitment — just actionable advice from an experienced Fractional CTO.",
@@ -70,7 +70,7 @@ export const items: CatalogItem[] = [
     icon: "📐",
     slug: "technical-discovery-sprint",
     title: "Technical Discovery Sprint — 3 Days",
-    price: "$1,500",
+    price: "$2,500",
     delivery: "3 days",
     desc:
       "A structured 3-day deep-dive where I analyze your idea, existing codebase, or infrastructure and deliver a detailed architecture blueprint. You get system diagrams, tech stack recommendations, cost estimates, and a phased build roadmap — everything you need to move forward with confidence.",
@@ -95,7 +95,7 @@ export const items: CatalogItem[] = [
     icon: "🚀",
     slug: "zero-to-production-saas-mvp",
     title: "Zero-to-Production SaaS MVP",
-    price: "From $8,000",
+    price: "From $15,000",
     delivery: "21 days",
     desc:
       "Full SaaS MVP from idea to live deployment. Includes authentication, payment processing, REST API, and an admin panel. Built on Deno + Preact + PostgreSQL — lean, fast, and ready for users.",
@@ -121,7 +121,7 @@ export const items: CatalogItem[] = [
     icon: "⚡",
     slug: "bulletproof-backend-api",
     title: "Bulletproof Backend API & Infrastructure",
-    price: "From $4,000",
+    price: "From $6,000",
     delivery: "14 days",
     desc:
       "Production-grade REST or GraphQL API with self-hosted or cloud infrastructure. Designed to scale to 10K+ users from day one. Includes monitoring, backups, and CI/CD.",
@@ -147,7 +147,7 @@ export const items: CatalogItem[] = [
     icon: "🤖",
     slug: "surgical-ai-integration",
     title: "Surgical AI Integration & LLM Pipelines",
-    price: "From $4,000",
+    price: "From $6,000",
     delivery: "14 days",
     desc:
       "Production-grade LLM pipelines, RAG systems, and autonomous subagents. Built to eliminate hallucination risks and integrate cleanly with your existing backend.",
@@ -173,7 +173,7 @@ export const items: CatalogItem[] = [
     icon: "🔍",
     slug: "codebase-health-audit",
     title: "Codebase Health Audit & Refactoring Roadmap",
-    price: "From $1,500",
+    price: "From $3,000",
     delivery: "3 days",
     desc:
       "48-hour deep audit of your existing codebase. You get a detailed report with architectural recommendations, security gaps, performance bottlenecks, and a prioritized refactoring roadmap.",

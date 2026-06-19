@@ -371,14 +371,14 @@ export default define.page(function Home(ctx) {
             >
               <div class="text-3xl mb-3">🎯</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
-                Technical Consultation
+                Strategy Session
               </h3>
               <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
-                60-minute video call. Deep-dive into your project. Honest
-                feedback and a clear technical path forward.
+                60-minute deep-dive with actionable roadmap and tech stack
+                recommendations.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
-                $150 — 60 min
+                $350 — 60 min
               </span>
             </a>
             <a
@@ -394,7 +394,7 @@ export default define.page(function Home(ctx) {
                 admin panel. Built to scale.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
-                From $8,000 — 21 days
+                From $15,000 — 21 days
               </span>
             </a>
             <a
@@ -781,7 +781,7 @@ export default define.page(function Home(ctx) {
               <div>
                 <p class="font-medium text-white text-sm">Startup Founder</p>
                 <p class="text-gray-400 text-sm">
-                  MVP Development • $4,000 fixed price
+                  MVP Development
                 </p>
               </div>
             </div>
@@ -829,7 +829,7 @@ export default define.page(function Home(ctx) {
               <div>
                 <p class="font-medium text-white text-sm">Startup Founder</p>
                 <p class="text-gray-400 text-sm">
-                  Technical Consultation • $115 fixed price
+                  Technical Consultation
                 </p>
               </div>
             </div>
