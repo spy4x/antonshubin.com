@@ -54,8 +54,8 @@ export const handler = define.handlers({
   },
 });
 
-export default define.page<PageData>(function BlogArticle(ctx) {
-  const { article, content, prev, next } = ctx.data;
+export default define.page(function BlogArticle(ctx) {
+  const { article, content, prev, next } = ctx.data as PageData;
 
   if (!article) {
     return (

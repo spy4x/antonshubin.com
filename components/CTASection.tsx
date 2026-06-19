@@ -29,7 +29,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
             isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
           } border border-transparent ${
             isCompact ? "text-base" : "text-lg font-semibold"
-          } rounded-${isCompact ? "md" : "lg"} text-white ${
+          } ${isCompact ? "rounded-md" : "rounded-lg"} text-white ${
             isCompact
               ? "bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400"
               : "bg-gradient-to-r from-green-600 to-emerald-500 shadow-lg shadow-green-500/25 hover:scale-105 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200"
@@ -45,7 +45,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
             isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
           } border border-transparent ${
             isCompact ? "text-base" : "text-lg font-semibold"
-          } rounded-${isCompact ? "md" : "lg"} text-white ${
+          } ${isCompact ? "rounded-md" : "rounded-lg"} text-white ${
             isCompact
               ? "bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
               : "bg-gradient-to-r from-gray-600 to-gray-500 shadow-lg shadow-gray-500/20 hover:scale-105 hover:shadow-xl hover:shadow-gray-500/25 transition-all duration-200"
@@ -75,7 +75,7 @@ export function CTASection({ variant = "compact" }: CTASectionProps) {
             isCompact ? "px-5 py-3" : "gap-2.5 px-8 py-3.5"
           } border border-transparent ${
             isCompact ? "text-base" : "text-lg font-semibold"
-          } rounded-${isCompact ? "md" : "lg"} text-white ${
+          } ${isCompact ? "rounded-md" : "rounded-lg"} text-white ${
             isCompact
               ? "bg-orange-500 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400"
               : "bg-gradient-to-r from-orange-600 to-amber-500 shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-200"

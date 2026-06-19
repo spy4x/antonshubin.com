@@ -6,7 +6,7 @@ interface AppProps {
   Component: preact.ComponentType;
   title?: string;
   description?: string;
-  url?: string;
+  url?: URL;
   image?: string;
   type?: string;
 }

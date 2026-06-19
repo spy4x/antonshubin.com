@@ -1,4 +1,3 @@
-import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";

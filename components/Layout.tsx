@@ -1,5 +1,5 @@
 import type { ComponentChildren } from "preact";
-import MobileMenu from "../islands/MobileMenu.tsx";
+import Menu from "../islands/Menu.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 
 interface LayoutProps {
@@ -10,7 +10,7 @@ interface LayoutProps {
 export function Layout({ children, currentPath }: LayoutProps) {
   return (
     <>
-      <MobileMenu
+      <Menu
         {...{ "client:idle": true }}
         currentPath={currentPath}
         scheduleUrl={SCHEDULE_URL}

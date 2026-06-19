@@ -19,7 +19,7 @@ deno task check    # fmt + lint + type check
 ├── assets/         # Global CSS
 ├── components/     # Reusable Preact components (Layout, CTASection, Icons)
 ├── content/        # Blog posts (Markdown)
-├── islands/        # Interactive client components (MobileMenu, ImageGallery)
+├── islands/        # Interactive client components (Menu, CopyButton, ImageGallery)
 ├── lib/            # Utilities, config, data
 ├── routes/         # File-based page routes
 ├── static/         # Images, favicons, JS

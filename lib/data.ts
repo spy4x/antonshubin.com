@@ -276,7 +276,7 @@ export const blogArticles: BlogArticle[] = [
     description:
       "Or why so many developers abandon their attempts to release a product",
     readTime: 5,
-    publishedAt: "2022.04.27",
+    publishedAt: "2022-04-27",
     previewImageURL: "preview.webp",
     category: "startups",
   },
@@ -286,7 +286,7 @@ export const blogArticles: BlogArticle[] = [
     slug: "from-office-job-to-freelance-to-my-startups",
     description: "While traveling and enjoying life",
     readTime: 15,
-    publishedAt: "2022.06.07",
+    publishedAt: "2022-06-07",
     previewImageURL: "preview2.webp",
     category: "personal",
   },
@@ -297,7 +297,7 @@ export const blogArticles: BlogArticle[] = [
     slug: "how-to-keep-sane-while-developing-saas-alone-part-1-mental-health",
     description: "Take care of yourself first and work hard then",
     readTime: 7,
-    publishedAt: "2022.12.15",
+    publishedAt: "2022-12-15",
     previewImageURL: "preview.webp",
     category: "personal",
   },
@@ -309,7 +309,7 @@ export const blogArticles: BlogArticle[] = [
     description:
       "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day!",
     readTime: 7,
-    publishedAt: "2022.12.21",
+    publishedAt: "2022-12-21",
     previewImageURL: "preview.webp",
     youtubeVideoId: "uaqFYlfOZeE",
     category: "dev-tips",
@@ -321,7 +321,7 @@ export const blogArticles: BlogArticle[] = [
     description:
       "Streamline your software development process with Drone CI. Learn how to set up your own CI/CD server using Drone CI.",
     readTime: 5,
-    publishedAt: "2023.02.12",
+    publishedAt: "2023-02-12",
     previewImageURL: "preview.webp",
     category: "dev-tips",
   },
@@ -333,7 +333,7 @@ export const blogArticles: BlogArticle[] = [
     description:
       "Designing system architecture can be challenging for new developers. ChatGPT can simplify the process.",
     readTime: 5,
-    publishedAt: "2023.04.18",
+    publishedAt: "2023-04-18",
     previewImageURL: "preview.webp",
     youtubeVideoId: "Ri3TLTKvSYQ",
     category: "dev-tips",
@@ -345,7 +345,7 @@ export const blogArticles: BlogArticle[] = [
     description:
       "My homelab runs 20+ services on a single $50/month Hetzner server. Here is the exact architecture, cost breakdown, and why your SaaS can use the same patterns to slash infrastructure costs by 90%.",
     readTime: 12,
-    publishedAt: "2026.06.15",
+    publishedAt: "2026-06-15",
     previewImageURL: "cover.svg",
     category: "startups",
   },
@@ -361,23 +361,23 @@ export const youtubeVideos: YouTubeVideo[] = [
   {
     title: "Working on my GPT4 chatbot improvements (SvelteKit, SSE)",
     videoId: "8a6LdZPki-s",
-    publishedAt: "2024.02.26",
+    publishedAt: "2024-02-26",
   },
   {
     title:
       "Walking and Coding: Remaking my Air Quality dashboard with Bun, Turborepo, SvelteKit, Hono, Chart.js",
     videoId: "opKoHblF7vE",
-    publishedAt: "2024.01.28",
+    publishedAt: "2024-01-28",
   },
   {
     title: "Working on my ChatGPT app (first 2 minutes are mute 😅)",
     videoId: "KFIm-O8cJ20",
-    publishedAt: "2024.01.20",
+    publishedAt: "2024-01-20",
   },
 ];
 
 export function prettyDate(dateString: string): string {
-  const date = new Date(dateString.replace(/\./g, "-"));
+  const date = new Date(dateString);
   const monthNames = [
     "January",
     "February",

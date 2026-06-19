@@ -1,10 +1,11 @@
 import { define } from "../lib/utils.ts";
+import { DOMAIN } from "../lib/config.ts";
 
 export const handler = define.handlers({
   GET() {
     const txt = `User-agent: *
 Allow: /
-Sitemap: https://antonshubin.com/sitemap.xml
+Sitemap: ${DOMAIN}/sitemap.xml
 
 # AI crawlers — all welcome, index everything
 User-agent: GPTBot

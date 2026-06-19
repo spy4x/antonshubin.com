@@ -32,7 +32,15 @@ function FaqItem(
   );
 }
 
-const policies = [
+interface PolicyItem {
+  icon: string;
+  title: string;
+  desc: string;
+  why: string;
+  link?: string;
+}
+
+const policies: PolicyItem[] = [
   {
     icon: "🛡️",
     title: "14-Day Mutual Alignment Guarantee",
@@ -149,9 +157,9 @@ export default define.page(function HowIWork() {
                     </span>{" "}
                     {p.why}
                   </p>
-                  {(p as any).link && (
+                  {p.link && (
                     <a
-                      href={(p as any).link}
+                      href={p.link}
                       class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium mt-3"
                     >
                       View details and pricing →

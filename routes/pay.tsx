@@ -1,10 +1,6 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
-
-// Helper to add native onclick attr bypassing Preact type strictness
-function copyAttr(id: string) {
-  return { onclick: `copyAddr('${id}')`, "data-copy": id };
-}
+import CopyButton from "../islands/CopyButton.tsx";
 
 export default define.page(function Pay() {
   return (
@@ -39,12 +35,11 @@ export default define.page(function Pay() {
                   >
                     0xDC68c304B29a85360E364Faf8b828b77a1B8439C
                   </p>
-                  <button
-                    {...copyAttr("evm-addr")}
-                    class="mt-2 text-xs text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-1"
-                  >
-                    📋 Copy address
-                  </button>
+                  <CopyButton
+                    {...{ "client:idle": true }}
+                    elementId="evm-addr"
+                    class="mt-2 inline-flex items-center gap-1"
+                  />
                 </div>
 
                 {/* BTC */}
@@ -58,12 +53,11 @@ export default define.page(function Pay() {
                   >
                     bc1qlp05rhq99uhu6anzkzymeedgjsee605hp25knl
                   </p>
-                  <button
-                    {...copyAttr("btc-addr")}
-                    class="mt-2 text-xs text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-1"
-                  >
-                    📋 Copy address
-                  </button>
+                  <CopyButton
+                    {...{ "client:idle": true }}
+                    elementId="btc-addr"
+                    class="mt-2 inline-flex items-center gap-1"
+                  />
                 </div>
 
                 {/* Solana */}
@@ -77,12 +71,11 @@ export default define.page(function Pay() {
                   >
                     J5dXRN3Rip1TuadSf8zAui72HY7osVvaMJZ7xXPmkuQo
                   </p>
-                  <button
-                    {...copyAttr("sol-addr")}
-                    class="mt-2 text-xs text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-1"
-                  >
-                    📋 Copy address
-                  </button>
+                  <CopyButton
+                    {...{ "client:idle": true }}
+                    elementId="sol-addr"
+                    class="mt-2 inline-flex items-center gap-1"
+                  />
                 </div>
               </div>
             </div>
@@ -119,13 +112,13 @@ export default define.page(function Pay() {
                     <p id="swift-acct" class="text-white font-mono">
                       8331896611
                     </p>
-                    <button
-                      {...copyAttr("swift-acct")}
-                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0"
+                    <CopyButton
+                      {...{ "client:idle": true }}
+                      elementId="swift-acct"
+                      label="📋"
+                      class="shrink-0"
                       title="Copy account number"
-                    >
-                      📋
-                    </button>
+                    />
                   </div>
                 </div>
                 <div>
@@ -138,39 +131,39 @@ export default define.page(function Pay() {
                     <p id="swift-addr" class="text-white text-xs">
                       5 Penn Plaza, 14th Floor, New York, NY 10001
                     </p>
-                    <button
-                      {...copyAttr("swift-addr")}
-                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0 mt-0.5"
+                    <CopyButton
+                      {...{ "client:idle": true }}
+                      elementId="swift-addr"
+                      label="📋"
+                      class="shrink-0 mt-0.5"
                       title="Copy bank address"
-                    >
-                      📋
-                    </button>
+                    />
                   </div>
                 </div>
                 <div>
                   <p class="text-gray-400 text-sm">ACH routing</p>
                   <div class="flex items-center gap-2">
                     <p id="swift-ach" class="text-white font-mono">026073150</p>
-                    <button
-                      {...copyAttr("swift-ach")}
-                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0"
+                    <CopyButton
+                      {...{ "client:idle": true }}
+                      elementId="swift-ach"
+                      label="📋"
+                      class="shrink-0"
                       title="Copy ACH routing"
-                    >
-                      📋
-                    </button>
+                    />
                   </div>
                 </div>
                 <div>
                   <p class="text-gray-400 text-sm">ABA / Fedwire</p>
                   <div class="flex items-center gap-2">
                     <p id="swift-aba" class="text-white font-mono">026073008</p>
-                    <button
-                      {...copyAttr("swift-aba")}
-                      class="text-xs text-green-400 hover:text-green-300 transition-colors shrink-0"
+                    <CopyButton
+                      {...{ "client:idle": true }}
+                      elementId="swift-aba"
+                      label="📋"
+                      class="shrink-0"
                       title="Copy ABA / Fedwire"
-                    >
-                      📋
-                    </button>
+                    />
                   </div>
                 </div>
 
@@ -218,34 +211,6 @@ export default define.page(function Pay() {
           </div>
         </div>
       </div>
-
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            function copyAddr(id) {
-              var el = document.getElementById(id);
-              if (!el) return;
-              var txt = el.textContent.trim();
-              if (navigator.clipboard) {
-                navigator.clipboard.writeText(txt);
-              } else {
-                var ta = document.createElement("textarea");
-                ta.value = txt;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand("copy");
-                document.body.removeChild(ta);
-              }
-              var btns = document.querySelectorAll('[data-copy="' + id + '"]');
-              btns.forEach(function(b) {
-                var orig = b.textContent;
-                b.textContent = "✅ Copied!";
-                setTimeout(function() { b.textContent = orig; }, 10000);
-              });
-            }
-          `,
-        }}
-      />
     </Layout>
   );
 });

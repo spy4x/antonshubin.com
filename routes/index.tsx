@@ -6,11 +6,9 @@ import { blogArticles, prettyDate, youtubeVideos } from "../lib/data.ts";
 import {
   CalendarIcon,
   GithubIcon,
-  LinkedInIcon,
   PenIcon,
   ServerIcon,
   StarIcon,
-  TelegramIcon,
   UpworkIcon,
   WalletIcon,
   YouTubeIcon,

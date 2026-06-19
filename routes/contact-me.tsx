@@ -3,7 +3,6 @@ import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import {
   CalendarIcon,
-  EmailIcon,
   GithubIcon,
   LinkedInIcon,
   TelegramIcon,

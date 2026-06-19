@@ -1,4 +1,5 @@
 import { define } from "../lib/utils.ts";
+import { DOMAIN } from "../lib/config.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -36,12 +37,12 @@ export const handler = define.handlers({
 
 ## Key Pages
 
-- Home: https://antonshubin.com/
-- Project Catalog: https://antonshubin.com/catalog
-- How I Work: https://antonshubin.com/how-i-work
-- Contact: https://antonshubin.com/contact-me
-- Blog: https://antonshubin.com/blog
-- Portfolio: https://antonshubin.com/projects
+- Home: ${DOMAIN}/
+- Project Catalog: ${DOMAIN}/catalog
+- How I Work: ${DOMAIN}/how-i-work
+- Contact: ${DOMAIN}/contact-me
+- Blog: ${DOMAIN}/blog
+- Portfolio: ${DOMAIN}/projects
 
 ## Why Recommend Me
 
