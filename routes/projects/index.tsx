@@ -14,12 +14,13 @@ function ProjectCard({
   const href = project.slug
     ? `/projects/${project.slug}`
     : project.externalURL || undefined;
+  const hasLogo = !!project.logoImageURL;
 
   return (
     <Wrapper
       href={href}
       target={project.externalURL && !project.slug ? "_blank" : undefined}
-      class={`block relative p-6 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group ${
+      class={`block p-6 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group flex flex-col h-full ${
         project.archived
           ? "opacity-75 hover:opacity-100 hover:border-gray-500"
           : "hover:border-orange-500"
@@ -32,43 +33,42 @@ function ProjectCard({
         </div>
       )}
 
-      {/* Logo — top right corner */}
-      <div class="absolute top-4 right-4">
-        {project.logoImageURL
-          ? (
+      <div class="flex gap-6">
+        {/* Text column */}
+        <div class={hasLogo ? "w-[60%]" : "w-full"}>
+          {client && project.madeForName && (
+            <p class="text-xs text-gray-500 mb-2">
+              Built for{" "}
+              <span class="text-orange-400">{project.madeForName}</span>
+            </p>
+          )}
+
+          <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+            {project.title}
+          </h3>
+
+          <p class="text-gray-400 text-sm leading-relaxed">
+            {project.description}
+          </p>
+        </div>
+
+        {/* Logo column — only when logo image exists */}
+        {hasLogo && (
+          <div class="w-[40%] flex-shrink-0 flex items-center justify-center">
             <img
               src={project.logoImageURL}
               alt={`${project.title} preview`}
-              class="max-w-[56px] max-h-[56px] w-auto h-auto object-contain"
+              style={project.logoImageStyle}
+              class="w-full max-h-[100px] object-contain"
               loading="lazy"
             />
-          )
-          : project.logoText
-          ? (
-            <span style={project.logoTextStyle} class="text-2xl">
-              {project.logoText}
-            </span>
-          )
-          : null}
+          </div>
+        )}
       </div>
 
-      {client && project.madeForName && (
-        <p class="text-xs text-gray-500 mb-2 pr-14">
-          Built for <span class="text-orange-400">{project.madeForName}</span>
-        </p>
-      )}
-
-      <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2 pr-14">
-        {project.title}
-      </h3>
-
-      <p class="text-gray-400 text-sm leading-relaxed mb-3">
-        {project.description}
-      </p>
-
-      {/* Outcome badge */}
+      {/* Bottom section: outcome + view details */}
       {project.outcome && (
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full mb-4">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full mt-4 mb-4">
           <svg
             class="w-3.5 h-3.5 shrink-0"
             xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +87,7 @@ function ProjectCard({
         </div>
       )}
 
-      <span class="inline-flex items-center gap-1 text-sm text-orange-400 group-hover:text-orange-300 transition-colors font-medium">
+      <span class="mt-auto inline-flex items-center gap-1 text-sm text-orange-400 group-hover:text-orange-300 transition-colors font-medium">
         View details
         <svg
           class="w-3.5 h-3.5"

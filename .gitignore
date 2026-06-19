@@ -1,9 +1,11 @@
-# dotenv environment variable files
+# Environment files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.prod
+.env.*.local
+
+# Age encryption key (never commit!)
+.age/
+key.txt
 
 # Fresh build directory
 _fresh/

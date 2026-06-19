@@ -2,27 +2,73 @@ import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { blogArticles, prettyDate } from "../../lib/data.ts";
 
+const TABS = [
+  { key: "all", label: "All" },
+  { key: "startups", label: "Startups" },
+  { key: "dev-tips", label: "Dev Tips" },
+  { key: "personal", label: "Personal" },
+] as const;
+
+const TAG_LABELS: Record<string, string> = {
+  startups: "Startups",
+  "dev-tips": "Dev Tips",
+  personal: "Personal",
+};
+
+const TAG_COLORS: Record<string, string> = {
+  startups: "bg-orange-600/15 text-orange-400",
+  "dev-tips": "bg-blue-600/15 text-blue-400",
+  personal: "bg-gray-600/15 text-gray-400",
+};
+
 export default define.page(function Blog(ctx) {
-  const sortedArticles = [...blogArticles].sort((a, b) => b.index - a.index);
+  const tab = (ctx.url.searchParams.get("tab") || "all") as string;
+  const filtered = tab === "all"
+    ? [...blogArticles].sort((a, b) => b.index - a.index)
+    : blogArticles.filter((a) => a.category === tab).sort((a, b) =>
+      b.index - a.index
+    );
 
   return (
     <Layout currentPath={ctx.url.pathname}>
       <div class="max-w-4xl mx-auto px-4 py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Blog</h1>
-        <p class="text-gray-400 mb-10 sm:mb-12 text-base sm:text-lg">
+        <p class="text-gray-400 mb-8 text-base sm:text-lg">
           Architecture insights, SaaS lessons, and production patterns from 80+
           shipped projects.
         </p>
 
+        {/* Filter tabs */}
+        <div class="flex gap-2 mb-10">
+          {TABS.map((t) => {
+            const active = tab === t.key;
+            const href = t.key === "all" ? "/blog" : `/blog?tab=${t.key}`;
+            return active
+              ? (
+                <span class="px-4 py-1.5 rounded-full bg-orange-600 text-white text-sm font-medium transition-colors">
+                  {t.label}
+                </span>
+              )
+              : (
+                <a
+                  href={href}
+                  class="px-4 py-1.5 rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600 text-sm transition-colors"
+                >
+                  {t.label}
+                </a>
+              );
+          })}
+        </div>
+
+        {/* Articles */}
         <div class="space-y-6">
-          {sortedArticles.map((article) => (
+          {filtered.map((article) => (
             <a
               key={article.slug}
               href={`/blog/${article.slug}`}
               class="block p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="flex flex-col sm:flex-row gap-5">
-                {/* Preview image */}
                 <div class="w-full sm:w-48 h-32 shrink-0 rounded-lg overflow-hidden bg-gray-700">
                   <img
                     src={`/img/blog/${article.slug}/${article.previewImageURL}`}
@@ -31,8 +77,18 @@ export default define.page(function Blog(ctx) {
                     loading="lazy"
                   />
                 </div>
-
                 <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-2">
+                    {article.category && (
+                      <span
+                        class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                          TAG_COLORS[article.category] || ""
+                        }`}
+                      >
+                        {TAG_LABELS[article.category] || article.category}
+                      </span>
+                    )}
+                  </div>
                   <h2 class="text-lg sm:text-xl font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
                     {article.title}
                   </h2>

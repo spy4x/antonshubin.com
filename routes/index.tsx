@@ -2,6 +2,7 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { CTASection } from "../components/CTASection.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
+import { blogArticles, prettyDate, youtubeVideos } from "../lib/data.ts";
 import {
   CalendarIcon,
   GithubIcon,
@@ -349,9 +350,13 @@ export default define.page(function Home(ctx) {
                 </p>
                 <p class="text-gray-400 leading-relaxed">
                   I've been the employee, the freelancer, the founder, the
-                  fixer. Now I build systems that don't need fixing — straight
-                  talk, lean architecture, someone who owns the result. 80+
-                  projects. Still going.
+                  fixer. Eighty-plus projects across a decade and a half —
+                  software, electronics, infrastructure. I do this because I
+                  genuinely love tinkering until things click, and this corner
+                  of the internet is my workshop. No empire to sell, no
+                  newsletter to grow. Just a domain I own, code I'm proud of,
+                  and the quiet satisfaction of building systems that earn their
+                  keep.
                 </p>
               </div>
             </div>
@@ -453,7 +458,7 @@ export default define.page(function Home(ctx) {
               </span>
             </p>
             <a
-              href="mailto:anton@antonshubin.com?subject=Free%20Architecture%20Audit"
+              href="/contact-me"
               class="inline-block px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
             >
               Send my stack for audit →
@@ -628,41 +633,130 @@ export default define.page(function Home(ctx) {
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">Content & Writing</h2>
           <div class="grid gap-6 md:grid-cols-2">
-            <a
-              href="https://www.youtube.com/@anton-shubin"
-              target="_blank"
-              class="group flex items-start gap-4 p-6 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-red-500 transition-colors"
-            >
-              <div class="p-3 bg-red-500/20 rounded-lg shrink-0">
-                <YouTubeIcon class="text-red-400 w-8 h-8" />
+            <div class="p-6 bg-gray-800 rounded-xl border-2 border-gray-700">
+              <div class="flex items-start gap-4 mb-5">
+                <div class="p-3 bg-red-500/20 rounded-lg shrink-0">
+                  <YouTubeIcon class="text-red-400 w-8 h-8" />
+                </div>
+                <div>
+                  <a
+                    href="https://www.youtube.com/@anton-shubin"
+                    target="_blank"
+                    class="text-lg font-semibold text-white hover:text-red-400 transition-colors"
+                  >
+                    YouTube Channel →
+                  </a>
+                  <p class="text-gray-300 text-sm mt-1">
+                    Architecture deep-dives, cost optimization strategies, and
+                    startup engineering from a Fractional CTO.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-red-400 transition-colors">
-                  YouTube Channel
-                </h3>
-                <p class="text-gray-300 text-sm">
-                  Architecture deep-dives, cost optimization strategies, and
-                  startup engineering from a Fractional CTO.
+              <div class="space-y-3">
+                {youtubeVideos.slice(0, 3).map((v) => (
+                  <a
+                    key={v.videoId}
+                    href={`https://www.youtube.com/watch?v=${v.videoId}`}
+                    target="_blank"
+                    class="flex items-start gap-2 group"
+                  >
+                    <span class="text-red-400 shrink-0 mt-0.5">▶</span>
+                    <span>
+                      <span class="text-sm text-gray-300 group-hover:text-red-400 transition-colors">
+                        {v.title}
+                      </span>
+                      <span class="block text-xs text-gray-500 mt-0.5">
+                        {prettyDate(v.publishedAt)}
+                      </span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div class="p-6 bg-gray-800 rounded-xl border-2 border-gray-700">
+              <div class="flex items-start gap-4 mb-5">
+                <div class="p-3 bg-orange-500/20 rounded-lg shrink-0">
+                  <PenIcon class="text-orange-400 w-8 h-8" />
+                </div>
+                <div>
+                  <a
+                    href="/blog"
+                    class="text-lg font-semibold text-white hover:text-orange-400 transition-colors"
+                  >
+                    Blog →
+                  </a>
+                  <p class="text-gray-300 text-sm mt-1">
+                    SaaS architecture, production patterns, and lessons from 80+
+                    shipped projects.
+                  </p>
+                </div>
+              </div>
+              <div class="space-y-3">
+                {blogArticles
+                  .filter((a) => a.category === "startups")
+                  .sort((a, b) => b.index - a.index)
+                  .slice(0, 3)
+                  .map((a) => (
+                    <a
+                      key={a.slug}
+                      href={`/blog/${a.slug}`}
+                      class="flex items-start gap-2 group"
+                    >
+                      <span class="text-orange-400 shrink-0 mt-0.5">▸</span>
+                      <span>
+                        <span class="text-sm text-gray-300 group-hover:text-orange-400 transition-colors">
+                          {a.title}
+                        </span>
+                        <span class="block text-xs text-gray-500 mt-0.5">
+                          {prettyDate(a.publishedAt)}
+                        </span>
+                      </span>
+                    </a>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Infrastructure Section */}
+        <section class="mb-16 md:mb-24">
+          <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 sm:p-10">
+            <div class="flex flex-col sm:flex-row items-start gap-6">
+              <div class="text-4xl shrink-0">🛠️</div>
+              <div class="flex-1">
+                <a
+                  href="/infrastructure"
+                  class="text-2xl sm:text-3xl font-bold text-white hover:text-orange-400 transition-colors"
+                >
+                  Infrastructure →
+                </a>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mt-3 mb-4">
+                  Self-hosted homelab running 40+ services on a single dedicated
+                  server for $50/month. Traefik, Docker, Grafana, PostgreSQL,
+                  and more — all running on Fedora at Hetzner.
                 </p>
+                <a
+                  href="/infrastructure"
+                  class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium underline underline-offset-2"
+                >
+                  Architecture breakdown and cost analysis
+                  <svg
+                    class="w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                    />
+                  </svg>
+                </a>
               </div>
-            </a>
-            <a
-              href="/blog"
-              class="group flex items-start gap-4 p-6 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-orange-500 transition-colors"
-            >
-              <div class="p-3 bg-orange-500/20 rounded-lg shrink-0">
-                <PenIcon class="text-orange-400 w-8 h-8" />
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
-                  Blog
-                </h3>
-                <p class="text-gray-300 text-sm">
-                  SaaS architecture, production patterns, and lessons from 80+
-                  shipped projects.
-                </p>
-              </div>
-            </a>
+            </div>
           </div>
         </section>
 
@@ -881,6 +975,11 @@ export default define.page(function Home(ctx) {
               class="text-orange-400 hover:text-orange-300 underline"
             >
               NeatSoft PTE LTD
+            </a>
+          </p>
+          <p class="text-gray-500 text-xs mt-3">
+            <a href="/pay" class="hover:text-orange-400 transition-colors">
+              Accepted payment: Stripe · SWIFT · BTC · ETH · Solana
             </a>
           </p>
         </div>

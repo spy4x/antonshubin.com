@@ -6,7 +6,9 @@
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update .",
-    "deploy": "rsync -avz --delete --exclude='.git/' --exclude='node_modules/' --exclude='_fresh/' --filter=':- .dockerignore' ./ homelab:~/ssd-2tb/apps/anton/antonshubin.com/ && ssh homelab 'cd ~/ssd-2tb/apps/anton/antonshubin.com && docker compose up -d --build'"
+    "deploy": "deno run -A scripts/deploy.ts",
+    "env:encrypt": "deno run -A scripts/encrypt.ts",
+    "env:decrypt": "deno run -A scripts/decrypt.ts"
   },
   "lint": {
     "rules": {

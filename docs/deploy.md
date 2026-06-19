@@ -1,58 +1,34 @@
 # Deploy
 
-Deploy to homelab server via rsync + Docker.
-
-## Target
-
-```
-ssh homelab:~/ssd-2tb/apps/anton/antonshubin.com/
-```
-
-## One-liner Deploy
-
 ```bash
 deno task deploy
 ```
 
-If not added yet, add to `deno.json`:
-
-```json
-"deploy": "rsync -avz --delete --exclude='.git/' --exclude='node_modules/' --exclude='_fresh/' --exclude='*.md' --filter=':- .dockerignore' ./ homelab:~/ssd-2tb/apps/anton/antonshubin.com/ && ssh homelab 'cd ~/ssd-2tb/apps/anton/antonshubin.com && docker compose up -d --build'"
-```
-
-## Manual Steps
+Decrypt env before deploy if needed:
 
 ```bash
-# 1. Check for issues
-deno task check
+deno task env:decrypt
+```
 
-# 2. Rsync source to homelab (exclude git/node_modules/build artifacts)
-rsync -avz --delete \
-  --exclude='.git/' \
-  --exclude='node_modules/' \
-  --exclude='_fresh/' \
-  --filter=':- .dockerignore' \
-  ./ homelab:~/ssd-2tb/apps/anton/antonshubin.com/
+## Env files
 
-# 3. Build and restart on homelab
-ssh homelab 'cd ~/ssd-2tb/apps/anton/antonshubin.com && docker compose up -d --build'
+| File            | Git       | Use                  |
+| --------------- | --------- | -------------------- |
+| `.env`          | ignored   | local dev            |
+| `.env.prod`     | ignored   | prod secrets         |
+| `.env.prod.age` | committed | encrypted (SOPS+age) |
+| `.env.example`  | committed | template             |
+
+## Age key
+
+```bash
+age-keygen -o .age/key.txt
+# copy public key from output → paste into .sops.yaml
 ```
 
 ## Verify
 
 ```bash
-# Check container status
-ssh homelab 'cd ~/ssd-2tb/apps/anton/antonshubin.com && docker compose ps'
-
-# Check response
+ssh homelab 'docker compose ps'
 curl -I https://antonshubin.com
-```
-
-## DotEnv
-
-`.env` on server is not in git. It contains:
-
-```
-DOMAIN=antonshubin.com
-SCHEDULE_URL=https://schedule.${DOMAIN}/spy4x/30min
 ```

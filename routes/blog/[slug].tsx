@@ -116,6 +116,30 @@ export default define.page<PageData>(function BlogArticle(ctx) {
           </div>
 
           <div class="p-8">
+            {/* Tag */}
+            {article.category && (() => {
+              const colors: Record<string, string> = {
+                "startups": "bg-orange-600/15 text-orange-400",
+                "dev-tips": "bg-blue-600/15 text-blue-400",
+                "personal": "bg-gray-600/15 text-gray-400",
+              };
+              const labels: Record<string, string> = {
+                "startups": "Startups",
+                "dev-tips": "Dev Tips",
+                "personal": "Personal",
+              };
+              return (
+                <span
+                  class={`inline-block px-2.5 py-0.5 rounded text-xs font-medium mb-4 ${
+                    colors[article.category] || ""
+                  }`}
+                >
+                  {labels[article.category] || article.category}
+                </span>
+              );
+            })()}
+
+            {/* Article meta */}
             {/* Article meta */}
             <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-4">
               <span>{prettyDate(article.publishedAt)}</span>

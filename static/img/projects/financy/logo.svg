@@ -1,0 +1,21 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="40"
+  height="40"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#7c3aed"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 2v20" stroke="#7c3aed" fill="none" />
+  <path
+    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+    stroke="#7c3aed"
+    fill="none"
+  />
+  <text x="8" y="16" font-size="5" fill="#7c3aed" font-weight="bold">$</text>
+  <text x="13" y="10" font-size="4" fill="#7c3aed" font-weight="bold">€</text>
+  <text x="14" y="18" font-size="3" fill="#7c3aed" font-weight="bold">₿</text>
+</svg>

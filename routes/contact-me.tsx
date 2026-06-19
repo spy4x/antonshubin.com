@@ -3,6 +3,7 @@ import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import {
   CalendarIcon,
+  EmailIcon,
   GithubIcon,
   LinkedInIcon,
   TelegramIcon,
@@ -144,6 +145,15 @@ export default define.page(function ContactMe() {
               </span>
             </a>
           ))}
+        </div>
+
+        {/* QR code */}
+        <div class="mt-16 text-center">
+          <img
+            class="w-full max-w-xs mx-auto object-cover"
+            src="/img/qr-share.webp"
+            alt="QR code — antonshubin.com"
+          />
         </div>
       </div>
     </Layout>

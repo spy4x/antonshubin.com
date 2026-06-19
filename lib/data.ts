@@ -27,6 +27,7 @@ export interface BlogArticle {
   publishedAt: string;
   previewImageURL: string;
   youtubeVideoId?: string;
+  category?: "startups" | "dev-tips" | "personal";
 }
 
 export const projects = {
@@ -37,8 +38,7 @@ export const projects = {
       externalURL: "https://github.com/spy4x/homelab",
       description:
         "Open-source infrastructure-as-code framework for managing multi-server Docker-based services with automated deployment, monitoring, and backups. Self-host your own cloud with Traefik, Immich, Jellyfin, Vaultwarden, Home Assistant, and 20+ more services.",
-      logoText: "Homelab",
-      logoTextStyle: "color: #22c55e; font-size: 2rem; font-weight: bold;",
+      logoImageURL: "/img/projects/homelab/logo.svg",
       tags: [
         "Deno",
         "TypeScript",
@@ -54,8 +54,7 @@ export const projects = {
       externalURL: "https://financy.dev",
       description:
         "Open-source, self-hostable finance tracking for individuals, families, and small businesses. Features double-entry accounting, multi-currency support, real-time collaboration, and PWA capabilities.",
-      logoText: "Financy",
-      logoTextStyle: "color: #7c3aed; font-size: 2rem; font-weight: bold;",
+      logoImageURL: "/img/projects/financy/logo.svg",
       tags: [
         "Deno",
         "Preact",
@@ -71,8 +70,7 @@ export const projects = {
       externalURL: "https://github.com/spy4x/air-quality-sensor",
       description:
         "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
-      logoText: "AQS",
-      logoTextStyle: "color: #06b6d4; font-size: 2rem; font-weight: bold;",
+      logoImageURL: "/img/projects/air-quality-sensor/logo.svg",
       tags: [
         "ESP32",
         "C++",
@@ -95,9 +93,6 @@ export const projects = {
       description:
         "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
       logoImageURL: "/img/projects/toread-today/logo.svg",
-      logoImageStyle: "padding: 3rem 0;",
-      logoText: "Toread.Today",
-      logoTextStyle: "color: white; font-size: 2rem;",
       tags: [
         "Angular",
         "Node.js",
@@ -218,9 +213,7 @@ export const projects = {
         "Human text classification service freelance platform. Earn money by classifying things.",
       role: "Full-stack",
       tags: ["Angular", "Node.js", "Express.js", "Firebase", "Firestore"],
-      logoText:
-        "\uFF4D\uFF49\uFF43\uFF52\uFF4F\uFF57\uFF4F\uFF52\uFF4B.\uFF49\uFF4F",
-      logoTextStyle: "color: white; font-weight: bold; font-size: 1.3rem;",
+      logoImageURL: "/img/projects/microwork/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
       madeForName: "Andy Gough",
       madeForURL: "https://www.linkedin.com/in/andy-gough-bb262b55/",
@@ -246,7 +239,6 @@ export const projects = {
         "Dashboard single-page application for search and recommendations engine as a service.",
       tags: ["Angular"],
       logoImageURL: "/img/projects/sajari/logo.svg",
-      logoImageStyle: "padding: 3rem;",
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],
       madeForName: "Hamish Ogilvy",
       madeForURL: "https://www.linkedin.com/in/hamishogilvy/",
@@ -259,9 +251,7 @@ export const projects = {
         "Analyze calls data from your call center and manage phone numbers based on various rules.",
       role: "Frontend",
       tags: ["Angular"],
-      logoText:
-        "\uD835\uDE8C\uD835\uDE9D\uD835\uDE9B\uD835\uDE94.\uD835\uDE97\uD835\uDE8E\uD835\uDE9D",
-      logoTextStyle: "color: white; font-size: 2.5rem;",
+      logoImageURL: "/img/projects/calltrack/logo.svg",
       screenshotURLs: [
         "1.webp",
         "2.webp",
@@ -288,6 +278,7 @@ export const blogArticles: BlogArticle[] = [
     readTime: 5,
     publishedAt: "2022.04.27",
     previewImageURL: "preview.webp",
+    category: "startups",
   },
   {
     index: 1,
@@ -297,6 +288,7 @@ export const blogArticles: BlogArticle[] = [
     readTime: 15,
     publishedAt: "2022.06.07",
     previewImageURL: "preview2.webp",
+    category: "personal",
   },
   {
     index: 2,
@@ -307,6 +299,7 @@ export const blogArticles: BlogArticle[] = [
     readTime: 7,
     publishedAt: "2022.12.15",
     previewImageURL: "preview.webp",
+    category: "personal",
   },
   {
     index: 3,
@@ -319,6 +312,7 @@ export const blogArticles: BlogArticle[] = [
     publishedAt: "2022.12.21",
     previewImageURL: "preview.webp",
     youtubeVideoId: "uaqFYlfOZeE",
+    category: "dev-tips",
   },
   {
     index: 5,
@@ -329,6 +323,7 @@ export const blogArticles: BlogArticle[] = [
     readTime: 5,
     publishedAt: "2023.02.12",
     previewImageURL: "preview.webp",
+    category: "dev-tips",
   },
   {
     index: 6,
@@ -341,6 +336,7 @@ export const blogArticles: BlogArticle[] = [
     publishedAt: "2023.04.18",
     previewImageURL: "preview.webp",
     youtubeVideoId: "Ri3TLTKvSYQ",
+    category: "dev-tips",
   },
   {
     index: 7,
@@ -351,6 +347,32 @@ export const blogArticles: BlogArticle[] = [
     readTime: 12,
     publishedAt: "2026.06.15",
     previewImageURL: "cover.svg",
+    category: "startups",
+  },
+];
+
+export interface YouTubeVideo {
+  title: string;
+  videoId: string;
+  publishedAt: string;
+}
+
+export const youtubeVideos: YouTubeVideo[] = [
+  {
+    title: "Working on my GPT4 chatbot improvements (SvelteKit, SSE)",
+    videoId: "8a6LdZPki-s",
+    publishedAt: "2024.02.26",
+  },
+  {
+    title:
+      "Walking and Coding: Remaking my Air Quality dashboard with Bun, Turborepo, SvelteKit, Hono, Chart.js",
+    videoId: "opKoHblF7vE",
+    publishedAt: "2024.01.28",
+  },
+  {
+    title: "Working on my ChatGPT app (first 2 minutes are mute 😅)",
+    videoId: "KFIm-O8cJ20",
+    publishedAt: "2024.01.20",
   },
 ];
 

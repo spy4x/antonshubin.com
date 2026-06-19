@@ -16,8 +16,7 @@ app.use(async (ctx) => {
       "Cache-Control",
       "public, max-age=31536000, immutable",
     );
-  }
-  // Images (change rarely) — cache 7 days
+  } // Images (change rarely) — cache 7 days
   else if (
     url.startsWith("/img/") || url.startsWith("/static/")
   ) {

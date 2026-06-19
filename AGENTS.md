@@ -80,7 +80,9 @@ Manual: rsync to homelab, then `docker compose up -d --build`. See
 5. **Docker** — everything runs in a container on homelab
 6. **Traefik** — reverse proxy with auto-SSL (external)
 7. **Auditability** — small, focused commits
-8. **Analytics via env vars** — Umami + Plausible URLs and IDs go in `lib/config.ts`, read from `.env`. Never hardcode analytics scripts or IDs in `_app.tsx`.
+8. **Analytics via env vars** — Umami + Plausible URLs and IDs go in
+   `lib/config.ts`, read from `.env`. Never hardcode analytics scripts or IDs in
+   `_app.tsx`.
 
 ## AI Crawler Optimization (SEO)
 
