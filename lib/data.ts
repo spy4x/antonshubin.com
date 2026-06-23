@@ -15,6 +15,7 @@ export interface Project {
   madeForName?: string;
   madeForURL?: string;
   archived?: boolean;
+  completed?: boolean;
   outcome?: string;
 }
 
@@ -111,6 +112,91 @@ export const projects = {
         "A one-person SaaS application codebase template. Ship your project idea in days instead of months. It is addictive.",
       logoImageURL: "/img/projects/seed/logo.webp",
       archived: true,
+    },
+    {
+      title: "TodoApp — CalDAV Task Manager (PWA)",
+      slug: "todoapp-caldav",
+      externalURL: "https://todos.antonshubin.com",
+      description:
+        "Self-hosted task manager that talks to any CalDAV server (Radicale, Nextcloud, Baikal). Web app + PWA, no vendor lock-in, your data stays on your server. Built because Tasks.org has no web UI.",
+      tags: [
+        "Vite",
+        "Preact",
+        "Preact Signals",
+        "Tailwind v4",
+        "Hono",
+        "SQLite",
+        "CalDAV",
+        "PWA",
+        "CQRS",
+      ],
+      outcome: "Live at todos.antonshubin.com",
+      completed: true,
+    },
+    {
+      title: "caldav-mcp",
+      slug: "caldav-mcp",
+      externalURL: "https://github.com/spy4x/caldav-mcp",
+      description:
+        "Native Deno Model Context Protocol server for CalDAV. Events + tasks, zero npm dependencies, single binary. Built because existing CalDAV MCP servers (dav-mcp) depend on a buggy tsdav library. Works with OpenCode, Claude Desktop, Cursor, and Open WebUI.",
+      tags: [
+        "Deno",
+        "TypeScript",
+        "MCP",
+        "CalDAV",
+        "Zero npm deps",
+        "Open source",
+      ],
+      completed: true,
+    },
+    {
+      title: "immich-mcp",
+      slug: "immich-mcp",
+      externalURL: "https://github.com/spy4x/immich-mcp",
+      description:
+        "Model Context Protocol server for self-hosted Immich photo management. Search albums, manage tags and people, list assets. Designed for Open WebUI agents that need to query your photo library.",
+      tags: [
+        "Deno",
+        "TypeScript",
+        "MCP",
+        "Immich",
+        "Self-hosted",
+        "Open source",
+      ],
+      completed: true,
+    },
+    {
+      title: "email-mcp",
+      slug: "email-mcp",
+      externalURL: "https://github.com/ai-zerolab/mcp-email-server",
+      description:
+        "Production Email MCP for Open WebUI / Claude Desktop. IMAP + SMTP via Streamable HTTP transport. Works with any self-hosted mailserver (Docker Mailserver, Stalwart, etc.). Plugs directly into Open WebUI's TOOL_SERVER_CONNECTIONS — no proxy needed.",
+      tags: [
+        "Python",
+        "MCP",
+        "IMAP",
+        "SMTP",
+        "Self-hosted",
+        "Open source",
+      ],
+      completed: true,
+    },
+    {
+      title: "google-maps-mcp",
+      slug: "google-maps-mcp",
+      externalURL: "https://github.com/cablate/mcp-google-map",
+      description:
+        "Google Maps Platform MCP for Open WebUI. 18 tools (search_places, place_details, geocode, directions, weather, air quality, route planning). Docker image built locally from a pinned release tag.",
+      tags: [
+        "TypeScript",
+        "Node.js",
+        "MCP",
+        "Google Maps",
+        "Places API",
+        "Routes API",
+        "Open source",
+      ],
+      completed: true,
     },
   ] as Project[],
   freelance: [

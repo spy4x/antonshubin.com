@@ -108,6 +108,11 @@ export default define.page(function ProjectDetail(ctx) {
                       Archived
                     </span>
                   )}
+                  {project.completed && (
+                    <span class="inline-flex items-center px-2.5 py-1 bg-orange-600/20 text-orange-300 text-xs font-medium rounded-full">
+                      Completed
+                    </span>
+                  )}
                 </div>
 
                 {project.externalURL && !project.externalURLDead

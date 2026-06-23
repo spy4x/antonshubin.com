@@ -33,6 +33,12 @@ function ProjectCard({
         </div>
       )}
 
+      {project.completed && !project.archived && (
+        <div class="flex items-center gap-1 px-2 py-1 bg-orange-600/20 text-orange-300 rounded text-xs w-fit mb-3">
+          ✓ Completed
+        </div>
+      )}
+
       <div class="flex gap-6">
         {/* Text column */}
         <div class={hasLogo ? "w-[60%]" : "w-full"}>
@@ -109,11 +115,14 @@ function ProjectCard({
 }
 
 export default define.page(function Projects(ctx) {
-  const activeProjects = projects.my.filter((p) => !p.archived);
+  // "Completed Projects" = shipped, working, stable. Distinct from "active" (still evolving)
+  // and "archived" (no longer maintained). User can mark a project `completed: true` in data.ts.
+  const activeProjects = projects.my.filter((p) => !p.archived && !p.completed);
+  const completedProjects = projects.my.filter((p) => p.completed);
   const archivedProjects = projects.my.filter((p) => p.archived);
   const clientProjects = projects.freelance;
-  const hasAny = activeProjects.length > 0 || archivedProjects.length > 0 ||
-    clientProjects.length > 0;
+  const hasAny = activeProjects.length > 0 || completedProjects.length > 0 ||
+    archivedProjects.length > 0 || clientProjects.length > 0;
 
   if (!hasAny) {
     return (
@@ -160,6 +169,26 @@ export default define.page(function Projects(ctx) {
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {activeProjects.map((project) => (
+                <ProjectCard
+                  key={project.title}
+                  project={project}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {completedProjects.length > 0 && (
+          <>
+            <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+              <span class="text-orange-400">✅</span> Completed Projects
+            </h2>
+            <p class="text-gray-400 text-sm mb-6">
+              Shipped, stable, and out in the wild. Not actively developed, but
+              maintained for security and infra updates.
+            </p>
+            <div class="grid gap-6 md:grid-cols-2 mb-16">
+              {completedProjects.map((project) => (
                 <ProjectCard
                   key={project.title}
                   project={project}
