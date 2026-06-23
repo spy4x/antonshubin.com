@@ -31,7 +31,7 @@ export default define.page(function Blog(ctx) {
 
   return (
     <Layout currentPath={ctx.url.pathname}>
-      <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Blog</h1>
         <p class="text-gray-400 mb-8 text-base sm:text-lg">
           Architecture insights, SaaS lessons, and production patterns from 80+

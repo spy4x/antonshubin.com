@@ -2,6 +2,7 @@ import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { type CatalogItem, items } from "./index.tsx";
+import { marked } from "marked";
 
 export default define.page(function CatalogDetail(ctx) {
   const slug = ctx.params.slug;
@@ -10,7 +11,7 @@ export default define.page(function CatalogDetail(ctx) {
   if (!item) {
     return (
       <Layout currentPath="/catalog">
-        <div class="max-w-4xl mx-auto px-4 py-12 text-center">
+        <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12 text-center">
           <h1 class="text-3xl font-bold text-white mb-4">Not Found</h1>
           <p class="text-gray-400 mb-6">
             This project catalog item does not exist.
@@ -25,6 +26,9 @@ export default define.page(function CatalogDetail(ctx) {
       </Layout>
     );
   }
+
+  // Render description as markdown so links inside work
+  const descHtml = marked.parse(item.desc, { async: false }) as string;
 
   // Parse price for schema (strip non-numeric)
   const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
@@ -84,7 +88,7 @@ export default define.page(function CatalogDetail(ctx) {
           }),
         }}
       />
-      <div class="max-w-3xl mx-auto px-4 py-12">
+      <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
         <a
           href="/catalog"
           class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
@@ -92,7 +96,7 @@ export default define.page(function CatalogDetail(ctx) {
           ← Back to catalog
         </a>
 
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6 md:p-8">
           <div class="flex items-center gap-4 mb-6">
             <span class="text-4xl">{item.icon}</span>
             <div>
@@ -110,9 +114,11 @@ export default define.page(function CatalogDetail(ctx) {
             </div>
           </div>
 
-          <p class="text-gray-300 leading-relaxed mb-8">
-            {item.desc}
-          </p>
+          <div
+            class="text-gray-300 leading-relaxed mb-8 prose prose-invert max-w-none"
+            // deno-lint-ignore react-no-danger
+            dangerouslySetInnerHTML={{ __html: descHtml }}
+          />
 
           {/* Who it's for */}
           <div class="mb-8">

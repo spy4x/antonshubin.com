@@ -15,7 +15,6 @@ export interface Project {
   madeForName?: string;
   madeForURL?: string;
   archived?: boolean;
-  completed?: boolean;
   outcome?: string;
 }
 
@@ -116,7 +115,7 @@ export const projects = {
     {
       title: "TodoApp — CalDAV Task Manager (PWA)",
       slug: "todoapp-caldav",
-      externalURL: "https://todos.antonshubin.com",
+      externalURL: "https://github.com/spy4x/todoapp",
       description:
         "Self-hosted task manager that talks to any CalDAV server (Radicale, Nextcloud, Baikal). Web app + PWA, no vendor lock-in, your data stays on your server. Built because Tasks.org has no web UI.",
       tags: [
@@ -131,14 +130,13 @@ export const projects = {
         "CQRS",
       ],
       outcome: "Live at todos.antonshubin.com",
-      completed: true,
     },
     {
       title: "caldav-mcp",
       slug: "caldav-mcp",
       externalURL: "https://github.com/spy4x/caldav-mcp",
       description:
-        "Native Deno Model Context Protocol server for CalDAV. Events + tasks, zero npm dependencies, single binary. Built because existing CalDAV MCP servers (dav-mcp) depend on a buggy tsdav library. Works with OpenCode, Claude Desktop, Cursor, and Open WebUI.",
+        "Native Deno Model Context Protocol server for CalDAV. Events + tasks, zero npm dependencies, single binary. Works with OpenCode, Claude Desktop, Cursor, and Open WebUI.",
       tags: [
         "Deno",
         "TypeScript",
@@ -147,56 +145,6 @@ export const projects = {
         "Zero npm deps",
         "Open source",
       ],
-      completed: true,
-    },
-    {
-      title: "immich-mcp",
-      slug: "immich-mcp",
-      externalURL: "https://github.com/spy4x/immich-mcp",
-      description:
-        "Model Context Protocol server for self-hosted Immich photo management. Search albums, manage tags and people, list assets. Designed for Open WebUI agents that need to query your photo library.",
-      tags: [
-        "Deno",
-        "TypeScript",
-        "MCP",
-        "Immich",
-        "Self-hosted",
-        "Open source",
-      ],
-      completed: true,
-    },
-    {
-      title: "email-mcp",
-      slug: "email-mcp",
-      externalURL: "https://github.com/ai-zerolab/mcp-email-server",
-      description:
-        "Production Email MCP for Open WebUI / Claude Desktop. IMAP + SMTP via Streamable HTTP transport. Works with any self-hosted mailserver (Docker Mailserver, Stalwart, etc.). Plugs directly into Open WebUI's TOOL_SERVER_CONNECTIONS — no proxy needed.",
-      tags: [
-        "Python",
-        "MCP",
-        "IMAP",
-        "SMTP",
-        "Self-hosted",
-        "Open source",
-      ],
-      completed: true,
-    },
-    {
-      title: "google-maps-mcp",
-      slug: "google-maps-mcp",
-      externalURL: "https://github.com/cablate/mcp-google-map",
-      description:
-        "Google Maps Platform MCP for Open WebUI. 18 tools (search_places, place_details, geocode, directions, weather, air quality, route planning). Docker image built locally from a pinned release tag.",
-      tags: [
-        "TypeScript",
-        "Node.js",
-        "MCP",
-        "Google Maps",
-        "Places API",
-        "Routes API",
-        "Open source",
-      ],
-      completed: true,
     },
   ] as Project[],
   freelance: [
@@ -437,29 +385,6 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     index: 8,
-    title:
-      "YouTube Video Ideas for a Solo Dev Channel That Actually Get Watched",
-    slug: "youtube-video-ideas-dev-channel",
-    description:
-      "30 video ideas for a developer YouTube channel, plus the audience triangle, format mix, and title formulas I use to keep videos compounding instead of churning.",
-    readTime: 9,
-    publishedAt: "2026-06-23",
-    previewImageURL: "cover.svg",
-    category: "startups",
-  },
-  {
-    index: 9,
-    title: "Satellite Articles: The SEO Layer Behind Every YouTube Video",
-    slug: "satellite-articles-seo",
-    description:
-      "How to pair every YouTube video with a long-form blog post that does the slow SEO work the video cannot. Structure, cross-linking, keyword research, and the publishing workflow.",
-    readTime: 8,
-    publishedAt: "2026-06-23",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 10,
     title: "Building MCP Servers with Deno: A Practical Guide",
     slug: "building-mcp-servers-with-deno",
     description:
@@ -470,7 +395,7 @@ export const blogArticles: BlogArticle[] = [
     category: "dev-tips",
   },
   {
-    index: 11,
+    index: 9,
     title: "Self-hosted CalDAV Task Manager as a PWA: Architecture Walkthrough",
     slug: "self-hosted-caldav-pwa-architecture",
     description:

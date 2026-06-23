@@ -46,7 +46,7 @@ const services = [
 export default define.page(function Infrastructure() {
   return (
     <Layout currentPath="/infrastructure">
-      <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Infrastructure Laboratory
         </h1>

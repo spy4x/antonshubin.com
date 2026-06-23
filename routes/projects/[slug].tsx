@@ -19,7 +19,7 @@ export default define.page(function ProjectDetail(ctx) {
   if (!project) {
     return (
       <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto px-4 py-12 text-center">
+        <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12 text-center">
           <h1 class="text-3xl font-bold text-white mb-4">Not Found</h1>
           <p class="text-gray-400 mb-6">
             The project you're looking for does not exist.
@@ -39,7 +39,7 @@ export default define.page(function ProjectDetail(ctx) {
 
   return (
     <Layout currentPath="/projects">
-      <div class="max-w-3xl mx-auto px-4 py-12">
+      <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
         <a
           href="/projects"
           class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
@@ -106,11 +106,6 @@ export default define.page(function ProjectDetail(ctx) {
                   {project.archived && (
                     <span class="inline-flex items-center px-2.5 py-1 bg-gray-600 text-gray-300 text-xs font-medium rounded-full">
                       Archived
-                    </span>
-                  )}
-                  {project.completed && (
-                    <span class="inline-flex items-center px-2.5 py-1 bg-orange-600/20 text-orange-300 text-xs font-medium rounded-full">
-                      Completed
                     </span>
                   )}
                 </div>

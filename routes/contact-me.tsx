@@ -116,7 +116,7 @@ const contacts = [
 export default define.page(function ContactMe() {
   return (
     <Layout currentPath="/contact-me">
-      <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Get in Touch
         </h1>

@@ -228,30 +228,30 @@ export const items: CatalogItem[] = [
     price: "From $4,000",
     delivery: "10 days",
     desc:
-      "Custom Model Context Protocol (MCP) servers that connect AI assistants (Claude, Open WebUI, Cursor) directly to your self-hosted tools, databases, and APIs. Lightweight, Deno-native, zero unnecessary dependencies, protocol-first. Ships as a self-hosted binary or Docker image, ready for your AI clients to consume.",
+      "I build custom MCP servers that let your AI assistant (Claude, Open WebUI, Cursor, any MCP client) read, write, and act inside your existing business tools — your CRM, your database, your email, your calendar, your internal APIs. The result: your team asks in plain English and the AI actually does the work instead of telling you to do it yourself. Ships as a self-hosted Docker image you own end-to-end.",
     includes: [
-      "MCP server for your specific protocol (CalDAV, IMAP, REST, GraphQL, custom)",
-      "Streamable HTTP or stdio transport (your choice)",
-      "Strict input validation (Zod / TypeBox) and rate limiting",
-      "Docker image with healthcheck and resource limits",
-      "OpenAPI/JSON-RPC tooling documentation",
-      "Integration with Open WebUI / Claude Desktop / Cursor",
-      "30-day code warranty",
+      "Discovery session: identify the 3-5 highest-leverage data sources to connect",
+      "Custom MCP server for each source (REST, GraphQL, SQL, IMAP, proprietary)",
+      "Streamable HTTP or stdio transport (matches your AI client)",
+      "Strict input validation, rate limiting, audit logging",
+      "Docker image with healthcheck, resource limits, auto-restart",
+      "OpenAPI / JSON-RPC tool documentation for your team",
+      "Wired into your Open WebUI / Claude Desktop / Cursor config",
+      "30-day code warranty + handoff walkthrough",
     ],
     tech: [
-      "Deno",
-      "TypeScript",
+      "Deno / TypeScript",
       "MCP SDK",
-      "Zod",
+      "Zod / TypeBox",
       "Docker",
       "Self-hosted",
     ],
     audience:
-      "Founders and teams who want their AI assistants to actually do work in their stack — not just chat. Perfect for self-hosters, SaaS with proprietary APIs, and anyone tired of copy-pasting context into prompts.",
+      "Non-technical founders and C-suite leaders who already use AI for writing/thinking and want it to also do work — pull live data, write back to systems, automate the boring 30% of your week. Not a fit if you want a chatbot on your marketing site.",
     examples: [
-      "A custom MCP that lets Claude read and write to your Radicale calendar, replacing manual task management in chat — like my own [caldav-mcp](https://github.com/spy4x/caldav-mcp) (Deno, zero npm deps)",
-      "An MCP server that queries your private PostgreSQL database and surfaces results in your AI assistant's responses — read-only by default, audited queries only",
-      "A wrapper MCP around your existing internal REST API so non-technical team members can interact with company tools through Claude Desktop",
+      "E-commerce founder — connect your AI to your inventory DB, Stripe, and shipping API. Ask 'are we low on size M of the best-seller?' and 'draft the supplier reorder email'. The AI pulls live data and drafts the email, you review and send.",
+      "B2B SaaS founder — connect your AI to your Postgres, Stripe, and Linear. Ask 'how many paying customers churned last week, and what were their last 3 support tickets about?' The AI joins the tables and writes a 1-page brief you can act on.",
+      "Services business owner — connect your AI to your CRM, calendar, and email. Before any meeting, the AI drafts a 1-page brief: contact history, last invoice, last 5 emails, open tasks. You walk in prepared without spending 20 minutes digging.",
     ],
   },
 ];
@@ -259,7 +259,7 @@ export const items: CatalogItem[] = [
 export default define.page(function Catalog() {
   return (
     <Layout currentPath="/catalog">
-      <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Project Catalog
         </h1>
@@ -273,7 +273,7 @@ export default define.page(function Catalog() {
               key={i}
               class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden"
             >
-              <div class="p-6 sm:p-8">
+              <div class="p-4 sm:p-6">
                 <a
                   href={`/catalog/${item.slug}`}
                   class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 group"
