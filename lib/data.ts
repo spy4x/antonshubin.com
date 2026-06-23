@@ -435,6 +435,51 @@ export const blogArticles: BlogArticle[] = [
     previewImageURL: "cover.svg",
     category: "startups",
   },
+  {
+    index: 8,
+    title:
+      "YouTube Video Ideas for a Solo Dev Channel That Actually Get Watched",
+    slug: "youtube-video-ideas-dev-channel",
+    description:
+      "30 video ideas for a developer YouTube channel, plus the audience triangle, format mix, and title formulas I use to keep videos compounding instead of churning.",
+    readTime: 9,
+    publishedAt: "2026-06-23",
+    previewImageURL: "cover.svg",
+    category: "startups",
+  },
+  {
+    index: 9,
+    title: "Satellite Articles: The SEO Layer Behind Every YouTube Video",
+    slug: "satellite-articles-seo",
+    description:
+      "How to pair every YouTube video with a long-form blog post that does the slow SEO work the video cannot. Structure, cross-linking, keyword research, and the publishing workflow.",
+    readTime: 8,
+    publishedAt: "2026-06-23",
+    previewImageURL: "cover.svg",
+    category: "dev-tips",
+  },
+  {
+    index: 10,
+    title: "Building MCP Servers with Deno: A Practical Guide",
+    slug: "building-mcp-servers-with-deno",
+    description:
+      "Why Deno is the right runtime for Model Context Protocol servers, the architecture I use, a working CalDAV example, and what I learned shipping four MCP servers in production.",
+    readTime: 15,
+    publishedAt: "2026-06-23",
+    previewImageURL: "cover.svg",
+    category: "dev-tips",
+  },
+  {
+    index: 11,
+    title: "Self-hosted CalDAV Task Manager as a PWA: Architecture Walkthrough",
+    slug: "self-hosted-caldav-pwa-architecture",
+    description:
+      "Full architecture for a self-hosted, CalDAV-backed task manager PWA. Vite + Preact + Hono + Radicale on a $50/month Hetzner box. No SaaS, no lock-in, no monthly fee.",
+    readTime: 11,
+    publishedAt: "2026-06-23",
+    previewImageURL: "cover.svg",
+    category: "dev-tips",
+  },
 ];
 
 export interface YouTubeVideo {
