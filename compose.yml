@@ -26,7 +26,10 @@ services:
       - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.regex=^https://www\\.${DOMAIN}/(.*)"
       - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.replacement=https://${DOMAIN}/$${1}"
       - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.permanent=true"
-      - "traefik.http.routers.antonshubincom.middlewares=antonshubincom-redirect"
+      # This is a public-facing site that we WANT to be indexed by search engines.
+      # Override the default `security-headers` X-Robots-Tag deny with the
+      # `allow-index` middleware defined in stacks/traefik/dynamic.yml.
+      - "traefik.http.routers.antonshubincom.middlewares=antonshubincom-redirect,allow-index@file"
     deploy:
       resources:
         limits:
