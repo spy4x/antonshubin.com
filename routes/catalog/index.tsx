@@ -221,6 +221,39 @@ export const items: CatalogItem[] = [
       "Infrastructure oversight while you focus on fundraising and business development",
     ],
   },
+  {
+    icon: "🔌",
+    slug: "mcp-server-development",
+    title: "Custom MCP Server Development",
+    price: "From $4,000",
+    delivery: "10 days",
+    desc:
+      "Custom Model Context Protocol (MCP) servers that connect AI assistants (Claude, Open WebUI, Cursor) directly to your self-hosted tools, databases, and APIs. Lightweight, Deno-native, zero unnecessary dependencies, protocol-first. Ships as a self-hosted binary or Docker image, ready for your AI clients to consume.",
+    includes: [
+      "MCP server for your specific protocol (CalDAV, IMAP, REST, GraphQL, custom)",
+      "Streamable HTTP or stdio transport (your choice)",
+      "Strict input validation (Zod / TypeBox) and rate limiting",
+      "Docker image with healthcheck and resource limits",
+      "OpenAPI/JSON-RPC tooling documentation",
+      "Integration with Open WebUI / Claude Desktop / Cursor",
+      "30-day code warranty",
+    ],
+    tech: [
+      "Deno",
+      "TypeScript",
+      "MCP SDK",
+      "Zod",
+      "Docker",
+      "Self-hosted",
+    ],
+    audience:
+      "Founders and teams who want their AI assistants to actually do work in their stack — not just chat. Perfect for self-hosters, SaaS with proprietary APIs, and anyone tired of copy-pasting context into prompts.",
+    examples: [
+      "A custom MCP that lets Claude read and write to your Radicale calendar, replacing manual task management in chat — like my own [caldav-mcp](https://github.com/spy4x/caldav-mcp) (Deno, zero npm deps)",
+      "An MCP server that queries your private PostgreSQL database and surfaces results in your AI assistant's responses — read-only by default, audited queries only",
+      "A wrapper MCP around your existing internal REST API so non-technical team members can interact with company tools through Claude Desktop",
+    ],
+  },
 ];
 
 export default define.page(function Catalog() {
