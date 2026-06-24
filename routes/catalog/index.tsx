@@ -196,32 +196,6 @@ export const items: CatalogItem[] = [
     ],
   },
   {
-    icon: "🛟",
-    slug: "post-launch-support-maintenance",
-    title: "Post-Launch Support & Maintenance",
-    price: "$400/month",
-    delivery: "Ongoing",
-    desc:
-      "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patches, and monthly reports — so you can focus on growing your business. This is a separate service from the initial build, designed for clients who want ongoing peace of mind.",
-    includes: [
-      "Server health & performance monitoring",
-      "Automated backup verification",
-      "Disk space & resource tracking",
-      "Security patch updates",
-      "Monthly status report",
-      "8-hour response for critical issues",
-      "Priority email support",
-    ],
-    tech: ["Deno/Node.js", "PostgreSQL", "Docker", "Linux", "Monitoring"],
-    audience:
-      "Founders who just launched and want infrastructure peace of mind without hiring a full-time DevOps person.",
-    examples: [
-      "Ongoing server monitoring for a growing SaaS handling sensitive user data",
-      "Monthly health reports and security patching for a compliance-critical platform",
-      "Infrastructure oversight while you focus on fundraising and business development",
-    ],
-  },
-  {
     icon: "🔌",
     slug: "mcp-server-development",
     title: "Custom MCP Server Development",
@@ -252,6 +226,59 @@ export const items: CatalogItem[] = [
       "E-commerce founder — connect your AI to your inventory DB, Stripe, and shipping API. Ask 'are we low on size M of the best-seller?' and 'draft the supplier reorder email'. The AI pulls live data and drafts the email, you review and send.",
       "B2B SaaS founder — connect your AI to your Postgres, Stripe, and Linear. Ask 'how many paying customers churned last week, and what were their last 3 support tickets about?' The AI joins the tables and writes a 1-page brief you can act on.",
       "Services business owner — connect your AI to your CRM, calendar, and email. Before any meeting, the AI drafts a 1-page brief: contact history, last invoice, last 5 emails, open tasks. You walk in prepared without spending 20 minutes digging.",
+    ],
+  },
+  {
+    icon: "👔",
+    slug: "cto-advisory-retainer",
+    title: "CTO Advisory Retainer",
+    price: "$3K–$5K/mo",
+    delivery: "Monthly",
+    desc:
+      "Ongoing fractional CTO partnership — strategy, architecture, team leadership, and technical decision-making. I act as your technical co-founder without the equity ask. Weekly alignment, async execution, fixed-price retainer. Ideal for funded startups that need senior technical leadership but aren't ready for a full-time CTO.",
+    includes: [
+      "Weekly 60-minute strategy call",
+      "Architecture review and technical decisions",
+      "Team structure and hiring guidance",
+      "Infrastructure cost optimization",
+      "Code review and quality standards",
+      "Security and compliance oversight",
+      "Emergency triage for production incidents",
+      "Monthly technical roadmap update",
+    ],
+    tech: ["Any stack", "Architecture", "Strategy", "Team leadership", "Cost optimization"],
+    upworkUrl: "https://www.upwork.com/freelancers/ashubin",
+    audience: "Funded startups ($500K–$5M raised) who need senior technical leadership but can't justify a full-time CTO hire. Also fits established businesses undergoing digital transformation who need architectural guidance.",
+    examples: [
+      "You have a dev team of 3–8 engineers and need someone to set technical direction, review architecture, and maintain code quality without becoming a blocker",
+      "You're raising your Series A and need a CTO-level technical roadmap, infrastructure budget, and team scaling plan for the next 12 months",
+      "Your current tech debt is slowing down feature delivery — you need an experienced architect to triage what to fix now versus what can wait",
+    ],
+  },
+  {
+    icon: "🛟",
+    slug: "post-launch-support-maintenance",
+    title: "Post-Launch Support & Maintenance",
+    price: "$400/month",
+    delivery: "Ongoing",
+    desc:
+      "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patches, and monthly reports — so you can focus on growing your business. This is a separate service from the initial build, designed for clients who want ongoing peace of mind.",
+    includes: [
+      "Server health & performance monitoring",
+      "Automated backup verification",
+      "Disk space & resource tracking",
+      "Security patch updates",
+      "Monthly status report",
+      "8-hour response for critical issues",
+      "Priority email support",
+    ],
+    tech: ["Deno/Node.js", "PostgreSQL", "Docker", "Linux", "Monitoring"],
+    audience:
+      "Founders who just launched and want infrastructure peace of mind without hiring a full-time DevOps person.",
+    examples: [
+      "Ongoing server monitoring for a growing SaaS handling sensitive user data",
+      "Monthly health reports and security patching for a compliance-critical platform",
+      "Infrastructure oversight while you focus on fundraising and business development",
     ],
   },
 ];

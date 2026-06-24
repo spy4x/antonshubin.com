@@ -364,7 +364,7 @@ export default define.page(function Home(ctx) {
         {/* Featured Services — from Catalog */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">How to Work Together</h2>
-          <div class="grid gap-5 md:grid-cols-3">
+          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <a
               href="/catalog/strategy-call"
               class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
@@ -379,6 +379,22 @@ export default define.page(function Home(ctx) {
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 $350 — 60 min
+              </span>
+            </a>
+            <a
+              href="/catalog/cto-advisory-retainer"
+              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+            >
+              <div class="text-3xl mb-3">👔</div>
+              <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+                CTO Advisory Retainer
+              </h3>
+              <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
+                Ongoing fractional CTO partnership — strategy, architecture,
+                team leadership. Weekly calls, async execution.
+              </p>
+              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
+                $3K–$5K/mo — Monthly
               </span>
             </a>
             <a
