@@ -20,7 +20,7 @@ function ProjectCard({
     <Wrapper
       href={href}
       target={project.externalURL && !project.slug ? "_blank" : undefined}
-      class={`block p-6 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group flex flex-col h-full ${
+      class={`block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group flex flex-col h-full ${
         project.archived
           ? "opacity-75 hover:opacity-100 hover:border-gray-500"
           : "hover:border-orange-500"
@@ -118,7 +118,7 @@ export default define.page(function Projects(ctx) {
   if (!hasAny) {
     return (
       <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12 text-center">
+        <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
           <h1 class="text-3xl font-bold text-white mb-4">Projects</h1>
           <p class="text-gray-400">No projects to display yet.</p>
         </div>
@@ -128,7 +128,7 @@ export default define.page(function Projects(ctx) {
 
   return (
     <Layout currentPath={ctx.url.pathname}>
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">
           Projects
         </h1>

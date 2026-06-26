@@ -11,7 +11,7 @@ export default define.page(function CatalogDetail(ctx) {
   if (!item) {
     return (
       <Layout currentPath="/catalog">
-        <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12 text-center">
+        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
           <h1 class="text-3xl font-bold text-white mb-4">Not Found</h1>
           <p class="text-gray-400 mb-6">
             This project catalog item does not exist.
@@ -88,7 +88,7 @@ export default define.page(function CatalogDetail(ctx) {
           }),
         }}
       />
-      <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <a
           href="/catalog"
           class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
@@ -96,7 +96,7 @@ export default define.page(function CatalogDetail(ctx) {
           ← Back to catalog
         </a>
 
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6 md:p-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-4 md:p-8">
           <div class="flex items-center gap-4 mb-6">
             <span class="text-4xl">{item.icon}</span>
             <div>

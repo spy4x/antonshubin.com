@@ -170,7 +170,7 @@ export default define.page(function Home(ctx) {
             Are you a non-technical founder who's been burned by developers?
           </h2>
           <div class="grid gap-5 md:grid-cols-3">
-            <div class="p-6 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
               <div class="text-2xl mb-3">🔥</div>
               <h3 class="text-lg font-semibold text-white mb-2">
                 Overpromised, underdelivered
@@ -180,7 +180,7 @@ export default define.page(function Home(ctx) {
                 nightmare. I've fixed those messes.
               </p>
             </div>
-            <div class="p-6 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
               <div class="text-2xl mb-3">💰</div>
               <h3 class="text-lg font-semibold text-white mb-2">
                 Bloated costs, slow progress
@@ -190,7 +190,7 @@ export default define.page(function Home(ctx) {
                 on Hetzner.
               </p>
             </div>
-            <div class="p-6 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
               <div class="text-2xl mb-3">🎯</div>
               <h3 class="text-lg font-semibold text-white mb-2">
                 No ownership, no clarity
@@ -212,7 +212,7 @@ export default define.page(function Home(ctx) {
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <a
               href="/how-i-work"
-              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="text-2xl mb-2">🛡️</div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
@@ -225,7 +225,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/how-i-work"
-              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="text-2xl mb-2">⏱️</div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
@@ -238,7 +238,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/how-i-work"
-              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="text-2xl mb-2">🔑</div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
@@ -251,7 +251,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/how-i-work"
-              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="text-2xl mb-2">🎯</div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
@@ -264,7 +264,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/how-i-work"
-              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group sm:col-span-2 lg:col-span-1"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group sm:col-span-2 lg:col-span-1"
             >
               <div class="text-2xl mb-2">🔧</div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
@@ -279,7 +279,7 @@ export default define.page(function Home(ctx) {
             {/* Policy 6: No Jargon Guarantee */}
             <a
               href="/how-i-work"
-              class="p-5 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="text-2xl mb-2">💬</div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
@@ -320,7 +320,7 @@ export default define.page(function Home(ctx) {
 
         {/* Why I Do This — psychologist recommendation */}
         <section class="mb-16 md:mb-24">
-          <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 sm:p-10">
+          <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row items-start gap-6">
               <div class="text-4xl shrink-0">👨‍💻</div>
               <div>
@@ -367,7 +367,7 @@ export default define.page(function Home(ctx) {
           <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <a
               href="/catalog/strategy-call"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+              class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🎯</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
@@ -383,7 +383,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/catalog/cto-advisory-retainer"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+              class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">👔</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
@@ -399,7 +399,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/catalog/zero-to-production-saas-mvp"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+              class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🚀</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
@@ -415,7 +415,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/catalog/free-architecture-audit"
-              class="p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+              class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🔍</div>
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
@@ -456,7 +456,7 @@ export default define.page(function Home(ctx) {
 
         {/* G1: Free Architecture Audit Lead Magnet */}
         <section class="mb-16 md:mb-24">
-          <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-8 sm:p-10 text-center">
+          <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 sm:p-6 text-center">
             <div class="text-3xl mb-4">🔍</div>
             <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
               Not sure where to start?
@@ -560,7 +560,7 @@ export default define.page(function Home(ctx) {
             {/* Homelab */}
             <a
               href="/projects/homelab"
-              class="group block p-6 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-green-500 transition-all"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-green-500 transition-all"
             >
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 bg-green-500/20 rounded-lg">
@@ -590,7 +590,7 @@ export default define.page(function Home(ctx) {
             {/* Financy */}
             <a
               href="/projects/financy"
-              class="group block p-6 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-purple-500 transition-all"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-purple-500 transition-all"
             >
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 bg-purple-500/20 rounded-lg">
@@ -647,7 +647,7 @@ export default define.page(function Home(ctx) {
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">Content & Writing</h2>
           <div class="grid gap-6 md:grid-cols-2">
-            <div class="p-6 bg-gray-800 rounded-xl border-2 border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border-2 border-gray-700">
               <div class="flex items-start gap-4 mb-5">
                 <div class="p-3 bg-red-500/20 rounded-lg shrink-0">
                   <YouTubeIcon class="text-red-400 w-8 h-8" />
@@ -687,7 +687,7 @@ export default define.page(function Home(ctx) {
                 ))}
               </div>
             </div>
-            <div class="p-6 bg-gray-800 rounded-xl border-2 border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border-2 border-gray-700">
               <div class="flex items-start gap-4 mb-5">
                 <div class="p-3 bg-orange-500/20 rounded-lg shrink-0">
                   <PenIcon class="text-orange-400 w-8 h-8" />
@@ -734,7 +734,7 @@ export default define.page(function Home(ctx) {
 
         {/* Infrastructure Section */}
         <section class="mb-16 md:mb-24">
-          <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 sm:p-10">
+          <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row items-start gap-6">
               <div class="text-4xl shrink-0">🛠️</div>
               <div class="flex-1">
@@ -779,7 +779,7 @@ export default define.page(function Home(ctx) {
           <h2 class="h1 mb-8">What Clients Say</h2>
           <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Testimonial 1: MVP Development */}
-            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
               <div class="flex gap-1 items-center mb-3">
                 <StarIcon class="text-orange-500 w-4 h-4" filled />
                 <StarIcon class="text-orange-500 w-4 h-4" filled />
@@ -803,7 +803,7 @@ export default define.page(function Home(ctx) {
             </div>
 
             {/* Testimonial 2: Technical Lead */}
-            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
               <div class="flex gap-1 items-center mb-3">
                 <StarIcon class="text-orange-500 w-4 h-4" filled />
                 <StarIcon class="text-orange-500 w-4 h-4" filled />
@@ -827,7 +827,7 @@ export default define.page(function Home(ctx) {
             </div>
 
             {/* Testimonial 3: Consultation */}
-            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
               <div class="flex gap-1 items-center mb-3">
                 <StarIcon class="text-orange-500 w-4 h-4" filled />
                 <StarIcon class="text-orange-500 w-4 h-4" filled />
@@ -882,7 +882,7 @@ export default define.page(function Home(ctx) {
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">Beyond the Code</h2>
           <div class="grid gap-5 sm:grid-cols-2">
-            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
               <h3 class="text-lg font-semibold text-white mb-3">
                 🛠️ Infrastructure & IoT
               </h3>
@@ -939,7 +939,7 @@ export default define.page(function Home(ctx) {
                 </li>
               </ul>
             </div>
-            <div class="p-6 bg-gray-800 rounded-xl border border-gray-700">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
               <h3 class="text-lg font-semibold text-white mb-3">
                 🏍️ Adventure
               </h3>
