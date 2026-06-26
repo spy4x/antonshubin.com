@@ -46,7 +46,7 @@ const services = [
 export default define.page(function Infrastructure() {
   return (
     <Layout currentPath="/infrastructure">
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Infrastructure Laboratory
         </h1>
@@ -56,9 +56,9 @@ export default define.page(function Infrastructure() {
         </p>
 
         {/* Cost comparison hero */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
           <div class="grid gap-6 sm:grid-cols-2">
-            <div class="text-center p-6 bg-gray-900/50 rounded-lg">
+            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
               <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
                 Typical AWS setup for 40+ services
               </p>
@@ -67,7 +67,7 @@ export default define.page(function Infrastructure() {
                 per month (shared CPU/RAM VMs)
               </p>
             </div>
-            <div class="text-center p-6 bg-gray-900/50 rounded-lg">
+            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
               <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
                 What I run on (Hetzner dedicated)
               </p>
@@ -84,7 +84,7 @@ export default define.page(function Infrastructure() {
         </div>
 
         {/* Architecture Diagram */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
           <h2 class="text-xl font-semibold text-white mb-4">
             🏗️ Architecture
           </h2>
@@ -97,7 +97,7 @@ export default define.page(function Infrastructure() {
         </div>
 
         {/* Live dashboard */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
           <h2 class="text-xl font-semibold text-white mb-4">
             📡 Live Status
           </h2>
@@ -115,7 +115,7 @@ export default define.page(function Infrastructure() {
         </div>
 
         {/* All services */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
           <h2 class="text-xl font-semibold text-white mb-4">
             📦 40+ Services Running
           </h2>
@@ -136,7 +136,7 @@ export default define.page(function Infrastructure() {
         </div>
 
         {/* Cost breakdown */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
           <h2 class="text-xl font-semibold text-white mb-4">
             💰 Real Cost Breakdown
           </h2>
@@ -193,7 +193,7 @@ export default define.page(function Infrastructure() {
         </div>
 
         {/* Apply to your project */}
-        <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-8 text-center">
+        <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 text-center">
           <h2 class="text-xl font-semibold text-white mb-3">
             Your SaaS Can Run on the Same Stack
           </h2>

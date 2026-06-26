@@ -116,7 +116,7 @@ const contacts = [
 export default define.page(function ContactMe() {
   return (
     <Layout currentPath="/contact-me">
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Get in Touch
         </h1>
@@ -132,7 +132,7 @@ export default define.page(function ContactMe() {
               rel={c.href.startsWith("http")
                 ? "noopener noreferrer"
                 : undefined}
-              class={`block p-5 sm:p-6 rounded-xl border transition-all ${c.color} group`}
+              class={`block p-4 sm:p-6 rounded-xl border transition-all ${c.color} group`}
             >
               <div class="flex items-center gap-3 mb-3">
                 <div class="p-2 rounded-lg bg-gray-800/50">{c.icon}</div>

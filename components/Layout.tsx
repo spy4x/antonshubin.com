@@ -15,7 +15,7 @@ export function Layout({ children, currentPath }: LayoutProps) {
         currentPath={currentPath}
         scheduleUrl={SCHEDULE_URL}
       />
-      <main id="main-content" class="p-6 pb-24 sm:ml-16 md:p-12">
+      <main id="main-content" class="p-4 pb-24 sm:ml-16 md:p-12">
         {children}
       </main>
     </>

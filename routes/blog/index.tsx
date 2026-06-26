@@ -31,7 +31,7 @@ export default define.page(function Blog(ctx) {
 
   return (
     <Layout currentPath={ctx.url.pathname}>
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Blog</h1>
         <p class="text-gray-400 mb-8 text-base sm:text-lg">
           Architecture insights, SaaS lessons, and production patterns from 80+
@@ -66,7 +66,7 @@ export default define.page(function Blog(ctx) {
             <a
               key={article.slug}
               href={`/blog/${article.slug}`}
-              class="block p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="block p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
               <div class="flex flex-col sm:flex-row gap-5">
                 <div class="w-full sm:w-48 h-32 shrink-0 rounded-lg overflow-hidden bg-gray-700">

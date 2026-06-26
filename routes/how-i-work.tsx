@@ -7,7 +7,7 @@ function FaqItem(
   { q, children }: { q: string; children: ComponentChildren },
 ) {
   return (
-    <details class="bg-gray-800 rounded-xl border border-gray-700 p-5 group open:border-orange-500 transition-colors">
+    <details class="bg-gray-800 rounded-xl border border-gray-700 p-4 group open:border-orange-500 transition-colors">
       <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
         <span>{q}</span>
         <svg
@@ -128,7 +128,7 @@ export default define.page(function HowIWork() {
           }),
         }}
       />
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           How I Deliver
         </h1>
@@ -140,7 +140,7 @@ export default define.page(function HowIWork() {
           {policies.map((p, i) => (
             <div
               key={i}
-              class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6"
+              class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-4"
             >
               <div class="flex items-start gap-4 sm:gap-6">
                 <div class="text-3xl shrink-0 mt-1">{p.icon}</div>

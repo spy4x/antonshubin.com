@@ -60,7 +60,7 @@ export default define.page(function BlogArticle(ctx) {
   if (!article) {
     return (
       <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12 text-center">
+        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
           <h1 class="text-3xl font-bold text-white mb-4">Not Found</h1>
           <p class="text-gray-400 mb-6">
             The article you're looking for does not exist.
@@ -96,7 +96,7 @@ export default define.page(function BlogArticle(ctx) {
           }),
         }}
       />
-      <article class="max-w-3xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <article class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <a
           href="/blog"
           class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
@@ -115,7 +115,7 @@ export default define.page(function BlogArticle(ctx) {
             />
           </div>
 
-          <div class="p-8">
+          <div class="p-4">
             {/* Tag */}
             {article.category && (() => {
               const colors: Record<string, string> = {
@@ -208,7 +208,7 @@ export default define.page(function BlogArticle(ctx) {
 
           {/* Previous / Next article navigation */}
           {(prev || next) && (
-            <div class="grid gap-4 sm:grid-cols-2 p-6 bg-gray-800 border-t border-gray-700">
+            <div class="grid gap-4 sm:grid-cols-2 p-4 bg-gray-800 border-t border-gray-700">
               {prev
                 ? (
                   <a

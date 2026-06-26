@@ -286,7 +286,7 @@ export const items: CatalogItem[] = [
 export default define.page(function Catalog() {
   return (
     <Layout currentPath="/catalog">
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Project Catalog
         </h1>
@@ -300,7 +300,7 @@ export default define.page(function Catalog() {
               key={i}
               class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden"
             >
-              <div class="p-4 sm:p-6">
+              <div class="p-3 sm:p-4">
                 <a
                   href={`/catalog/${item.slug}`}
                   class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 group"
