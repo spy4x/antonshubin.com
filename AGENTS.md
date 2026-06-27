@@ -33,24 +33,33 @@ not after understanding the code, not after "figuring out what to do".**
 
 ```bash
 # ONE COMMAND: create branch+worktree from main and cd into it
-git -C .. worktree add -b <type>/<short-description> <type>/<short-description> main
-cd ../<type>/<short-description>
+git worktree add -b <type>/<short-description> <type>/<short-description> main
+cd <type>/<short-description>
 ```
 
-After creation, run `ls -la` to confirm you're in the new directory.
+After creation, run `pwd` to confirm you're in the new directory, and `git
+branch --show-current` to confirm you're on the new branch.
 
 ### Worktree directory layout
 
 ```
-antonshubin.com/                     ← bare repo (.git lives here)
-├── main/                            ← worktree for main branch (your start dir)
-├── feat/add-dark-mode/              ← worktree for your feature branch
-├── fix/mobile-nav-overlap/          ← worktree for your fix branch
+antonshubin.com/                     ← main worktree + .git/
+├── .git/                            ← git data (shared across all worktrees)
+├── assets/
+├── components/
+├── routes/
+├── feat/add-dark-mode/              ← worktree for feature branch
+│   ├── .git                         ← pointer to ../.git
+│   ├── assets/
+│   ├── components/
+│   └── ...
+├── fix/mobile-nav-overlap/          ← worktree for fix branch
 └── ...
 ```
 
-**Every branch gets its own directory.** You `cd` into that directory and do
-ALL work there.
+**Every branch gets its own subdirectory.** Worktrees live **inside** the
+repo directory (unlike the homelab repo which uses a bare-repo layout). You
+`cd` into that subdirectory and do ALL work there.
 
 ### Branch naming convention (Angular)
 
@@ -83,8 +92,8 @@ is ALWAYS:
 
 ```bash
 # STEP 1 (mandatory, no exceptions): create worktree
-git -C .. worktree add -b feat/my-task feat/my-task main
-cd ../feat/my-task
+git worktree add -b feat/my-task feat/my-task main
+cd feat/my-task
 
 # STEP 2: now explore and make changes
 ```
@@ -198,7 +207,7 @@ gh pr merge --rebase --delete-branch
 Then switch back to `main` and remove the worktree:
 
 ```bash
-cd /home/spy4x/ssd-2tb/sync/code/antonshubin.com
+cd $(git rev-parse --show-toplevel)
 git worktree remove <type>/<short-description>
 git branch -d <type>/<short-description>
 ```
