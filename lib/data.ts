@@ -234,7 +234,8 @@ export const projects = {
       ],
       madeForName: "Lila King",
       madeForURL: "https://www.linkedin.com/in/lila-king-66b94b",
-      outcome: "Live at makearoley.com — processing 500+ kid-made movies monthly",
+      outcome:
+        "Live at makearoley.com — processing 500+ kid-made movies monthly",
     },
     {
       title: "PayBridge",
@@ -242,10 +243,18 @@ export const projects = {
       description:
         "B2B payment reconciliation SaaS built from scratch. Founder (ex-Stripe PM) had a validated idea but the previous dev team spent 6 months and $60K on a non-functional prototype with wrong architecture — monolithic design that couldn't scale and wrong database choice. I ran a 3-day discovery sprint, architected an event-driven microservices system on Deno + Postgres, and delivered a production-ready MVP in 21 days with Stripe Connect integration, multi-tenant isolation, and webhook system.",
       role: "Fractional CTO & Lead Architect",
-      tags: ["Deno", "PostgreSQL", "Event-driven", "Stripe Connect", "Docker", "Microservices"],
+      tags: [
+        "Deno",
+        "PostgreSQL",
+        "Event-driven",
+        "Stripe Connect",
+        "Docker",
+        "Microservices",
+      ],
       madeForName: "PayBridge",
       madeForURL: "https://paybridge.io",
-      outcome: "$15K investment → 12 beta customers → $1.2M seed round → acquired for $4.2M",
+      outcome:
+        "$15K investment → 12 beta customers → $1.2M seed round → acquired for $4.2M",
     },
     {
       title: "PropView",
@@ -253,10 +262,19 @@ export const projects = {
       description:
         "Real estate virtual property tour platform infrastructure overhaul. Founder had a WordPress-based platform that was crashing under load (1.2K concurrent users max), couldn't handle 4K video streaming, and had 40% bounce rate due to slow loading. I rebuilt the full infrastructure on Docker + Traefik, implemented CDN for video streaming, rewrote the image processing pipeline from Python to Rust, added auto-scaling for traffic spikes, and reduced asset sizes by 80%.",
       role: "Infrastructure Architect & Performance Engineer",
-      tags: ["Rust", "Docker", "Traefik", "CDN", "Auto-scaling", "Python", "WordPress"],
+      tags: [
+        "Rust",
+        "Docker",
+        "Traefik",
+        "CDN",
+        "Auto-scaling",
+        "Python",
+        "WordPress",
+      ],
       madeForName: "PropView",
       madeForURL: "https://propview.io",
-      outcome: "50K concurrent users supported. Bounce rate: 40% → 12%. Page load <1.5s globally. $3.5M Series A raised. Client: 'best technical decision we ever made'",
+      outcome:
+        "50K concurrent users supported. Bounce rate: 40% → 12%. Page load <1.5s globally. $3.5M Series A raised. Client: 'best technical decision we ever made'",
     },
     {
       title: "MediFlow",
@@ -264,10 +282,18 @@ export const projects = {
       description:
         "Healthcare platform rescue mission. Founder (former nurse) had a working prototype built by an offshore team that was a tech debt nightmare — $8K/month AWS bill, 12-second page loads, no backups, database corruption every 2 weeks. I performed a full infrastructure audit, migrated to Hetzner ($180/mo), rewrote critical query paths, implemented proper backup strategy, monitoring, and zero-downtime deployment pipeline.",
       role: "Lead Architect & Infrastructure Engineer",
-      tags: ["PostgreSQL", "Hetzner", "Docker", "Traefik", "Monitoring", "Performance"],
+      tags: [
+        "PostgreSQL",
+        "Hetzner",
+        "Docker",
+        "Traefik",
+        "Monitoring",
+        "Performance",
+      ],
       madeForName: "MediFlow",
       madeForURL: "https://mediflow.io",
-      outcome: "Incidents: monthly → zero in 6 months. Page load: 12s → <200ms. AWS savings: $7,820/month. 3+ years without data loss",
+      outcome:
+        "Incidents: monthly → zero in 6 months. Page load: 12s → <200ms. AWS savings: $7,820/month. 3+ years without data loss",
     },
     {
       title: "WordWeaver",
@@ -275,10 +301,20 @@ export const projects = {
       description:
         "AI-powered long-form content platform for enterprises. Founder (ex-journalist) had a prototype from AI researchers that was unusable — 40% hallucination rate, no citations, couldn't handle branded content guidelines. I designed a RAG pipeline with citation verification, built a custom MCP server for brand guidelines, implemented human-in-the-loop review workflow, and deployed on self-hosted infrastructure with GPU acceleration.",
       role: "Fractional CTO & AI Architect",
-      tags: ["Deno", "RAG", "LLM", "MCP", "Docker", "Python", "Self-hosted", "GPU"],
+      tags: [
+        "Deno",
+        "RAG",
+        "LLM",
+        "MCP",
+        "Docker",
+        "Python",
+        "Self-hosted",
+        "GPU",
+      ],
       madeForName: "WordWeaver",
       madeForURL: "https://wordweaver.ai",
-      outcome: "$8K investment → 97% citation accuracy → 3 enterprise clients in month one → $280K ARR in 6 months → 12 employees",
+      outcome:
+        "$8K investment → 97% citation accuracy → 3 enterprise clients in month one → $280K ARR in 6 months → 12 employees",
     },
     {
       title: "Connectful",
@@ -300,7 +336,8 @@ export const projects = {
       externalURLDead: true,
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
-      outcome: "Fast growth during COVID-19 pandemic; 40% weekly retention at peak",
+      outcome:
+        "Fast growth during COVID-19 pandemic; 40% weekly retention at peak",
     },
     {
       title: "GoPingu",
@@ -315,7 +352,8 @@ export const projects = {
       externalURLDead: true,
       madeForName: "Peter Visser",
       madeForURL: "https://www.linkedin.com/in/peter-visser-04331820a/",
-      outcome: "Real-time collaborative SaaS with template marketplace; served 15+ agencies",
+      outcome:
+        "Real-time collaborative SaaS with template marketplace; served 15+ agencies",
     },
     {
       title: "Microwork",

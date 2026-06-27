@@ -12,22 +12,23 @@ conflicts.
 **This is the single most important rule. Violations cause merge conflicts
 between parallel AI workers.**
 
-The very first action you take when given any task involving code changes
-MUST be to create a new branch and worktree. You MUST NOT open any files,
-read any source code, explore the codebase, or make any changes in the
-**current directory first**. You work inside the worktree.
+The very first action you take when given any task involving code changes MUST
+be to create a new branch and worktree. You MUST NOT open any files, read any
+source code, explore the codebase, or make any changes in the **current
+directory first**. You work inside the worktree.
 
 ### Why this rule is absolute
 
-This repo may have another AI agent working on a different feature in the
-`main` worktree at the same time. If you start editing files in `main`,
-you will either:
+This repo may have another AI agent working on a different feature in the `main`
+worktree at the same time. If you start editing files in `main`, you will
+either:
+
 - Clobber their in-progress changes
 - Force them to resolve merge conflicts
 - Lose your own work when their agent commits
 
-**Creating the branch first is your very first action — not after exploring,
-not after understanding the code, not after "figuring out what to do".**
+**Creating the branch first is your very first action — not after exploring, not
+after understanding the code, not after "figuring out what to do".**
 
 ### → Create branch + worktree immediately
 
@@ -37,7 +38,8 @@ git worktree add -b <type>/<short-description> <type>/<short-description> main
 cd <type>/<short-description>
 ```
 
-After creation, run `pwd` to confirm you're in the new directory, and `git
+After creation, run `pwd` to confirm you're in the new directory, and
+`git
 branch --show-current` to confirm you're on the new branch.
 
 ### Worktree directory layout
@@ -57,9 +59,9 @@ antonshubin.com/                     ← main worktree + .git/
 └── ...
 ```
 
-**Every branch gets its own subdirectory.** Worktrees live **inside** the
-repo directory (unlike the homelab repo which uses a bare-repo layout). You
-`cd` into that subdirectory and do ALL work there.
+**Every branch gets its own subdirectory.** Worktrees live **inside** the repo
+directory (unlike the homelab repo which uses a bare-repo layout). You `cd` into
+that subdirectory and do ALL work there.
 
 ### Branch naming convention (Angular)
 
@@ -67,16 +69,17 @@ repo directory (unlike the homelab repo which uses a bare-repo layout). You
 <type>/<short-kebab-description>
 ```
 
-| Type        | Use when                              |
-| ----------- | ------------------------------------- |
-| `feat/`     | New feature or enhancement            |
-| `fix/`      | Bug fix                               |
+| Type        | Use when                                 |
+| ----------- | ---------------------------------------- |
+| `feat/`     | New feature or enhancement               |
+| `fix/`      | Bug fix                                  |
 | `refactor/` | Code restructuring (no behaviour change) |
-| `chore/`    | Tooling, deps, CI, config             |
-| `docs/`     | Documentation only                    |
-| `style/`    | Formatting, styling, design tweaks    |
+| `chore/`    | Tooling, deps, CI, config                |
+| `docs/`     | Documentation only                       |
+| `style/`    | Formatting, styling, design tweaks       |
 
 Examples:
+
 ```
 feat/add-dark-mode
 fix/mobile-nav-overlap
@@ -87,8 +90,8 @@ docs/seo-crawler-guide
 
 ### What about exploration / understanding the codebase first?
 
-NO. Create the branch first. Then explore inside the worktree. The sequence
-is ALWAYS:
+NO. Create the branch first. Then explore inside the worktree. The sequence is
+ALWAYS:
 
 ```bash
 # STEP 1 (mandatory, no exceptions): create worktree
@@ -128,8 +131,8 @@ docs: add AGENTS.md and docs/ folder
    Co-authored-by: openhands <openhands@all-hands.dev>
    ```
 2. Keep commits small and focused (one logical change per commit).
-3. Run `deno task check` before every commit — the pre-commit style checks
-   MUST pass.
+3. Run `deno task check` before every commit — the pre-commit style checks MUST
+   pass.
 
 ---
 
@@ -143,9 +146,9 @@ After committing and pushing your branch, create a pull request:
 gh pr create --fill
 ```
 
-If the task references a GitHub issue, include `Fixes #N` or `Closes #N` in
-the PR body so the issue auto-closes on merge. If no issue exists yet, create
-one first:
+If the task references a GitHub issue, include `Fixes #N` or `Closes #N` in the
+PR body so the issue auto-closes on merge. If no issue exists yet, create one
+first:
 
 ```bash
 gh issue create --title "<type>(<scope>): <summary>" --body "<description>"
@@ -156,8 +159,8 @@ convention for the issue title as you would for a commit.
 
 ### Updating an existing PR
 
-Never create a second PR for the same task. Push additional commits to the
-same branch and the PR updates automatically.
+Never create a second PR for the same task. Push additional commits to the same
+branch and the PR updates automatically.
 
 ---
 
@@ -169,15 +172,15 @@ Before EVERY commit, run:
 deno task check
 ```
 
-This runs `fmt + lint + type check`. All checks MUST pass before you commit.
-If they don't, fix the issues first.
+This runs `fmt + lint + type check`. All checks MUST pass before you commit. If
+they don't, fix the issues first.
 
 ---
 
 ## 🧹 Merge Protocol (Human-in-the-Loop)
 
-**After all changes are done and the PR is created, you DO NOT merge
-yourself. You STOP and wait.**
+**After all changes are done and the PR is created, you DO NOT merge yourself.
+You STOP and wait.**
 
 ### What you do after pushing + creating PR
 
@@ -189,10 +192,10 @@ yourself. You STOP and wait.**
 
 Decide the merge strategy:
 
-| Condition                                                  | Strategy     |
-| ---------------------------------------------------------- | ------------ |
-| All commits relate to the same feature/issue/fix           | **Squash**   |
-| Some commits fix independent things that should stay apart | **Rebase**   |
+| Condition                                                  | Strategy   |
+| ---------------------------------------------------------- | ---------- |
+| All commits relate to the same feature/issue/fix           | **Squash** |
+| Some commits fix independent things that should stay apart | **Rebase** |
 
 Then:
 

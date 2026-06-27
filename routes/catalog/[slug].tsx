@@ -120,6 +120,14 @@ export default define.page(function CatalogDetail(ctx) {
             dangerouslySetInnerHTML={{ __html: descHtml }}
           />
 
+          {/* Outcome — what you'll achieve */}
+          <div class="mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+              <span class="text-amber-400">🎯</span> Outcome
+            </h2>
+            <p class="text-amber-300 leading-relaxed">{item.outcome}</p>
+          </div>
+
           {/* Who it's for */}
           <div class="mb-8">
             <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
