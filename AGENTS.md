@@ -207,6 +207,8 @@ gh pr merge --squash --delete-branch
 gh pr merge --rebase --delete-branch
 ```
 
+### Clean up — remove worktree + delete local branch
+
 Then switch back to `main` and remove the worktree:
 
 ```bash
