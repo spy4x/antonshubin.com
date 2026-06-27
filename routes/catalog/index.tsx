@@ -353,9 +353,9 @@ export default define.page(function Catalog() {
                   {item.desc}
                 </p>
 
-                <div class="mb-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                  <p class="text-amber-300 text-sm font-medium leading-relaxed">
-                    <span class="text-amber-400 mr-1">🎯</span>
+                <div class="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <p class="text-emerald-300 text-sm font-medium leading-relaxed">
+                    <span class="text-emerald-400 mr-1">🎯</span>
                     {item.outcome}
                   </p>
                 </div>
