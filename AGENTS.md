@@ -1,8 +1,97 @@
-# AGENTS.md - Dev Guidelines
+# AGENTS.md — Dev Guidelines (Strict Git Flow)
 
-Guidelines for AI agents working on this project.
+Guidelines for AI agents working on this project. This project uses **git
+worktrees** with a **strict branch-per-feature** flow. Multiple AI agents may
+work on different features simultaneously, so breaking the rules causes
+conflicts.
 
-## Commit Convention (Angular)
+---
+
+## 🔴 IMMUTABLE RULE: Branch + Worktree FIRST
+
+**This is the single most important rule. Violations cause merge conflicts
+between parallel AI workers.**
+
+The very first action you take when given any task involving code changes
+MUST be to create a new branch and worktree. You MUST NOT open any files,
+read any source code, explore the codebase, or make any changes in the
+**current directory first**. You work inside the worktree.
+
+### Why this rule is absolute
+
+This repo may have another AI agent working on a different feature in the
+`main` worktree at the same time. If you start editing files in `main`,
+you will either:
+- Clobber their in-progress changes
+- Force them to resolve merge conflicts
+- Lose your own work when their agent commits
+
+**Creating the branch first is your very first action — not after exploring,
+not after understanding the code, not after "figuring out what to do".**
+
+### → Create branch + worktree immediately
+
+```bash
+# ONE COMMAND: create branch+worktree from main and cd into it
+git -C .. worktree add -b <type>/<short-description> <type>/<short-description> main
+cd ../<type>/<short-description>
+```
+
+After creation, run `ls -la` to confirm you're in the new directory.
+
+### Worktree directory layout
+
+```
+antonshubin.com/                     ← bare repo (.git lives here)
+├── main/                            ← worktree for main branch (your start dir)
+├── feat/add-dark-mode/              ← worktree for your feature branch
+├── fix/mobile-nav-overlap/          ← worktree for your fix branch
+└── ...
+```
+
+**Every branch gets its own directory.** You `cd` into that directory and do
+ALL work there.
+
+### Branch naming convention (Angular)
+
+```
+<type>/<short-kebab-description>
+```
+
+| Type        | Use when                              |
+| ----------- | ------------------------------------- |
+| `feat/`     | New feature or enhancement            |
+| `fix/`      | Bug fix                               |
+| `refactor/` | Code restructuring (no behaviour change) |
+| `chore/`    | Tooling, deps, CI, config             |
+| `docs/`     | Documentation only                    |
+| `style/`    | Formatting, styling, design tweaks    |
+
+Examples:
+```
+feat/add-dark-mode
+fix/mobile-nav-overlap
+refactor/extract-cta-utils
+chore/upgrade-deno-version
+docs/seo-crawler-guide
+```
+
+### What about exploration / understanding the codebase first?
+
+NO. Create the branch first. Then explore inside the worktree. The sequence
+is ALWAYS:
+
+```bash
+# STEP 1 (mandatory, no exceptions): create worktree
+git -C .. worktree add -b feat/my-task feat/my-task main
+cd ../feat/my-task
+
+# STEP 2: now explore and make changes
+```
+
+---
+
+## 📝 Commit Convention (Angular)
 
 ```
 <type>(<scope>): <short summary>
@@ -23,30 +112,102 @@ feat(cta): add gradient backgrounds and scale hover
 docs: add AGENTS.md and docs/ folder
 ```
 
-## Commands
+### Commit message requirements
+
+1. Every commit MUST include the co-author trailer:
+   ```
+   Co-authored-by: openhands <openhands@all-hands.dev>
+   ```
+2. Keep commits small and focused (one logical change per commit).
+3. Run `deno task check` before every commit — the pre-commit style checks
+   MUST pass.
+
+---
+
+## 🔄 Pull Requests & Issues
+
+### Creating a PR
+
+After committing and pushing your branch, create a pull request:
 
 ```bash
-deno task dev       # Dev server at localhost:5173 (HMR)
-deno task build     # Production build via Vite
-deno task start     # Run production server
-deno task check     # fmt + lint + type check
-deno task deploy    # Rsync to homelab + Docker rebuild
+gh pr create --fill
 ```
 
-## Code Style
+If the task references a GitHub issue, include `Fixes #N` or `Closes #N` in
+the PR body so the issue auto-closes on merge. If no issue exists yet, create
+one first:
 
-- **Indent**: 2 spaces
-- **Quotes**: Double
-- **Semicolons**: No
-- **JSX**: Preact with signals
-- **Styling**: Tailwind v4 utility classes
-- **Store money as ints**
-- **Enums start at 1**
-- **Minimize third-party deps**
-- Relative imports for local modules
-- JSR/npm imports for external deps
+```bash
+gh issue create --title "<type>(<scope>): <summary>" --body "<description>"
+```
 
-## Project Structure
+If an issue already exists for this feature, link it. Use the same Angular
+convention for the issue title as you would for a commit.
+
+### Updating an existing PR
+
+Never create a second PR for the same task. Push additional commits to the
+same branch and the PR updates automatically.
+
+---
+
+## ✅ Pre-Commit Checklist (MANDATORY)
+
+Before EVERY commit, run:
+
+```bash
+deno task check
+```
+
+This runs `fmt + lint + type check`. All checks MUST pass before you commit.
+If they don't, fix the issues first.
+
+---
+
+## 🧹 Merge Protocol (Human-in-the-Loop)
+
+**After all changes are done and the PR is created, you DO NOT merge
+yourself. You STOP and wait.**
+
+### What you do after pushing + creating PR
+
+1. Stay in the worktree/branch you created.
+2. Report to the human with a summary of what was done and a link to the PR.
+3. Wait for the human to review the PR and give you instructions.
+
+### When the human says "merge" (or "merge it")
+
+Decide the merge strategy:
+
+| Condition                                                  | Strategy     |
+| ---------------------------------------------------------- | ------------ |
+| All commits relate to the same feature/issue/fix           | **Squash**   |
+| Some commits fix independent things that should stay apart | **Rebase**   |
+
+Then:
+
+```bash
+# Squash (default choice — all commits for one feature):
+gh pr merge --squash --delete-branch
+
+# Rebase (commits have independent meaning):
+gh pr merge --rebase --delete-branch
+```
+
+Then switch back to `main` and remove the worktree:
+
+```bash
+cd /home/spy4x/ssd-2tb/sync/code/antonshubin.com
+git worktree remove <type>/<short-description>
+git branch -d <type>/<short-description>
+```
+
+This prevents stale worktree directories from accumulating.
+
+---
+
+## 🏗️ Project Structure
 
 ```
 ├── assets/         # Global CSS
@@ -62,6 +223,16 @@ deno task deploy    # Rsync to homelab + Docker rebuild
 └── compose.yml     # Docker Compose + Traefik labels
 ```
 
+## Commands
+
+```bash
+deno task dev       # Dev server at localhost:5173 (HMR)
+deno task build     # Production build via Vite
+deno task start     # Run production server
+deno task check     # fmt + lint + type check
+deno task deploy    # Rsync to homelab + Docker rebuild
+```
+
 ## Deploy
 
 ```bash
@@ -70,6 +241,19 @@ deno task deploy
 
 Manual: rsync to homelab, then `docker compose up -d --build`. See
 [docs/deploy.md](docs/deploy.md) for details.
+
+## Code Style
+
+- **Indent**: 2 spaces
+- **Quotes**: Double
+- **Semicolons**: No
+- **JSX**: Preact with signals
+- **Styling**: Tailwind v4 utility classes
+- **Store money as ints**
+- **Enums start at 1**
+- **Minimize third-party deps**
+- Relative imports for local modules
+- JSR/npm imports for external deps
 
 ## Key Principles
 
