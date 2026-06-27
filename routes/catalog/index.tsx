@@ -9,6 +9,7 @@ export interface CatalogItem {
   price: string;
   delivery: string;
   desc: string;
+  outcome: string;
   includes: string[];
   tech: string[];
   upworkUrl?: string;
@@ -25,6 +26,8 @@ export const items: CatalogItem[] = [
     delivery: "60 min",
     desc:
       "A focused 60-minute video call where we dive deep into your project or idea. I give you honest architectural feedback, answer your questions, and help you plan the technical path forward. No pitch, no commitment — just actionable advice from an experienced Fractional CTO.",
+    outcome:
+      "Walk away with a clear technical direction and an actionable plan — no fluff, no pitch, just honest advice from an experienced CTO.",
     includes: [
       "60-minute structured video call",
       "Honest technical assessment of your project or idea",
@@ -51,6 +54,8 @@ export const items: CatalogItem[] = [
     delivery: "48 hours",
     desc:
       "Send me your current tech stack or idea — I will send back 3 concrete architectural improvements within 48 hours. No cost, no commitment. Just honest, actionable feedback from an experienced architect.",
+    outcome:
+      "Three concrete, prioritized improvements that catch problems before they become expensive — delivered free, no strings attached.",
     includes: [
       "Review of your current tech stack or project description",
       "3 specific architectural improvements or recommendations",
@@ -74,6 +79,8 @@ export const items: CatalogItem[] = [
     delivery: "3 days",
     desc:
       "A structured 3-day deep-dive where I analyze your idea, existing codebase, or infrastructure and deliver a detailed architecture blueprint. You get system diagrams, tech stack recommendations, cost estimates, and a phased build roadmap — everything you need to move forward with confidence.",
+    outcome:
+      "A complete architectural blueprint and phased build roadmap so you can execute with confidence instead of guesswork.",
     includes: [
       "System architecture diagram (Excalidraw or draw.io)",
       "Tech stack recommendation with rationale",
@@ -99,6 +106,8 @@ export const items: CatalogItem[] = [
     delivery: "21 days",
     desc:
       "Full SaaS MVP from idea to live deployment. Includes authentication, payment processing, REST API, and an admin panel. Built on Deno + Preact + PostgreSQL — lean, fast, and ready for users.",
+    outcome:
+      "A live, revenue-ready product in 21 days. Real users, real payments, real traction — without building an in-house team.",
     includes: [
       "User authentication (email/social login)",
       "Payment integration (Stripe)",
@@ -125,6 +134,8 @@ export const items: CatalogItem[] = [
     delivery: "14 days",
     desc:
       "Production-grade REST or GraphQL API with self-hosted or cloud infrastructure. Designed to scale to 10K+ users from day one. Includes monitoring, backups, and CI/CD.",
+    outcome:
+      "A production-grade backend that handles 10K+ users without breaking a sweat. Monitoring, backups, CI/CD — infrastructure that runs itself.",
     includes: [
       "REST or GraphQL API (your choice)",
       "PostgreSQL schema design",
@@ -151,6 +162,8 @@ export const items: CatalogItem[] = [
     delivery: "14 days",
     desc:
       "Production-grade LLM pipelines, RAG systems, and autonomous subagents. Built to eliminate hallucination risks and integrate cleanly with your existing backend.",
+    outcome:
+      "Production AI that your customers actually enjoy using — no hallucinations, no half-baked features, no research dead-ends.",
     includes: [
       "LLM pipeline architecture",
       "RAG (Retrieval-Augmented Generation) system",
@@ -177,6 +190,8 @@ export const items: CatalogItem[] = [
     delivery: "3 days",
     desc:
       "48-hour deep audit of your existing codebase. You get a detailed report with architectural recommendations, security gaps, performance bottlenecks, and a prioritized refactoring roadmap.",
+    outcome:
+      "A prioritized, actionable roadmap that tells you exactly what to fix, what to rewrite, and what to leave alone — so you stop guessing and start shipping.",
     includes: [
       "Full codebase review",
       "Security vulnerability scan",
@@ -203,6 +218,8 @@ export const items: CatalogItem[] = [
     delivery: "10 days",
     desc:
       "I build custom MCP servers that let your AI assistant (Claude, Open WebUI, Cursor, any MCP client) read, write, and act inside your existing business tools — your CRM, your database, your email, your calendar, your internal APIs. The result: your team asks in plain English and the AI actually does the work instead of telling you to do it yourself. Ships as a self-hosted Docker image you own end-to-end.",
+    outcome:
+      "Your AI goes from writing drafts to doing work — pulling live data, updating records, sending messages. Your team asks in plain English, the AI executes.",
     includes: [
       "Discovery session: identify the 3-5 highest-leverage data sources to connect",
       "Custom MCP server for each source (REST, GraphQL, SQL, IMAP, proprietary)",
@@ -236,6 +253,8 @@ export const items: CatalogItem[] = [
     delivery: "Monthly",
     desc:
       "Ongoing fractional CTO partnership — strategy, architecture, team leadership, and technical decision-making. I act as your technical co-founder without the equity ask. Weekly alignment, async execution, fixed-price retainer. Ideal for funded startups that need senior technical leadership but aren't ready for a full-time CTO.",
+    outcome:
+      "Senior technical leadership that keeps your architecture healthy, your team shipping, and your infrastructure costs under control — every single week.",
     includes: [
       "Weekly 60-minute strategy call",
       "Architecture review and technical decisions",
@@ -246,9 +265,16 @@ export const items: CatalogItem[] = [
       "Emergency triage for production incidents",
       "Monthly technical roadmap update",
     ],
-    tech: ["Any stack", "Architecture", "Strategy", "Team leadership", "Cost optimization"],
+    tech: [
+      "Any stack",
+      "Architecture",
+      "Strategy",
+      "Team leadership",
+      "Cost optimization",
+    ],
     upworkUrl: "https://www.upwork.com/freelancers/ashubin",
-    audience: "Funded startups ($500K–$5M raised) who need senior technical leadership but can't justify a full-time CTO hire. Also fits established businesses undergoing digital transformation who need architectural guidance.",
+    audience:
+      "Funded startups ($500K–$5M raised) who need senior technical leadership but can't justify a full-time CTO hire. Also fits established businesses undergoing digital transformation who need architectural guidance.",
     examples: [
       "You have a dev team of 3–8 engineers and need someone to set technical direction, review architecture, and maintain code quality without becoming a blocker",
       "You're raising your Series A and need a CTO-level technical roadmap, infrastructure budget, and team scaling plan for the next 12 months",
@@ -263,6 +289,8 @@ export const items: CatalogItem[] = [
     delivery: "Ongoing",
     desc:
       "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patches, and monthly reports — so you can focus on growing your business. This is a separate service from the initial build, designed for clients who want ongoing peace of mind.",
+    outcome:
+      "Wake up every morning knowing your servers are healthy, your backups are verified, and your security is patched — so you can focus on growing your business.",
     includes: [
       "Server health & performance monitoring",
       "Automated backup verification",
@@ -324,6 +352,13 @@ export default define.page(function Catalog() {
                 <p class="text-gray-300 text-sm mb-4 leading-relaxed">
                   {item.desc}
                 </p>
+
+                <div class="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <p class="text-emerald-300 text-sm font-medium leading-relaxed">
+                    <span class="text-emerald-400 mr-1">🎯</span>
+                    {item.outcome}
+                  </p>
+                </div>
 
                 <details class="mb-4">
                   <summary class="text-orange-400 text-sm cursor-pointer hover:text-orange-300 transition-colors">
