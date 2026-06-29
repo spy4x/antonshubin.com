@@ -34,7 +34,6 @@ export default define.page(function CatalogDetail(ctx) {
 
   // Parse price for schema (strip non-numeric)
   const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
-  const priceCurrency = item.price.includes("$") ? "USD" : "USD";
 
   head.value = {
     ...head.value,
@@ -52,23 +51,28 @@ export default define.page(function CatalogDetail(ctx) {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Product",
+            "@type": "Service",
+            "@id": `https://antonshubin.com/catalog/${item.slug}/#service`,
             "name": item.title,
             "description": item.desc,
-            "offers": {
-              "@type": "Offer",
-              "price": priceNum || 0,
-              "priceCurrency": priceCurrency,
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": new Date(
-                Date.now() + 365 * 24 * 60 * 60 * 1000,
-              ).toISOString().split("T")[0],
+            "serviceType": "Fractional CTO & SaaS Architecture",
+            "image": "https://antonshubin.com/img/photo-big.webp",
+            "provider": {
+              "@type": "Person",
+              "@id": "https://antonshubin.com/#person",
+              "name": "Anton Shubin",
             },
-            "category": item.slug === "strategy-call"
-              ? "Consultation"
-              : item.slug === "free-architecture-audit"
-              ? "Audit"
-              : "Development",
+            "areaServed": { "@type": "Place", "name": "Worldwide" },
+            "offers": priceNum && priceNum > 0
+              ? {
+                "@type": "Offer",
+                "priceCurrency": "USD",
+                "price": priceNum.toFixed(2),
+                "url": `https://antonshubin.com/catalog/${item.slug}/`,
+                "availability": "https://schema.org/InStock",
+                "seller": { "@id": "https://antonshubin.com/#person" },
+              }
+              : undefined,
           }),
         }}
       />
