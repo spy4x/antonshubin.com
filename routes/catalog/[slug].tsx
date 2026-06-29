@@ -3,6 +3,8 @@ import { Layout } from "../../components/Layout.tsx";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { type CatalogItem, items } from "./index.tsx";
 import { marked } from "marked";
+import { head } from "../../lib/head.ts";
+import { SEOHead } from "../../components/SEOHead.tsx";
 
 export default define.page(function CatalogDetail(ctx) {
   const slug = ctx.params.slug;
@@ -34,8 +36,17 @@ export default define.page(function CatalogDetail(ctx) {
   const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
   const priceCurrency = item.price.includes("$") ? "USD" : "USD";
 
+  head.value = {
+    ...head.value,
+    title: `${item.title} — Anton Shubin`,
+    description: item.desc,
+    canonical: `https://antonshubin.com/catalog/${item.slug}/`,
+    ogType: "website",
+  };
+
   return (
     <Layout currentPath="/catalog">
+      <SEOHead />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

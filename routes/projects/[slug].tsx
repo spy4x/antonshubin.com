@@ -3,6 +3,8 @@ import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
+import { head } from "../../lib/head.ts";
+import { SEOHead } from "../../components/SEOHead.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -37,8 +39,20 @@ export default define.page(function ProjectDetail(ctx) {
 
   const isClientProject = projects.freelance.some((p) => p.slug === slug);
 
+  head.value = {
+    ...head.value,
+    title: `${project.title} — Anton Shubin`,
+    description: project.description,
+    canonical: `https://antonshubin.com/projects/${slug}/`,
+    ogType: "article",
+    ogImage: project.logoImageURL
+      ? `https://antonshubin.com${project.logoImageURL}`
+      : head.value.ogImage,
+  };
+
   return (
     <Layout currentPath="/projects">
+      <SEOHead />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <a
           href="/projects"

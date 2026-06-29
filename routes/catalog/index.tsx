@@ -1,4 +1,6 @@
 import { define } from "../../lib/utils.ts";
+import { head } from "../../lib/head.ts";
+import { SEOHead } from "../../components/SEOHead.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { SCHEDULE_URL, UPWORK_URL } from "../../lib/config.ts";
 
@@ -312,8 +314,18 @@ export const items: CatalogItem[] = [
 ];
 
 export default define.page(function Catalog() {
+  head.value = {
+    ...head.value,
+    title: "Catalog — Anton Shubin",
+    description:
+      "Fixed-price SaaS development services, architecture audits, and fractional CTO consulting.",
+    canonical: "https://antonshubin.com/catalog/",
+    ogType: "website",
+  };
+
   return (
     <Layout currentPath="/catalog">
+      <SEOHead />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Project Catalog

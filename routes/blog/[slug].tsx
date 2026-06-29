@@ -5,6 +5,8 @@ import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { marked } from "marked";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
+import { head } from "../../lib/head.ts";
+import { SEOHead } from "../../components/SEOHead.tsx";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -76,8 +78,19 @@ export default define.page(function BlogArticle(ctx) {
     );
   }
 
+  head.value = {
+    ...head.value,
+    title: `${article.title} — Anton Shubin`,
+    description: article.description,
+    canonical: `https://antonshubin.com/blog/${article.slug}/`,
+    ogType: "article",
+    ogImage:
+      `https://antonshubin.com/img/blog/${article.slug}/${article.previewImageURL}`,
+  };
+
   return (
     <Layout currentPath="/blog">
+      <SEOHead />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
