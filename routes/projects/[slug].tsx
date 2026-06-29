@@ -3,8 +3,9 @@ import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
-import { head } from "../../lib/head.ts";
+import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
+import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -53,6 +54,9 @@ export default define.page(function ProjectDetail(ctx) {
   return (
     <Layout currentPath="/projects">
       <SEOHead />
+      <Breadcrumb
+        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <a
           href="/projects"

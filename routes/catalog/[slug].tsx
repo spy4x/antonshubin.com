@@ -3,8 +3,9 @@ import { Layout } from "../../components/Layout.tsx";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { type CatalogItem, items } from "./index.tsx";
 import { marked } from "marked";
-import { head } from "../../lib/head.ts";
+import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
+import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 
 export default define.page(function CatalogDetail(ctx) {
   const slug = ctx.params.slug;
@@ -46,6 +47,9 @@ export default define.page(function CatalogDetail(ctx) {
   return (
     <Layout currentPath="/catalog">
       <SEOHead />
+      <Breadcrumb
+        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
