@@ -1,5 +1,7 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
+import { head } from "../lib/head.ts";
+import { SEOHead } from "../components/SEOHead.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import {
   CalendarIcon,
@@ -114,8 +116,17 @@ const contacts = [
 ];
 
 export default define.page(function ContactMe() {
+  head.value = {
+    ...head.value,
+    title: "Contact Anton Shubin",
+    description:
+      "Fractional CTO consultation, questions, and project inquiries.",
+    canonical: "https://antonshubin.com/contact-me/",
+    ogType: "website",
+  };
   return (
     <Layout currentPath="/contact-me">
+      <SEOHead />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Get in Touch

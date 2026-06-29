@@ -1,4 +1,6 @@
 import { define } from "../../lib/utils.ts";
+import { head } from "../../lib/head.ts";
+import { SEOHead } from "../../components/SEOHead.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";
 import { ArchiveIcon } from "../../components/Icons.tsx";
@@ -110,6 +112,14 @@ function ProjectCard({
 
 export default define.page(function Projects(ctx) {
   const activeProjects = projects.my.filter((p) => !p.archived);
+  head.value = {
+    ...head.value,
+    title: "Projects — Anton Shubin",
+    description:
+      "Open-source projects, client work, and infrastructure portfolio by Anton Shubin.",
+    canonical: "https://antonshubin.com/projects/",
+    ogType: "website",
+  };
   const archivedProjects = projects.my.filter((p) => p.archived);
   const clientProjects = projects.freelance;
   const hasAny = activeProjects.length > 0 || archivedProjects.length > 0 ||
@@ -119,6 +129,7 @@ export default define.page(function Projects(ctx) {
     return (
       <Layout currentPath={ctx.url.pathname}>
         <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
+          <SEOHead />
           <h1 class="text-3xl font-bold text-white mb-4">Projects</h1>
           <p class="text-gray-400">No projects to display yet.</p>
         </div>
@@ -128,6 +139,7 @@ export default define.page(function Projects(ctx) {
 
   return (
     <Layout currentPath={ctx.url.pathname}>
+      <SEOHead />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">
           Projects

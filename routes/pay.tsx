@@ -1,10 +1,21 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
+import { head } from "../lib/head.ts";
+import { SEOHead } from "../components/SEOHead.tsx";
 import CopyButton from "../islands/CopyButton.tsx";
 
 export default define.page(function Pay() {
+  head.value = {
+    ...head.value,
+    title: "Payment — Anton Shubin | Fractional CTO",
+    description: "Accepted payment methods: Stripe, SWIFT, BTC, ETH, Solana.",
+    canonical: "https://antonshubin.com/pay/",
+    ogType: "website",
+  };
+
   return (
     <Layout currentPath="/pay">
+      <SEOHead />
       <div class="max-w-5xl mx-auto px-4 py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Choose Your Payment Method

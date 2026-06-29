@@ -1,5 +1,7 @@
 import type { ComponentChildren } from "preact";
 import { define } from "../lib/utils.ts";
+import { head } from "../lib/head.ts";
+import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 
@@ -109,8 +111,18 @@ const policies: PolicyItem[] = [
 ];
 
 export default define.page(function HowIWork() {
+  head.value = {
+    ...head.value,
+    title: "How I Deliver — Anton Shubin",
+    description:
+      "Zero micromanagement. Complete transparency. Predictable outcomes.",
+    canonical: "https://antonshubin.com/how-i-work/",
+    ogType: "website",
+  };
+
   return (
     <Layout currentPath="/how-i-work">
+      <SEOHead />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

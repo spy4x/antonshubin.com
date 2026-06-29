@@ -1,4 +1,5 @@
 import { define } from "../lib/utils.ts";
+import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { CTASection } from "../components/CTASection.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
@@ -17,6 +18,7 @@ import {
 export default define.page(function Home(ctx) {
   return (
     <Layout currentPath={ctx.url.pathname}>
+      <SEOHead />
       <div class="max-w-4xl mx-auto">
         {/* Hero Section */}
         <div class="mb-16 md:mb-24">

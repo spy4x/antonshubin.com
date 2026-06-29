@@ -1,4 +1,6 @@
 import { define } from "../../lib/utils.ts";
+import { head } from "../../lib/head.ts";
+import { SEOHead } from "../../components/SEOHead.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { blogArticles, prettyDate } from "../../lib/data.ts";
 
@@ -23,6 +25,14 @@ const TAG_COLORS: Record<string, string> = {
 
 export default define.page(function Blog(ctx) {
   const tab = (ctx.url.searchParams.get("tab") || "all") as string;
+  head.value = {
+    ...head.value,
+    title: "Blog — Anton Shubin",
+    description:
+      "Technical articles, architecture deep-dives, and dev tips from a Fractional CTO.",
+    canonical: "https://antonshubin.com/blog/",
+    ogType: "website",
+  };
   const filtered = tab === "all"
     ? [...blogArticles].sort((a, b) => b.index - a.index)
     : blogArticles.filter((a) => a.category === tab).sort((a, b) =>
@@ -31,6 +41,7 @@ export default define.page(function Blog(ctx) {
 
   return (
     <Layout currentPath={ctx.url.pathname}>
+      <SEOHead />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Blog</h1>
         <p class="text-gray-400 mb-8 text-base sm:text-lg">

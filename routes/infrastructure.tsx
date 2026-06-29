@@ -1,5 +1,7 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
+import { head } from "../lib/head.ts";
+import { SEOHead } from "../components/SEOHead.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 
 const services = [
@@ -44,8 +46,18 @@ const services = [
 ];
 
 export default define.page(function Infrastructure() {
+  head.value = {
+    ...head.value,
+    title: "Infrastructure & Architecture — Anton Shubin",
+    description:
+      "Self-hosted infrastructure stack powering 40+ services on a $50/mo budget.",
+    canonical: "https://antonshubin.com/infrastructure/",
+    ogType: "website",
+  };
+
   return (
     <Layout currentPath="/infrastructure">
+      <SEOHead />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Infrastructure Laboratory
