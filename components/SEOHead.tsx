@@ -11,7 +11,10 @@ export function SEOHead() {
       <title>{h.title}</title>
       <meta name="description" content={h.description} />
       <link rel="canonical" href={h.canonical} />
-      <meta name="robots" content="index, follow" />
+      <meta
+        name="robots"
+        content={h.noindex ? "noindex, nofollow" : "index, follow"}
+      />
 
       {/* Twitter Card — large summary with image */}
       <meta name="twitter:card" content="summary_large_image" />
