@@ -45,12 +45,6 @@ export const handler = define.handlers({
         lastmod: undefined,
       },
       {
-        loc: "/pay",
-        priority: "0.5",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      {
         loc: "/infrastructure",
         priority: "0.7",
         changefreq: "monthly",
