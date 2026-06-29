@@ -301,3 +301,47 @@ content, ALWAYS update the corresponding files:
 update the corresponding AI crawler files. The `llms*.txt` files are parsed by
 GPTBot, Claude, Perplexity, and other AI crawlers — they are a primary traffic
 source.
+
+## Cache-Control Headers
+
+Cache policies live in `main.ts` as a middleware. When adding or changing
+routes, update the `CORE_PAGES` set if the new page should be cached at the
+edge:
+
+```ts
+const CORE_PAGES = new Set([
+  "/",
+  "/how-i-work",
+  "/infrastructure",
+  "/contact-me",
+  "/blog",
+  "/projects",
+  "/catalog",
+  "/pay",
+]);
+```
+
+The three cache tiers and their use-cases:
+
+| Cache tier     | Duration                        | Targets                  | When to use                                         |
+| -------------- | ------------------------------- | ------------------------ | --------------------------------------------------- |
+| **Immutable**  | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*` | Content-hashed files (fingerprint = immutable)      |
+| **Images**     | 7 days + stale-while-revalidate | `/img/*`                 | Photos, illustrations (rarely change)               |
+| **Core pages** | 3 days + stale-while-revalidate | `CORE_PAGES` set         | SSR pages that update every few days                |
+| **No cache**   | `no-cache, must-revalidate`     | `/sw.js`                 | Service worker (byte-for-byte PWA update detection) |
+
+**Staging** (`website-stag.*`): caches assets and images but sets `no-cache` for
+HTML, giving instant feedback on deploys.
+
+**To enable edge caching for HTML** in Cloudflare, add a Cache Rule:
+
+1. Cloudflare Dashboard → Rules → Cache Rules → Create rule
+2. Field: `Hostname` equals `antonshubin.com`
+3. Then: Cache Eligibility → Eligible for cache, Edge TTL → 3 days
+
+**Deploy commands:**
+
+```bash
+deno task deploy           # production → antonshubin.com
+deno task deploy:stag      # staging   → website-stag.antonshubin.com
+```

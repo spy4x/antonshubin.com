@@ -2,17 +2,46 @@
 /**
  * Deploy to homelab: rsync source + env files, docker compose up --build
  *
- * Usage: deno task deploy
+ * Usage:
+ *   deno task deploy           # production → antonshubin.com
+ *   deno task deploy:stag      # staging   → website-stag.antonshubin.com
  *
  * Steps:
  *  1. Rsync source (excluding .git, node_modules, _fresh, and .dockerignore patterns)
- *  2. Rsync .env + .env.prod separately (blocked by .dockerignore from step 1)
- *  3. SSH to homelab: docker compose --env-file .env.prod up -d --build
+ *  2. Rsync env files separately (blocked by .dockerignore from step 1)
+ *  3. SSH to homelab: docker compose up -d --build
  */
 
 const SERVER = "homelab";
-const REMOTE_PATH = "~/ssd-2tb/apps/anton/antonshubin.com/";
+const isStaging = Deno.env.get("DEPLOY_ENV") === "staging";
+
+const TARGET = isStaging
+  ? {
+    name: "staging",
+    project: "antonshubincom-stag",
+    envFile: ".env.staging",
+    domain: "website-stag.antonshubin.com",
+  }
+  : {
+    name: "production",
+    project: "antonshubincom",
+    envFile: ".env.prod",
+    domain: "antonshubin.com",
+  };
+
+const REMOTE_PATH = isStaging
+  ? "~/ssd-2tb/apps/anton/antonshubin.com-stag/"
+  : "~/ssd-2tb/apps/anton/antonshubin.com/";
 const REMOTE = `${SERVER}:${REMOTE_PATH}`;
+
+console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
+
+if (isStaging) {
+  // Create .env.staging on the fly
+  const prodEnv = Deno.readTextFileSync(".env.prod");
+  const stagEnv = prodEnv.replace(/DOMAIN=.*/, `DOMAIN=${TARGET.domain}`);
+  Deno.writeTextFileSync(".env.staging", stagEnv);
+}
 
 // Step 0: bump SW cache version so browsers detect an update
 const swPath = "static/sw.js";
@@ -58,7 +87,7 @@ console.log(r1.stdout);
 
 // Step 2: env files (bypass dockerignore)
 console.log("  rsync env files...");
-const r2 = await run(`rsync -avz .env .env.prod ${REMOTE}`);
+const r2 = await run(`rsync -avz .env ${TARGET.envFile} ${REMOTE}`);
 if (r2.code !== 0) {
   console.error(r2.stderr);
   Deno.exit(1);
@@ -68,7 +97,7 @@ console.log(r2.stdout);
 // Step 3: build and restart on remote
 console.log("  docker compose...");
 const r3 = await run(
-  `ssh ${SERVER} 'cd ${REMOTE_PATH} && docker compose --env-file .env.prod up -d --build'`,
+  `ssh ${SERVER} 'cd ${REMOTE_PATH} && docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build'`,
 );
 if (r3.code !== 0) {
   console.error(r3.stderr);
@@ -76,4 +105,11 @@ if (r3.code !== 0) {
 }
 console.log(r3.stdout);
 
-console.log("✅ Deploy complete");
+console.log(`✅ Deploy to ${TARGET.name} complete`);
+
+// Clean up temp env file
+if (isStaging) {
+  try {
+    Deno.removeSync(".env.staging");
+  } catch { /* ok */ }
+}
