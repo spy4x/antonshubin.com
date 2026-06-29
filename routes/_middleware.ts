@@ -1,9 +1,7 @@
 export async function handler(
-  req: Request,
-  ctx: { next: () => Promise<Response> },
+  ctx: { req: Request; url: URL; next: () => Promise<Response> },
 ): Promise<Response> {
-  const url = new URL(req.url);
-  const pathname = url.pathname;
+  const pathname = ctx.url.pathname;
 
   const res = await ctx.next();
 
