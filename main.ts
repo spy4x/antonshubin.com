@@ -3,6 +3,22 @@ import type { State } from "./lib/utils.ts";
 
 export const app = new App<State>();
 
+// Core static page routes that change infrequently (cached 3 days at edge).
+const CORE_PAGES = new Set([
+  "/",
+  "/how-i-work",
+  "/infrastructure",
+  "/contact-me",
+  "/blog",
+  "/projects",
+  "/catalog",
+  "/pay",
+]);
+
+const isAsset = (url: string) =>
+  url.startsWith("/assets/") || url.startsWith("/_fresh/");
+const isImage = (url: string) => url.startsWith("/img/");
+
 // Cache middleware: set Cache-Control per content type.
 // On staging (website-stag.*), skip HTML caching for instant feedback.
 app.use(async (ctx) => {
@@ -13,14 +29,12 @@ app.use(async (ctx) => {
 
   // Staging: cache assets but NOT HTML (instant feedback on deploys)
   if (isStaging) {
-    if (
-      url.startsWith("/assets/") || url.startsWith("/_fresh/")
-    ) {
+    if (isAsset(url)) {
       resp.headers.set(
         "Cache-Control",
         "public, max-age=31536000, immutable",
       );
-    } else if (url.startsWith("/img/")) {
+    } else if (isImage(url)) {
       resp.headers.set(
         "Cache-Control",
         "public, max-age=604800, stale-while-revalidate=86400",
@@ -44,13 +58,13 @@ app.use(async (ctx) => {
   // and the PWA service worker (stale-while-revalidate).
 
   // Content-hashed assets — cache forever (fingerprint = immutable)
-  if (url.startsWith("/assets/") || url.startsWith("/_fresh/")) {
+  if (isAsset(url)) {
     resp.headers.set(
       "Cache-Control",
       "public, max-age=31536000, immutable",
     );
   } // Images (rare changes) — cache 7 days, serve stale while refreshing
-  else if (url.startsWith("/img/")) {
+  else if (isImage(url)) {
     resp.headers.set(
       "Cache-Control",
       "public, max-age=604800, stale-while-revalidate=86400",
@@ -58,11 +72,7 @@ app.use(async (ctx) => {
   } // Core static pages — cache 3 days at edge, stale-while-revalidate
   // for PWA background refreshes. The site content changes every few
   // days, so 3 days balances freshness with max edge cache HIT rate.
-  else if (
-    url === "/" || url === "/how-i-work" || url === "/infrastructure" ||
-    url === "/contact-me" || url === "/blog" || url === "/projects" ||
-    url === "/catalog" || url === "/pay"
-  ) {
+  else if (CORE_PAGES.has(url)) {
     resp.headers.set(
       "Cache-Control",
       "public, max-age=259200, stale-while-revalidate=43200",

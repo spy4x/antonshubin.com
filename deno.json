@@ -7,7 +7,7 @@
     "start": "deno serve -A _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update .",
     "deploy": "deno run -A scripts/deploy.ts",
-    "deploy:stag": "deno run -A scripts/deploy.ts --stag",
+    "deploy:stag": "DEPLOY_ENV=staging deno run -A scripts/deploy.ts",
     "env:encrypt": "deno run -A scripts/encrypt.ts",
     "env:decrypt": "deno run -A scripts/decrypt.ts"
   },

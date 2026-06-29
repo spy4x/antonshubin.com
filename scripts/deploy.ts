@@ -4,7 +4,7 @@
  *
  * Usage:
  *   deno task deploy           # production → antonshubin.com
- *   deno task deploy --stag    # staging   → website-stag.antonshubin.com
+ *   deno task deploy:stag      # staging   → website-stag.antonshubin.com
  *
  * Steps:
  *  1. Rsync source (excluding .git, node_modules, _fresh, and .dockerignore patterns)
@@ -13,7 +13,7 @@
  */
 
 const SERVER = "homelab";
-const isStaging = Deno.args.includes("--stag");
+const isStaging = Deno.env.get("DEPLOY_ENV") === "staging";
 
 const TARGET = isStaging
   ? {
@@ -29,9 +29,8 @@ const TARGET = isStaging
     domain: "antonshubin.com",
   };
 
-// Production uses the legacy root path. Staging gets its own subdir.
 const REMOTE_PATH = isStaging
-  ? `~/ssd-2tb/apps/anton/antonshubin.com/staging/`
+  ? "~/ssd-2tb/apps/anton/antonshubin.com-stag/"
   : "~/ssd-2tb/apps/anton/antonshubin.com/";
 const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 
