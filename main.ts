@@ -8,19 +8,6 @@ export const app = new App<State>();
 app.use(async (ctx) => {
   const url = ctx.url.pathname;
 
-  // Serve sw.js directly with no-cache (bypasses Fresh staticFiles which
-  // would set max-age=31536000). Browsers detect PWA updates via byte-
-  // for-byte comparison — a cached sw.js prevents update propagation.
-  if (url === "/sw.js") {
-    const file = await Deno.readFile("./static/sw.js");
-    return new Response(file, {
-      headers: {
-        "Content-Type": "application/javascript",
-        "Cache-Control": "no-cache, must-revalidate",
-      },
-    });
-  }
-
   const resp = await ctx.next();
   const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
