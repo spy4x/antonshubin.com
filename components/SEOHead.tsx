@@ -1,5 +1,6 @@
 import { Head } from "fresh/runtime";
 import { breadcrumbFromCanonical, head } from "../lib/head.ts";
+import { SAME_AS_URLS } from "../lib/config.ts";
 
 export function SEOHead() {
   const h = head.value;
@@ -39,10 +40,15 @@ export function SEOHead() {
                 "@type": "Person",
                 "@id": "https://antonshubin.com/#person",
                 "name": "Anton Shubin",
+                "givenName": "Anton",
+                "familyName": "Shubin",
                 "jobTitle": "Fractional CTO & Lead Architect",
                 "description":
                   "I take non-technical founders from napkin sketch to production. Fixed-price milestones. Zero-bloat architecture. No dev-team drama.",
                 "url": "https://antonshubin.com",
+                "image": "https://antonshubin.com/img/photo-big.webp",
+                "email": "mailto:hello@antonshubin.com",
+                "knowsLanguage": ["en", "ru"],
                 "knowsAbout": [
                   "Software Architecture",
                   "SaaS Development",
@@ -54,11 +60,25 @@ export function SEOHead() {
                   "System Design",
                   "System Performance Optimization",
                 ],
+                "award": [
+                  "Upwork Expert-Vetted",
+                  "Upwork 100% Job Success",
+                  "$395K+ earned on Upwork across 80+ projects",
+                ],
+                "sameAs": [...SAME_AS_URLS],
                 "worksFor": {
                   "@type": "Organization",
+                  "@id": "https://neatsoft.dev/#org",
                   "name": "NeatSoft PTE LTD",
                   "url": "https://neatsoft.dev",
                 },
+              },
+              {
+                "@type": "Organization",
+                "@id": "https://neatsoft.dev/#org",
+                "name": "NeatSoft PTE LTD",
+                "url": "https://neatsoft.dev",
+                "founder": { "@id": "https://antonshubin.com/#person" },
               },
               {
                 "@type": "WebSite",

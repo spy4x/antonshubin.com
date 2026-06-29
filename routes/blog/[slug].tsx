@@ -103,9 +103,11 @@ export default define.page(function BlogArticle(ctx) {
             "timeRequired": `PT${article.readTime}M`,
             "author": {
               "@type": "Person",
+              "@id": "https://antonshubin.com/#person",
               "name": "Anton Shubin",
               "url": "https://antonshubin.com",
             },
+            "publisher": { "@id": "https://antonshubin.com/#person" },
           }),
         }}
       />
