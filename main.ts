@@ -6,8 +6,22 @@ export const app = new App<State>();
 // Cache middleware: set Cache-Control per content type.
 // On staging (website-stag.*), skip HTML caching for instant feedback.
 app.use(async (ctx) => {
-  const resp = await ctx.next();
   const url = ctx.url.pathname;
+
+  // Serve sw.js directly with no-cache (bypasses Fresh staticFiles which
+  // would set max-age=31536000). Browsers detect PWA updates via byte-
+  // for-byte comparison — a cached sw.js prevents update propagation.
+  if (url === "/sw.js") {
+    const file = await Deno.readFile("./static/sw.js");
+    return new Response(file, {
+      headers: {
+        "Content-Type": "application/javascript",
+        "Cache-Control": "no-cache, must-revalidate",
+      },
+    });
+  }
+
+  const resp = await ctx.next();
   const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
   // Staging: cache assets but NOT HTML (instant feedback on deploys)
@@ -24,10 +38,6 @@ app.use(async (ctx) => {
         "Cache-Control",
         "public, max-age=604800, stale-while-revalidate=86400",
       );
-    } else if (url === "/sw.js") {
-      const newResp = new Response(resp.body, resp);
-      newResp.headers.set("Cache-Control", "no-cache");
-      return newResp;
     } else {
       resp.headers.set("Cache-Control", "no-cache, must-revalidate");
     }
@@ -47,9 +57,7 @@ app.use(async (ctx) => {
   // and the PWA service worker (stale-while-revalidate).
 
   // Content-hashed assets — cache forever (fingerprint = immutable)
-  if (
-    url.startsWith("/assets/") || url.startsWith("/_fresh/")
-  ) {
+  if (url.startsWith("/assets/") || url.startsWith("/_fresh/")) {
     resp.headers.set(
       "Cache-Control",
       "public, max-age=31536000, immutable",
@@ -60,17 +68,6 @@ app.use(async (ctx) => {
       "Cache-Control",
       "public, max-age=604800, stale-while-revalidate=86400",
     );
-  } // Service worker: MUST NOT be cached long. Browsers check sw.js via
-  // byte-for-byte comparison. If CF or a downstream cache serves a
-  // stale sw.js, the PWA won't detect updates.
-  // Clone the response to override Fresh's staticFiles() headers.
-  else if (url === "/sw.js") {
-    const newResp = new Response(resp.body, resp);
-    newResp.headers.set(
-      "Cache-Control",
-      "no-cache, must-revalidate",
-    );
-    return newResp;
   } // Core static pages — cache 3 days at edge, stale-while-revalidate
   // for PWA background refreshes. The site content changes every few
   // days, so 3 days balances freshness with max edge cache HIT rate.
