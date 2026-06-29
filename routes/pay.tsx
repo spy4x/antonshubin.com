@@ -11,6 +11,7 @@ export default define.page(function Pay() {
     description: "Accepted payment methods: Stripe, SWIFT, BTC, ETH, Solana.",
     canonical: "https://antonshubin.com/pay/",
     ogType: "website",
+    noindex: true,
   };
 
   return (
