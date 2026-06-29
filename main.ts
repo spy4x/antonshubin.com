@@ -3,12 +3,48 @@ import type { State } from "./lib/utils.ts";
 
 export const app = new App<State>();
 
-// Cache middleware: set immutable cache for content-hashed assets
+// Cache middleware: set Cache-Control per content type.
+// On staging (website-stag.*), skip HTML caching for instant feedback.
 app.use(async (ctx) => {
   const resp = await ctx.next();
   const url = ctx.url.pathname;
+  const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
-  // Assets with content hash in name — cache forever
+  // Staging: cache assets but NOT HTML (instant feedback on deploys)
+  if (isStaging) {
+    if (
+      url.startsWith("/assets/") || url.startsWith("/_fresh/")
+    ) {
+      resp.headers.set(
+        "Cache-Control",
+        "public, max-age=31536000, immutable",
+      );
+    } else if (url.startsWith("/img/")) {
+      resp.headers.set(
+        "Cache-Control",
+        "public, max-age=604800, stale-while-revalidate=86400",
+      );
+    } else if (url === "/static/sw.js") {
+      resp.headers.set("Cache-Control", "no-cache");
+    } else {
+      resp.headers.set("Cache-Control", "no-cache, must-revalidate");
+    }
+    return resp;
+  }
+
+  // ── Production caching strategy ──────────────────────────────
+  //
+  // Cloudflare (orange-cloud) accepts these Cache-Control headers
+  // for static assets and caches them at the edge automatically.
+  // HTML pages are treated as DYNAMIC by default — to enable edge
+  // caching for HTML too, add a CF Cache Rule:
+  //   Field: Hostname = antonshubin.com
+  //   Then:  Cache Eligibility → Eligible for cache
+  //   Edge TTL → 3 days
+  // Without that rule, these headers still help the browser cache
+  // and the PWA service worker (stale-while-revalidate).
+
+  // Content-hashed assets — cache forever (fingerprint = immutable)
   if (
     url.startsWith("/assets/") || url.startsWith("/_fresh/")
   ) {
@@ -16,13 +52,31 @@ app.use(async (ctx) => {
       "Cache-Control",
       "public, max-age=31536000, immutable",
     );
-  } // Images (change rarely) — cache 7 days
-  else if (
-    url.startsWith("/img/") || url.startsWith("/static/")
-  ) {
+  } // Images (rare changes) — cache 7 days, serve stale while refreshing
+  else if (url.startsWith("/img/")) {
     resp.headers.set(
       "Cache-Control",
       "public, max-age=604800, stale-while-revalidate=86400",
+    );
+  } // Service worker: MUST NOT be cached long. Browsers check sw.js via
+  // byte-for-byte comparison. If CF or a downstream cache serves a
+  // stale sw.js, the PWA won't detect updates.
+  else if (url === "/static/sw.js") {
+    resp.headers.set(
+      "Cache-Control",
+      "no-cache, must-revalidate",
+    );
+  } // Core static pages — cache 3 days at edge, stale-while-revalidate
+  // for PWA background refreshes. The site content changes every few
+  // days, so 3 days balances freshness with max edge cache HIT rate.
+  else if (
+    url === "/" || url === "/how-i-work" || url === "/infrastructure" ||
+    url === "/contact-me" || url === "/blog" || url === "/projects" ||
+    url === "/catalog" || url === "/pay"
+  ) {
+    resp.headers.set(
+      "Cache-Control",
+      "public, max-age=259200, stale-while-revalidate=43200",
     );
   }
 
