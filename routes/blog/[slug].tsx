@@ -97,10 +97,18 @@ export default define.page(function BlogArticle(ctx) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
+            "@id": `https://antonshubin.com/blog/${article.slug}/#article`,
             "headline": article.title,
             "description": article.description,
+            "image":
+              `https://antonshubin.com/img/blog/${article.slug}/${article.previewImageURL}`,
             "datePublished": article.publishedAt,
             "timeRequired": `PT${article.readTime}M`,
+            "inLanguage": "en-US",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://antonshubin.com/blog/${article.slug}/`,
+            },
             "author": {
               "@type": "Person",
               "@id": "https://antonshubin.com/#person",
