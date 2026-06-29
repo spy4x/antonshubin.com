@@ -24,7 +24,7 @@ app.use(async (ctx) => {
         "Cache-Control",
         "public, max-age=604800, stale-while-revalidate=86400",
       );
-    } else if (url === "/static/sw.js") {
+    } else if (url === "/sw.js") {
       resp.headers.set("Cache-Control", "no-cache");
     } else {
       resp.headers.set("Cache-Control", "no-cache, must-revalidate");
@@ -61,7 +61,7 @@ app.use(async (ctx) => {
   } // Service worker: MUST NOT be cached long. Browsers check sw.js via
   // byte-for-byte comparison. If CF or a downstream cache serves a
   // stale sw.js, the PWA won't detect updates.
-  else if (url === "/static/sw.js") {
+  else if (url === "/sw.js") {
     resp.headers.set(
       "Cache-Control",
       "no-cache, must-revalidate",
