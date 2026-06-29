@@ -5,8 +5,9 @@ import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { marked } from "marked";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
-import { head } from "../../lib/head.ts";
+import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
+import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -91,6 +92,9 @@ export default define.page(function BlogArticle(ctx) {
   return (
     <Layout currentPath="/blog">
       <SEOHead />
+      <Breadcrumb
+        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

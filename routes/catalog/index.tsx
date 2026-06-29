@@ -1,6 +1,7 @@
 import { define } from "../../lib/utils.ts";
-import { head } from "../../lib/head.ts";
+import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
+import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { SCHEDULE_URL, UPWORK_URL } from "../../lib/config.ts";
 
@@ -326,6 +327,9 @@ export default define.page(function Catalog() {
   return (
     <Layout currentPath="/catalog">
       <SEOHead />
+      <Breadcrumb
+        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
           Project Catalog

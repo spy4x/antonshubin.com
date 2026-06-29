@@ -1,7 +1,8 @@
 import type { ComponentChildren } from "preact";
 import { define } from "../lib/utils.ts";
-import { head } from "../lib/head.ts";
+import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
+import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 
@@ -123,6 +124,9 @@ export default define.page(function HowIWork() {
   return (
     <Layout currentPath="/how-i-work">
       <SEOHead />
+      <Breadcrumb
+        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
