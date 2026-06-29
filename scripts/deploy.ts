@@ -29,7 +29,10 @@ const TARGET = isStaging
     domain: "antonshubin.com",
   };
 
-const REMOTE_PATH = `~/ssd-2tb/apps/anton/antonshubin.com/${TARGET.name}/`;
+// Production uses the legacy root path. Staging gets its own subdir.
+const REMOTE_PATH = isStaging
+  ? `~/ssd-2tb/apps/anton/antonshubin.com/staging/`
+  : "~/ssd-2tb/apps/anton/antonshubin.com/";
 const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 
 console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
