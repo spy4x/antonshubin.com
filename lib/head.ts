@@ -37,6 +37,10 @@ function humanize(slug: string): string {
 /**
  * Generate a BreadcrumbList itemListElement array from a canonical URL.
  * Used by the JSON-LD structured data in _app.tsx.
+ *
+ * Href values are WITHOUT trailing slashes (e.g. "/blog" not "/blog/").
+ * Fresh router handles both variants; the sitemap already omits them.
+ * The root "/" is the only exception (kept for correctness).
  */
 export function breadcrumbFromCanonical(
   canonical: string,
@@ -56,7 +60,7 @@ export function breadcrumbFromCanonical(
       "@type": "ListItem",
       position: idx + 2,
       name: isLast ? pageName : humanize(seg),
-      item: `${DOMAIN}${acc}/`,
+      item: `${DOMAIN}${acc}`,
     });
   });
 
@@ -69,6 +73,8 @@ export function breadcrumbFromCanonical(
  *
  * Uses URL.pathname to strip protocol/domain/port/hash/query — immune to
  * trailing-slash edge cases and DOMAIN env-var mismatches.
+ * Href values are WITHOUT trailing slashes (e.g. "/blog" not "/blog/"),
+ * matching the rest of the site. Only "/" keeps its slash.
  */
 export function getBreadcrumb(
   canonical: string,
@@ -87,7 +93,7 @@ export function getBreadcrumb(
     const isLast = idx === segments.length - 1;
     items.push({
       name: isLast ? pageName : humanize(seg),
-      href: isLast ? undefined : acc + "/",
+      href: isLast ? undefined : acc,
     });
   });
 
