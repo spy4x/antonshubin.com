@@ -7,7 +7,7 @@ networks:
 services:
   web:
     build: .
-    container_name: antonshubincom-web
+    container_name: ${PROJECT:-antonshubincom}-web
     restart: unless-stopped
     # Env vars for container: loaded from file at runtime
     # YAML substitution (${DOMAIN}) comes from `--env-file .env.prod` CLI flag

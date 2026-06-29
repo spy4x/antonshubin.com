@@ -37,7 +37,7 @@ const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
 
 if (isStaging) {
-  // Create .env.staging on the fly
+  // Create .env.staging on the fly (used for docker compose --env-file)
   const prodEnv = Deno.readTextFileSync(".env.prod");
   const stagEnv = prodEnv.replace(/DOMAIN=.*/, `DOMAIN=${TARGET.domain}`);
   Deno.writeTextFileSync(".env.staging", stagEnv);
@@ -96,8 +96,13 @@ console.log(r2.stdout);
 
 // Step 3: build and restart on remote
 console.log("  docker compose...");
+const composeCmd = isStaging
+  // Staging: cp .env.staging → .env.prod for compose.yml's env_file,
+  // and set PROJECT for the container_name variable in compose.yml
+  ? `cd ${REMOTE_PATH} && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
+  : `cd ${REMOTE_PATH} && docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
 const r3 = await run(
-  `ssh ${SERVER} 'cd ${REMOTE_PATH} && docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build'`,
+  `ssh ${SERVER} '${composeCmd}'`,
 );
 if (r3.code !== 0) {
   console.error(r3.stderr);
