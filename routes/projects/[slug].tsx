@@ -54,16 +54,10 @@ export default define.page(function ProjectDetail(ctx) {
   return (
     <Layout currentPath="/projects">
       <SEOHead />
-      <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
-      />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <a
-          href="/projects"
-          class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
-        >
-          ← Back to projects
-        </a>
+        <Breadcrumb
+          items={getBreadcrumb(head.value.canonical, head.value.title)}
+        />
 
         <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
           {/* Header with logo */}

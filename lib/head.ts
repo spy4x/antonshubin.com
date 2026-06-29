@@ -42,8 +42,7 @@ export function breadcrumbFromCanonical(
   canonical: string,
   pageName: string,
 ) {
-  const path = canonical.replace(DOMAIN, "");
-  const segments = path.split("/").filter(Boolean);
+  const segments = new URL(canonical).pathname.split("/").filter(Boolean);
 
   const items: unknown[] = [
     { "@type": "ListItem", position: 1, name: "Home", item: `${DOMAIN}/` },
@@ -67,13 +66,15 @@ export function breadcrumbFromCanonical(
 /**
  * Generate a flat breadcrumb array for the visible <nav> in component/Breadcrumb.tsx.
  * Returns [{ name, href? }, ...] where the last item has no href.
+ *
+ * Uses URL.pathname to strip protocol/domain/port/hash/query — immune to
+ * trailing-slash edge cases and DOMAIN env-var mismatches.
  */
 export function getBreadcrumb(
   canonical: string,
   pageName: string,
 ): { name: string; href?: string }[] {
-  const path = canonical.replace(DOMAIN, "");
-  const segments = path.split("/").filter(Boolean);
+  const segments = new URL(canonical).pathname.split("/").filter(Boolean);
 
   const items: { name: string; href?: string }[] = [{
     name: "Home",

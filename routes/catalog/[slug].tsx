@@ -47,9 +47,6 @@ export default define.page(function CatalogDetail(ctx) {
   return (
     <Layout currentPath="/catalog">
       <SEOHead />
-      <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -108,12 +105,9 @@ export default define.page(function CatalogDetail(ctx) {
         }}
       />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <a
-          href="/catalog"
-          class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
-        >
-          ← Back to catalog
-        </a>
+        <Breadcrumb
+          items={getBreadcrumb(head.value.canonical, head.value.title)}
+        />
 
         <div class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-4 md:p-8">
           <div class="flex items-center gap-4 mb-6">

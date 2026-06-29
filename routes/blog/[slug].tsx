@@ -92,9 +92,6 @@ export default define.page(function BlogArticle(ctx) {
   return (
     <Layout currentPath="/blog">
       <SEOHead />
-      <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -124,12 +121,9 @@ export default define.page(function BlogArticle(ctx) {
         }}
       />
       <article class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <a
-          href="/blog"
-          class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm mb-8"
-        >
-          ← Back to blog
-        </a>
+        <Breadcrumb
+          items={getBreadcrumb(head.value.canonical, head.value.title)}
+        />
 
         <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
           {/* Preview image */}
