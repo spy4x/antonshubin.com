@@ -87,7 +87,19 @@ export default define.page(function Home(ctx) {
                 </a>
               </div>
 
-              <div class="mt-6 flex flex-wrap gap-2">
+              {/* Primary CTA — prominent gradient button */}
+              <div class="mt-6">
+                <a
+                  href={SCHEDULE_URL}
+                  target="_blank"
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-base"
+                >
+                  <CalendarIcon class="w-5 h-5" />
+                  Book a free intro call — no pitch, just advice
+                </a>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
                 <a
                   href="https://github.com/spy4x"
                   target="_blank"
@@ -111,36 +123,6 @@ export default define.page(function Home(ctx) {
                   title="Upwork profile"
                 >
                   <UpworkIcon class="w-auto h-4 text-white" />
-                </a>
-              </div>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <a
-                  href={SCHEDULE_URL}
-                  target="_blank"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-500 transition-colors"
-                >
-                  <CalendarIcon class="w-4 h-4" />
-                  Schedule a call
-                </a>
-                <a
-                  href="/contact-me"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-500 transition-colors"
-                >
-                  <svg
-                    class="w-4 h-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-                    />
-                  </svg>
-                  Contact me
                 </a>
               </div>
             </div>
