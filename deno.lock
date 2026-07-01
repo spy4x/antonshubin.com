@@ -42,6 +42,7 @@
     "npm:esbuild@0.25.7": "0.25.7",
     "npm:esbuild@~0.25.5": "0.25.12",
     "npm:marked@^17.0.1": "17.0.1",
+    "npm:nodemailer@^9.0.3": "9.0.3",
     "npm:preact-render-to-string@^6.6.3": "6.6.5_preact@10.28.2",
     "npm:preact@^10.27.0": "10.28.2",
     "npm:preact@^10.27.2": "10.28.2",
@@ -1341,6 +1342,9 @@
     "node-releases@2.0.27": {
       "integrity": "sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA=="
     },
+    "nodemailer@9.0.3": {
+      "integrity": "sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw=="
+    },
     "picocolors@1.1.1": {
       "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="
     },
@@ -1458,6 +1462,7 @@
       "npm:@preact/signals@^2.5.0",
       "npm:@tailwindcss/vite@^4.1.18",
       "npm:marked@^17.0.1",
+      "npm:nodemailer@^9.0.3",
       "npm:preact@^10.27.2",
       "npm:tailwindcss@^4.1.18",
       "npm:vite@^7.1.3"
