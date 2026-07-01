@@ -337,19 +337,19 @@ export default define.page(function Home(ctx) {
                   performance degrades. You need someone who takes ownership of
                   outcomes, not hours.
                 </p>
-                <p class="text-gray-400 leading-relaxed mb-4">
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
                   You have a technical product — or are building one — and you
                   need architectural leadership that bridges business goals and
                   engineering reality. You value clear communication, predictable
                   delivery, and a partner who explains complex tradeoffs in plain
                   English instead of hiding behind jargon.
                 </p>
-                <p class="text-gray-400 leading-relaxed mb-4">
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
                   You want a system architect who aligns with your vision,
                   owns the technical roadmap, and ships measurable results — on
                   time, on budget, with no surprises.
                 </p>
-                <p class="text-gray-400 leading-relaxed">
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed">
                   I work with funded startups, lean SaaS teams, and established
                   businesses that have outgrown their current technical setup.
                   If you are stuck between "it works" and "it scales" — this is
