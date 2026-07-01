@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals";
-import { DOMAIN } from "./config.ts";
+import { BASE_URL } from "./config.ts";
 
 export interface PageHead {
   title: string;
@@ -49,7 +49,7 @@ export function breadcrumbFromCanonical(
   const segments = new URL(canonical).pathname.split("/").filter(Boolean);
 
   const items: unknown[] = [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${DOMAIN}/` },
+    { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
   ];
 
   let acc = "";
@@ -60,7 +60,7 @@ export function breadcrumbFromCanonical(
       "@type": "ListItem",
       position: idx + 2,
       name: isLast ? pageName : humanize(seg),
-      item: `${DOMAIN}${acc}`,
+      item: `${BASE_URL}${acc}`,
     });
   });
 

@@ -1,4 +1,7 @@
-export const DOMAIN = Deno.env.get("DOMAIN") || "https://antonshubin.com";
+export const DOMAIN = Deno.env.get("DOMAIN") || "antonshubin.com";
+export const BASE_URL = DOMAIN.startsWith("https://")
+  ? DOMAIN
+  : `https://${DOMAIN}`;
 export const SCHEDULE_URL = Deno.env.get("SCHEDULE_URL") || "";
 export const UPWORK_URL = Deno.env.get("UPWORK_URL") ||
   "https://www.upwork.com/freelancers/ashubin";

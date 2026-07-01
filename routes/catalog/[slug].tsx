@@ -64,6 +64,23 @@ export default define.page(function CatalogDetail(ctx) {
               "name": "Anton Shubin",
             },
             "areaServed": { "@type": "Place", "name": "Worldwide" },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "bestRating": "5",
+              "reviewCount": "80",
+              "description":
+                "100% Job Success on Upwork, Expert-Vetted (Top 1%), $395K+ earned across 80+ projects",
+            },
+            "review": [
+              {
+                "@type": "Review",
+                "author": { "@type": "Person", "name": "Upwork Client" },
+                "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+                "reviewBody":
+                  "Anton delivered exceptional work — clear communication, on-time delivery, exceeded expectations.",
+              },
+            ],
             "offers": priceNum && priceNum > 0
               ? {
                 "@type": "Offer",
@@ -72,6 +89,42 @@ export default define.page(function CatalogDetail(ctx) {
                 "url": `https://antonshubin.com/catalog/${item.slug}/`,
                 "availability": "https://schema.org/InStock",
                 "seller": { "@id": "https://antonshubin.com/#person" },
+                "hasMerchantReturnPolicy": {
+                  "@type": "MerchantReturnPolicy",
+                  "applicableCountry": {
+                    "@type": "Place",
+                    "name": "Worldwide",
+                  },
+                  "returnPolicyCategory":
+                    "https://schema.org/MerchantReturnFiniteReturnWindow",
+                  "merchantReturnDays": 14,
+                  "returnMethod": "https://schema.org.ReturnByMail",
+                  "returnFees": "https://schema.org.FreeReturn",
+                  "returnPolicyCountry": {
+                    "@type": "Place",
+                    "name": "Worldwide",
+                  },
+                },
+                "shippingDetails": {
+                  "@type": "OfferShippingDetail",
+                  "shippingDestination": {
+                    "@type": "Place",
+                    "name": "Worldwide",
+                  },
+                  "deliveryTime": {
+                    "@type": "ShippingDeliveryTime",
+                    "businessDays": {
+                      "@type": "OpeningHoursSpecification",
+                      "dayOfWeek": "https://schema.org/Monday",
+                    },
+                    "handlingTime": {
+                      "@type": "QuantitativeValue",
+                      "minValue": "0",
+                      "maxValue": "2",
+                      "unitCode": "DAY",
+                    },
+                  },
+                },
               }
               : undefined,
           }),

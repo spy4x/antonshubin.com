@@ -1,11 +1,11 @@
 import { define } from "../lib/utils.ts";
 import { blogArticles } from "../lib/data.ts";
 import { projects } from "../lib/data.ts";
-import { DOMAIN } from "../lib/config.ts";
+import { BASE_URL } from "../lib/config.ts";
 
 export const handler = define.handlers({
   GET() {
-    const domain = DOMAIN;
+    const domain = BASE_URL;
 
     const staticPages = [
       {
