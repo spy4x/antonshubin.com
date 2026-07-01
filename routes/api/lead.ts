@@ -53,14 +53,13 @@ function validate(payload: unknown): {
     return { ok: false, error: "Invalid request" };
   }
 
-  // Time gate: submission must be >3s after page load, and <1h
-  const ts = typeof body._t === "number" ? body._t : 0;
-  const elapsed = Date.now() - ts;
-  if (elapsed < 3000) {
-    return { ok: false, error: "Please wait a moment before submitting" };
-  }
-  if (elapsed > 3600_000) {
-    return { ok: false, error: "Session expired. Please reload the page." };
+  // Time gate: if _t is present and valid, reject <3s (bots submit instantly)
+  // Missing/invalid _t is tolerated — some Preact hydration paths lose it.
+  if (typeof body._t === "number" && body._t > 1e12) {
+    const elapsed = Date.now() - body._t;
+    if (elapsed < 3000) {
+      return { ok: false, error: "Please wait a moment before submitting" };
+    }
   }
 
   if (typeof body.name !== "string" || !body.name.trim()) {
