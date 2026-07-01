@@ -209,7 +209,7 @@ export default define.page(function Home(ctx) {
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">How I Deliver — The Terms of Engagement</h2>
           <p class="text-gray-400 mb-8 text-base sm:text-lg">
-            Complete transparency. Predictable outcomes.
+            Zero micromanagement. Complete transparency.
           </p>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <a
