@@ -27,6 +27,7 @@ interface PageData {
   content: string | null;
   prev: BlogArticle | null;
   next: BlogArticle | null;
+  related?: BlogArticle[];
 }
 
 export const handler = define.handlers({
@@ -40,6 +41,7 @@ export const handler = define.handlers({
         content: null,
         prev: null,
         next: null,
+        related: [],
       });
     }
 
@@ -53,12 +55,21 @@ export const handler = define.handlers({
     const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null;
     const content = body ? await marked(body) : null;
 
-    return page<PageData>({ article, content, prev, next });
+    // Related posts: same category, exclude self, max 3
+    const related = article
+      ? blogArticles
+        .filter((a) =>
+          a.category && a.category === article.category && a.slug !== slug
+        )
+        .slice(0, 3)
+      : [];
+
+    return page<PageData>({ article, content, prev, next, related });
   },
 });
 
 export default define.page(function BlogArticle(ctx) {
-  const { article, content, prev, next } = ctx.data as PageData;
+  const { article, content, prev, next, related = [] } = ctx.data as PageData;
 
   if (!article) {
     return (
@@ -226,6 +237,33 @@ export default define.page(function BlogArticle(ctx) {
                 </p>
               )}
           </div>
+
+          {/* Related posts — same category interlinking */}
+          {related && related.length > 0 && (
+            <div class="px-4 pt-6 pb-4 bg-gray-800 border-t border-gray-700">
+              <h3 class="text-base font-semibold text-gray-400 mb-4">
+                Read next
+              </h3>
+              <div class="grid gap-3 sm:grid-cols-2">
+                {related.map((r) => (
+                  <a
+                    href={`/blog/${r.slug}`}
+                    class="block p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group"
+                  >
+                    <p class="text-white text-sm font-medium group-hover:text-orange-400 transition-colors leading-snug mb-1">
+                      {r.title}
+                    </p>
+                    <p class="text-gray-500 text-xs line-clamp-2">
+                      {r.description}
+                    </p>
+                    <p class="text-gray-600 text-xs mt-1.5">
+                      {r.readTime} min read
+                    </p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Previous / Next article navigation */}
           {(prev || next) && (
