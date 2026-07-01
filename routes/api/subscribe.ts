@@ -1,5 +1,6 @@
 import { define } from "../../lib/utils.ts";
 import {
+  BASE_URL,
   CONTACT_EMAIL,
   SMTP_FROM,
   SMTP_HOST,
@@ -8,7 +9,7 @@ import {
   SMTP_USERNAME,
 } from "../../lib/config.ts";
 
-interface Subscriber {
+export interface Subscriber {
   email: string;
   subscribedAt: string;
 }
@@ -133,12 +134,24 @@ export const handler = define.handlers({
     subs.push({ email, subscribedAt: new Date().toISOString() });
     saveSubscribers(subs);
 
+    // Welcome the subscriber
+    sendMail(
+      email,
+      SMTP_FROM || SMTP_USERNAME,
+      "Welcome to Anton Shubin's newsletter",
+      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from 80+ projects.\n\nHere's a good place to start:\n${BASE_URL}/saas-architecture-guide\n\nUnsubscribe anytime:\n${BASE_URL}/api/unsubscribe?email=${
+        encodeURIComponent(email)
+      }\n\n— Anton`,
+    ).catch((err) => console.error("[SUBSCRIBE] welcome failed:", err));
+
     // Notify owner
     sendMail(
       CONTACT_EMAIL,
       SMTP_FROM || SMTP_USERNAME,
       `[Newsletter] New subscriber: ${email}`,
-      `${email} subscribed to the newsletter.\nTotal subscribers: ${subs.length}`,
+      `${email} subscribed.\nTotal subscribers: ${subs.length}\n\nUnsubscribe: ${BASE_URL}/api/unsubscribe?email=${
+        encodeURIComponent(email)
+      }`,
     ).catch((err) => console.error("[SUBSCRIBE] notify failed:", err));
 
     return Response.json({ ok: true });
