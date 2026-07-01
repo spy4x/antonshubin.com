@@ -6,6 +6,7 @@ export const PLAUSIBLE_URL = Deno.env.get("PLAUSIBLE_URL") || "";
 export const UMAMI_URL = Deno.env.get("UMAMI_URL") || "";
 export const UMAMI_ID = Deno.env.get("UMAMI_ID") || "";
 
+export const CONTACT_EMAIL = Deno.env.get("CONTACT_EMAIL") || "";
 export const SAME_AS_URLS = [
   "https://www.upwork.com/freelancers/ashubin",
   "https://github.com/spy4x",
