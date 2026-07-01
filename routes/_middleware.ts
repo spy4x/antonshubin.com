@@ -48,6 +48,7 @@ export async function handler(
 ): Promise<Response> {
   const pathname = ctx.url.pathname;
   const isCrawler = isBot(ctx.req);
+  const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
   // Only strip analytics for HTML page requests (not assets/API)
   const isHtmlPage = !pathname.startsWith("/assets/") &&
@@ -60,7 +61,9 @@ export async function handler(
   const res = await ctx.next();
 
   // ── X-Robots-Tag per path ────────────────────────────
-  if (pathname === "/pay" || pathname.startsWith("/pay/")) {
+  if (isStaging) {
+    // Already set by main.ts cache middleware — preserve noindex
+  } else if (pathname === "/pay" || pathname.startsWith("/pay/")) {
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
   } else {
     res.headers.set(
