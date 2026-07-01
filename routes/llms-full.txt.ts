@@ -82,6 +82,13 @@ export const handler = define.handlers({
 ### Blog Posts
 ${blogList}
 
+### Open Source Projects
+- **caldav-mcp** (${DOMAIN}/projects/caldav-mcp) — Native Deno MCP server for CalDAV. Events + tasks, zero npm deps, single binary. Works with Claude Desktop, Cursor, Open WebUI, and OpenCode.
+- **Financy** (${DOMAIN}/projects/financy) — Self-hostable finance tracking with double-entry accounting, multi-currency, PWA.
+- **Homelab** (${DOMAIN}/projects/homelab) — Infrastructure-as-code framework for 20+ Docker services with Traefik, automated backups, monitoring.
+- **TodoApp** (${DOMAIN}/projects/todoapp-caldav) — Self-hosted CalDAV task manager PWA. No vendor lock-in.
+- **Air Quality Sensor** (${DOMAIN}/projects/air-quality-sensor) — DIY ESP32-based air quality monitor with Home Assistant integration.
+
 ### Tech Stack Used
 Deno, Node.js, TypeScript, Preact, React, Fresh, Hono, Angular, Svelte, PostgreSQL, Valkey/Redis, MongoDB, Firebase, Docker, Podman, Traefik, Hetzner, AWS, GCP, OpenAI, Claude, DeepSeek, Stripe, Tailwind CSS, WebSockets, PWA
 

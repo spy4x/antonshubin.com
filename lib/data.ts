@@ -16,6 +16,8 @@ export interface Project {
   madeForURL?: string;
   archived?: boolean;
   outcome?: string;
+  /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
+  ghRepo?: string;
 }
 
 export interface BlogArticle {
@@ -38,6 +40,7 @@ export const projects = {
       externalURL: "https://github.com/spy4x/homelab",
       description:
         "Open-source infrastructure-as-code framework for managing multi-server Docker-based services with automated deployment, monitoring, and backups. Self-host your own cloud with Traefik, Immich, Jellyfin, Vaultwarden, Home Assistant, and 20+ more services.",
+      ghRepo: "spy4x/homelab",
       logoImageURL: "/img/projects/homelab/logo.svg",
       tags: [
         "Deno",
@@ -51,7 +54,8 @@ export const projects = {
     {
       title: "Financy",
       slug: "financy",
-      externalURL: "https://financy.dev",
+      externalURL: "https://github.com/spy4x/financy",
+      ghRepo: "spy4x/financy",
       description:
         "Open-source, self-hostable finance tracking for individuals, families, and small businesses. Features double-entry accounting, multi-currency support, real-time collaboration, and PWA capabilities.",
       logoImageURL: "/img/projects/financy/logo.svg",
@@ -68,6 +72,7 @@ export const projects = {
       title: "Air Quality Sensor",
       slug: "air-quality-sensor",
       externalURL: "https://github.com/spy4x/air-quality-sensor",
+      ghRepo: "spy4x/air-quality-sensor",
       description:
         "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
       logoImageURL: "/img/projects/air-quality-sensor/logo.svg",
@@ -107,6 +112,7 @@ export const projects = {
     {
       title: "The Seed",
       externalURL: "https://github.com/spy4x/seed",
+      ghRepo: "spy4x/seed",
       description:
         "A one-person SaaS application codebase template. Ship your project idea in days instead of months. It is addictive.",
       logoImageURL: "/img/projects/seed/logo.webp",
@@ -116,6 +122,7 @@ export const projects = {
       title: "TodoApp — CalDAV Task Manager (PWA)",
       slug: "todoapp-caldav",
       externalURL: "https://github.com/spy4x/todoapp",
+      ghRepo: "spy4x/todoapp",
       description:
         "Self-hosted task manager that talks to any CalDAV server (Radicale, Nextcloud, Baikal). Web app + PWA, no vendor lock-in, your data stays on your server. Built because Tasks.org has no web UI.",
       tags: [
@@ -135,6 +142,7 @@ export const projects = {
       title: "caldav-mcp",
       slug: "caldav-mcp",
       externalURL: "https://github.com/spy4x/caldav-mcp",
+      ghRepo: "spy4x/caldav-mcp",
       description:
         "Native Deno Model Context Protocol server for CalDAV. Events + tasks, zero npm dependencies, single binary. Works with OpenCode, Claude Desktop, Cursor, and Open WebUI.",
       tags: [
