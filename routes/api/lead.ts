@@ -64,10 +64,14 @@ function buildEmailHtml(lead: LeadPayload): string {
 // Fail-open: never reject the response on notification failure.
 async function notifyOwner(lead: LeadPayload): Promise<void> {
   if (!SMTP_HOST || !SMTP_USERNAME || !SMTP_PASSWORD || !CONTACT_EMAIL) {
-    console.log("[LEAD]", JSON.stringify(lead));
+    console.log(
+      "[LEAD] SMTP not configured, logging lead:",
+      JSON.stringify(lead),
+    );
     return;
   }
 
+  console.log("[LEAD] SMTP_HOST=" + SMTP_HOST + " SMTP_PORT=" + SMTP_PORT);
   const client = new SMTPClient({
     host: SMTP_HOST,
     port: SMTP_PORT,
@@ -75,26 +79,20 @@ async function notifyOwner(lead: LeadPayload): Promise<void> {
     password: SMTP_PASSWORD,
     ssl: SMTP_PORT === 465,
   });
+  console.log("[LEAD] client created, sending to " + CONTACT_EMAIL);
 
-  await new Promise<void>((resolve, reject) => {
-    client.send(
-      {
-        from: SMTP_FROM || SMTP_USERNAME,
-        to: CONTACT_EMAIL,
-        replyTo: lead.email,
-        subject: `[Lead] Architecture audit request from ${lead.name}`,
-        text:
-          `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`,
-        attachment: [
-          { data: buildEmailHtml(lead), alternative: true },
-        ],
-      },
-      (err) => {
-        if (err) reject(err);
-        else resolve();
-      },
-    );
+  await client.sendAsync({
+    from: SMTP_FROM || SMTP_USERNAME,
+    to: [CONTACT_EMAIL],
+    replyTo: lead.email,
+    subject: `[Lead] Architecture audit request from ${lead.name}`,
+    text:
+      `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`,
+    attachment: [
+      { data: buildEmailHtml(lead), alternative: true },
+    ],
   });
+  console.log("[LEAD] sendAsync completed");
 }
 
 export const handler = define.handlers({
