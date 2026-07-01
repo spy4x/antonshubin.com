@@ -28,6 +28,9 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
   const techStack = useSignal("");
   const status = useSignal<SubmitStatus>({ type: "idle" });
 
+  // Set page-load timestamp on mount
+  const pageLoad = useSignal(Date.now());
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     const form: FormState = {
@@ -45,7 +48,11 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
       const resp = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          _t: pageLoad.value,
+          _website: "",
+        }),
       });
       if (!resp.ok) {
         const body = await resp.json().catch(() => ({}));
@@ -90,6 +97,19 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         </p>
 
         <form onSubmit={handleSubmit} class="max-w-lg mx-auto space-y-4">
+          {/* Honeypot — off-screen so bots fill it, humans never see */}
+          <div class="absolute -left-[9999px]" aria-hidden="true">
+            <label for="lead-website">Website</label>
+            <input
+              id="lead-website"
+              name="_website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value=""
+            />
+          </div>
+
           <div>
             <label for="lead-name" class="sr-only">Your name</label>
             <input
