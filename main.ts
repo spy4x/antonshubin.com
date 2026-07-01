@@ -29,6 +29,7 @@ app.use(async (ctx) => {
 
   // Staging: cache assets but NOT HTML (instant feedback on deploys)
   if (isStaging) {
+    resp.headers.set("X-Robots-Tag", "noindex, nofollow");
     if (isAsset(url)) {
       resp.headers.set(
         "Cache-Control",
