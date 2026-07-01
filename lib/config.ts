@@ -6,6 +6,12 @@ export const PLAUSIBLE_URL = Deno.env.get("PLAUSIBLE_URL") || "";
 export const UMAMI_URL = Deno.env.get("UMAMI_URL") || "";
 export const UMAMI_ID = Deno.env.get("UMAMI_ID") || "";
 
+export const CONTACT_EMAIL = Deno.env.get("CONTACT_EMAIL") || "";
+export const SMTP_HOST = Deno.env.get("SMTP_HOST") || "";
+export const SMTP_PORT = parseInt(Deno.env.get("SMTP_PORT") || "587");
+export const SMTP_FROM = Deno.env.get("SMTP_FROM") || "";
+export const SMTP_USERNAME = Deno.env.get("SMTP_USERNAME") || "";
+export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
 export const SAME_AS_URLS = [
   "https://www.upwork.com/freelancers/ashubin",
   "https://github.com/spy4x",
