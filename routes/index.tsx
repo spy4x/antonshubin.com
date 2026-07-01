@@ -4,6 +4,7 @@ import { Layout } from "../components/Layout.tsx";
 import { CTASection } from "../components/CTASection.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { blogArticles, prettyDate, youtubeVideos } from "../lib/data.ts";
+import LeadForm from "../islands/LeadForm.tsx";
 import {
   CalendarIcon,
   GithubIcon,
@@ -453,103 +454,9 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
-        {/* G1: Free Architecture Audit Lead Magnet */}
+        {/* G1: Free Architecture Audit Lead Magnet — interactive form */}
         <section class="mb-16 md:mb-24">
-          <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 sm:p-6 text-center">
-            <div class="text-3xl mb-4">🔍</div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
-              Not sure where to start?
-            </h2>
-            <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
-              Send me your current tech stack or idea — I'll send back 3
-              concrete architectural improvements within 48 hours.
-              <span class="text-orange-400 font-semibold block sm:inline">
-                No cost.
-              </span>{" "}
-              <span class="text-orange-400 font-semibold block sm:inline">
-                No commitment.
-              </span>
-            </p>
-            <a
-              href="/contact-me"
-              class="inline-block px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
-            >
-              Send my stack for audit →
-            </a>
-            <p class="text-gray-400 text-sm mt-3">
-              I'll respond within 48 hours. No sales pitch — just honest
-              architectural feedback.
-            </p>
-            <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-5 text-gray-500 text-xs">
-              <span class="inline-flex items-center gap-1">
-                <svg
-                  class="w-3.5 h-3.5 text-green-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Expert-Vetted (Top 1%)
-              </span>
-              <span class="inline-flex items-center gap-1">
-                <svg
-                  class="w-3.5 h-3.5 text-green-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                80+ projects shipped
-              </span>
-              <span class="inline-flex items-center gap-1">
-                <svg
-                  class="w-3.5 h-3.5 text-green-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                100% Job Success
-              </span>
-              <span class="inline-flex items-center gap-1">
-                <svg
-                  class="w-3.5 h-3.5 text-green-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </span>
-            </div>
-          </div>
+          <LeadForm scheduleUrl={SCHEDULE_URL} />
         </section>
 
         {/* Featured Projects Section */}
