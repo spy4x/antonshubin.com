@@ -65,6 +65,7 @@ export const handler = define.handlers({
 
 ### Pages
 - **Home:** ${BASE_URL}/ — Main landing page with pain points, engagement terms, featured services
+- **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
 - **Catalog:** ${BASE_URL}/catalog — 7 fixed-price offerings
   - /catalog/strategy-call — Strategy Session ($350, 60 min)
   - /catalog/free-architecture-audit — Free Architecture Audit (free, 48h)

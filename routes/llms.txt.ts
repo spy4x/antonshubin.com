@@ -38,6 +38,7 @@ export const handler = define.handlers({
 ## Key Pages
 
 - Home: ${BASE_URL}/
+- SaaS Architecture Guide: ${BASE_URL}/saas-architecture-guide
 - Project Catalog: ${BASE_URL}/catalog
 - How I Work: ${BASE_URL}/how-i-work
 - Contact: ${BASE_URL}/contact-me
