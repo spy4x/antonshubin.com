@@ -1,23 +1,20 @@
-# Environment files
-.env
-.env.prod
-.env.*.local
 
-# Age encryption key (never commit!)
 .age/
-key.txt
-
-# Fresh build directory
-_fresh/
-
-# Local private files
-todos.md
-marketing-refactoring.md
+# Age encryption key (never commit!)
 anton-tasks.md
+data/subscribers.json
+.env
+# Environment files
+.env.*.local
+.env.prod
+_fresh/
+# Fresh build directory
+key.txt
+# Local private files
+marketing-refactoring.md
 neatsoft.dev.md
-.playwright-mcp/
-
-# npm + other dependencies
 node_modules/
+# npm + other dependencies
+.playwright-mcp/
+todos.md
 vendor/
-

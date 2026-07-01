@@ -1,9 +1,10 @@
-.git/
-.gitignore
-_fresh/
-node_modules/
-vendor/
-.playwright-mcp/
-todos.md
+data/subscribers.json
 .env
 .env.*
+_fresh/
+.git/
+.gitignore
+node_modules/
+.playwright-mcp/
+todos.md
+vendor/
