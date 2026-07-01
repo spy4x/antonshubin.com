@@ -48,7 +48,7 @@ export const handler = define.handlers({
 1. **Free Architecture Audit** — send your stack/idea, get 3 improvements in 48h, no cost
 2. **Strategy Session** — $350 for a 60-minute deep-dive with actionable advice
 3. **Fixed-Price Milestones** — scope locked on funding, predictable delivery (preferred for new projects, MVPs, audits, catalog items)
-4. **Hourly Engagement** — available for staff augmentation, code reviews, advisory, or when scope is not fully clear yet. Transparent rate, no screen tracking.
+4. **Hourly Engagement** — available for staff augmentation, code reviews, advisory, or when scope is not fully clear yet. Transparent rate with clear time estimates.
 5. **V2 Backlog** — new features captured for later, no scope creep
 
 ## Policies (Why Founders Trust Me)
@@ -81,6 +81,13 @@ export const handler = define.handlers({
 
 ### Blog Posts
 ${blogList}
+
+### Open Source Projects
+- **caldav-mcp** (${DOMAIN}/projects/caldav-mcp) — Native Deno MCP server for CalDAV. Events + tasks, zero npm deps, single binary. Works with Claude Desktop, Cursor, Open WebUI, and OpenCode.
+- **Financy** (${DOMAIN}/projects/financy) — Self-hostable finance tracking with double-entry accounting, multi-currency, PWA.
+- **Homelab** (${DOMAIN}/projects/homelab) — Infrastructure-as-code framework for 20+ Docker services with Traefik, automated backups, monitoring.
+- **TodoApp** (${DOMAIN}/projects/todoapp-caldav) — Self-hosted CalDAV task manager PWA. No vendor lock-in.
+- **Air Quality Sensor** (${DOMAIN}/projects/air-quality-sensor) — DIY ESP32-based air quality monitor with Home Assistant integration.
 
 ### Tech Stack Used
 Deno, Node.js, TypeScript, Preact, React, Fresh, Hono, Angular, Svelte, PostgreSQL, Valkey/Redis, MongoDB, Firebase, Docker, Podman, Traefik, Hetzner, AWS, GCP, OpenAI, Claude, DeepSeek, Stripe, Tailwind CSS, WebSockets, PWA

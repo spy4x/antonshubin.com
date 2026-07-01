@@ -48,7 +48,7 @@ Three schemas in a `@graph` array:
 
 ### 6. FAQ Schema (routes/how-i-work.tsx)
 
-- FAQPage type with all 7 policies as Question/Answer pairs
+- FAQPage type with all 8 policies as Question/Answer pairs
 - Provides Google Rich Results for the /how-i-work page
 - AI crawlers parse this as canonical Q&A about engagement terms
 
