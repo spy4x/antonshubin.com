@@ -78,6 +78,7 @@ async function notifyOwner(lead: LeadPayload): Promise<void> {
     user: SMTP_USERNAME,
     password: SMTP_PASSWORD,
     ssl: SMTP_PORT === 465,
+    timeout: 10000,
   });
   console.log("[LEAD] client created, sending to " + CONTACT_EMAIL);
 
