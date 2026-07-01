@@ -116,7 +116,7 @@ export default define.page(function HowIWork() {
     ...head.value,
     title: "How I Deliver — Anton Shubin",
     description:
-      "Zero micromanagement. Complete transparency. Predictable outcomes.",
+      "Complete transparency. Predictable outcomes.",
     canonical: "https://antonshubin.com/how-i-work/",
     ogType: "website",
   };
@@ -149,7 +149,7 @@ export default define.page(function HowIWork() {
           How I Deliver
         </h1>
         <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg">
-          Zero micromanagement. Complete transparency. Predictable outcomes.
+          Complete transparency. Predictable outcomes.
         </p>
 
         <div class="space-y-8">

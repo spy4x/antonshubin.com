@@ -209,7 +209,7 @@ export default define.page(function Home(ctx) {
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">How I Deliver — The Terms of Engagement</h2>
           <p class="text-gray-400 mb-8 text-base sm:text-lg">
-            Zero micromanagement. Complete transparency.
+            Complete transparency. Predictable outcomes.
           </p>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <a
@@ -320,43 +320,40 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
-        {/* Why I Do This — psychologist recommendation */}
+        {/* Who This Is For */}
         <section class="mb-16 md:mb-24">
           <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row items-start gap-6">
-              <div class="text-4xl shrink-0">👨‍💻</div>
+              <div class="text-4xl shrink-0">🎯</div>
               <div>
                 <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  Why I Do This
+                  Who This Is For
                 </h2>
                 <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
-                  I started as an enterprise dev in 2010. Became a team lead.
-                  Hit the salary ceiling at $1000/month. Quit to freelance —
-                  almost went bankrupt. Couldn't afford a pizza. Parents gave me
-                  an ultimatum: one month to find a contract or go back to the
-                  office.
+                  You are a founder, CTO, or product owner who knows what good
+                  looks like — but your current team, contractor, or agency is
+                  not delivering it. Deadlines slip. The codebase accumulates
+                  tech debt faster than features. AWS bills climb while
+                  performance degrades. You need someone who takes ownership of
+                  outcomes, not hours.
                 </p>
                 <p class="text-gray-400 leading-relaxed mb-4">
-                  Found work on Upwork. Over eight years I went from $2/hour
-                  with zero English to $150/hour as a system architect leading
-                  teams. The secret? Taking responsibility for outcomes, not
-                  hours. One client told me I was the only dev willing to sit on
-                  a call and explain things until they made sense.
+                  You have a technical product — or are building one — and you
+                  need architectural leadership that bridges business goals and
+                  engineering reality. You value clear communication, predictable
+                  delivery, and a partner who explains complex tradeoffs in plain
+                  English instead of hiding behind jargon.
                 </p>
                 <p class="text-gray-400 leading-relaxed mb-4">
-                  Built my own startups too. Some failed — bad tech choices,
-                  over-engineering. I also fixed products dying because devs hid
-                  behind jargon or thought complexity was the goal.
+                  You want a system architect who aligns with your vision,
+                  owns the technical roadmap, and ships measurable results — on
+                  time, on budget, with no surprises.
                 </p>
                 <p class="text-gray-400 leading-relaxed">
-                  I've been the employee, the freelancer, the founder, the
-                  fixer. Eighty-plus projects across a decade and a half —
-                  software, electronics, infrastructure. I do this because I
-                  genuinely love tinkering until things click, and this corner
-                  of the internet is my workshop. No empire to sell, no
-                  newsletter to grow. Just a domain I own, code I'm proud of,
-                  and the quiet satisfaction of building systems that earn their
-                  keep.
+                  I work with funded startups, lean SaaS teams, and established
+                  businesses that have outgrown their current technical setup.
+                  If you are stuck between "it works" and "it scales" — this is
+                  the right place.
                 </p>
               </div>
             </div>
