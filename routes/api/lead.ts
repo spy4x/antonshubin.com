@@ -7,7 +7,6 @@ import {
   SMTP_PORT,
   SMTP_USERNAME,
 } from "../../lib/config.ts";
-import { SMTPClient } from "emailjs";
 
 interface LeadPayload {
   name: string;
@@ -45,18 +44,55 @@ function validate(payload: unknown): {
   };
 }
 
-function buildEmailHtml(lead: LeadPayload): string {
-  return [
-    "<h2>New Architecture Audit Request</h2>",
-    '<table style="border-collapse:collapse;width:100%;max-width:600px">',
-    `<tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Name</td><td style="padding:8px">${lead.name}</td></tr>`,
-    `<tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Email</td><td style="padding:8px">${lead.email}</td></tr>`,
-    `<tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Tech Stack / Idea</td><td style="padding:8px">${
-      lead.techStack.replace(/\n/g, "<br>")
-    }</td></tr>`,
-    "</table><hr>",
-    '<p style="color:#666;font-size:12px">Sent via antonshubin.com lead form</p>',
-  ].join("");
+// Send email via SMTP with TLS (port 465) using Deno's native TLS.
+// No npm deps — avoids Vite bundling issues with event-based libraries.
+async function sendMail(
+  to: string,
+  from: string,
+  subject: string,
+  text: string,
+): Promise<void> {
+  const conn = await Deno.connectTls({
+    hostname: SMTP_HOST,
+    port: SMTP_PORT,
+  });
+  const buf = new Uint8Array(4096);
+  const enc = new TextEncoder();
+
+  async function read(): Promise<string> {
+    const n = await conn.read(buf);
+    return new TextDecoder().decode(buf.subarray(0, n ?? 0));
+  }
+
+  async function cmd(line: string): Promise<string> {
+    await conn.write(enc.encode(line + "\r\n"));
+    return read();
+  }
+
+  // Read greeting
+  await read();
+  // EHLO
+  await cmd(`EHLO ${SMTP_HOST}`);
+  // AUTH LOGIN
+  await cmd("AUTH LOGIN");
+  await cmd(btoa(SMTP_USERNAME));
+  await cmd(btoa(SMTP_PASSWORD));
+  // MAIL FROM
+  await cmd(`MAIL FROM:<${from}>`);
+  // RCPT TO
+  await cmd(`RCPT TO:<${to}>`);
+  // DATA
+  await cmd("DATA");
+  // Body
+  await conn.write(
+    enc.encode(
+      `From: ${from}\r\nTo: ${to}\r\nSubject: ${subject}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n${text}\r\n.\r\n`,
+    ),
+  );
+  await read();
+  // QUIT
+  await cmd("QUIT");
+  conn.close();
 }
 
 // Notify the site owner about a new lead via SMTP.
@@ -71,29 +107,12 @@ async function notifyOwner(lead: LeadPayload): Promise<void> {
     return;
   }
 
-  console.log("[LEAD] SMTP_HOST=" + SMTP_HOST + " SMTP_PORT=" + SMTP_PORT);
-  const client = new SMTPClient({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    user: SMTP_USERNAME,
-    password: SMTP_PASSWORD,
-    ssl: SMTP_PORT === 465,
-    timeout: 10000,
-  });
-  console.log("[LEAD] client created, sending to " + CONTACT_EMAIL);
-
-  await client.sendAsync({
-    from: SMTP_FROM || SMTP_USERNAME,
-    to: [CONTACT_EMAIL],
-    replyTo: lead.email,
-    subject: `[Lead] Architecture audit request from ${lead.name}`,
-    text:
-      `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`,
-    attachment: [
-      { data: buildEmailHtml(lead), alternative: true },
-    ],
-  });
-  console.log("[LEAD] sendAsync completed");
+  console.log("[LEAD] sending via " + SMTP_HOST + ":" + SMTP_PORT);
+  const subject = `[Lead] Architecture audit request from ${lead.name}`;
+  const text =
+    `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`;
+  await sendMail(CONTACT_EMAIL, SMTP_FROM || SMTP_USERNAME, subject, text);
+  console.log("[LEAD] sent OK");
 }
 
 export const handler = define.handlers({
@@ -112,7 +131,7 @@ export const handler = define.handlers({
 
     // Fire notification but never block the response (fail-open).
     notifyOwner(result.data).catch((err) => {
-      console.error("[LEAD] notification failed:", err);
+      console.error("[LEAD] failed:", err);
     });
 
     return Response.json({ ok: true });

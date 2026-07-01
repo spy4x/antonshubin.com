@@ -29,7 +29,6 @@
     "@/": "./",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
-    "emailjs": "npm:emailjs@^5.0.1",
     "fresh": "jsr:@fresh/core@^2.2.0",
     "marked": "npm:marked@^17.0.1",
     "preact": "npm:preact@^10.27.2",
