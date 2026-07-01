@@ -478,7 +478,7 @@ export const blogArticles: BlogArticle[] = [
     title: "Setting Up Your Own CI/CD Server with Drone CI",
     slug: "setting-up-your-own-ci-cd-server-with-drone-ci",
     description:
-      "Streamline your software development process with Drone CI. Learn how to set up your own CI/CD server using Drone CI.",
+      "Running your own CI/CD with Drone CI on a $10 VPS. Docker Compose setup, pipeline config, GitHub integration — skip vendor lock-in, keep your builds private.",
     readTime: 5,
     publishedAt: "2023-02-12",
     previewImageURL: "preview.webp",
@@ -490,7 +490,7 @@ export const blogArticles: BlogArticle[] = [
       "How ChatGPT Can Help You Design System Architecture for Your Applications",
     slug: "how-chatgpt-can-help-you-design-system-architecture",
     description:
-      "Designing system architecture can be challenging for new developers. ChatGPT can simplify the process.",
+      "ChatGPT as your architecture copilot: generate system diagrams, compare databases, spot security gaps before they ship. Real prompts that work.",
     readTime: 5,
     publishedAt: "2023-04-18",
     previewImageURL: "preview.webp",
