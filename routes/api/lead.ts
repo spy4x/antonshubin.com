@@ -7,7 +7,7 @@ import {
   SMTP_PORT,
   SMTP_USERNAME,
 } from "../../lib/config.ts";
-import nodemailer from "nodemailer";
+import { SMTPClient } from "emailjs";
 
 interface LeadPayload {
   name: string;
@@ -46,17 +46,17 @@ function validate(payload: unknown): {
 }
 
 function buildEmailHtml(lead: LeadPayload): string {
-  return `
-<h2>New Architecture Audit Request</h2>
-<table style="border-collapse:collapse;width:100%;max-width:600px">
-  <tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Name</td><td style="padding:8px">${lead.name}</td></tr>
-  <tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Email</td><td style="padding:8px">${lead.email}</td></tr>
-  <tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Tech Stack / Idea</td><td style="padding:8px">${
-    lead.techStack.replace(/\n/g, "<br>")
-  }</td></tr>
-</table>
-<hr>
-<p style="color:#666;font-size:12px">Sent via antonshubin.com lead form</p>`;
+  return [
+    "<h2>New Architecture Audit Request</h2>",
+    '<table style="border-collapse:collapse;width:100%;max-width:600px">',
+    `<tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Name</td><td style="padding:8px">${lead.name}</td></tr>`,
+    `<tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Email</td><td style="padding:8px">${lead.email}</td></tr>`,
+    `<tr><td style="padding:8px;font-weight:bold;background:#f5f5f5">Tech Stack / Idea</td><td style="padding:8px">${
+      lead.techStack.replace(/\n/g, "<br>")
+    }</td></tr>`,
+    "</table><hr>",
+    '<p style="color:#666;font-size:12px">Sent via antonshubin.com lead form</p>',
+  ].join("");
 }
 
 // Notify the site owner about a new lead via SMTP.
@@ -68,21 +68,32 @@ async function notifyOwner(lead: LeadPayload): Promise<void> {
     return;
   }
 
-  const transporter = nodemailer.createTransport({
+  const client = new SMTPClient({
     host: SMTP_HOST,
     port: SMTP_PORT,
-    secure: SMTP_PORT === 465,
-    auth: { user: SMTP_USERNAME, pass: SMTP_PASSWORD },
+    user: SMTP_USERNAME,
+    password: SMTP_PASSWORD,
+    ssl: SMTP_PORT === 465,
   });
 
-  await transporter.sendMail({
-    from: SMTP_FROM || SMTP_USERNAME,
-    to: CONTACT_EMAIL,
-    replyTo: lead.email,
-    subject: `[Lead] Architecture audit request from ${lead.name}`,
-    text:
-      `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`,
-    html: buildEmailHtml(lead),
+  await new Promise<void>((resolve, reject) => {
+    client.send(
+      {
+        from: SMTP_FROM || SMTP_USERNAME,
+        to: CONTACT_EMAIL,
+        replyTo: lead.email,
+        subject: `[Lead] Architecture audit request from ${lead.name}`,
+        text:
+          `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`,
+        attachment: [
+          { data: buildEmailHtml(lead), alternative: true },
+        ],
+      },
+      (err) => {
+        if (err) reject(err);
+        else resolve();
+      },
+    );
   });
 }
 
