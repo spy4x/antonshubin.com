@@ -5,6 +5,7 @@ import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { marked } from "marked";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
+import NewsletterForm from "../../islands/NewsletterForm.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
@@ -376,6 +377,19 @@ export default define.page(function BlogArticle(ctx) {
                 Email
               </a>
             </div>
+          </div>
+
+          {/* Newsletter signup */}
+          <div class="px-8 py-5 bg-gray-800 border-t border-gray-700">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <span class="text-gray-300 text-sm font-medium shrink-0">
+                Get new posts via email:
+              </span>
+              <NewsletterForm />
+            </div>
+            <p class="text-gray-600 text-xs mt-2">
+              No spam. Unsubscribe anytime.
+            </p>
           </div>
 
           {/* Footer CTA */}

@@ -50,6 +50,12 @@ export const handler = define.handlers({
         changefreq: "monthly",
         lastmod: undefined,
       },
+      {
+        loc: "/saas-architecture-guide",
+        priority: "0.9",
+        changefreq: "monthly",
+        lastmod: undefined,
+      },
     ];
 
     const blogUrls = blogArticles.map((a) => ({
