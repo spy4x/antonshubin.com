@@ -71,14 +71,14 @@ for (const sub of subs) {
     const conn = await Deno.connectTls({ hostname: host, port });
     const buf = new Uint8Array(4096);
     const enc = new TextEncoder();
-    async function read() {
+    const read = async () => {
       const n = await conn.read(buf);
       return new TextDecoder().decode(buf.subarray(0, n ?? 0));
-    }
-    async function cmd(line: string) {
+    };
+    const cmd = async (line: string) => {
       await conn.write(enc.encode(line + "\r\n"));
       return read();
-    }
+    };
 
     await read();
     await cmd(`EHLO ${host}`);

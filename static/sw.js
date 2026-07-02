@@ -1,5 +1,5 @@
 // Cache version — bump on each deploy where sw.js changes
-const CACHE = "antonshubin-v54";
+const CACHE = "antonshubin-v55";
 
 const PRECACHE_URLS = [
   "/",
