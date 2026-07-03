@@ -2,6 +2,7 @@ import { useSignal } from "@preact/signals";
 import {
   BriefcaseIcon,
   CloseIcon,
+  CodeIcon,
   FolderIcon,
   GridIcon,
   MailIcon,
@@ -46,6 +47,11 @@ const links: NavLink[] = [
     icon: <ServerIcon class="w-5 h-5" />,
   },
   { href: "/blog", label: "Blog", icon: <PenIcon class="w-5 h-5" /> },
+  {
+    href: "/hackathons",
+    label: "Hackathons",
+    icon: <CodeIcon class="w-5 h-5" />,
+  },
 ];
 
 export default function Menu(

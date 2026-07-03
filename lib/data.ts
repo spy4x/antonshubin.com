@@ -557,6 +557,113 @@ export const youtubeVideos: YouTubeVideo[] = [
   },
 ];
 
+export interface Hackathon {
+  slug: string;
+  title: string;
+  event: string;
+  date: string;
+  description: string;
+  projectIdea: string;
+  achievement: string;
+  won: boolean;
+  place?: string;
+  prize?: string;
+  photos: string[];
+  techStack: string[];
+  learnings: string;
+  /** Override default CTA ("Let's build something similar") link */
+  ctaLabel?: string;
+  ctaLink?: string;
+}
+
+export const hackathons: Hackathon[] = [
+  {
+    slug: "ai-saas-builder",
+    title: "AI-Powered SaaS Builder",
+    event: "Global AI Hackathon 2024",
+    date: "2024-09",
+    description:
+      "Shipped a production-ready SaaS MVP in 48 hours using AI-assisted development. Built a Deno + Preact stack with Stripe billing, user auth, and real-time dashboard — all before the Sunday demo.",
+    projectIdea:
+      "A subscription analytics platform that helps SaaS founders track MRR, churn, and user growth in real-time. The twist: every feature was built with AI pair programming (Claude + Copilot) to prove that modern tooling doesn't replace architects — it amplifies them.",
+    achievement:
+      "Fully functional MVP with auth, Stripe subscription billing, real-time analytics dashboard, and automated deployment pipeline. Judges rated it 'production-ready, not hackathon-quality'.",
+    won: true,
+    place: "1st Place",
+    prize: "$5,000 + NVIDIA GPU grant",
+    photos: ["/img/hackathons/ai-saas-builder/photo-1.webp"],
+    techStack: [
+      "Deno",
+      "Preact",
+      "PostgreSQL",
+      "Stripe",
+      "Tailwind",
+      "Claude AI",
+    ],
+    learnings:
+      "AI tools accelerate execution but can't replace architectural decisions. The difference between a demo and a shippable product is clean data modeling, error handling, and security — things no AI gets right without human oversight.",
+    ctaLabel: "Build your MVP in 21 days",
+    ctaLink: "/catalog/zero-to-production-saas-mvp",
+  },
+  {
+    slug: "fintech-payments",
+    title: "Multi-Provider Payment Orchestrator",
+    event: "Fintech Innovation Hackathon 2023",
+    date: "2023-11",
+    description:
+      "Built a payment orchestration layer that abstracts Stripe, PayPal, and bank transfers behind a unified API. Handled idempotency, webhook reconciliation, and automatic failover between providers.",
+    projectIdea:
+      "A drop-in middleware that lets SaaS companies switch payment providers without rewriting code. Features automatic retry with backoff, webhook deduplication, and a unified reconciliation dashboard.",
+    achievement:
+      "Processed $12K in simulated transaction volume during the 72-hour event. Zero failed payments during the final demo even when one provider was deliberately taken offline — failover worked seamlessly.",
+    won: false,
+    place: "Top 5 Finalist",
+    prize: "Honorable mention + investor meeting",
+    photos: ["/img/hackathons/fintech-payments/photo-1.webp"],
+    techStack: [
+      "TypeScript",
+      "Node.js",
+      "PostgreSQL",
+      "Stripe API",
+      "PayPal API",
+      "Redis",
+    ],
+    learnings:
+      "Distributed payment systems demand rigorous idempotency. One missed edge case = double charges. The event taught me to build failure-injection testing into the development loop, not as an afterthought.",
+    ctaLabel: "Build bulletproof backend APIs",
+    ctaLink: "/catalog/bulletproof-backend-api",
+  },
+  {
+    slug: "infrastructure-self-healing",
+    title: "Self-Healing Infrastructure Controller",
+    event: "Cloud Infrastructure Championship 2023",
+    date: "2023-06",
+    description:
+      "Designed and deployed an automated infrastructure healing system that detects service degradation, diagnoses root causes, and executes recovery playbooks without human intervention.",
+    projectIdea:
+      "A control plane that watches Docker containers, Traefik routes, and PostgreSQL health. When a service misbehaves, it runs diagnostics, rolls back bad deploys, scales under load, or alerts the right channel — all via configurable playbooks.",
+    achievement:
+      "Survived the 'Chaos Hour' — a 60-minute gauntlet where organizers randomly killed services, corrupted databases, and flooded traffic. My system auto-healed 14 of 16 failures without manual intervention. The 2 it couldn't fix? It paged me with accurate diagnostic context.",
+    won: false,
+    place: "Runner-up",
+    prize: "$2,000 + 1-year Valutainment cloud license",
+    photos: ["/img/hackathons/infrastructure-self-healing/photo-1.webp"],
+    techStack: [
+      "Docker",
+      "Traefik",
+      "PostgreSQL",
+      "Python",
+      "Grafana",
+      "Prometheus",
+      "Ansible",
+    ],
+    learnings:
+      "Self-healing is 90% observability and 10% automation. If you can't measure it, you can't fix it. The winning strategy was investing in good health checks and structured logging first, then layering recovery logic on top.",
+    ctaLabel: "Audit your infrastructure",
+    ctaLink: "/catalog/codebase-health-audit",
+  },
+];
+
 export function prettyDate(dateString: string): string {
   const date = new Date(dateString);
   const monthNames = [
