@@ -73,7 +73,7 @@ export async function handler(
   }
 
   // ── Strip analytics scripts for known bots ────────────
-  // Prevents crawler pageviews from inflating Umami/Plausible stats.
+  // Prevents crawler pageviews from inflating Umami stats.
   // Without this, AI crawlers (which we welcome via robots.txt) execute
   // JS and register as real "Chrome" visitors, skewing everything.
   if (isCrawler && isHtmlPage) {
@@ -82,11 +82,6 @@ export async function handler(
       // Remove Umami tracker
       .replace(
         /<script\s+defer\s+src="[^"]*"\s+data-website-id="[^"]*"\s*><\/script>/gi,
-        "",
-      )
-      // Remove Plausible tracker
-      .replace(
-        /<script\s+defer\s+data-domain="[^"]*"\s+src="[^"]*"\s*><\/script>/gi,
         "",
       );
     return new Response(clean, {

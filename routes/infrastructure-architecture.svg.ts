@@ -56,7 +56,7 @@ export const handler = define.handlers({
   <text x="310" y="434" fill="#cbd5e1" font-family="system-ui" font-size="11">Paperless-ngx (docs)</text>
   <text x="310" y="452" fill="#cbd5e1" font-family="system-ui" font-size="11">Gitea (Git)</text>
   <text x="310" y="470" fill="#cbd5e1" font-family="system-ui" font-size="11">Home Assistant</text>
-  <text x="310" y="488" fill="#cbd5e1" font-family="system-ui" font-size="11">Plausible + Umami</text>
+  <text x="310" y="488" fill="#cbd5e1" font-family="system-ui" font-size="11">Umami</text>
   <text x="310" y="506" fill="#cbd5e1" font-family="system-ui" font-size="11">+ 30 more services</text>
 
   <rect x="504" y="325" width="195" height="310" rx="8" fill="#334155" stroke="#475569" stroke-width="1"/>

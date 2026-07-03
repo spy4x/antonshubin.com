@@ -32,7 +32,7 @@ const services = [
   ["Calendly / Radicale", "Calendar sync", "📅"],
   ["Firefly III", "Finance tracking", "💰"],
   ["Monica", "CRM / relationship manager", "👥"],
-  ["Plausible + Umami", "Web analytics", "📊"],
+  ["Umami", "Web analytics", "📊"],
   ["Watchtower", "Auto container updates", "🔄"],
   ["Cloudflared", "Cloudflare Tunnel", "☁️"],
   ["Stalwart Mail", "Mail server", "📧"],
