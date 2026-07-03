@@ -3,6 +3,17 @@ import type { State } from "./lib/utils.ts";
 
 export const app = new App<State>();
 
+// www → non-www redirect (301 permanent)
+app.use(async (ctx) => {
+  const hostname = ctx.url.hostname;
+  if (hostname.startsWith("www.")) {
+    const target = new URL(ctx.url);
+    target.hostname = hostname.slice(4);
+    return Response.redirect(target.toString(), 301);
+  }
+  return await ctx.next();
+});
+
 // Core static page routes that change infrequently (cached 3 days at edge).
 const CORE_PAGES = new Set([
   "/",

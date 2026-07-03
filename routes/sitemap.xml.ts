@@ -78,10 +78,13 @@ export const handler = define.handlers({
     const catalogSlugs = [
       "strategy-call",
       "free-architecture-audit",
+      "technical-discovery-sprint",
       "zero-to-production-saas-mvp",
       "bulletproof-backend-api",
       "surgical-ai-integration",
       "codebase-health-audit",
+      "mcp-server-development",
+      "cto-advisory-retainer",
       "post-launch-support-maintenance",
     ];
     const catalogUrls = catalogSlugs.map((s) => ({
