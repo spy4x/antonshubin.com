@@ -77,6 +77,7 @@ that subdirectory and do ALL work there.
 | `chore/`    | Tooling, deps, CI, config                |
 | `docs/`     | Documentation only                       |
 | `style/`    | Formatting, styling, design tweaks       |
+| `ci/`       | CI/CD pipeline changes                   |
 
 Examples:
 
@@ -162,6 +163,39 @@ convention for the issue title as you would for a commit.
 Never create a second PR for the same task. Push additional commits to the same
 branch and the PR updates automatically.
 
+### PR Discipline (MANDATORY)
+
+**A PR MUST exist at all times when working on a task.** Never work without one.
+
+1. **Create the PR immediately** after the first commit — even if the task is
+   incomplete.
+2. **Prefix the title with `[WIP]`** if the task is not yet complete.
+3. **Update the PR after every human interaction** — if the human gives
+   feedback, comments, or new information, push a new commit and update the PR
+   body.
+4. **Remove `[WIP]` only when the task is fully complete** and ready for final
+   review.
+5. **Keep the PR body accurate** — reflect the current state, known issues, and
+   next steps.
+
+This ensures the human can always see what's been done, what's pending, and
+review intermediate progress.
+
+**Create the PR immediately after pushing — never ask "do you want a PR?".**
+Just run `gh pr create --fill` and report the link.
+
+### Deploy & Verify (REQUIRED)
+
+**Before committing or reporting "done", you MUST:**
+
+1. Deploy to production: `deno task deploy`
+2. Verify the site starts, stays healthy, and the fix/feature actually works as
+   expected
+3. Only after verification passes, commit and push
+
+This applies to any change that affects deployed routes or content. Trivial
+doc-only changes can skip this step.
+
 ---
 
 ## ✅ Pre-Commit Checklist (MANDATORY)
@@ -237,24 +271,33 @@ This prevents stale worktree directories from accumulating.
 └── compose.yml     # Docker Compose + Traefik labels
 ```
 
-## Commands
+## Quick Start Commands
+
+### Essential Development Commands
 
 ```bash
 deno task dev       # Dev server at localhost:5173 (HMR)
 deno task build     # Production build via Vite
 deno task start     # Run production server
 deno task check     # fmt + lint + type check
-deno task deploy    # Rsync to homelab + Docker rebuild
 ```
 
-## Deploy
+### Deployment
 
 ```bash
-deno task deploy
+deno task deploy           # production → antonshubin.com
+deno task deploy:stag      # staging   → website-stag.antonshubin.com
 ```
 
 Manual: rsync to homelab, then `docker compose up -d --build`. See
 [docs/deploy.md](docs/deploy.md) for details.
+
+### Infrastructure & Operations
+
+```bash
+deno task env:encrypt      # Encrypt .env files to .env.age
+deno task env:decrypt      # Decrypt .env.age files to .env
+```
 
 ## Code Style
 
@@ -280,6 +323,19 @@ Manual: rsync to homelab, then `docker compose up -d --build`. See
 7. **Auditability** — small, focused commits
 8. **Analytics via env vars** — Umami URLs and IDs go in `lib/config.ts`, read
    from `.env`. Never hardcode analytics scripts or IDs in `_app.tsx`.
+
+## Testing
+
+- Uses Deno's built-in test runner
+- Test files: `*.test.ts` pattern
+- Run tests with `deno test`
+- Currently limited coverage — tests encouraged but not required
+
+## CI/CD
+
+- No automated CI/CD currently
+- Manual checks via `deno task check`
+- Focus on local development and manual deployment
 
 ## AI Crawler Optimization (SEO)
 

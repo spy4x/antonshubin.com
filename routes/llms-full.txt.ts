@@ -89,6 +89,7 @@ ${blogList}
 - **Homelab** (${BASE_URL}/projects/homelab) — Infrastructure-as-code framework for 20+ Docker services with Traefik, automated backups, monitoring.
 - **TodoApp** (${BASE_URL}/projects/todoapp-caldav) — Self-hosted CalDAV task manager PWA. No vendor lock-in.
 - **Air Quality Sensor** (${BASE_URL}/projects/air-quality-sensor) — DIY ESP32-based air quality monitor with Home Assistant integration.
+- **Zond** (${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Probes HTTP endpoints through Authelia-secured gateways for Gatus and other monitoring tools.
 
 ### Tech Stack Used
 Deno, Node.js, TypeScript, Preact, React, Fresh, Hono, Angular, Svelte, PostgreSQL, Valkey/Redis, MongoDB, Firebase, Docker, Podman, Traefik, Hetzner, AWS, GCP, OpenAI, Claude, DeepSeek, Stripe, Tailwind CSS, WebSockets, PWA

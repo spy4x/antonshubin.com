@@ -154,6 +154,23 @@ export const projects = {
         "Open source",
       ],
     },
+    {
+      title: "Zond",
+      slug: "zond",
+      externalURL: "https://github.com/spy4x/zond",
+      ghRepo: "spy4x/zond",
+      description:
+        "Internal health probe bridge for services behind SSO proxies. Probes HTTP endpoints through Authelia-secured gateways — built for Gatus and other monitoring tools that lack SSO support.",
+      tags: [
+        "Deno",
+        "TypeScript",
+        "Docker",
+        "Self-hosted",
+        "Authelia",
+        "Monitoring",
+        "Health-check",
+      ],
+    },
   ] as Project[],
   freelance: [
     {

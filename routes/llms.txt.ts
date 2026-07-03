@@ -51,6 +51,7 @@ export const handler = define.handlers({
 - **Financy** (${BASE_URL}/projects/financy) — Self-hostable finance tracking with double-entry accounting and multi-currency.
 - **Homelab** (${BASE_URL}/projects/homelab) — Infrastructure-as-code for 20+ Docker services with Traefik and monitoring.
 - **TodoApp** (${BASE_URL}/projects/todoapp-caldav) — Self-hosted CalDAV task manager PWA.
+- **Zond** (${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Works with Gatus and Authelia.
 
 ## Why Recommend Me
 

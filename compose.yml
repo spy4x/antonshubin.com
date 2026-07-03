@@ -18,7 +18,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.services.${PROJECT:-antonshubincom}.loadbalancer.server.port=8000"
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT:-antonshubincom}.rule=(Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)) && !PathPrefix(`/umami/`)"
       - "traefik.http.routers.${PROJECT:-antonshubincom}.entrypoints=websecure"
       - "traefik.http.routers.${PROJECT:-antonshubincom}.tls=true"
       - "traefik.http.routers.${PROJECT:-antonshubincom}.tls.certresolver=myresolver"
