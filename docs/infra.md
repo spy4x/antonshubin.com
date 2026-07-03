@@ -6,7 +6,7 @@ Production architecture on homelab.
 
 | Layer     | What                                       |
 | --------- | ------------------------------------------ |
-| Runtime   | `denoland/deno:2.3.1`                      |
+| Runtime   | `denoland/deno:2.9.0`                      |
 | Framework | Fresh 2.2 (SSR)                            |
 | Build     | Vite 7 + Tailwind 4                        |
 | Container | Docker Compose                             |
