@@ -52,7 +52,7 @@ export default function SWUpdater() {
       <button
         type="button"
         onClick={reload}
-        class="ml-auto sm:ml-0 cursor-pointer rounded bg-white px-3 py-1 text-sm font-semibold text-orange-600 hover:bg-orange-100"
+        class="ml-auto sm:ml-0 cursor-pointer rounded bg-white px-3 py-1 text-sm font-semibold text-gray-900 hover:bg-orange-100"
       >
         Reload
       </button>
