@@ -52,17 +52,16 @@ export default define.page(function CatalogDetail(ctx) {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Service",
-            "@id": `https://antonshubin.com/catalog/${item.slug}/#service`,
+            "@type": "Product",
+            "@id": `https://antonshubin.com/catalog/${item.slug}/#product`,
             "name": item.title,
             "description": item.desc,
-            "serviceType": "Fractional CTO & SaaS Architecture",
             "image": "https://antonshubin.com/img/photo-big.webp",
-            "provider": {
-              "@type": "Person",
-              "@id": "https://antonshubin.com/#person",
+            "brand": {
+              "@type": "Brand",
               "name": "Anton Shubin",
             },
+            "category": "Fractional CTO & SaaS Architecture",
             "areaServed": { "@type": "Place", "name": "Worldwide" },
             "aggregateRating": {
               "@type": "AggregateRating",
