@@ -1,5 +1,5 @@
 import { define } from "../lib/utils.ts";
-import { PLAUSIBLE_URL, UMAMI_ID, UMAMI_URL } from "../lib/config.ts";
+import { UMAMI_ID, UMAMI_URL } from "../lib/config.ts";
 import SWUpdater from "../islands/SWUpdater.tsx";
 import { resetHead } from "../lib/head.ts";
 
@@ -45,9 +45,6 @@ export default define.page(function App({ Component }) {
         <meta name="mobile-web-app-capable" content="yes" />
 
         {/* Analytics */}
-        {PLAUSIBLE_URL && (
-          <script defer data-domain="antonshubin.com" src={PLAUSIBLE_URL} />
-        )}
         {UMAMI_URL && UMAMI_ID && (
           <script defer src={UMAMI_URL} data-website-id={UMAMI_ID} />
         )}

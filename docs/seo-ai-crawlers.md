@@ -66,11 +66,8 @@ Three schemas in a `@graph` array:
 
 ## Analytics Configuration
 
-Analytics (Plausible + Umami) are configured via environment variables in
-`lib/config.ts`:
+Analytics (Umami) is configured via environment variables in `lib/config.ts`:
 
-- `PLAUSIBLE_URL` — Plausible script URL (e.g.
-  `https://analytics.antonshubin.com/js/script.js`)
 - `UMAMI_URL` — Umami script URL (e.g.
   `https://stats.antonshubin.com/script.js`)
 - `UMAMI_ID` — Umami website ID
