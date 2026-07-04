@@ -91,23 +91,28 @@ export default define.page(function CatalogDetail(ctx) {
                 "hasMerchantReturnPolicy": {
                   "@type": "MerchantReturnPolicy",
                   "applicableCountry": {
-                    "@type": "Place",
+                    "@type": "Country",
                     "name": "Worldwide",
                   },
                   "returnPolicyCategory":
                     "https://schema.org/MerchantReturnFiniteReturnWindow",
                   "merchantReturnDays": 14,
-                  "returnMethod": "https://schema.org.ReturnByMail",
-                  "returnFees": "https://schema.org.FreeReturn",
+                  "returnMethod": "https://schema.org/ReturnByMail",
+                  "returnFees": "https://schema.org/FreeReturn",
                   "returnPolicyCountry": {
-                    "@type": "Place",
+                    "@type": "Country",
                     "name": "Worldwide",
                   },
                 },
                 "shippingDetails": {
                   "@type": "OfferShippingDetail",
+                  "shippingRate": {
+                    "@type": "MonetaryAmount",
+                    "value": "0",
+                    "currency": "USD",
+                  },
                   "shippingDestination": {
-                    "@type": "Place",
+                    "@type": "DefinedRegion",
                     "name": "Worldwide",
                   },
                   "deliveryTime": {
