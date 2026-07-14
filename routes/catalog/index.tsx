@@ -14,6 +14,7 @@ export interface CatalogItem {
   desc: string;
   outcome: string;
   includes: string[];
+  exclusions?: string[];
   tech: string[];
   upworkUrl?: string;
   audience: string;
@@ -112,12 +113,20 @@ export const items: CatalogItem[] = [
     outcome:
       "A live, revenue-ready product in 21 days. Real users, real payments, real traction — without building an in-house team.",
     includes: [
-      "User authentication (email/social login)",
-      "Payment integration (Stripe)",
-      "REST API with 10+ endpoints",
-      "Admin dashboard",
-      "Docker deployment on your server",
-      "30-day code warranty",
+      "User authentication (email + social login, password reset, sessions)",
+      "Stripe payments (Checkout + customer portal, subscriptions, webhooks)",
+      "REST API with auth-protected endpoints + OpenAPI docs",
+      "Admin dashboard (user management, content moderation, basic analytics)",
+      "Docker deployment on your server (staging + production)",
+      "CI/CD pipeline + automated backups",
+      "30-day code warranty + handoff walkthrough",
+    ],
+    exclusions: [
+      "Native mobile apps (iOS/Android) — web-responsive only",
+      "Third-party SaaS integrations beyond Stripe (CRM, email tools, etc. quoted separately)",
+      "Post-launch feature additions — captured in a V2 Backlog at fixed price",
+      "Design/branding work beyond system defaults — UI tokens and components included, not custom illustrations",
+      "Ongoing maintenance — see Post-Launch Support ($400/mo) for that",
     ],
     tech: ["Deno", "Preact", "PostgreSQL", "Docker", "Stripe"],
     upworkUrl: UPWORK_URL,
@@ -391,6 +400,24 @@ export default define.page(function Catalog() {
                       </li>
                     ))}
                   </ul>
+                  {item.exclusions && item.exclusions.length > 0 && (
+                    <details class="mt-3">
+                      <summary class="text-gray-500 text-xs cursor-pointer hover:text-gray-400 transition-colors">
+                        Not included
+                      </summary>
+                      <ul class="mt-2 space-y-1.5">
+                        {item.exclusions.map((exc, j) => (
+                          <li
+                            key={j}
+                            class="text-gray-500 text-xs flex items-start gap-2"
+                          >
+                            <span class="text-gray-600 shrink-0">×</span>
+                            {exc}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
                 </details>
 
                 <div class="flex flex-wrap gap-2 mb-5">

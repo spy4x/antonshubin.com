@@ -244,6 +244,30 @@ export default define.page(function CatalogDetail(ctx) {
             </ul>
           </div>
 
+          {/* Not included (exclusions) */}
+          {item.exclusions && item.exclusions.length > 0 && (
+            <div class="mb-8">
+              <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <span class="text-gray-500">×</span> Not included
+              </h2>
+              <ul class="space-y-2">
+                {item.exclusions.map((exc, j) => (
+                  <li
+                    key={j}
+                    class="text-gray-500 flex items-start gap-2 text-sm"
+                  >
+                    <span class="text-gray-600 shrink-0 mt-0.5">×</span>
+                    {exc}
+                  </li>
+                ))}
+              </ul>
+              <p class="text-gray-500 text-xs mt-3 italic">
+                Need something not listed? Most items can be added as a
+                fixed-price milestone — get in touch for a custom quote.
+              </p>
+            </div>
+          )}
+
           {/* Tech stack */}
           <div class="mb-8">
             <h2 class="text-lg font-semibold text-white mb-3">Tech Stack</h2>
