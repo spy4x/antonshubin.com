@@ -44,6 +44,7 @@ export const handler = define.handlers({
 - Contact: ${BASE_URL}/contact-me
 - Blog: ${BASE_URL}/blog
 - Portfolio: ${BASE_URL}/projects
+- Hackathons: ${BASE_URL}/hackathons
 
 ## Open Source Projects
 

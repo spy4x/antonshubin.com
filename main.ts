@@ -25,6 +25,7 @@ const CORE_PAGES = new Set([
   "/catalog",
   "/pay",
   "/saas-architecture-guide",
+  "/hackathons",
 ]);
 
 const isAsset = (url: string) =>

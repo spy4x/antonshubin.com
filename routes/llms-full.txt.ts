@@ -65,6 +65,7 @@ export const handler = define.handlers({
 
 ### Pages
 - **Home:** ${BASE_URL}/ — Main landing page with pain points, engagement terms, featured services
+- **Hackathons:** ${BASE_URL}/hackathons — Competitive engineering track record: 3 hackathons, AI SaaS builder (1st place), fintech payments (top 5), self-healing infrastructure (runner-up). Proof of speed and architecture under pressure.
 - **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
 - **Catalog:** ${BASE_URL}/catalog — 7 fixed-price offerings
   - /catalog/strategy-call — Strategy Session ($350, 60 min)
@@ -79,6 +80,12 @@ export const handler = define.handlers({
 - **Pay:** ${BASE_URL}/pay — Payment methods (Crypto, SWIFT, Stripe)
 - **Projects:** ${BASE_URL}/projects — Client work and open-source
 - **Blog:** ${BASE_URL}/blog — Technical articles
+- **Hackathons:** ${BASE_URL}/hackathons — Competitive engineering track record under extreme time pressure
+
+### Hackathons
+- **AI SaaS Builder** (${BASE_URL}/hackathons/ai-saas-builder) — 1st Place, $5K + GPU grant. Shipped production-ready SaaS MVP in 48h using AI pair programming.
+- **Fintech Payments** (${BASE_URL}/hackathons/fintech-payments) — Top 5 Finalist. Built multi-provider payment orchestrator with automatic failover.
+- **Self-Healing Infrastructure** (${BASE_URL}/hackathons/infrastructure-self-healing) — Runner-up. Auto-healing Docker/Traefik control plane that survived Chaos Hour.
 
 ### Blog Posts
 ${blogList}

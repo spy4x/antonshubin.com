@@ -1,5 +1,5 @@
 import { define } from "../lib/utils.ts";
-import { blogArticles } from "../lib/data.ts";
+import { blogArticles, hackathons } from "../lib/data.ts";
 import { projects } from "../lib/data.ts";
 import { BASE_URL } from "../lib/config.ts";
 
@@ -56,6 +56,12 @@ export const handler = define.handlers({
         changefreq: "monthly",
         lastmod: undefined,
       },
+      {
+        loc: "/hackathons",
+        priority: "0.7",
+        changefreq: "monthly",
+        lastmod: undefined,
+      },
     ];
 
     const blogUrls = blogArticles.map((a) => ({
@@ -94,7 +100,20 @@ export const handler = define.handlers({
       lastmod: undefined as string | undefined,
     }));
 
-    const all = [...staticPages, ...blogUrls, ...projectUrls, ...catalogUrls];
+    const hackathonUrls = hackathons.map((h) => ({
+      loc: `/hackathons/${h.slug}`,
+      priority: "0.6",
+      changefreq: "monthly" as const,
+      lastmod: undefined as string | undefined,
+    }));
+
+    const all = [
+      ...staticPages,
+      ...blogUrls,
+      ...projectUrls,
+      ...catalogUrls,
+      ...hackathonUrls,
+    ];
 
     const urls = all.map((u) => `
     <url>
