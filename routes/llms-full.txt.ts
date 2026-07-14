@@ -70,7 +70,7 @@ export const handler = define.handlers({
 - **Catalog:** ${BASE_URL}/catalog — 7 fixed-price offerings
   - /catalog/strategy-call — Strategy Session ($350, 60 min)
   - /catalog/free-architecture-audit — Free Architecture Audit (free, 48h)
-  - /catalog/zero-to-production-saas-mvp — SaaS MVP (from $8K, 21 days)
+  - /catalog/zero-to-production-saas-mvp — SaaS MVP (from $15K, 21 days). Includes auth, Stripe payments, REST API, admin dashboard, Docker deploy, CI/CD, 30-day warranty. Excludes native mobile apps, third-party SaaS integrations, post-launch features.
   - /catalog/bulletproof-backend-api — Backend API (from $4K, 14 days)
   - /catalog/surgical-ai-integration — AI Integration (from $4K, 14 days)
   - /catalog/codebase-health-audit — Code Audit (from $1.5K, 3 days)

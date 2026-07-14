@@ -388,13 +388,35 @@ export default define.page(function Home(ctx) {
               <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
                 SaaS MVP
               </h3>
-              <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
-                Full MVP from idea to live deployment. Auth, payments, API,
-                admin panel. Built to scale.
+              <p class="text-gray-400 text-sm mb-3 leading-relaxed">
+                Full MVP from idea to live deployment.
               </p>
-              <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
-                From $15,000 — 21 days
-              </span>
+              <ul class="text-xs text-gray-300 space-y-1 mb-3 leading-relaxed">
+                <li class="flex items-start gap-1.5">
+                  <span class="text-green-400 shrink-0">✓</span>
+                  <span>Auth (email + social login)</span>
+                </li>
+                <li class="flex items-start gap-1.5">
+                  <span class="text-green-400 shrink-0">✓</span>
+                  <span>Stripe payments + webhooks</span>
+                </li>
+                <li class="flex items-start gap-1.5">
+                  <span class="text-green-400 shrink-0">✓</span>
+                  <span>REST API + admin dashboard</span>
+                </li>
+                <li class="flex items-start gap-1.5">
+                  <span class="text-green-400 shrink-0">✓</span>
+                  <span>Docker deploy + 30-day warranty</span>
+                </li>
+              </ul>
+              <div class="mt-auto flex items-center justify-between gap-2">
+                <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full self-start">
+                  From $15,000 — 21 days
+                </span>
+                <span class="text-xs text-orange-400 group-hover:text-orange-300 transition-colors font-medium">
+                  Full scope →
+                </span>
+              </div>
             </a>
             <a
               href="/catalog/free-architecture-audit"
