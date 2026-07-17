@@ -2,8 +2,9 @@ data/subscribers.json
 .env
 .env.*
 _fresh/
-.git/
+.git
 .gitignore
+.age/
 node_modules/
 .playwright-mcp/
 todos.md

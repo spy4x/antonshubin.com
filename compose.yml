@@ -41,6 +41,7 @@ services:
           path: .
           ignore:
             - .git/
+            - .age/
             - _fresh/
             - node_modules/
             - "*.md"
