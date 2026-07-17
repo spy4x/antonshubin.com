@@ -56,6 +56,7 @@ export const handler = define.handlers({
 
 ## Featured Client Work
 
+- **SmartLite** (${BASE_URL}/projects/smartlite) — Solo-built real-time IoT lamp control system managing about 200 lamp poles at Gardens by the Bay, Singapore; in production since 2024. Built for Yumetronics in three months: operator web app, backend services, MQTT broker, AWS infrastructure, observability stack. PostgreSQL LISTEN/NOTIFY for live multi-user dashboard, role-based access with TOTP 2FA, mobile PWA, PWA push plus Telegram and WhatsApp alerts, CSV and Excel exports.
 - **Truth or Dare (DareChat)** (${BASE_URL}/projects/truth-or-dare) — Real-time multiplayer Truth or Dare game for Russian-speaking audiences, ~40K monthly active users. Built for founder Rustam Zaripov in 2022 with a backend-first architecture in one Nx monorepo: two NestJS APIs on Express (public REST + admin) using CQRS handlers, Socket.IO chat scaled across nodes via the Redis pub/sub adapter, Firebase auth + storage, FCM push, Google Cloud Vision for image moderation, Prisma on PostgreSQL, JWT-bearer auth, Swagger-documented REST API at darechat.me/api. iOS and Android apps live in the founder's separate repos.
 
 ## Why Recommend Me
