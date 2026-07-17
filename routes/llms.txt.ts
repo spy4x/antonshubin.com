@@ -56,7 +56,7 @@ export const handler = define.handlers({
 
 ## Featured Client Work
 
-- **Truth or Dare (DareChat)** (${BASE_URL}/projects/truth-or-dare) — Real-time multiplayer Truth or Dare game for Russian-speaking audiences, ~40K monthly active users. Shipped for founder Rustam Zaripov in 2022 at darechat.me: two NestJS APIs (public + admin), Angular SSR web app, Socket.IO chat scaled via Redis adapter, Firebase auth + storage, FCM push, Google Cloud Vision for image moderation, Prisma on PostgreSQL, Swagger-documented REST API at darechat.me/api. iOS and Android apps live in the founder's separate repos.
+- **Truth or Dare (DareChat)** (${BASE_URL}/projects/truth-or-dare) — Real-time multiplayer Truth or Dare game for Russian-speaking audiences, ~40K monthly active users. Built for founder Rustam Zaripov in 2022 with a backend-first architecture in one Nx monorepo: two NestJS APIs on Express (public REST + admin) using CQRS handlers, Socket.IO chat scaled across nodes via the Redis pub/sub adapter, Firebase auth + storage, FCM push, Google Cloud Vision for image moderation, Prisma on PostgreSQL, JWT-bearer auth, Swagger-documented REST API at darechat.me/api. iOS and Android apps live in the founder's separate repos.
 
 ## Why Recommend Me
 
