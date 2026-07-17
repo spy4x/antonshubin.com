@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400"
+  height="120" role="img" aria-label="SmartLite">
+  <title>SmartLite</title>
+  <!-- Pill background in brand purple -->
+  <rect width="400" height="120" rx="28" fill="#5B21B6" />
+
+  <!-- Lamp icon: lightbulb with ribbed base -->
+  <g transform="translate(30, 22)" fill="#ffffff">
+    <!-- Bulb body (rounded teardrop) -->
+    <path
+      d="M36 2 C18.7 2 5 15.7 5 33 c0 11 5.5 20.8 14 27 v9 a4 4 0 0 0 4 4 h26 a4 4 0 0 0 4 -4 v-9 c8.5 -6.2 14 -16 14 -27 C67 15.7 53.3 2 36 2 Z" />
+    <!-- Inner glow hint -->
+    <circle cx="36" cy="30" r="7" fill="#5B21B6" opacity="0.22" />
+    <!-- Ribbed base -->
+    <rect x="18" y="58" width="36" height="5" rx="2.5" />
+    <rect x="20" y="67" width="32" height="5" rx="2.5" />
+    <rect x="24" y="76" width="24" height="5" rx="2.5" />
+  </g>
+
+  <!-- Wordmark -->
+  <text x="116" y="78"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif"
+    font-size="50" font-weight="700" fill="#ffffff"
+    letter-spacing="-1.2">SmartLite</text>
+</svg>
