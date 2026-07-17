@@ -615,7 +615,7 @@ export default define.page(function Home(ctx) {
                 <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
                   CalDAV
                 </span>
-                <GhStars repo="spy4x/todoapp" class="ml-auto" />
+                <GhStars repo="spy4x/caldav-tasks-web" class="ml-auto" />
               </div>
             </a>
           </div>
