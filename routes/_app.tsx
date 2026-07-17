@@ -1,5 +1,5 @@
 import { define } from "../lib/utils.ts";
-import { UMAMI_ID, UMAMI_URL } from "../lib/config.ts";
+import { UMAMI_ID, UMAMI_URL, UMAMI_URL_ORIGIN } from "../lib/config.ts";
 import SWUpdater from "../islands/SWUpdater.tsx";
 import { resetHead } from "../lib/head.ts";
 
@@ -46,7 +46,11 @@ export default define.page(function App({ Component }) {
 
         {/* Analytics */}
         {UMAMI_URL && UMAMI_ID && (
-          <script defer src={UMAMI_URL} data-website-id={UMAMI_ID} />
+          <>
+            <link rel="preconnect" href={UMAMI_URL_ORIGIN} />
+            <link rel="dns-prefetch" href={UMAMI_URL_ORIGIN} />
+            <script defer src={UMAMI_URL} data-website-id={UMAMI_ID} />
+          </>
         )}
       </head>
       <body class="h-full">
