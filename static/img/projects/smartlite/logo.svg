@@ -1,25 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400"
-  height="120" role="img" aria-label="SmartLite">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120" role="img" aria-label="SmartLite">
   <title>SmartLite</title>
   <!-- Pill background in brand purple -->
-  <rect width="400" height="120" rx="28" fill="#5B21B6" />
+  <rect width="400" height="120" rx="28" fill="#5B21B6"/>
 
-  <!-- Lamp icon: lightbulb with ribbed base -->
-  <g transform="translate(30, 22)" fill="#ffffff">
-    <!-- Bulb body (rounded teardrop) -->
-    <path
-      d="M36 2 C18.7 2 5 15.7 5 33 c0 11 5.5 20.8 14 27 v9 a4 4 0 0 0 4 4 h26 a4 4 0 0 0 4 -4 v-9 c8.5 -6.2 14 -16 14 -27 C67 15.7 53.3 2 36 2 Z" />
-    <!-- Inner glow hint -->
-    <circle cx="36" cy="30" r="7" fill="#5B21B6" opacity="0.22" />
-    <!-- Ribbed base -->
-    <rect x="18" y="58" width="36" height="5" rx="2.5" />
-    <rect x="20" y="67" width="32" height="5" rx="2.5" />
-    <rect x="24" y="76" width="24" height="5" rx="2.5" />
+  <!-- Lamp icon: Heroicons light-bulb (from libs/client/icons.tsx IconLightBulb) -->
+  <g transform="translate(30 16) scale(3.75)" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
   </g>
 
-  <!-- Wordmark -->
-  <text x="116" y="78"
-    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif"
-    font-size="50" font-weight="700" fill="#ffffff"
-    letter-spacing="-1.2">SmartLite</text>
+  <!-- Wordmark (medium weight) -->
+  <text x="132" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif" font-size="50" font-weight="500" fill="#ffffff" letter-spacing="-0.8">SmartLite</text>
 </svg>
