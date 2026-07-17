@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" role="img"
+  aria-label="DareChat">
+  <defs>
+    <linearGradient id="dcg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="60%" stop-color="#d946ef" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <g fill="url(#dcg)">
+    <path
+      d="M22 30c-6-8 6-14 12-8 2 2 4 4 6 4s4-2 6-4c6-6 18 0 12 8-3 4-9 8-18 8s-15-4-18-8z"
+      opacity="0.95" />
+    <path d="M40 56c-6 4-14 4-20 0 2 6 10 10 20 10s18-4 20-10c-6 4-14 4-20 0z"
+      opacity="0.7" />
+  </g>
+  <text x="68" y="62"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    font-weight="800" font-size="40" letter-spacing="-1"
+    fill="url(#dcg)">DareChat</text>
+</svg>

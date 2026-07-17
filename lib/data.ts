@@ -174,6 +174,42 @@ export const projects = {
   ] as Project[],
   freelance: [
     {
+      title: "Truth or Dare (DareChat)",
+      slug: "truth-or-dare",
+      externalURL: "https://darechat.me",
+      role: "Tech Lead & Architect",
+      description:
+        "Real-time multiplayer Truth or Dare game for Russian-speaking audiences, live at darechat.me. Built for founder Rustam Zapirov in 2022 and shipped the entire web stack in one Nx monorepo: two NestJS APIs (public + admin) with a Swagger-documented REST endpoint surface, an Angular SSR web app for SEO, Socket.IO chat scaled across nodes via the Redis adapter, Firebase auth and storage, FCM push notifications, Google Cloud Vision for image moderation, and Prisma on PostgreSQL. The public API at darechat.me/api is the same one mobile clients hit; iOS and Android apps live in the founder's separate repos.",
+      tags: [
+        "Angular",
+        "Nest.js",
+        "Express.js",
+        "Nx monorepo",
+        "PostgreSQL",
+        "Prisma",
+        "Redis",
+        "Socket.IO",
+        "WebSockets",
+        "Firebase",
+        "FCM",
+        "Google Cloud Vision",
+        "Swagger",
+        "Angular SSR",
+      ],
+      logoImageURL: "/img/projects/truth-or-dare/logo.svg",
+      screenshotURLs: [
+        "01-home.png",
+        "01-hero.webp",
+        "02-game-modes.webp",
+        "03-truth-or-dare.webp",
+        "04-players-list.webp",
+        "02-api.png",
+      ],
+      madeForName: "Rustam Zapirov",
+      outcome:
+        "Live at darechat.me — Swagger-documented public REST API at darechat.me/api",
+    },
+    {
       title: "FoodRazor",
       slug: "foodrazor",
       externalURL: "https://foodrazor.com",
