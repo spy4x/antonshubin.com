@@ -7,6 +7,18 @@ export const UPWORK_URL = Deno.env.get("UPWORK_URL") ||
   "https://www.upwork.com/freelancers/ashubin";
 export const UMAMI_URL = Deno.env.get("UMAMI_URL") || "";
 export const UMAMI_ID = Deno.env.get("UMAMI_ID") || "";
+/**
+ * Origin (scheme + host) of the Umami script URL, suitable for
+ * `<link rel="preconnect">` and `dns-prefetch`. Empty when analytics disabled.
+ */
+export const UMAMI_URL_ORIGIN = (() => {
+  if (!UMAMI_URL) return "";
+  try {
+    return new URL(UMAMI_URL).origin;
+  } catch {
+    return "";
+  }
+})();
 
 export const CONTACT_EMAIL = Deno.env.get("CONTACT_EMAIL") || "";
 export const SMTP_HOST = Deno.env.get("SMTP_HOST") || "";

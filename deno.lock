@@ -16,6 +16,7 @@
     "jsr:@std/fmt@^1.0.7": "1.0.10",
     "jsr:@std/fmt@^1.0.8": "1.0.10",
     "jsr:@std/front-matter@^1.0.9": "1.0.9",
+    "jsr:@std/fs@1": "1.0.24",
     "jsr:@std/fs@^1.0.19": "1.0.24",
     "jsr:@std/html@^1.0.5": "1.0.7",
     "jsr:@std/http@^1.0.21": "1.1.1",
@@ -77,7 +78,7 @@
         "jsr:@fresh/build-id",
         "jsr:@std/encoding",
         "jsr:@std/fmt@^1.0.8",
-        "jsr:@std/fs",
+        "jsr:@std/fs@^1.0.19",
         "jsr:@std/html",
         "jsr:@std/http",
         "jsr:@std/jsonc",
@@ -1455,6 +1456,21 @@
     "yallist@3.1.1": {
       "integrity": "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="
     }
+  },
+  "redirects": {
+    "https://esm.sh/wasm-feature-detect@^1.2.11?target=denonext": "https://esm.sh/wasm-feature-detect@1.8.0?target=denonext"
+  },
+  "remote": {
+    "https://esm.sh/@jsquash/png@3.0.1/denonext/png.mjs": "83c8619b21c0ccb4c49986c2fdd50817c433af997c7e612878ec9477bc65e883",
+    "https://esm.sh/@jsquash/png@3.0.1?target=denonext": "2415e4ca044ca4ca0bee8dfbe19106ab8de9cd3f49811e8c3eb4dba2c3137bd4",
+    "https://esm.sh/@jsquash/png@3.0.1?target=denonext&pin=v135": "2415e4ca044ca4ca0bee8dfbe19106ab8de9cd3f49811e8c3eb4dba2c3137bd4",
+    "https://esm.sh/@jsquash/webp@1.5.0/denonext/codec/enc/webp_enc.mjs": "0e862f2a77eada4b7533fef2ef7856ad61ee003396264533fdc3c69cc8e1abcb",
+    "https://esm.sh/@jsquash/webp@1.5.0/denonext/codec/enc/webp_enc_simd.mjs": "9496c771fb8d9a5b33f4b447fe285b7d0196a5eafe46f0b57bd5e1fa5e4c89d2",
+    "https://esm.sh/@jsquash/webp@1.5.0/denonext/webp.mjs": "274fbbd982d3c1081d517594644ca782760141474f1fa1c02434abc5138c7cf7",
+    "https://esm.sh/@jsquash/webp@1.5.0?target=denonext": "d3068f78c5ca8c4702ef6cb01f16d37777f44cbd7f43f6cb52994278cc4c2c2c",
+    "https://esm.sh/@jsquash/webp@1.5.0?target=denonext&pin=v135": "d3068f78c5ca8c4702ef6cb01f16d37777f44cbd7f43f6cb52994278cc4c2c2c",
+    "https://esm.sh/wasm-feature-detect@1.8.0/denonext/wasm-feature-detect.mjs": "22539ae664a56f41530c4732b4d8a4699a8587cb6bd8a866d895484e3a6ac6c2",
+    "https://esm.sh/wasm-feature-detect@1.8.0?target=denonext": "8dea82cb306132a2b4a502a2050121506bd262051d76a5f72c9d91c8e9046aba"
   },
   "workspace": {
     "dependencies": [
