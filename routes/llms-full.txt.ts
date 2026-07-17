@@ -98,7 +98,8 @@ ${blogList}
 - **Air Quality Sensor** (${BASE_URL}/projects/air-quality-sensor) — DIY ESP32-based air quality monitor with Home Assistant integration.
 - **Zond** (${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Probes HTTP endpoints through Authelia-secured gateways for Gatus and other monitoring tools.
 
-### Client Case Study
+### Featured Client Work
+- **Truth or Dare (DareChat)** (${BASE_URL}/projects/truth-or-dare) — Real-time multiplayer Truth or Dare game for Russian-speaking audiences, ~40K monthly active users. Built for founder Rustam Zaripov in 2022 at darechat.me with a Swagger-documented public REST API at darechat.me/api. Shipped the entire web stack in one Nx monorepo: NestJS public + admin APIs on Express, Angular Universal SSR web app, Socket.IO chat scaled across nodes via the Redis adapter, Firebase auth + storage, FCM push notifications, Google Cloud Vision for user-uploaded image moderation, Prisma on PostgreSQL, Swagger-documented REST API. iOS and Android apps were built by the founder and live in his separate repos.
 - **Sogroya Dose Reminder** (${BASE_URL}/projects/sogroya) — Once-weekly medication reminder launched in 2023 for worldwide Novo Nordisk client use. SvelteKit, TypeScript, five languages, and in-browser ICS calendar generation. Original project site is now offline.
 
 ### Tech Stack Used
