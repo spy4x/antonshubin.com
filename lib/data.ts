@@ -263,6 +263,31 @@ export const projects = {
         "Live at makearoley.com — processing 500+ kid-made movies monthly",
     },
     {
+      title: "Sogroya Dose Reminder",
+      slug: "sogroya",
+      description:
+        "A four-step multilingual web app for setting once-weekly Sogroya medication reminders on mobile and desktop calendars. I built the SvelteKit + TypeScript SPA, five-language flow (English, French, German, Portuguese, and Japanese), privacy consent, dose/day/time selection, and in-browser ICS generation. Static deployment kept the experience fast, backend-free, and easy to distribute globally. Completed in 2023 and remained publicly accessible on its branded domain through at least July 2025.",
+      role: "Full-stack",
+      tags: [
+        "SvelteKit",
+        "TypeScript",
+        "Tailwind CSS",
+        "i18n",
+        "ICS",
+        "Vercel",
+      ],
+      screenshotURLs: [
+        "01-home.png",
+        "02-consent.png",
+        "03-schedule.png",
+        "04-download.png",
+      ],
+      madeForName: "Novo Nordisk",
+      madeForURL: "https://www.novonordisk.com/",
+      archived: true,
+      outcome: "Launched in 2023 for worldwide Novo Nordisk client use",
+    },
+    {
       title: "PayBridge",
       slug: "paybridge",
       description:

@@ -208,7 +208,7 @@ roadmap for detailed steps.
 | -------------------------- | -------------------------------------------------------------------------- |
 | New blog post              | `routes/sitemap.xml.ts`, `routes/llms-full.txt.ts`                         |
 | New catalog item           | `routes/sitemap.xml.ts`, `routes/llms-full.txt.ts`                         |
-| New project                | `routes/sitemap.xml.ts`                                                    |
+| New project                | `routes/sitemap.xml.ts` (automatic), `routes/llms-full.txt.ts`             |
 | Add LinkedIn/X/YouTube URL | `lib/config.ts` (`SAME_AS_URLS`)                                           |
 | Change pricing/policies    | `routes/llms.txt.ts`, `routes/llms-full.txt.ts`                            |
 | Change crawler rules       | `routes/robots.txt.ts`                                                     |
