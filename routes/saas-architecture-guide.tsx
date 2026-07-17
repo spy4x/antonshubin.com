@@ -61,14 +61,16 @@ export default define.page(function SaasArchGuide() {
             </li>
             <li>
               <a
-                href="/blog/self-hosted-caldav-pwa-architecture"
+                href="/blog/self-hosted-caldav-web-ui-tasks-org"
                 class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → Self-hosted CalDAV Task Manager: Architecture Walkthrough
+                → The missing piece in a self-hosted CalDAV stack: a web UI for
+                Tasks.org
               </a>
               <p class="text-gray-500 text-sm mt-0.5">
-                Full PWA architecture with Vite + Preact + Hono + Radicale on a
-                $50/month server.
+                Tasks.org syncs Android tasks to CalDAV cleanly. There is no web
+                UI for that data. The fix is a stateless PWA on top of the
+                CalDAV server you already run.
               </p>
             </li>
             <li>
