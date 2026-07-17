@@ -4,3 +4,5 @@ steps:
     commands:
       - deno install
       - deno task check
+    when:
+      event: [push, pull_request]

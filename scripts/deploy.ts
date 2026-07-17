@@ -7,7 +7,7 @@
  *   deno task deploy:stag      # staging   → website-stag.antonshubin.com
  *
  * Steps:
- *  1. Rsync source (excluding .git, node_modules, _fresh, and .dockerignore patterns)
+ *  1. Rsync source (excluding .git, .age, node_modules, _fresh, and .dockerignore patterns)
  *  2. Rsync env files separately (blocked by .dockerignore from step 1)
  *  3. SSH to homelab: docker compose up -d --build
  */
@@ -77,7 +77,7 @@ async function run(
 // Step 1: source code (exclude env files via dockerignore filter)
 console.log("  rsync source...");
 const r1 = await run(
-  `rsync -avz --delete --exclude='.git/' --exclude='node_modules/' --exclude='_fresh/' --filter=':- .dockerignore' ./ ${REMOTE}`,
+  `rsync -avz --delete --exclude='.git' --exclude='.age/' --exclude='node_modules/' --exclude='_fresh/' --filter=':- .dockerignore' ./ ${REMOTE}`,
 );
 if (r1.code !== 0) {
   console.error(r1.stderr);
