@@ -199,15 +199,16 @@ export const projects = {
       logoImageURL: "/img/projects/truth-or-dare/logo.svg",
       screenshotURLs: [
         "01-home.png",
-        "01-hero.webp",
-        "02-game-modes.webp",
-        "03-truth-or-dare.webp",
-        "04-players-list.webp",
-        "02-api.png",
+        "02-webapp-login.png",
+        "03-swagger-overview.png",
+        "04-game-modes.webp",
+        "05-truth-or-dare.webp",
+        "06-players-list.webp",
       ],
-      madeForName: "Rustam Zapirov",
+      madeForName: "Rustam Zaripov",
+      madeForURL: "https://www.linkedin.com/in/rustam-zaripov-69436559/",
       outcome:
-        "Live at darechat.me — Swagger-documented public REST API at darechat.me/api",
+        "~40K monthly active users — live at darechat.me with Swagger-documented public REST API at darechat.me/api",
     },
     {
       title: "FoodRazor",
