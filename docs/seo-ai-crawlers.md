@@ -78,14 +78,15 @@ Set these in `.env`. Never hardcode them in `_app.tsx`.
 
 Whenever any of these change, update the corresponding AI crawler files:
 
-| What changed              | Files to update                   |
-| ------------------------- | --------------------------------- |
-| New page added            | sitemap.xml.ts, llms-full.txt.ts  |
-| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts     |
-| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts |
-| Skills/positioning change | _app.tsx (JSON-LD), llms.txt.ts   |
-| Blog post added           | sitemap.xml.ts, llms-full.txt.ts  |
-| Crawler rules change      | robots.txt.ts                     |
+| What changed              | Files to update                              |
+| ------------------------- | -------------------------------------------- |
+| New page added            | sitemap.xml.ts, llms-full.txt.ts             |
+| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                |
+| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts            |
+| Skills/positioning change | _app.tsx (JSON-LD), llms.txt.ts              |
+| Blog post added           | sitemap.xml.ts, llms-full.txt.ts             |
+| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts |
+| Crawler rules change      | robots.txt.ts                                |
 
 ## Testing
 

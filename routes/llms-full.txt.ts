@@ -98,6 +98,9 @@ ${blogList}
 - **Air Quality Sensor** (${BASE_URL}/projects/air-quality-sensor) — DIY ESP32-based air quality monitor with Home Assistant integration.
 - **Zond** (${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Probes HTTP endpoints through Authelia-secured gateways for Gatus and other monitoring tools.
 
+### Archived Client Case Study
+- **Sogroya Dose Reminder** (${BASE_URL}/projects/sogroya) — Once-weekly medication reminder launched in 2023 for worldwide Novo Nordisk client use. SvelteKit, TypeScript, five languages, and in-browser ICS calendar generation. Remained publicly accessible through July 2025.
+
 ### Tech Stack Used
 Deno, Node.js, TypeScript, Preact, React, Fresh, Hono, Angular, Svelte, PostgreSQL, Valkey/Redis, MongoDB, Firebase, Docker, Podman, Traefik, Hetzner, AWS, GCP, OpenAI, Claude, DeepSeek, Stripe, Tailwind CSS, WebSockets, PWA
 
