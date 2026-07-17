@@ -265,8 +265,10 @@ export const projects = {
     {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
+      externalURL: "https://www.sogroyadosereminder.com/",
+      externalURLDead: true,
       description:
-        "A four-step multilingual web app for setting once-weekly Sogroya medication reminders on mobile and desktop calendars. I built the SvelteKit + TypeScript SPA, five-language flow (English, French, German, Portuguese, and Japanese), privacy consent, dose/day/time selection, and in-browser ICS generation. Static deployment kept the experience fast, backend-free, and easy to distribute globally. Completed in 2023 and remained publicly accessible on its branded domain through at least July 2025.",
+        "A four-step multilingual web app for setting once-weekly Sogroya medication reminders on mobile and desktop calendars. I built the SvelteKit + TypeScript SPA, five-language flow (English, French, German, Portuguese, and Japanese), privacy consent, dose/day/time selection, and in-browser ICS generation. Static deployment kept the experience fast, backend-free, and easy to distribute globally. Completed in 2023 and remained publicly accessible on its branded domain through at least July 2025. The original project site is now offline.",
       role: "Full-stack",
       tags: [
         "SvelteKit",
@@ -284,7 +286,6 @@ export const projects = {
       ],
       madeForName: "Novo Nordisk",
       madeForURL: "https://www.novonordisk.com/",
-      archived: true,
       outcome: "Launched in 2023 for worldwide Novo Nordisk client use",
     },
     {
