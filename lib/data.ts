@@ -121,10 +121,16 @@ export const projects = {
     {
       title: "TodoApp — CalDAV Task Manager (PWA)",
       slug: "todoapp-caldav",
-      externalURL: "https://github.com/spy4x/todoapp",
-      ghRepo: "spy4x/todoapp",
+      externalURL: "https://github.com/spy4x/caldav-tasks-web",
+      ghRepo: "spy4x/caldav-tasks-web",
+      screenshotURLs: [
+        "desktop-dashboard.png",
+        "desktop-kanban.png",
+        "desktop-settings.png",
+        "mobile-dashboard.png",
+      ],
       description:
-        "Self-hosted task manager that talks to any CalDAV server (Radicale, Nextcloud, Baikal). Web app + PWA, no vendor lock-in, your data stays on your server. Built because Tasks.org has no web UI.",
+        "My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface that speaks both Radicale and Stalwart), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos. Result: 5 calendars and 140+ todos on a single Hetzner box, deployed since June 2026, including a Radicale-to-Stalwart migration that moved zero VTODO data.",
       tags: [
         "Vite",
         "Preact",
@@ -136,7 +142,8 @@ export const projects = {
         "PWA",
         "CQRS",
       ],
-      outcome: "Live at todos.antonshubin.com",
+      outcome:
+        "5 calendars, 140+ todos, deployed since June 2026. Radicale to Stalwart migration moved zero VTODO data. Live at todos.antonshubin.com.",
     },
     {
       title: "caldav-mcp",
@@ -610,6 +617,18 @@ export const blogArticles: BlogArticle[] = [
       "Full architecture for a self-hosted, CalDAV-backed task manager PWA. Vite + Preact + Hono + Radicale on a $50/month Hetzner box. No SaaS, no lock-in, no monthly fee.",
     readTime: 11,
     publishedAt: "2026-06-23",
+    previewImageURL: "cover.svg",
+    category: "dev-tips",
+  },
+  {
+    index: 10,
+    title:
+      "The missing piece in a self-hosted CalDAV stack: a web UI for Tasks.org",
+    slug: "self-hosted-caldav-web-ui-tasks-org",
+    description:
+      "Tasks.org syncs Android tasks to CalDAV. There is no web UI for that data. The fix is a stateless PWA on top of the CalDAV server you already run — and the architecture that made it boring to ship.",
+    readTime: 9,
+    publishedAt: "2026-07-22",
     previewImageURL: "cover.svg",
     category: "dev-tips",
   },
