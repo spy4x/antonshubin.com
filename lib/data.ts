@@ -312,6 +312,8 @@ export const projects = {
     {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
+      logoImageURL: "/img/projects/sogroya/logo.svg",
+      logoImageStyle: "background: white; border-radius: 0.5rem;",
       externalURL: "https://www.sogroyadosereminder.com/",
       externalURLDead: true,
       description:
