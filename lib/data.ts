@@ -653,17 +653,6 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     index: 9,
-    title: "Self-hosted CalDAV Task Manager as a PWA: Architecture Walkthrough",
-    slug: "self-hosted-caldav-pwa-architecture",
-    description:
-      "Full architecture for a self-hosted, CalDAV-backed task manager PWA. Vite + Preact + Hono + Radicale on a $50/month Hetzner box. No SaaS, no lock-in, no monthly fee.",
-    readTime: 11,
-    publishedAt: "2026-06-23",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 10,
     title:
       "The missing piece in a self-hosted CalDAV stack: a web UI for Tasks.org",
     slug: "self-hosted-caldav-web-ui-tasks-org",
