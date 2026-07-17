@@ -300,7 +300,7 @@ export const projects = {
       madeForName: "Lila King",
       madeForURL: "https://www.linkedin.com/in/lila-king-66b94b",
       outcome:
-        "Built the real app end-to-end. Portfolio re-imagination at roley.antonshubin.com",
+        "Shipped the whole app end-to-end. Client went quiet before launch, so I rebuilt it as a portfolio piece — the originals belonged to them, this one's mine.",
     },
     {
       title: "Sogroya Dose Reminder",
