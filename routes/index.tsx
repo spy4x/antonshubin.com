@@ -57,6 +57,15 @@ export default define.page(function Home(ctx) {
                 </ul>
               </div>
 
+              {/* AI-augmented positioning sub-headline — stack + price anchor */}
+              <p class="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed">
+                <span class="text-white font-medium">
+                  AI-augmented production systems
+                </span>{" "}
+                — Deno, Preact, MCP, self-hosted infrastructure. Fixed price,
+                you own everything. MVPs from $15K, audits from $1.5K.
+              </p>
+
               {/* Metrics Bar — linked to Upwork for proof */}
               <div class="mt-6 grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-row sm:items-center sm:gap-x-4 text-sm sm:text-base text-gray-400">
                 <a
