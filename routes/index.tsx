@@ -689,8 +689,9 @@ export default define.page(function Home(ctx) {
                     YouTube Channel →
                   </a>
                   <p class="text-gray-300 text-sm mt-1">
-                    Architecture deep-dives, cost optimization strategies, and
-                    startup engineering from a Fractional CTO.
+                    AI-augmented architecture, deterministic LLM pipelines, MCP
+                    tooling, and startup engineering from a Fractional CTO who
+                    ships them.
                   </p>
                 </div>
               </div>
