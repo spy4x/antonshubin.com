@@ -342,6 +342,11 @@ export default define.page(function Home(ctx) {
                   the technical roadmap, and ships measurable results — on time,
                   on budget, with no surprises.
                 </p>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
+                  You want AI-augmented execution with human-owned architecture
+                  — spec-driven, deterministic pipelines, no LLM left
+                  unsupervised in production.
+                </p>
                 <p class="text-gray-300 text-base sm:text-lg leading-relaxed">
                   I work with funded startups, lean SaaS teams, and established
                   businesses that have outgrown their current technical setup.
