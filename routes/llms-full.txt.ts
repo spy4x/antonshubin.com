@@ -15,6 +15,7 @@ export const handler = define.handlers({
     const txt = `# Anton Shubin — Fractional CTO & Lead Architect (Full Index)
 
 > I take non-technical founders from napkin sketch to production.
+> AI-augmented workflows, deterministic LLM pipelines, MCP tooling.
 > Fixed-price milestones. Zero-bloat architecture. No dev-team drama.
 > Expert-Vetted (Top 1%). 100% Job Success. $395K+ earned. 80+ projects.
 
@@ -40,6 +41,8 @@ export const handler = define.handlers({
 - SaaS MVP development (zero-to-production)
 - Backend API architecture (Deno/Node.js, Preact/React, PostgreSQL)
 - AI/LLM integration (OpenAI, Claude, DeepSeek, RAG pipelines)
+- MCP server engineering (Model Context Protocol — production MCP servers)
+- Deterministic LLM pipelines (spec-driven, human-owned architecture, agent-assisted scaffolding)
 - Self-hosted infrastructure (Docker/Podman, Traefik, Hetzner)
 - Codebase audits and refactoring
 

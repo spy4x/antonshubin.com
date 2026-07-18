@@ -57,6 +57,15 @@ export default define.page(function Home(ctx) {
                 </ul>
               </div>
 
+              {/* AI-augmented positioning sub-headline — stack + price anchor */}
+              <p class="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed">
+                <span class="text-white font-medium">
+                  AI-augmented production systems
+                </span>{" "}
+                — Deno, Preact, MCP, self-hosted infrastructure. Fixed price,
+                you own everything. MVPs from $15K, audits from $1.5K.
+              </p>
+
               {/* Metrics Bar — linked to Upwork for proof */}
               <div class="mt-6 grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-row sm:items-center sm:gap-x-4 text-sm sm:text-base text-gray-400">
                 <a
@@ -333,6 +342,11 @@ export default define.page(function Home(ctx) {
                   the technical roadmap, and ships measurable results — on time,
                   on budget, with no surprises.
                 </p>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
+                  You want AI-augmented execution with human-owned architecture
+                  — spec-driven, deterministic pipelines, no LLM left
+                  unsupervised in production.
+                </p>
                 <p class="text-gray-300 text-base sm:text-lg leading-relaxed">
                   I work with funded startups, lean SaaS teams, and established
                   businesses that have outgrown their current technical setup.
@@ -466,71 +480,21 @@ export default define.page(function Home(ctx) {
 
         {/* Featured Projects Section */}
         <section class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">Open Source Projects</h2>
+          <h2 class="h1 mb-8">
+            Open Source — AI Tooling & Self-Hosted Infrastructure
+          </h2>
+          {/* AI-augmented positioning callout */}
+          <div class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+            <p class="text-sm sm:text-base text-gray-200 leading-relaxed">
+              Built with{" "}
+              <span class="text-white font-medium">AI-augmented workflows</span>
+              {" "}
+              — spec-first, human-owned architecture, agent-assisted
+              scaffolding. Source on GitHub, no paywalls, no telemetry.
+            </p>
+          </div>
           <div class="grid gap-6 md:grid-cols-2">
-            {/* Homelab */}
-            <a
-              href="/projects/homelab"
-              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-green-500 transition-all"
-            >
-              <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-green-500/20 rounded-lg">
-                  <ServerIcon class="w-6 h-6 text-green-400" />
-                </div>
-                <h3 class="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
-                  Homelab
-                </h3>
-              </div>
-              <p class="text-gray-300 text-sm mb-4">
-                Infrastructure-as-code framework for self-hosting 20+ services
-                with Docker, Traefik, automated backups, and monitoring.
-              </p>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Deno
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Docker
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Ansible
-                </span>
-                <GhStars repo="spy4x/homelab" class="ml-auto" />
-              </div>
-            </a>
-
-            {/* Financy */}
-            <a
-              href="/projects/financy"
-              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-purple-500 transition-all"
-            >
-              <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-purple-500/20 rounded-lg">
-                  <WalletIcon class="w-6 h-6 text-purple-400" />
-                </div>
-                <h3 class="text-xl font-semibold text-white group-hover:text-purple-400 transition-colors">
-                  Financy
-                </h3>
-              </div>
-              <p class="text-gray-300 text-sm mb-4">
-                Self-hostable finance tracking with double-entry accounting,
-                multi-currency, real-time collaboration, and PWA support.
-              </p>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Deno
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Preact
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  PostgreSQL
-                </span>
-                <GhStars repo="spy4x/financy" class="ml-auto" />
-              </div>
-            </a>
-
-            {/* caldav-mcp */}
+            {/* caldav-mcp — AI-native MCP server, leads the grid */}
             <a
               href="/projects/caldav-mcp"
               class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-blue-500 transition-all"
@@ -575,7 +539,7 @@ export default define.page(function Home(ctx) {
               </div>
             </a>
 
-            {/* TodoApp — CalDAV Task Manager */}
+            {/* TodoApp — CalDAV Task Manager (PWA) */}
             <a
               href="/projects/todoapp-caldav"
               class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-cyan-500 transition-all"
@@ -616,6 +580,68 @@ export default define.page(function Home(ctx) {
                   CalDAV
                 </span>
                 <GhStars repo="spy4x/caldav-tasks-web" class="ml-auto" />
+              </div>
+            </a>
+
+            {/* Financy */}
+            <a
+              href="/projects/financy"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-purple-500 transition-all"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-purple-500/20 rounded-lg">
+                  <WalletIcon class="w-6 h-6 text-purple-400" />
+                </div>
+                <h3 class="text-xl font-semibold text-white group-hover:text-purple-400 transition-colors">
+                  Financy
+                </h3>
+              </div>
+              <p class="text-gray-300 text-sm mb-4">
+                Self-hostable finance tracking with double-entry accounting,
+                multi-currency, real-time collaboration, and PWA support.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Deno
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Preact
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  PostgreSQL
+                </span>
+                <GhStars repo="spy4x/financy" class="ml-auto" />
+              </div>
+            </a>
+
+            {/* Homelab */}
+            <a
+              href="/projects/homelab"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-green-500 transition-all"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-green-500/20 rounded-lg">
+                  <ServerIcon class="w-6 h-6 text-green-400" />
+                </div>
+                <h3 class="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
+                  Homelab
+                </h3>
+              </div>
+              <p class="text-gray-300 text-sm mb-4">
+                Infrastructure-as-code framework for self-hosting 20+ services
+                with Docker, Traefik, automated backups, and monitoring.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Deno
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Docker
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Ansible
+                </span>
+                <GhStars repo="spy4x/homelab" class="ml-auto" />
               </div>
             </a>
           </div>
@@ -663,8 +689,9 @@ export default define.page(function Home(ctx) {
                     YouTube Channel →
                   </a>
                   <p class="text-gray-300 text-sm mt-1">
-                    Architecture deep-dives, cost optimization strategies, and
-                    startup engineering from a Fractional CTO.
+                    AI-augmented architecture, deterministic LLM pipelines, MCP
+                    tooling, and startup engineering from a Fractional CTO who
+                    ships them.
                   </p>
                 </div>
               </div>
