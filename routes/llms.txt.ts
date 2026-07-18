@@ -5,17 +5,17 @@ export const handler = define.handlers({
   GET() {
     const txt = `# Anton Shubin — Fractional CTO & Lead Architect
 
-> I take non-technical founders from napkin sketch to production. Fixed-price milestones. Zero-bloat architecture. No dev-team drama.
+> I take non-technical founders from napkin sketch to production. AI-augmented workflows, deterministic LLM pipelines, MCP tooling, fixed-price milestones, zero-bloat architecture, no dev-team drama.
 
 ## Quick Facts
 
 - Role: Fractional CTO, Lead Architect, Tech-to-Business Translator
 - Company: NeatSoft PTE LTD (Singapore)
-- Expertise: SaaS development, backend architecture, AI integration, self-hosted infrastructure
-- Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik
+- Expertise: SaaS development, backend architecture, AI integration, MCP server engineering, deterministic LLM pipelines, self-hosted infrastructure
+- Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: Expert-Vetted (Top 1%), 100% Job Success, $395K+ earned, 80+ projects
-- Pricing: Fixed-price milestones ($3,000-$25,000+)
+- Pricing: Fixed-price milestones ($1,500-$25,000+)
 - Location: Da Nang, Vietnam (Singapore-based entity)
 
 ## Engagement Model
