@@ -1,17 +1,35 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
+import { webpForPng } from "../lib/image-path.ts";
 
 interface ImageGalleryProps {
   images: { src: string; alt: string }[];
 }
 
 /**
- * Given `…/foo/01-home.png`, return webp candidate path `…/foo/01-home.webp`.
- * Returns null if path does not end in `.png`.
+ * Renders an image with a WebP `<source>` fallback when the src ends in `.png`.
+ * Used in both the gallery thumbnails and the lightbox.
  */
-function webpForPng(src: string): string | null {
-  if (!src.toLowerCase().endsWith(".png")) return null;
-  return src.slice(0, -4) + ".webp";
+function GalleryImage(
+  { src, alt, class: className }: {
+    src: string;
+    alt: string;
+    class: string;
+  },
+) {
+  const webpSrc = webpForPng(src);
+  return (
+    <picture>
+      {webpSrc && <source srcset={webpSrc} type="image/webp" />}
+      <img
+        src={src}
+        alt={alt}
+        class={className}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
 }
 
 export default function ImageGallery({ images }: ImageGalleryProps) {
@@ -66,28 +84,20 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
     <>
       {/* Horizontal scrollable gallery */}
       <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
-        {images.map((image, index) => {
-          const webpSrc = webpForPng(image.src);
-          return (
-            <button
-              key={index}
-              type="button"
-              onClick={() => openLightbox(index)}
-              class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
-            >
-              <picture>
-                {webpSrc && <source srcset={webpSrc} type="image/webp" />}
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-            </button>
-          );
-        })}
+        {images.map((image, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => openLightbox(index)}
+            class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
+          >
+            <GalleryImage
+              src={image.src}
+              alt={image.alt}
+              class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
+            />
+          </button>
+        ))}
       </div>
 
       {/* Lightbox Dialog */}
@@ -147,21 +157,11 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             )}
 
             {/* Image (lightbox uses webp if available, falls back to png) */}
-            {(() => {
-              const src = images[activeIndex.value].src;
-              const webpSrc = webpForPng(src);
-              return (
-                <picture>
-                  {webpSrc && <source srcset={webpSrc} type="image/webp" />}
-                  <img
-                    src={src}
-                    alt={images[activeIndex.value].alt}
-                    class="max-w-[90vw] max-h-[90vh] object-contain"
-                    decoding="async"
-                  />
-                </picture>
-              );
-            })()}
+            <GalleryImage
+              src={images[activeIndex.value].src}
+              alt={images[activeIndex.value].alt}
+              class="max-w-[90vw] max-h-[90vh] object-contain"
+            />
 
             {/* Next button */}
             {images.length > 1 && (

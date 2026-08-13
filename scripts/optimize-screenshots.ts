@@ -74,6 +74,8 @@ for await (
   const entry of walk(SCREENSHOTS_DIR, {
     includeDirs: false,
     exts: [".png"],
+    // Project logos live as `logo.svg` already; any `logo.png` is a leftover
+    // and shouldn't get a webp variant.
     skip: [/\/logo\.png$/],
   })
 ) {

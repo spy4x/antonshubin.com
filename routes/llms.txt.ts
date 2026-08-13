@@ -3,9 +3,9 @@ import { BASE_URL } from "../lib/config.ts";
 
 export const handler = define.handlers({
   GET() {
-    const txt = `# Anton Shubin
+    const txt = `# Anton Shubin — Fractional CTO & Lead Architect
 
-> Fractional CTO & Lead Architect. I take non-technical founders from napkin sketch to production. Fixed-price milestones. Zero-bloat architecture. No dev-team drama.
+> I take non-technical founders from napkin sketch to production. Fixed-price milestones. Zero-bloat architecture. No dev-team drama.
 
 ## Quick Facts
 
