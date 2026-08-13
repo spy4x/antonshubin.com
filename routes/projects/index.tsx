@@ -7,6 +7,19 @@ import { type Project, projects } from "../../lib/data.ts";
 import { ArchiveIcon } from "../../components/Icons.tsx";
 import GhStars from "../../islands/GhStars.tsx";
 
+/**
+ * Truncate a description to a meaningful, scannable preview on the listing page.
+ * Strategy: take the first paragraph (semantic boundary) and hard-cap at 220
+ * chars at a word boundary. Avoids "very long" cards while preserving the hook.
+ */
+function truncateDescription(text: string, maxLen = 220): string {
+  const firstPara = text.split(/\n\n/)[0].trim().replace(/\s+/g, " ");
+  if (firstPara.length <= maxLen) return firstPara;
+  const cut = firstPara.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 40 ? cut.slice(0, lastSpace) : cut) + "…";
+}
+
 function ProjectCard({
   project,
   client,
@@ -19,59 +32,71 @@ function ProjectCard({
     ? `/projects/${project.slug}`
     : project.externalURL || undefined;
   const hasLogo = !!project.logoImageURL;
+  const hasLogoText = !hasLogo && !!project.logoText;
+  const preview = truncateDescription(project.description);
 
   return (
     <Wrapper
       href={href}
       target={project.externalURL && !project.slug ? "_blank" : undefined}
-      class={`block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group flex flex-col h-full ${
+      class={`block p-5 bg-gray-800 rounded-xl border-2 border-gray-700 transition-all group flex flex-col h-full ${
         project.archived
           ? "opacity-75 hover:opacity-100 hover:border-gray-500"
           : "hover:border-orange-500"
       }`}
     >
-      {project.archived && (
-        <div class="flex items-center gap-1 px-2 py-1 bg-gray-600 rounded text-xs text-gray-300 w-fit mb-3">
-          <ArchiveIcon class="w-3 h-3" />
-          Archived
+      {/* Top: logo (or logoText fallback) — same column as title */}
+      {(hasLogo || hasLogoText) && (
+        <div class="h-14 mb-4 flex items-center">
+          {hasLogo
+            ? (
+              <img
+                src={project.logoImageURL}
+                alt={`${project.title} logo`}
+                style={project.logoImageStyle}
+                class="max-h-full max-w-[160px] object-contain"
+                loading="lazy"
+              />
+            )
+            : (
+              <span
+                style={project.logoTextStyle}
+                class="text-xl font-semibold text-white"
+              >
+                {project.logoText}
+              </span>
+            )}
         </div>
       )}
 
-      <div class="flex gap-6">
-        {/* Text column */}
-        <div class={hasLogo ? "w-[60%]" : "w-full"}>
-          {client && project.madeForName && (
-            <p class="text-xs text-gray-500 mb-2">
-              Built for{" "}
-              <span class="text-orange-400">{project.madeForName}</span>
-            </p>
-          )}
+      {/* "Built for" line — client projects only */}
+      {client && project.madeForName && (
+        <p class="text-xs uppercase tracking-wide text-gray-500 mb-1.5">
+          Built for{" "}
+          <span class="text-orange-400 font-medium normal-case tracking-normal">
+            {project.madeForName}
+          </span>
+        </p>
+      )}
 
-          <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
-            {project.title}
-          </h3>
+      {/* Title */}
+      <h3 class="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+        {project.title}
+      </h3>
 
-          <p class="text-gray-400 text-sm leading-relaxed">
-            {project.description}
-          </p>
-        </div>
+      {/* Truncated description */}
+      <p class="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-4">
+        {preview}
+      </p>
 
-        {/* Logo column — only when logo image exists */}
-        {hasLogo && (
-          <div class="w-[40%] flex-shrink-0 flex items-center justify-center">
-            <img
-              src={project.logoImageURL}
-              alt={`${project.title} preview`}
-              style={project.logoImageStyle}
-              class="w-full max-h-[100px] object-contain"
-              loading="lazy"
-            />
+      {/* Bottom row: outcome + stars */}
+      <div class="mt-auto flex flex-wrap items-center gap-2 mb-3">
+        {project.archived && (
+          <div class="inline-flex items-center gap-1 px-2 py-1 bg-gray-600 rounded text-xs text-gray-300">
+            <ArchiveIcon class="w-3 h-3" />
+            Archived
           </div>
         )}
-      </div>
-
-      {/* Bottom section: outcome + stars + view details */}
-      <div class="mt-4 mb-4 flex flex-wrap items-center gap-2">
         {project.outcome && (
           <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full">
             <svg
@@ -94,7 +119,7 @@ function ProjectCard({
         {project.ghRepo && <GhStars repo={project.ghRepo} />}
       </div>
 
-      <span class="mt-auto inline-flex items-center gap-1 text-sm text-orange-400 group-hover:text-orange-300 transition-colors font-medium">
+      <span class="inline-flex items-center gap-1 text-sm text-orange-400 group-hover:text-orange-300 transition-colors font-medium">
         View details
         <svg
           class="w-3.5 h-3.5"
