@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run -A
 /**
- * Deploy to homelab: rsync source + env files, docker compose up --build
+ * Deploy to the cloud server: rsync source + env files, docker compose up --build
  *
  * Usage:
  *   deno task deploy           # production → antonshubin.com
@@ -9,10 +9,13 @@
  * Steps:
  *  1. Rsync source (excluding .git, .age, node_modules, _fresh, and .dockerignore patterns)
  *  2. Rsync env files separately (blocked by .dockerignore from step 1)
- *  3. SSH to homelab: docker compose up -d --build
+ *  3. SSH to the server: docker compose up -d --build
  */
 
-const SERVER = "homelab";
+// Cloud server (23.88.101.28). antonshubin.com used to run on the home server
+// as well; it was consolidated onto cloud, where Umami also lives — which is
+// what lets the first-party /umami/ proxy work from Traefik labels alone.
+const SERVER = "cloudlab";
 const isStaging = Deno.env.get("DEPLOY_ENV") === "staging";
 
 const TARGET = isStaging
@@ -30,8 +33,8 @@ const TARGET = isStaging
   };
 
 const REMOTE_PATH = isStaging
-  ? "~/ssd-2tb/apps/anton/antonshubin.com-stag/"
-  : "~/ssd-2tb/apps/anton/antonshubin.com/";
+  ? "~/cloudlab/apps/antonshubin.com-stag/"
+  : "~/cloudlab/apps/antonshubin.com/";
 const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 
 console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
@@ -39,7 +42,14 @@ console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
 if (isStaging) {
   // Create .env.staging on the fly (used for docker compose --env-file)
   const prodEnv = Deno.readTextFileSync(".env.prod");
-  const stagEnv = prodEnv.replace(/DOMAIN=.*/, `DOMAIN=${TARGET.domain}`);
+  // Anchor both replacements: an unanchored /DOMAIN=.*/ also matches the tail
+  // of WWW_DOMAIN=. WWW_DOMAIN is pinned to the staging host (not
+  // `www.<staging host>`) because that name has no DNS record — Traefik would
+  // request a cert for it and Let's Encrypt would fail the whole order,
+  // leaving staging with no certificate at all.
+  const stagEnv = prodEnv
+    .replace(/^DOMAIN=.*$/m, `DOMAIN=${TARGET.domain}`)
+    .replace(/^WWW_DOMAIN=.*$/m, `WWW_DOMAIN=${TARGET.domain}`);
   Deno.writeTextFileSync(".env.staging", stagEnv);
 }
 
