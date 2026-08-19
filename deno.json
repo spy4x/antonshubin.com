@@ -10,7 +10,8 @@
     "deploy:stag": "DEPLOY_ENV=staging deno run -A scripts/deploy.ts",
     "env:encrypt": "deno run -A scripts/encrypt.ts",
     "env:decrypt": "deno run -A scripts/decrypt.ts",
-    "publish:blog": "deno run -A scripts/publish-blog.ts"
+    "publish:blog": "deno run -A scripts/publish-blog.ts",
+    "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts"
   },
   "lint": {
     "rules": {
