@@ -15,7 +15,7 @@ export const handler = define.handlers({
 - Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: Expert-Vetted (Top 1%), 100% Job Success, $395K+ earned, 80+ projects
-- Pricing: Fixed-price milestones ($1,500-$25,000+)
+- Pricing: Fixed-price milestones ($3,000-$25,000+)
 - Location: Da Nang, Vietnam (Singapore-based entity)
 
 ## Engagement Model

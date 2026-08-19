@@ -70,13 +70,16 @@ export const handler = define.handlers({
 - **Home:** ${BASE_URL}/ — Main landing page with pain points, engagement terms, featured services
 - **Hackathons:** ${BASE_URL}/hackathons — Competitive engineering track record: 3 hackathons, AI SaaS builder (1st place), fintech payments (top 5), self-healing infrastructure (runner-up). Proof of speed and architecture under pressure.
 - **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
-- **Catalog:** ${BASE_URL}/catalog — 7 fixed-price offerings
+- **Catalog:** ${BASE_URL}/catalog — 10 fixed-price offerings
   - /catalog/strategy-call — Strategy Session ($350, 60 min)
   - /catalog/free-architecture-audit — Free Architecture Audit (free, 48h)
+  - /catalog/technical-discovery-sprint — Technical Discovery Sprint ($2,500, 3 days)
   - /catalog/zero-to-production-saas-mvp — SaaS MVP (from $15K, 21 days). Includes auth, Stripe payments, REST API, admin dashboard, Docker deploy, CI/CD, 30-day warranty. Excludes native mobile apps, third-party SaaS integrations, post-launch features.
-  - /catalog/bulletproof-backend-api — Backend API (from $4K, 14 days)
-  - /catalog/surgical-ai-integration — AI Integration (from $4K, 14 days)
-  - /catalog/codebase-health-audit — Code Audit (from $1.5K, 3 days)
+  - /catalog/bulletproof-backend-api — Backend API (from $6K, 14 days)
+  - /catalog/surgical-ai-integration — AI Integration & LLM Pipelines (from $6K, 14 days)
+  - /catalog/codebase-health-audit — Code Audit (from $3K, 3 days)
+  - /catalog/mcp-server-development — Custom MCP Server Development (from $4K, 10 days)
+  - /catalog/cto-advisory-retainer — CTO Advisory Retainer ($3K-$5K/mo, monthly)
   - /catalog/post-launch-support-maintenance — Support ($400/mo, ongoing)
 - **How I Work:** ${BASE_URL}/how-i-work — Full terms, policies, guarantees
 - **Contact:** ${BASE_URL}/contact-me — All contact channels

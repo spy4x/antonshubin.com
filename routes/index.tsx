@@ -63,7 +63,7 @@ export default define.page(function Home(ctx) {
                   AI-augmented production systems
                 </span>{" "}
                 — Deno, Preact, MCP, self-hosted infrastructure. Fixed price,
-                you own everything. MVPs from $15K, audits from $1.5K.
+                you own everything. MVPs from $15K, audits from $3K.
               </p>
 
               {/* Metrics Bar — linked to Upwork for proof */}
