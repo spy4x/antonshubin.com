@@ -1,8 +1,35 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
+import { webpForPng } from "../lib/image-path.ts";
 
 interface ImageGalleryProps {
   images: { src: string; alt: string }[];
+}
+
+/**
+ * Renders an image with a WebP `<source>` fallback when the src ends in `.png`.
+ * Used in both the gallery thumbnails and the lightbox.
+ */
+function GalleryImage(
+  { src, alt, class: className }: {
+    src: string;
+    alt: string;
+    class: string;
+  },
+) {
+  const webpSrc = webpForPng(src);
+  return (
+    <picture>
+      {webpSrc && <source srcset={webpSrc} type="image/webp" />}
+      <img
+        src={src}
+        alt={alt}
+        class={className}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
 }
 
 export default function ImageGallery({ images }: ImageGalleryProps) {
@@ -64,11 +91,10 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             onClick={() => openLightbox(index)}
             class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
           >
-            <img
+            <GalleryImage
               src={image.src}
               alt={image.alt}
               class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
-              loading="lazy"
             />
           </button>
         ))}
@@ -130,8 +156,8 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
               </button>
             )}
 
-            {/* Image */}
-            <img
+            {/* Image (lightbox uses webp if available, falls back to png) */}
+            <GalleryImage
               src={images[activeIndex.value].src}
               alt={images[activeIndex.value].alt}
               class="max-w-[90vw] max-h-[90vh] object-contain"

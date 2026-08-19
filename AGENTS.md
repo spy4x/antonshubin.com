@@ -33,35 +33,55 @@ after understanding the code, not after "figuring out what to do".**
 ### → Create branch + worktree immediately
 
 ```bash
-# ONE COMMAND: create branch+worktree from main and cd into it
-git worktree add -b <type>/<short-description> <type>/<short-description> main
-cd <type>/<short-description>
+# A linked worktree has .git as a FILE. The main repo has it as a DIRECTORY.
+if [ -f .git ]; then
+  echo "Already in a worktree — work here. Do NOT create another."
+else
+  # Derive paths from the repo, so this works on any machine or layout.
+  MAIN=$(realpath "$(dirname "$(git rev-parse --git-common-dir)")")
+  WT="$(dirname "$MAIN")/worktrees/$(basename "$MAIN")/<type>/<slug>"
+  mkdir -p "$(dirname "$WT")"   # git worktree add does NOT create parent dirs
+  git worktree add -b <type>/<slug> "$WT" main
+  cd "$WT"
+fi
 ```
 
 After creation, run `pwd` to confirm you're in the new directory, and
-`git
-branch --show-current` to confirm you're on the new branch.
+`git branch --show-current` to confirm you're on the new branch.
 
 ### Worktree directory layout
 
+Worktrees go in a sibling `worktrees/<repo>/` directory, **never inside the
+repo**:
+
 ```
-antonshubin.com/                     ← main worktree + .git/
-├── .git/                            ← git data (shared across all worktrees)
-├── assets/
-├── components/
-├── routes/
-├── feat/add-dark-mode/              ← worktree for feature branch
-│   ├── .git                         ← pointer to ../.git
+sync/code/
+├── antonshubin.com/                 ← main worktree + .git/
+│   ├── .git/                        ← git data (shared across all worktrees)
 │   ├── assets/
 │   ├── components/
-│   └── ...
-├── fix/mobile-nav-overlap/          ← worktree for fix branch
-└── ...
+│   └── routes/
+└── worktrees/antonshubin.com/
+    ├── feat/add-dark-mode/          ← worktree for feature branch
+    │   ├── .git                     ← pointer to the shared .git
+    │   ├── assets/
+    │   └── components/
+    └── fix/mobile-nav-overlap/      ← worktree for fix branch
 ```
 
-**Every branch gets its own subdirectory.** Worktrees live **inside** the repo
-directory (unlike the homelab repo which uses a bare-repo layout). You `cd` into
-that subdirectory and do ALL work there.
+**Every branch gets its own subdirectory** under `worktrees/antonshubin.com/`.
+You `cd` into that directory and do ALL work there.
+
+Why outside the repo: repo tooling walks the working tree, so nested worktrees
+get swept into formatters, type-checkers and env scripts — they scan other
+branches' files, fail on them, and in the worst case rewrite another branch's
+secrets. `deno task check` on this repo went from scanning 316 files to 104 once
+the nested worktrees were moved out. Nested worktrees also show up as untracked
+dirs (one `git add -A` from being committed) and make branch names ambiguous
+with paths (`git log feat/foo` → `fatal: ambiguous argument`).
+
+`realpath` matters when a checkout is reachable through a symlink — without it
+the same worktree gets registered under two different paths.
 
 ### Branch naming convention (Angular)
 
