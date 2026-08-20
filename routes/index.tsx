@@ -12,7 +12,6 @@ import {
   ServerIcon,
   StarIcon,
   UpworkIcon,
-  WalletIcon,
   YouTubeIcon,
 } from "../components/Icons.tsx";
 import GhStars from "../islands/GhStars.tsx";
@@ -32,38 +31,33 @@ export default define.page(function Home(ctx) {
               </h1>
               <div class="text-base text-gray-300 sm:text-lg md:text-xl">
                 <p class="mb-4">
-                  I take your SaaS from{" "}
+                  One accountable technical lead from{" "}
                   <span class="text-white font-semibold bg-orange-600 px-2 py-0.5 rounded-md whitespace-nowrap">
-                    napkin sketch to production
+                    architecture through production
                   </span>
                 </p>
                 <ul class="space-y-1 text-gray-300">
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
-                    <span>Without the dev-team drama</span>
+                    <span>Fixed-price milestones with clear scope</span>
                   </li>
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
-                    <span>Autonomous technical partner</span>
+                    <span>
+                      Architecture decisions explained in plain English
+                    </span>
                   </li>
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
-                    <span>Fixed-price milestones</span>
-                  </li>
-                  <li class="flex items-baseline gap-2">
-                    <span class="text-orange-500 shrink-0">—</span>
-                    <span>Zero-bloat architecture</span>
+                    <span>You own the code, infrastructure, and root keys</span>
                   </li>
                 </ul>
               </div>
 
-              {/* AI-augmented positioning sub-headline — stack + price anchor */}
               <p class="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed">
-                <span class="text-white font-medium">
-                  AI-augmented production systems
-                </span>{" "}
-                — Deno, Preact, MCP, self-hosted infrastructure. Fixed price,
-                you own everything. MVPs from $15K, audits from $3K.
+                Production includes deployment, observability, recovery,
+                security, and cost control — not code handed over before it is
+                ready to operate.
               </p>
 
               {/* Metrics Bar — linked to Upwork for proof */}
@@ -96,15 +90,22 @@ export default define.page(function Home(ctx) {
                 </a>
               </div>
 
-              {/* Primary CTA — prominent gradient button */}
-              <div class="mt-6">
+              <div class="mt-6 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <a
                   href={SCHEDULE_URL}
                   target="_blank"
                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-base"
+                  data-e2e="hero-book-call"
                 >
                   <CalendarIcon class="w-5 h-5" />
                   Book a free intro call — no pitch, just advice
+                </a>
+                <a
+                  href="/infrastructure"
+                  class="inline-flex min-h-11 items-center px-2 text-sm font-medium text-orange-400 underline underline-offset-4 transition-colors hover:text-orange-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+                  data-e2e="hero-production-proof"
+                >
+                  See production operations proof →
                 </a>
               </div>
 
@@ -178,11 +179,11 @@ export default define.page(function Home(ctx) {
             <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
               <div class="text-2xl mb-3">💰</div>
               <h3 class="text-lg font-semibold text-white mb-2">
-                Bloated costs, slow progress
+                Infrastructure chosen by habit
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                Your SaaS is running on $500/month AWS when it should cost $40
-                on Hetzner.
+                Infrastructure cost should follow actual load, recovery needs,
+                compliance, and your team's capacity — not a default stack.
               </p>
             </div>
             <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
@@ -194,6 +195,37 @@ export default define.page(function Home(ctx) {
                 You need a technical partner who owns the outcome — not a
                 time-tracker who owns the hours.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Infrastructure ownership proof */}
+        <section class="mb-16 md:mb-24">
+          <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row items-start gap-6">
+              <div class="p-3 bg-orange-500/15 rounded-xl shrink-0">
+                <ServerIcon class="w-8 h-8 text-orange-400" />
+              </div>
+              <div class="flex-1">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
+                  Architecture That Still Works After Launch
+                </h2>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-5">
+                  Product architecture includes deployment, observability,
+                  recovery, security, cost controls, and clean handoff. My
+                  Production Infrastructure Lab turns that operational judgment
+                  into a sanitized case study while client recommendations stay
+                  grounded in workload, team, compliance, recovery targets, and
+                  budget.
+                </p>
+                <a
+                  href="/infrastructure"
+                  data-e2e="home-view-infrastructure-proof"
+                  class="min-h-11 inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded-md transition-colors font-medium"
+                >
+                  See production operations proof →
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -481,22 +513,98 @@ export default define.page(function Home(ctx) {
         {/* Featured Projects Section */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">
-            Open Source — AI Tooling & Self-Hosted Infrastructure
+            Production Systems & Engineering Proof
           </h2>
-          {/* AI-augmented positioning callout */}
           <div class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
             <p class="text-sm sm:text-base text-gray-200 leading-relaxed">
-              Built with{" "}
-              <span class="text-white font-medium">AI-augmented workflows</span>
-              {" "}
-              — spec-first, human-owned architecture, agent-assisted
-              scaffolding. Source on GitHub, no paywalls, no telemetry.
+              Client production ownership first, backed by public systems you
+              can inspect.
             </p>
           </div>
           <div class="grid gap-6 md:grid-cols-2">
-            {/* caldav-mcp — AI-native MCP server, leads the grid */}
+            {/* SmartLite — client production system */}
+            <a
+              href="/projects/smartlite"
+              data-e2e="home-view-smartlite"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-blue-500 transition-all"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-blue-500/20 rounded-lg">
+                  <svg
+                    class="w-6 h-6 text-blue-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"
+                    />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
+                  SmartLite
+                </h3>
+              </div>
+              <p class="text-gray-300 text-sm mb-4">
+                Real-time IoT control platform for about 200 lamp poles at
+                Gardens by the Bay, in production since 2024. Built from zero to
+                production in three months: operator web app, backend, AWS
+                infrastructure, deployment pipeline, alerts, and role-based
+                access with 2FA.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  IoT
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Production
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  AWS
+                </span>
+              </div>
+            </a>
+
+            {/* Production Infrastructure Lab — public operations proof */}
+            <a
+              href="/projects/homelab"
+              data-e2e="home-view-infrastructure-lab"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-green-500 transition-all"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-green-500/20 rounded-lg">
+                  <ServerIcon class="w-6 h-6 text-green-400" />
+                </div>
+                <h3 class="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
+                  Production Infrastructure Lab
+                </h3>
+              </div>
+              <p class="text-gray-300 text-sm mb-4">
+                Sanitized infrastructure case study covering versioned delivery,
+                observability, backup integrity checks, retention and restore
+                tooling, and identity controls.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  IaC
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Operations
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Recovery
+                </span>
+              </div>
+            </a>
+
+            {/* caldav-mcp — public engineering proof */}
             <a
               href="/projects/caldav-mcp"
+              data-e2e="home-view-caldav-mcp"
               class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-blue-500 transition-all"
             >
               <div class="flex items-center gap-3 mb-4">
@@ -521,9 +629,8 @@ export default define.page(function Home(ctx) {
                 </h3>
               </div>
               <p class="text-gray-300 text-sm mb-4">
-                Native Deno MCP server for CalDAV. Events + tasks, zero npm
-                dependencies, single binary. Works with Claude, Cursor, and Open
-                WebUI.
+                Native Deno MCP server for CalDAV events and tasks. Zero npm
+                dependencies, single binary, and public source.
               </p>
               <div class="flex flex-wrap items-center gap-2">
                 <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
@@ -542,6 +649,7 @@ export default define.page(function Home(ctx) {
             {/* TodoApp — CalDAV Task Manager (PWA) */}
             <a
               href="/projects/todoapp-caldav"
+              data-e2e="home-view-todoapp"
               class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-cyan-500 transition-all"
             >
               <div class="flex items-center gap-3 mb-4">
@@ -580,68 +688,6 @@ export default define.page(function Home(ctx) {
                   CalDAV
                 </span>
                 <GhStars repo="spy4x/caldav-tasks-web" class="ml-auto" />
-              </div>
-            </a>
-
-            {/* Financy */}
-            <a
-              href="/projects/financy"
-              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-purple-500 transition-all"
-            >
-              <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-purple-500/20 rounded-lg">
-                  <WalletIcon class="w-6 h-6 text-purple-400" />
-                </div>
-                <h3 class="text-xl font-semibold text-white group-hover:text-purple-400 transition-colors">
-                  Financy
-                </h3>
-              </div>
-              <p class="text-gray-300 text-sm mb-4">
-                Self-hostable finance tracking with double-entry accounting,
-                multi-currency, real-time collaboration, and PWA support.
-              </p>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Deno
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Preact
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  PostgreSQL
-                </span>
-                <GhStars repo="spy4x/financy" class="ml-auto" />
-              </div>
-            </a>
-
-            {/* Homelab */}
-            <a
-              href="/projects/homelab"
-              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-green-500 transition-all"
-            >
-              <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-green-500/20 rounded-lg">
-                  <ServerIcon class="w-6 h-6 text-green-400" />
-                </div>
-                <h3 class="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
-                  Homelab
-                </h3>
-              </div>
-              <p class="text-gray-300 text-sm mb-4">
-                Infrastructure-as-code framework for self-hosting 20+ services
-                with Docker, Traefik, automated backups, and monitoring.
-              </p>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Deno
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Docker
-                </span>
-                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
-                  Ansible
-                </span>
-                <GhStars repo="spy4x/homelab" class="ml-auto" />
               </div>
             </a>
           </div>
@@ -761,48 +807,6 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
-        {/* Infrastructure Section */}
-        <section class="mb-16 md:mb-24">
-          <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
-            <div class="flex flex-col sm:flex-row items-start gap-6">
-              <div class="text-4xl shrink-0">🛠️</div>
-              <div class="flex-1">
-                <a
-                  href="/infrastructure"
-                  class="text-2xl sm:text-3xl font-bold text-white hover:text-orange-400 transition-colors"
-                >
-                  Infrastructure →
-                </a>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mt-3 mb-4">
-                  Self-hosted homelab running 40+ services on a single dedicated
-                  server for $50/month. Traefik, Docker, Grafana, PostgreSQL,
-                  and more — all running on Fedora at Hetzner.
-                </p>
-                <a
-                  href="/infrastructure"
-                  class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium underline underline-offset-2"
-                >
-                  Architecture breakdown and cost analysis
-                  <svg
-                    class="w-4 h-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                    />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Testimonial Section */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">What Clients Say</h2>
@@ -906,106 +910,28 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
-        {/* CTA Section */}
-        {/* Beyond the Code Section */}
+        {/* Outside Work Section */}
         <section class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">Beyond the Code</h2>
-          <div class="grid gap-5 sm:grid-cols-2">
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
-              <h3 class="text-lg font-semibold text-white mb-3">
-                🛠️ Infrastructure & IoT
-              </h3>
-              <ul class="space-y-3 text-gray-400 text-sm">
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <span>
-                    Self-host 20+ services on Fedora with{" "}
-                    <a
-                      href="https://uptime-cloud.antonshubin.com"
-                      target="_blank"
-                      class="text-orange-400 hover:text-orange-300 underline"
-                    >
-                      Docker/Podman
-                    </a>
-                  </span>
-                </li>
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <a
-                    href="/infrastructure"
-                    class="text-orange-400 hover:text-orange-300 underline"
-                  >
-                    Full infrastructure breakdown ($50/mo, 40+ services)
-                  </a>
-                </li>
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <span>
-                    Custom{" "}
-                    <a
-                      href="https://www.instagram.com/p/ChWl-7Vr_nU/?img_index=1"
-                      target="_blank"
-                      class="text-orange-400 hover:text-orange-300 underline"
-                    >
-                      ESP32 air quality sensor
-                    </a>{" "}
-                    in Home Assistant
-                  </span>
-                </li>
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <span>
-                    Open-source{" "}
-                    <a
-                      href="https://financy.dev"
-                      target="_blank"
-                      class="text-orange-400 hover:text-orange-300 underline"
-                    >
-                      finance tracker
-                    </a>{" "}
-                    (double-entry accounting, PWA)
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
-              <h3 class="text-lg font-semibold text-white mb-3">
-                🏍️ Adventure
-              </h3>
-              <ul class="space-y-3 text-gray-400 text-sm">
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <span>
-                    <a
-                      href="https://www.youtube.com/@anton-shubin-live"
-                      target="_blank"
-                      class="text-orange-400 hover:text-orange-300 underline"
-                    >
-                      Enduro, skiing, and scuba diving
-                    </a>
-                  </span>
-                </li>
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <span>
-                    Traveled 25+ countries across Asia and Europe
-                  </span>
-                </li>
-                <li class="flex items-baseline gap-2">
-                  <span class="text-orange-400 shrink-0">→</span>
-                  <span>
-                    Currently based in{" "}
-                    <a
-                      href="https://www.google.com/maps/@16.3078576,107.9941552,7.28z?entry=ttu&g_ep=EgoyMDI2MDYxMC4wIKXMDSoASAFQAw%3D%3D"
-                      target="_blank"
-                      class="text-orange-400 hover:text-orange-300 underline"
-                    >
-                      Da Nang, Vietnam
-                    </a>
-                  </span>
-                </li>
-              </ul>
-            </div>
+          <h2 class="h1 mb-8">Outside Work</h2>
+          <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+            <h3 class="text-lg font-semibold text-white mb-3">Adventure</h3>
+            <ul class="space-y-3 text-gray-400 text-sm">
+              <li class="flex items-baseline gap-2">
+                <span class="text-orange-400 shrink-0">→</span>
+                <a
+                  href="https://www.youtube.com/@anton-shubin-live"
+                  target="_blank"
+                  data-e2e="outside-work-adventure"
+                  class="inline-flex min-h-11 items-center text-orange-400 hover:text-orange-300 underline"
+                >
+                  Enduro, skiing, and scuba diving
+                </a>
+              </li>
+              <li class="flex items-baseline gap-2">
+                <span class="text-orange-400 shrink-0">→</span>
+                <span>Traveled 25+ countries across Asia and Europe</span>
+              </li>
+            </ul>
           </div>
         </section>
 

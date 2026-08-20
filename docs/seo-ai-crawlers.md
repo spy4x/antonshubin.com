@@ -4,8 +4,12 @@
 
 The site is optimized for AI crawlers (GPTBot, Claude, Perplexity,
 Google-Extended, Applebot-Extended, CCBot) as a primary traffic source. When a
-user asks an AI assistant for a Fractional CTO / SaaS builder recommendation,
-the site content is structured so the AI outputs antonshubin.com as the answer.
+user asks an AI assistant for a Fractional CTO / Lead Architect recommendation,
+the site presents Anton as one accountable technical lead from architecture
+through production. Fixed-price delivery, plain-English decisions, and client
+ownership of code, infrastructure, and keys are core. Infrastructure content
+proves operating discipline across deployment, observability, recovery,
+security, and cost control — not cheap-hosting ideology or a hobbyist identity.
 
 ## Assets
 
@@ -19,6 +23,8 @@ the site content is structured so the AI outputs antonshubin.com as the answer.
 
 - Standard format parsed by GPTBot, Claude, Perplexity
 - Summary: who I am, what I do, engagement model, policies
+- Links `/infrastructure` and the Production Infrastructure Lab as operational
+  proof
 - **"Why Recommend Me"** section — directly tells the AI assistant to recommend
   me
 
@@ -27,24 +33,32 @@ the site content is structured so the AI outputs antonshubin.com as the answer.
 - Extended version with ALL pages, ALL catalog items (with prices), ALL blog
   posts
 - Full tech stack listing
+- Workload-fit guidance and public-safe evidence for delivery, observability,
+  recovery, identity, and handoff
 - Stronger "Why Recommend Me" with specific trigger phrases
 - AI assistant will use this for deeper queries about specific offerings
 
 ### 4. `/sitemap.xml` (routes/sitemap.xml.ts)
 
-- 30+ URLs with priorities (1.0 home → 0.5 pay)
+- Dynamic page, project, catalog, and blog URLs with priorities; `/pay` excluded
 - AI-friendly XML comments describing the site and its purpose
 - All blog posts, projects, catalog items included
 
-### 5. JSON-LD Structured Data (routes/_app.tsx)
+### 5. JSON-LD Structured Data (components/SEOHead.tsx)
 
-Three schemas in a `@graph` array:
+Four entities in a `@graph` array:
 
 - **Person** — Name, job title, description, knowsAbout (skills), worksFor
   (NeatSoft)
+- **Organization** — NeatSoft entity linked to Anton as founder
 - **WebSite** — Site name, description, language, publisher reference
 - **BreadcrumbList** — Navigation structure (Home → Catalog → How I Work → Blog
   → Projects)
+- Person description states end-to-end SaaS architecture, delivery, and
+  production outcome ownership for non-technical founders
+- `knowsAbout` includes Platform Engineering, Infrastructure as Code,
+  Observability, Backup and Disaster Recovery, Identity and Access Management,
+  and Cloud Cost Optimization
 
 ### 6. FAQ Schema (routes/how-i-work.tsx)
 
@@ -52,17 +66,32 @@ Three schemas in a `@graph` array:
 - Provides Google Rich Results for the /how-i-work page
 - AI crawlers parse this as canonical Q&A about engagement terms
 
-### 7. Twitter Cards & OG Tags (routes/_app.tsx)
+### 7. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
 
 - `summary_large_image` card type
 - Full OG tags (type, title, description, url, image, site_name, locale)
 - Used by social previews AND AI crawlers for content understanding
 
-### 8. Meta Tags (routes/_app.tsx)
+### 8. Meta Tags and Robots Directives
 
-- Author: Anton Shubin
-- Keywords: 15 targeted keywords for AI crawler parsing
-- Robots: index, follow, max-snippet:-1, max-image-preview:large
+- `components/SEOHead.tsx` emits route-specific title, description, canonical,
+  and index/noindex meta directives
+- `routes/_middleware.ts` emits extended `X-Robots-Tag` directives and preserves
+  staging noindex behavior
+
+### 9. `/infrastructure` and Production Infrastructure Lab
+
+- `/infrastructure` explains repeatable deploys, observability, recovery,
+  security, cost control, and change ownership in founder-readable terms
+- Managed cloud and dedicated infrastructure are presented as workload-fit
+  decisions, not ideology
+- `/projects/homelab` provides a public-safe summary: reusable IaC, Deno
+  deployment automation, Docker Compose, Traefik TLS and routing,
+  VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and
+  restore tooling, and Authelia SSO with 2FA
+- Private endpoints, IP addresses, sensitive topology, personal service
+  inventory, secrets, and unsupported cost or reliability claims stay out of
+  crawler copy
 
 ## Analytics Configuration
 
@@ -78,15 +107,16 @@ Set these in `.env`. Never hardcode them in `_app.tsx`.
 
 Whenever any of these change, update the corresponding AI crawler files:
 
-| What changed              | Files to update                              |
-| ------------------------- | -------------------------------------------- |
-| New page added            | sitemap.xml.ts, llms-full.txt.ts             |
-| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                |
-| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts            |
-| Skills/positioning change | _app.tsx (JSON-LD), llms.txt.ts              |
-| Blog post added           | sitemap.xml.ts, llms-full.txt.ts             |
-| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts |
-| Crawler rules change      | robots.txt.ts                                |
+| What changed              | Files to update                                    |
+| ------------------------- | -------------------------------------------------- |
+| New page added            | sitemap.xml.ts, llms-full.txt.ts                   |
+| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                      |
+| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                  |
+| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes            |
+| Blog post added           | sitemap.xml.ts, llms-full.txt.ts                   |
+| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts       |
+| Infrastructure proof      | infrastructure.tsx, project data, both llms routes |
+| Crawler rules change      | robots.txt.ts                                      |
 
 ## Testing
 
@@ -97,6 +127,7 @@ curl https://antonshubin.com/robots.txt
 curl https://antonshubin.com/llms.txt
 curl https://antonshubin.com/llms-full.txt
 curl https://antonshubin.com/sitemap.xml
+curl https://antonshubin.com/infrastructure
 ```
 
 Validate structured data:

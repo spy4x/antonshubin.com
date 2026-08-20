@@ -146,12 +146,14 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href="/infrastructure"
-                class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
+                data-e2e="architecture-guide-production-operations"
+                class="inline-flex min-h-11 items-center text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → Infrastructure Overview
+                → Production Operations Practice
               </a>
               <p class="text-gray-500 text-sm mt-0.5">
-                Full stack architecture: Traefik, monitoring, backup strategy.
+                Repeatable deployment, observability, recovery, security, and
+                cost control after launch.
               </p>
             </li>
           </ul>
@@ -164,31 +166,34 @@ export default define.page(function SaasArchGuide() {
             Infrastructure &amp; Cost Optimization
           </h2>
           <p class="text-gray-400 mb-4">
-            Run production services on a budget without sacrificing reliability.
+            Choose infrastructure from measured load, recovery needs,
+            compliance, team capacity, and budget.
           </p>
           <ul class="space-y-3">
             <li>
               <a
-                href="/blog/cost-optimization-laboratory"
-                class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
+                href="/infrastructure"
+                data-e2e="architecture-guide-infrastructure-rubric"
+                class="inline-flex min-h-11 items-center text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → How I Run 20+ Production Services on a Single $50/Month Server
+                → Managed Cloud, Dedicated, or Hybrid
               </a>
               <p class="text-gray-500 text-sm mt-0.5">
-                Exact architecture, cost breakdown, and patterns to slash infra
-                costs by 90%.
+                Decision rubric for compliance, elasticity, geography, team
+                capacity, uptime, recovery, and cost.
               </p>
             </li>
             <li>
               <a
                 href="/projects/homelab"
-                class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
+                data-e2e="architecture-guide-homelab-proof"
+                class="inline-flex min-h-11 items-center text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → Homelab
+                → Production Infrastructure Lab
               </a>
               <p class="text-gray-500 text-sm mt-0.5">
-                Infrastructure-as-code for 20+ Docker services with Traefik and
-                monitoring.
+                Sanitized case study of reusable IaC, Deno deployment
+                automation, monitoring, recovery tooling, and identity controls.
               </p>
             </li>
           </ul>
