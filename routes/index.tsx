@@ -921,6 +921,7 @@ export default define.page(function Home(ctx) {
                 <a
                   href="https://www.youtube.com/@anton-shubin-live"
                   target="_blank"
+                  rel="noopener noreferrer"
                   data-e2e="outside-work-adventure"
                   class="inline-flex min-h-11 items-center text-orange-400 hover:text-orange-300 underline"
                 >
