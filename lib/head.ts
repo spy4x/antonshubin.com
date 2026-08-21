@@ -13,7 +13,7 @@ export interface PageHead {
 const DEFAULTS: PageHead = {
   title: "Anton Shubin | Fractional CTO & Lead Architect",
   description:
-    "Fractional CTO for non-technical founders. Fixed-price SaaS delivery from architecture through deployment, observability, recovery, security, and cost control.",
+    "Fractional CTO and Lead Architect. Open-source self-hostable stacks default, dedicated hardware when it earns its keep, managed cloud when the business calls for it. Fixed-price SaaS delivery from architecture through production.",
   canonical: "https://antonshubin.com/",
   ogImage: "https://antonshubin.com/img/photo-big.webp",
   ogType: "profile",

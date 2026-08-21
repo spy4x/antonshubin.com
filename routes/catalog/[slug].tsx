@@ -63,6 +63,15 @@ export default define.page(function CatalogDetail(ctx) {
             "serviceType": item.title,
             "provider": { "@id": "https://antonshubin.com/#person" },
             "areaServed": "Worldwide",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "5.0",
+              "bestRating": "5",
+              "ratingCount": "80",
+              "url": "https://www.upwork.com/freelancers/ashubin",
+              "description":
+                "Upwork-verified rating: 5.0/5.0 across 80+ engagements.",
+            },
             "offers": exactPrice
               ? {
                 "@type": "Offer",

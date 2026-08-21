@@ -86,11 +86,11 @@ export const items: CatalogItem[] = [
     outcome:
       "A complete architectural blueprint and phased build roadmap so you can execute with confidence instead of guesswork.",
     includes: [
-      "Architecture blueprint with system diagrams and decision rationale",
-      "Risk register with practical mitigation options",
-      "Operating-cost estimate for infrastructure and third-party services",
-      "Recovery plan aligned with product data and acceptable downtime",
-      "Phased scope with build order and timeline estimates",
+      "System architecture diagram (Excalidraw or draw.io)",
+      "Tech stack recommendation with rationale",
+      "Infrastructure cost estimate (server, database, third-party services)",
+      "Phased build roadmap with timeline estimates",
+      "Key risk factors and mitigation strategies",
       "30-minute walkthrough call to review the blueprint",
     ],
     tech: ["Any stack", "Architecture", "Strategy", "Cost optimization"],

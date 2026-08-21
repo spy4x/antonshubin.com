@@ -90,15 +90,15 @@ const policies: PolicyItem[] = [
     desc:
       "Every technical decision gets a plain-English explanation. You will never hear opaque jargon without a clear translation of what it means for your product, timeline, and budget.",
     why:
-      "Non-technical founders should not need a translator. I speak both business and engineering fluently.",
+      "You should not need a translator. I speak both business and engineering fluently with founders, technical co-founders, and CTOs alike.",
   },
   {
     icon: "🌐",
-    title: "Constraint-Led Architecture",
+    title: "Open-Source, Self-Hostable Stacks",
     desc:
-      "I choose managed cloud, dedicated infrastructure, or hybrid architecture from the product workload, compliance needs, recovery targets, team capacity, and budget. Portability and exit costs are documented before they become constraints.",
+      "I default to open-source, self-hostable infrastructure — FOSS preferred for cost discipline, performance, portability, and auditability. Bare-metal on Hetzner when the workload justifies it, managed cloud (AWS, GCP, Supabase) when the business calls for it, hybrid in between. Exit costs are documented before they become constraints.",
     why:
-      "Architecture should fit the business instead of following cloud fashion or my preferred tools.",
+      "You own the keys, the code, and the choices. No proprietary lock-in, no surprise bills, no vendor hostage.",
   },
   {
     icon: "🛟",
@@ -106,7 +106,7 @@ const policies: PolicyItem[] = [
     desc:
       "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patch updates, and monthly status reports. Critical issues get an 8-hour response time.",
     why:
-      "Monitoring, backup checks, capacity tracking, and patching reduce avoidable operational risk after launch.",
+      "Your software is your asset — it deserves care after launch. Patch cycles, capacity checks, and incident response keep the system healthy.",
     link: "/catalog/post-launch-support-maintenance",
   },
 ];
@@ -236,6 +236,15 @@ export default define.page(function HowIWork() {
               phased plan before funding implementation. Ongoing technical
               leadership uses a CTO advisory retainer with explicit outcomes —
               not embedded labor or screen-tracked hours.
+            </FaqItem>
+
+            <FaqItem q="Do you accept hourly engagements?">
+              Yes — hourly is available for staff augmentation, code reviews, or
+              when scope is not fully clear yet. Fixed-price milestones are my
+              preferred default for new projects because they eliminate
+              micromanagement and screen tracking, but hourly remains a real
+              option for the right context. The first conversation is about
+              which fits your situation.
             </FaqItem>
 
             <FaqItem q="How do you communicate during a project?">

@@ -44,6 +44,7 @@ export const handler = define.handlers({
 - MCP server engineering (Model Context Protocol — production MCP servers)
 - Deterministic LLM pipelines (spec-driven, human-owned architecture, agent-assisted scaffolding)
 - Product and production ownership from architecture through clean handoff
+- Open-source and self-hostable infrastructure as a default; dedicated bare-metal on Hetzner when the workload justifies it; managed cloud (AWS, GCP, Supabase) when the business calls for it
 - Platform engineering, infrastructure as code, observability, backup and disaster recovery
 - Identity and access management, workload-fit decisions, and cloud cost optimization
 - Codebase audits and refactoring

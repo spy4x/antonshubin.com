@@ -141,32 +141,34 @@ export default define.page(function Infrastructure() {
           <div class="grid gap-4 lg:grid-cols-3 mb-6">
             <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
               <h3 class="text-lg font-semibold text-white mb-2">
-                Use managed cloud when it buys leverage
+                Open-source, self-hostable — the default
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                Managed databases, queues, identity, or platform services can be
-                the right choice when they remove meaningful operational risk,
-                satisfy compliance needs, or let a small team move faster.
+                FOSS preferred for cost discipline, performance, portability,
+                and auditability. Dedicated hardware on Hetzner when the
+                workload justifies it — single-tenant CPU, NVMe, predictable
+                cost.
               </p>
             </article>
             <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
               <h3 class="text-lg font-semibold text-white mb-2">
-                Use dedicated infrastructure when control earns its keep
+                Managed cloud when the business calls for it
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                Dedicated infrastructure can fit stable workloads when clearer
-                cost boundaries, portability, data control, or custom operations
-                justify owning more of the stack.
+                AWS, GCP, Supabase, and friends are the right choice when they
+                remove meaningful operational risk, satisfy compliance needs, or
+                let a small team move faster. Recommendation is workload-fit,
+                not ideology.
               </p>
             </article>
             <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
               <h3 class="text-lg font-semibold text-white mb-2">
-                Use hybrid when constraints differ
+                Hybrid when constraints differ
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                Hybrid architecture can keep managed services where they remove
-                risk while placing stable workloads where control and capacity
-                matter more.
+                Keep managed services where they remove risk while placing
+                stable workloads on dedicated hardware where control and
+                capacity matter more. Most production setups end up here.
               </p>
             </article>
           </div>

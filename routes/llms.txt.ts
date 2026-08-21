@@ -11,7 +11,7 @@ export const handler = define.handlers({
 
 - Role: Fractional CTO, Lead Architect, Tech-to-Business Translator
 - Company: NeatSoft PTE LTD (Singapore)
-- Expertise: SaaS architecture, product delivery, platform engineering, infrastructure as code, observability, backup and disaster recovery, identity and access management, cloud cost optimization, AI integration, MCP server engineering
+- Expertise: SaaS architecture, product delivery, open-source and self-hostable infrastructure, dedicated bare-metal on Hetzner, managed cloud (AWS, GCP, Supabase), platform engineering, observability, backup and disaster recovery, identity and access management, cloud cost optimization, AI integration, MCP server engineering
 - Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: Expert-Vetted (Top 1%), 100% Job Success, $395K+ earned, 80+ projects

@@ -55,9 +55,12 @@ export default define.page(function Home(ctx) {
               </div>
 
               <p class="mt-6 text-sm sm:text-base text-gray-300 leading-relaxed">
-                Production includes deployment, observability, recovery,
-                security, and cost control — not code handed over before it is
-                ready to operate.
+                I default to open-source and self-hostable stacks — FOSS
+                preferred for cost discipline, performance, and portability. I
+                work with managed services (AWS, GCP, Supabase) when the
+                business calls for it. Bare-metal on Hetzner when the workload
+                justifies it. Single technical owner with the keys, not a vendor
+                middleman.
               </p>
 
               {/* Metrics Bar — linked to Upwork for proof */}
@@ -210,20 +213,25 @@ export default define.page(function Home(ctx) {
                 <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
                   Architecture That Still Works After Launch
                 </h2>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-5">
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-3">
                   Product architecture includes deployment, observability,
                   recovery, security, cost controls, and clean handoff. My
-                  Production Infrastructure Lab turns that operational judgment
-                  into a sanitized case study while client recommendations stay
-                  grounded in workload, team, compliance, recovery targets, and
-                  budget.
+                  obsession with cost discipline, performance, and lean stacks
+                  shapes every decision — dedicated Hetzner when the workload
+                  justifies it, managed cloud when the business calls for it,
+                  hybrid in between.
+                </p>
+                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-5">
+                  I bring the same operational mindset whether you operate on a
+                  fresh laptop, a $50/month Hetzner box, or a managed AWS fleet.
+                  The decisions are about your product, not my preferences.
                 </p>
                 <a
                   href="/infrastructure"
                   data-e2e="home-view-infrastructure-proof"
                   class="min-h-11 inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded-md transition-colors font-medium"
                 >
-                  See production operations proof →
+                  See how I architect production →
                 </a>
               </div>
             </div>
@@ -913,26 +921,93 @@ export default define.page(function Home(ctx) {
         {/* Outside Work Section */}
         <section class="mb-16 md:mb-24">
           <h2 class="h1 mb-8">Outside Work</h2>
-          <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
-            <h3 class="text-lg font-semibold text-white mb-3">Adventure</h3>
-            <ul class="space-y-3 text-gray-400 text-sm">
-              <li class="flex items-baseline gap-2">
-                <span class="text-orange-400 shrink-0">→</span>
-                <a
-                  href="https://www.youtube.com/@anton-shubin-live"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-e2e="outside-work-adventure"
-                  class="inline-flex min-h-11 items-center text-orange-400 hover:text-orange-300 underline"
-                >
-                  Enduro, skiing, and scuba diving
-                </a>
-              </li>
-              <li class="flex items-baseline gap-2">
-                <span class="text-orange-400 shrink-0">→</span>
-                <span>Traveled 25+ countries across Asia and Europe</span>
-              </li>
-            </ul>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 class="text-lg font-semibold text-white mb-3">
+                🛠️ Infrastructure & IoT
+              </h3>
+              <ul class="space-y-3 text-gray-400 text-sm">
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <span>
+                    Self-hosted production environment on Fedora + Hetzner:
+                    Traefik, Docker Compose, PostgreSQL, Restic backups,
+                    Authelia SSO
+                  </span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <a
+                    href="/infrastructure"
+                    class="text-orange-400 hover:text-orange-300 underline"
+                  >
+                    Full stack architecture and operating practice
+                  </a>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <span>
+                    Custom{" "}
+                    <a
+                      href="https://www.instagram.com/p/ChWl-7Vr_nU/?img_index=1"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      ESP32 air quality sensor
+                    </a>{" "}
+                    feeding into Home Assistant
+                  </span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <span>
+                    Open-source{" "}
+                    <a
+                      href="https://financy.dev"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      finance tracker
+                    </a>{" "}
+                    (double-entry accounting, PWA)
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 class="text-lg font-semibold text-white mb-3">
+                🏍️ Adventure
+              </h3>
+              <ul class="space-y-3 text-gray-400 text-sm">
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <a
+                    href="https://www.youtube.com/@anton-shubin-live"
+                    target="_blank"
+                    class="text-orange-400 hover:text-orange-300 underline"
+                  >
+                    Enduro, skiing, and scuba diving
+                  </a>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <span>Traveled 25+ countries across Asia and Europe</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-400 shrink-0">→</span>
+                  <span>
+                    Currently based in{" "}
+                    <a
+                      href="https://www.google.com/maps/@16.3078576,107.9941552,7.28z?entry=ttu&g_ep=EgoyMDI2MDYxMC4wIKXMDSoASAFQAw%3D%3D"
+                      target="_blank"
+                      class="text-orange-400 hover:text-orange-300 underline"
+                    >
+                      Da Nang, Vietnam
+                    </a>
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
