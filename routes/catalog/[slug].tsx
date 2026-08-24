@@ -33,8 +33,12 @@ export default define.page(function CatalogDetail(ctx) {
   // Render description as markdown so links inside work
   const descHtml = marked.parse(item.desc, { async: false }) as string;
 
-  // Parse price for schema (strip non-numeric)
-  const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+  // Only publish exact one-time prices. "From", ranges, free work, and retainers
+  // need different schema semantics and are safer without an Offer.
+  const exactPriceMatch = item.price.match(/^\$([\d,]+)$/);
+  const exactPrice = exactPriceMatch
+    ? Number(exactPriceMatch[1].replaceAll(",", ""))
+    : undefined;
 
   head.value = {
     ...head.value,
@@ -52,112 +56,32 @@ export default define.page(function CatalogDetail(ctx) {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Product",
-            "@id": `https://antonshubin.com/catalog/${item.slug}/#product`,
+            "@type": "Service",
+            "@id": `https://antonshubin.com/catalog/${item.slug}/#service`,
             "name": item.title,
             "description": item.desc,
-            "image": "https://antonshubin.com/img/photo-big.webp",
-            "brand": {
-              "@type": "Brand",
-              "name": "Anton Shubin",
-            },
-            "category": "Fractional CTO & SaaS Architecture",
-            "areaServed": { "@type": "Place", "name": "Worldwide" },
+            "serviceType": item.title,
+            "provider": { "@id": "https://antonshubin.com/#person" },
+            "areaServed": "Worldwide",
             "aggregateRating": {
               "@type": "AggregateRating",
-              "ratingValue": "4.9",
+              "ratingValue": "5.0",
               "bestRating": "5",
-              "reviewCount": "80",
+              "ratingCount": "80",
+              "url": "https://www.upwork.com/freelancers/ashubin",
               "description":
-                "100% Job Success on Upwork, Expert-Vetted (Top 1%), $395K+ earned across 80+ projects",
+                "Upwork-verified rating: 5.0/5.0 across 80+ engagements.",
             },
-            "review": [
-              {
-                "@type": "Review",
-                "author": { "@type": "Person", "name": "Upwork Client" },
-                "reviewRating": { "@type": "Rating", "ratingValue": "5" },
-                "reviewBody":
-                  "Anton delivered exceptional work — clear communication, on-time delivery, exceeded expectations.",
-              },
-            ],
-            "offers": priceNum && priceNum > 0
+            "offers": exactPrice
               ? {
                 "@type": "Offer",
                 "priceCurrency": "USD",
-                "price": priceNum.toFixed(2),
+                "price": String(exactPrice),
                 "url": `https://antonshubin.com/catalog/${item.slug}/`,
                 "availability": "https://schema.org/InStock",
                 "seller": { "@id": "https://antonshubin.com/#person" },
-                "hasMerchantReturnPolicy": {
-                  "@type": "MerchantReturnPolicy",
-                  "applicableCountry": {
-                    "@type": "Country",
-                    "name": "Worldwide",
-                  },
-                  "returnPolicyCategory":
-                    "https://schema.org/MerchantReturnFiniteReturnWindow",
-                  "merchantReturnDays": 14,
-                  "returnMethod": "https://schema.org/ReturnByMail",
-                  "returnFees": "https://schema.org/FreeReturn",
-                  "returnPolicyCountry": {
-                    "@type": "Country",
-                    "name": "Worldwide",
-                  },
-                },
-                "shippingDetails": {
-                  "@type": "OfferShippingDetail",
-                  "shippingRate": {
-                    "@type": "MonetaryAmount",
-                    "value": "0",
-                    "currency": "USD",
-                  },
-                  "shippingDestination": {
-                    "@type": "DefinedRegion",
-                    "name": "Worldwide",
-                  },
-                  "deliveryTime": {
-                    "@type": "ShippingDeliveryTime",
-                    "businessDays": {
-                      "@type": "OpeningHoursSpecification",
-                      "dayOfWeek": "https://schema.org/Monday",
-                    },
-                    "handlingTime": {
-                      "@type": "QuantitativeValue",
-                      "minValue": "0",
-                      "maxValue": "2",
-                      "unitCode": "DAY",
-                    },
-                  },
-                },
               }
               : undefined,
-          }),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Who is this service for?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": item.audience,
-                },
-              },
-              ...item.examples.map((ex) => ({
-                "@type": "Question",
-                "name": ex.split(" — ")[0],
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": ex,
-                },
-              })),
-            ],
           }),
         }}
       />

@@ -90,15 +90,15 @@ const policies: PolicyItem[] = [
     desc:
       "Every technical decision gets a plain-English explanation. You will never hear opaque jargon without a clear translation of what it means for your product, timeline, and budget.",
     why:
-      "Non-technical founders should not need a translator. I speak both business and engineering fluently.",
+      "You should not need a translator. I speak both business and engineering fluently with founders, technical co-founders, and CTOs alike.",
   },
   {
     icon: "🌐",
-    title: "Community-Driven Architecture",
+    title: "Open-Source, Self-Hostable Stacks",
     desc:
-      "I build with proven technologies: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman. AI integrations via OpenAI, Claude, and DeepSeek APIs. No proprietary frameworks. No single-vendor risk. Developers everywhere already know these tools — there is no research or retraining needed.",
+      "I default to open-source, self-hostable infrastructure — FOSS preferred for cost discipline, performance, portability, and auditability. Bare-metal on Hetzner when the workload justifies it, managed cloud (AWS, GCP, Supabase) when the business calls for it, hybrid in between. Exit costs are documented before they become constraints.",
     why:
-      "Your product should not be held hostage by a niche technology choice. Open-source means portable, auditable, and sustainable.",
+      "You own the keys, the code, and the choices. No proprietary lock-in, no surprise bills, no vendor hostage.",
   },
   {
     icon: "🛟",
@@ -106,7 +106,7 @@ const policies: PolicyItem[] = [
     desc:
       "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patch updates, and monthly status reports. Critical issues get an 8-hour response time.",
     why:
-      "Your software is your asset — it deserves care after launch. This is not just bug fixes; it is peace of mind that your product stays healthy, secure, and fast.",
+      "Your software is your asset — it deserves care after launch. Patch cycles, capacity checks, and incident response keep the system healthy.",
     link: "/catalog/post-launch-support-maintenance",
   },
 ];
@@ -230,13 +230,21 @@ export default define.page(function HowIWork() {
               back on track — without replacing your entire team.
             </FaqItem>
 
-            <FaqItem q="What kind of projects do you take on an hourly basis?">
-              I prefer fixed-price for clearly defined projects from our catalog
-              (MVPs, audits, API builds). But I am open to hourly for staff
-              augmentation, consulting, or when the scope is not fully clear yet
-              — such as helping your existing team, reviewing code, or advising
-              on architecture decisions. The key is transparency: you will know
-              upfront whether a project fits better as fixed-price or hourly.
+            <FaqItem q="What if the scope is not clear yet?">
+              We start with a fixed-price Technical Discovery Sprint or scoped
+              architecture advisory. You receive defined decisions, risks, and a
+              phased plan before funding implementation. Ongoing technical
+              leadership uses a CTO advisory retainer with explicit outcomes —
+              not embedded labor or screen-tracked hours.
+            </FaqItem>
+
+            <FaqItem q="Do you accept hourly engagements?">
+              Yes — hourly is available for staff augmentation, code reviews, or
+              when scope is not fully clear yet. Fixed-price milestones are my
+              preferred default for new projects because they eliminate
+              micromanagement and screen tracking, but hourly remains a real
+              option for the right context. The first conversation is about
+              which fits your situation.
             </FaqItem>
 
             <FaqItem q="How do you communicate during a project?">
@@ -258,9 +266,10 @@ export default define.page(function HowIWork() {
             <FaqItem q="What technologies do you use?">
               My core stack is Deno/Node.js, TypeScript, Preact/React,
               PostgreSQL, Valkey/Redis, Docker/Podman, and Traefik. For AI work,
-              I integrate OpenAI, Claude, and DeepSeek APIs. Everything is
-              open-source and self-hostable — no proprietary frameworks, no
-              vendor lock-in.
+              I integrate providers such as OpenAI, Claude, and DeepSeek behind
+              explicit application boundaries. Core architecture favors proven,
+              portable tools; provider dependencies and exit costs are
+              documented rather than hidden.
             </FaqItem>
 
             <FaqItem q="Can you work with my existing codebase?">

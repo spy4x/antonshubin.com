@@ -35,20 +35,14 @@ Traefik runs as a separate stack on the `proxy` network. It:
 ## Updates
 
 ```bash
-# Deploy new version
 deno task deploy
-
-# Or manually:
-ssh homelab 'cd ~/ssd-2tb/apps/anton/antonshubin.com && docker compose pull && docker compose up -d --build'
 ```
+
+The deploy task syncs tracked source and environment files separately, then
+rebuilds the Docker Compose service on the production host. Remote host aliases,
+paths, and access details stay outside public documentation.
 
 ## Resource Limits
 
 - CPU: 0.5 cores
 - Memory: 256 MB
-
-## Directory
-
-```
-~/ssd-2tb/apps/anton/antonshubin.com/  # Source + Docker context
-```

@@ -116,6 +116,7 @@ export default define.page(function BlogArticle(ctx) {
             "image":
               `https://antonshubin.com/img/blog/${article.slug}/${article.previewImageURL}`,
             "datePublished": article.publishedAt,
+            "dateModified": article.updatedAt ?? article.publishedAt,
             "timeRequired": `PT${article.readTime}M`,
             "inLanguage": "en-US",
             "mainEntityOfPage": {

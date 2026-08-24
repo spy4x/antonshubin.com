@@ -68,7 +68,7 @@ export const handler = define.handlers({
       loc: `/blog/${a.slug}`,
       priority: "0.7",
       changefreq: "monthly" as const,
-      lastmod: a.publishedAt,
+      lastmod: a.updatedAt ?? a.publishedAt,
     }));
 
     const allProjects = [...projects.my, ...projects.freelance];
@@ -131,11 +131,10 @@ export const handler = define.handlers({
 
     // AI-friendly metadata in sitemap comments
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
 <!--
   Site: Anton Shubin — Fractional CTO & Lead Architect
-  Description: I take non-technical founders from napkin sketch to production.
-  Fixed-price milestones. Zero-bloat architecture. No dev-team drama.
+  Description: Fractional CTO owning SaaS outcomes from architecture through production.
+  Fixed-price delivery, plain-English decisions, observability, recovery, security, and cost control.
   Expert-Vetted (Top 1%). 100% Job Success. $395K+ earned. 80+ projects.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -1,7 +1,8 @@
 # antonshubin.com
 
-Personal portfolio website for Anton Shubin - Full-stack web developer and
-entrepreneur.
+Website for Anton Shubin — Fractional CTO and Lead Architect helping
+non-technical founders take SaaS products from idea through production
+operations.
 
 ## Tech Stack
 

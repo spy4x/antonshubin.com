@@ -146,7 +146,7 @@ export default define.page(function Projects(ctx) {
     ...head.value,
     title: "Projects — Anton Shubin",
     description:
-      "Open-source projects, client work, and infrastructure portfolio by Anton Shubin.",
+      "Client work, open-source products, and production infrastructure proof by Anton Shubin.",
     canonical: "https://antonshubin.com/projects/",
     ogType: "website",
   };
@@ -204,7 +204,8 @@ export default define.page(function Projects(ctx) {
         {activeProjects.length > 0 && (
           <>
             <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-orange-400">🔧</span> Personal Projects
+              <span class="text-orange-400">🔧</span>{" "}
+              Open-Source Products &amp; Systems
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {activeProjects.map((project) => (

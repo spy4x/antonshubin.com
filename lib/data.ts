@@ -27,6 +27,7 @@ export interface BlogArticle {
   description: string;
   readTime: number;
   publishedAt: string;
+  updatedAt?: string;
   previewImageURL: string;
   youtubeVideoId?: string;
   category?: "startups" | "dev-tips" | "personal";
@@ -35,12 +36,11 @@ export interface BlogArticle {
 export const projects = {
   my: [
     {
-      title: "Homelab",
+      title: "Production Infrastructure Lab",
       slug: "homelab",
-      externalURL: "https://github.com/spy4x/homelab",
       description:
-        "Open-source infrastructure-as-code framework for managing multi-server Docker-based services with automated deployment, monitoring, and backups. Self-host your own cloud with Traefik, Immich, Jellyfin, Vaultwarden, Home Assistant, and 20+ more services.",
-      ghRepo: "spy4x/homelab",
+        "Sanitized production infrastructure case study demonstrating end-to-end operational ownership. Reusable infrastructure as code and Deno automation coordinate Docker Compose delivery behind Traefik, VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and restore tooling, and Authelia SSO with 2FA.",
+      role: "Platform Engineering & Operations",
       logoImageURL: "/img/projects/homelab/logo.svg",
       tags: [
         "Deno",
@@ -48,7 +48,10 @@ export const projects = {
         "Docker",
         "Ansible",
         "Traefik",
-        "Self-hosted",
+        "VictoriaMetrics",
+        "Gatus",
+        "Restic",
+        "Authelia",
       ],
     },
     {
@@ -631,12 +634,14 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     index: 7,
-    title: "How I Run 20+ Production Services on a Single $50/Month Server",
+    title:
+      "Cost-Disciplined SaaS Infrastructure: Managed Cloud, Dedicated, or Hybrid?",
     slug: "cost-optimization-laboratory",
     description:
-      "My homelab runs 20+ services on a single $50/month Hetzner server. Here is the exact architecture, cost breakdown, and why your SaaS can use the same patterns to slash infrastructure costs by 90%.",
-    readTime: 12,
+      "A founder-readable framework for choosing managed cloud, dedicated, or hybrid SaaS infrastructure based on workload, team, compliance, recovery, and total cost.",
+    readTime: 9,
     publishedAt: "2026-06-15",
+    updatedAt: "2026-08-20",
     previewImageURL: "cover.svg",
     category: "startups",
   },
@@ -763,7 +768,7 @@ export const hackathons: Hackathon[] = [
     ],
     learnings:
       "Distributed payment systems demand rigorous idempotency. One missed edge case = double charges. The event taught me to build failure-injection testing into the development loop, not as an afterthought.",
-    ctaLabel: "Build bulletproof backend APIs",
+    ctaLabel: "Build production backend APIs",
     ctaLink: "/catalog/bulletproof-backend-api",
   },
   {

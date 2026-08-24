@@ -141,13 +141,13 @@ export const items: CatalogItem[] = [
   {
     icon: "⚡",
     slug: "bulletproof-backend-api",
-    title: "Bulletproof Backend API & Infrastructure",
+    title: "Production Backend API & Infrastructure",
     price: "From $6,000",
     delivery: "14 days",
     desc:
-      "Production-grade REST or GraphQL API with self-hosted or cloud infrastructure. Designed to scale to 10K+ users from day one. Includes monitoring, backups, and CI/CD.",
+      "Production REST or GraphQL API with self-hosted, managed cloud, or hybrid infrastructure selected for your workload. Includes monitoring, backups, and CI/CD.",
     outcome:
-      "A production-grade backend that handles 10K+ users without breaking a sweat. Monitoring, backups, CI/CD — infrastructure that runs itself.",
+      "A deployable, observable backend with documented monitoring, backup, recovery, and delivery paths.",
     includes: [
       "REST or GraphQL API (your choice)",
       "PostgreSQL schema design",
