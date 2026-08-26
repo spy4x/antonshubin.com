@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100" width="260"
+  height="100">
+  <rect width="260" height="100" rx="12" fill="#0f172a" />
+  <g transform="translate(22 22)">
+    <path
+      d="M0 28 L28 0 L28 18 L18 18 L18 56 L0 56 Z M28 0 L56 28 L28 28 L28 0 Z"
+      fill="#f59e0b" />
+  </g>
+  <text x="92" y="48" font-family="system-ui" font-size="22" font-weight="700"
+    fill="#f59e0b">Deno</text>
+  <text x="92" y="78" font-family="system-ui" font-size="22" font-weight="700"
+    fill="#fbbf24">Platform</text>
+</svg>

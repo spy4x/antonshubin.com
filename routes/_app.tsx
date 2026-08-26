@@ -53,7 +53,12 @@ export default define.page(function App({ Component }) {
                 <link rel="dns-prefetch" href={UMAMI_PRECONNECT_ORIGIN} />
               </>
             )}
-            <script defer src={UMAMI_URL} data-website-id={UMAMI_ID} />
+            <script
+              defer
+              src={UMAMI_URL}
+              data-website-id={UMAMI_ID}
+              data-performance="true"
+            />
           </>
         )}
       </head>

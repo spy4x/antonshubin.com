@@ -55,7 +55,18 @@ export const handler = define.handlers({
 - [Financy](${BASE_URL}/projects/financy) — Self-hostable finance tracking with double-entry accounting and multi-currency.
 - [Production Infrastructure Lab](${BASE_URL}/projects/homelab) — Sanitized infrastructure case study covering Deno deployment automation, Docker Compose, Traefik TLS and routing, VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and restore tooling, and Authelia SSO with 2FA.
 - [TodoApp](${BASE_URL}/projects/todoapp-caldav) — Self-hosted CalDAV task manager PWA.
-- [Zond](${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Works with Gatus and Authelia.
+- [Zond](${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Single 10 MB Go binary, works with Gatus and Authelia.
+- [rostok](${BASE_URL}/projects/rostok) — One-command scaffolder for a self-hosted homelab from a curated service catalog. age-encrypted secrets you can commit.
+- [Deno Platform Template](${BASE_URL}/projects/template) — Reusable Deno baseline for SaaS: API, SPA, MPA, worker, persistence, offline sync. Distilled from 80+ client projects, zero product code.
+- [mig](${BASE_URL}/projects/mig) — Tiny self-hosted meeting scheduler. One owner, one URL, JSON-file storage, SMTP + ICS. Single Deno binary.
+
+## Recent Blog Posts
+
+- [rostok: scaffold a self-hosted homelab from a curated service catalog](${BASE_URL}/blog/rostok-self-hosted-scaffolder)
+- [Deno Platform Template: distilling 80+ client projects into one repo](${BASE_URL}/blog/deno-platform-template)
+- [zond: a 10 MB probe bridge so Gatus can see through your SSO proxy](${BASE_URL}/blog/zond-sso-probe-bridge)
+- [mig: a 200-line meeting scheduler because Calendly alternatives are overkill](${BASE_URL}/blog/mig-tiny-self-hosted-scheduler)
+- [Building MCP Servers with Deno: A Practical Guide](${BASE_URL}/blog/building-mcp-servers-with-deno)
 
 ## Featured Client Work
 
