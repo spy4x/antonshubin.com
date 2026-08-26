@@ -230,6 +230,7 @@ export default define.page(function ProjectDetail(ctx) {
                     <a
                       href={project.externalURL}
                       target="_blank"
+                      data-umami-event={`project-cta-${project.slug}-external`}
                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       Visit project site
@@ -253,6 +254,7 @@ export default define.page(function ProjectDetail(ctx) {
                 <a
                   href={`https://github.com/${project.ghRepo}`}
                   target="_blank"
+                  data-umami-event={`project-cta-${project.slug}-github`}
                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -333,6 +335,7 @@ export default define.page(function ProjectDetail(ctx) {
               <div class="flex flex-wrap items-stretch gap-3">
                 <a
                   href="/contact-me"
+                  data-umami-event={`project-cta-${project.slug}-contact`}
                   class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
                 >
                   Start a similar project
@@ -340,6 +343,7 @@ export default define.page(function ProjectDetail(ctx) {
                 <a
                   href={SCHEDULE_URL}
                   target="_blank"
+                  data-umami-event={`project-cta-${project.slug}-schedule`}
                   class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors"
                 >
                   Book a free intro call
@@ -347,6 +351,7 @@ export default define.page(function ProjectDetail(ctx) {
               </div>
               <a
                 href="/how-i-work"
+                data-umami-event={`project-cta-${project.slug}-how-i-work`}
                 class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
               >
                 How I work

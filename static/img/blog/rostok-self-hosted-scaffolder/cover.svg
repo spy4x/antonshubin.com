@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"
+  viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0f172a" />
+  <text x="70" y="160" font-family="system-ui" font-size="64" font-weight="bold"
+    fill="#10b981">росток</text>
+  <text x="70" y="220" font-family="system-ui" font-size="32"
+    fill="#94a3b8">Scaffold a self-hosted homelab</text>
+  <text x="70" y="260" font-family="system-ui" font-size="32"
+    fill="#94a3b8">from a curated catalog</text>
+  <text x="70" y="380" font-family="ui-monospace,monospace" font-size="22"
+    fill="#64748b">$ deno install -A -n rostok jsr:@rostok/cli</text>
+  <text x="70" y="420" font-family="ui-monospace,monospace" font-size="22"
+    fill="#64748b">$ mkdir ~/rostok &amp;&amp; cd ~/rostok</text>
+  <text x="70" y="460" font-family="ui-monospace,monospace" font-size="22"
+    fill="#64748b">$ rostok</text>
+  <text x="70" y="580" font-family="system-ui" font-size="22"
+    fill="#64748b">github.com/spy4x/rostok</text>
+</svg>

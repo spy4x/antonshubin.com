@@ -26,3 +26,10 @@ Update rules when adding content or pages.
 Post-implementation report of all SEO fixes shipped 2026-06-29. Covers 5 feature
 PRs + 2 production hotfixes, architecture decisions, live verification results,
 and ongoing maintenance procedures.
+
+### [UTM convention](utm.md)
+
+The 3-parameter taxonomy every external link back to antonshubin.com must use,
+with worked URL examples for GitHub READMEs, Upwork proposals, YouTube
+descriptions, LinkedIn posts, HN/Reddit submissions, business cards, and email
+signatures. Build the URL with UTMs first, paste it second.

@@ -134,6 +134,7 @@ export default define.page(function Home(ctx) {
                 <a
                   href="https://github.com/spy4x"
                   target="_blank"
+                  data-umami-event="home-outbound-github"
                   class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-600 transition-colors"
                 >
                   <GithubIcon class="w-4 h-4" />
@@ -142,6 +143,7 @@ export default define.page(function Home(ctx) {
                 <a
                   href="https://www.youtube.com/@anton-shubin"
                   target="_blank"
+                  data-umami-event="home-outbound-youtube"
                   class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-500 transition-colors"
                 >
                   <YouTubeIcon class="w-4 h-4" />
@@ -150,6 +152,7 @@ export default define.page(function Home(ctx) {
                 <a
                   href="https://www.upwork.com/freelancers/ashubin"
                   target="_blank"
+                  data-umami-event="home-outbound-upwork"
                   class="inline-flex items-center justify-center px-3 py-2 rounded-md text-white bg-green-700 hover:bg-green-600 transition-colors"
                   title="Upwork profile"
                 >
@@ -479,6 +482,7 @@ export default define.page(function Home(ctx) {
           <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <a
               href="/catalog/strategy-call"
+              data-umami-event="home-cta-strategy-call"
               class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🎯</div>
@@ -495,6 +499,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/catalog/cto-advisory-retainer"
+              data-umami-event="home-cta-retainer"
               class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">👔</div>
@@ -511,6 +516,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/catalog/zero-to-production-saas-mvp"
+              data-umami-event="home-cta-mvp"
               class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🚀</div>
@@ -549,6 +555,7 @@ export default define.page(function Home(ctx) {
             </a>
             <a
               href="/catalog/free-architecture-audit"
+              data-umami-event="home-cta-audit"
               class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
             >
               <div class="text-3xl mb-3">🔍</div>
@@ -784,6 +791,98 @@ export default define.page(function Home(ctx) {
                   CalDAV
                 </span>
                 <GhStars repo="spy4x/caldav-tasks-web" class="ml-auto" />
+              </div>
+            </a>
+
+            {/* rostok — self-hosted homelab scaffolder */}
+            <a
+              href="/projects/rostok"
+              data-e2e="home-view-rostok"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-emerald-500 transition-all"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-emerald-500/20 rounded-lg">
+                  <svg
+                    class="w-6 h-6 text-emerald-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+                    />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                  rostok
+                </h3>
+              </div>
+              <p class="text-gray-300 text-sm mb-4">
+                One-command scaffolder for a self-hosted homelab. Curated
+                catalog of services, sensible defaults, age-encrypted secrets
+                you can commit.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Deno
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  CLI
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  IaC
+                </span>
+                <GhStars repo="spy4x/rostok" class="ml-auto" />
+              </div>
+            </a>
+
+            {/* Deno Platform Template */}
+            <a
+              href="/projects/template"
+              data-e2e="home-view-template"
+              class="group block p-4 bg-gray-800 rounded-xl border-2 border-gray-700 hover:border-amber-500 transition-all"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-amber-500/20 rounded-lg">
+                  <svg
+                    class="w-6 h-6 text-amber-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+                    />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-white group-hover:text-amber-400 transition-colors">
+                  Deno Platform Template
+                </h3>
+              </div>
+              <p class="text-gray-300 text-sm mb-4">
+                Reusable Deno baseline for SaaS: API, SPA, MPA, worker,
+                persistence, and offline sync. Distilled from 80+ client
+                projects, no product code.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Deno
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  Template
+                </span>
+                <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
+                  CQRS
+                </span>
+                <GhStars repo="spy4x/template" class="ml-auto" />
               </div>
             </a>
           </div>
