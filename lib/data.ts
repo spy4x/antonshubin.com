@@ -235,7 +235,7 @@ export const projects = {
       description:
         "миг (moment) — tiny self-hosted meeting scheduler. One owner, one URL, one feature: book a time slot. Single Deno binary, JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a static meeting link without a Next.js + Postgres deployment.",
       outcome:
-        "Powers my own booking link at schedule.antonshubin.com — dogfooded daily for client intros.",
+        "Powers my own booking link at meet.antonshubin.com — dogfooded daily for client intros.",
       tags: [
         "Deno",
         "Fresh",

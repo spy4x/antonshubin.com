@@ -46,7 +46,7 @@ docker run -d --name mig \
   -e HOST_NAME="Anton Shubin" \
   -e HOST_EMAIL="anton@antonshubin.com" \
   -e HOST_TZ="Asia/Ho_Chi_Minh" \
-  -e MEETING_URL="https://schedule.antonshubin.com/spy4x/30min" \
+  -e MEETING_URL="https://meet.antonshubin.com" \
   -e WEEKLY_AVAILABILITY="MON-FRI 09:00-17:00" \
   -e SLOT_DURATION_MIN=30 \
   -e MIN_NOTICE_HOURS=6 \
@@ -124,6 +124,8 @@ Source: [github.com/spy4x/mig](https://github.com/spy4x/mig). The Docker image
 is at `ghcr.io/spy4x/mig:latest`. The README has the full env var reference.
 
 I use mig for my own booking link at
-[schedule.antonshubin.com/spy4x/30min](https://schedule.antonshubin.com/spy4x/30min).
-If you want a strategy call to talk through whether you need a custom build, the
-link is on [/contact-me](https://antonshubin.com/contact-me).
+[meet.antonshubin.com](https://meet.antonshubin.com). It also exposes an
+iframe-friendly page at [/embed](https://meet.antonshubin.com/embed) if you want
+to inline the scheduler on another site. If you want a strategy call to talk
+through whether you need a custom build, the link is on
+[/contact-me](https://antonshubin.com/contact-me).
