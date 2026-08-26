@@ -1,57 +1,71 @@
-import { define } from "../lib/utils.ts";
+import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
-import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
+import { getBreadcrumb, head } from "../lib/head.ts";
+import { define } from "../lib/utils.ts";
 
-const services = [
-  ["Traefik", "Reverse proxy + auto SSL", "🌐"],
-  ["Grafana + Prometheus", "Self-hosted monitoring stack", "📈"],
-  ["Docker Compose", "Container orchestration", "🐳"],
-  ["PostgreSQL", "Relational database", "🗄️"],
-  ["Authentik", "SSO / Identity provider", "🔑"],
-  ["Home Assistant", "Smart home automation", "🏠"],
-  ["Jellyfin", "Media streaming", "🎬"],
-  ["Immich", "Photo backup (Google Photos alt)", "📸"],
-  ["VaultWarden", "Password manager (Bitwarden)", "🔐"],
-  ["Syncthing", "File sync across devices", "🔄"],
-  ["Paperless-ngx", "Document management + OCR", "📄"],
-  ["Gitea", "Self-hosted Git", "🦊"],
-  ["Woodpecker CI", "CI/CD pipelines", "⚡"],
-  ["Ollama + Open WebUI", "Local LLM inference", "🤖"],
-  ["SearXNG", "Private metasearch engine", "🔍"],
-  ["Ntfy", "Push notifications", "🔔"],
-  ["WireGuard", "VPN server", "🔒"],
-  ["AdGuard Home", "DNS-level ad blocking", "🛡️"],
-  ["MinIO", "S3-compatible storage", "💾"],
-  ["Stirling PDF", "PDF manipulation tools", "📄"],
-  ["Uptime Kuma / Gatus", "Service health monitoring", "❤️"],
-  ["Transmission", "Torrent client", "⬇️"],
-  ["Metube", "YouTube downloading", "🎥"],
-  ["Healthchecks", "Cron job monitoring", "⏱️"],
-  ["Calendly / Radicale", "Calendar sync", "📅"],
-  ["Firefly III", "Finance tracking", "💰"],
-  ["Monica", "CRM / relationship manager", "👥"],
-  ["Umami", "Web analytics", "📊"],
-  ["Watchtower", "Auto container updates", "🔄"],
-  ["Cloudflared", "Cloudflare Tunnel", "☁️"],
-  ["Stalwart Mail", "Mail server", "📧"],
-  ["Akaunting", "Accounting", "📊"],
-  ["IT Tools", "Developer utilities", "🧰"],
-  ["Mailer", "Email sending", "📨"],
-  ["Piped", "YouTube frontend (alt interface)", "▶️"],
-  ["Usememos", "Lightweight notes", "📝"],
-  ["Audiobookshelf", "Audiobook server", "🎧"],
-  ["Mirotalk", "Video calls (self-hosted Meet)", "📹"],
+const outcomes = [
+  {
+    title: "Deployable",
+    description:
+      "A release follows a documented, repeatable path instead of one person's memory.",
+  },
+  {
+    title: "Observable",
+    description:
+      "Monitoring is designed to surface failures early and preserve diagnostic context.",
+  },
+  {
+    title: "Recoverable",
+    description:
+      "Backups are checked, retained deliberately, and paired with restore tooling.",
+  },
+  {
+    title: "Transferable",
+    description:
+      "Versioned configuration and documented operating paths reduce dependence on one builder.",
+  },
+];
+
+const proofAreas = [
+  {
+    title: "Versioned delivery",
+    summary:
+      "Infrastructure changes travel with product changes, so releases can be reviewed, repeated, and handed over.",
+    details:
+      "My public Production Infrastructure Lab uses reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing. Configuration and deployment logic stay versioned rather than living as undocumented server steps.",
+  },
+  {
+    title: "Failure detection",
+    summary:
+      "Health checks and metrics make product risk visible while there is still time to act.",
+    details:
+      "VictoriaMetrics records operational signals while Gatus checks service health. This separates customer-facing availability checks from deeper system measurements and creates useful diagnostic context when something fails.",
+  },
+  {
+    title: "Recovery",
+    summary:
+      "A backup only matters when its integrity, retention, and restore path are understood.",
+    details:
+      "Restic automation covers integrity checks, retention policies, and restore tooling. Recovery work is treated as part of system design, not a command to research for the first time during an incident.",
+  },
+  {
+    title: "Clean handoff",
+    summary:
+      "Ownership includes operating knowledge, access boundaries, and a path for the next team.",
+    details:
+      "Versioned configuration and deployment tooling reduce dependence on one operator. Authelia provides centralized SSO and 2FA, helping keep access explicit while preserving a system another team can understand and take over.",
+  },
 ];
 
 export default define.page(function Infrastructure() {
   head.value = {
     ...head.value,
-    title: "Infrastructure & Architecture — Anton Shubin",
+    title: "Production Infrastructure, Owned End to End — Anton Shubin",
     description:
-      "Self-hosted infrastructure stack powering 40+ services on a $50/mo budget.",
+      "How Anton designs deployable, observable, recoverable, and transferable production systems as a Fractional CTO and Lead Architect.",
     canonical: "https://antonshubin.com/infrastructure/",
     ogType: "website",
   };
@@ -60,179 +74,247 @@ export default define.page(function Infrastructure() {
     <Layout currentPath="/infrastructure">
       <SEOHead />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
-          Infrastructure Laboratory
-        </h1>
-        <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg max-w-2xl mx-auto">
-          Where I develop and test the architecture patterns that keep client
-          SaaS costs near zero. 40+ services. One server. $50/month.
-        </p>
+        <Breadcrumb
+          items={getBreadcrumb(head.value.canonical, head.value.title)}
+        />
 
-        {/* Cost comparison hero */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
-          <div class="grid gap-6 sm:grid-cols-2">
-            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
-              <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Typical AWS setup for 40+ services
-              </p>
-              <p class="text-4xl font-bold text-red-400">$3,000+</p>
-              <p class="text-gray-500 text-xs mt-1">
-                per month (shared CPU/RAM VMs)
-              </p>
-            </div>
-            <div class="text-center p-4 bg-gray-900/50 rounded-lg">
-              <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                What I run on (Hetzner dedicated)
-              </p>
-              <p class="text-4xl font-bold text-green-400">$50</p>
-              <p class="text-gray-500 text-xs mt-1">
-                per month (dedicated CPU/RAM/NVMe)
-              </p>
-            </div>
+        <header class="text-center mb-12 sm:mb-16">
+          <p class="text-sm font-semibold uppercase tracking-widest text-orange-400 mb-3">
+            Operational judgment, made visible
+          </p>
+          <h1 class="text-3xl sm:text-5xl font-bold text-white text-balance mb-5">
+            Production Infrastructure, Owned End to End
+          </h1>
+          <p class="text-gray-300 text-base sm:text-xl leading-relaxed max-w-3xl mx-auto">
+            Shipping the product is half the job. Deployment, observability,
+            recovery, security, and cost controls need to be designed with it —
+            so the business gets a system designed for operability after launch.
+          </p>
+        </header>
+
+        <section aria-labelledby="operational-outcomes" class="mb-12 sm:mb-16">
+          <div class="mb-6">
+            <h2
+              id="operational-outcomes"
+              class="text-2xl sm:text-3xl font-bold text-white mb-3"
+            >
+              What ownership looks like in production
+            </h2>
+            <p class="text-gray-400 text-base sm:text-lg leading-relaxed max-w-3xl">
+              Founders should not need to manage infrastructure. They should
+              know how product risk is controlled, what happens when something
+              fails, and whether another team can take over cleanly.
+            </p>
           </div>
-          <p class="text-center text-gray-400 text-sm mt-4">
-            ~20x better performance on a dedicated CPU/RAM/NVMe server vs shared
-            EC2 VMs. Same reliability. 98% cost reduction.
-          </p>
-        </div>
-
-        {/* Architecture Diagram */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
-          <h2 class="text-xl font-semibold text-white mb-4">
-            🏗️ Architecture
-          </h2>
-          <img
-            src="/infrastructure-architecture.svg"
-            alt="Infrastructure architecture diagram showing Cloudflare → Traefik → Docker Compose → Backups flow"
-            class="w-full rounded-lg"
-            loading="lazy"
-          />
-        </div>
-
-        {/* Live dashboard */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
-          <h2 class="text-xl font-semibold text-white mb-4">
-            📡 Live Status
-          </h2>
-          <p class="text-gray-400 text-sm leading-relaxed mb-4">
-            Real-time health status for all services. Runs on the same
-            monitoring stack I deploy for client projects.
-          </p>
-          <a
-            href="https://uptime-cloud.antonshubin.com"
-            target="_blank"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded-lg transition-colors"
-          >
-            View live dashboard
-            <ArrowRightIcon class="w-4 h-4" />
-          </a>
-        </div>
-
-        {/* All services */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
-          <h2 class="text-xl font-semibold text-white mb-4">
-            📦 40+ Services Running
-          </h2>
-          <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map(([name, desc, icon]) => (
-              <div
-                key={name}
-                class="flex items-center gap-2 p-2.5 bg-gray-900/50 rounded-lg"
+          <div class="grid gap-4 sm:grid-cols-2">
+            {outcomes.map((outcome) => (
+              <article
+                key={outcome.title}
+                class="bg-gray-800 rounded-xl border border-gray-700 p-5"
               >
-                <span class="text-lg shrink-0">{icon}</span>
-                <div class="min-w-0">
-                  <p class="text-white text-sm font-medium truncate">{name}</p>
-                  <p class="text-gray-500 text-xs truncate">{desc}</p>
-                </div>
-              </div>
+                <h3 class="text-lg font-semibold text-white mb-2">
+                  <span class="text-orange-400" aria-hidden="true">✓</span>{" "}
+                  {outcome.title}
+                </h3>
+                <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                  {outcome.description}
+                </p>
+              </article>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Cost breakdown */}
-        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 mb-4">
-          <h2 class="text-xl font-semibold text-white mb-4">
-            💰 Real Cost Breakdown
+        <section
+          aria-labelledby="workload-fit"
+          class="bg-gray-800 rounded-xl border border-gray-700 p-5 sm:p-7 mb-12 sm:mb-16"
+        >
+          <h2
+            id="workload-fit"
+            class="text-2xl sm:text-3xl font-bold text-white mb-3"
+          >
+            Infrastructure follows the workload
           </h2>
-          <div class="space-y-3">
-            <div class="flex justify-between items-center py-2 border-b border-gray-700">
-              <span class="text-gray-300 text-sm">
-                Hetzner dedicated server
-              </span>
-              <span class="text-green-400 text-sm font-mono font-medium">
-                $47/mo
-              </span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-gray-700">
-              <span class="text-gray-300 text-sm">Domain names</span>
-              <span class="text-green-400 text-sm font-mono font-medium">
-                $12/year
-              </span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-gray-700">
-              <span class="text-gray-300 text-sm">Cloudflare (free tier)</span>
-              <span class="text-green-400 text-sm font-mono font-medium">
-                $0
-              </span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-gray-700">
-              <span class="text-gray-300 text-sm">
-                SSL (Let's Encrypt, auto via Traefik)
-              </span>
-              <span class="text-green-400 text-sm font-mono font-medium">
-                $0
-              </span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-gray-700">
-              <span class="text-gray-300 text-sm">
-                Monitoring (self-hosted Grafana + Prometheus)
-              </span>
-              <span class="text-green-400 text-sm font-mono font-medium">
-                $0
-              </span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-gray-700">
-              <span class="text-gray-300 text-sm">
-                Backups (Syncthing + restic → other devices)
-              </span>
-              <span class="text-green-400 text-sm font-mono font-medium">
-                $0
-              </span>
-            </div>
-            <div class="flex justify-between items-center py-2 font-bold">
-              <span class="text-white">Total</span>
-              <span class="text-green-400 font-mono">~$50/month</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Apply to your project */}
-        <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 text-center">
-          <h2 class="text-xl font-semibold text-white mb-3">
-            Your SaaS Can Run on the Same Stack
-          </h2>
-          <p class="text-gray-400 text-sm max-w-lg mx-auto mb-6">
-            Every client SaaS I build uses the same infrastructure patterns —
-            Docker Compose, Traefik, dedicated server. Your MVP does not need a
-            $500/month cloud bill with shared CPU.
+          <p class="text-gray-300 leading-relaxed mb-6">
+            There is no universal self-hosting template. Recommendation follows
+            workload, team capability, compliance needs, recovery targets, and
+            budget.
           </p>
-          <div class="flex flex-wrap justify-center gap-4">
-            <a
-              href="/catalog/bulletproof-backend-api"
-              class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+          <div class="grid gap-4 lg:grid-cols-3 mb-6">
+            <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
+              <h3 class="text-lg font-semibold text-white mb-2">
+                Open-source, self-hostable — the default
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                FOSS preferred for cost discipline, performance, portability,
+                and auditability. Dedicated hardware on Hetzner when the
+                workload justifies it — single-tenant CPU, NVMe, predictable
+                cost.
+              </p>
+            </article>
+            <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
+              <h3 class="text-lg font-semibold text-white mb-2">
+                Managed cloud when the business calls for it
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                AWS, GCP, Supabase, and friends are the right choice when they
+                remove meaningful operational risk, satisfy compliance needs, or
+                let a small team move faster. Recommendation is workload-fit,
+                not ideology.
+              </p>
+            </article>
+            <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
+              <h3 class="text-lg font-semibold text-white mb-2">
+                Hybrid when constraints differ
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Keep managed services where they remove risk while placing
+                stable workloads on dedicated hardware where control and
+                capacity matter more. Most production setups end up here.
+              </p>
+            </article>
+          </div>
+          <p class="text-gray-300 leading-relaxed mb-3">Decision follows:</p>
+          <ul class="grid gap-2 sm:grid-cols-2 text-gray-400">
+            <li>— Compliance and data-control requirements</li>
+            <li>— Elasticity and traffic patterns</li>
+            <li>— User geography and latency</li>
+            <li>— Team capacity to operate systems</li>
+            <li>— Uptime and recovery needs</li>
+            <li>— Current and expected budget</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="operational-proof" class="mb-12 sm:mb-16">
+          <div class="mb-6">
+            <h2
+              id="operational-proof"
+              class="text-2xl sm:text-3xl font-bold text-white mb-3"
             >
-              See backend API pricing
+              Production and operational proof
+            </h2>
+            <p class="text-gray-400 text-base sm:text-lg leading-relaxed max-w-3xl">
+              Client production work shows outcome ownership. Sanitized case
+              studies make the operating practice concrete without exposing
+              sensitive topology.
+            </p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 mb-6">
+            <a
+              href="/projects/smartlite"
+              data-e2e="infrastructure-view-smartlite"
+              class="group min-h-44 rounded-xl border border-gray-700 bg-gray-800 p-5 transition-colors hover:border-orange-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+            >
+              <p class="text-sm font-semibold text-orange-400 mb-2">
+                Professional production proof
+              </p>
+              <h3 class="text-xl font-semibold text-white mb-2 group-hover:text-orange-300">
+                SmartLite
+              </h3>
+              <p class="text-gray-400 leading-relaxed">
+                End-to-end ownership of a live IoT control platform: product,
+                backend, infrastructure, deployment, observability, alerts, and
+                access controls.
+              </p>
+            </a>
+            <a
+              href="/projects/homelab"
+              data-e2e="infrastructure-view-homelab"
+              class="group min-h-44 rounded-xl border border-gray-700 bg-gray-800 p-5 transition-colors hover:border-orange-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+            >
+              <p class="text-sm font-semibold text-orange-400 mb-2">
+                Operational engineering proof
+              </p>
+              <h3 class="text-xl font-semibold text-white mb-2 group-hover:text-orange-300">
+                Production Infrastructure Lab
+              </h3>
+              <p class="text-gray-400 leading-relaxed">
+                Reusable infrastructure as code showing versioned delivery,
+                monitoring, recovery tooling, and identity controls.
+              </p>
+            </a>
+          </div>
+
+          <div class="space-y-4">
+            {proofAreas.map((area, index) => (
+              <details
+                key={area.title}
+                class="group bg-gray-800 rounded-xl border border-gray-700 open:border-orange-500/50"
+              >
+                <summary
+                  data-e2e={`infrastructure-proof-${index + 1}`}
+                  class="min-h-14 cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-inset rounded-xl"
+                >
+                  <span class="flex items-start justify-between gap-4">
+                    <span>
+                      <span class="block text-lg font-semibold text-white mb-1">
+                        {area.title}
+                      </span>
+                      <span class="block text-gray-400 text-sm sm:text-base leading-relaxed">
+                        {area.summary}
+                      </span>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      class="text-orange-400 text-xl transition-transform group-open:rotate-45"
+                    >
+                      +
+                    </span>
+                  </span>
+                </summary>
+                <div class="px-5 pb-5 text-gray-300 text-sm sm:text-base leading-relaxed border-t border-gray-700 pt-4">
+                  {area.details}
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="discovery-heading"
+          class="bg-gray-800 rounded-xl border border-orange-500/40 p-5 sm:p-7 text-center"
+        >
+          <p class="text-sm font-semibold uppercase tracking-widest text-orange-400 mb-2">
+            Start with decisions, not vendors
+          </p>
+          <h2
+            id="discovery-heading"
+            class="text-2xl sm:text-3xl font-bold text-white mb-3"
+          >
+            Map the operating model before committing to the build
+          </h2>
+          <p class="text-gray-300 leading-relaxed max-w-2xl mx-auto mb-5">
+            Fixed-price Technical Discovery produces an architecture blueprint,
+            risk register, operating-cost estimate, recovery plan, and phased
+            scope grounded in your product and team.
+          </p>
+          <div class="flex flex-col sm:flex-row justify-center gap-3">
+            <a
+              href="/catalog/technical-discovery-sprint"
+              data-e2e="infrastructure-start-discovery"
+              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 transition-all duration-200"
+            >
+              See Technical Discovery
               <ArrowRightIcon class="w-5 h-5" />
+            </a>
+            <a
+              href="/catalog/free-architecture-audit"
+              data-e2e="infrastructure-request-audit"
+              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 transition-colors"
+            >
+              Request a free audit
             </a>
             <a
               href={SCHEDULE_URL}
               target="_blank"
-              class="inline-flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
+              rel="noopener noreferrer"
+              data-e2e="infrastructure-book-intro"
+              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 transition-colors"
             >
-              Book a free intro call
+              Book an intro call
             </a>
           </div>
-        </div>
+        </section>
       </div>
     </Layout>
   );
