@@ -2,6 +2,7 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
+import { ArrowRightIcon } from "../components/Icons.tsx";
 import CopyButton from "../islands/CopyButton.tsx";
 
 export default define.page(function Pay() {
@@ -191,7 +192,8 @@ export default define.page(function Pay() {
                 href="/contact-me"
                 class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 text-sm transition-colors"
               >
-                From outside US? Contact me →
+                From outside US? Contact me
+                <ArrowRightIcon class="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -210,9 +212,10 @@ export default define.page(function Pay() {
                 href="https://buy.stripe.com/4gw171g4hcwC06IdQS"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
               >
-                Pay with Stripe →
+                Pay with Stripe
+                <ArrowRightIcon class="w-5 h-5" />
               </a>
               <img
                 class="w-full max-w-[200px] mx-auto mt-6 object-cover"

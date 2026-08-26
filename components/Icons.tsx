@@ -519,3 +519,178 @@ export function FolderIcon({ class: className }: { class?: string }) {
     </svg>
   );
 }
+
+export function FireIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+      <path d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.97 5.97 0 01-2.133-1A3.75 3.75 0 0012 18z" />
+    </svg>
+  );
+}
+
+export function ArrowRightIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-5 h-5"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+    </svg>
+  );
+}
+
+export function DollarIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+export function FlagIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M4 21V4" />
+      <path d="M4 4h13l-3 6 3 6H4" />
+    </svg>
+  );
+}
+
+export function ShieldCheckIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M9 12.75L11.25 15 15 9.75M21 12c0 5.591-3.824 10.29-9 11.622C6.824 22.29 3 17.59 3 12V5.25a1.125 1.125 0 011.13-1.124c3.36-.18 6.32-1.466 8.146-3.526.36-.404.92-.404 1.28 0 1.826 2.06 4.786 3.346 8.144 3.526A1.125 1.125 0 0121 5.25V12z" />
+    </svg>
+  );
+}
+
+export function ClockIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+export function KeyIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+    </svg>
+  );
+}
+
+export function BullseyeIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function WrenchIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M14.7 6.3a4.5 4.5 0 0 0-5.6 5.6L4 17l3 3 5.1-5.1a4.5 4.5 0 0 0 5.6-5.6l-2.1 2.1-2-2 2.1-2.1z" />
+    </svg>
+  );
+}
+
+export function ChatBubbleIcon({ class: className }: { class?: string }) {
+  return (
+    <svg
+      class={className || "w-6 h-6"}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+      <path d="M8 12h.008M12 12h.008M16 12h.008" />
+    </svg>
+  );
+}

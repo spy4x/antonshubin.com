@@ -6,12 +6,21 @@ import { SCHEDULE_URL } from "../lib/config.ts";
 import { blogArticles, prettyDate, youtubeVideos } from "../lib/data.ts";
 import LeadForm from "../islands/LeadForm.tsx";
 import {
-  CalendarIcon,
+  ArrowRightIcon,
+  BullseyeIcon,
+  ChatBubbleIcon,
+  ClockIcon,
+  DollarIcon,
+  FireIcon,
+  FlagIcon,
   GithubIcon,
+  KeyIcon,
   PenIcon,
   ServerIcon,
+  ShieldCheckIcon,
   StarIcon,
   UpworkIcon,
+  WrenchIcon,
   YouTubeIcon,
 } from "../components/Icons.tsx";
 import GhStars from "../islands/GhStars.tsx";
@@ -93,23 +102,32 @@ export default define.page(function Home(ctx) {
                 </a>
               </div>
 
-              <div class="mt-6 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
+              {/* Primary CTA — Free Audit (low commitment, leads to #audit-form) */}
+              <div class="mt-6">
                 <a
-                  href={SCHEDULE_URL}
-                  target="_blank"
+                  href="#audit-form"
+                  data-umami-event="hero-audit-cta"
                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-base"
                   data-e2e="hero-book-call"
                 >
-                  <CalendarIcon class="w-5 h-5" />
-                  Book a free intro call — no pitch, just advice
+                  Get my free architecture audit
+                  <ArrowRightIcon class="w-5 h-5" />
                 </a>
-                <a
-                  href="/infrastructure"
-                  class="inline-flex min-h-11 items-center px-2 text-sm font-medium text-orange-400 underline underline-offset-4 transition-colors hover:text-orange-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
-                  data-e2e="hero-production-proof"
-                >
-                  See production operations proof →
-                </a>
+                {/* Risk-reversal micro-copy (no-pitch reassurance) */}
+                <p class="mt-2 text-sm text-gray-400">
+                  No pitch. 3 concrete improvements in your inbox within 48
+                  hours.
+                </p>
+                {/* Secondary link to production-credibility proof */}
+                <p class="mt-3">
+                  <a
+                    href="/infrastructure"
+                    class="inline-flex min-h-11 items-center px-2 text-sm font-medium text-orange-400 underline underline-offset-4 transition-colors hover:text-orange-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+                    data-e2e="hero-production-proof"
+                  >
+                    See production operations proof →
+                  </a>
+                </p>
               </div>
 
               <div class="mt-4 flex flex-wrap gap-2">
@@ -170,7 +188,9 @@ export default define.page(function Home(ctx) {
           </h2>
           <div class="grid gap-5 md:grid-cols-3">
             <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
-              <div class="text-2xl mb-3">🔥</div>
+              <div class="p-2 bg-orange-500/15 rounded-lg inline-block mb-3 text-orange-400">
+                <FireIcon class="w-6 h-6" />
+              </div>
               <h3 class="text-lg font-semibold text-white mb-2">
                 Overpromised, underdelivered
               </h3>
@@ -180,7 +200,9 @@ export default define.page(function Home(ctx) {
               </p>
             </div>
             <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
-              <div class="text-2xl mb-3">💰</div>
+              <div class="p-2 bg-orange-500/15 rounded-lg inline-block mb-3 text-orange-400">
+                <DollarIcon class="w-6 h-6" />
+              </div>
               <h3 class="text-lg font-semibold text-white mb-2">
                 Infrastructure chosen by habit
               </h3>
@@ -190,7 +212,9 @@ export default define.page(function Home(ctx) {
               </p>
             </div>
             <div class="p-4 bg-gray-800 rounded-xl border-l-4 border-orange-500 border border-gray-700">
-              <div class="text-2xl mb-3">🎯</div>
+              <div class="p-2 bg-orange-500/15 rounded-lg inline-block mb-3 text-orange-400">
+                <FlagIcon class="w-6 h-6" />
+              </div>
               <h3 class="text-lg font-semibold text-white mb-2">
                 No ownership, no clarity
               </h3>
@@ -249,7 +273,9 @@ export default define.page(function Home(ctx) {
               href="/how-i-work"
               class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
-              <div class="text-2xl mb-2">🛡️</div>
+              <div class="p-2 bg-green-500/15 rounded-lg inline-block mb-2 text-green-400">
+                <ShieldCheckIcon class="w-5 h-5" />
+              </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 14-Day Mutual Alignment Guarantee
               </h3>
@@ -262,7 +288,9 @@ export default define.page(function Home(ctx) {
               href="/how-i-work"
               class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
-              <div class="text-2xl mb-2">⏱️</div>
+              <div class="p-2 bg-blue-500/15 rounded-lg inline-block mb-2 text-blue-400">
+                <ClockIcon class="w-5 h-5" />
+              </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 Async-First Execution
               </h3>
@@ -275,7 +303,9 @@ export default define.page(function Home(ctx) {
               href="/how-i-work"
               class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
-              <div class="text-2xl mb-2">🔑</div>
+              <div class="p-2 bg-amber-500/15 rounded-lg inline-block mb-2 text-amber-400">
+                <KeyIcon class="w-5 h-5" />
+              </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 Clean Handoff & IP Sovereignty
               </h3>
@@ -288,7 +318,9 @@ export default define.page(function Home(ctx) {
               href="/how-i-work"
               class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
-              <div class="text-2xl mb-2">🎯</div>
+              <div class="p-2 bg-orange-500/15 rounded-lg inline-block mb-2 text-orange-400">
+                <BullseyeIcon class="w-5 h-5" />
+              </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 Fixed-Price Milestones
               </h3>
@@ -301,7 +333,9 @@ export default define.page(function Home(ctx) {
               href="/how-i-work"
               class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group sm:col-span-2 lg:col-span-1"
             >
-              <div class="text-2xl mb-2">🔧</div>
+              <div class="p-2 bg-gray-700/60 rounded-lg inline-block mb-2 text-gray-300">
+                <WrenchIcon class="w-5 h-5" />
+              </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 30-Day Code Warranty
               </h3>
@@ -316,7 +350,9 @@ export default define.page(function Home(ctx) {
               href="/how-i-work"
               class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
             >
-              <div class="text-2xl mb-2">💬</div>
+              <div class="p-2 bg-cyan-500/15 rounded-lg inline-block mb-2 text-cyan-400">
+                <ChatBubbleIcon class="w-5 h-5" />
+              </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
                 No Jargon Guarantee
               </h3>
@@ -353,49 +389,88 @@ export default define.page(function Home(ctx) {
           </div>
         </section>
 
-        {/* Who This Is For */}
+        {/* Who This Is For — 3 persona cards for self-categorization */}
         <section class="mb-16 md:mb-24">
-          <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
-            <div class="flex flex-col sm:flex-row items-start gap-6">
-              <div class="text-4xl shrink-0">🎯</div>
-              <div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  Who This Is For
-                </h2>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
-                  You are a founder, CTO, or product owner who knows what good
-                  looks like — but your current team, contractor, or agency is
-                  not delivering it. Deadlines slip. The codebase accumulates
-                  tech debt faster than features. AWS bills climb while
-                  performance degrades. You need someone who takes ownership of
-                  outcomes, not hours.
-                </p>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
-                  You have a technical product — or are building one — and you
-                  need architectural leadership that bridges business goals and
-                  engineering reality. You value clear communication,
-                  predictable delivery, and a partner who explains complex
-                  tradeoffs in plain English instead of hiding behind jargon.
-                </p>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
-                  You want a system architect who aligns with your vision, owns
-                  the technical roadmap, and ships measurable results — on time,
-                  on budget, with no surprises.
-                </p>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-4">
-                  You want AI-augmented execution with human-owned architecture
-                  — spec-driven, deterministic pipelines, no LLM left
-                  unsupervised in production.
-                </p>
-                <p class="text-gray-300 text-base sm:text-lg leading-relaxed">
-                  I work with funded startups, lean SaaS teams, and established
-                  businesses that have outgrown their current technical setup.
-                  If you are stuck between "it works" and "it scales" — this is
-                  the right place.
-                </p>
-              </div>
+          <h2 class="h1 mb-8">Who This Is For</h2>
+          <div class="grid gap-5 md:grid-cols-3">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+                Founder
+              </p>
+              <h3 class="text-base font-semibold text-white mb-2">
+                You have the idea. Need one technical partner to ship it.
+              </h3>
+              <ul class="text-gray-400 text-sm space-y-1.5 leading-relaxed">
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Driving the vision, not the codebase</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Idea, napkin sketch, or pre-seed traction</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Want one accountable owner, not a dev agency</span>
+                </li>
+              </ul>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+                CTO
+              </p>
+              <h3 class="text-base font-semibold text-white mb-2">
+                Need a senior pair of hands on architecture and AI tooling.
+              </h3>
+              <ul class="text-gray-400 text-sm space-y-1.5 leading-relaxed">
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Tech debt slowing velocity</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Architecture review or security audit</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Want AI / MCP integration without lock-in</span>
+                </li>
+              </ul>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+                Scaling Founder
+              </p>
+              <h3 class="text-base font-semibold text-white mb-2">
+                Post-PMF with a team. Need fractional leadership.
+              </h3>
+              <ul class="text-gray-400 text-sm space-y-1.5 leading-relaxed">
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Funded SaaS, in-build or scaling</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>AWS bill climbing, perf degrading</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-orange-500 shrink-0">—</span>
+                  <span>Want predictable delivery and plain-English comms</span>
+                </li>
+              </ul>
             </div>
           </div>
+          <p class="mt-5 text-gray-400 text-sm leading-relaxed">
+            AI-augmented execution with human-owned architecture + spec-driven
+            development.{" "}
+            <a
+              href="/how-i-work#ai-augmented"
+              class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 underline font-medium"
+            >
+              See how I work
+              <ArrowRightIcon class="w-4 h-4" />
+            </a>
+          </p>
         </section>
 
         {/* Featured Services — from Catalog */}
@@ -514,9 +589,22 @@ export default define.page(function Home(ctx) {
         </section>
 
         {/* G1: Free Architecture Audit Lead Magnet — interactive form */}
-        <section class="mb-16 md:mb-24">
+        <section id="audit-form" class="mb-16 md:mb-24 scroll-mt-4">
           <LeadForm scheduleUrl={SCHEDULE_URL} />
         </section>
+
+        {/* Mid-funnel escape hatch — demoted to muted text link */}
+        <p class="mb-16 md:mb-24 text-center text-sm text-gray-400">
+          Rather just talk?{" "}
+          <a
+            href="#cta-bottom"
+            data-umami-event="mid-funnel-talk-link"
+            class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 underline font-medium"
+          >
+            Schedule a free intro call
+            <ArrowRightIcon class="w-4 h-4" />
+          </a>
+        </p>
 
         {/* Featured Projects Section */}
         <section class="mb-16 md:mb-24">
@@ -1029,7 +1117,7 @@ export default define.page(function Home(ctx) {
           </p>
         </div>
 
-        <CTASection variant="full" />
+        <CTASection variant="full" id="cta-bottom" />
         <div class="h-[40vh]" />
       </div>
     </Layout>

@@ -4,6 +4,7 @@ import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
+import { ArrowRightIcon } from "../components/Icons.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 
 function FaqItem(
@@ -178,7 +179,8 @@ export default define.page(function HowIWork() {
                       href={p.link}
                       class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium mt-3"
                     >
-                      View details and pricing →
+                      View details and pricing
+                      <ArrowRightIcon class="w-4 h-4" />
                     </a>
                   )}
                 </div>
@@ -186,6 +188,83 @@ export default define.page(function HowIWork() {
             </div>
           ))}
         </div>
+
+        <section id="ai-augmented" class="mt-16 scroll-mt-4">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">
+            AI-Augmented Execution
+          </h2>
+          <p class="text-gray-400 text-center mb-8 text-base">
+            Human-owned architecture + spec-driven development. Two rules I
+            keep, two alternatives I avoid.
+          </p>
+          <div class="grid gap-5 md:grid-cols-2">
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 class="text-base font-semibold text-white mb-2">
+                What "human-owned" means
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Every architectural decision is made by me, not by a model. I
+                draft specs, choose stacks, and own the system diagram. AI
+                assists with boilerplate, refactors, and test scaffolding — the
+                parts where consistency matters more than judgement.
+              </p>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 class="text-base font-semibold text-white mb-2">
+                What "spec-driven" means
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Every change starts as a written spec — a brief paragraph on
+                intent, edge cases, and acceptance criteria. Code follows the
+                spec, not the other way around. If the spec changes, the diff
+                includes the spec update first, so reviewers can reason about
+                intent before implementation.
+              </p>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-xl border border-orange-900/40">
+              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+                Vs vibe-coding
+              </p>
+              <h3 class="text-base font-semibold text-white mb-2">
+                What "AI owns the architecture" looks like
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Ask an LLM to "build me a SaaS", paste the output, ship it. No
+                system diagram. No stack rationale. Three weeks in: tech debt
+                the model can't see, dependencies it picked for vibes, auth
+                flows it hallucinated. You own the codebase. Nobody owns the
+                decisions in it.
+              </p>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-xl border border-orange-900/40">
+              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+                Vs code-first
+              </p>
+              <h3 class="text-base font-semibold text-white mb-2">
+                What "ship now, spec later" looks like
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Move fast, write code, document when there's time. There is no
+                time. Six months later, no one remembers why the auth flow skips
+                email verification for legacy users, or why that one table has
+                no foreign key. The spec lives only in Slack threads and
+                ex-employers' heads.
+              </p>
+            </div>
+          </div>
+          <p class="mt-6 text-gray-400 text-sm text-center">
+            Stack I work with: Deno, Preact, TypeScript, PostgreSQL, Docker,
+            MCP, self-hosted infra. See{" "}
+            <a
+              href="/infrastructure"
+              class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 underline font-medium"
+            >
+              my infrastructure setup
+              <ArrowRightIcon class="w-4 h-4" />
+            </a>{" "}
+            for proof.
+          </p>
+        </section>
 
         <div class="text-center mt-12">
           <a

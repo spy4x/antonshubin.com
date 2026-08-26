@@ -3,6 +3,7 @@ import { Layout } from "../components/Layout.tsx";
 import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
+import { ArrowRightIcon } from "../components/Icons.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import {
   CalendarIcon,
@@ -154,8 +155,9 @@ export default define.page(function ContactMe() {
                 <h3 class="text-lg font-semibold text-white">{c.title}</h3>
               </div>
               <p class="text-gray-400 text-sm mb-4">{c.desc}</p>
-              <span class={c.btnClass}>
-                {c.btnText} →
+              <span class={c.btnClass + " inline-flex items-center gap-1"}>
+                {c.btnText}
+                <ArrowRightIcon class="w-4 h-4" />
               </span>
             </a>
           ))}
