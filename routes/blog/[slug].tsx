@@ -31,6 +31,9 @@ interface PageData {
   related?: BlogArticle[];
 }
 
+// Unknown slugs keep the friendly "Not Found" view below, but must answer with
+// a real 404 so search engines drop removed articles instead of indexing an
+// empty 200.
 export const handler = define.handlers({
   async GET(ctx) {
     const { slug } = ctx.params;
@@ -43,6 +46,9 @@ export const handler = define.handlers({
         prev: null,
         next: null,
         related: [],
+      }, {
+        status: 404,
+        headers: { "Cache-Control": "no-store" },
       });
     }
 
@@ -95,7 +101,7 @@ export default define.page(function BlogArticle(ctx) {
     ...head.value,
     title: `${article.title} — Anton Shubin`,
     description: article.description,
-    canonical: `https://antonshubin.com/blog/${article.slug}/`,
+    canonical: `https://antonshubin.com/blog/${article.slug}`,
     ogType: "article",
     ogImage:
       `https://antonshubin.com/img/blog/${article.slug}/${article.previewImageURL}`,
@@ -110,7 +116,7 @@ export default define.page(function BlogArticle(ctx) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "@id": `https://antonshubin.com/blog/${article.slug}/#article`,
+            "@id": `https://antonshubin.com/blog/${article.slug}#article`,
             "headline": article.title,
             "description": article.description,
             "image":
@@ -121,7 +127,7 @@ export default define.page(function BlogArticle(ctx) {
             "inLanguage": "en-US",
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `https://antonshubin.com/blog/${article.slug}/`,
+              "@id": `https://antonshubin.com/blog/${article.slug}`,
             },
             "author": {
               "@type": "Person",

@@ -1,3 +1,4 @@
+import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { SCHEDULE_URL } from "../../lib/config.ts";
@@ -6,6 +7,22 @@ import { marked } from "marked";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
+
+function getItemBySlug(slug: string): CatalogItem | undefined {
+  return items.find((i) => i.slug === slug);
+}
+
+// Unknown slugs keep the friendly "Not Found" view below, but must answer with
+// a real 404 so search engines drop removed catalog items instead of indexing
+// an empty 200.
+export const handler = define.handlers({
+  GET(ctx) {
+    return getItemBySlug(ctx.params.slug) ? page() : page(null, {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  },
+});
 
 export default define.page(function CatalogDetail(ctx) {
   const slug = ctx.params.slug;
@@ -44,7 +61,7 @@ export default define.page(function CatalogDetail(ctx) {
     ...head.value,
     title: `${item.title} — Anton Shubin`,
     description: item.desc,
-    canonical: `https://antonshubin.com/catalog/${item.slug}/`,
+    canonical: `https://antonshubin.com/catalog/${item.slug}`,
     ogType: "website",
   };
 
@@ -57,7 +74,7 @@ export default define.page(function CatalogDetail(ctx) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Service",
-            "@id": `https://antonshubin.com/catalog/${item.slug}/#service`,
+            "@id": `https://antonshubin.com/catalog/${item.slug}#service`,
             "name": item.title,
             "description": item.desc,
             "serviceType": item.title,
@@ -77,7 +94,7 @@ export default define.page(function CatalogDetail(ctx) {
                 "@type": "Offer",
                 "priceCurrency": "USD",
                 "price": String(exactPrice),
-                "url": `https://antonshubin.com/catalog/${item.slug}/`,
+                "url": `https://antonshubin.com/catalog/${item.slug}`,
                 "availability": "https://schema.org/InStock",
                 "seller": { "@id": "https://antonshubin.com/#person" },
               }
