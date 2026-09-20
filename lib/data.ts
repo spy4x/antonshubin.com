@@ -702,12 +702,23 @@ export const blogArticles: BlogArticle[] = [
   },
 ];
 
+// Hand-picked, not date-sorted: these speak to cost control, AI integration,
+// and delivery speed — what the home page sells. Order is the display order.
+export const homeBlogSlugs: string[] = [
+  "cost-optimization-laboratory",
+  "building-mcp-servers-with-deno",
+  "rostok-self-hosted-scaffolder",
+];
+
 export interface YouTubeVideo {
   title: string;
   videoId: string;
   publishedAt: string;
 }
 
+// Not shown on the home page until there are three new videos (issue #116):
+// the current list is from early 2024 and undercuts the pitch. Kept here so
+// it can come back once refreshed.
 export const youtubeVideos: YouTubeVideo[] = [
   {
     title: "Working on my GPT4 chatbot improvements (SvelteKit, SSE)",
