@@ -917,7 +917,7 @@ export default define.page(function Home(ctx) {
           <h2 class="h1 mb-8">Content & Writing</h2>
           <div class="grid gap-6 md:grid-cols-2">
             <div class="p-4 bg-gray-800 rounded-xl border-2 border-gray-700">
-              <div class="flex items-start gap-4 mb-5">
+              <div class="flex items-start gap-4">
                 <div class="p-3 bg-red-500/20 rounded-lg shrink-0">
                   <YouTubeIcon class="text-red-400 w-8 h-8" />
                 </div>
@@ -957,8 +957,15 @@ export default define.page(function Home(ctx) {
               </div>
               <div class="space-y-3">
                 {homeBlogSlugs
-                  .map((slug) => blogArticles.find((a) => a.slug === slug))
-                  .filter((a): a is typeof blogArticles[number] => a != null)
+                  .map((slug) => {
+                    const article = blogArticles.find((a) => a.slug === slug);
+                    if (!article) {
+                      throw new Error(
+                        `homeBlogSlugs: no article with slug "${slug}"`,
+                      );
+                    }
+                    return article;
+                  })
                   .map((a) => (
                     <a
                       key={a.slug}
