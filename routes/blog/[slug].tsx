@@ -334,7 +334,7 @@ export default define.page(function BlogArticle(ctx) {
                   encodeURIComponent(`"${article.title}" by @antonshubin`)
                 }&url=${
                   encodeURIComponent(
-                    `https://antonshubin.com/blog/${article.slug}/?utm_source=twitter&utm_medium=social&utm_campaign=blog-share`,
+                    `https://antonshubin.com/blog/${article.slug}?utm_source=twitter&utm_medium=social&utm_campaign=blog-share`,
                   )
                 }`}
                 target="_blank"
@@ -349,7 +349,7 @@ export default define.page(function BlogArticle(ctx) {
               <a
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${
                   encodeURIComponent(
-                    `https://antonshubin.com/blog/${article.slug}/?utm_source=linkedin&utm_medium=social&utm_campaign=blog-share`,
+                    `https://antonshubin.com/blog/${article.slug}?utm_source=linkedin&utm_medium=social&utm_campaign=blog-share`,
                   )
                 }`}
                 target="_blank"
@@ -366,7 +366,7 @@ export default define.page(function BlogArticle(ctx) {
                   encodeURIComponent(article.title)
                 }&body=${
                   encodeURIComponent(
-                    `I thought you'd find this interesting:\n\n${article.title}\n\nhttps://antonshubin.com/blog/${article.slug}/?utm_source=email&utm_medium=social&utm_campaign=blog-share`,
+                    `I thought you'd find this interesting:\n\n${article.title}\n\nhttps://antonshubin.com/blog/${article.slug}?utm_source=email&utm_medium=social&utm_campaign=blog-share`,
                   )
                 }`}
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
