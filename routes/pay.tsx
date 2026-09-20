@@ -10,7 +10,7 @@ export default define.page(function Pay() {
     ...head.value,
     title: "Payment — Anton Shubin | Fractional CTO",
     description: "Accepted payment methods: Stripe, SWIFT, BTC, ETH, Solana.",
-    canonical: "https://antonshubin.com/pay/",
+    canonical: "https://antonshubin.com/pay",
     ogType: "website",
     noindex: true,
   };

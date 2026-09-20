@@ -49,7 +49,7 @@ export default define.page(function HackathonDetail(ctx) {
     ...head.value,
     title: `${h.title} — Anton Shubin Hackathons`,
     description: h.description,
-    canonical: `https://antonshubin.com/hackathons/${h.slug}/`,
+    canonical: `https://antonshubin.com/hackathons/${h.slug}`,
     ogType: "article",
     ogImage: `https://antonshubin.com${h.photos[0]}`,
   };

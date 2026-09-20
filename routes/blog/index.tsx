@@ -31,7 +31,7 @@ export default define.page(function Blog(ctx) {
     title: "Blog — Anton Shubin",
     description:
       "Technical articles, architecture deep-dives, and dev tips from a Fractional CTO.",
-    canonical: "https://antonshubin.com/blog/",
+    canonical: "https://antonshubin.com/blog",
     ogType: "website",
   };
   const filtered = tab === "all"

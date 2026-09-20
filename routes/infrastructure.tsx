@@ -66,7 +66,7 @@ export default define.page(function Infrastructure() {
     title: "Production Infrastructure, Owned End to End — Anton Shubin",
     description:
       "How Anton designs deployable, observable, recoverable, and transferable production systems as a Fractional CTO and Lead Architect.",
-    canonical: "https://antonshubin.com/infrastructure/",
+    canonical: "https://antonshubin.com/infrastructure",
     ogType: "website",
   };
 

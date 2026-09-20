@@ -329,7 +329,7 @@ export default define.page(function Catalog() {
     title: "Catalog — Anton Shubin",
     description:
       "Fixed-price SaaS development services, architecture audits, and fractional CTO consulting.",
-    canonical: "https://antonshubin.com/catalog/",
+    canonical: "https://antonshubin.com/catalog",
     ogType: "website",
   };
 

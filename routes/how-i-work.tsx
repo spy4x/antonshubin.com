@@ -118,7 +118,7 @@ export default define.page(function HowIWork() {
     title: "How I Deliver — Anton Shubin",
     description:
       "Zero micromanagement. Complete transparency. Predictable outcomes.",
-    canonical: "https://antonshubin.com/how-i-work/",
+    canonical: "https://antonshubin.com/how-i-work",
     ogType: "website",
   };
 

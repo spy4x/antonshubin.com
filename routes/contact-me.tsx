@@ -123,7 +123,7 @@ export default define.page(function ContactMe() {
     title: "Contact Anton Shubin",
     description:
       "Fractional CTO consultation, questions, and project inquiries.",
-    canonical: "https://antonshubin.com/contact-me/",
+    canonical: "https://antonshubin.com/contact-me",
     ogType: "website",
   };
   return (
