@@ -1,8 +1,15 @@
 # Deploy
 
+Review the pull request, merge it, then deploy from the default branch:
+
 ```bash
 deno task deploy
 ```
+
+The script reads the local commit hash and passes it to the remote build as
+`BUILD_ID`, which becomes the service worker's cache name (`routes/sw.js.ts`).
+Nothing is written back to a tracked file, so `git status` is clean before and
+after a deploy.
 
 Decrypt env before deploy if needed:
 
