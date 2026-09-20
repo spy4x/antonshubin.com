@@ -12,7 +12,7 @@ export default define.page(function SaasArchGuide() {
     title: "SaaS Architecture Guide — Anton Shubin",
     description:
       "From idea to production: architecture patterns, infrastructure decisions, CI/CD, AI integration, and lessons learned building 80+ projects.",
-    canonical: "https://antonshubin.com/saas-architecture-guide/",
+    canonical: "https://antonshubin.com/saas-architecture-guide",
     ogType: "article",
   };
 

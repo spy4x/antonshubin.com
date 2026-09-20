@@ -147,7 +147,7 @@ export default define.page(function Projects(ctx) {
     title: "Projects — Anton Shubin",
     description:
       "Client work, open-source products, and production infrastructure proof by Anton Shubin.",
-    canonical: "https://antonshubin.com/projects/",
+    canonical: "https://antonshubin.com/projects",
     ogType: "website",
   };
   const archivedProjects = projects.my.filter((p) => p.archived);

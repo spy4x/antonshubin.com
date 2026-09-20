@@ -39,8 +39,11 @@ function humanize(slug: string): string {
  * Used by the JSON-LD structured data in _app.tsx.
  *
  * Href values are WITHOUT trailing slashes (e.g. "/blog" not "/blog/").
- * Fresh router handles both variants; the sitemap already omits them.
- * The root "/" is the only exception (kept for correctness).
+ * A [slug] route 404s when the path ends in a trailing slash
+ * (e.g. /projects/smartlite/ 404s, /projects/smartlite is 200), so
+ * canonical values, breadcrumb hrefs and sitemap loc values are all
+ * written without a trailing slash. The root "/" is the only exception
+ * (kept for correctness).
  */
 export function breadcrumbFromCanonical(
   canonical: string,

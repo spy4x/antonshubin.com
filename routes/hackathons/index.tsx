@@ -114,7 +114,7 @@ export default define.page(function Hackathons(ctx) {
     title: "Hackathons — Anton Shubin",
     description:
       "Real hackathon wins and projects. I compete to prove my architecture skills under extreme time pressure — 48-hour builds, self-healing infra, and payment orchestration. Results speak for themselves.",
-    canonical: "https://antonshubin.com/hackathons/",
+    canonical: "https://antonshubin.com/hackathons",
     ogType: "website",
   };
 

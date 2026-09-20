@@ -71,7 +71,7 @@ export default define.page(function ProjectDetail(ctx) {
     ...head.value,
     title: `${project.title} — Anton Shubin`,
     description: project.description,
-    canonical: `https://antonshubin.com/projects/${slug}/`,
+    canonical: `https://antonshubin.com/projects/${slug}`,
     ogType: "article",
     ogImage: project.logoImageURL
       ? `https://antonshubin.com${project.logoImageURL}`
