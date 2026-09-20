@@ -8,6 +8,8 @@ interface GhStarsProps {
 
 const CACHE_KEY = "gh-stars";
 const CACHE_TTL = 3600_000; // 1 hour
+// Below this, the star count reads as "not maintained" rather than as proof.
+const MIN_VISIBLE_STARS = 25;
 
 interface CacheEntry {
   stars: number;
@@ -75,6 +77,7 @@ export default function GhStars({ repo, class: className }: GhStarsProps) {
   const display = useComputed(() => {
     if (loading.value) return null;
     if (error.value || stars.value === null) return null;
+    if (stars.value < MIN_VISIBLE_STARS) return null;
     return formatStars(stars.value);
   });
 
