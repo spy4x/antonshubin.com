@@ -957,15 +957,8 @@ export default define.page(function Home(ctx) {
               </div>
               <div class="space-y-3">
                 {homeBlogSlugs
-                  .map((slug) => {
-                    const article = blogArticles.find((a) => a.slug === slug);
-                    if (!article) {
-                      throw new Error(
-                        `homeBlogSlugs: no article with slug "${slug}"`,
-                      );
-                    }
-                    return article;
-                  })
+                  .map((slug) => blogArticles.find((a) => a.slug === slug))
+                  .filter((a) => a !== undefined)
                   .map((a) => (
                     <a
                       key={a.slug}
