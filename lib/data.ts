@@ -333,7 +333,7 @@ export const projects = {
       slug: "foodrazor",
       externalURL: "https://foodrazor.com",
       description:
-        "From paper chaos to automated procurement — built the platform that digitizes restaurant invoice processing, automates supplier ordering, and tracks ingredient price fluctuations in real-time. The founder (a serial restaurateur) was drowning in manual paperwork across 5 locations. I architected an Angular + Node.js stack with Firebase real-time sync, OCR-based invoice scanning, and ML-driven price trend predictions. What started as a single-restaurant tool grew into a multi-country operation.",
+        "Digitize paper invoices, automating orders to suppliers, and tracking price fluctuations.",
       role: "Tech Lead",
       tags: [
         "Angular",
@@ -342,7 +342,6 @@ export const projects = {
         "GCP",
         "Firebase",
         "Firestore",
-        "OCR",
       ],
       logoImageURL: "/img/projects/foodrazor/logo.svg",
       screenshotURLs: [
@@ -375,7 +374,7 @@ export const projects = {
       logoImageURL: "/img/projects/corecircle/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp"],
       description:
-        "Fitness social network that actually kept people moving — built the backend and ML recommendation engine that matched users with workouts, trainers, and accountability partners. The founder had a vision for AI-driven fitness personalization but the existing codebase was a monolithic Nest.js app that couldn't handle real-time interactions. I introduced Nx monorepo for shared code, Redis pub/sub for live workout sessions, and a collaborative filtering ML pipeline that boosted engagement 3x.",
+        "Fitness-focused social network with exercise tracking features and ML for recommendation system.",
       externalURL: "https://corecircle.com",
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
@@ -461,13 +460,12 @@ export const projects = {
       logoImageURL: "/img/projects/connectful/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],
       description:
-        "Networking app with Tinder-like UI and Machine Learning algorithm to match like-minded professionals. Built during the pandemic when in-person networking vanished. The founder needed a platform that could replace conference hallway conversations — I built real-time matching with collaborative filtering, virtual event integration, and icebreaker automation that drove 40% weekly active user retention.",
+        "Networking app with Tinder-like UI and Machine Learning algorithm to match like-minded people.",
       externalURL: "https://connectful.com",
       externalURLDead: true,
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
-      outcome:
-        "Fast growth during COVID-19 pandemic; 40% weekly retention at peak",
+      outcome: "Showed fast growth during the COVID-19 pandemic",
     },
     {
       title: "GoPingu",
@@ -477,13 +475,13 @@ export const projects = {
       logoImageURL: "/img/projects/gopingu/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
       description:
-        "Marketing team management platform with a Trello-like interface and a marketplace of reusable project templates. The founder needed to standardize how 50+ marketing agencies ran their campaigns — I built a drag-and-drop workflow builder, real-time collaboration on task boards, and a template marketplace that reduced campaign setup time from 3 days to 2 hours.",
+        "Manage marketing teams via a Trello-like app that utilized a marketplace for project templates.",
       externalURL: "https://app.gopingu.com",
       externalURLDead: true,
       madeForName: "Peter Visser",
       madeForURL: "https://www.linkedin.com/in/peter-visser-04331820a/",
       outcome:
-        "Real-time collaborative SaaS with template marketplace; served 15+ agencies",
+        "Architected a real-time collaborative SaaS platform; delivered task orchestration modules",
     },
     {
       title: "Microwork",
@@ -491,7 +489,7 @@ export const projects = {
       externalURL: "https://microwork.io",
       externalURLDead: true,
       description:
-        "Human-in-the-loop text classification platform — a marketplace connecting businesses needing data labeling with a global workforce. Built the full-stack platform handling user onboarding, task assignment, quality control, and payment processing. The founder needed a reliable way to scale human classification without managing a distributed team manually.",
+        "Human text classification service freelance platform. Earn money by classifying things.",
       role: "Full-stack",
       tags: ["Angular", "Node.js", "Express.js", "Firebase", "Firestore"],
       logoImageURL: "/img/projects/microwork/logo.svg",
@@ -504,7 +502,7 @@ export const projects = {
       slug: "calltrack",
       externalURL: "https://ctrk.net",
       description:
-        "Call center analytics platform — ingests call metadata from Twilio and telephony providers, visualizes agent performance, detects call drop patterns, and automates phone number provisioning based on geographic routing rules. The founder needed visibility into a chaotic multi-provider setup.",
+        "Analyze calls data from your call center and manage phone numbers based on various rules.",
       role: "Frontend",
       tags: ["Angular"],
       logoImageURL: "/img/projects/calltrack/logo.svg",
@@ -527,7 +525,7 @@ export const projects = {
       externalURL: "https://sajari.com",
       externalURLDead: true,
       description:
-        "Enterprise dashboard for a search and recommendations engine-as-a-service. Built a single-page application that let customers configure search relevance, monitor query analytics, and A/B test ranking algorithms — without touching code. The founder needed a UI that could surface complex ML model performance to non-technical product managers.",
+        "Dashboard single-page application for search and recommendations engine as a service.",
       tags: ["Angular"],
       logoImageURL: "/img/projects/sajari/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],
@@ -539,7 +537,7 @@ export const projects = {
       slug: "code-review",
       externalURL: "https://spy4x.github.io/pb-code-review",
       description:
-        "Deep-dive code review for a Node.js REST API codebase that was falling apart under production load. Documented callback hell, code inconsistency, missing error handling, and security gaps. Delivered a prioritized refactoring roadmap that the team used to cut incident rate by 60% in 3 months.",
+        "Code review report for a Node.js REST API codebase. Callback hell, code inconsistency and fun.",
       role: "Audit",
       tags: ["Node.js", "Express.js"],
       logoImageURL: "/img/projects/code-review/logo.svg",
