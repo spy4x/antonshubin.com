@@ -1,7 +1,8 @@
 {
   "nodeModulesDir": "manual",
   "tasks": {
-    "check": "deno fmt --check . && deno lint . && deno check",
+    "check": "deno fmt --check . && deno lint . && deno check && deno task test",
+    "test": "deno test",
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",

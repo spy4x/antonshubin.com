@@ -3,7 +3,7 @@ import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { CTASection } from "../components/CTASection.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
-import { blogArticles, prettyDate, youtubeVideos } from "../lib/data.ts";
+import { blogArticles, homeBlogSlugs, prettyDate } from "../lib/data.ts";
 import LeadForm from "../islands/LeadForm.tsx";
 import {
   ArrowRightIcon,
@@ -563,7 +563,7 @@ export default define.page(function Home(ctx) {
                 Free Architecture Audit
               </h3>
               <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
-                Send your tech stack or idea. I'll send back 3 concrete
+                Send your idea or your current app. I'll send back 3 concrete
                 improvements within 48 hours. No cost.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
@@ -917,7 +917,7 @@ export default define.page(function Home(ctx) {
           <h2 class="h1 mb-8">Content & Writing</h2>
           <div class="grid gap-6 md:grid-cols-2">
             <div class="p-4 bg-gray-800 rounded-xl border-2 border-gray-700">
-              <div class="flex items-start gap-4 mb-5">
+              <div class="flex items-start gap-4">
                 <div class="p-3 bg-red-500/20 rounded-lg shrink-0">
                   <YouTubeIcon class="text-red-400 w-8 h-8" />
                 </div>
@@ -935,26 +935,6 @@ export default define.page(function Home(ctx) {
                     ships them.
                   </p>
                 </div>
-              </div>
-              <div class="space-y-3">
-                {youtubeVideos.slice(0, 3).map((v) => (
-                  <a
-                    key={v.videoId}
-                    href={`https://www.youtube.com/watch?v=${v.videoId}`}
-                    target="_blank"
-                    class="flex items-start gap-2 group"
-                  >
-                    <span class="text-red-400 shrink-0 mt-0.5">▶</span>
-                    <span>
-                      <span class="text-sm text-gray-300 group-hover:text-red-400 transition-colors">
-                        {v.title}
-                      </span>
-                      <span class="block text-xs text-gray-500 mt-0.5">
-                        {prettyDate(v.publishedAt)}
-                      </span>
-                    </span>
-                  </a>
-                ))}
               </div>
             </div>
             <div class="p-4 bg-gray-800 rounded-xl border-2 border-gray-700">
@@ -976,10 +956,9 @@ export default define.page(function Home(ctx) {
                 </div>
               </div>
               <div class="space-y-3">
-                {blogArticles
-                  .filter((a) => a.category === "startups")
-                  .sort((a, b) => b.index - a.index)
-                  .slice(0, 3)
+                {homeBlogSlugs
+                  .map((slug) => blogArticles.find((a) => a.slug === slug))
+                  .filter((a) => a !== undefined)
                   .map((a) => (
                     <a
                       key={a.slug}
