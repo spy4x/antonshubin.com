@@ -1,5 +1,11 @@
-// Cache version — bump on each deploy where sw.js changes
-const CACHE = "antonshubin-v96";
+import { define } from "../lib/utils.ts";
+
+// Cache name is derived from the build, not hand-bumped, so a deploy never
+// edits a tracked file. BUILD_ID is set from the deploy commit hash (see
+// scripts/deploy.ts); it falls back to a fixed value so `deno task dev` and
+// local builds still work without it.
+const BUILD_ID = Deno.env.get("BUILD_ID") || "dev";
+const CACHE = `antonshubin-${BUILD_ID}`;
 
 const PRECACHE_URLS = [
   "/",
@@ -11,6 +17,12 @@ const PRECACHE_URLS = [
   "/pay",
   "/manifest.json",
 ];
+
+const SW_SCRIPT =
+  `// Cache version — derived from the build id, never hand-edited.
+const CACHE = "${CACHE}";
+
+const PRECACHE_URLS = ${JSON.stringify(PRECACHE_URLS)};
 
 // Install: precache core pages
 self.addEventListener("install", (event) => {
@@ -51,4 +63,18 @@ self.addEventListener("message", (event) => {
   if (event.data?.action === "skipWaiting") {
     self.skipWaiting();
   }
+});
+`;
+
+export const handler = define.handlers({
+  GET() {
+    return new Response(SW_SCRIPT, {
+      headers: {
+        "Content-Type": "text/javascript; charset=utf-8",
+        // The browser detects a service-worker update byte for byte, so this
+        // file must never be cached.
+        "Cache-Control": "no-cache, must-revalidate",
+      },
+    });
+  },
 });
