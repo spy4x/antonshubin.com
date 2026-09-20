@@ -1,3 +1,4 @@
+import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type Project, projects } from "../../lib/data.ts";
@@ -27,6 +28,18 @@ function splitParagraphs(text: string): string[] {
     .map((p) => p.trim().replace(/\s+/g, " "))
     .filter(Boolean);
 }
+
+// Unknown slugs keep the friendly "Not Found" view below, but must answer with
+// a real 404 so search engines drop removed project pages instead of indexing
+// an empty 200.
+export const handler = define.handlers({
+  GET(ctx) {
+    return getProjectBySlug(ctx.params.slug) ? page() : page(null, {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  },
+});
 
 export default define.page(function ProjectDetail(ctx) {
   const { slug } = ctx.params;

@@ -40,6 +40,15 @@ app.use(async (ctx) => {
   const resp = await ctx.next();
   const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
+  // Never cache an error. A 404 for a core page (for example /hackathons
+  // while its list is empty) would otherwise stay in browsers and at the edge
+  // for three days after the page comes back.
+  if (resp.status >= 400) {
+    resp.headers.set("Cache-Control", "no-store");
+    if (isStaging) resp.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return resp;
+  }
+
   // Staging: cache assets but NOT HTML (instant feedback on deploys)
   if (isStaging) {
     resp.headers.set("X-Robots-Tag", "noindex, nofollow");

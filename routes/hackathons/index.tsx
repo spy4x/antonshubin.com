@@ -1,3 +1,4 @@
+import { HttpError } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
@@ -92,6 +93,14 @@ function HackathonCard({ h }: { h: Hackathon }) {
     </a>
   );
 }
+
+// No entries means no page: an empty trophy shelf is worse than none.
+export const handler = define.handlers({
+  GET() {
+    if (hackathons.length === 0) throw new HttpError(404);
+    return { data: null };
+  },
+});
 
 export default define.page(function Hackathons(ctx) {
   const wins = hackathons.filter((h) => h.won).length;
