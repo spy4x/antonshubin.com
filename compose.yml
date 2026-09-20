@@ -6,7 +6,10 @@ networks:
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      args:
+        BUILD_ID: ${BUILD_ID:-dev}
     container_name: ${PROJECT:-antonshubincom}-web
     restart: unless-stopped
     # Env vars for container: loaded from file at runtime

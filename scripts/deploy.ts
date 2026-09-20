@@ -2,6 +2,10 @@
 /**
  * Deploy to the cloud server: rsync source + env files, docker compose up --build
  *
+ * Never edits a tracked file — the service-worker cache name (routes/sw.js.ts)
+ * comes from BUILD_ID, set below to the local commit hash and passed to the
+ * remote build, so `git status` stays clean before and after a deploy.
+ *
  * Usage:
  *   deno task deploy           # production → antonshubin.com
  *   deno task deploy:stag      # staging   → website-stag.antonshubin.com
@@ -9,7 +13,7 @@
  * Steps:
  *  1. Rsync source (excluding .git, .age, node_modules, _fresh, and .dockerignore patterns)
  *  2. Rsync env files separately (blocked by .dockerignore from step 1)
- *  3. SSH to the server: docker compose up -d --build
+ *  3. SSH to the server: BUILD_ID=<commit hash> docker compose up -d --build
  */
 
 // Cloud server (23.88.101.28). antonshubin.com used to run on the home server
@@ -53,19 +57,6 @@ if (isStaging) {
   Deno.writeTextFileSync(".env.staging", stagEnv);
 }
 
-// Step 0: bump SW cache version so browsers detect an update
-const swPath = "static/sw.js";
-let sw = Deno.readTextFileSync(swPath);
-const match = sw.match(/const CACHE = "antonshubin-v(\d+)"/);
-if (match) {
-  const ver = parseInt(match[1]) + 1;
-  sw = sw.replace(`antonshubin-v${match[1]}`, `antonshubin-v${ver}`);
-  Deno.writeTextFileSync(swPath, sw);
-  console.log(`  sw cache: antonshubin-v${match[1]} → v${ver}`);
-} else {
-  console.log("  sw cache: version pattern not found — skipping bump");
-}
-
 async function run(
   cmd: string,
   cwd?: string,
@@ -83,6 +74,16 @@ async function run(
     stderr: new TextDecoder().decode(o.stderr),
   };
 }
+
+// Build id for the service worker's cache name (routes/sw.js.ts). Computed
+// locally instead of writing it into a tracked file, so the working tree
+// stays clean.
+const buildIdResult = await run("git rev-parse --short HEAD");
+if (buildIdResult.code !== 0) {
+  console.error(buildIdResult.stderr);
+  Deno.exit(1);
+}
+const BUILD_ID = buildIdResult.stdout.trim();
 
 // Step 1: source code (exclude env files via dockerignore filter)
 console.log("  rsync source...");
@@ -109,8 +110,8 @@ console.log("  docker compose...");
 const composeCmd = isStaging
   // Staging: cp .env.staging → .env.prod for compose.yml's env_file,
   // and set PROJECT for the container_name variable in compose.yml
-  ? `cd ${REMOTE_PATH} && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
-  : `cd ${REMOTE_PATH} && docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
+  ? `cd ${REMOTE_PATH} && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
+  : `cd ${REMOTE_PATH} && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
 const r3 = await run(
   `ssh ${SERVER} '${composeCmd}'`,
 );
