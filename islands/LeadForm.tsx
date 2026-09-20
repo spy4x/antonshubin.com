@@ -19,7 +19,7 @@ function validate(form: FormState): string | null {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
     return "Please enter a valid email";
   }
-  if (!form.techStack.trim()) return "Describe your tech stack or idea";
+  if (!form.techStack.trim()) return "Describe your idea or your current app";
   return null;
 }
 
@@ -87,7 +87,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           Not sure where to start?
         </h2>
         <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6 text-center">
-          Send me your current tech stack or idea — I'll send back 3 concrete
+          Send me your idea or your current app — I'll send back 3 concrete
           architectural improvements within 48 hours.
           <span class="text-orange-400 font-semibold block sm:inline">
             {" "}No cost.
@@ -142,11 +142,11 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
 
           <div>
             <label for="lead-stack" class="sr-only">
-              Describe your tech stack or idea
+              Describe your idea or your current app
             </label>
             <textarea
               id="lead-stack"
-              placeholder="Describe your tech stack, idea, or what you need help with..."
+              placeholder="Describe your idea, your current app, or what you need help with..."
               value={techStack}
               onInput={(e) =>
                 techStack.value = (e.target as HTMLTextAreaElement).value}
