@@ -56,12 +56,14 @@ export const handler = define.handlers({
         changefreq: "monthly",
         lastmod: undefined,
       },
-      {
-        loc: "/hackathons",
-        priority: "0.7",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
+      ...(hackathons.length > 0
+        ? [{
+          loc: "/hackathons",
+          priority: "0.7",
+          changefreq: "monthly",
+          lastmod: undefined,
+        }]
+        : []),
     ];
 
     const blogUrls = blogArticles.map((a) => ({

@@ -1,8 +1,14 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL } from "../lib/config.ts";
+import { hackathons } from "../lib/data.ts";
 
 export const handler = define.handlers({
   GET() {
+    // Listed only while lib/data.ts holds real entries.
+    const hackathonsLink = hackathons.length > 0
+      ? `\n- [Hackathons](${BASE_URL}/hackathons)`
+      : "";
+
     const txt = `# Anton Shubin — Fractional CTO & Lead Architect
 
 > One accountable technical lead from architecture through production for non-technical founders. Fixed-price milestones, plain-English decisions, and client ownership of code, infrastructure, and keys. Production includes deployment, observability, recovery, security, and cost control.
@@ -46,8 +52,7 @@ export const handler = define.handlers({
 - [Production Infrastructure](${BASE_URL}/infrastructure) — Operational proof of deployable, observable, recoverable, and transferable systems
 - [Contact](${BASE_URL}/contact-me)
 - [Blog](${BASE_URL}/blog)
-- [Portfolio](${BASE_URL}/projects)
-- [Hackathons](${BASE_URL}/hackathons)
+- [Portfolio](${BASE_URL}/projects)${hackathonsLink}
 
 ## Open Source Projects
 

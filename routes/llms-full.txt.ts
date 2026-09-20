@@ -1,6 +1,6 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL } from "../lib/config.ts";
-import { blogArticles } from "../lib/data.ts";
+import { blogArticles, hackathons } from "../lib/data.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -11,6 +11,20 @@ export const handler = define.handlers({
           `- [${a.title}](${BASE_URL}/blog/${a.slug}) — ${a.description} (${a.readTime} min read, ${a.publishedAt})`,
       )
       .join("\n");
+
+    // Built from lib/data.ts so the section exists only while there are real
+    // entries, and never restates results by hand.
+    const hackathonsSection = hackathons.length > 0
+      ? `- **Hackathons:** ${BASE_URL}/hackathons — Hackathon projects and results\n\n### Hackathons\n${
+        hackathons
+          .map((h) =>
+            `- **${h.title}** (${BASE_URL}/hackathons/${h.slug}) — ${
+              h.place ?? "Participant"
+            }, ${h.event}. ${h.description}`
+          )
+          .join("\n")
+      }\n`
+      : "";
 
     const txt = `# Anton Shubin — Fractional CTO & Lead Architect (Full Index)
 
@@ -80,7 +94,6 @@ Three named personas on the landing page, each with a stage-specific fit:
 
 ### Pages
 - **Home:** ${BASE_URL}/ — Main landing page with pain points, engagement terms, featured services
-- **Hackathons:** ${BASE_URL}/hackathons — Competitive engineering track record: 3 hackathons, AI SaaS builder (1st place), fintech payments (top 5), self-healing infrastructure (runner-up). Proof of speed and architecture under pressure.
 - **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
 - **Catalog:** ${BASE_URL}/catalog — 10 fixed-price offerings
   - /catalog/strategy-call — Strategy Session ($350, 60 min)
@@ -99,13 +112,7 @@ Three named personas on the landing page, each with a stage-specific fit:
 - **Projects:** ${BASE_URL}/projects — Client work and open-source
 - **Production Infrastructure:** ${BASE_URL}/infrastructure — Fractional CTO operational proof: deployable, observable, recoverable, and transferable systems. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 - **Blog:** ${BASE_URL}/blog — Technical articles
-- **Hackathons:** ${BASE_URL}/hackathons — Competitive engineering track record under extreme time pressure
-
-### Hackathons
-- **AI SaaS Builder** (${BASE_URL}/hackathons/ai-saas-builder) — 1st Place, $5K + GPU grant. Shipped production-ready SaaS MVP in 48h using AI pair programming.
-- **Fintech Payments** (${BASE_URL}/hackathons/fintech-payments) — Top 5 Finalist. Built multi-provider payment orchestrator with automatic failover.
-- **Self-Healing Infrastructure** (${BASE_URL}/hackathons/infrastructure-self-healing) — Runner-up. Auto-healing Docker/Traefik control plane that survived Chaos Hour.
-
+${hackathonsSection}
 ### Blog Posts
 ${blogList}
 

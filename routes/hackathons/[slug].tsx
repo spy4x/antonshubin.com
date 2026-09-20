@@ -1,3 +1,4 @@
+import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type Hackathon, hackathons } from "../../lib/data.ts";
@@ -10,6 +11,16 @@ import { CalendarIcon, CodeIcon, StarIcon } from "../../components/Icons.tsx";
 function getHackathonBySlug(slug: string): Hackathon | undefined {
   return hackathons.find((h) => h.slug === slug);
 }
+
+// Unknown slugs answer with a real 404, not a 200 "Not Found" page.
+export const handler = define.handlers({
+  GET(ctx) {
+    return getHackathonBySlug(ctx.params.slug) ? page() : page(null, {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  },
+});
 
 export default define.page(function HackathonDetail(ctx) {
   const { slug } = ctx.params;
