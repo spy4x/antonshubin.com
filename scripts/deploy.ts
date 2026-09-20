@@ -26,7 +26,7 @@ const TARGET = isStaging
   ? {
     name: "staging",
     project: "antonshubincom-stag",
-    envFile: ".env.staging",
+    envFile: ".env.staging.local",
     domain: "website-stag.antonshubin.com",
   }
   : {
@@ -44,7 +44,10 @@ const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
 
 if (isStaging) {
-  // Create .env.staging on the fly (used for docker compose --env-file)
+  // Create .env.staging.local on the fly (used for docker compose
+  // --env-file). The .local suffix keeps it matched by the .gitignore rule
+  // .env.*.local, so a deploy that fails midway leaves no untracked,
+  // un-ignored copy of the environment values behind.
   const prodEnv = Deno.readTextFileSync(".env.prod");
   // Anchor both replacements: an unanchored /DOMAIN=.*/ also matches the tail
   // of WWW_DOMAIN=. WWW_DOMAIN is pinned to the staging host (not
@@ -54,7 +57,7 @@ if (isStaging) {
   const stagEnv = prodEnv
     .replace(/^DOMAIN=.*$/m, `DOMAIN=${TARGET.domain}`)
     .replace(/^WWW_DOMAIN=.*$/m, `WWW_DOMAIN=${TARGET.domain}`);
-  Deno.writeTextFileSync(".env.staging", stagEnv);
+  Deno.writeTextFileSync(TARGET.envFile, stagEnv);
 }
 
 async function run(
@@ -75,57 +78,65 @@ async function run(
   };
 }
 
-// Build id for the service worker's cache name (routes/sw.js.ts). Computed
-// locally instead of writing it into a tracked file, so the working tree
-// stays clean.
-const buildIdResult = await run("git rev-parse --short HEAD");
-if (buildIdResult.code !== 0) {
-  console.error(buildIdResult.stderr);
-  Deno.exit(1);
+// Runs every deploy step, wrapped so a failure at any point still lets the
+// caller clean up the temp env file below instead of exiting mid-deploy.
+let failed = false;
+try {
+  // Build id for the service worker's cache name (routes/sw.js.ts). Computed
+  // locally instead of writing it into a tracked file, so the working tree
+  // stays clean.
+  const buildIdResult = await run("git rev-parse --short HEAD");
+  if (buildIdResult.code !== 0) {
+    throw new Error(buildIdResult.stderr);
+  }
+  const BUILD_ID = buildIdResult.stdout.trim();
+
+  // Step 1: source code (exclude env files via dockerignore filter)
+  console.log("  rsync source...");
+  const r1 = await run(
+    `rsync -avz --delete --exclude='.git' --exclude='.age/' --exclude='node_modules/' --exclude='_fresh/' --filter=':- .dockerignore' ./ ${REMOTE}`,
+  );
+  if (r1.code !== 0) {
+    throw new Error(r1.stderr);
+  }
+  console.log(r1.stdout);
+
+  // Step 2: env files (bypass dockerignore)
+  console.log("  rsync env files...");
+  const r2 = await run(`rsync -avz .env ${TARGET.envFile} ${REMOTE}`);
+  if (r2.code !== 0) {
+    throw new Error(r2.stderr);
+  }
+  console.log(r2.stdout);
+
+  // Step 3: build and restart on remote
+  console.log("  docker compose...");
+  const composeCmd = isStaging
+    // Staging: cp .env.staging.local → .env.prod for compose.yml's env_file,
+    // and set PROJECT for the container_name variable in compose.yml
+    ? `cd ${REMOTE_PATH} && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
+    : `cd ${REMOTE_PATH} && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
+  const r3 = await run(
+    `ssh ${SERVER} '${composeCmd}'`,
+  );
+  if (r3.code !== 0) {
+    throw new Error(r3.stderr);
+  }
+  console.log(r3.stdout);
+
+  console.log(`✅ Deploy to ${TARGET.name} complete`);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
+  failed = true;
+} finally {
+  // Clean up temp env file, including on a failed/early-exiting deploy.
+  if (isStaging) {
+    try {
+      Deno.removeSync(TARGET.envFile);
+    } catch { /* already gone */ }
+  }
 }
-const BUILD_ID = buildIdResult.stdout.trim();
 
-// Step 1: source code (exclude env files via dockerignore filter)
-console.log("  rsync source...");
-const r1 = await run(
-  `rsync -avz --delete --exclude='.git' --exclude='.age/' --exclude='node_modules/' --exclude='_fresh/' --filter=':- .dockerignore' ./ ${REMOTE}`,
-);
-if (r1.code !== 0) {
-  console.error(r1.stderr);
+if (failed) {
   Deno.exit(1);
-}
-console.log(r1.stdout);
-
-// Step 2: env files (bypass dockerignore)
-console.log("  rsync env files...");
-const r2 = await run(`rsync -avz .env ${TARGET.envFile} ${REMOTE}`);
-if (r2.code !== 0) {
-  console.error(r2.stderr);
-  Deno.exit(1);
-}
-console.log(r2.stdout);
-
-// Step 3: build and restart on remote
-console.log("  docker compose...");
-const composeCmd = isStaging
-  // Staging: cp .env.staging → .env.prod for compose.yml's env_file,
-  // and set PROJECT for the container_name variable in compose.yml
-  ? `cd ${REMOTE_PATH} && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
-  : `cd ${REMOTE_PATH} && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
-const r3 = await run(
-  `ssh ${SERVER} '${composeCmd}'`,
-);
-if (r3.code !== 0) {
-  console.error(r3.stderr);
-  Deno.exit(1);
-}
-console.log(r3.stdout);
-
-console.log(`✅ Deploy to ${TARGET.name} complete`);
-
-// Clean up temp env file
-if (isStaging) {
-  try {
-    Deno.removeSync(".env.staging");
-  } catch { /* ok */ }
 }

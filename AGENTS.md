@@ -95,8 +95,9 @@ Claude, Perplexity, and other AI crawlers — a primary traffic source.
 
 ## Cache-Control headers
 
-Cache policy lives in `main.ts` as middleware. When adding or changing routes,
-update the `CORE_PAGES` set if the new page should be cached at the edge:
+Cache policy lives in `main.ts` as middleware, except `/sw.js`, which sets its
+own header in `routes/sw.js.ts`. When adding or changing routes, update the
+`CORE_PAGES` set if the new page should be cached at the edge:
 
 ```ts
 const CORE_PAGES = new Set([
@@ -115,12 +116,12 @@ const CORE_PAGES = new Set([
 
 Cache tiers:
 
-| Tier       | Duration                        | Targets                  | Use case                                            |
-| ---------- | ------------------------------- | ------------------------ | --------------------------------------------------- |
-| Immutable  | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*` | Content-hashed files (fingerprint = immutable)      |
-| Images     | 7 days + stale-while-revalidate | `/img/*`                 | Photos, illustrations (rarely change)               |
-| Core pages | 3 days + stale-while-revalidate | `CORE_PAGES` set         | SSR pages that update every few days                |
-| No cache   | `no-cache, must-revalidate`     | `/sw.js`                 | Service worker (byte-for-byte PWA update detection) |
+| Tier       | Duration                        | Targets                  | Use case                                                      |
+| ---------- | ------------------------------- | ------------------------ | ------------------------------------------------------------- |
+| Immutable  | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*` | Content-hashed files (fingerprint = immutable)                |
+| Images     | 7 days + stale-while-revalidate | `/img/*`                 | Photos, illustrations (rarely change)                         |
+| Core pages | 3 days + stale-while-revalidate | `CORE_PAGES` set         | SSR pages that update every few days                          |
+| No cache   | `no-cache, must-revalidate`     | `/sw.js`                 | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
 
 Error responses (status ≥ 400) are never cached, in `main.ts`'s middleware,
 regardless of which tier the path would otherwise fall into — a 404 must not
