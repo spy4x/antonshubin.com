@@ -113,6 +113,29 @@ Deno.test("findReadmePath fails loudly, naming every path it tried, when nothing
   }
 });
 
+Deno.test("findReadmePath returns the later candidate when the first is absent", async () => {
+  const tempDir = await Deno.makeTempDir();
+  const repo = "some-repo";
+  const reposDir = `${tempDir}/repos`;
+  await Deno.mkdir(`${reposDir}/${repo}`, { recursive: true });
+  await Deno.writeTextFile(`${reposDir}/${repo}/README.md`, "# some-repo\n");
+  const prevReposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR");
+  Deno.env.set("LAUNCH_KIT_REPOS_DIR", reposDir);
+  try {
+    // The explicit path (checked first) does not exist, so this only passes
+    // if the loop keeps going to the LAUNCH_KIT_REPOS_DIR candidate.
+    const result = await findReadmePath(
+      repo,
+      `${tempDir}/missing-explicit-path`,
+    );
+    assertEquals(result, `${reposDir}/${repo}/README.md`);
+  } finally {
+    if (prevReposDir === undefined) Deno.env.delete("LAUNCH_KIT_REPOS_DIR");
+    else Deno.env.set("LAUNCH_KIT_REPOS_DIR", prevReposDir);
+    await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
 const ctx: DraftContext = {
   repo: "rostok",
   readme: { title: "rostok", description: "Scaffold a self-hosted homelab." },
