@@ -496,7 +496,7 @@ export default define.page(function Home(ctx) {
               </h3>
               <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
                 Ongoing fractional CTO partnership — strategy, architecture,
-                team leadership. Async execution, calls when they help.
+                team leadership. Weekly alignment, async execution.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 $3K–$5K/mo — Monthly
