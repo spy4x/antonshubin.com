@@ -124,7 +124,7 @@ export const items: CatalogItem[] = [
     exclusions: [
       "Native mobile apps (iOS/Android) — web-responsive only",
       "Third-party SaaS integrations beyond Stripe (CRM, email tools, etc. quoted separately)",
-      "Post-launch feature additions — captured in a V2 Backlog at fixed price",
+      "Post-launch feature additions — a fixed-price quote once we scope them",
       "Design/branding work beyond system defaults — UI tokens and components included, not custom illustrations",
       "Ongoing maintenance — see Post-Launch Support ($400/mo) for that",
     ],
