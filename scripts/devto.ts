@@ -95,6 +95,12 @@ function findMatchingBracketEnd(
  * doesn't end it early. The path is only rewritten when it starts with a
  * single `/` — an already-absolute URL, a protocol-relative `//` URL, a data
  * URI or an ordinary (non-image) link is left exactly as written.
+ *
+ * An alt text with an unmatched opening bracket, e.g. `![a [b](/img/x.png)`,
+ * is left alone: `findMatchingBracketEnd` never finds a closing `]` for it,
+ * so no rewrite is attempted anywhere in the line. This matches CommonMark,
+ * which reads that text as a plain link, not an image — do not "fix" this
+ * to rewrite it.
  */
 function rewriteImagesInLine(line: string): string {
   let result = "";
