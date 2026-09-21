@@ -47,7 +47,10 @@ export default define.page(function Home(ctx) {
                 <ul class="space-y-1 text-gray-300">
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
-                    <span>Fixed-price milestones with clear scope</span>
+                    <span>
+                      Fixed price when the scope is fixed, hourly when it's
+                      open-ended
+                    </span>
                   </li>
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
@@ -493,7 +496,7 @@ export default define.page(function Home(ctx) {
               </h3>
               <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
                 Ongoing fractional CTO partnership — strategy, architecture,
-                team leadership. Weekly calls, async execution.
+                team leadership. Async execution, calls when they help.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 $3K–$5K/mo — Monthly
