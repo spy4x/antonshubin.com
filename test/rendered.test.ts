@@ -43,14 +43,11 @@ Deno.test("how-i-work renders exactly five promise cards", async () => {
 // `main` at 8af3288 before this guard was added (curled each page and
 // grepped case-insensitively for each phrase; zero hits).
 //
-// Two phrases from the issue's own list are deliberately left out:
-//  - "Fixed-price milestones, plain-English decisions" — still live today in
-//    the `Person` JSON-LD in components/SEOHead.tsx, which renders on every
-//    page below (issue #134, not yet fixed). Asserting it here would fail on
-//    today's correct-per-scope `main`, so it stays out until #134 lands.
-//  - "48 hours" / "fractional CTO" — issue #134 says a follow-up PR handles
-//    these; out of scope for this guard.
+// "Fixed-price milestones, plain-English decisions" joined the list when #134
+// rewrote the `Person` description in components/SEOHead.tsx. "48 hours" and
+// the "fractional CTO" label are guarded in test/structure.test.ts.
 const RETIRED_PHRASES = [
+  "Fixed-price milestones, plain-English decisions",
   "14-Day",
   "Mutual Alignment Guarantee",
   "no questions asked",
