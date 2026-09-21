@@ -6,3 +6,35 @@ steps:
       - deno task check
     when:
       event: [push, pull_request]
+
+  # Sunday numbers report: visitors/pages/referrers/CTA events (Umami), stars
+  # (GitHub), subscribers/views (YouTube) — printed as markdown and pushed to
+  # NTFY. Fires only on the "weekly-numbers" cron trigger, never on push or
+  # pull_request, so it never runs `deno task check` and `check` never runs on
+  # this trigger. See docs/weekly-numbers.md for the one-time cron setup and
+  # the env vars this step needs.
+  weekly-numbers:
+    image: denoland/deno:2.9.0
+    commands:
+      - deno install
+      - deno task weekly-numbers
+    environment:
+      UMAMI_API_URL:
+        from_secret: umami_api_url
+      UMAMI_API_TOKEN:
+        from_secret: umami_api_token
+      UMAMI_ID:
+        from_secret: umami_id
+      GITHUB_REPOS:
+        from_secret: weekly_numbers_github_repos
+      YOUTUBE_API_KEY:
+        from_secret: youtube_api_key
+      YOUTUBE_CHANNEL_ID:
+        from_secret: youtube_channel_id
+      NTFY_URL:
+        from_secret: ntfy_url
+      NTFY_TOPIC:
+        from_secret: ntfy_topic
+    when:
+      event: cron
+      cron: weekly-numbers

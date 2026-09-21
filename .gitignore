@@ -9,6 +9,8 @@ data/subscribers.json
 .env.prod
 _fresh/
 # Fresh build directory
+launches/
+# Generated launch-kit drafts
 key.txt
 # Local private files
 marketing-refactoring.md

@@ -32,22 +32,27 @@ everywhere.
 
 These are real links Anton is shipping this week. Copy the pattern.
 
+A `[slug]` route on this site 404s when the path ends in a trailing slash
+(`/projects/smartlite/` 404s, `/projects/smartlite` is 200 — see the comment at
+`lib/head.ts:43`). None of the examples below end in one, except the root `/`,
+which is the one path where a trailing slash is correct.
+
 **1. GitHub repo README link to a case study**
 
 ```
-https://antonshubin.com/projects/smartlite/?utm_source=github&utm_medium=oss&utm_campaign=template-launch
+https://antonshubin.com/projects/smartlite?utm_source=github&utm_medium=oss&utm_campaign=template-launch
 ```
 
 **2. Upwork proposal chat (client outreach)**
 
 ```
-https://antonshubin.com/how-i-work/?utm_source=upwork&utm_medium=dm&utm_campaign=client-acme-audit
+https://antonshubin.com/how-i-work?utm_source=upwork&utm_medium=dm&utm_campaign=client-acme-audit
 ```
 
 **3. YouTube video description (companion blog post)**
 
 ```
-https://antonshubin.com/blog/building-mcp-servers-with-deno/?utm_source=youtube&utm_medium=blog&utm_campaign=mcp-yt
+https://antonshubin.com/blog/building-mcp-servers-with-deno?utm_source=youtube&utm_medium=blog&utm_campaign=mcp-yt
 ```
 
 **4. LinkedIn post CTA link**
@@ -59,7 +64,7 @@ https://antonshubin.com/?utm_source=linkedin&utm_medium=social&utm_campaign=foun
 **5. Hacker News Show post (rostok launch)**
 
 ```
-https://antonshubin.com/infrastructure/?utm_source=hn&utm_medium=oss&utm_campaign=rostok-launch
+https://antonshubin.com/infrastructure?utm_source=hn&utm_medium=oss&utm_campaign=rostok-launch
 ```
 
 **6. Business card QR code**
@@ -71,19 +76,19 @@ https://antonshubin.com/?utm_source=qr-card&utm_medium=profile
 **7. Reddit r/selfhosted post body link**
 
 ```
-https://antonshubin.com/blog/rostok-self-hosted-scaffolder/?utm_source=reddit&utm_medium=social&utm_campaign=rostok-launch
+https://antonshubin.com/blog/rostok-self-hosted-scaffolder?utm_source=reddit&utm_medium=social&utm_campaign=rostok-launch
 ```
 
 **8. Dev.to canonical cross-post**
 
 ```
-https://antonshubin.com/blog/mig-tiny-self-hosted-scheduler/?utm_source=devto&utm_medium=blog&utm_campaign=mig-launch
+https://antonshubin.com/blog/mig-tiny-self-hosted-scheduler?utm_source=devto&utm_medium=blog&utm_campaign=mig-launch
 ```
 
 **9. Email signature / cold outreach**
 
 ```
-https://antonshubin.com/catalog/free-architecture-audit/?utm_source=email&utm_medium=profile&utm_campaign=audit-q3
+https://antonshubin.com/catalog/free-architecture-audit?utm_source=email&utm_medium=profile&utm_campaign=audit-q3
 ```
 
 ## Build the link first, paste it second

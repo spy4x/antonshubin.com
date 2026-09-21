@@ -14,6 +14,8 @@
  *   ---
  */
 
+import { createDevToDraft } from "./devto.ts";
+
 const DATA_FILE = "lib/data.ts";
 const CONTENT_DIR = "content/blog";
 
@@ -181,6 +183,10 @@ updateDataTS(slug, front, readTime);
 
 // Send newsletter
 sendNewsletter(slug, front.title);
+
+// Create a Dev.to draft (never published directly, and never blocks a
+// publish — see scripts/devto.ts)
+await createDevToDraft(front.title, slug, body);
 
 console.log(`\n  ✅ Published: /blog/${slug}\n`);
 console.log("  Next steps:");
