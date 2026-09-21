@@ -35,8 +35,9 @@ Woodpecker's own configuration, not in this repo, and have to be set once by
 hand:
 
 1. **The cron trigger itself** — Woodpecker → this repo → Cron → Add cron job,
-   name `weekly-numbers`, schedule `0 9 * * 0` (Sunday, 09:00 — the same time as
-   the analytics ritual in `docs/utm.md`), branch `main`.
+   name `weekly-numbers`, schedule `0 9 * * 0` (Sunday, 09:00, per issue #124 —
+   two days after the Friday 09:00 analytics ritual in `docs/utm.md`), branch
+   `main`.
 2. **The secrets** referenced by the step's `from_secret` entries — Woodpecker →
    this repo → Secrets: `umami_api_url`, `umami_api_token`, `umami_id`,
    `weekly_numbers_github_repos`, `youtube_api_key`, `youtube_channel_id`,
