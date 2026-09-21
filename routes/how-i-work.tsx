@@ -47,68 +47,41 @@ interface PolicyItem {
 const policies: PolicyItem[] = [
   {
     icon: "🛡️",
-    title: "14-Day Mutual Alignment Guarantee",
+    title: "Five-Day Refund",
     desc:
-      "If within the first two weeks either party feels the communication style, workflow, or technical approach isn't working, the contract is terminated immediately and a 100% refund is issued — no questions asked. Software architecture requires absolute trust. This guarantee makes it risk-free.",
+      "If in the first five days you feel this is not working, tell me and I refund what you paid.",
     why:
-      "I'd rather lose a project than force a partnership that doesn't click. This protects both of us.",
-  },
-  {
-    icon: "⏱️",
-    title: "Async-First Execution",
-    desc:
-      "One structured weekly alignment call (30-60 min). All daily standups, updates, and demonstrations handled asynchronously via text or Loom video. You pay for engineering throughput, not meeting bloat.",
-    why:
-      "Synchronous meetings kill deep work. Async-first means more code shipped, fewer hours billed to meetings.",
-  },
-  {
-    icon: "🔑",
-    title: "Clean Handoff & IP Sovereignty",
-    desc:
-      "You hold the root infrastructure keys and own 100% of the source code and intellectual property from Day 1. I build on open-source, self-hostable stacks — no proprietary lock-in, no vendor hostage.",
-    why:
-      "Your product is your asset. I build it so you can take it anywhere, anytime.",
+      "In fifteen years the few engagements that needed a refund all showed it within two or three days, so five days is a promise I can keep.",
   },
   {
     icon: "🎯",
-    title: "Fixed-Price Milestones",
+    title: "A Small First Milestone",
     desc:
-      "Once a milestone is funded, the scope is locked to guarantee delivery dates. New ideas or features introduced mid-sprint are automatically captured in a structured V2 Backlog — quoted only after the current version is deployed to production.",
+      "We start with one or two weeks of work. If either of us wants to stop at the end of it, we stop — you keep everything built so far.",
     why:
-      "No scope creep. No surprise costs. You know exactly what you're paying for and when you'll get it.",
+      "You don't have to commit to months of work before we know the collaboration is right.",
+  },
+  {
+    icon: "🔑",
+    title: "You Own Everything From Day One",
+    desc: "Code, accounts, servers and keys are in your name.",
+    why:
+      "Your product is your asset. Nothing about how I work should get in the way of you taking it wherever you need it.",
+  },
+  {
+    icon: "🗓️",
+    title: "Weekly Working Software",
+    desc:
+      "You see working software every week, with a short written update. Calls when they help, not on a schedule for its own sake.",
+    why:
+      "You always know where the project stands, without sitting through meetings that do not move it forward.",
   },
   {
     icon: "🔧",
-    title: "30-Day Code Warranty",
-    desc:
-      "I patch any bugs or regressions within the delivered scope for free for 30 days post-launch. If something breaks that shouldn't have, I fix it on my dime.",
+    title: "Free Bug Fixes for 30 Days",
+    desc: "Bugs in what I delivered are fixed free for 30 days.",
     why:
-      "I stand by my architecture. This isn't 'ship and forget' — it's 'ship and support.'",
-  },
-  {
-    icon: "💬",
-    title: "No Jargon Guarantee",
-    desc:
-      "Every technical decision gets a plain-English explanation. You will never hear opaque jargon without a clear translation of what it means for your product, timeline, and budget.",
-    why:
-      "You should not need a translator. I speak both business and engineering fluently with founders, technical co-founders, and CTOs alike.",
-  },
-  {
-    icon: "🌐",
-    title: "Open-Source, Self-Hostable Stacks",
-    desc:
-      "I default to open-source, self-hostable infrastructure — FOSS preferred for cost discipline, performance, portability, and auditability. Bare-metal on Hetzner when the workload justifies it, managed cloud (AWS, GCP, Supabase) when the business calls for it, hybrid in between. Exit costs are documented before they become constraints.",
-    why:
-      "You own the keys, the code, and the choices. No proprietary lock-in, no surprise bills, no vendor hostage.",
-  },
-  {
-    icon: "🛟",
-    title: "Post-Launch Support & Maintenance",
-    desc:
-      "Ongoing infrastructure oversight after your project ships. Server monitoring, backup verification, disk space tracking, security patch updates, and monthly status reports. Critical issues get an 8-hour response time.",
-    why:
-      "Your software is your asset — it deserves care after launch. Patch cycles, capacity checks, and incident response keep the system healthy.",
-    link: "/catalog/post-launch-support-maintenance",
+      "I stand behind what I build. If something I shipped breaks, I fix it on my time, not yours.",
   },
 ];
 
@@ -117,7 +90,7 @@ export default define.page(function HowIWork() {
     ...head.value,
     title: "How I Deliver — Anton Shubin",
     description:
-      "Zero micromanagement. Complete transparency. Predictable outcomes.",
+      "Five promises, no fine print: a five-day refund, a small first milestone, full ownership from day one, weekly working software, and free bug fixes for 30 days.",
     canonical: "https://antonshubin.com/how-i-work",
     ogType: "website",
   };
@@ -150,7 +123,7 @@ export default define.page(function HowIWork() {
           How I Deliver
         </h1>
         <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg">
-          Zero micromanagement. Complete transparency. Predictable outcomes.
+          Five promises, no fine print.
         </p>
 
         <div class="space-y-8">
@@ -188,6 +161,11 @@ export default define.page(function HowIWork() {
             </div>
           ))}
         </div>
+
+        <p class="text-gray-400 text-center max-w-2xl mx-auto mt-8 text-sm sm:text-base">
+          Pricing: fixed price when the scope is fixed, hourly when the work is
+          open-ended. A change to scope gets a quote before I start on it.
+        </p>
 
         <section id="ai-augmented" class="mt-16 scroll-mt-4">
           <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">
@@ -286,19 +264,18 @@ export default define.page(function HowIWork() {
           </p>
           <div class="space-y-4 max-w-3xl mx-auto">
             <FaqItem q="What if we start working together and it is not a good fit?">
-              That is exactly why I offer the 14-Day Mutual Alignment Guarantee.
-              If within the first two weeks either of us feels the communication
-              style, workflow, or technical approach is not working, I issue a
-              100% refund — no questions asked. I would rather lose a project
-              than force a partnership that does not click.
+              That is exactly why I offer a five-day refund. If in the first
+              five days you feel this is not working, tell me and I refund what
+              you paid. We also start with a small first milestone — one or two
+              weeks of work — so if either of us wants to stop at the end of it,
+              we stop, and you keep everything built so far.
             </FaqItem>
 
             <FaqItem q="How do you handle scope changes mid-project?">
-              Once a milestone is funded, the scope is locked to guarantee
-              delivery dates. New ideas or features that come up during
-              development are automatically captured in a structured V2 Backlog
-              — quoted separately after the current version is deployed. This
-              protects your timeline and your budget.
+              I work fixed price when the scope is fixed, and hourly when the
+              work is open-ended. If the scope changes once we have started, you
+              get a quote for the change before I start on it — no surprise
+              costs.
             </FaqItem>
 
             <FaqItem q="Do you work with clients who already have a development team?">
@@ -318,20 +295,15 @@ export default define.page(function HowIWork() {
             </FaqItem>
 
             <FaqItem q="Do you accept hourly engagements?">
-              Yes — hourly is available for staff augmentation, code reviews, or
-              when scope is not fully clear yet. Fixed-price milestones are my
-              preferred default for new projects because they eliminate
-              micromanagement and screen tracking, but hourly remains a real
-              option for the right context. The first conversation is about
-              which fits your situation.
+              Yes. I work fixed price when the scope is fixed, and hourly for
+              staff augmentation, code reviews, or when the work is open-ended.
+              The first conversation is about which fits your situation.
             </FaqItem>
 
             <FaqItem q="How do you communicate during a project?">
-              We hold one structured weekly alignment call (30-60 minutes). All
-              daily updates, code demonstrations, and questions are handled
-              asynchronously via text or Loom video. You are always in the loop
-              without sitting through daily standups. You pay for engineering
-              throughput, not meeting bloat.
+              You see working software every week, with a short written update.
+              I schedule calls when they help move things forward, not on a
+              fixed cadence for its own sake.
             </FaqItem>
 
             <FaqItem q="How long does a typical project take?">
@@ -368,18 +340,17 @@ export default define.page(function HowIWork() {
             </FaqItem>
 
             <FaqItem q="What if my project needs more work after launch?">
-              Every project comes with a 30-Day Code Warranty — I fix any bugs
-              within the delivered scope for free. For ongoing needs, I offer a
-              {" "}
+              Bugs in what I delivered are fixed free for 30 days. For ongoing
+              needs after that, I offer a{" "}
               <a
                 href="/catalog/post-launch-support-maintenance"
                 class="text-orange-400 hover:text-orange-300 underline"
               >
                 Post-Launch Support & Maintenance
               </a>{" "}
-              package that covers server monitoring, backup verification,
-              security patches, and priority support. You can also fund
-              additional milestones from the V2 Backlog at any time.
+              package — see what it covers and its price on that page. You can
+              also fund a new milestone at any time; if the scope changes, I
+              quote it before I start.
             </FaqItem>
 
             <FaqItem q="How do I know you are the right person for my project?">
