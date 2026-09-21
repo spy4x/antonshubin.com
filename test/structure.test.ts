@@ -59,10 +59,25 @@ siteTest("the navigation has the five agreed links", async (site) => {
   );
 });
 
+/**
+ * The six retired slugs and their new homes, written out here on purpose. The
+ * test must not read its expectation from `catalogRedirects`, the map that
+ * produces the redirects: a deleted or repointed entry would then pass.
+ */
+const EXPECTED_REDIRECTS: Record<string, string> = {
+  "technical-discovery-sprint": "/catalog/zero-to-production-saas-mvp",
+  "bulletproof-backend-api": "/catalog/zero-to-production-saas-mvp",
+  "surgical-ai-integration": "/catalog/zero-to-production-saas-mvp",
+  "mcp-server-development": "/catalog/zero-to-production-saas-mvp",
+  "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
+  "free-architecture-audit": "/#audit-form",
+};
+
 siteTest(
   "each retired catalog slug answers 301 to its new home",
   async (site) => {
-    for (const [slug, target] of Object.entries(catalogRedirects)) {
+    assertEquals(catalogRedirects, EXPECTED_REDIRECTS);
+    for (const [slug, target] of Object.entries(EXPECTED_REDIRECTS)) {
       const res = await site.get(`/catalog/${slug}`);
       await res.body?.cancel();
       assertEquals(res.status, 301, slug);
@@ -120,20 +135,32 @@ siteTest(
   },
 );
 
+/**
+ * Every page that shows a catalog price, with the dollar figures on it that are
+ * not my prices. Add a page here when it starts showing a price.
+ */
+const PRICE_PAGES: Record<string, string[]> = {
+  // Upwork earnings, and the contract value quoted under a testimonial.
+  "/": ["$395K", "$55,749"],
+  "/catalog": [],
+  ...Object.fromEntries(catalogItems.map((i) => [`/catalog/${i.slug}`, []])),
+  "/how-i-work": [],
+  // "a $10 VPS" in a blog post summary.
+  "/saas-architecture-guide": ["$10"],
+};
+
 siteTest(
-  "every price shown on the home and catalog pages equals lib/catalog.ts",
+  "every price shown on a page equals lib/catalog.ts",
   async (site) => {
-    const paths = [
-      "/",
-      "/catalog",
-      ...catalogItems.map((i) => `/catalog/${i.slug}`),
-    ];
-    for (const path of paths) {
-      for (const amount of dollarAmounts(visibleText(await site.html(path)))) {
-        // The home page quotes a testimonial's contract value; it is not a price.
-        if (path === "/" && amount === "$55,749") continue;
+    for (const [path, notPrices] of Object.entries(PRICE_PAGES)) {
+      const amounts = dollarAmounts(visibleText(await site.html(path)));
+      assert(
+        amounts.some((a) => catalogAmounts.has(a)),
+        `${path} is listed as a price page but shows no catalog price`,
+      );
+      for (const amount of amounts) {
         assert(
-          catalogAmounts.has(amount) || NOT_A_PRICE.has(amount),
+          catalogAmounts.has(amount) || notPrices.includes(amount),
           `${path} shows ${amount}, which is not a price in lib/catalog.ts`,
         );
       }

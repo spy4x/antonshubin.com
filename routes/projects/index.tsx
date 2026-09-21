@@ -150,9 +150,12 @@ export default define.page(function Projects(ctx) {
     canonical: "https://antonshubin.com/projects",
     ogType: "website",
   };
-  const clientProjects = featuredClientSlugs
-    .map((slug) => projects.freelance.find((p) => p.slug === slug))
-    .filter((p) => p !== undefined);
+  // A typo in featuredClientSlugs must fail loudly, not shrink the grid.
+  const clientProjects = featuredClientSlugs.map((slug) => {
+    const project = projects.freelance.find((p) => p.slug === slug);
+    if (!project) throw new Error(`featuredClientSlugs: no project "${slug}"`);
+    return project;
+  });
   const olderWork = [
     ...projects.freelance.filter((p) =>
       !featuredClientSlugs.includes(p.slug ?? "")

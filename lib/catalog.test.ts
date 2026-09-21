@@ -18,18 +18,20 @@ Deno.test("the catalog holds the four decided items at the decided prices", () =
   );
 });
 
-Deno.test("every retired slug redirects to a live catalog item or the audit form", () => {
-  const live = new Set(catalogItems.map((i) => `/catalog/${i.slug}`));
-  for (const [slug, target] of Object.entries(catalogRedirects)) {
+Deno.test("the six retired slugs redirect to the items that absorbed them", () => {
+  assertEquals(catalogRedirects, {
+    "technical-discovery-sprint": "/catalog/zero-to-production-saas-mvp",
+    "bulletproof-backend-api": "/catalog/zero-to-production-saas-mvp",
+    "surgical-ai-integration": "/catalog/zero-to-production-saas-mvp",
+    "mcp-server-development": "/catalog/zero-to-production-saas-mvp",
+    "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
+    "free-architecture-audit": "/#audit-form",
+  });
+  for (const slug of Object.keys(catalogRedirects)) {
     assertEquals(
       catalogItems.some((i) => i.slug === slug),
       false,
       `"${slug}" is both a live item and a redirect`,
-    );
-    assertEquals(
-      live.has(target) || target === "/#audit-form",
-      true,
-      `"${slug}" redirects to "${target}", which is not a live target`,
     );
   }
 });
@@ -48,7 +50,7 @@ Deno.test("a 'from' price is published as minPrice, never as a fixed price", () 
         assertEquals(offer.priceSpecification.price, undefined);
         assertEquals(offer.priceSpecification.minPrice, price.usd);
       } else {
-        assertEquals(offer.price, String(price.usd));
+        assertEquals(offer.price, price.period ? undefined : String(price.usd));
         assertEquals(offer.priceSpecification.price, price.usd);
       }
     });

@@ -3,8 +3,9 @@
  *
  * Every page, the sitemap, both llms files, the head metadata and the JSON-LD
  * read titles and prices from here. Nothing else in the repository may restate
- * a price by hand — `test/catalog.test.ts` fails when a rendered price differs
- * from this file. The same list is used on Upwork and neatsoft.dev, so changing
+ * a price by hand. `lib/catalog.test.ts` pins the four prices and the six
+ * redirects; `test/structure.test.ts` fails when a dollar amount that is not in
+ * this file shows up on a page listed in its `PRICE_PAGES`, or in an llms file. The same list is used on Upwork and neatsoft.dev, so changing
  * a number here is the first of three edits, not the only one.
  *
  * This module has no imports on purpose, so tests and scripts can load it
@@ -261,20 +262,13 @@ export function catalogPath(slug: string): string {
   return `/catalog/${catalogItem(slug).slug}`;
 }
 
-/** The lowest price on the list, for copy such as "projects from $1,500". */
-export function lowestProjectPrice(): CatalogPrice {
-  const oneTime = catalogItems
-    .flatMap((i) => i.prices)
-    .filter((p) => p.from && !p.period);
-  return oneTime.reduce((min, p) => (p.usd < min.usd ? p : min));
-}
-
 const UNIT_CODES: Record<PricePeriod, string> = { hour: "HUR", month: "MON" };
 
 /**
  * schema.org `Offer` objects for an item, one per price. A "from" price is
  * published as `minPrice`, never as a fixed `price`, so a crawler cannot quote
- * a starting price as the price.
+ * a starting price as the price. An hourly or monthly price lives only in its
+ * `UnitPriceSpecification`, where the unit is.
  */
 export function catalogOffers(item: CatalogItem, baseUrl: string): unknown[] {
   return item.prices.map((p) => ({
@@ -284,7 +278,8 @@ export function catalogOffers(item: CatalogItem, baseUrl: string): unknown[] {
     "availability": "https://schema.org/InStock",
     "seller": { "@id": "https://antonshubin.com/#person" },
     "priceCurrency": "USD",
-    ...(p.from ? {} : { "price": String(p.usd) }),
+    // A bare Offer.price carries no unit, so only a one-time exact price gets one.
+    ...(p.from || p.period ? {} : { "price": String(p.usd) }),
     "priceSpecification": {
       "@type": p.period ? "UnitPriceSpecification" : "PriceSpecification",
       "priceCurrency": "USD",
