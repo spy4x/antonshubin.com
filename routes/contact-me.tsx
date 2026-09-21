@@ -68,6 +68,13 @@ const contacts = [
   },
 ];
 
+/**
+ * The intro sentence names how many cards are on the page, so it has to
+ * follow `contacts.length` instead of hardcoding "Three" — the only two
+ * possible counts once the "Book a call" card is optional (#152).
+ */
+const CONTACT_COUNT_WORD: Record<number, string> = { 2: "Two", 3: "Three" };
+
 const profiles = [
   {
     name: "LinkedIn",
@@ -106,10 +113,20 @@ export default define.page(function ContactMe() {
           Get in Touch
         </h1>
         <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg">
-          Three ways to reach me. Pick the one that suits you.
+          {CONTACT_COUNT_WORD[contacts.length]}{" "}
+          ways to reach me. Pick the one that suits you.
         </p>
 
-        <div class="grid gap-5 sm:grid-cols-3">
+        {
+          /* Two full literal class strings, chosen by count — Tailwind only
+            picks up a class name that appears complete in the source, so
+            this can't be built by interpolating the column count in. */
+        }
+        <div
+          class={contacts.length === 3
+            ? "grid gap-5 sm:grid-cols-3"
+            : "grid gap-5 sm:grid-cols-2"}
+        >
           {contacts.map((c) => (
             <a
               href={c.href}

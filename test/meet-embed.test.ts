@@ -317,17 +317,16 @@ Deno.test("contact-me ships the booking facade behind #book, no iframe before a 
   }
 });
 
-Deno.test("home page renders no booking block when SCHEDULE_URL is unset", async () => {
+// Scoped to the LeadForm success wrapper only. The home page also has two
+// other `href={SCHEDULE_URL}` CTAs (`hero-book-call`, `home-book-call` in
+// routes/index.tsx) that render an empty href when unset too, but fixing
+// those is a separate, tracked follow-up, not part of this guard.
+Deno.test("lead form success panel renders no booking block when SCHEDULE_URL is unset", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.delete("SCHEDULE_URL");
   const site = await startSite();
   try {
     const body = await site.html("/");
-    // Scoped to the LeadForm success wrapper, not the whole page: the home
-    // page also carries its own unrelated `href={SCHEDULE_URL}` CTAs
-    // (`hero-book-call`, `home-book-call` in routes/index.tsx) that are out
-    // of scope for this issue and still render an empty href when unset —
-    // asserting against the whole page would flag those too.
     const wrapper = findDivByAttr(body, "data-lead-success");
     const wrapperHtml = body.slice(wrapper.start, wrapper.end);
     assertNoBookingBlock(wrapperHtml, "/ (LeadForm success panel)");
