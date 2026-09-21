@@ -23,7 +23,8 @@ specific to this repository.
 ## Tasks (from `deno.json`)
 
 ```bash
-deno task check                 # fmt --check + lint + type check
+deno task check                 # fmt --check + lint + type check + test
+deno task test                  # deno test alone
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -32,9 +33,14 @@ deno task deploy                # production → antonshubin.com
 deno task deploy:stag           # staging   → website-stag.antonshubin.com
 deno task env:encrypt           # .env.prod → .env.prod.age
 deno task env:decrypt           # .env.prod.age → .env.prod
-deno task publish:blog          # publish a blog post
+deno task publish:blog          # publish a blog post + a Dev.to draft
+deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
+deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
 ```
+
+`deno task check` fails on a failing test, same as a lint or type error — a red
+test blocks the merge exactly like a red lint.
 
 ## Environment setup for a new worktree
 
@@ -70,9 +76,16 @@ instead of inventing or estimating one.
 ## Continuous integration
 
 `.woodpecker.yml` runs on every `push` and `pull_request`: it starts a
-`denoland/deno:2.9.0` container, runs `deno install`, then `deno task check`.
-There is no deploy step in CI — deploying stays a manual, post-merge action (see
+`denoland/deno:2.9.0` container, runs `deno install`, then `deno task check`
+(fmt, lint, type check and `deno test` — a failing test fails the build). There
+is no deploy step in CI — deploying stays a manual, post-merge action (see
 Deploy above).
+
+A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
+runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
+`when: event: [push, pull_request]` keeps it from running on that same cron
+trigger. See `docs/weekly-numbers.md` for the env vars it needs and the one-time
+Woodpecker cron setup.
 
 ## AI crawler optimization (SEO)
 
