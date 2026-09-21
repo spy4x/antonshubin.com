@@ -8,11 +8,13 @@ import { extract as extractYaml } from "@std/front-matter/yaml";
 import {
   devtoDraft,
   type DraftContext,
+  findBlogSlug,
   findReadmePath,
   hnDraft,
   linkedinDraft,
   matchBlogSlugByName,
   mentionsRepo,
+  parseBlogFrontMatter,
   parseReadme,
   redditDraft,
   selectBlogSlug,
@@ -152,6 +154,88 @@ Deno.test("selectBlogSlug orders slugs so the mention scan can't depend on direc
 Deno.test("selectBlogSlug's by-name match also follows sorted order when more than one slug qualifies", () => {
   const result = selectBlogSlug("widget", ["widget-zzz", "widget-bbb"]);
   assertEquals(result.slug, "widget-bbb");
+});
+
+Deno.test("findBlogSlug returns the override and never consults the directory", async () => {
+  const tempDir = await Deno.makeTempDir();
+  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  try {
+    Deno.env.set("LAUNCH_KIT_BLOG_SLUG", "some-override-slug");
+    // The directory does not exist, so if findBlogSlug consulted it at all
+    // — via Deno.readDir or otherwise — this would reject with NotFound
+    // instead of returning the override.
+    const result = await findBlogSlug("whatever-repo", `${tempDir}/missing`);
+    assertEquals(result, "some-override-slug");
+  } finally {
+    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
+    await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
+Deno.test("findBlogSlug prefers a by-name match over a post that merely mentions the repo", async () => {
+  const tempDir = await Deno.makeTempDir();
+  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  try {
+    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    await Deno.writeTextFile(
+      `${tempDir}/widget-launch.md`,
+      "A post named after widget.\n",
+    );
+    await Deno.writeTextFile(
+      `${tempDir}/unrelated-notes.md`,
+      "This post just mentions widget in passing.\n",
+    );
+    const result = await findBlogSlug("widget", tempDir);
+    assertEquals(result, "widget-launch");
+  } finally {
+    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
+    await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
+Deno.test("findBlogSlug scans candidates in sorted order, not the order they're given", async () => {
+  const tempDir = await Deno.makeTempDir();
+  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  try {
+    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    // Neither slug matches "gadget" by name, and both mention it as a whole
+    // word. The candidate list is passed in pre-built and already out of
+    // alphabetical order, so this doesn't depend on what order any given
+    // filesystem's Deno.readDir happens to return: only a sort-before-scan
+    // implementation can return "aaa-gadget-notes" here.
+    await Deno.writeTextFile(
+      `${tempDir}/aaa-gadget-notes.md`,
+      "More notes about gadget.\n",
+    );
+    await Deno.writeTextFile(
+      `${tempDir}/zzz-gadget-notes.md`,
+      "Some notes about gadget.\n",
+    );
+    const result = await findBlogSlug("gadget", tempDir, [
+      "zzz-gadget-notes",
+      "aaa-gadget-notes",
+    ]);
+    assertEquals(result, "aaa-gadget-notes");
+  } finally {
+    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
+    await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
+Deno.test("parseBlogFrontMatter names the file and says what to do when front matter is missing", () => {
+  const err = assertThrows(
+    () =>
+      parseBlogFrontMatter(
+        "Just prose, no front matter.\n",
+        "content/blog/no-front-matter.md",
+      ),
+    Error,
+  );
+  assertStringIncludes(err.message, "content/blog/no-front-matter.md");
+  assertStringIncludes(err.message, "LAUNCH_KIT_BLOG_SLUG");
 });
 
 const ctx: DraftContext = {
