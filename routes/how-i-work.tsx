@@ -6,6 +6,7 @@ import { Layout } from "../components/Layout.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
+import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
 
 interface Faq {
   q: string;
@@ -287,16 +288,6 @@ export default define.page(function HowIWork() {
           </p>
         </section>
 
-        <div class="text-center mt-12">
-          <a
-            href={SCHEDULE_URL}
-            target="_blank"
-            class="inline-block px-8 py-3.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
-          >
-            Book a free 30-min intro call
-          </a>
-        </div>
-
         {/* FAQ Section */}
         <section class="mt-16">
           <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">
@@ -309,6 +300,23 @@ export default define.page(function HowIWork() {
             {faqs.map((f) => <FaqItem key={f.q} faq={f} />)}
           </div>
         </section>
+
+        {/* Booking ask, after the FAQ: objections cleared before the ask. */}
+        <div class="text-center mt-16">
+          <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
+          <p class="mt-4 text-gray-400 text-sm">
+            Or{" "}
+            <a
+              href={SCHEDULE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-umami-event="meet-embed-fallback-click"
+              class="hover:text-orange-300 underline underline-offset-4"
+            >
+              open standalone
+            </a>
+          </p>
+        </div>
       </div>
     </Layout>
   );
