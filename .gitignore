@@ -11,6 +11,8 @@ _fresh/
 # Fresh build directory
 launches/
 # Generated launch-kit drafts
+videos/
+# Generated video-kit drafts
 key.txt
 # Local private files
 marketing-refactoring.md

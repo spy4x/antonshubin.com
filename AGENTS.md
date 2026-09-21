@@ -35,6 +35,7 @@ deno task env:encrypt           # .env.prod → .env.prod.age
 deno task env:decrypt           # .env.prod.age → .env.prod
 deno task publish:blog          # publish a blog post + a Dev.to draft
 deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
+deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
 ```

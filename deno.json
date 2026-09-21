@@ -13,6 +13,7 @@
     "env:decrypt": "deno run -A scripts/decrypt.ts",
     "publish:blog": "deno run -A scripts/publish-blog.ts",
     "launch-kit": "deno run -A scripts/launch-kit.ts",
+    "video-kit": "deno run -A scripts/video-kit.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts"
   },
@@ -22,7 +23,7 @@
       "exclude": ["react-no-danger"]
     }
   },
-  "exclude": ["**/_fresh/*", "launches/**"],
+  "exclude": ["**/_fresh/*", "launches/**", "videos/**"],
   "imports": {
     "@/": "./",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
