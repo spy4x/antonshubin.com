@@ -15,26 +15,32 @@ import {
 } from "../components/Icons.tsx";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
 
-/** The three ways to reach me. Everything else is an icon below. */
+/**
+ * The ways to reach me. Everything else is an icon below. The "Book a call"
+ * card is omitted when `SCHEDULE_URL` is unset, since it links to `#book`,
+ * a section that itself only renders when the scheduler is configured.
+ */
 const contacts = [
-  {
-    icon: <CalendarIcon class="w-6 h-6" />,
-    title: "Book a call",
-    desc: "A free 30-minute intro call. Pick a time that works for you.",
-    href: "#book",
-    color:
-      "bg-green-600/20 text-green-400 border-green-600/30 hover:border-green-500",
-    btnClass:
-      "bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    // The glyph is rendered separately, wrapped in an `aria-hidden` span, so
-    // a screen reader doesn't read "downwards arrow" after the label.
-    btnText: "Book now",
-    downArrow: true,
-    // The down arrow in the text already points at the #book section below,
-    // so the trailing ArrowRightIcon every other card gets would be a second,
-    // conflicting arrow here.
-    hideArrow: true,
-  },
+  ...(SCHEDULE_URL
+    ? [{
+      icon: <CalendarIcon class="w-6 h-6" />,
+      title: "Book a call",
+      desc: "A free 30-minute intro call. Pick a time that works for you.",
+      href: "#book",
+      color:
+        "bg-green-600/20 text-green-400 border-green-600/30 hover:border-green-500",
+      btnClass:
+        "bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+      // The glyph is rendered separately, wrapped in an `aria-hidden` span, so
+      // a screen reader doesn't read "downwards arrow" after the label.
+      btnText: "Book now",
+      downArrow: true,
+      // The down arrow in the text already points at the #book section below,
+      // so the trailing ArrowRightIcon every other card gets would be a second,
+      // conflicting arrow here.
+      hideArrow: true,
+    }]
+    : []),
   {
     icon: <MailIcon class="w-6 h-6" />,
     title: "Email",
@@ -149,29 +155,31 @@ export default define.page(function ContactMe() {
           Invoices are issued by NeatSoft PTE LTD, Singapore.
         </p>
 
-        <section id="book" class="mt-12 scroll-mt-4">
-          <h2 class="text-2xl font-bold text-white text-center mb-2">
-            Book a Free 30-min Intro Call
-          </h2>
-          <p class="text-gray-400 text-center mb-6 text-sm">
-            Roles, press, or a quick question — email or Telegram above.
-          </p>
-          <div class="flex justify-center">
-            <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
-          </div>
-          <p class="text-xs text-gray-500 mt-3 text-center">
-            Or{" "}
-            <a
-              href={SCHEDULE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-umami-event="meet-embed-fallback-click"
-              class="underline hover:text-orange-300"
-            >
-              open standalone
-            </a>.
-          </p>
-        </section>
+        {SCHEDULE_URL && (
+          <section id="book" class="mt-12 scroll-mt-4">
+            <h2 class="text-2xl font-bold text-white text-center mb-2">
+              Book a Free 30-min Intro Call
+            </h2>
+            <p class="text-gray-400 text-center mb-6 text-sm">
+              Roles, press, or a quick question — email or Telegram above.
+            </p>
+            <div class="flex justify-center">
+              <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
+            </div>
+            <p class="text-xs text-gray-500 mt-3 text-center">
+              Or{" "}
+              <a
+                href={SCHEDULE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="meet-embed-fallback-click"
+                class="underline hover:text-orange-300"
+              >
+                open standalone
+              </a>.
+            </p>
+          </section>
+        )}
 
         {/* QR code */}
         <div class="mt-16 text-center">

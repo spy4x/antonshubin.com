@@ -250,6 +250,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
       }
       <div
         class="transition-all duration-500 ease-in-out text-center"
+        data-lead-success="true"
         inert={!isSuccess}
         style={{
           opacity: isSuccess ? 1 : 0,
@@ -264,23 +265,29 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         </h2>
         <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
           I'll review what you sent and write back with 3 concrete architectural
-          improvements. If you'd rather talk it through, book an intro call.
+          improvements.
+          {scheduleUrl &&
+            " If you'd rather talk it through, book an intro call."}
         </p>
-        <MeetEmbed url={embedUrl(scheduleUrl)} />
-        <p class="mt-4">
-          <a
-            href={scheduleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="meet-embed-fallback-click"
-            class="text-gray-400 hover:text-orange-300 underline underline-offset-4 text-sm"
-          >
-            Open standalone
-          </a>
-        </p>
-        <p class="text-gray-500 text-sm mt-4">
-          No pressure. It's a free 30-minute call.
-        </p>
+        {scheduleUrl && (
+          <>
+            <MeetEmbed url={embedUrl(scheduleUrl)} />
+            <p class="mt-4">
+              <a
+                href={scheduleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="meet-embed-fallback-click"
+                class="text-gray-400 hover:text-orange-300 underline underline-offset-4 text-sm"
+              >
+                Open standalone
+              </a>
+            </p>
+            <p class="text-gray-500 text-sm mt-4">
+              No pressure. It's a free 30-minute call.
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
