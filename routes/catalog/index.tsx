@@ -309,7 +309,6 @@ export const items: CatalogItem[] = [
       "Disk space & resource tracking",
       "Security patch updates",
       "Monthly status report",
-      "8-hour response for critical issues",
       "Priority email support",
     ],
     tech: ["Deno/Node.js", "PostgreSQL", "Docker", "Linux", "Monitoring"],
