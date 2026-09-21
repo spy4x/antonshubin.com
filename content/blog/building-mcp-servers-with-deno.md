@@ -1,4 +1,10 @@
-# Building MCP Servers with Deno: A Practical Guide
+---
+title: "Building MCP Servers with Deno: A Practical Guide"
+description: "Why Deno is the right runtime for Model Context Protocol servers, the architecture I use, a working CalDAV example, and what I learned shipping four MCP servers in production."
+publishedAt: "2026-06-23"
+readTime: 15
+previewImageURL: "cover.svg"
+---
 
 Model Context Protocol (MCP) is the JSON-RPC 2.0 standard that lets AI
 assistants (Claude, Open WebUI, Cursor, OpenCode) call tools you expose. The
