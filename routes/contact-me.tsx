@@ -13,6 +13,7 @@ import {
   TelegramIcon,
   YouTubeIcon,
 } from "../components/Icons.tsx";
+import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
 
 /** The three ways to reach me. Everything else is an icon below. */
 const contacts = [
@@ -20,12 +21,16 @@ const contacts = [
     icon: <CalendarIcon class="w-6 h-6" />,
     title: "Book a call",
     desc: "A free 30-minute intro call. Pick a time that works for you.",
-    href: SCHEDULE_URL,
+    href: "#book",
     color:
       "bg-green-600/20 text-green-400 border-green-600/30 hover:border-green-500",
     btnClass:
       "bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "Book now",
+    btnText: "Book now ↓",
+    // The down arrow in the text already points at the #book section below,
+    // so the trailing ArrowRightIcon every other card gets would be a second,
+    // conflicting arrow here.
+    hideArrow: true,
   },
   {
     icon: <MailIcon class="w-6 h-6" />,
@@ -37,6 +42,7 @@ const contacts = [
     btnClass:
       "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Send email",
+    hideArrow: false,
   },
   {
     icon: <TelegramIcon class="w-6 h-6" />,
@@ -47,6 +53,7 @@ const contacts = [
     btnClass:
       "bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Message me",
+    hideArrow: false,
   },
 ];
 
@@ -109,7 +116,7 @@ export default define.page(function ContactMe() {
               <p class="text-gray-400 text-sm mb-4">{c.desc}</p>
               <span class={c.btnClass + " inline-flex items-center gap-1"}>
                 {c.btnText}
-                <ArrowRightIcon class="w-4 h-4" />
+                {!c.hideArrow && <ArrowRightIcon class="w-4 h-4" />}
               </span>
             </a>
           ))}
@@ -135,6 +142,30 @@ export default define.page(function ContactMe() {
         <p class="mt-8 text-center text-gray-400 text-sm">
           Invoices are issued by NeatSoft PTE LTD, Singapore.
         </p>
+
+        <section id="book" class="mt-12 scroll-mt-4">
+          <h2 class="text-2xl font-bold text-white text-center mb-2">
+            Book a Free 30-min Intro Call
+          </h2>
+          <p class="text-gray-400 text-center mb-6 text-sm">
+            Roles, press, or a quick question — email or Telegram above.
+          </p>
+          <div class="flex justify-center">
+            <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
+          </div>
+          <p class="text-xs text-gray-500 mt-3 text-center">
+            Or{" "}
+            <a
+              href={SCHEDULE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-umami-event="meet-embed-fallback-click"
+              class="underline hover:text-orange-300"
+            >
+              open standalone
+            </a>.
+          </p>
+        </section>
 
         {/* QR code */}
         <div class="mt-16 text-center">

@@ -1,5 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
 
 interface FormState {
   name: string;
@@ -233,13 +234,16 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         </div>
       </div>
 
-      {/* Success section */}
+      {
+        /* Success section. maxHeight must clear the 760px iframe MeetEmbed
+          opens inline once clicked, so it's taller than the form section's. */
+      }
       <div
         class="transition-all duration-500 ease-in-out text-center"
         style={{
           opacity: isSuccess ? 1 : 0,
           transform: isSuccess ? "translateY(0)" : "translateY(12px)",
-          maxHeight: isSuccess ? "400px" : "0px",
+          maxHeight: isSuccess ? "1400px" : "0px",
           overflow: "hidden",
         }}
       >
@@ -251,13 +255,18 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           I'll review what you sent and write back with 3 concrete architectural
           improvements. If you'd rather talk it through, book an intro call.
         </p>
-        <a
-          href={scheduleUrl}
-          target="_blank"
-          class="inline-block px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
-        >
-          Book a free intro call →
-        </a>
+        <MeetEmbed url={embedUrl(scheduleUrl)} />
+        <p class="mt-4">
+          <a
+            href={scheduleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-umami-event="meet-embed-fallback-click"
+            class="text-gray-400 hover:text-orange-300 underline underline-offset-4 text-sm"
+          >
+            Open standalone
+          </a>
+        </p>
         <p class="text-gray-500 text-sm mt-4">
           No pressure. It's a free 30-minute call.
         </p>
