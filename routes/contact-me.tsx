@@ -9,15 +9,17 @@ import {
   CalendarIcon,
   GithubIcon,
   LinkedInIcon,
+  MailIcon,
   TelegramIcon,
   YouTubeIcon,
 } from "../components/Icons.tsx";
 
+/** The three ways to reach me. Everything else is an icon below. */
 const contacts = [
   {
     icon: <CalendarIcon class="w-6 h-6" />,
-    title: "Schedule a Call",
-    desc: "Book a 30-min strategy session. Pick a time that works for you.",
+    title: "Book a call",
+    desc: "A free 30-minute intro call. Pick a time that works for you.",
     href: SCHEDULE_URL,
     color:
       "bg-green-600/20 text-green-400 border-green-600/30 hover:border-green-500",
@@ -26,73 +28,15 @@ const contacts = [
     btnText: "Book now",
   },
   {
-    icon: <YouTubeIcon class="w-6 h-6" />,
-    title: "YouTube",
-    desc: "Architecture deep-dives and dev tips from a Fractional CTO.",
-    href: "https://www.youtube.com/@anton-shubin",
-    color: "bg-red-600/20 text-red-400 border-red-600/30 hover:border-red-500",
-    btnClass:
-      "bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "Watch videos",
-  },
-  {
-    icon: <GithubIcon class="w-6 h-6" />,
-    title: "GitHub",
-    desc: "Open-source projects and code contributions.",
-    href: "https://github.com/spy4x",
-    color: "bg-gray-600/20 text-gray-300 border-gray-600/30 hover:border-white",
-    btnClass:
-      "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "View profile",
-  },
-  {
-    icon: (
-      <svg
-        class="w-6 h-6"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-        <polyline points="22,6 12,13 2,6" />
-      </svg>
-    ),
+    icon: <MailIcon class="w-6 h-6" />,
     title: "Email",
-    desc: "Prefer written communication? Email me anytime.",
+    desc: "Prefer writing? Email me anytime.",
     href: "mailto:anton@antonshubin.com",
     color:
       "bg-gray-600/20 text-gray-300 border-gray-600/30 hover:border-gray-400",
     btnClass:
       "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Send email",
-  },
-  {
-    icon: (
-      <svg
-        class="w-6 h-6"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"
-        />
-      </svg>
-    ),
-    title: "NeatSoft",
-    desc: "My Singapore-based software agency. Same quality, company backing.",
-    href: "https://neatsoft.dev",
-    color:
-      "bg-indigo-600/20 text-indigo-400 border-indigo-600/30 hover:border-indigo-500",
-    btnClass:
-      "bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "Visit website",
   },
   {
     icon: <TelegramIcon class="w-6 h-6" />,
@@ -104,16 +48,23 @@ const contacts = [
       "bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Message me",
   },
+];
+
+const profiles = [
   {
-    icon: <LinkedInIcon class="w-6 h-6" />,
-    title: "LinkedIn",
-    desc: "Connect professionally. Follow my work and updates.",
+    name: "LinkedIn",
     href: "https://www.linkedin.com/in/anton-shubin",
-    color:
-      "bg-blue-700/20 text-blue-400 border-blue-700/30 hover:border-blue-500",
-    btnClass:
-      "bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "Connect",
+    icon: <LinkedInIcon class="w-6 h-6" />,
+  },
+  {
+    name: "GitHub",
+    href: "https://github.com/spy4x",
+    icon: <GithubIcon class="w-6 h-6" />,
+  },
+  {
+    name: "YouTube",
+    href: "https://www.youtube.com/@anton-shubin",
+    icon: <YouTubeIcon class="w-6 h-6" />,
   },
 ];
 
@@ -122,7 +73,7 @@ export default define.page(function ContactMe() {
     ...head.value,
     title: "Contact Anton Shubin",
     description:
-      "Fractional CTO consultation, questions, and project inquiries.",
+      "Book a free 30-minute intro call, email me, or message me on Telegram.",
     canonical: "https://antonshubin.com/contact-me",
     ogType: "website",
   };
@@ -137,10 +88,10 @@ export default define.page(function ContactMe() {
           Get in Touch
         </h1>
         <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg">
-          Pick the channel that works best for you.
+          Three ways to reach me. Pick the one that suits you.
         </p>
 
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-5 sm:grid-cols-3">
           {contacts.map((c) => (
             <a
               href={c.href}
@@ -148,11 +99,12 @@ export default define.page(function ContactMe() {
               rel={c.href.startsWith("http")
                 ? "noopener noreferrer"
                 : undefined}
+              data-contact-option
               class={`block p-4 sm:p-6 rounded-xl border transition-all ${c.color} group`}
             >
               <div class="flex items-center gap-3 mb-3">
                 <div class="p-2 rounded-lg bg-gray-800/50">{c.icon}</div>
-                <h3 class="text-lg font-semibold text-white">{c.title}</h3>
+                <h2 class="text-lg font-semibold text-white">{c.title}</h2>
               </div>
               <p class="text-gray-400 text-sm mb-4">{c.desc}</p>
               <span class={c.btnClass + " inline-flex items-center gap-1"}>
@@ -162,6 +114,27 @@ export default define.page(function ContactMe() {
             </a>
           ))}
         </div>
+
+        <ul class="mt-10 flex justify-center gap-4">
+          {profiles.map((p) => (
+            <li key={p.name}>
+              <a
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={p.name}
+                title={p.name}
+                class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-orange-500 transition-colors"
+              >
+                {p.icon}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-8 text-center text-gray-400 text-sm">
+          Invoices are issued by NeatSoft PTE LTD, Singapore.
+        </p>
 
         {/* QR code */}
         <div class="mt-16 text-center">

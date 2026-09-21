@@ -2,6 +2,8 @@ import { define } from "../lib/utils.ts";
 import { blogArticles, hackathons } from "../lib/data.ts";
 import { projects } from "../lib/data.ts";
 import { BASE_URL } from "../lib/config.ts";
+import { catalogItems } from "../lib/catalog.ts";
+import { ROLE } from "../lib/head.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -83,19 +85,7 @@ export const handler = define.handlers({
         lastmod: undefined as string | undefined,
       }));
 
-    const catalogSlugs = [
-      "strategy-call",
-      "free-architecture-audit",
-      "technical-discovery-sprint",
-      "zero-to-production-saas-mvp",
-      "bulletproof-backend-api",
-      "surgical-ai-integration",
-      "codebase-health-audit",
-      "mcp-server-development",
-      "cto-advisory-retainer",
-      "post-launch-support-maintenance",
-    ];
-    const catalogUrls = catalogSlugs.map((s) => ({
+    const catalogUrls = catalogItems.map((i) => i.slug).map((s) => ({
       loc: `/catalog/${s}`,
       priority: "0.7",
       changefreq: "monthly" as const,
@@ -134,9 +124,8 @@ export const handler = define.handlers({
     // AI-friendly metadata in sitemap comments
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Site: Anton Shubin — Fractional CTO & Lead Architect
-  Description: Fractional CTO owning SaaS outcomes from architecture through production.
-  Fixed-price delivery, plain-English decisions, observability, recovery, security, and cost control.
+  Site: Anton Shubin — ${ROLE}
+  Description: I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
   Expert-Vetted (Top 1%). 100% Job Success. $395K+ earned. 80+ projects.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

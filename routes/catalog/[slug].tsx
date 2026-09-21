@@ -1,22 +1,39 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { SCHEDULE_URL } from "../../lib/config.ts";
-import { type CatalogItem, items } from "./index.tsx";
+import { BASE_URL, SCHEDULE_URL } from "../../lib/config.ts";
+import {
+  type CatalogItem,
+  catalogItems,
+  catalogOffers,
+  catalogRedirects,
+  priceLabel,
+} from "../../lib/catalog.ts";
 import { marked } from "marked";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
-  return items.find((i) => i.slug === slug);
+  return catalogItems.find((i) => i.slug === slug);
 }
 
+// Retired slugs answer 301 to the item that absorbed them (lib/catalog.ts).
 // Unknown slugs keep the friendly "Not Found" view below, but must answer with
 // a real 404 so search engines drop removed catalog items instead of indexing
 // an empty 200.
 export const handler = define.handlers({
   GET(ctx) {
+    const movedTo = catalogRedirects[ctx.params.slug];
+    if (movedTo) {
+      // Keep the query string, so a tagged link (?utm_…) survives the move.
+      const [path, hash] = movedTo.split("#");
+      const location = path + ctx.url.search + (hash ? `#${hash}` : "");
+      return new Response(null, {
+        status: 301,
+        headers: { Location: location },
+      });
+    }
     return getItemBySlug(ctx.params.slug) ? page() : page(null, {
       status: 404,
       headers: { "Cache-Control": "no-store" },
@@ -26,7 +43,7 @@ export const handler = define.handlers({
 
 export default define.page(function CatalogDetail(ctx) {
   const slug = ctx.params.slug;
-  const item = items.find((i: CatalogItem) => i.slug === slug);
+  const item = getItemBySlug(slug);
 
   if (!item) {
     return (
@@ -50,17 +67,10 @@ export default define.page(function CatalogDetail(ctx) {
   // Render description as markdown so links inside work
   const descHtml = marked.parse(item.desc, { async: false }) as string;
 
-  // Only publish exact one-time prices. "From", ranges, free work, and retainers
-  // need different schema semantics and are safer without an Offer.
-  const exactPriceMatch = item.price.match(/^\$([\d,]+)$/);
-  const exactPrice = exactPriceMatch
-    ? Number(exactPriceMatch[1].replaceAll(",", ""))
-    : undefined;
-
   head.value = {
     ...head.value,
     title: `${item.title} — Anton Shubin`,
-    description: item.desc,
+    description: item.summary,
     canonical: `https://antonshubin.com/catalog/${item.slug}`,
     ogType: "website",
   };
@@ -89,16 +99,9 @@ export default define.page(function CatalogDetail(ctx) {
               "description":
                 "Upwork-verified rating: 5.0/5.0 across 80+ engagements.",
             },
-            "offers": exactPrice
-              ? {
-                "@type": "Offer",
-                "priceCurrency": "USD",
-                "price": String(exactPrice),
-                "url": `https://antonshubin.com/catalog/${item.slug}`,
-                "availability": "https://schema.org/InStock",
-                "seller": { "@id": "https://antonshubin.com/#person" },
-              }
-              : undefined,
+            // One Offer per price, built from the same lib/catalog.ts entry as the
+            // visible price above — see catalogOffers for how "from" is published.
+            "offers": catalogOffers(item, BASE_URL),
           }),
         }}
       />
@@ -116,7 +119,7 @@ export default define.page(function CatalogDetail(ctx) {
               </h1>
               <div class="flex items-center gap-3 mt-2">
                 <span class="inline-block px-3 py-1 bg-green-600/20 text-green-400 text-sm font-medium rounded-full">
-                  {item.price}
+                  {priceLabel(item)}
                 </span>
                 <span class="inline-block px-3 py-1 bg-blue-600/20 text-blue-400 text-sm font-medium rounded-full">
                   {item.delivery}
@@ -138,6 +141,31 @@ export default define.page(function CatalogDetail(ctx) {
             </h2>
             <p class="text-emerald-300 leading-relaxed">{item.outcome}</p>
           </div>
+
+          {item.firstStep && (
+            <div class="mb-8">
+              <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <span class="text-orange-400">1.</span> {item.firstStep.title}
+              </h2>
+              <p class="text-gray-400 leading-relaxed">{item.firstStep.desc}</p>
+            </div>
+          )}
+
+          {item.alsoCovers && item.alsoCovers.length > 0 && (
+            <div class="mb-8">
+              <h2 class="text-lg font-semibold text-white mb-3">
+                Also built under this item
+              </h2>
+              <ul class="space-y-3">
+                {item.alsoCovers.map((c) => (
+                  <li key={c.title} class="text-gray-400 leading-relaxed">
+                    <span class="text-white font-medium">{c.title}.</span>{" "}
+                    {c.desc}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Who it's for */}
           <div class="mb-8">
@@ -203,8 +231,8 @@ export default define.page(function CatalogDetail(ctx) {
                 ))}
               </ul>
               <p class="text-gray-500 text-xs mt-3 italic">
-                Need something not listed? Most items can be added as a
-                fixed-price milestone — get in touch for a custom quote.
+                Need something not listed? Most of it can be added — tell me
+                what you need and I will quote it before I start.
               </p>
             </div>
           )}
@@ -231,7 +259,7 @@ export default define.page(function CatalogDetail(ctx) {
                 href="/contact-me"
                 class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
               >
-                Start this project
+                Talk about this
               </a>
               <a
                 href={SCHEDULE_URL}

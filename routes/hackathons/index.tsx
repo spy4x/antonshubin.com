@@ -210,7 +210,7 @@ export default define.page(function Hackathons(ctx) {
               href="/catalog"
               class="inline-flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
             >
-              View fixed-price services
+              View services
             </a>
           </div>
         </div>

@@ -10,8 +10,15 @@ export interface PageHead {
   noindex?: boolean;
 }
 
+/**
+ * The label I lead with everywhere: hero, `<title>`, description, Person
+ * JSON-LD, llms files. "Fractional CTO" is one service in lib/catalog.ts, not
+ * a label.
+ */
+export const ROLE = "Senior Full-Stack Engineer & Tech Lead";
+
 const DEFAULTS: PageHead = {
-  title: "Anton Shubin | Fractional CTO & Lead Architect",
+  title: `Anton Shubin | ${ROLE}`,
   description:
     "I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.",
   canonical: "https://antonshubin.com/",

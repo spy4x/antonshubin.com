@@ -30,7 +30,7 @@ export default define.page(function Blog(ctx) {
     ...head.value,
     title: "Blog — Anton Shubin",
     description:
-      "Technical articles, architecture deep-dives, and dev tips from a Fractional CTO.",
+      "Technical articles, architecture deep-dives, and dev tips from a senior full-stack engineer and tech lead.",
     canonical: "https://antonshubin.com/blog",
     ogType: "website",
   };

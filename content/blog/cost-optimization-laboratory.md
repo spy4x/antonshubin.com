@@ -10,9 +10,9 @@ previewImageURL: "cover.svg"
 Infrastructure should follow the business. It should not follow fashion, a
 provider's reference diagram, or an engineer's preferred tool.
 
-As a Fractional CTO and Lead Architect, I start with five questions: What does
-the workload do? Who will operate it? What must happen after a failure? Which
-security or compliance constraints apply? What can the business afford to own?
+As a tech lead, I start with five questions: What does the workload do? Who will
+operate it? What must happen after a failure? Which security or compliance
+constraints apply? What can the business afford to own?
 
 Only then do I choose managed cloud, dedicated infrastructure, or a hybrid. Each
 can be correct. Each can also become expensive and fragile when selected for the
@@ -235,15 +235,16 @@ Use this before approving a migration or signing a larger platform contract.
 There is no prestigious infrastructure option. There is only an option that fits
 the product and one that consumes runway without improving the business.
 
-My role as Fractional CTO and Lead Architect is to connect those technical
-tradeoffs to product risk, team capacity, and budget—then define a delivery plan
-the founder can understand and fund.
+My role as tech lead is to connect those technical tradeoffs to product risk,
+team capacity, and budget—then define a delivery plan the founder can understand
+and fund.
 
-If you need the decision documented before implementation, the
-[Technical Discovery Sprint](/catalog/technical-discovery-sprint) produces an
-architecture blueprint, risk analysis, cost model, and phased roadmap.
+If you need the decision documented before implementation, every
+[build I take on](/catalog/zero-to-production-saas-mvp) opens with a short
+discovery sprint that produces an architecture blueprint, risk analysis, cost
+model, and phased roadmap.
 
 If you want a smaller starting point, send your current setup or product idea
-through the [free architecture audit](/catalog/free-architecture-audit). I will
-return prioritized improvements without assuming that managed cloud,
-self-hosting, or hybrid is automatically correct.
+through the [free architecture audit](/#audit-form). I will return prioritized
+improvements without assuming that managed cloud, self-hosting, or hybrid is
+automatically correct.

@@ -8,7 +8,7 @@ specific to this repository.
 
 ```
 ├── assets/         # Global CSS
-├── components/     # Preact components (Layout, CTASection, Icons)
+├── components/     # Preact components (Layout, SEOHead, Icons)
 ├── content/        # Blog posts (Markdown)
 ├── docs/           # Dev, deploy, infra docs
 ├── islands/        # Interactive client components
@@ -65,6 +65,20 @@ Nothing is written back to a tracked file, so a deploy leaves `git status` clean
 
 Double quotes, no semicolons, 2-space indent, 100 columns — this is what
 `deno fmt` enforces, so run it instead of hand-formatting.
+
+## Catalog and prices
+
+`lib/catalog.ts` is the only place a catalog title or price is written. The home
+page, `/catalog`, `/catalog/[slug]`, the sitemap, both llms files, the guide
+page and the `Offer` JSON-LD read from it; `test/structure.test.ts` fails when a
+rendered price differs. Retired slugs live in `catalogRedirects` there and
+answer 301 — never link to one. The same price list is used on Upwork and
+neatsoft.dev, so a price change is followed by a manual edit in both places.
+
+The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
+Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
+item. The five promises on `/how-i-work` are the only promises on the site; the
+free written audit carries no deadline.
 
 ## Content rule
 

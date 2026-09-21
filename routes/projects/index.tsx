@@ -3,7 +3,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
-import { type Project, projects } from "../../lib/data.ts";
+import { featuredClientSlugs, type Project, projects } from "../../lib/data.ts";
 import { ArchiveIcon } from "../../components/Icons.tsx";
 import GhStars from "../../islands/GhStars.tsx";
 
@@ -150,9 +150,16 @@ export default define.page(function Projects(ctx) {
     canonical: "https://antonshubin.com/projects",
     ogType: "website",
   };
-  const archivedProjects = projects.my.filter((p) => p.archived);
-  const clientProjects = projects.freelance;
-  const hasAny = activeProjects.length > 0 || archivedProjects.length > 0 ||
+  const clientProjects = featuredClientSlugs
+    .map((slug) => projects.freelance.find((p) => p.slug === slug))
+    .filter((p) => p !== undefined);
+  const olderWork = [
+    ...projects.freelance.filter((p) =>
+      !featuredClientSlugs.includes(p.slug ?? "")
+    ),
+    ...projects.my.filter((p) => p.archived),
+  ];
+  const hasAny = activeProjects.length > 0 || olderWork.length > 0 ||
     clientProjects.length > 0;
 
   if (!hasAny) {
@@ -181,13 +188,21 @@ export default define.page(function Projects(ctx) {
           Projects
         </h1>
         <p class="text-gray-400 mb-10 sm:mb-12 text-base sm:text-lg">
-          Client work and open-source projects I have built.
+          Client work first, then my open-source tools. How I run things in
+          production is on the{" "}
+          <a
+            href="/infrastructure"
+            class="text-orange-400 hover:text-orange-300 underline underline-offset-4"
+          >
+            infrastructure page
+          </a>
+          .
         </p>
 
         {clientProjects.length > 0 && (
           <>
             <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-orange-400">💼</span> Client Work
+              <span class="text-orange-400">💼</span> Client case studies
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {clientProjects.map((project) => (
@@ -204,8 +219,7 @@ export default define.page(function Projects(ctx) {
         {activeProjects.length > 0 && (
           <>
             <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-orange-400">🔧</span>{" "}
-              Open-Source Products &amp; Systems
+              <span class="text-orange-400">🔧</span> Open-source tools
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {activeProjects.map((project) => (
@@ -218,20 +232,32 @@ export default define.page(function Projects(ctx) {
           </>
         )}
 
-        {archivedProjects.length > 0 && (
+        {olderWork.length > 0 && (
           <>
-            <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <ArchiveIcon class="w-5 h-5 text-gray-400" />
-              <span>Archived Projects</span>
+              <span>Older work</span>
             </h2>
-            <div class="grid gap-6 md:grid-cols-2 mb-10">
-              {archivedProjects.map((project) => (
-                <ProjectCard
-                  key={project.title}
-                  project={project}
-                />
-              ))}
-            </div>
+            <p data-older-work class="text-gray-400 leading-relaxed mb-10">
+              {olderWork.map((project, i) => {
+                const href = project.slug
+                  ? `/projects/${project.slug}`
+                  : project.externalURL;
+                return (
+                  <span key={project.title}>
+                    {i > 0 && " · "}
+                    <a
+                      href={href}
+                      target={project.slug ? undefined : "_blank"}
+                      rel={project.slug ? undefined : "noopener noreferrer"}
+                      class="text-orange-400 hover:text-orange-300 underline underline-offset-4"
+                    >
+                      {project.title}
+                    </a>
+                  </span>
+                );
+              })}
+            </p>
           </>
         )}
       </div>

@@ -7,8 +7,6 @@ import {
   MailIcon,
   MenuIcon,
   PenIcon,
-  PersonIcon,
-  ServerIcon,
 } from "../components/Icons.tsx";
 
 interface MenuProps {
@@ -22,30 +20,21 @@ interface NavLink {
   icon: preact.ComponentChildren;
 }
 
+/** Work, Services, How I work, Blog, Contact — the photo links home. */
 const links: NavLink[] = [
-  { href: "/", label: "About me", icon: <PersonIcon class="w-5 h-5" /> },
+  { href: "/projects", label: "Work", icon: <FolderIcon class="w-5 h-5" /> },
+  { href: "/catalog", label: "Services", icon: <GridIcon class="w-5 h-5" /> },
   {
     href: "/how-i-work",
     label: "How I work",
     icon: <BriefcaseIcon class="w-5 h-5" />,
   },
-  { href: "/catalog", label: "Catalog", icon: <GridIcon class="w-5 h-5" /> },
+  { href: "/blog", label: "Blog", icon: <PenIcon class="w-5 h-5" /> },
   {
     href: "/contact-me",
-    label: "Contact me",
+    label: "Contact",
     icon: <MailIcon class="w-5 h-5" />,
   },
-  {
-    href: "/projects",
-    label: "Completed Projects",
-    icon: <FolderIcon class="w-5 h-5" />,
-  },
-  {
-    href: "/infrastructure",
-    label: "Infrastructure",
-    icon: <ServerIcon class="w-5 h-5" />,
-  },
-  { href: "/blog", label: "Blog", icon: <PenIcon class="w-5 h-5" /> },
 ];
 
 export default function Menu(
@@ -162,6 +151,7 @@ export default function Menu(
                     <a
                       key={link.href}
                       href={link.href}
+                      data-nav-link
                       class={desktopLinkClass(link.href)}
                     >
                       <span>{link.label}</span>

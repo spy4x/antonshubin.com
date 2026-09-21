@@ -1,5 +1,5 @@
 import { Head } from "fresh/runtime";
-import { breadcrumbFromCanonical, head } from "../lib/head.ts";
+import { breadcrumbFromCanonical, head, ROLE } from "../lib/head.ts";
 import { SAME_AS_URLS } from "../lib/config.ts";
 
 export function SEOHead() {
@@ -45,9 +45,9 @@ export function SEOHead() {
                 "name": "Anton Shubin",
                 "givenName": "Anton",
                 "familyName": "Shubin",
-                "jobTitle": "Fractional CTO & Lead Architect",
+                "jobTitle": ROLE,
                 "description":
-                  "Fractional CTO and Lead Architect owning SaaS architecture, delivery, and production outcomes end to end for SaaS teams — non-technical founders, hands-on CTOs, and post-PMF founders with teams. Free architecture audit as the entry point. Fixed-price milestones, plain-English decisions, client ownership of code, infrastructure, and keys.",
+                  "I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one. I work fixed price when the scope is fixed and hourly when it's open-ended.",
                 "url": "https://antonshubin.com",
                 "image": "https://antonshubin.com/img/photo-big.webp",
                 "email": "mailto:hello@antonshubin.com",
@@ -74,9 +74,8 @@ export function SEOHead() {
                   "PostgreSQL",
                   "System Design",
                   "System Performance Optimization",
-                  "Fractional CTO",
+                  "Technical Leadership",
                   "Architecture Audit",
-                  "Technical Co-founder",
                   "MCP Server Development",
                   "Founder Advisory",
                   "Codebase Review",
@@ -106,7 +105,7 @@ export function SEOHead() {
                 "@type": "WebSite",
                 "@id": "https://antonshubin.com/#website",
                 "url": "https://antonshubin.com",
-                "name": "Anton Shubin — Fractional CTO & Lead Architect",
+                "name": `Anton Shubin — ${ROLE}`,
                 "description": h.description,
                 "inLanguage": "en-US",
                 "publisher": { "@id": "https://antonshubin.com/#person" },

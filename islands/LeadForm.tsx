@@ -87,8 +87,8 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           Not sure where to start?
         </h2>
         <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6 text-center">
-          Send me your idea or your current app — I'll send back 3 concrete
-          architectural improvements within 48 hours.
+          Send me your idea or your current app and I'll write back with 3
+          concrete architectural improvements.
           <span class="text-orange-400 font-semibold block sm:inline">
             {" "}No cost.
           </span>{" "}
@@ -248,9 +248,8 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           Your audit is queued
         </h2>
         <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
-          I'll review your stack and send you 3 concrete architectural
-          improvements within 48 hours. While you wait, let's fast-track things
-          with a quick intro call.
+          I'll review what you sent and write back with 3 concrete architectural
+          improvements. If you'd rather talk it through, book an intro call.
         </p>
         <a
           href={scheduleUrl}
@@ -260,7 +259,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           Book a free intro call →
         </a>
         <p class="text-gray-500 text-sm mt-4">
-          No pressure. Just a 15-min chat to align expectations.
+          No pressure. It's a free 30-minute call.
         </p>
       </div>
     </div>

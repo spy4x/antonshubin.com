@@ -2,6 +2,7 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { catalogPath } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { getBreadcrumb, head } from "../lib/head.ts";
 import { define } from "../lib/utils.ts";
@@ -65,7 +66,7 @@ export default define.page(function Infrastructure() {
     ...head.value,
     title: "Production Infrastructure, Owned End to End — Anton Shubin",
     description:
-      "How Anton designs deployable, observable, recoverable, and transferable production systems as a Fractional CTO and Lead Architect.",
+      "How Anton designs deployable, observable, recoverable, and transferable production systems as a senior full-stack engineer and tech lead.",
     canonical: "https://antonshubin.com/infrastructure",
     ogType: "website",
   };
@@ -284,21 +285,21 @@ export default define.page(function Infrastructure() {
             Map the operating model before committing to the build
           </h2>
           <p class="text-gray-300 leading-relaxed max-w-2xl mx-auto mb-5">
-            Fixed-price Technical Discovery produces an architecture blueprint,
-            risk register, operating-cost estimate, recovery plan, and phased
-            scope grounded in your product and team.
+            Every build I take on opens with a short discovery sprint: an
+            architecture blueprint, the main risks, an operating-cost estimate,
+            and a phased scope grounded in your product and team.
           </p>
           <div class="flex flex-col sm:flex-row justify-center gap-3">
             <a
-              href="/catalog/technical-discovery-sprint"
+              href={catalogPath("zero-to-production-saas-mvp")}
               data-e2e="infrastructure-start-discovery"
               class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 transition-all duration-200"
             >
-              See Technical Discovery
+              See how a build starts
               <ArrowRightIcon class="w-5 h-5" />
             </a>
             <a
-              href="/catalog/free-architecture-audit"
+              href="/#audit-form"
               data-e2e="infrastructure-request-audit"
               class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 transition-colors"
             >

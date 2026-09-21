@@ -20,7 +20,7 @@ export const handler = define.handlers({
   <channel>
     <title>Anton Shubin — Blog</title>
     <link>${BASE_URL}/blog</link>
-    <description>Architecture insights, SaaS lessons, and production patterns from a Fractional CTO.</description>
+    <description>Architecture insights, SaaS lessons, and production patterns from a senior full-stack engineer and tech lead.</description>
     <language>en</language>
     <atom:link href="${BASE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
     ${items}
