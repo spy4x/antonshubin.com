@@ -152,7 +152,7 @@ export const projects = {
         "CQRS",
       ],
       outcome:
-        "5 calendars, 140+ todos, deployed since June 2026. Radicale to Stalwart migration moved zero VTODO data. Live at todos.antonshubin.com.",
+        "5 calendars, 140+ todos, deployed since June 2026. Radicale to Stalwart migration moved zero VTODO data.",
     },
     {
       title: "caldav-mcp",

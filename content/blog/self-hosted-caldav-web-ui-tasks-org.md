@@ -6,14 +6,18 @@ readTime: 9
 previewImageURL: "cover.svg"
 ---
 
+> **Update, September 2026:** The tool works well with Radicale. Stalwart
+> support is currently broken, to the point that the app is not usable with it,
+> and there is no public demo right now. Tracked in
+> [issue #10](https://github.com/spy4x/caldav-tasks-web/issues/10).
+
 Tasks.org syncs Android tasks to CalDAV cleanly. There is no web UI for that
 data. After a year of reaching for my phone to edit a todo at my desk, I built
 one. Here is the gap I noticed in the self-hosted ecosystem, and how I closed it
 without breaking the standards-first contract most of us signed up for.
 
 The result is open source at
-[github.com/spy4x/caldav-tasks-web](https://github.com/spy4x/caldav-tasks-web)
-and live at [todos.antonshubin.com](https://todos.antonshubin.com).
+[github.com/spy4x/caldav-tasks-web](https://github.com/spy4x/caldav-tasks-web).
 
 ## The gap in the stack
 
@@ -30,8 +34,9 @@ Stalwart on purpose shouldn't need to deploy a Nextcloud instance to edit a todo
 on desktop. The fix had to assume the CalDAV server is the only piece already
 running.
 
-If you run Radicale, Nextcloud, Baikal, or Stalwart — that is your calendar
-server. This PWA is the missing task UI for it.
+If you run Radicale — tested in production — that is your calendar server and
+this PWA is the missing task UI for it. Nextcloud and Baikal are
+CalDAV-compliant and expected to work too, though untested.
 
 ## Architecture: CalDAV as the only source of truth
 
@@ -39,9 +44,9 @@ VTODO files live on the CalDAV server. The PWA is a stateless client. SQLite in
 the API container holds user accounts and AES-GCM-encrypted server credentials
 and nothing else. Switch CalDAV servers and no todos move.
 
-That property mattered enough to me that I tested it. The deployed instance runs
-on Stalwart now; it ran on Radicale before that. The migration was a config
-string change. Zero todos moved. That is the test the architecture had to pass.
+That property mattered enough to me that I tested it. In July 2026 the instance
+I ran then migrated from Radicale to Stalwart with a config string change. Zero
+todos moved. That is the test the architecture had to pass.
 
 ## CQRS in a UI app, and why it fits
 
@@ -113,6 +118,5 @@ self-hosted CalDAV stack was real, and fixing it didn't need to be
 enterprise-grade — it just needed to honour the contract: the server you trust,
 the format you control, the data you already have.
 
-If you already run Radicale or Stalwart and want a desktop UI for the same data
-your Android phone sees, try it. The deploy script in the README is five
-commands.
+If you already run Radicale and want a desktop UI for the same data your Android
+phone sees, try it. The deploy script in the README is five commands.
