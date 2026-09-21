@@ -145,6 +145,7 @@ export async function findBlogSlug(repo: string): Promise<string> {
       slugs.push(entry.name.slice(0, -3));
     }
   }
+  slugs.sort();
 
   const byName = matchBlogSlugByName(repo, slugs);
   if (byName) return byName;
@@ -323,6 +324,8 @@ async function main() {
     console.error(`\n  ✗ ${(err as Error).message}\n`);
     Deno.exit(1);
   }
+
+  console.log(`  blog post: ${CONTENT_DIR}/${slug}.md`);
 
   const campaign = `${repo}-launch`;
   const outDir = `${OUT_DIR}/${repo}`;
