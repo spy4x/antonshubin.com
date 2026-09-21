@@ -106,7 +106,7 @@ Deno.test("every blog post renders exactly one h1", async (t) => {
   }
 });
 
-Deno.test("every sitemap page announces /rss.xml exactly once", async (t) => {
+Deno.test("every sitemap page announces /rss.xml exactly once in <head>", async (t) => {
   const site = await startSite();
   try {
     const paths = await sitemapPaths(site);
@@ -117,6 +117,8 @@ Deno.test("every sitemap page announces /rss.xml exactly once", async (t) => {
     for (const path of paths) {
       await t.step(path, async () => {
         const body = await site.html(path);
+        const headHtml = body.slice(0, body.indexOf("</head>"));
+        assertEquals(count(headHtml, /application\/rss\+xml/g), 1);
         assertEquals(count(body, /application\/rss\+xml/g), 1);
       });
     }
@@ -152,9 +154,11 @@ Deno.test("no rendered image has an empty or missing alt", async (t) => {
       paths.length > 0,
       "sitemap.xml is empty — the loop below would pass vacuously",
     );
+    let images = 0;
     for (const path of paths) {
       await t.step(path, async () => {
         const body = await site.html(path);
+        images += count(body, /<img\b/gi);
         const bad = imagesWithBadAlt(body);
         assertEquals(
           bad,
@@ -163,6 +167,10 @@ Deno.test("no rendered image has an empty or missing alt", async (t) => {
         );
       });
     }
+    assert(
+      images > 0,
+      "no <img> found on any page — the guard checked nothing",
+    );
   } finally {
     await site.stop();
   }
