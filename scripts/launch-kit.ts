@@ -160,13 +160,21 @@ export function selectBlogSlug(
   return { slug: matchBlogSlugByName(repo, orderedSlugs), orderedSlugs };
 }
 
-/** Finds the `content/blog/` slug for `repo`, per the order in the header comment. */
-export async function findBlogSlug(repo: string): Promise<string> {
+/**
+ * Finds the `content/blog/` slug for `repo`, per the order in the header
+ * comment. `contentDir` defaults to `CONTENT_DIR`; a test points it at a
+ * temporary directory instead, so the scan is deterministic and never
+ * touches this repo's real posts.
+ */
+export async function findBlogSlug(
+  repo: string,
+  contentDir: string = CONTENT_DIR,
+): Promise<string> {
   const override = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
   if (override) return override;
 
   const slugs: string[] = [];
-  for await (const entry of Deno.readDir(CONTENT_DIR)) {
+  for await (const entry of Deno.readDir(contentDir)) {
     if (entry.isFile && entry.name.endsWith(".md")) {
       slugs.push(entry.name.slice(0, -3));
     }
@@ -176,12 +184,12 @@ export async function findBlogSlug(repo: string): Promise<string> {
   if (byName) return byName;
 
   for (const slug of orderedSlugs) {
-    const text = await Deno.readTextFile(`${CONTENT_DIR}/${slug}.md`);
+    const text = await Deno.readTextFile(`${contentDir}/${slug}.md`);
     if (mentionsRepo(repo, text)) return slug;
   }
 
   throw new Error(
-    `No post in ${CONTENT_DIR}/ is named "${repo}-..." or mentions "${repo}". ` +
+    `No post in ${contentDir}/ is named "${repo}-..." or mentions "${repo}". ` +
       `Set LAUNCH_KIT_BLOG_SLUG=<slug> to point at the right one.`,
   );
 }
@@ -191,10 +199,27 @@ export interface BlogSummary {
   description: string;
 }
 
-export function parseBlogFrontMatter(text: string): BlogSummary {
-  const { attrs } = extractYaml<{ title?: string; description?: string }>(text);
+/**
+ * Parses a blog post's YAML front matter. `filePath`, when given, names the
+ * file in both error messages, so a bad post fails with something a reader
+ * can act on instead of the front-matter library's raw parse error.
+ */
+export function parseBlogFrontMatter(
+  text: string,
+  filePath?: string,
+): BlogSummary {
+  const name = filePath ?? "the blog post";
+  let attrs: { title?: string; description?: string };
+  try {
+    ({ attrs } = extractYaml<{ title?: string; description?: string }>(text));
+  } catch {
+    throw new Error(
+      `${name} has no YAML front matter — add title and description, or set ` +
+        `LAUNCH_KIT_BLOG_SLUG to a post that has them.`,
+    );
+  }
   if (!attrs.title || !attrs.description) {
-    throw new Error("Blog post front matter is missing title or description");
+    throw new Error(`${name} front matter is missing title or description`);
   }
   return { title: attrs.title, description: attrs.description };
 }
@@ -342,9 +367,8 @@ async function main() {
     const readmePath = await findReadmePath(repo, Deno.args[1]);
     readme = parseReadme(await Deno.readTextFile(readmePath));
     slug = await findBlogSlug(repo);
-    blog = parseBlogFrontMatter(
-      await Deno.readTextFile(`${CONTENT_DIR}/${slug}.md`),
-    );
+    const blogPath = `${CONTENT_DIR}/${slug}.md`;
+    blog = parseBlogFrontMatter(await Deno.readTextFile(blogPath), blogPath);
   } catch (err) {
     console.error(`\n  ✗ ${(err as Error).message}\n`);
     Deno.exit(1);
