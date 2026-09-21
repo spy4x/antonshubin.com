@@ -2,7 +2,7 @@
   "nodeModulesDir": "manual",
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check && deno task test",
-    "test": "deno test --allow-env --allow-read --allow-write",
+    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net --allow-run=deno",
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",
@@ -26,6 +26,7 @@
   "imports": {
     "@/": "./",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
+    "@std/net": "jsr:@std/net@^1.0.6",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
     "fresh": "jsr:@fresh/core@^2.3.3",
     "marked": "npm:marked@^17.0.1",

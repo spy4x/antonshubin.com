@@ -130,6 +130,7 @@ export default define.page(function HowIWork() {
           {policies.map((p, i) => (
             <div
               key={i}
+              data-promise
               class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-4"
             >
               <div class="flex items-start gap-4 sm:gap-6">
