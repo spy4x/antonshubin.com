@@ -8,6 +8,7 @@ import { extract as extractYaml } from "@std/front-matter/yaml";
 import {
   devtoDraft,
   type DraftContext,
+  findBlogSlug,
   findReadmePath,
   hnDraft,
   linkedinDraft,
@@ -132,6 +133,41 @@ Deno.test("findReadmePath returns the later candidate when the first is absent",
   } finally {
     if (prevReposDir === undefined) Deno.env.delete("LAUNCH_KIT_REPOS_DIR");
     else Deno.env.set("LAUNCH_KIT_REPOS_DIR", prevReposDir);
+    await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
+Deno.test("findBlogSlug picks the alphabetically first post when several mention the repo", async () => {
+  const tempDir = await Deno.makeTempDir();
+  const repo = "widget";
+  // Neither slug matches by name (no "widget" or "widget-..." slug), so all
+  // fall to the mentions-the-repo scan — which must run in sorted order, not
+  // whatever order the filesystem's directory listing happens to return.
+  // Five names, deliberately not inserted in alphabetical order: on this
+  // filesystem `Deno.readDir` returns them as zzz, bbb, qqq, ddd, mmm — a
+  // raw order that disagrees with the alphabetical one, so a missing sort
+  // would pick "zzz-widget-notes" instead of "bbb-widget-notes".
+  const names = [
+    "mmm-widget-notes",
+    "ddd-widget-notes",
+    "qqq-widget-notes",
+    "bbb-widget-notes",
+    "zzz-widget-notes",
+  ];
+  for (const name of names) {
+    await Deno.writeTextFile(
+      `${tempDir}/${name}.md`,
+      "Uses widget internally.\n",
+    );
+  }
+  const prevContentDir = Deno.env.get("LAUNCH_KIT_CONTENT_DIR");
+  Deno.env.set("LAUNCH_KIT_CONTENT_DIR", tempDir);
+  try {
+    const slug = await findBlogSlug(repo);
+    assertEquals(slug, "bbb-widget-notes");
+  } finally {
+    if (prevContentDir === undefined) Deno.env.delete("LAUNCH_KIT_CONTENT_DIR");
+    else Deno.env.set("LAUNCH_KIT_CONTENT_DIR", prevContentDir);
     await Deno.remove(tempDir, { recursive: true });
   }
 });

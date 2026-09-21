@@ -30,7 +30,14 @@ import { extract as extractYaml } from "@std/front-matter/yaml";
 import { BASE_URL } from "@/lib/config.ts";
 import { buildTaggedUrl, type UtmParams } from "./utm.ts";
 
-const CONTENT_DIR = "content/blog";
+/**
+ * Where blog posts live. Overridable via `LAUNCH_KIT_CONTENT_DIR` so tests
+ * can point at a fixture directory instead of `content/blog`; normal runs
+ * never set the variable, so behaviour is unchanged.
+ */
+function contentDir(): string {
+  return Deno.env.get("LAUNCH_KIT_CONTENT_DIR") ?? "content/blog";
+}
 const OUT_DIR = "launches";
 
 export interface ReadmeSummary {
@@ -140,7 +147,7 @@ export async function findBlogSlug(repo: string): Promise<string> {
   if (override) return override;
 
   const slugs: string[] = [];
-  for await (const entry of Deno.readDir(CONTENT_DIR)) {
+  for await (const entry of Deno.readDir(contentDir())) {
     if (entry.isFile && entry.name.endsWith(".md")) {
       slugs.push(entry.name.slice(0, -3));
     }
@@ -151,12 +158,12 @@ export async function findBlogSlug(repo: string): Promise<string> {
   if (byName) return byName;
 
   for (const slug of slugs) {
-    const text = await Deno.readTextFile(`${CONTENT_DIR}/${slug}.md`);
+    const text = await Deno.readTextFile(`${contentDir()}/${slug}.md`);
     if (mentionsRepo(repo, text)) return slug;
   }
 
   throw new Error(
-    `No post in ${CONTENT_DIR}/ is named "${repo}-..." or mentions "${repo}". ` +
+    `No post in ${contentDir()}/ is named "${repo}-..." or mentions "${repo}". ` +
       `Set LAUNCH_KIT_BLOG_SLUG=<slug> to point at the right one.`,
   );
 }
@@ -318,14 +325,14 @@ async function main() {
     readme = parseReadme(await Deno.readTextFile(readmePath));
     slug = await findBlogSlug(repo);
     blog = parseBlogFrontMatter(
-      await Deno.readTextFile(`${CONTENT_DIR}/${slug}.md`),
+      await Deno.readTextFile(`${contentDir()}/${slug}.md`),
     );
   } catch (err) {
     console.error(`\n  ✗ ${(err as Error).message}\n`);
     Deno.exit(1);
   }
 
-  console.log(`  blog post: ${CONTENT_DIR}/${slug}.md`);
+  console.log(`  blog post: ${contentDir()}/${slug}.md`);
 
   const campaign = `${repo}-launch`;
   const outDir = `${OUT_DIR}/${repo}`;
