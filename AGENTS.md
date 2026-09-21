@@ -24,7 +24,7 @@ specific to this repository.
 
 ```bash
 deno task check                 # fmt --check + lint + type check + test
-deno task test                  # deno test alone
+deno task test                  # build, then deno test (see Rendered-page tests below)
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -86,6 +86,54 @@ runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
 `when: event: [push, pull_request]` keeps it from running on that same cron
 trigger. See `docs/weekly-numbers.md` for the env vars it needs and the one-time
 Woodpecker cron setup.
+
+## Rendered-page tests
+
+Some fixes only exist in the rendered HTML — a retired phrase removed from a
+policy card, an `<h1>` count, an RSS `<link>` in `<head>`, an image's `alt` —
+and nothing catches a regression in them unless a test fetches a built page and
+looks. `test/harness.ts` and `test/rendered.test.ts` (issue #135) do that.
+
+**How it works.** `test/harness.ts` exports `startSite()`, which boots the
+production server (`deno serve -A _fresh/server.js`) on a free port
+(`getAvailablePort()` from `jsr:@std/net`, the same pattern its own docs show
+for passing a port to a spawned subprocess) and waits until it answers. It
+returns a `Site` with `get(path)` (fetches with `redirect: "manual"`, so a 301
+is visible as one), `html(path)` (fetches, asserts 200, returns text), and
+`stop()` (kills the server; safe to call twice). `test/html.ts` has three small,
+dependency-free helpers for asserting on the HTML that comes back:
+`visibleText()` (strips `<script>`/`<style>`/tags, decodes entities, collapses
+whitespace), `jsonLd()` (parses every `<script
+type="application/ld+json">`
+block), and `count()` (counts regex matches).
+
+**Design choice — A, build before test, not build-on-demand in the harness.**
+`deno task test` is now `deno task build && deno test ...`, so the site is built
+exactly once per `deno task check` run, before `deno test` starts, no matter how
+many test files call `startSite()`. `startSite()` itself never builds; it only
+checks `_fresh/server.js` exists and throws a clear error naming the missing
+file and the task to run if it doesn't. I picked this over option B (the harness
+builds on demand behind a cross-process lock) because it needs no lock, behaves
+identically locally and in CI, and the one gap it leaves — running `deno test`
+directly, bypassing the `test` task — fails loudly instead of silently skipping,
+which is the one hard requirement. `.woodpecker.yml` needed no change: it
+already runs `deno task check`, which now builds as a side effect of
+`deno task test`.
+
+**Permissions.** `deno task test` carries `--allow-net` (the harness's own
+readiness check binds `0.0.0.0:0` to find a free port, then fetches `127.0.0.1`)
+and `--allow-run=deno` (to spawn the server as a child process). Both are new;
+the existing `--allow-env --allow-read --allow-write` were already there for
+other tests.
+
+**How to add a guard.** Call `startSite()`, fetch a page with `site.html()` or
+`site.get()`, assert on structure or a short phrase with `count()` /
+`visibleText()` / `jsonLd()`, then `await site.stop()` in a `finally`. Assert
+structure and short phrases, never prose: the copy on this site changes often,
+and a test that pins a whole paragraph gets deleted the first time it goes red
+for the wrong reason, not fixed. Every response body must be consumed or
+cancelled (`res.body?.cancel()`) and every server stopped, even on failure, so
+tests keep passing Deno's resource and op sanitizers.
 
 ## AI crawler optimization (SEO)
 
