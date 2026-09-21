@@ -301,22 +301,28 @@ export default define.page(function HowIWork() {
           </div>
         </section>
 
-        {/* Booking ask, after the FAQ: objections cleared before the ask. */}
-        <div class="text-center mt-16">
-          <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
-          <p class="mt-4 text-gray-400 text-sm">
-            Or{" "}
-            <a
-              href={SCHEDULE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-umami-event="meet-embed-fallback-click"
-              class="hover:text-orange-300 underline underline-offset-4"
-            >
-              open standalone
-            </a>
-          </p>
-        </div>
+        {
+          /* Booking ask, after the FAQ: objections cleared before the ask.
+          Rendered only when SCHEDULE_URL is set — otherwise MeetEmbed shows
+          nothing and the fallback link below would carry an empty href. */
+        }
+        {SCHEDULE_URL && (
+          <div class="text-center mt-16">
+            <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
+            <p class="mt-4 text-gray-400 text-sm">
+              Or{" "}
+              <a
+                href={SCHEDULE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="meet-embed-fallback-click"
+                class="hover:text-orange-300 underline underline-offset-4"
+              >
+                open standalone
+              </a>
+            </p>
+          </div>
+        )}
       </div>
     </Layout>
   );

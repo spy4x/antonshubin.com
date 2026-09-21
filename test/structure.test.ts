@@ -257,14 +257,67 @@ siteTest(
   },
 );
 
-siteTest("contact page offers three ways to reach me", async (site) => {
-  const html = await site.html("/contact-me");
-  assertEquals(count(html, /data-contact-option/g), 3);
-  assert(
-    visibleText(html).includes(
-      "Invoices are issued by NeatSoft PTE LTD, Singapore.",
-    ),
-  );
+// These two don't use `siteTest`: `SCHEDULE_URL` has to be set (or deleted)
+// before `startSite()` spawns the server, since the server reads it once at
+// process start — `siteTest` boots the server with no env control. Restored
+// in `finally` either way so it can't leak into a later test in this file
+// (issue #152: the "Book a call" card links to #book and is only shown when
+// SCHEDULE_URL is set, which changes this count).
+Deno.test("contact page offers three ways to reach me", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com");
+  const site = await startSite();
+  try {
+    const html = await site.html("/contact-me");
+    assertEquals(
+      count(html, /data-contact-option/g),
+      3,
+      "/contact-me: expected 3 contact cards with SCHEDULE_URL set",
+    );
+    assert(
+      visibleText(html).includes("Three ways to reach me."),
+      '/contact-me: intro sentence does not say "Three ways" with SCHEDULE_URL set',
+    );
+    assert(
+      visibleText(html).includes(
+        "Invoices are issued by NeatSoft PTE LTD, Singapore.",
+      ),
+    );
+  } finally {
+    await site.stop();
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+    else Deno.env.set("SCHEDULE_URL", previous);
+  }
+});
+
+Deno.test("contact page drops the #book card when SCHEDULE_URL is unset", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  Deno.env.delete("SCHEDULE_URL");
+  const site = await startSite();
+  try {
+    const html = await site.html("/contact-me");
+    assertEquals(
+      count(html, /data-contact-option/g),
+      2,
+      "/contact-me: expected 2 contact cards with SCHEDULE_URL unset",
+    );
+    assert(
+      !/href="#book"/.test(html),
+      "/contact-me: a card still links to #book with SCHEDULE_URL unset",
+    );
+    const text = visibleText(html);
+    assert(
+      !text.includes("Three ways"),
+      '/contact-me: intro sentence still says "Three ways" with SCHEDULE_URL unset',
+    );
+    assert(
+      text.includes("Two ways to reach me."),
+      '/contact-me: intro sentence does not say "Two ways" with SCHEDULE_URL unset',
+    );
+  } finally {
+    await site.stop();
+    if (previous !== undefined) Deno.env.set("SCHEDULE_URL", previous);
+  }
 });
 
 siteTest(

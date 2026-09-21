@@ -1,6 +1,6 @@
-// Guards for issue #111 (and its review round, #111 follow-up): the inline
-// scheduler facade on `/`, `/how-i-work` and `/contact-me`. Three things are
-// guarded per page:
+// Guards for issue #111, its review round (#111 follow-up), and #152: the
+// inline scheduler facade on `/`, `/how-i-work` and `/contact-me`. Four
+// things are guarded per page:
 //  1. The facade button and the standalone fallback link both exist, and the
 //     fallback's `href` really is the scheduler's URL — this must run before
 //     the "nothing fetches the origin" check below, otherwise that check
@@ -17,6 +17,10 @@
 //  3. On `/`, the collapsed success panel (and, once success shows, the
 //     collapsed form panel) carries `inert`, so a Tab press can't reach a
 //     control that is invisible at `max-height: 0`.
+//  4. With `SCHEDULE_URL` unset, every booking block (facade, fallback link,
+//     and — on `/contact-me` — the `#book` section and its card) is absent
+//     rather than rendering a dead end: an empty-`href` link or a heading
+//     with nothing under it.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 import { count } from "./html.ts";
@@ -166,16 +170,61 @@ function matchDivElement(
   throw new Error("no matching </div> found");
 }
 
-/** Finds the `<div class="...">` element whose class attribute is exactly `classAttr`. */
-function findDivByClass(
+/**
+ * Finds the `<div ...>` element carrying the given boolean/string attribute
+ * (matched by name only, not value — `data-lead-success="true"` and a bare
+ * `data-lead-success` both match). Keyed on a stable `data-` attribute
+ * rather than a Tailwind class string, so a styling change to the element
+ * can't break this lookup and produce a misleading "no element found"
+ * failure instead of a real guard result.
+ */
+function findDivByAttr(
   html: string,
-  classAttr: string,
+  attr: string,
 ): { start: number; end: number } {
-  const classIdx = html.indexOf(`class="${classAttr}"`);
-  assert(classIdx >= 0, `no element found with class="${classAttr}"`);
-  const tagStart = html.lastIndexOf("<div", classIdx);
-  assert(tagStart >= 0, `class="${classAttr}" is not inside a <div>`);
-  return matchDivElement(html, tagStart);
+  const match = new RegExp(`<div\\b[^>]*\\b${attr}\\b[^>]*>`, "i").exec(html);
+  assert(match, `no <div> found with attribute "${attr}"`);
+  return matchDivElement(html, match.index);
+}
+
+/**
+ * True if `html` contains an `<a>` whose `href` is empty (`href=""`) or a
+ * bare attribute with no value at all — the shape the fallback and
+ * standalone links would take if `SCHEDULE_URL` reached the page unset.
+ */
+function hasEmptyHrefAnchor(html: string): boolean {
+  return openTags(html, "a").some((tag) =>
+    /\bhref\s*=\s*""/.test(tag) || /\bhref\b(?!\s*=)/.test(tag)
+  );
+}
+
+/**
+ * Asserts the booking facade, its fallback link, and any empty-href anchor
+ * are all absent — the guard for a misconfigured environment where
+ * `SCHEDULE_URL` is unset. Each absence checked here has a matching
+ * presence assertion in a set-case test above, so this can't pass
+ * vacuously against a page that never had the block to begin with.
+ */
+function assertNoBookingBlock(html: string, path: string) {
+  assertEquals(
+    count(html, new RegExp(escapeRegExp(FACADE_EVENT), "g")),
+    0,
+    `${path}: rendered the booking facade button with SCHEDULE_URL unset`,
+  );
+  assertEquals(
+    count(html, /<iframe\b/gi),
+    0,
+    `${path}: rendered an <iframe> with SCHEDULE_URL unset`,
+  );
+  assertEquals(
+    count(html, new RegExp(escapeRegExp(FALLBACK_EVENT), "g")),
+    0,
+    `${path}: rendered the "open standalone" fallback link with SCHEDULE_URL unset`,
+  );
+  assert(
+    !hasEmptyHrefAnchor(html),
+    `${path}: rendered an <a> with an empty href with SCHEDULE_URL unset`,
+  );
 }
 
 Deno.test("home page ships the booking facade and no iframe before a click", async () => {
@@ -198,10 +247,7 @@ Deno.test("home page keeps the collapsed success panel out of the tab order", as
   const site = await startSite();
   try {
     const body = await site.html("/");
-    const wrapper = findDivByClass(
-      body,
-      "transition-all duration-500 ease-in-out text-center",
-    );
+    const wrapper = findDivByAttr(body, "data-lead-success");
     const wrapperHtml = body.slice(wrapper.start, wrapper.end);
     const openTag = wrapperHtml.slice(0, wrapperHtml.indexOf(">") + 1);
     assert(
@@ -260,10 +306,71 @@ Deno.test("contact-me ships the booking facade behind #book, no iframe before a 
       /\bid="book"/.test(body),
       '/contact-me: no element with id="book" found',
     );
+    assert(
+      body.includes("Book a Free 30-min Intro Call"),
+      "/contact-me: booking heading not found",
+    );
   } finally {
     await site.stop();
     if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
     else Deno.env.set("SCHEDULE_URL", previous);
+  }
+});
+
+// Scoped to the LeadForm success wrapper only. The home page also has two
+// other `href={SCHEDULE_URL}` CTAs (`hero-book-call`, `home-book-call` in
+// routes/index.tsx) that render an empty href when unset too, but fixing
+// those is a separate, tracked follow-up, not part of this guard.
+Deno.test("lead form success panel renders no booking block when SCHEDULE_URL is unset", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  Deno.env.delete("SCHEDULE_URL");
+  const site = await startSite();
+  try {
+    const body = await site.html("/");
+    const wrapper = findDivByAttr(body, "data-lead-success");
+    const wrapperHtml = body.slice(wrapper.start, wrapper.end);
+    assertNoBookingBlock(wrapperHtml, "/ (LeadForm success panel)");
+  } finally {
+    await site.stop();
+    if (previous !== undefined) Deno.env.set("SCHEDULE_URL", previous);
+  }
+});
+
+Deno.test("how-i-work renders no booking block when SCHEDULE_URL is unset", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  Deno.env.delete("SCHEDULE_URL");
+  const site = await startSite();
+  try {
+    const body = await site.html("/how-i-work");
+    assertNoBookingBlock(body, "/how-i-work");
+  } finally {
+    await site.stop();
+    if (previous !== undefined) Deno.env.set("SCHEDULE_URL", previous);
+  }
+});
+
+Deno.test("contact-me renders no #book section or link when SCHEDULE_URL is unset", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  Deno.env.delete("SCHEDULE_URL");
+  const site = await startSite();
+  try {
+    const body = await site.html("/contact-me");
+    assertNoBookingBlock(body, "/contact-me");
+    assert(
+      !/\bid="book"/.test(body),
+      '/contact-me: found id="book" with SCHEDULE_URL unset',
+    );
+    assert(
+      !/href="#book"/.test(body),
+      "/contact-me: a card still links to #book with SCHEDULE_URL unset",
+    );
+    assert(
+      !body.includes("Book a Free 30-min Intro Call"),
+      "/contact-me: booking heading still rendered with SCHEDULE_URL unset",
+    );
+  } finally {
+    await site.stop();
+    if (previous !== undefined) Deno.env.set("SCHEDULE_URL", previous);
   }
 });
 
