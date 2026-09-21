@@ -7,6 +7,9 @@
  * on its own.
  */
 
+// Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
+// must point at production, since it tells search engines which copy is the
+// original. Pointing it at a staging host would misattribute the source.
 const DEVTO_BASE_URL = "https://antonshubin.com";
 
 export interface DevToArticlePayload {
