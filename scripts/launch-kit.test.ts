@@ -159,12 +159,12 @@ Deno.test("selectBlogSlug's by-name match also follows sorted order when more th
 Deno.test("findBlogSlug returns the override and never consults the directory", async () => {
   const tempDir = await Deno.makeTempDir();
   const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
-  Deno.env.set("LAUNCH_KIT_BLOG_SLUG", "some-override-slug");
   try {
-    // tempDir stays empty: if findBlogSlug reads it at all, readDir would
-    // still succeed (it's a valid empty dir), so the real assertion is that
-    // the override value comes back rather than an error or another slug.
-    const result = await findBlogSlug("whatever-repo", tempDir);
+    Deno.env.set("LAUNCH_KIT_BLOG_SLUG", "some-override-slug");
+    // The directory does not exist, so if findBlogSlug consulted it at all
+    // — via Deno.readDir or otherwise — this would reject with NotFound
+    // instead of returning the override.
+    const result = await findBlogSlug("whatever-repo", `${tempDir}/missing`);
     assertEquals(result, "some-override-slug");
   } finally {
     if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
@@ -176,8 +176,8 @@ Deno.test("findBlogSlug returns the override and never consults the directory", 
 Deno.test("findBlogSlug prefers a by-name match over a post that merely mentions the repo", async () => {
   const tempDir = await Deno.makeTempDir();
   const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
-  Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
   try {
+    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
     await Deno.writeTextFile(
       `${tempDir}/widget-launch.md`,
       "A post named after widget.\n",
@@ -195,17 +195,16 @@ Deno.test("findBlogSlug prefers a by-name match over a post that merely mentions
   }
 });
 
-Deno.test("findBlogSlug picks the alphabetically first mention, not the first one written", async () => {
+Deno.test("findBlogSlug scans candidates in sorted order, not the order they're given", async () => {
   const tempDir = await Deno.makeTempDir();
   const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
-  Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
   try {
+    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
     // Neither slug matches "gadget" by name, and both mention it as a whole
-    // word. The directory backing `Deno.makeTempDir()` here hands entries
-    // back in the reverse of creation order, so writing the alphabetically
-    // first slug before the alphabetically last one makes the raw
-    // `Deno.readDir` order disagree with alphabetical order: only a
-    // sort-before-scan implementation can return "aaa-gadget-notes" here.
+    // word. The candidate list is passed in pre-built and already out of
+    // alphabetical order, so this doesn't depend on what order any given
+    // filesystem's Deno.readDir happens to return: only a sort-before-scan
+    // implementation can return "aaa-gadget-notes" here.
     await Deno.writeTextFile(
       `${tempDir}/aaa-gadget-notes.md`,
       "More notes about gadget.\n",
@@ -214,7 +213,10 @@ Deno.test("findBlogSlug picks the alphabetically first mention, not the first on
       `${tempDir}/zzz-gadget-notes.md`,
       "Some notes about gadget.\n",
     );
-    const result = await findBlogSlug("gadget", tempDir);
+    const result = await findBlogSlug("gadget", tempDir, [
+      "zzz-gadget-notes",
+      "aaa-gadget-notes",
+    ]);
     assertEquals(result, "aaa-gadget-notes");
   } finally {
     if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
@@ -233,7 +235,7 @@ Deno.test("parseBlogFrontMatter names the file and says what to do when front ma
     Error,
   );
   assertStringIncludes(err.message, "content/blog/no-front-matter.md");
-  assertStringIncludes(err.message, "front matter");
+  assertStringIncludes(err.message, "LAUNCH_KIT_BLOG_SLUG");
 });
 
 const ctx: DraftContext = {

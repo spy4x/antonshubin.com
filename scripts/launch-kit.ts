@@ -160,25 +160,36 @@ export function selectBlogSlug(
   return { slug: matchBlogSlugByName(repo, orderedSlugs), orderedSlugs };
 }
 
-/**
- * Finds the `content/blog/` slug for `repo`, per the order in the header
- * comment. `contentDir` defaults to `CONTENT_DIR`; a test points it at a
- * temporary directory instead, so the scan is deterministic and never
- * touches this repo's real posts.
- */
-export async function findBlogSlug(
-  repo: string,
-  contentDir: string = CONTENT_DIR,
-): Promise<string> {
-  const override = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
-  if (override) return override;
-
+/** Lists the `.md` slugs directly under `contentDir`, in whatever order `Deno.readDir` returns. */
+export async function listBlogSlugs(contentDir: string): Promise<string[]> {
   const slugs: string[] = [];
   for await (const entry of Deno.readDir(contentDir)) {
     if (entry.isFile && entry.name.endsWith(".md")) {
       slugs.push(entry.name.slice(0, -3));
     }
   }
+  return slugs;
+}
+
+/**
+ * Finds the `content/blog/` slug for `repo`, per the order in the header
+ * comment. `contentDir` defaults to `CONTENT_DIR`; a test points it at a
+ * temporary directory instead, so the scan is deterministic and never
+ * touches this repo's real posts. `candidateSlugs`, when given, replaces the
+ * `listBlogSlugs(contentDir)` call — a test uses it to hand in a
+ * deliberately unsorted list, so the sort-before-scan behaviour is checked
+ * without depending on what order any given filesystem's `Deno.readDir`
+ * happens to return.
+ */
+export async function findBlogSlug(
+  repo: string,
+  contentDir: string = CONTENT_DIR,
+  candidateSlugs?: string[],
+): Promise<string> {
+  const override = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  if (override) return override;
+
+  const slugs = candidateSlugs ?? await listBlogSlugs(contentDir);
 
   const { slug: byName, orderedSlugs } = selectBlogSlug(repo, slugs);
   if (byName) return byName;
