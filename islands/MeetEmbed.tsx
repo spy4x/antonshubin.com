@@ -14,14 +14,22 @@ interface UmamiGlobal {
 
 /**
  * Builds the iframe-friendly scheduler URL from `SCHEDULE_URL`, trimming a
- * trailing slash first so the result is never `//embed`.
+ * trailing slash first so the result is never `//embed`. Returns the empty
+ * string when `scheduleUrl` is empty (the local/test default, when the env
+ * var is unset) rather than the misleading `/embed` — a relative path that
+ * would load this site's own 404 page inside the frame.
  */
 export function embedUrl(scheduleUrl: string): string {
+  if (!scheduleUrl) return "";
   return `${scheduleUrl.replace(/\/+$/, "")}/embed`;
 }
 
 interface MeetEmbedProps {
-  /** Iframe-friendly scheduler URL, normally built with `embedUrl()`. */
+  /**
+   * Iframe-friendly scheduler URL, normally built with `embedUrl()`. Empty
+   * when `SCHEDULE_URL` is unset — the component renders nothing in that
+   * case rather than a facade button that would open a broken frame.
+   */
   url: string;
 }
 
@@ -42,13 +50,27 @@ export default function MeetEmbed({ url }: MeetEmbedProps) {
     if (loaded.value) iframeRef.current?.focus();
   }, [loaded.value]);
 
+  /**
+   * Fires on the iframe element's native `load` event, which fires the same
+   * way for a successfully rendered scheduler page and for the browser's own
+   * blocked/error page when the frame is refused (for example by
+   * `X-Frame-Options` or `frame-ancestors`). It measures "the frame element
+   * finished loading something", not booking-scheduler render success — this
+   * script runs on our origin and can't read the cross-origin frame's
+   * content to tell the two apart. Real render success can only be measured
+   * on the scheduler's own side.
+   */
   const handleLoad = () => {
     try {
-      (globalThis as unknown as UmamiGlobal).umami?.track("meet-embed-loaded");
+      (globalThis as unknown as UmamiGlobal).umami?.track(
+        "meet-embed-frame-load",
+      );
     } catch {
       // Umami absent or blocked by the visitor — never break the page for it.
     }
   };
+
+  if (!url) return null;
 
   if (!loaded.value) {
     return (

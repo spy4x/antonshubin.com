@@ -26,7 +26,10 @@ const contacts = [
       "bg-green-600/20 text-green-400 border-green-600/30 hover:border-green-500",
     btnClass:
       "bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
-    btnText: "Book now ↓",
+    // The glyph is rendered separately, wrapped in an `aria-hidden` span, so
+    // a screen reader doesn't read "downwards arrow" after the label.
+    btnText: "Book now",
+    downArrow: true,
     // The down arrow in the text already points at the #book section below,
     // so the trailing ArrowRightIcon every other card gets would be a second,
     // conflicting arrow here.
@@ -43,6 +46,7 @@ const contacts = [
       "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Send email",
     hideArrow: false,
+    downArrow: false,
   },
   {
     icon: <TelegramIcon class="w-6 h-6" />,
@@ -54,6 +58,7 @@ const contacts = [
       "bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Message me",
     hideArrow: false,
+    downArrow: false,
   },
 ];
 
@@ -116,6 +121,7 @@ export default define.page(function ContactMe() {
               <p class="text-gray-400 text-sm mb-4">{c.desc}</p>
               <span class={c.btnClass + " inline-flex items-center gap-1"}>
                 {c.btnText}
+                {c.downArrow && <span aria-hidden="true">↓</span>}
                 {!c.hideArrow && <ArrowRightIcon class="w-4 h-4" />}
               </span>
             </a>

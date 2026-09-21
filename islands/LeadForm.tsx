@@ -73,9 +73,14 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
 
   return (
     <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 sm:p-6 relative overflow-hidden">
-      {/* Form section */}
+      {
+        /* Form section. `inert` once success shows, so its now-hidden inputs
+          drop out of the tab order and out of assistive tech, matching the
+          `maxHeight: 0` collapse below it. */
+      }
       <div
         class="transition-all duration-500 ease-in-out"
+        inert={isSuccess}
         style={{
           opacity: isSuccess ? 0 : 1,
           transform: isSuccess ? "translateY(-12px)" : "translateY(0)",
@@ -236,10 +241,16 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
 
       {
         /* Success section. maxHeight must clear the 760px iframe MeetEmbed
-          opens inline once clicked, so it's taller than the form section's. */
+          opens inline once clicked, so it's taller than the form section's.
+          `inert` until success, so the facade button and fallback link can't
+          be Tab'd to (and silently activated) while this panel is collapsed
+          to `maxHeight: 0` and `opacity: 0` — without it, Tab from the last
+          form field reaches these controls and Enter loads a cross-origin
+          iframe invisibly. */
       }
       <div
         class="transition-all duration-500 ease-in-out text-center"
+        inert={!isSuccess}
         style={{
           opacity: isSuccess ? 1 : 0,
           transform: isSuccess ? "translateY(0)" : "translateY(12px)",

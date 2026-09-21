@@ -304,15 +304,16 @@ export default define.page(function HowIWork() {
         {/* Booking ask, after the FAQ: objections cleared before the ask. */}
         <div class="text-center mt-16">
           <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
-          <p class="mt-4">
+          <p class="mt-4 text-gray-400 text-sm">
+            Or{" "}
             <a
               href={SCHEDULE_URL}
               target="_blank"
               rel="noopener noreferrer"
               data-umami-event="meet-embed-fallback-click"
-              class="text-gray-400 hover:text-orange-300 underline underline-offset-4 text-sm"
+              class="hover:text-orange-300 underline underline-offset-4"
             >
-              Or open standalone
+              open standalone
             </a>
           </p>
         </div>
