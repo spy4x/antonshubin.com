@@ -22,7 +22,7 @@ export const handler = define.handlers({
 - Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: Expert-Vetted (Top 1%), 100% Job Success, $395K+ earned, 80+ projects
-- Pricing: Fixed-price milestones ($3,000-$25,000+)
+- Pricing: Fixed price when the scope is fixed ($3,000-$25,000+), hourly when open-ended
 - Location: Da Nang, Vietnam (Singapore-based entity)
 
 ## Engagement Model
@@ -80,7 +80,7 @@ export const handler = define.handlers({
 
 Non-technical founders with a budget and a vision need someone who:
 1. Translates business goals into technical execution without jargon
-2. Uses fixed-price milestones for defined outcomes and scope
+2. Prices fixed when the scope is fixed, hourly when it's open-ended — no surprise costs
 3. Owns product delivery and production operations end to end
 4. Has a track record (80+ projects, $395K+, Top 1% on Upwork)
 5. Reduces initial engagement risk with a five-day refund and free architecture audit
