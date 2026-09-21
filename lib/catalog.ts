@@ -5,8 +5,9 @@
  * read titles and prices from here. Nothing else in the repository may restate
  * a price by hand. `lib/catalog.test.ts` pins the four prices and the six
  * redirects; `test/structure.test.ts` fails when a dollar amount that is not in
- * this file shows up on a page listed in its `PRICE_PAGES`, or in an llms file. The same list is used on Upwork and neatsoft.dev, so changing
- * a number here is the first of three edits, not the only one.
+ * this file shows up on a page listed in its `PRICE_PAGES`, or in an llms file.
+ * The same list is used on Upwork and neatsoft.dev, so changing a number here
+ * is the first of three edits, not the only one.
  *
  * This module has no imports on purpose, so tests and scripts can load it
  * without environment access.
