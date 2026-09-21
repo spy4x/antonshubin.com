@@ -4,6 +4,7 @@ import {
   assertStringIncludes,
   assertThrows,
 } from "jsr:@std/assert@^1.0.0";
+import { extract as extractYaml } from "@std/front-matter/yaml";
 import {
   devtoDraft,
   type DraftContext,
@@ -158,4 +159,9 @@ Deno.test("devtoDraft's canonical_url is clean, with no utm params", () => {
 
 Deno.test("devtoDraft's body still carries the utm-tagged link, for the human posting it", () => {
   assertStringIncludes(devtoDraft(ctx), ctx.taggedBlogUrl);
+});
+
+Deno.test("devtoDraft's front matter is valid YAML and the title round-trips, even with a colon in it", () => {
+  const { attrs } = extractYaml<{ title: string }>(devtoDraft(ctx));
+  assertEquals(attrs.title, ctx.blog.title);
 });

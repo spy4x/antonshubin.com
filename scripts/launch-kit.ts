@@ -91,14 +91,12 @@ export async function findReadmePath(
   const candidates: string[] = [];
   if (explicitPath) {
     candidates.push(`${explicitPath.replace(/\/$/, "")}/README.md`);
-  } else {
-    const reposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR");
-    candidates.push(
-      reposDir
-        ? `${reposDir.replace(/\/$/, "")}/${repo}/README.md`
-        : `../${repo}/README.md`,
-    );
   }
+  const reposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR");
+  if (reposDir) {
+    candidates.push(`${reposDir.replace(/\/$/, "")}/${repo}/README.md`);
+  }
+  candidates.push(`../${repo}/README.md`);
 
   for (const candidate of candidates) {
     try {
@@ -250,7 +248,7 @@ Repo: ${ctx.githubUrl}
 
 export function devtoDraft(ctx: DraftContext): string {
   return `---
-title: ${ctx.blog.title}
+title: ${JSON.stringify(ctx.blog.title)}
 published: false
 canonical_url: ${ctx.canonicalBlogUrl}
 ---
