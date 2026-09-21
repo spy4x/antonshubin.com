@@ -34,8 +34,9 @@ Stalwart on purpose shouldn't need to deploy a Nextcloud instance to edit a todo
 on desktop. The fix had to assume the CalDAV server is the only piece already
 running.
 
-If you run Radicale, Nextcloud, or Baikal — that is your calendar server. This
-PWA is the missing task UI for it.
+If you run Radicale — tested in production — that is your calendar server and
+this PWA is the missing task UI for it. Nextcloud and Baikal are
+CalDAV-compliant and expected to work too, though untested.
 
 ## Architecture: CalDAV as the only source of truth
 
@@ -43,9 +44,9 @@ VTODO files live on the CalDAV server. The PWA is a stateless client. SQLite in
 the API container holds user accounts and AES-GCM-encrypted server credentials
 and nothing else. Switch CalDAV servers and no todos move.
 
-That property mattered enough to me that I tested it. The deployed instance
-migrated from Radicale to Stalwart with a config string change. Zero todos
-moved. That is the test the architecture had to pass.
+That property mattered enough to me that I tested it. In July 2026 the instance
+I ran then migrated from Radicale to Stalwart with a config string change. Zero
+todos moved. That is the test the architecture had to pass.
 
 ## CQRS in a UI app, and why it fits
 
