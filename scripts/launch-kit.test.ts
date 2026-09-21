@@ -12,6 +12,7 @@ import {
   findReadmePath,
   hnDraft,
   linkedinDraft,
+  listBlogSlugs,
   matchBlogSlugByName,
   mentionsRepo,
   parseBlogFrontMatter,
@@ -195,19 +196,28 @@ Deno.test("findBlogSlug prefers a by-name match over a post that merely mentions
   }
 });
 
-Deno.test("findBlogSlug scans candidates in sorted order, not the order they're given", async () => {
+Deno.test("findBlogSlug scans the injected candidate list, sorted, not the directory or the given order", async () => {
   const tempDir = await Deno.makeTempDir();
   const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
   try {
     Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
-    // Neither slug matches "gadget" by name, and both mention it as a whole
-    // word. The candidate list is passed in pre-built and already out of
-    // alphabetical order, so this doesn't depend on what order any given
-    // filesystem's Deno.readDir happens to return: only a sort-before-scan
-    // implementation can return "aaa-gadget-notes" here.
+    // Three posts, none matching "gadget" by name, all mentioning it as a
+    // whole word. The injected candidate list names only two of them, and in
+    // reverse-of-sorted order, so three different implementation bugs each
+    // produce a different, distinguishable wrong answer: ignoring
+    // candidateSlugs and reading the directory instead answers
+    // "aaa-gadget-notes" (present only on disk, absent from the list);
+    // scanning the injected list without sorting it first answers
+    // "zzz-gadget-notes" (first in the given order); only a correct,
+    // sort-before-scan implementation that honours the injected list answers
+    // "mmm-gadget-notes".
     await Deno.writeTextFile(
       `${tempDir}/aaa-gadget-notes.md`,
       "More notes about gadget.\n",
+    );
+    await Deno.writeTextFile(
+      `${tempDir}/mmm-gadget-notes.md`,
+      "Middle notes about gadget.\n",
     );
     await Deno.writeTextFile(
       `${tempDir}/zzz-gadget-notes.md`,
@@ -215,12 +225,28 @@ Deno.test("findBlogSlug scans candidates in sorted order, not the order they're 
     );
     const result = await findBlogSlug("gadget", tempDir, [
       "zzz-gadget-notes",
-      "aaa-gadget-notes",
+      "mmm-gadget-notes",
     ]);
-    assertEquals(result, "aaa-gadget-notes");
+    assertEquals(result, "mmm-gadget-notes");
   } finally {
     if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
     else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
+    await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
+Deno.test("listBlogSlugs lists only .md files directly under the directory, not subdirectories or other extensions", async () => {
+  const tempDir = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(`${tempDir}/real-post.md`, "content\n");
+    await Deno.writeTextFile(`${tempDir}/notes.txt`, "not markdown\n");
+    // A directory whose own name ends in ".md" — catches a filter that
+    // dropped the isFile check, since entry.name.endsWith(".md") alone would
+    // accept it.
+    await Deno.mkdir(`${tempDir}/widget.md`);
+    const result = await listBlogSlugs(tempDir);
+    assertEquals(result, ["real-post"]);
+  } finally {
     await Deno.remove(tempDir, { recursive: true });
   }
 });
