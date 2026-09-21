@@ -1,7 +1,7 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { type Project, projects } from "../../lib/data.ts";
+import { type Project, projects, projectScreenshots } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
@@ -333,12 +333,7 @@ export default define.page(function ProjectDetail(ctx) {
               <h2 class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-4">
                 Screenshots ({project.screenshotURLs.length})
               </h2>
-              <ImageGallery
-                images={project.screenshotURLs.map((screenshot, index) => ({
-                  src: `/img/projects/${project.slug}/${screenshot}`,
-                  alt: `${project.title} screenshot ${index + 1}`,
-                }))}
-              />
+              <ImageGallery images={projectScreenshots(project)} />
             </section>
           )}
 

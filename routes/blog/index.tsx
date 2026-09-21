@@ -87,7 +87,7 @@ export default define.page(function Blog(ctx) {
                 <div class="w-full sm:w-48 h-32 shrink-0 rounded-lg overflow-hidden bg-gray-700">
                   <img
                     src={`/img/blog/${article.slug}/${article.previewImageURL}`}
-                    alt="Article preview"
+                    alt={article.title}
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />

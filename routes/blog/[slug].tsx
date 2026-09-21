@@ -285,7 +285,7 @@ export default define.page(function BlogArticle(ctx) {
                     <div class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-700">
                       <img
                         src={`/img/blog/${prev.slug}/${prev.previewImageURL}`}
-                        alt=""
+                        alt={prev.title}
                         class="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -308,7 +308,7 @@ export default define.page(function BlogArticle(ctx) {
                     <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-700">
                       <img
                         src={`/img/blog/${next.slug}/${next.previewImageURL}`}
-                        alt=""
+                        alt={next.title}
                         class="w-full h-full object-cover"
                         loading="lazy"
                       />

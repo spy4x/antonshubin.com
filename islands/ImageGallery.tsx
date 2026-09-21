@@ -2,18 +2,25 @@ import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 import { webpForPng } from "../lib/image-path.ts";
 
+interface GalleryImageData {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+}
+
 interface ImageGalleryProps {
-  images: { src: string; alt: string }[];
+  images: GalleryImageData[];
 }
 
 /**
  * Renders an image with a WebP `<source>` fallback when the src ends in `.png`.
- * Used in both the gallery thumbnails and the lightbox.
+ * Used in both the gallery thumbnails and the lightbox. Emits `width`/`height`
+ * only when the caller supplied them, so the browser can reserve layout space
+ * for galleries where the intrinsic size is known.
  */
 function GalleryImage(
-  { src, alt, class: className }: {
-    src: string;
-    alt: string;
+  { src, alt, width, height, class: className }: GalleryImageData & {
     class: string;
   },
 ) {
@@ -24,6 +31,8 @@ function GalleryImage(
       <img
         src={src}
         alt={alt}
+        width={width}
+        height={height}
         class={className}
         loading="lazy"
         decoding="async"
@@ -92,8 +101,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
           >
             <GalleryImage
-              src={image.src}
-              alt={image.alt}
+              {...image}
               class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
             />
           </button>
@@ -158,8 +166,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
 
             {/* Image (lightbox uses webp if available, falls back to png) */}
             <GalleryImage
-              src={images[activeIndex.value].src}
-              alt={images[activeIndex.value].alt}
+              {...images[activeIndex.value]}
               class="max-w-[90vw] max-h-[90vh] object-contain"
             />
 

@@ -11,6 +11,12 @@ export interface Project {
   role?: string;
   tags?: string[];
   screenshotURLs?: string[];
+  /**
+   * Intrinsic pixel size shared by every file in `screenshotURLs`, used to
+   * set `width`/`height` on the `<img>` so the layout doesn't jump while it
+   * loads. Optional — galleries whose files vary in size leave this unset.
+   */
+  screenshotSize?: { width: number; height: number };
   videoURL?: string;
   madeForName?: string;
   madeForURL?: string;
@@ -284,6 +290,7 @@ export const projects = {
         "11-admin-settings.png",
         "12-profile.png",
       ],
+      screenshotSize: { width: 1440, height: 1000 },
       madeForName: "Yumetronics",
       madeForURL: "https://yumetronics.com.sg/",
       outcome:
@@ -782,4 +789,22 @@ export function prettyDate(dateString: string): string {
   const m = monthNames[date.getMonth()];
   const y = date.getFullYear();
   return `${d} ${m} ${y}`;
+}
+
+/**
+ * Build the gallery image list for a project: one entry per screenshot, with
+ * `width`/`height` carried over from `screenshotSize` when the project has
+ * one. Used by the project detail page to feed `<ImageGallery>` without
+ * repeating the src/alt convention inline.
+ */
+export function projectScreenshots(
+  project: Project,
+): { src: string; alt: string; width?: number; height?: number }[] {
+  if (!project.screenshotURLs) return [];
+  return project.screenshotURLs.map((file, index) => ({
+    src: `/img/projects/${project.slug}/${file}`,
+    alt: `${project.title} screenshot ${index + 1}`,
+    width: project.screenshotSize?.width,
+    height: project.screenshotSize?.height,
+  }));
 }
