@@ -75,6 +75,102 @@ Deno.test("absolutizeImageUrls leaves a relative, non-rooted image path alone", 
   assertEquals(absolutizeImageUrls(body), body);
 });
 
+Deno.test("absolutizeImageUrls rewrites an image whose alt text contains a bracket", () => {
+  const body = "![a [b] c](/img/blog/x.png)";
+  assertEquals(
+    absolutizeImageUrls(body),
+    "![a [b] c](https://antonshubin.com/img/blog/x.png)",
+  );
+});
+
+Deno.test("absolutizeImageUrls rewrites an image whose alt text nests brackets two levels deep", () => {
+  const body = "![a [b [c] d] e](/img/blog/x.png)";
+  assertEquals(
+    absolutizeImageUrls(body),
+    "![a [b [c] d] e](https://antonshubin.com/img/blog/x.png)",
+  );
+});
+
+Deno.test("absolutizeImageUrls leaves an image inside a ``` fence untouched but still rewrites one outside it", () => {
+  const body = [
+    "before ![alt](/img/blog/a.png) after",
+    "```",
+    "![alt](/img/blog/b.png)",
+    "```",
+  ].join("\n");
+  const expected = [
+    "before ![alt](https://antonshubin.com/img/blog/a.png) after",
+    "```",
+    "![alt](/img/blog/b.png)",
+    "```",
+  ].join("\n");
+  assertEquals(absolutizeImageUrls(body), expected);
+});
+
+Deno.test("absolutizeImageUrls leaves an image inside a ~~~ fence untouched but still rewrites one outside it", () => {
+  const body = [
+    "before ![alt](/img/blog/a.png) after",
+    "~~~",
+    "![alt](/img/blog/b.png)",
+    "~~~",
+  ].join("\n");
+  const expected = [
+    "before ![alt](https://antonshubin.com/img/blog/a.png) after",
+    "~~~",
+    "![alt](/img/blog/b.png)",
+    "~~~",
+  ].join("\n");
+  assertEquals(absolutizeImageUrls(body), expected);
+});
+
+Deno.test("absolutizeImageUrls treats a shorter fence line inside a longer fence as fenced content", () => {
+  const body = [
+    "````",
+    "```",
+    "![alt](/img/blog/x.png)",
+    "````",
+    "after ![alt](/img/blog/y.png)",
+  ].join("\n");
+  const expected = [
+    "````",
+    "```",
+    "![alt](/img/blog/x.png)",
+    "````",
+    "after ![alt](https://antonshubin.com/img/blog/y.png)",
+  ].join("\n");
+  assertEquals(absolutizeImageUrls(body), expected);
+});
+
+Deno.test("absolutizeImageUrls leaves an image inside an unclosed fence untouched to the end of the document", () => {
+  const body = [
+    "before ![alt](/img/blog/a.png) after",
+    "```md",
+    "![alt](/img/blog/b.png)",
+  ].join("\n");
+  const expected = [
+    "before ![alt](https://antonshubin.com/img/blog/a.png) after",
+    "```md",
+    "![alt](/img/blog/b.png)",
+  ].join("\n");
+  assertEquals(absolutizeImageUrls(body), expected);
+});
+
+Deno.test("absolutizeImageUrls rewrites an image again once a fence has closed", () => {
+  const body = [
+    "```",
+    "![alt](/img/blog/a.png)",
+    "```",
+    "![alt](/img/blog/b.png)",
+  ].join("\n");
+  const expected = [
+    "```",
+    "![alt](/img/blog/a.png)",
+    "```",
+    "![alt](https://antonshubin.com/img/blog/b.png)",
+  ].join("\n");
+  assertEquals(absolutizeImageUrls(body), expected);
+});
+
 Deno.test("createDevToDraft skips the network call and does not throw when DEVTO_API_KEY is unset", async () => {
   const previous = Deno.env.get("DEVTO_API_KEY");
   Deno.env.delete("DEVTO_API_KEY");
