@@ -420,7 +420,7 @@ export default define.page(function BlogArticle(ctx) {
                   href="/catalog"
                   class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded-lg shadow transition-colors"
                 >
-                  View project catalog
+                  View services
                 </a>
               </div>
             </div>

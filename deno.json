@@ -2,7 +2,7 @@
   "nodeModulesDir": "manual",
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check && deno task test",
-    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net --allow-run=deno",
+    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno",
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",

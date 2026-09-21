@@ -8,7 +8,7 @@ specific to this repository.
 
 ```
 ├── assets/         # Global CSS
-├── components/     # Preact components (Layout, CTASection, Icons)
+├── components/     # Preact components (Layout, SEOHead, Icons)
 ├── content/        # Blog posts (Markdown)
 ├── docs/           # Dev, deploy, infra docs
 ├── islands/        # Interactive client components
@@ -66,6 +66,23 @@ Nothing is written back to a tracked file, so a deploy leaves `git status` clean
 Double quotes, no semicolons, 2-space indent, 100 columns — this is what
 `deno fmt` enforces, so run it instead of hand-formatting.
 
+## Catalog and prices
+
+`lib/catalog.ts` is the only place a catalog title or price is written. The home
+page, `/catalog`, `/catalog/[slug]`, the sitemap, both llms files, the guide
+page and the `Offer` JSON-LD read from it. `lib/catalog.test.ts` pins the four
+prices and the six redirects; `test/structure.test.ts` fails when a dollar
+amount that is not in the catalog shows up on a page listed in its `PRICE_PAGES`
+or in an llms file — add a page to that list when it starts showing a price.
+Retired slugs live in `catalogRedirects` there and answer 301 — never link to
+one. The same price list is used on Upwork and neatsoft.dev, so a price change
+is followed by a manual edit in both places.
+
+The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
+Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
+item. The five promises on `/how-i-work` are the only promises on the site; the
+free written audit carries no deadline.
+
 ## Content rule
 
 No client name, number, prize, testimonial or guarantee goes on the site unless
@@ -95,17 +112,19 @@ and nothing catches a regression in them unless a test fetches a built page and
 looks. `test/harness.ts` and `test/rendered.test.ts` (issue #135) do that.
 
 **How it works.** `test/harness.ts` exports `startSite()`, which boots the
-production server (`deno serve -A _fresh/server.js`) on a free port
+production server (`deno serve -A --port <n> _fresh/server.js`) on a free port
 (`getAvailablePort()` from `jsr:@std/net`, the same pattern its own docs show
 for passing a port to a spawned subprocess) and waits until it answers. It
 returns a `Site` with `get(path)` (fetches with `redirect: "manual"`, so a 301
-is visible as one), `html(path)` (fetches, asserts 200, returns text), and
-`stop()` (kills the server; safe to call twice). `test/html.ts` has three small,
-dependency-free helpers for asserting on the HTML that comes back:
-`visibleText()` (strips `<script>`/`<style>`/tags, decodes entities, collapses
-whitespace), `jsonLd()` (parses every `<script
-type="application/ld+json">`
-block), and `count()` (counts regex matches).
+is visible as one), `html(path)` (fetches, throws unless the status is 200,
+returns text), and `stop()` (kills the server; safe to call twice).
+`test/html.ts` has three small, dependency-free helpers for asserting on the
+HTML that comes back: `visibleText()` (strips `<script>`/`<style>`/tags, decodes
+entities, collapses whitespace), `jsonLd()` (parses every JSON-LD script block),
+and `count()` (counts regex matches). `test/html.test.ts` tests the helpers
+themselves, because a `visibleText()` that keeps script bodies makes the FAQ
+guard pass against a broken page. `test/structure.test.ts` guards the site
+structure: catalog items, navigation, redirects, prices, home sections, labels.
 
 **Design choice — A, build before test, not build-on-demand in the harness.**
 `deno task test` is now `deno task build && deno test ...`, so the site is built
@@ -120,11 +139,11 @@ which is the one hard requirement. `.woodpecker.yml` needed no change: it
 already runs `deno task check`, which now builds as a side effect of
 `deno task test`.
 
-**Permissions.** `deno task test` carries `--allow-net` (the harness's own
-readiness check binds `0.0.0.0:0` to find a free port, then fetches `127.0.0.1`)
-and `--allow-run=deno` (to spawn the server as a child process). Both are new;
-the existing `--allow-env --allow-read --allow-write` were already there for
-other tests.
+**Permissions.** `deno task test` carries `--allow-net=127.0.0.1,0.0.0.0` (the
+free-port probe binds `0.0.0.0:0`, the harness then fetches `127.0.0.1`) and
+`--allow-run=deno` (to spawn the server as a child process). The flags apply to
+every test file, not only the harness, so no test can make a live outbound call;
+the tests that look network-shaped replace `globalThis.fetch` themselves.
 
 **How to add a guard.** Call `startSite()`, fetch a page with `site.html()` or
 `site.get()`, assert on structure or a short phrase with `count()` /

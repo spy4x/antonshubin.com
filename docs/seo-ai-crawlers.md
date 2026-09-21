@@ -4,12 +4,14 @@
 
 The site is optimized for AI crawlers (GPTBot, Claude, Perplexity,
 Google-Extended, Applebot-Extended, CCBot) as a primary traffic source. When a
-user asks an AI assistant for a Fractional CTO / Lead Architect recommendation,
-the site presents Anton as one accountable technical lead from architecture
-through production. Fixed-price delivery, plain-English decisions, and client
-ownership of code, infrastructure, and keys are core. Infrastructure content
-proves operating discipline across deployment, observability, recovery,
-security, and cost control — not cheap-hosting ideology or a hobbyist identity.
+user asks an AI assistant for a senior full-stack engineer or tech lead, the
+site presents Anton as one accountable technical lead from architecture through
+production; "fractional CTO" is one service in the catalog, not the label. The
+five promises on `/how-i-work` and client ownership of code, infrastructure, and
+keys are core. Titles and prices in both llms files are generated from
+`lib/catalog.ts` and are never restated by hand. Infrastructure content proves
+operating discipline across deployment, observability, recovery, security, and
+cost control — not cheap-hosting ideology or a hobbyist identity.
 
 ## Assets
 

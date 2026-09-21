@@ -8,7 +8,7 @@ import CopyButton from "../islands/CopyButton.tsx";
 export default define.page(function Pay() {
   head.value = {
     ...head.value,
-    title: "Payment — Anton Shubin | Fractional CTO",
+    title: "Payment — Anton Shubin",
     description: "Accepted payment methods: Stripe, SWIFT, BTC, ETH, Solana.",
     canonical: "https://antonshubin.com/pay",
     ogType: "website",

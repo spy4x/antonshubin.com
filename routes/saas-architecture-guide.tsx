@@ -5,6 +5,10 @@ import { getBreadcrumb, head } from "../lib/head.ts";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { blogArticles, projects } from "../lib/data.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
+import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
+
+const audit = catalogItem("codebase-health-audit");
+const build = catalogItem("zero-to-production-saas-mvp");
 
 export default define.page(function SaasArchGuide() {
   head.value = {
@@ -75,14 +79,12 @@ export default define.page(function SaasArchGuide() {
             </li>
             <li>
               <a
-                href="/catalog/technical-discovery-sprint"
+                href={catalogPath(audit.slug)}
                 class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → Technical Discovery Sprint (catalog)
+                → {audit.title} ({priceLabel(audit)})
               </a>
-              <p class="text-gray-500 text-sm mt-0.5">
-                Get a complete architecture blueprint and phased build roadmap.
-              </p>
+              <p class="text-gray-500 text-sm mt-0.5">{audit.summary}</p>
             </li>
           </ul>
         </section>
@@ -109,14 +111,12 @@ export default define.page(function SaasArchGuide() {
             ))}
             <li>
               <a
-                href="/catalog/zero-to-production-saas-mvp"
+                href={catalogPath(build.slug)}
                 class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → Zero-to-Production SaaS MVP (catalog)
+                → {build.title} ({priceLabel(build)})
               </a>
-              <p class="text-gray-500 text-sm mt-0.5">
-                Full SaaS MVP from idea to live deployment in 21 days.
-              </p>
+              <p class="text-gray-500 text-sm mt-0.5">{build.summary}</p>
             </li>
           </ul>
         </section>
@@ -223,25 +223,15 @@ export default define.page(function SaasArchGuide() {
             </li>
             <li>
               <a
-                href="/catalog/surgical-ai-integration"
+                href={catalogPath(build.slug)}
                 class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
               >
-                → Surgical AI Integration &amp; LLM Pipelines (catalog)
+                → AI integration and MCP servers, built under {build.shortTitle}
+                {" "}
+                ({priceLabel(build)})
               </a>
               <p class="text-gray-500 text-sm mt-0.5">
-                Production-grade LLM pipelines, RAG systems, and autonomous
-                subagents.
-              </p>
-            </li>
-            <li>
-              <a
-                href="/catalog/mcp-server-development"
-                class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
-              >
-                → Custom MCP Server Development (catalog)
-              </a>
-              <p class="text-gray-500 text-sm mt-0.5">
-                Connect your AI to your CRM, database, email, and internal APIs.
+                {build.alsoCovers?.find((c) => c.title === "MCP servers")?.desc}
               </p>
             </li>
           </ul>

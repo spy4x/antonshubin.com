@@ -1,4 +1,3 @@
-import type { ComponentChildren } from "preact";
 import { define } from "../lib/utils.ts";
 import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
@@ -6,14 +5,53 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
+import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 
-function FaqItem(
-  { q, children }: { q: string; children: ComponentChildren },
-) {
+interface Faq {
+  q: string;
+  /** Plain text: the same string is shown on the page and sent as FAQ JSON-LD. */
+  a: string;
+  link?: { href: string; label: string };
+}
+
+const ongoing = catalogItem("cto-advisory-retainer");
+
+/** At most five. The FAQPage JSON-LD below is generated from this array. */
+const faqs: Faq[] = [
+  {
+    q: "What if we start working together and it is not a good fit?",
+    a: "That is exactly why I offer a five-day refund. If in the first five days you feel this is not working, tell me and I refund what you paid. We also start with a small first milestone — one or two weeks of work — so if either of us wants to stop at the end of it, we stop, and you keep everything built so far.",
+  },
+  {
+    q: "Do you work fixed price or hourly, and what happens when the scope changes?",
+    a: "Both. I work fixed price when the scope is fixed, and hourly for staff augmentation, code reviews, or when the work is open-ended. If the scope changes once we have started, you get a quote for the change before I start on it — no surprise costs.",
+  },
+  {
+    q: "Do you work with clients who already have a development team?",
+    a: "Yes, that is one of the most common scenarios. Founders come to me when their existing team is moving too slow, building the wrong thing, or the technical debt is piling up. I step in as a tech lead to set direction, review code, and get things back on track — without replacing your entire team.",
+  },
+  {
+    q: "What if I don't have a clear idea yet?",
+    a: "Book the free 30-minute intro call, or send me a paragraph about your idea or problem through the form on the home page and I will write back with 3 concrete recommendations. No cost, no pitch.",
+    link: { href: "/#audit-form", label: "Send me your idea" },
+  },
+  {
+    q: "What if my project needs more work after launch?",
+    a: `Bugs in what I delivered are fixed free for 30 days. For ongoing needs after that there is the Ongoing item in my catalog (${
+      priceLabel(ongoing)
+    }), which covers post-launch support. You can also fund a new milestone at any time; if the scope changes, I quote it before I start.`,
+    link: { href: catalogPath(ongoing.slug), label: ongoing.title },
+  },
+];
+
+function FaqItem({ faq }: { faq: Faq }) {
   return (
-    <details class="bg-gray-800 rounded-xl border border-gray-700 p-4 group open:border-orange-500 transition-colors">
+    <details
+      data-faq
+      class="bg-gray-800 rounded-xl border border-gray-700 p-4 group open:border-orange-500 transition-colors"
+    >
       <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
-        <span>{q}</span>
+        <span>{faq.q}</span>
         <svg
           class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
           xmlns="http://www.w3.org/2000/svg"
@@ -29,9 +67,16 @@ function FaqItem(
           />
         </svg>
       </summary>
-      <p class="text-gray-400 text-sm mt-3 leading-relaxed">
-        {children}
-      </p>
+      <p class="text-gray-400 text-sm mt-3 leading-relaxed">{faq.a}</p>
+      {faq.link && (
+        <a
+          href={faq.link.href}
+          class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 underline text-sm mt-2"
+        >
+          {faq.link.label}
+          <ArrowRightIcon class="w-4 h-4" />
+        </a>
+      )}
     </details>
   );
 }
@@ -107,13 +152,10 @@ export default define.page(function HowIWork() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": policies.map((p) => ({
+            "mainEntity": faqs.map((f) => ({
               "@type": "Question",
-              "name": p.title,
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": p.desc + " " + p.why,
-              },
+              "name": f.q,
+              "acceptedAnswer": { "@type": "Answer", "text": f.a },
             })),
           }),
         }}
@@ -264,104 +306,7 @@ export default define.page(function HowIWork() {
             Honest answers to the questions I get most often.
           </p>
           <div class="space-y-4 max-w-3xl mx-auto">
-            <FaqItem q="What if we start working together and it is not a good fit?">
-              That is exactly why I offer a five-day refund. If in the first
-              five days you feel this is not working, tell me and I refund what
-              you paid. We also start with a small first milestone — one or two
-              weeks of work — so if either of us wants to stop at the end of it,
-              we stop, and you keep everything built so far.
-            </FaqItem>
-
-            <FaqItem q="How do you handle scope changes mid-project?">
-              I work fixed price when the scope is fixed, and hourly when the
-              work is open-ended. If the scope changes once we have started, you
-              get a quote for the change before I start on it — no surprise
-              costs.
-            </FaqItem>
-
-            <FaqItem q="Do you work with clients who already have a development team?">
-              Yes, that is one of the most common scenarios. Founders come to me
-              when their existing team is moving too slow, building the wrong
-              thing, or the technical debt is piling up. I step in as a Tech
-              Lead or Architect to set direction, review code, and get things
-              back on track — without replacing your entire team.
-            </FaqItem>
-
-            <FaqItem q="What if the scope is not clear yet?">
-              We start with a fixed-price Technical Discovery Sprint or scoped
-              architecture advisory. You receive defined decisions, risks, and a
-              phased plan before funding implementation. Ongoing technical
-              leadership uses a CTO advisory retainer with explicit outcomes —
-              not embedded labor or screen-tracked hours.
-            </FaqItem>
-
-            <FaqItem q="Do you accept hourly engagements?">
-              Yes. I work fixed price when the scope is fixed, and hourly for
-              staff augmentation, code reviews, or when the work is open-ended.
-              The first conversation is about which fits your situation.
-            </FaqItem>
-
-            <FaqItem q="How do you communicate during a project?">
-              You see working software every week, with a short written update.
-              I schedule calls when they help move things forward, not on a
-              fixed cadence for its own sake.
-            </FaqItem>
-
-            <FaqItem q="How long does a typical project take?">
-              It depends on the scope. A Codebase Health Audit takes 3 days. A
-              Backend API takes around 14 days. A full SaaS MVP is typically 21
-              days. The Technical Discovery Sprint (3 days) helps us define the
-              exact timeline before committing to a larger milestone. Every
-              project ships in weeks, not months.
-            </FaqItem>
-
-            <FaqItem q="What technologies do you use?">
-              My core stack is Deno/Node.js, TypeScript, Preact/React,
-              PostgreSQL, Valkey/Redis, Docker/Podman, and Traefik. For AI work,
-              I integrate providers such as OpenAI, Claude, and DeepSeek behind
-              explicit application boundaries. Core architecture favors proven,
-              portable tools; provider dependencies and exit costs are
-              documented rather than hidden.
-            </FaqItem>
-
-            <FaqItem q="Can you work with my existing codebase?">
-              Yes, I regularly take over existing projects that need
-              architecture improvements, performance fixes, or new features. The
-              Codebase Health Audit is specifically designed for this — I review
-              your code and deliver a prioritized roadmap of what to fix, what
-              to keep, and what to rewrite.
-            </FaqItem>
-
-            <FaqItem q="What if I don't have a clear idea yet?">
-              That is what the Free Architecture Audit is for. Send me a
-              paragraph about your idea or problem, and I will send back 3
-              concrete recommendations within 48 hours. No cost, no pitch. From
-              there, we can decide if a consultation or discovery sprint makes
-              sense.
-            </FaqItem>
-
-            <FaqItem q="What if my project needs more work after launch?">
-              Bugs in what I delivered are fixed free for 30 days. For ongoing
-              needs after that, I offer a{" "}
-              <a
-                href="/catalog/post-launch-support-maintenance"
-                class="text-orange-400 hover:text-orange-300 underline"
-              >
-                Post-Launch Support & Maintenance
-              </a>{" "}
-              package — see what it covers and its price on that page. You can
-              also fund a new milestone at any time; if the scope changes, I
-              quote it before I start.
-            </FaqItem>
-
-            <FaqItem q="How do I know you are the right person for my project?">
-              Start with a free architecture audit — send me your tech stack or
-              idea, and I will send back 3 concrete improvements within 48
-              hours. No cost, no pitch. If you like the quality of the feedback,
-              we can schedule a consultation. If not, you have lost nothing
-              except an email. I have done this for 80+ projects across 15
-              years, and I am confident I can help you too.
-            </FaqItem>
+            {faqs.map((f) => <FaqItem key={f.q} faq={f} />)}
           </div>
         </section>
       </div>

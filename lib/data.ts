@@ -553,6 +553,20 @@ export const projects = {
   ] as Project[],
 };
 
+/**
+ * The six client case studies shown first on /projects, strongest first. Every
+ * other client project, and my archived ones, go into the one-line list of
+ * older work.
+ */
+export const featuredClientSlugs: string[] = [
+  "smartlite",
+  "foodrazor",
+  "corecircle",
+  "truth-or-dare",
+  "sogroya",
+  "gopingu",
+];
+
 export const blogArticles: BlogArticle[] = [
   {
     index: 0,

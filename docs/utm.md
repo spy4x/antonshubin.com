@@ -88,7 +88,7 @@ https://antonshubin.com/blog/mig-tiny-self-hosted-scheduler?utm_source=devto&utm
 **9. Email signature / cold outreach**
 
 ```
-https://antonshubin.com/catalog/free-architecture-audit?utm_source=email&utm_medium=profile&utm_campaign=audit-q3
+https://antonshubin.com/?utm_source=email&utm_medium=profile&utm_campaign=audit-q3#audit-form
 ```
 
 ## Build the link first, paste it second

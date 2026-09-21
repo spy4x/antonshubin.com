@@ -1,6 +1,6 @@
 # antonshubin.com
 
-Website for Anton Shubin — Fractional CTO and Lead Architect helping
+Website for Anton Shubin — senior full-stack engineer and tech lead helping
 non-technical founders take SaaS products from idea through production
 operations.
 
