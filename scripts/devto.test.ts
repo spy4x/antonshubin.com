@@ -235,18 +235,16 @@ Deno.test("absolutizeImageUrls never rewrites an image written in the opening fe
   assertEquals(absolutizeImageUrls(body), body);
 });
 
-Deno.test("absolutizeImageUrls leaves the closing fence line itself untouched", () => {
-  const body = [
-    "```",
-    "![alt](/img/blog/x.png)",
-    "``` ",
-  ].join("\n");
-  assertEquals(absolutizeImageUrls(body), body);
-});
-
 Deno.test("absolutizeImageUrls leaves an image alone when its alt text has an unmatched opening bracket", () => {
   const body = "![a [b](/img/x.png)";
   assertEquals(absolutizeImageUrls(body), body);
+});
+
+Deno.test("absolutizeImageUrls skips only the malformed image and still rewrites a later well-formed one on the same line", () => {
+  const body = "![a [b](/img/x.png) and ![c](/img/y.png)";
+  const expected =
+    "![a [b](/img/x.png) and ![c](https://antonshubin.com/img/y.png)";
+  assertEquals(absolutizeImageUrls(body), expected);
 });
 
 Deno.test("createDevToDraft skips the network call and does not throw when DEVTO_API_KEY is unset", async () => {

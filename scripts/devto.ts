@@ -98,9 +98,11 @@ function findMatchingBracketEnd(
  *
  * An alt text with an unmatched opening bracket, e.g. `![a [b](/img/x.png)`,
  * is left alone: `findMatchingBracketEnd` never finds a closing `]` for it,
- * so no rewrite is attempted anywhere in the line. This matches CommonMark,
- * which reads that text as a plain link, not an image — do not "fix" this
- * to rewrite it.
+ * so that one `![` is skipped without being rewritten. This matches
+ * CommonMark, which reads that text as a plain link, not an image — do not
+ * "fix" this to rewrite it. The skip is local to that `![` — a later,
+ * well-formed image on the same line (`![a [b](/img/x.png) and
+ * ![c](/img/y.png)`) is still rewritten normally.
  */
 function rewriteImagesInLine(line: string): string {
   let result = "";
@@ -136,6 +138,13 @@ function rewriteImagesInLine(line: string): string {
  * so a post that documents markdown image syntax in a code sample doesn't
  * have that sample silently edited. Inline (single-backtick) code spans are
  * not protected — an image path written inside one would still be rewritten.
+ *
+ * The opening and closing fence lines themselves are never passed through
+ * the rewriter either. For the closing line this rule has no observable
+ * effect and so needs, and can have, no test: to close a fence a line's
+ * `rest` (whatever follows the fence run) must trim to the empty string, so
+ * a closing line can only ever consist of indentation and fence characters
+ * — it can never contain an image, so rewriting it is always a no-op.
  */
 export function absolutizeImageUrls(markdown: string): string {
   const lines = markdown.split("\n");
