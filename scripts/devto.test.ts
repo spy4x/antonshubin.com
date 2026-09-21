@@ -1,5 +1,9 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
-import { buildDevToPayload, createDevToDraft } from "./devto.ts";
+import {
+  absolutizeImageUrls,
+  buildDevToPayload,
+  createDevToDraft,
+} from "./devto.ts";
 
 Deno.test("buildDevToPayload creates a draft with a clean, untagged canonical url", () => {
   const payload = buildDevToPayload(
@@ -15,6 +19,60 @@ Deno.test("buildDevToPayload creates a draft with a clean, untagged canonical ur
     "https://antonshubin.com/blog/rostok-self-hosted-scaffolder",
   );
   assertEquals(payload.article.canonical_url.includes("utm_"), false);
+});
+
+Deno.test("buildDevToPayload rewrites a site-relative image path to an absolute url", () => {
+  const payload = buildDevToPayload(
+    "post title",
+    "post-slug",
+    "before ![alt text](/img/blog/x.png) after",
+  );
+  assertEquals(
+    payload.article.body_markdown,
+    "before ![alt text](https://antonshubin.com/img/blog/x.png) after",
+  );
+});
+
+Deno.test("buildDevToPayload leaves a body with no images unchanged", () => {
+  const body = "just text, and a [link](/blog/other-post) with no image";
+  const payload = buildDevToPayload("post title", "post-slug", body);
+  assertEquals(payload.article.body_markdown, body);
+});
+
+Deno.test("buildDevToPayload leaves an already-absolute image url alone", () => {
+  const body = "![alt](https://cdn.example.com/img/x.png)";
+  const payload = buildDevToPayload("post title", "post-slug", body);
+  assertEquals(payload.article.body_markdown, body);
+});
+
+Deno.test("buildDevToPayload rewrites images to the same origin as canonical_url", () => {
+  const payload = buildDevToPayload(
+    "post title",
+    "post-slug",
+    "![alt](/img/blog/x.png)",
+  );
+  const canonicalOrigin = new URL(payload.article.canonical_url).origin;
+  const imageUrlMatch = payload.article.body_markdown.match(
+    /\((https?:\/\/[^)]+)\)/,
+  );
+  assertEquals(imageUrlMatch !== null, true);
+  const imageOrigin = new URL(imageUrlMatch![1]).origin;
+  assertEquals(imageOrigin, canonicalOrigin);
+});
+
+Deno.test("absolutizeImageUrls leaves a protocol-relative image url alone", () => {
+  const body = "![alt](//cdn.example.com/img/x.png)";
+  assertEquals(absolutizeImageUrls(body), body);
+});
+
+Deno.test("absolutizeImageUrls leaves a data uri image alone", () => {
+  const body = "![alt](data:image/png;base64,AAAA)";
+  assertEquals(absolutizeImageUrls(body), body);
+});
+
+Deno.test("absolutizeImageUrls leaves a relative, non-rooted image path alone", () => {
+  const body = "![alt](img/x.png)";
+  assertEquals(absolutizeImageUrls(body), body);
 });
 
 Deno.test("createDevToDraft skips the network call and does not throw when DEVTO_API_KEY is unset", async () => {

@@ -22,6 +22,21 @@ export interface DevToArticlePayload {
 }
 
 /**
+ * Rewrites site-relative markdown image paths to absolute production URLs.
+ * Dev.to resolves a relative path against dev.to, not antonshubin.com, so a
+ * post image written as `![alt](/img/blog/x.png)` renders broken on the
+ * draft. Only markdown image syntax with a path starting in a single `/` is
+ * touched — an already-absolute URL, a protocol-relative URL, a data URI or
+ * an ordinary (non-image) link is left exactly as written.
+ */
+export function absolutizeImageUrls(markdown: string): string {
+  return markdown.replace(
+    /!\[([^\]]*)\]\(\/([^/)][^)]*)\)/g,
+    (_match, alt, path) => `![${alt}](${DEVTO_BASE_URL}/${path})`,
+  );
+}
+
+/**
  * Builds the Dev.to API payload for a draft cross-post. `canonical_url` is
  * the clean blog URL, with no UTM params — it is Dev.to's canonicalization
  * field, not a tracked link, so tagging it would point the canonical at a
@@ -35,7 +50,7 @@ export function buildDevToPayload(
   return {
     article: {
       title,
-      body_markdown: bodyMarkdown,
+      body_markdown: absolutizeImageUrls(bodyMarkdown),
       published: false,
       canonical_url: `${DEVTO_BASE_URL}/blog/${slug}`,
     },
