@@ -139,7 +139,7 @@ export const projects = {
         "mobile-dashboard.png",
       ],
       description:
-        "My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface that speaks both Radicale and Stalwart), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos. Result: 5 calendars and 140+ todos on a single Hetzner box, deployed since June 2026, including a Radicale-to-Stalwart migration that moved zero VTODO data.",
+        "My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface that speaks both Radicale and Stalwart), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos. Result: it ran 5 calendars and 140+ todos on a single Hetzner box, deployed in June 2026, including a Radicale-to-Stalwart migration that moved zero VTODO data.",
       tags: [
         "Vite",
         "Preact",
@@ -152,7 +152,7 @@ export const projects = {
         "CQRS",
       ],
       outcome:
-        "5 calendars, 140+ todos, deployed since June 2026. Radicale to Stalwart migration moved zero VTODO data.",
+        "5 calendars, 140+ todos, deployed in June 2026. Radicale to Stalwart migration moved zero VTODO data.",
     },
     {
       title: "caldav-mcp",
