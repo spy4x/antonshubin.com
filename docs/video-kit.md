@@ -10,15 +10,19 @@ fully testable without a network connection.
 (`content/blog/<slug>.md`) and also names the output directory. Drafts land in
 `videos/<slug>/`:
 
-- `titles.md` — several candidate titles, numbered, for a human to pick from
-- `description.md` — the YouTube description, ending in the UTM-tagged link back
-  to the companion blog post
+- `titles.md` — the transcript's first five sentences of between 15 and 90
+  characters, numbered, in the order they occur — candidate titles, not finished
+  ones, for a human to pick from and clean up
+- `description.md` — those same first sentences (up to three) as a summary
+  paragraph, followed by the UTM-tagged link to the companion blog post
 - `chapters.md` — timestamped chapter lines in YouTube's format (`0:00 Intro`)
 - `blog-draft.md` — a draft for `content/blog/`, with YAML front matter carrying
-  a `title` and a `description`
+  a `title` and a `description`. It is not ready for `deno task publish:blog` as
+  written — see below.
 
-`videos/` is excluded from `deno fmt`/`deno lint` in `deno.json`, the same way
-`launches/` is for `launch-kit.ts` — generated drafts aren't source.
+`videos/` is gitignored and excluded from `deno fmt`/`deno lint` in `deno.json`,
+the same way `launches/` is for `launch-kit.ts` — generated drafts aren't source
+and shouldn't reach the public history.
 
 ## Where the transcript comes from
 
@@ -49,3 +53,13 @@ Every link the script writes back to antonshubin.com is built with
 `buildTaggedUrl` from `scripts/utm.ts`, carrying exactly the three parameters
 `docs/utm.md` requires (`utm_source=youtube`, `utm_medium=blog`,
 `utm_campaign=<slug>-yt` or the override), with no trailing slash on the path.
+
+## The blog draft is not publishable as-is
+
+`blog-draft.md` only carries `title` and `description` in its front matter.
+`deno task publish:blog` also requires `category` and `publishedAt`, and exits 1
+with "Missing required front matter" without them. This is deliberate:
+`category` (`dev-tips` | `startups` | `personal`) and `publishedAt` are
+editorial decisions this script has no way to make, and a guessed placeholder
+risks being copy-pasted straight through `publish:blog` unnoticed. Fill in both
+by hand before publishing.

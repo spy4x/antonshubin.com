@@ -24,10 +24,14 @@ Welcome back to the channel, today we are shipping something new.
 This video walks through the whole packaging pipeline end to end.
 
 3
+00:00:40,000 --> 00:00:45,000
+Around the halfway mark we cover the trickiest part of the setup.
+
+4
 00:01:10,000 --> 00:01:15,000
 Here is the second chapter, where we get into the real build.
 
-4
+5
 00:02:20,000 --> 00:02:25,000
 And now a third chapter, wrapping up with a short recap.
 `;
@@ -52,11 +56,12 @@ Deno.test("detectTranscriptFormat fails loudly on an unsupported extension, nami
 
 Deno.test("parseSrt turns cues into timestamped segments", () => {
   const segments = parseSrt(SRT_SAMPLE);
-  assertEquals(segments.length, 4);
+  assertEquals(segments.length, 5);
   assertEquals(segments[0].startSeconds, 0);
-  assertEquals(segments[2].startSeconds, 70);
+  assertEquals(segments[2].startSeconds, 40);
+  assertEquals(segments[3].startSeconds, 70);
   assertEquals(
-    segments[2].text,
+    segments[3].text,
     "Here is the second chapter, where we get into the real build.",
   );
 });
@@ -202,14 +207,33 @@ Deno.test("runVideoKit writes titles, description, chapters and a blog draft fro
     assertEquals(result.files.length, 4);
 
     const titles = await Deno.readTextFile(`${outDir}/titles.md`);
-    assertEquals(titles.includes("1. "), true);
+    const numberedOptions = titles.match(/^\d+\.\s/gm) ?? [];
+    assertEquals(
+      numberedOptions.length > 1,
+      true,
+      "titles.md must list more than one numbered option",
+    );
 
     const description = await Deno.readTextFile(`${outDir}/description.md`);
+    const linkUrl =
+      "https://antonshubin.com/blog/some-post?utm_source=youtube&utm_medium=blog&utm_campaign=some-post-yt";
+    const summaryFirstWords = "Welcome back to the channel";
+    const summaryIndex = description.indexOf(summaryFirstWords);
+    const linkIndex = description.indexOf(linkUrl);
     assertEquals(
-      description.includes(
-        "https://antonshubin.com/blog/some-post?utm_source=youtube&utm_medium=blog&utm_campaign=some-post-yt",
-      ),
+      summaryIndex !== -1,
       true,
+      "description.md must carry the summary text",
+    );
+    assertEquals(
+      linkIndex !== -1,
+      true,
+      "description.md must carry the tagged link",
+    );
+    assertEquals(
+      summaryIndex < linkIndex,
+      true,
+      "description.md must show the summary above the link",
     );
 
     const chapters = await Deno.readTextFile(`${outDir}/chapters.md`);
