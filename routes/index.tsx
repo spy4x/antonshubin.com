@@ -8,7 +8,6 @@ import LeadForm from "../islands/LeadForm.tsx";
 import {
   ArrowRightIcon,
   BullseyeIcon,
-  ChatBubbleIcon,
   ClockIcon,
   DollarIcon,
   FireIcon,
@@ -48,7 +47,10 @@ export default define.page(function Home(ctx) {
                 <ul class="space-y-1 text-gray-300">
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
-                    <span>Fixed-price milestones with clear scope</span>
+                    <span>
+                      Fixed price when the scope is fixed, hourly when it's
+                      open-ended
+                    </span>
                   </li>
                   <li class="flex items-baseline gap-2">
                     <span class="text-orange-500 shrink-0">—</span>
@@ -267,9 +269,9 @@ export default define.page(function Home(ctx) {
 
         {/* B3: Engagement Terms Section */}
         <section class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">How I Deliver — The Terms of Engagement</h2>
+          <h2 class="h1 mb-8">How I Deliver</h2>
           <p class="text-gray-400 mb-8 text-base sm:text-lg">
-            Zero micromanagement. Complete transparency.
+            Five promises, no fine print.
           </p>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <a
@@ -280,41 +282,11 @@ export default define.page(function Home(ctx) {
                 <ShieldCheckIcon class="w-5 h-5" />
               </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                14-Day Mutual Alignment Guarantee
+                Five-Day Refund
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                If we're not a perfect fit within 2 weeks, I issue a 100% refund
-                — no questions asked.
-              </p>
-            </a>
-            <a
-              href="/how-i-work"
-              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
-            >
-              <div class="p-2 bg-blue-500/15 rounded-lg inline-block mb-2 text-blue-400">
-                <ClockIcon class="w-5 h-5" />
-              </div>
-              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                Async-First Execution
-              </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                One weekly alignment call. All daily updates async via text or
-                Loom. You pay for engineering throughput, not meeting bloat.
-              </p>
-            </a>
-            <a
-              href="/how-i-work"
-              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
-            >
-              <div class="p-2 bg-amber-500/15 rounded-lg inline-block mb-2 text-amber-400">
-                <KeyIcon class="w-5 h-5" />
-              </div>
-              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                Clean Handoff & IP Sovereignty
-              </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                You hold the root keys and own 100% of source code from Day 1.
-                No proprietary lock-in, no vendor hostage.
+                If in the first five days you feel this is not working, tell me
+                and I refund what you paid.
               </p>
             </a>
             <a
@@ -325,11 +297,42 @@ export default define.page(function Home(ctx) {
                 <BullseyeIcon class="w-5 h-5" />
               </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                Fixed-Price Milestones
+                A Small First Milestone
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                Once a milestone is funded, scope is locked. New ideas go into a
-                V2 Backlog — quoted after launch.
+                We start with one or two weeks of work. If either of us wants to
+                stop at the end of it, we stop — you keep everything built so
+                far.
+              </p>
+            </a>
+            <a
+              href="/how-i-work"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
+              <div class="p-2 bg-amber-500/15 rounded-lg inline-block mb-2 text-amber-400">
+                <KeyIcon class="w-5 h-5" />
+              </div>
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
+                You Own Everything From Day One
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                Code, accounts, servers and keys are in your name.
+              </p>
+            </a>
+            <a
+              href="/how-i-work"
+              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+            >
+              <div class="p-2 bg-blue-500/15 rounded-lg inline-block mb-2 text-blue-400">
+                <ClockIcon class="w-5 h-5" />
+              </div>
+              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
+                Weekly Working Software
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed">
+                You see working software every week, with a short written
+                update. Calls when they help, not on a schedule for its own
+                sake.
               </p>
             </a>
             <a
@@ -340,33 +343,18 @@ export default define.page(function Home(ctx) {
                 <WrenchIcon class="w-5 h-5" />
               </div>
               <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                30-Day Code Warranty
+                Free Bug Fixes for 30 Days
               </h3>
               <p class="text-gray-400 text-sm leading-relaxed">
-                I patch any bugs within the delivered scope for free for 30 days
-                post-launch.
-              </p>
-            </a>
-
-            {/* Policy 6: No Jargon Guarantee */}
-            <a
-              href="/how-i-work"
-              class="p-4 block bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
-            >
-              <div class="p-2 bg-cyan-500/15 rounded-lg inline-block mb-2 text-cyan-400">
-                <ChatBubbleIcon class="w-5 h-5" />
-              </div>
-              <h3 class="text-base font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
-                No Jargon Guarantee
-              </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Every technical decision gets a plain-English explanation.
-                You'll never hear "we need to refactor the microservices layer"
-                without a clear translation of what it means for your product,
-                timeline, and budget.
+                Bugs in what I delivered are fixed free for 30 days.
               </p>
             </a>
           </div>
+
+          <p class="text-gray-400 text-sm mt-6 max-w-2xl">
+            Pricing: fixed price when the scope is fixed, hourly when the work
+            is open-ended. A change to scope gets a quote before I start on it.
+          </p>
 
           <div class="mt-6 text-right">
             <a
@@ -508,7 +496,7 @@ export default define.page(function Home(ctx) {
               </h3>
               <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
                 Ongoing fractional CTO partnership — strategy, architecture,
-                team leadership. Weekly calls, async execution.
+                team leadership. Weekly alignment, async execution.
               </p>
               <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
                 $3K–$5K/mo — Monthly
