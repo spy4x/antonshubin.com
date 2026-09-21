@@ -44,6 +44,14 @@ export default define.page(function App({ Component }) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
 
+        {/* RSS feed discovery */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Anton Shubin — Blog"
+          href="https://antonshubin.com/rss.xml"
+        />
+
         {/* Analytics */}
         {UMAMI_URL && UMAMI_ID && (
           <>
