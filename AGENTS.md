@@ -227,7 +227,7 @@ as the panel expands); and that the form and success panels swap their `inert`
 state.
 
 `test/a11y.browser.test.ts` (issue #165) is the other file in this task. It
-covers three things the server-rendered HTML in `test/a11y.test.ts` cannot see,
+covers four things the server-rendered HTML in `test/a11y.test.ts` cannot see,
 because each only exists after client JS runs. First, the project-page lightbox
 (`islands/ImageGallery.tsx`, checked on `/projects/calltrack`, which has seven
 screenshots): opening it names the dialog after the current image
@@ -244,17 +244,27 @@ one image that was clicked. Third, that Escape closes the mobile menu
 (`islands/Menu.tsx`) at a 390×844 viewport and returns focus to the toggle
 button — checked by first moving focus onto a menu link, so the assertion proves
 Escape moves focus back rather than merely observing focus that a native click
-handler already left in place. That last distinction matters for the other two:
-`<dialog>` elements restore focus to whatever was focused before `showModal()`
-on `close()`, in every browser, on their own, so removing the explicit
-`triggerRef.current?.focus()` call in `islands/ImageGallery.tsx` or
-`islands/BlogImageEnhancer.tsx` does not turn this test red — confirmed by
-removing each and re-running. The explicit calls stay anyway, as a
-self-contained guarantee that does not depend on every future browser keeping
-that native behaviour, but the test's real, provable coverage there is the
-dialog and button names, not that specific line. Removing the mobile menu's
-Escape handler, or any one of the dialog or button `aria-label`s, does turn the
-test red — confirmed the same way, by removing each and re-running.
+handler already left in place. Fourth, that Escape does nothing when the menu is
+already closed: with focus on a link inside `<main>`, Escape must leave it there
+— a handler that closes (and refocuses the toggle) on every Escape, not only
+while the menu is open, would steal focus from whatever the visitor was doing on
+the rest of the page, and the third check alone can't catch that, since it never
+presses Escape from a closed state.
+
+For the two lightboxes, the focus-return assertions guard the real behaviour:
+moving focus anywhere other than the button or image that opened the lightbox
+when it closes turns the test red, the same way it would for a regression in
+either island's own close-handling. What the test cannot prove is that the
+explicit `triggerRef.current?.focus()` call in `islands/ImageGallery.tsx` and
+`islands/BlogImageEnhancer.tsx` is itself doing the work — removing just that
+line, in isolation, leaves the test green, confirmed in both Chromium and
+Firefox: the native `<dialog>` element already restores focus to whatever was
+focused before `showModal()` was called, once `close()` runs, without any help
+from application code. The explicit calls stay anyway, as a guarantee that does
+not depend on that native behaviour continuing to hold. Removing the mobile
+menu's Escape handler (or its `isOpen` guard — see the fourth check above), or
+any one of the dialog or button `aria-label`s, does turn the test red —
+confirmed the same way, by removing each and re-running.
 
 Both files run under `deno task test:browser`, not the plain `deno task test`
 glob, and `deno task check` runs both. Two reasons for the split: the

@@ -3,8 +3,9 @@ steps:
     image: denoland/deno:2.9.0
     commands:
       - deno install
-      # test/lead-form.browser.test.ts (deno task test:browser, run inside
-      # "deno task check") drives a real Chromium. The base image has none,
+      # test/lead-form.browser.test.ts and test/a11y.browser.test.ts (deno
+      # task test:browser, run inside "deno task check") drive a real
+      # Chromium. The base image has none,
       # so install it — matching version pin in deno.json's "playwright"
       # import, so the download always lands on the browser build that
       # version expects — with OS deps included, since this container has
