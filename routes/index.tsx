@@ -386,7 +386,7 @@ export default define.page(function Home(ctx) {
             rel="noopener noreferrer"
             data-umami-event="home-book-call"
             data-primary-cta
-            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg font-semibold rounded-lg text-white bg-gradient-to-r from-green-600 to-emerald-500 shadow-lg shadow-green-500/25 hover:scale-105 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200"
+            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg font-semibold rounded-lg text-white bg-green-700 shadow-lg shadow-green-500/25 hover:scale-105 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200"
           >
             <CalendarIcon class="w-5 h-5" />
             Book a {INTRO_CALL}

@@ -431,7 +431,7 @@ export default define.page(function BlogArticle(ctx) {
                 <BookCallLink
                   url={SCHEDULE_URL}
                   target="_blank"
-                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-lg shadow transition-colors"
+                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold rounded-lg shadow transition-colors"
                 >
                   Book a free intro call
                 </BookCallLink>

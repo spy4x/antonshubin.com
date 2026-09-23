@@ -3,11 +3,12 @@
 // (test/rendered.test.ts) never sees, so this runs through Chromium the same
 // way test/a11y.browser.test.ts does.
 //
-// It checks five representative pages rather than the full sitemap (see the
+// It checks six representative pages rather than the full sitemap (see the
 // PR body for the full 48-page crawl): the home page, the catalog index (with
 // its two nested <details> opened, since axe skips content a <details> hides
 // by default), a blog post with inline code, a blog post without it, and the
-// contact page — plus one synthetic probe (see below). A full-site crawl
+// contact page and /pay, served with a placeholder SCHEDULE_URL so the
+// booking buttons render — plus one synthetic probe (see below). A full-site crawl
 // belongs in a one-off audit script, not a task that runs on every push —
 // this only needs to catch a *regression* in the fixed tokens
 // (assets/styles.css `@theme`) or the class edits that went with them
@@ -44,6 +45,12 @@
 //      not just `violations`) — /catalog has one; assertNoContrastViolations
 //      checks it structurally on every page in the loop below regardless of
 //      whether that page has a gradient CTA
+//   12. #175: the booking buttons, which render only when SCHEDULE_URL
+//      is set (the main test below sets a placeholder): bg-green-600 ->
+//      bg-green-700 on the blog, catalog and contact buttons and the
+//      MeetEmbed facade, and the home and /pay gradient buttons made solid
+//      (bg-green-700, bg-blue-600) — /, /contact-me, both blog posts, /pay
+//      and /catalog
 //
 // #2 needs its own probe: --color-gray-400 was already comfortably above AA
 // (5.78:1) against gray-800, the background most of its real uses sit on —
@@ -288,8 +295,15 @@ Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch p
   }
 });
 
-Deno.test("no WCAG AA colour-contrast violations across five representative pages", async () => {
-  const site = await startSite();
+/** Placeholder booking URL: the booking buttons render only when
+ * `SCHEDULE_URL` is set, which production does, so the scan must set it too
+ * or it never sees them (#175). */
+const PLACEHOLDER_SCHEDULE_URL = "https://cal.example.com/book";
+
+Deno.test("no WCAG AA colour-contrast violations across six representative pages", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
@@ -301,9 +315,25 @@ Deno.test("no WCAG AA colour-contrast violations across five representative page
           "/contact-me",
           "/blog/ship-it-today",
           "/blog/building-mcp-servers-with-deno",
+          "/pay",
         ]
       ) {
         await assertNoContrastViolations(page, site.origin, path);
+      }
+
+      // Every page in the loop above except /pay carries a booking button
+      // (the home CTA, the contact page's facade and link, the blog post
+      // footer). Without this, a server that never received the placeholder
+      // would pass the loop above vacuously.
+      for (const path of ["/", "/contact-me", "/blog/ship-it-today"]) {
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        const bookingLinks = await page.locator(
+          `a[href="${PLACEHOLDER_SCHEDULE_URL}"]`,
+        ).count();
+        assert(
+          bookingLinks > 0,
+          `${path} must render a booking link with SCHEDULE_URL set`,
+        );
       }
 
       // components/Breadcrumb.tsx's "/" separator: aria-hidden, so axe never

@@ -171,12 +171,13 @@ the narrow `deno task test`.
   closed). The explicit `triggerRef.current?.focus()` calls in both lightboxes
   are kept on purpose, even though native `<dialog>` already restores focus.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
-  (version pinned exactly in `deno.json`, like `playwright`) against five
-  representative pages, plus synthetic probes for pairings axe can't reach on
-  its own — an `aria-hidden` separator, a lone symbol character, a gradient
-  background. Colour tokens live in `assets/styles.css`'s `@theme` block. See
-  the test file's own header for which of the fix's colour changes each page or
-  probe covers, and the two it doesn't.
+  (version pinned exactly in `deno.json`, like `playwright`) against six
+  representative pages, served with a placeholder `SCHEDULE_URL` because the
+  booking buttons only render when it is set (#175), plus synthetic probes for
+  pairings axe can't reach on its own — an `aria-hidden` separator, a lone
+  symbol character, a gradient background. Colour tokens live in
+  `assets/styles.css`'s `@theme` block. See the test file's own header for which
+  of the fix's colour changes each page or probe covers, and the two it doesn't.
 
 ## AI crawler optimization (SEO)
 
