@@ -154,7 +154,20 @@ since hiding an icon from assistive tech without naming the control anywhere
 else leaves it with no name at all. Both guards only see markup from the built,
 non-hydrated HTML `test/harness.ts` fetches, so they don't cover the two
 lightboxes' close/prev/next buttons, which only exist once client JS opens the
-dialog — those stay covered by the axe-core run in the issue's PR body instead.
+dialog. Nothing in the automated suite guards those buttons — the axe-core run
+in issue #160's PR body was a one-off manual check against a specific commit,
+not a standing test, so it protects nothing against a later regression. A real
+guard would need a browser-driven test in the shape of
+`test/lead-form.browser.test.ts`; none exists yet.
+
+`lib/markdown.test.ts` (issue #160) is not one of these — it tests
+`lib/markdown.ts` directly, with no server and no `test/harness.ts`, since a
+marked renderer is plain string-in/string-out. It guards the blog markdown a11y
+fixes (a checklist checkbox's `aria-label`, the new-tab hint on a
+`target="_blank"` link embedded in markdown, `tabindex` on a `<pre>`) against
+markdown shapes a rendered blog post doesn't happen to exercise: nested and
+loose checklists, inline markup inside a checklist item, and content that only
+looks like a tag or a link because it sits inside a fenced code block.
 
 **Design choice — A, build before test, not build-on-demand in the harness.**
 `deno task test` is now `deno task build && deno test ...`, so the site is built
