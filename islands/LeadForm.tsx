@@ -13,15 +13,27 @@ type SubmitStatus =
   | { type: "idle" }
   | { type: "submitting" }
   | { type: "success" }
-  | { type: "error"; message: string };
+  | { type: "error"; message: string; field?: string };
 
-function validate(form: FormState): string | null {
-  if (!form.name.trim()) return "Name is required";
-  if (!form.email.trim()) return "Email is required";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    return "Please enter a valid email";
+/** The id of the field a validation error is about, so it can carry aria-invalid/aria-describedby. */
+function validate(
+  form: FormState,
+): { field: string; message: string } | null {
+  if (!form.name.trim()) {
+    return { field: "lead-name", message: "Name is required" };
   }
-  if (!form.techStack.trim()) return "Describe your idea or your current app";
+  if (!form.email.trim()) {
+    return { field: "lead-email", message: "Email is required" };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    return { field: "lead-email", message: "Please enter a valid email" };
+  }
+  if (!form.techStack.trim()) {
+    return {
+      field: "lead-stack",
+      message: "Describe your idea or your current app",
+    };
+  }
   return null;
 }
 
@@ -48,7 +60,11 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
     };
     const error = validate(form);
     if (error) {
-      status.value = { type: "error", message: error };
+      status.value = {
+        type: "error",
+        message: error.message,
+        field: error.field,
+      };
       return;
     }
     status.value = { type: "submitting" };
@@ -76,6 +92,9 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
   };
 
   const isSuccess = status.value.type === "success";
+  const errorField = status.value.type === "error"
+    ? status.value.field
+    : undefined;
 
   // Runs after the DOM commits the success state, once the heading is no
   // longer inside an `inert` subtree and can actually take focus.
@@ -144,6 +163,10 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               value={name}
               onInput={(e) => name.value = (e.target as HTMLInputElement).value}
               disabled={status.value.type === "submitting"}
+              aria-invalid={errorField === "lead-name" ? "true" : undefined}
+              aria-describedby={errorField === "lead-name"
+                ? "lead-form-error"
+                : undefined}
               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
               required
             />
@@ -159,6 +182,10 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               onInput={(e) =>
                 email.value = (e.target as HTMLInputElement).value}
               disabled={status.value.type === "submitting"}
+              aria-invalid={errorField === "lead-email" ? "true" : undefined}
+              aria-describedby={errorField === "lead-email"
+                ? "lead-form-error"
+                : undefined}
               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
               required
             />
@@ -175,6 +202,10 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               onInput={(e) =>
                 techStack.value = (e.target as HTMLTextAreaElement).value}
               disabled={status.value.type === "submitting"}
+              aria-invalid={errorField === "lead-stack" ? "true" : undefined}
+              aria-describedby={errorField === "lead-stack"
+                ? "lead-form-error"
+                : undefined}
               rows={4}
               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y disabled:opacity-50"
               required
@@ -182,7 +213,11 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           </div>
 
           {status.value.type === "error" && (
-            <p class="text-red-400 text-sm text-center">
+            <p
+              id="lead-form-error"
+              role="alert"
+              class="text-red-400 text-sm text-center"
+            >
               {status.value.message}
             </p>
           )}
