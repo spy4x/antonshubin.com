@@ -213,7 +213,7 @@ export default define.page(function Pay() {
                 href="https://buy.stripe.com/4gw171g4hcwC06IdQS"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
               >
                 Pay with Stripe
                 <ArrowRightIcon class="w-5 h-5" />

@@ -146,7 +146,7 @@ export default define.page(function Catalog() {
           <BookCallLink
             url={SCHEDULE_URL}
             target="_blank"
-            class="inline-block px-8 py-3.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
+            class="inline-block px-8 py-3.5 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg transition-colors"
           >
             Book a free 30-min intro call
           </BookCallLink>
