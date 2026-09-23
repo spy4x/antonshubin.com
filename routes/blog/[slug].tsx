@@ -5,6 +5,7 @@ import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { marked } from "marked";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
+import BlogContentA11y from "../../islands/BlogContentA11y.tsx";
 import NewsletterForm from "../../islands/NewsletterForm.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
@@ -219,6 +220,7 @@ export default define.page(function BlogArticle(ctx) {
                 <div class="aspect-video rounded-lg overflow-hidden">
                   <iframe
                     src={`https://www.youtube.com/embed/${article.youtubeVideoId}`}
+                    title={`Video: ${article.title}`}
                     class="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -240,6 +242,7 @@ export default define.page(function BlogArticle(ctx) {
                     dangerouslySetInnerHTML={{ __html: content }}
                   />
                   <BlogImageEnhancer />
+                  <BlogContentA11y />
                 </>
               )
               : (

@@ -351,6 +351,7 @@ export default define.page(function ProjectDetail(ctx) {
               <div class="aspect-video rounded-lg overflow-hidden bg-gray-900">
                 <iframe
                   src={project.videoURL}
+                  title={`Video overview: ${project.title}`}
                   class="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
