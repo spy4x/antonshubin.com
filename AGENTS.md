@@ -23,8 +23,9 @@ specific to this repository.
 ## Tasks (from `deno.json`)
 
 ```bash
-deno task check                 # fmt --check + lint + type check + test
+deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
+deno task test:browser          # the Playwright lead-form test; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -156,8 +157,11 @@ already runs `deno task check`, which now builds as a side effect of
 **Permissions.** `deno task test` carries `--allow-net=127.0.0.1,0.0.0.0` (the
 free-port probe binds `0.0.0.0:0`, the harness then fetches `127.0.0.1`) and
 `--allow-run=deno` (to spawn the server as a child process). The flags apply to
-every test file, not only the harness, so no test can make a live outbound call;
-the tests that look network-shaped replace `globalThis.fetch` themselves.
+every test file run by that task, not only the harness, so none of them can make
+a live outbound call; the tests that look network-shaped replace
+`globalThis.fetch` themselves. The one exception is
+`test/lead-form.browser.test.ts`, which `deno task test:browser` runs with `-A`
+(see below).
 
 **How to add a guard.** Call `startSite()`, fetch a page with `site.html()` or
 `site.get()`, assert on structure or a short phrase with `count()` /
