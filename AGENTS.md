@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form + a11y tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form + a11y + contrast tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -102,17 +102,17 @@ Deploy above).
 
 The `check` step also installs Chromium before `deno task check` runs:
 `deno run -A npm:playwright@1.63.0 install --with-deps chromium`. That's for
-`test/lead-form.browser.test.ts` and `test/a11y.browser.test.ts` (see
-"Rendered-page tests" below), which `deno task check` runs via
-`deno task test:browser`. The base image has no browser and none of the OS
-libraries a headless Chromium needs, hence `--with-deps`; the version in that
-command must match the `"playwright"` entry in `deno.json`'s import map, since a
-version mismatch downloads a different Chromium build than the one the test
-launches. This was chosen over a separate CI step with its own image, because it
-keeps the browser test on the same container the rest of `check` already runs
-in, at the cost of that one extra install command per run — CI has no local
-cache to skip it with, the way a machine that already has
-`~/.cache/ms-playwright` populated does locally.
+`test/lead-form.browser.test.ts`, `test/a11y.browser.test.ts` and
+`test/contrast.browser.test.ts` (see "Rendered-page tests" below), which
+`deno task check` runs via `deno task test:browser`. The base image has no
+browser and none of the OS libraries a headless Chromium needs, hence
+`--with-deps`; the version in that command must match the `"playwright"` entry
+in `deno.json`'s import map, since a version mismatch downloads a different
+Chromium build than the one the test launches. This was chosen over a separate
+CI step with its own image, because it keeps the browser test on the same
+container the rest of `check` already runs in, at the cost of that one extra
+install command per run — CI has no local cache to skip it with, the way a
+machine that already has `~/.cache/ms-playwright` populated does locally.
 
 A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
 runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
@@ -282,6 +282,17 @@ above), not a silent skip. If Chromium is missing entirely (a fresh machine, or
 `PLAYWRIGHT_BROWSERS_PATH` pointed elsewhere), the test fails with an error
 naming the exact install command instead of skipping — required, since a
 lead-form regression must fail the build, not vanish quietly.
+
+**`test/contrast.browser.test.ts` (issue #160)** runs axe-core's
+`color-contrast` rule, through the same Chromium/`startSite()` pattern as the
+two files above, against three representative pages (`/`, `/catalog`,
+`/blog/ship-it-today`) rather than the full sitemap — a regression guard only
+needs to catch a break in the fixed tokens or the two class edits that went with
+them, not repeat a full-site audit on every push. It imports `axe-core` (pinned
+in `deno.json`'s import map) and reads its `.source` string, the same way the
+one-off audit script that produced the PR's before/after counts injected it with
+`page.addScriptTag()`, so no network fetch happens in the test itself. Listed
+alongside the other two files in `test:browser`.
 
 ## AI crawler optimization (SEO)
 

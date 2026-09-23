@@ -2,8 +2,8 @@
   "nodeModulesDir": "manual",
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check && deno task test && deno task test:browser",
-    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno --ignore=test/lead-form.browser.test.ts,test/a11y.browser.test.ts",
-    "test:browser": "deno test -A test/lead-form.browser.test.ts test/a11y.browser.test.ts",
+    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno --ignore=test/lead-form.browser.test.ts,test/a11y.browser.test.ts,test/contrast.browser.test.ts",
+    "test:browser": "deno test -A test/lead-form.browser.test.ts test/a11y.browser.test.ts test/contrast.browser.test.ts",
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",
@@ -37,7 +37,8 @@
     "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.8",
     "tailwindcss": "npm:tailwindcss@^4.1.18",
     "vite": "npm:vite@^7.1.3",
-    "playwright": "npm:playwright@1.63.0"
+    "playwright": "npm:playwright@1.63.0",
+    "axe-core": "npm:axe-core@^4.10.2"
   },
   "compilerOptions": {
     "lib": ["dom", "dom.asynciterable", "dom.iterable", "deno.ns"],
