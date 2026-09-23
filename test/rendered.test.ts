@@ -154,8 +154,10 @@ Deno.test("no rendered image has an empty or missing alt", async (t) => {
       paths.length > 0,
       "sitemap.xml is empty — the loop below would pass vacuously",
     );
+    // /pay carries noindex: true (see routes/pay.tsx), so it never appears
+    // in the sitemap the loop above reads — walk it explicitly too.
     let images = 0;
-    for (const path of paths) {
+    for (const path of [...paths, "/pay"]) {
       await t.step(path, async () => {
         const body = await site.html(path);
         images += count(body, /<img\b/gi);
