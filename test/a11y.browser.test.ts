@@ -208,3 +208,35 @@ Deno.test("Escape closes the mobile menu and returns focus to the toggle button"
     await site.stop();
   }
 });
+
+Deno.test("Escape leaves focus alone when the mobile menu is already closed", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    try {
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+
+      // The menu is closed from the start — focus a link outside it, in
+      // <main>, and press Escape. A menu handler that closes on every
+      // Escape, not just while open, would steal focus to the toggle button
+      // even though there is nothing open to close.
+      const mainLink = page.locator("#main-content").getByRole("link", {
+        name: "See all work",
+      });
+      await mainLink.focus();
+      await page.keyboard.press("Escape");
+
+      assert(
+        await isFocused(mainLink),
+        "focus must stay on the link when Escape is pressed with the menu already closed",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
