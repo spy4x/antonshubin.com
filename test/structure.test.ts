@@ -168,22 +168,36 @@ siteTest(
   },
 );
 
-siteTest(
+// Doesn't use `siteTest`: `SCHEDULE_URL` has to be set before `startSite()`
+// spawns the server, since the server reads it once at process start. The
+// primary CTA (`data-primary-cta`) only renders when `SCHEDULE_URL` resolves
+// to a URL — issue #156 replaced the previous behaviour of rendering it
+// anyway with an empty `href`.
+Deno.test(
   "the home page has at most six sections and one primary call to action",
-  async (site) => {
-    const html = await site.html("/");
-    const main = html.slice(html.indexOf('id="main-content"'));
-    assertEquals(
-      [...main.matchAll(/<section[^>]*data-home-section="([^"]*)"/g)].map((m) =>
-        m[1]
-      ),
-      ["hero", "proof", "offers", "testimonials", "how-it-works", "cta"],
-    );
-    assert(
-      count(main, /<section[\s>]/g) <= 6,
-      "more than six <section> elements",
-    );
-    assertEquals(count(main, /data-primary-cta/g), 1);
+  async () => {
+    const previous = Deno.env.get("SCHEDULE_URL");
+    Deno.env.set("SCHEDULE_URL", "https://meet.example.com");
+    const site = await startSite();
+    try {
+      const html = await site.html("/");
+      const main = html.slice(html.indexOf('id="main-content"'));
+      assertEquals(
+        [...main.matchAll(/<section[^>]*data-home-section="([^"]*)"/g)].map((
+          m,
+        ) => m[1]),
+        ["hero", "proof", "offers", "testimonials", "how-it-works", "cta"],
+      );
+      assert(
+        count(main, /<section[\s>]/g) <= 6,
+        "more than six <section> elements",
+      );
+      assertEquals(count(main, /data-primary-cta/g), 1);
+    } finally {
+      await site.stop();
+      if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+      else Deno.env.set("SCHEDULE_URL", previous);
+    }
   },
 );
 

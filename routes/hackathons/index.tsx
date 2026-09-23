@@ -7,6 +7,7 @@ import { Layout } from "../../components/Layout.tsx";
 import { type Hackathon, hackathons } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { CalendarIcon, CodeIcon, PersonIcon } from "../../components/Icons.tsx";
+import { BookCallLink } from "../../components/BookCallLink.tsx";
 
 function HackathonCard({ h }: { h: Hackathon }) {
   return (
@@ -199,13 +200,13 @@ export default define.page(function Hackathons(ctx) {
             bring the same competitive edge to your project.
           </p>
           <div class="flex flex-wrap justify-center gap-4">
-            <a
-              href={SCHEDULE_URL}
+            <BookCallLink
+              url={SCHEDULE_URL}
               target="_blank"
               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
             >
               Book a free intro call
-            </a>
+            </BookCallLink>
             <a
               href="/catalog"
               class="inline-flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"

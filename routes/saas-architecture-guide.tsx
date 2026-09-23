@@ -6,6 +6,7 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { blogArticles, projects } from "../lib/data.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
+import { BookCallLink } from "../components/BookCallLink.tsx";
 
 const audit = catalogItem("codebase-health-audit");
 const build = catalogItem("zero-to-production-saas-mvp");
@@ -269,13 +270,13 @@ export default define.page(function SaasArchGuide() {
           <p class="text-gray-400 mb-5">
             Book a free 30-minute intro call. No pitch, just advice.
           </p>
-          <a
-            href={SCHEDULE_URL}
+          <BookCallLink
+            url={SCHEDULE_URL}
             target="_blank"
             class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 transition-all duration-200"
           >
             Book a free intro call
-          </a>
+          </BookCallLink>
         </div>
       </div>
     </Layout>
