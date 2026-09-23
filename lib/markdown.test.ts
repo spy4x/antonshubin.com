@@ -113,6 +113,36 @@ Deno.test("a raw <br> in a checklist item becomes a space in the label", async (
   assertMatch(ours, /aria-label="x y z"/);
 });
 
+Deno.test("text inside inline <kbd> or <code> cannot break out of the label", async () => {
+  const md =
+    '- [ ] press <kbd>"</kbd> key\n- [ ] <kbd>" onfocus="alert(1)</kbd> x\n';
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  assertMatch(ours, /aria-label="press &quot; key"/);
+  assertMatch(ours, /aria-label="&quot; onfocus=&quot;alert\(1\) x"/);
+  // The page text inside <kbd> still says onfocus=; the <input> must not.
+  for (const input of ours.match(/<input [^>]*>/g) ?? []) {
+    assertEquals(/\sonfocus="/.test(input), false, input);
+  }
+});
+
+Deno.test("bold, italic, strikethrough and link text get an escaped label", async () => {
+  const md = '- [ ] **a" b** *c `<d>`* ~~e"~~ [f "g"](https://e.example)\n';
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  assertMatch(
+    ours,
+    /aria-label="a&quot; b c &lt;d&gt; e&quot; f &quot;g&quot;"/,
+  );
+});
+
+Deno.test("a hard line break and an image alt read like the page", async () => {
+  const md = "- [ ] one  \n  two ![a *b* c](x.png)\n";
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  assertMatch(ours, /aria-label="one two a b c"/);
+});
+
 Deno.test("a plain (non-task) list is untouched", async () => {
   const md = "- one\n- two\n";
   const ours = await renderBlogMarkdown(md);

@@ -53,8 +53,12 @@ class LabelRenderer extends TextRenderer {
     if ("tokens" in token && token.tokens) {
       return this.parser.parseInline(token.tokens, this as unknown as Renderer);
     }
+    // Marked marks text inside inline <kbd>, <code>, <pre> or <script> as
+    // already escaped and prints it raw. That is fine on the page, not in a
+    // quoted attribute: escape the quote and angle brackets, keep `&` so an
+    // entity still decodes to what the page shows.
     return "escaped" in token && token.escaped
-      ? token.text
+      ? token.text.replace(/["<>]/g, (c) => ESCAPE_MAP[c])
       : escapeNoEncode(token.text);
   }
   override codespan({ text }: Tokens.Codespan): string {
@@ -72,11 +76,13 @@ class LabelRenderer extends TextRenderer {
   override link({ tokens }: Tokens.Link): string {
     return this.parser.parseInline(tokens, this as unknown as Renderer);
   }
-  override image({ text }: Tokens.Image): string {
-    return escapeNoEncode(text);
+  override image({ text, tokens }: Tokens.Image): string {
+    return tokens
+      ? this.parser.parseInline(tokens, this as unknown as Renderer)
+      : escapeNoEncode(text);
   }
   override html({ text }: Tokens.HTML | Tokens.Tag): string {
-    return /^<br\b/i.test(text) ? " " : "";
+    return /^<br\s*\/?>$/i.test(text) ? " " : "";
   }
   override br(): string {
     return " ";
