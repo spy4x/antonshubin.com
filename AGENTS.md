@@ -173,14 +173,21 @@ client-side JS runs — an island's post-hydration DOM change, where focus lands
 after an interaction — and a `site.html()` fetch never sees it, because that's
 one server-rendered response with no hydration and no click. For that,
 `test/lead-form.browser.test.ts` drives real Chromium through Playwright
-(`npm:playwright@1.63.0`, pinned in `deno.json`'s import map to match the
-Chromium build already cached locally under `~/.cache/ms-playwright`, so running
-it locally downloads nothing). It still calls `startSite()` for the running
-server, stubs `/api/lead` with `page.route()` so no real network call is made,
-submits the lead form, and asserts on the two things a plain HTML fetch of the
-pre-submit page can't show: that focus lands on the success heading (the
-screen-reader announcement for issue #157) and that the form and success panels
-swap their `inert` state.
+(`npm:playwright@1.63.0`, pinned to that exact version — not a `^` range — in
+`deno.json`'s import map, because it must match the version in
+`.woodpecker.yml`'s install command exactly: each Playwright version expects one
+specific Chromium build, so a mismatch there downloads a different Chromium than
+the one this test launches. That it also happens to match the Chromium build
+already cached locally under `~/.cache/ms-playwright`, so running it locally
+downloads nothing, is a side effect of picking a recent version, not the reason
+for the pin). It still calls `startSite()` for the running server, stubs
+`/api/lead` with `page.route()` so no real network call is made, submits the
+lead form, and asserts on three things a plain HTML fetch of the pre-submit page
+can't show: that focus lands on the success heading (the screen-reader
+announcement for issue #157) with `{ preventScroll: true }` (dropping that
+option lets the still-collapsing success panel jerk the page around, since the
+element hasn't reached its final position yet), and that the form and success
+panels swap their `inert` state.
 
 That file runs under its own task, `deno task test:browser`, not the plain
 `deno task test` glob, and `deno task check` runs both. Two reasons for the
