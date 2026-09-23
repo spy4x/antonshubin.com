@@ -68,20 +68,34 @@ Four entities in a `@graph` array:
 - Provides Google Rich Results for the /how-i-work page
 - AI crawlers parse this as canonical Q&A about engagement terms
 
-### 7. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
+### 7. Project JSON-LD (routes/projects/[slug].tsx)
+
+- One `SoftwareSourceCode` node when the project links a repo (`ghRepo`),
+  otherwise `CreativeWork`, built only from fields already on the `Project`
+  record in `lib/data.ts` (issue #167) — no invented dates or ratings
+- `author` points at the site-wide Person node's `@id`
+  (`https://antonshubin.com/#person`), same one the BlogPosting JSON-LD in
+  `routes/blog/[slug].tsx` uses for `author`/`publisher`
+- `codeRepository` when `ghRepo` is set, `sameAs` when the project has a live,
+  non-dead `externalURL`, `sourceOrganization` when `madeForName` is set,
+  `creativeWorkStatus: "Archived"` when `archived` is true
+- Lets AI crawlers and search engines read each project as a distinct piece of
+  work instead of a generic page
+
+### 8. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
 
 - `summary_large_image` card type
 - Full OG tags (type, title, description, url, image, site_name, locale)
 - Used by social previews AND AI crawlers for content understanding
 
-### 8. Meta Tags and Robots Directives
+### 9. Meta Tags and Robots Directives
 
 - `components/SEOHead.tsx` emits route-specific title, description, canonical,
   and index/noindex meta directives
 - `routes/_middleware.ts` emits extended `X-Robots-Tag` directives and preserves
   staging noindex behavior
 
-### 9. `/infrastructure` and Production Infrastructure Lab
+### 10. `/infrastructure` and Production Infrastructure Lab
 
 - `/infrastructure` explains repeatable deploys, observability, recovery,
   security, cost control, and change ownership in founder-readable terms
@@ -109,16 +123,16 @@ Set these in `.env`. Never hardcode them in `_app.tsx`.
 
 Whenever any of these change, update the corresponding AI crawler files:
 
-| What changed              | Files to update                                    |
-| ------------------------- | -------------------------------------------------- |
-| New page added            | sitemap.xml.ts, llms-full.txt.ts                   |
-| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                      |
-| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                  |
-| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes            |
-| Blog post added           | sitemap.xml.ts, llms-full.txt.ts                   |
-| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts       |
-| Infrastructure proof      | infrastructure.tsx, project data, both llms routes |
-| Crawler rules change      | robots.txt.ts                                      |
+| What changed              | Files to update                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------- |
+| New page added            | sitemap.xml.ts, llms-full.txt.ts                                                      |
+| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                         |
+| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                     |
+| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                               |
+| Blog post added           | sitemap.xml.ts, llms-full.txt.ts                                                      |
+| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD) |
+| Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                    |
+| Crawler rules change      | robots.txt.ts                                                                         |
 
 ## Testing
 

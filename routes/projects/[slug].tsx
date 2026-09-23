@@ -31,6 +31,56 @@ function splitParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Build the project's JSON-LD node from fields the `Project` interface
+ * already holds — no invented dates, ratings or facts. `SoftwareSourceCode`
+ * when the project links a repo (`ghRepo`), otherwise `CreativeWork`. The
+ * `author` points at the site-wide Person node from `components/SEOHead.tsx`
+ * (issue #167), same `@id` the BlogPosting JSON-LD in
+ * `routes/blog/[slug].tsx` uses.
+ */
+function projectJsonLd(project: Project, canonical: string) {
+  const images = [
+    ...(project.logoImageURL
+      ? [`https://antonshubin.com${project.logoImageURL}`]
+      : []),
+    ...(project.screenshotURLs ?? []).map((file) =>
+      `https://antonshubin.com/img/projects/${project.slug}/${file}`
+    ),
+  ];
+
+  return {
+    "@context": "https://schema.org",
+    "@type": project.ghRepo ? "SoftwareSourceCode" : "CreativeWork",
+    "@id": `${canonical}#project`,
+    "name": project.title,
+    "description": project.description,
+    "url": canonical,
+    ...(images.length > 0 ? { "image": images } : {}),
+    "author": { "@id": "https://antonshubin.com/#person" },
+    ...(project.tags && project.tags.length > 0
+      ? { "keywords": project.tags.join(", ") }
+      : {}),
+    ...(project.ghRepo
+      ? { "codeRepository": `https://github.com/${project.ghRepo}` }
+      : {}),
+    ...(project.externalURL && !project.externalURLDead
+      ? { "sameAs": [project.externalURL] }
+      : {}),
+    ...(project.madeForName
+      ? {
+        "sourceOrganization": {
+          "@type": "Organization",
+          "name": project.madeForName,
+          ...(project.madeForURL ? { "url": project.madeForURL } : {}),
+        },
+      }
+      : {}),
+    ...(project.archived ? { "creativeWorkStatus": "Archived" } : {}),
+    "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+  };
+}
+
 // Unknown slugs keep the friendly "Not Found" view below, but must answer with
 // a real 404 so search engines drop removed project pages instead of indexing
 // an empty 200.
@@ -83,6 +133,12 @@ export default define.page(function ProjectDetail(ctx) {
   return (
     <Layout currentPath="/projects">
       <SEOHead />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(projectJsonLd(project, head.value.canonical)),
+        }}
+      />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <Breadcrumb
           items={getBreadcrumb(head.value.canonical, head.value.title)}
