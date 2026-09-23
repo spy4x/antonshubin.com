@@ -100,6 +100,8 @@ function ProjectCard({
         {project.outcome && (
           <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full">
             <svg
+              aria-hidden="true"
+              focusable="false"
               class="w-3.5 h-3.5 shrink-0"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -122,6 +124,8 @@ function ProjectCard({
       <span class="inline-flex items-center gap-1 text-sm text-orange-400 group-hover:text-orange-300 transition-colors font-medium">
         View details
         <svg
+          aria-hidden="true"
+          focusable="false"
           class="w-3.5 h-3.5"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

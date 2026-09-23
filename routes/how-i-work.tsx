@@ -56,6 +56,8 @@ function FaqItem({ faq }: { faq: Faq }) {
       <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
         <span>{faq.q}</span>
         <svg
+          aria-hidden="true"
+          focusable="false"
           class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

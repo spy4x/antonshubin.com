@@ -315,6 +315,8 @@ export default define.page(function Home(ctx) {
             >
               View all reviews on <UpworkIcon class="w-auto h-4 text-white" />
               <svg
+                aria-hidden="true"
+                focusable="false"
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

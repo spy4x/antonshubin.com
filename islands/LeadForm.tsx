@@ -205,6 +205,8 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-5 text-gray-500 text-xs">
           <span class="inline-flex items-center gap-1">
             <svg
+              aria-hidden="true"
+              focusable="false"
               class="w-3.5 h-3.5 text-green-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -222,6 +224,8 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           </span>
           <span class="inline-flex items-center gap-1">
             <svg
+              aria-hidden="true"
+              focusable="false"
               class="w-3.5 h-3.5 text-green-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -239,6 +243,8 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           </span>
           <span class="inline-flex items-center gap-1">
             <svg
+              aria-hidden="true"
+              focusable="false"
               class="w-3.5 h-3.5 text-green-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

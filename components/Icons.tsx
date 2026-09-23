@@ -6,6 +6,7 @@ export function UpworkIcon({ class: className }: { class?: string }) {
       viewBox="0 0 102 28"
       role="img"
       aria-hidden="true"
+      focusable="false"
       height="20"
     >
       <path
@@ -35,6 +36,8 @@ export function UpworkIcon({ class: className }: { class?: string }) {
 export function YouTubeIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -55,6 +58,8 @@ export function YouTubeIcon({ class: className }: { class?: string }) {
 export function GitHubIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -74,6 +79,8 @@ export function GitHubIcon({ class: className }: { class?: string }) {
 export function TwitterIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -93,6 +100,8 @@ export function TwitterIcon({ class: className }: { class?: string }) {
 export function EmailIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -119,6 +128,7 @@ export function MenuIcon({ class: className }: { class?: string }) {
       viewBox="0 0 24 24"
       stroke="currentColor"
       aria-hidden="true"
+      focusable="false"
     >
       <path
         stroke-linecap="round"
@@ -139,6 +149,7 @@ export function CloseIcon({ class: className }: { class?: string }) {
       viewBox="0 0 24 24"
       stroke="currentColor"
       aria-hidden="true"
+      focusable="false"
     >
       <path
         stroke-linecap="round"
@@ -153,6 +164,8 @@ export function CloseIcon({ class: className }: { class?: string }) {
 export function PenIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-12 h-12"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -172,6 +185,8 @@ export function PenIcon({ class: className }: { class?: string }) {
 export function CodeIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-12 h-12"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -192,6 +207,8 @@ export function CodeIcon({ class: className }: { class?: string }) {
 export function BookmarkIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-12 h-12"}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 46 46"
@@ -217,6 +234,8 @@ export function StarIcon({
 }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-6 h-6"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -236,6 +255,8 @@ export function StarIcon({
 export function QuoteIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-8 h-8"}
       xmlns="http://www.w3.org/2000/svg"
       fill="currentColor"
@@ -252,6 +273,7 @@ export function UpworkBadgeIcon({ class: className }: { class?: string }) {
       class={className || "w-6 h-6"}
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
+      focusable="false"
       data-name="Layer 1"
       viewBox="0 0 14 14"
       role="img"
@@ -269,6 +291,8 @@ export function UpworkBadgeIcon({ class: className }: { class?: string }) {
 export function WalletIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -289,6 +313,8 @@ export function WalletIcon({ class: className }: { class?: string }) {
 export function ChipIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -316,6 +342,8 @@ export function ChipIcon({ class: className }: { class?: string }) {
 export function ArchiveIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-4 h-4"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -337,6 +365,8 @@ export function ArchiveIcon({ class: className }: { class?: string }) {
 export function GithubIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -352,6 +382,8 @@ export function GithubIcon({ class: className }: { class?: string }) {
 export function LinkedInIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -367,6 +399,8 @@ export function LinkedInIcon({ class: className }: { class?: string }) {
 export function TelegramIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -384,6 +418,8 @@ export function TelegramIcon({ class: className }: { class?: string }) {
 export function CalendarIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -406,6 +442,8 @@ export function CalendarIcon({ class: className }: { class?: string }) {
 export function PersonIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -425,6 +463,8 @@ export function PersonIcon({ class: className }: { class?: string }) {
 export function BriefcaseIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -444,6 +484,8 @@ export function BriefcaseIcon({ class: className }: { class?: string }) {
 export function GridIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -463,6 +505,8 @@ export function GridIcon({ class: className }: { class?: string }) {
 export function MailIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -482,6 +526,8 @@ export function MailIcon({ class: className }: { class?: string }) {
 export function FolderIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -501,6 +547,8 @@ export function FolderIcon({ class: className }: { class?: string }) {
 export function ArrowRightIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-5 h-5"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -518,6 +566,8 @@ export function ArrowRightIcon({ class: className }: { class?: string }) {
 export function ChatBubbleIcon({ class: className }: { class?: string }) {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       class={className || "w-6 h-6"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

@@ -126,6 +126,8 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
               aria-label="Close"
             >
               <svg
+                aria-hidden="true"
+                focusable="false"
                 class="w-8 h-8"
                 fill="none"
                 stroke="currentColor"
@@ -149,6 +151,8 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                 aria-label="Previous image"
               >
                 <svg
+                  aria-hidden="true"
+                  focusable="false"
                   class="w-8 h-8"
                   fill="none"
                   stroke="currentColor"
@@ -179,6 +183,8 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                 aria-label="Next image"
               >
                 <svg
+                  aria-hidden="true"
+                  focusable="false"
                   class="w-8 h-8"
                   fill="none"
                   stroke="currentColor"

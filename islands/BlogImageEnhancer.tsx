@@ -58,6 +58,8 @@ export default function BlogImageEnhancer() {
             aria-label="Close"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               class="w-8 h-8"
               fill="none"
               stroke="currentColor"

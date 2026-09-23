@@ -28,6 +28,8 @@ function HackathonCard({ h }: { h: Hackathon }) {
           ? (
             <div class="absolute top-3 right-3 flex items-center gap-1 px-3 py-1.5 bg-yellow-500/20 backdrop-blur-sm text-yellow-400 text-xs font-bold rounded-full">
               <svg
+                aria-hidden="true"
+                focusable="false"
                 class="w-3.5 h-3.5"
                 viewBox="0 0 24 24"
                 fill="currentColor"
@@ -62,6 +64,8 @@ function HackathonCard({ h }: { h: Hackathon }) {
         {/* Achievement highlight */}
         <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full mb-4">
           <svg
+            aria-hidden="true"
+            focusable="false"
             class="w-3.5 h-3.5 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
