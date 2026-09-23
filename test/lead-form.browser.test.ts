@@ -37,7 +37,11 @@ Deno.test("lead form announces success and swaps the inert panels", async () => 
   let browser: any;
   try {
     try {
-      browser = await chromium.launch();
+      // CI (Woodpecker/denoland/deno:2.9.0) runs this container as root, and
+      // Chromium's own sandbox refuses to start as root without this flag.
+      // Harmless here: the browser only ever loads the site this test just
+      // booted, never third-party content.
+      browser = await chromium.launch({ args: ["--no-sandbox"] });
     } catch (cause) {
       const installCmd =
         `deno run -A npm:playwright@${PLAYWRIGHT_VERSION} install chromium`;
