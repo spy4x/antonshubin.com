@@ -247,3 +247,66 @@ Deno.test("every sitemap page responds 200", async (t) => {
     await site.stop();
   }
 });
+
+/**
+ * Raw text of every `<script type="application/ld+json">` block, unparsed.
+ * Unlike `jsonLd()` in test/html.ts, this doesn't call `JSON.parse` — a value
+ * containing an unescaped `<` that doesn't spell `</script` (e.g. `<b>`)
+ * stays inside the tag and would slip past a check that only inspects the
+ * parsed object, since re-serialising a legitimately parsed string for
+ * comparison would show the same character either way.
+ *
+ * This regex has its own blind spot: an unescaped `</script` inside a value
+ * ends the match early, so the captured text never contains the `<` that
+ * caused it — the capture just stops being what the script tag actually
+ * held. That case isn't silent, though: the text after the real value's
+ * `</script>` is no longer valid JSON-LD, and `jsonLd()` — called first,
+ * below — throws a `SyntaxError` on it rather than returning a block, which
+ * fails the test for the real reason before this function's blind spot
+ * would ever matter.
+ */
+function rawJsonLdBlocks(html: string): string[] {
+  const pattern =
+    /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  return [...html.matchAll(pattern)].map((m) => m[1]);
+}
+
+/** /pay is deliberately left out of /sitemap.xml (it's noindex) but still renders
+ * <SEOHead/>, so it needs its own JSON-LD guard rather than relying on the
+ * sitemap loop below to reach it. */
+const NON_SITEMAP_PAGES = ["/pay"];
+
+Deno.test("every sitemap page and /pay's JSON-LD blocks carry no raw <", async (t) => {
+  const site = await startSite();
+  try {
+    const paths = [...await sitemapPaths(site), ...NON_SITEMAP_PAGES];
+    assert(
+      paths.length > NON_SITEMAP_PAGES.length,
+      "sitemap.xml is empty — the loop below would pass vacuously",
+    );
+    for (const path of paths) {
+      await t.step(path, async () => {
+        const html = await site.html(path);
+
+        // jsonLd() (test/html.ts) calls JSON.parse on each block. A value
+        // whose unescaped </script> ended its script tag early leaves
+        // truncated, invalid JSON behind, so this throws — which is what
+        // actually catches that case, not the raw-text scan below.
+        jsonLd(html);
+
+        // A value with a raw < that doesn't spell </script> (e.g. <b>)
+        // never breaks its script tag, so JSON.parse above sees valid JSON
+        // and would not have caught it. This scan does.
+        const rawBlocks = rawJsonLdBlocks(html);
+        for (const [i, raw] of rawBlocks.entries()) {
+          assert(
+            !raw.includes("<"),
+            `raw < in JSON-LD block ${i} on ${path}`,
+          );
+        }
+      });
+    }
+  } finally {
+    await site.stop();
+  }
+});

@@ -10,6 +10,7 @@ import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import GhStars from "../../islands/GhStars.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
+import { toJsonLd } from "../../lib/json-ld.ts";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -138,7 +139,7 @@ export default define.page(function ProjectDetail(ctx) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(projectJsonLd(project, head.value.canonical)),
+          __html: toJsonLd(projectJsonLd(project, head.value.canonical)),
         }}
       />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
