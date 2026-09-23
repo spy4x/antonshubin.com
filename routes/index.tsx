@@ -91,7 +91,7 @@ export default define.page(function Home(ctx) {
                   Book a {INTRO_CALL}
                 </BookCallLink>
                 <p class="mt-3 text-sm text-gray-400">
-                  Rather write?{" "}
+                  {SCHEDULE_URL && "Rather write? "}
                   <a
                     href="#audit-form"
                     data-umami-event="hero-audit-link"
@@ -374,10 +374,12 @@ export default define.page(function Home(ctx) {
           class="mb-16 md:mb-24 text-center"
         >
           <h2 class="h1 mb-4">Let's talk</h2>
-          <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
-            Thirty minutes, free, no pitch. We talk about what you are building
-            and whether I can help.
-          </p>
+          {SCHEDULE_URL && (
+            <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
+              Thirty minutes, free, no pitch. We talk about what you are
+              building and whether I can help.
+            </p>
+          )}
           <BookCallLink
             url={SCHEDULE_URL}
             target="_blank"
@@ -390,7 +392,7 @@ export default define.page(function Home(ctx) {
             Book a {INTRO_CALL}
           </BookCallLink>
           <p class="mt-4 text-sm text-gray-400">
-            Rather write?{" "}
+            {SCHEDULE_URL && "Rather write? "}
             <a
               href="#audit-form"
               data-umami-event="cta-audit-link"

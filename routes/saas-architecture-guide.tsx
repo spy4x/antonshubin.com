@@ -262,22 +262,27 @@ export default define.page(function SaasArchGuide() {
           </ul>
         </section>
 
-        {/* CTA */}
-        <div class="mt-12 p-6 bg-gray-800 rounded-xl border border-gray-700 text-center">
-          <h2 class="text-xl font-bold text-white mb-3">
-            Need help with your architecture?
-          </h2>
-          <p class="text-gray-400 mb-5">
-            Book a free 30-minute intro call. No pitch, just advice.
-          </p>
-          <BookCallLink
-            url={SCHEDULE_URL}
-            target="_blank"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 transition-all duration-200"
-          >
-            Book a free intro call
-          </BookCallLink>
-        </div>
+        {
+          /* CTA — rendered only when SCHEDULE_URL is set; otherwise there is
+        no booking button for the card to introduce. */
+        }
+        {SCHEDULE_URL && (
+          <div class="mt-12 p-6 bg-gray-800 rounded-xl border border-gray-700 text-center">
+            <h2 class="text-xl font-bold text-white mb-3">
+              Need help with your architecture?
+            </h2>
+            <p class="text-gray-400 mb-5">
+              Book a free 30-minute intro call. No pitch, just advice.
+            </p>
+            <BookCallLink
+              url={SCHEDULE_URL}
+              target="_blank"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 transition-all duration-200"
+            >
+              Book a free intro call
+            </BookCallLink>
+          </div>
+        )}
       </div>
     </Layout>
   );
