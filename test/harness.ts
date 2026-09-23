@@ -56,7 +56,20 @@ async function assertBuilt(): Promise<void> {
  * this function without a build, and `assertBuilt()` above turns that into a
  * loud failure instead of a silent skip.
  */
-export async function startSite(): Promise<Site> {
+/** Options for {@link startSite}. */
+export interface StartSiteOptions {
+  /**
+   * Env vars to overlay onto the spawned server's inherited environment.
+   * Each key replaces the parent process's value for that var, so passing
+   * `{ SCHEDULE_URL: "" }` reliably tests the unset case even when the
+   * parent shell (local or CI) happens to have `SCHEDULE_URL` set — the
+   * override always wins, it does not merely fill a gap. Omit entirely to
+   * keep the previous behavior of inheriting the parent env untouched.
+   */
+  env?: Record<string, string>;
+}
+
+export async function startSite(options: StartSiteOptions = {}): Promise<Site> {
   await assertBuilt();
 
   const port = getAvailablePort();
@@ -77,6 +90,7 @@ export async function startSite(): Promise<Site> {
   const command = new Deno.Command(Deno.execPath(), {
     args: ["serve", "-A", "--port", String(port), urlToPath(SERVER_ENTRY_URL)],
     cwd: urlToPath(ROOT_URL),
+    env: options.env ? { ...Deno.env.toObject(), ...options.env } : undefined,
     stdin: "null",
     stdout: "null",
     stderr: "piped",
