@@ -38,20 +38,23 @@
 //   9 & 10. routes/blog/[slug].tsx's two captions (text-gray-600 -> gray-400)
 //      — both render on every blog post below
 //
-// #2 needs its own probe: --color-gray-400's only real failing pairing
-// (4.06:1 pre-fix) is text-gray-400 on bg-gray-700, used by
-// islands/GhStars.tsx's "no stars yet / fetch failed" fallback badge — the
-// only place that exact pairing renders. Every other text-gray-400 use on
-// these five pages already sits on a background dark enough that even the
-// pre-fix value passed, so visiting real pages alone never exercises the
-// pairing that actually failed (confirmed: reverting the token alone left
-// this test green until the probe below was added). GhStars also fetches
-// live star counts from api.github.com client-side, so loading a page that
-// renders it for real would make this test's result depend on network
-// conditions and GitHub's API — not something to add to a deterministic
-// suite. Instead, the probe injects that one class combination directly onto
-// an already-loaded page (reusing its already-loaded stylesheet) and asks
-// axe to check only that element, which is deterministic and network-free.
+// #2 needs its own probe: --color-gray-400 was already comfortably above AA
+// (5.78:1) against gray-800, the background most of its real uses sit on —
+// its one failing pairing pre-fix (4.06:1) is specifically text-gray-400 on
+// bg-gray-700, used by islands/GhStars.tsx's "no stars yet / fetch failed"
+// fallback badge (and, as plain placeholder text rather than a contrast
+// requirement, islands/LeadForm.tsx's placeholder-gray-400 inputs, which
+// also sit on bg-gray-700). Every other text-gray-400 use on these five
+// pages already sits on a background dark enough that even the pre-fix
+// value passed, so visiting real pages alone never exercises the pairing
+// that actually failed (confirmed: reverting the token alone left this test
+// green until the probe below was added). GhStars also fetches live star
+// counts from api.github.com client-side, so loading a page that renders it
+// for real would make this test's result depend on network conditions and
+// GitHub's API — not something to add to a deterministic suite. Instead,
+// the probe injects that one class combination directly onto an
+// already-loaded page (reusing its already-loaded stylesheet) and asks axe
+// to check only that element, which is deterministic and network-free.
 //
 // #6 and #7 need a manual ratio check instead of axe, for two different
 // reasons neither related to the actual colour: the breadcrumb "/" carries
@@ -141,7 +144,21 @@ async function assertNoContrastViolations(
  * uses. For the handful of elements axe itself won't judge — aria-hidden
  * nodes (excluded from the accessibility tree entirely) and lone symbol
  * characters ("x", "✓", classified as "non-text content") — see the file
- * header for which two and why. Returns `null` if nothing matches. */
+ * header for which two and why. Returns `null` if `selector`/`exactText`
+ * matches nothing; throws if a matched element's colour can't be parsed.
+ *
+ * Colours are parsed through a 1x1 `<canvas>` rather than a `rgb(...)`
+ * regex: Tailwind v4's palette is defined in `oklch()`, and
+ * `getComputedStyle` returns whatever colour space the declaration used
+ * (`oklch(...)`, not `rgb(...)`) rather than normalizing it, so a regex
+ * built for `rgb()`/`rgba()` alone would silently fail to match — and
+ * previously did, defaulting to black rather than raising. Canvas's
+ * `fillStyle` accepts any CSS `<color>` the browser understands (oklch
+ * included, since it's the same engine that painted the page) and, per
+ * spec, *ignores* an unparseable assignment rather than throwing —
+ * leaving the previous value in place. Setting a sentinel value first and
+ * checking whether it survived the real assignment is how that spec
+ * behaviour is turned back into a thrown error here. */
 function getContrastRatio(
   page: Page,
   selector: string,
@@ -154,6 +171,26 @@ function getContrastRatio(
       : candidates.find((c) => c.textContent?.trim() === text);
     if (!el) return null;
 
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext("2d")!;
+    const UNPARSEABLE_SENTINEL = "#010203";
+
+    /** Parses any CSS colour Chromium can paint (oklch, rgb, hex, named,
+     * ...) into 0-255 RGBA channels, via the canvas 2D context's own colour
+     * parser. Throws if `color` isn't a valid CSS `<color>`. */
+    function parseColor(color: string): [number, number, number, number] {
+      ctx.fillStyle = UNPARSEABLE_SENTINEL;
+      ctx.fillStyle = color;
+      if (ctx.fillStyle === UNPARSEABLE_SENTINEL) {
+        throw new Error(`getContrastRatio: could not parse colour "${color}"`);
+      }
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillRect(0, 0, 1, 1);
+      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+      return [r, g, b, a];
+    }
     function relativeLuminance(r: number, g: number, b: number): number {
       const chan = (c: number) => {
         const s = c / 255;
@@ -161,35 +198,67 @@ function getContrastRatio(
       };
       return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
     }
-    function parseRgb(color: string): [number, number, number] {
-      const m = color.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)/);
-      if (!m) return [0, 0, 0];
-      return [Number(m[1]), Number(m[2]), Number(m[3])];
-    }
-    function isTransparent(color: string): boolean {
-      return color === "transparent" || /rgba\([^)]+,\s*0\)/.test(color);
-    }
 
-    const textColor = getComputedStyle(el).color;
-    let bg = "";
+    const [tr, tg, tb] = parseColor(getComputedStyle(el).color);
+
+    let bg: [number, number, number, number] = [0, 0, 0, 0];
     let node: Element | null = el;
     while (node) {
-      const c = getComputedStyle(node).backgroundColor;
-      if (c && !isTransparent(c)) {
-        bg = c;
+      const parsed = parseColor(getComputedStyle(node).backgroundColor);
+      if (parsed[3] > 0) {
+        bg = parsed;
         break;
       }
       node = node.parentElement;
     }
-    const [tr, tg, tb] = parseRgb(textColor);
-    const [br, bg2, bb] = parseRgb(bg);
     const l1 = relativeLuminance(tr, tg, tb);
-    const l2 = relativeLuminance(br, bg2, bb);
+    const l2 = relativeLuminance(bg[0], bg[1], bg[2]);
     const lighter = Math.max(l1, l2);
     const darker = Math.min(l1, l2);
     return (lighter + 0.05) / (darker + 0.05);
   }, { sel: selector, text: exactText });
 }
+
+Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch pairing", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await browser.newPage();
+    try {
+      // white text on bg-sky-600 (Tailwind v4's oklch(58.8% .158 241.966),
+      // #0084d1 once painted) is a known quantity: axe itself reports this
+      // exact pairing's ratio as 4.02 on routes/contact-me.tsx's Telegram
+      // button pre-fix (see the PR body's evidence). Reproducing that number
+      // here, from a synthetic element rather than a real page, is this
+      // helper's own proof that routing colours through a <canvas> — needed
+      // for oklch, see getContrastRatio's docs above — gives the same answer
+      // as the browser's actual rendering, not just a plausible one.
+      await page.goto(site.origin, { waitUntil: "networkidle" });
+      await page.evaluate(() => {
+        const el = document.createElement("span");
+        el.id = "contrast-probe-white-on-sky-600";
+        el.className = "bg-sky-600 text-white";
+        el.textContent = "probe";
+        document.body.appendChild(el);
+      });
+      const ratio = await getContrastRatio(
+        page,
+        "#contrast-probe-white-on-sky-600",
+      );
+      assert(ratio !== null, "probe element must be found");
+      assert(
+        Math.abs(ratio - 4.02) < 0.01,
+        `white on bg-sky-600 must be ~4.02, got ${ratio}`,
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
 
 Deno.test("no WCAG AA colour-contrast violations across five representative pages", async () => {
   const site = await startSite();
@@ -211,7 +280,9 @@ Deno.test("no WCAG AA colour-contrast violations across five representative page
 
       // components/Breadcrumb.tsx's "/" separator: aria-hidden, so axe never
       // judges it (see the file header) — checked manually instead. Still on
-      // /contact-me from the loop above.
+      // the last page from the loop above (/blog/building-mcp-servers-with-deno,
+      // whose breadcrumb is Home > Blog > post title — any page in the loop
+      // with more than one crumb would do).
       const breadcrumbSepRatio = await getContrastRatio(
         page,
         'nav[aria-label="Breadcrumb"] span[aria-hidden="true"]',

@@ -303,9 +303,15 @@ visually rendered; and axe classifies a lone symbol character ("x", "✓") as
 "non-text content", so the catalog page's "not included" marker lands in
 `incomplete`, never `violations`, regardless of its colour. The test's
 `getContrastRatio()` helper computes the same WCAG relative-luminance formula
-axe itself uses directly from `getComputedStyle`, for those two elements only. A
-third fix (`--color-gray-400`) needs a synthetic probe rather than a real page:
-its one failing pairing pre-fix (text-gray-400 on bg-gray-700) only renders from
+axe itself uses, for those two elements only, from colours it parses through a
+1x1 `<canvas>` rather than a `rgb()` regex — Tailwind v4's palette is `oklch()`,
+which `getComputedStyle` returns as-is rather than normalizing, so a regex built
+for `rgb()` alone would silently treat an unparsed oklch value as black instead
+of raising. A separate `Deno.test` in the same file proves this against a known
+quantity: white text on `bg-sky-600` (oklch, `#0084d1` once painted) reproduces
+the 4.02 ratio axe itself reports for the same pairing on `main`. A third fix
+(`--color-gray-400`) needs a synthetic probe rather than a real page: its one
+failing pairing pre-fix (text-gray-400 on bg-gray-700) only renders from
 `islands/GhStars.tsx`'s "fetch failed" fallback badge, which needs a live
 `api.github.com` call to reach — not something to make this test's result depend
 on, so the probe injects that exact class pairing onto an already-loaded page
