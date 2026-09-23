@@ -11,11 +11,10 @@
 // from the plain `deno task test` glob instead of widening that task's
 // permissions for every test file.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { chromium } from "playwright";
 import type { Browser, Page, Route } from "playwright";
 import { startSite } from "./harness.ts";
+import { launchChromium } from "./browser.ts";
 
-const PLAYWRIGHT_VERSION = "1.63.0";
 const FOCUS_TIMEOUT_MS = 5000;
 // Longer than the panels' 500ms CSS transition, so the scroll sampler below
 // keeps recording past the point where a scroll jump would show up.
@@ -100,24 +99,7 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
   const site = await startSite();
   let browser: Browser | undefined;
   try {
-    try {
-      // CI (Woodpecker/denoland/deno:2.9.0) runs this container as root, and
-      // Chromium's own sandbox refuses to start as root without this flag.
-      // Harmless here: the browser only ever loads the site this test just
-      // booted, never third-party content.
-      browser = await chromium.launch({ args: ["--no-sandbox"] });
-    } catch (cause) {
-      const installCmd =
-        `deno run -A npm:playwright@${PLAYWRIGHT_VERSION} install --with-deps chromium`;
-      const reason = cause instanceof Error ? cause.message : String(cause);
-      throw new Error(
-        `chromium.launch() failed — no compatible Chromium build found. ` +
-          `Install one with \`${installCmd}\` ` +
-          `(see AGENTS.md "Rendered-page tests" for why this test needs its ` +
-          `own task). Original error: ${reason}`,
-        { cause },
-      );
-    }
+    browser = await launchChromium();
 
     // Default 1280x720 viewport, deliberately not overridden: it's one of
     // the two sizes (the other being 390x844) confirmed to reproduce the
