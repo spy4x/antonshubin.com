@@ -71,14 +71,14 @@ export default function Menu(
   const linkClass = (href: string) =>
     `block px-3 py-2 rounded-md text-base font-medium ${
       isActive(href)
-        ? "bg-orange-500 text-white"
+        ? "bg-orange-600 text-white"
         : "text-gray-300 hover:bg-gray-700 hover:text-white"
     }`;
 
   const desktopLinkClass = (href: string) =>
     `flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium ${
       isActive(href)
-        ? "bg-orange-500 text-white"
+        ? "bg-orange-600 text-white"
         : "text-gray-300 hover:bg-gray-700 hover:text-white"
     }`;
 
