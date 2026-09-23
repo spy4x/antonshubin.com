@@ -41,12 +41,13 @@
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@preact/signals@^2.5.1": "2.9.2_preact@10.29.3",
     "npm:@preact/signals@^2.9.0": "2.9.2_preact@10.29.3",
-    "npm:@prefresh/vite@^2.4.8": "2.4.12_preact@10.29.3_vite@7.3.1__picomatch@4.0.3",
-    "npm:@tailwindcss/vite@^4.1.18": "4.1.18_vite@7.3.1__picomatch@4.0.3",
+    "npm:@prefresh/vite@^2.4.8": "2.4.12_preact@10.29.3_vite@7.3.1",
+    "npm:@tailwindcss/vite@^4.1.18": "4.1.18_vite@7.3.1",
     "npm:esbuild-wasm@~0.25.11": "0.25.12",
     "npm:esbuild@0.25.7": "0.25.7",
     "npm:esbuild@~0.25.5": "0.25.12",
     "npm:marked@^17.0.1": "17.0.1",
+    "npm:playwright@1.63.0": "1.63.0",
     "npm:preact-render-to-string@^6.6.3": "6.7.0_preact@10.29.3",
     "npm:preact@^10.28.2": "10.29.3",
     "npm:preact@^10.29.1": "10.29.3",
@@ -828,7 +829,7 @@
     "@prefresh/utils@1.2.1": {
       "integrity": "sha512-vq/sIuN5nYfYzvyayXI4C2QkprfNaHUQ9ZX+3xLD8nL3rWyzpxOm1+K7RtMbhd+66QcaISViK7amjnheQ/4WZw=="
     },
-    "@prefresh/vite@2.4.12_preact@10.29.3_vite@7.3.1__picomatch@4.0.3": {
+    "@prefresh/vite@2.4.12_preact@10.29.3_vite@7.3.1": {
       "integrity": "sha512-FY1fzXpUjiuosznMV0YM7XAOPZjB5FIdWS0W24+XnlxYkt9hNAwwsiKYn+cuTEoMtD/ZVazS5QVssBr9YhpCQA==",
       "dependencies": [
         "@babel/core",
@@ -1060,7 +1061,7 @@
         "@tailwindcss/oxide-win32-x64-msvc"
       ]
     },
-    "@tailwindcss/vite@4.1.18_vite@7.3.1__picomatch@4.0.3": {
+    "@tailwindcss/vite@4.1.18_vite@7.3.1": {
       "integrity": "sha512-jVA+/UpKL1vRLg6Hkao5jldawNmRo7mQYrZtNHMIVpLfLhDml5nMRUo/8MwoX2vNXvnaXNNMedrMfMugAVX1nA==",
       "dependencies": [
         "@tailwindcss/node",
@@ -1365,6 +1366,17 @@
     "picomatch@4.0.3": {
       "integrity": "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="
     },
+    "playwright-core@1.63.0": {
+      "integrity": "sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==",
+      "bin": true
+    },
+    "playwright@1.63.0": {
+      "integrity": "sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==",
+      "dependencies": [
+        "playwright-core"
+      ],
+      "bin": true
+    },
     "postcss@8.5.6": {
       "integrity": "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==",
       "dependencies": [
@@ -1489,6 +1501,7 @@
       "npm:@preact/signals@^2.9.0",
       "npm:@tailwindcss/vite@^4.1.18",
       "npm:marked@^17.0.1",
+      "npm:playwright@1.63.0",
       "npm:preact@^10.29.1",
       "npm:tailwindcss@^4.1.18",
       "npm:vite@^7.1.3"
