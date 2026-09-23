@@ -22,6 +22,19 @@ function withoutNewTabHint(html: string): string {
   );
 }
 
+/** Undoes the `escapeNoEncode` this module now applies to an `<img>`'s `alt`, so what's left can be compared against plain marked's own (unescaped) output. Leaves `title` untouched, since that must match plain marked byte for byte. */
+function withoutAltEscaping(html: string): string {
+  return html.replace(/alt="([^"]*)"/g, (_match, alt: string) =>
+    `alt="${
+      alt
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
+    }"`);
+}
+
 Deno.test("a tight checklist keeps marked's own HTML, plus aria-label", async () => {
   const md = "- [ ] Product stage is written down.\n- [x] Done thing.\n";
   const ours = await renderBlogMarkdown(md);
@@ -214,15 +227,18 @@ Deno.test("an image alt with a quote is escaped, not a live attribute", async ()
 });
 
 Deno.test("an image with formatted alt and a title renders like marked, alt escaped", async () => {
-  const md = '![a *b* "c"](x.png "my title")\n';
+  const md =
+    '![a *b* "c"](x.png "Tom &amp; Jerry &quot;show&quot; O&#39;Brien")\n';
   const ours = await renderBlogMarkdown(md);
+  const plain = await marked(md);
   // Apart from the alt escaping this guards, the rest of marked's own image
   // handling (inline formatting flattened to plain text, the title
-  // attribute) must stay exactly as plain marked renders it.
-  assertMatch(
-    ours,
-    /<img src="x\.png" alt="a b &quot;c&quot;" title="my title">/,
-  );
+  // attribute with its existing entities kept, not re-encoded) must stay
+  // exactly as plain marked renders it — compared against a live call, not
+  // a hardcoded string, so a change to marked's own output would show here.
+  assertEquals(withoutAltEscaping(ours), plain);
+  assertMatch(ours, /alt="a b &quot;c&quot;"/);
+  assertMatch(ours, /title="Tom &amp; Jerry &quot;show&quot; O&#39;Brien"/);
 });
 
 Deno.test("a hidden <script> in one checklist item never hides the next item's text", async () => {

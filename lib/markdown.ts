@@ -189,11 +189,13 @@ blogMarked.use({
     /**
      * Plain marked's own `image` renderer (marked 17.0.1) writes the alt text
      * straight into `alt="${n}"` with no escaping at all — an alt of
-     * `" onfocus="x` produces a second, live attribute. This override is
-     * otherwise byte-for-byte the same logic (inline-formatted alt via the
-     * shared `TextRenderer`, the same `cleanUrl` href handling, the same
-     * `title` attribute), escaped the same way the checklist labels above
-     * are: `escapeNoEncode`, marked's own no-encode entity-aware pattern.
+     * `" onfocus="x` produces a second, live attribute. This override
+     * otherwise matches that same logic (inline-formatted alt via the shared
+     * `TextRenderer`, the same `cleanUrl` href handling, the same `title`
+     * attribute), with both `alt` and `title` escaped by `escapeNoEncode` —
+     * the same no-encode, entity-aware pattern marked's own `image()` and
+     * `link()` use for `title` (single-argument `w(t)`, whose `encode` flag
+     * defaults to false) and the one the checklist labels above already use.
      */
     image({ href, title, text, tokens }) {
       const alt = escapeNoEncode(
@@ -204,7 +206,7 @@ blogMarked.use({
       const cleanHref = cleanUrl(href);
       if (cleanHref === null) return alt;
       let out = `<img src="${cleanHref}" alt="${alt}"`;
-      if (title) out += ` title="${escapeEncode(title)}"`;
+      if (title) out += ` title="${escapeNoEncode(title)}"`;
       out += ">";
       return out;
     },
