@@ -91,7 +91,7 @@ export default define.page(function Home(ctx) {
                   Book a {INTRO_CALL}
                 </BookCallLink>
                 <p class="mt-3 text-sm text-gray-400">
-                  Rather write?{" "}
+                  {SCHEDULE_URL && "Rather write? "}
                   <a
                     href="#audit-form"
                     data-umami-event="hero-audit-link"
@@ -392,7 +392,7 @@ export default define.page(function Home(ctx) {
             Book a {INTRO_CALL}
           </BookCallLink>
           <p class="mt-4 text-sm text-gray-400">
-            Rather write?{" "}
+            {SCHEDULE_URL && "Rather write? "}
             <a
               href="#audit-form"
               data-umami-event="cta-audit-link"
