@@ -14,6 +14,14 @@ function withoutAriaLabel(html: string): string {
   return html.replace(/<input aria-label="[^"]*" /g, "<input ");
 }
 
+/** Strips the sr-only new-tab hint `addNewTabHints` adds to a `target="_blank"` link, so what's left can be compared against plain marked's own output. */
+function withoutNewTabHint(html: string): string {
+  return html.replace(
+    /<span class="sr-only">&nbsp;\(opens in a new tab\)<\/span>/g,
+    "",
+  );
+}
+
 Deno.test("a tight checklist keeps marked's own HTML, plus aria-label", async () => {
   const md = "- [ ] Product stage is written down.\n- [x] Done thing.\n";
   const ours = await renderBlogMarkdown(md);
@@ -60,6 +68,18 @@ Deno.test("a checklist item with inline markup gets a plain-text label", async (
   // The rendered inline markup itself must still be intact.
   assertMatch(ours, /<strong>bold<\/strong>/);
   assertMatch(ours, /<a href="http:\/\/example\.com">a link<\/a>/);
+});
+
+Deno.test("a checklist item with inline HTML gets a tag-free label", async () => {
+  const md = '- [ ] see <a href="https://e.example" target="_blank">site</a>\n';
+  const ours = await renderBlogMarkdown(md);
+  const plain = await marked(md);
+  // The new-tab hint is a separate, unrelated post-processing step (see
+  // addNewTabHints) that plain marked never runs, so it's stripped here too.
+  assertEquals(withoutNewTabHint(withoutAriaLabel(ours)), plain);
+  // The bug this guards: the raw `<a ...>site</a>` tag text landing in the
+  // attribute instead of just "site", the tag's own text token.
+  assertMatch(ours, /aria-label="see site"/);
 });
 
 Deno.test("a plain (non-task) list is untouched", async () => {

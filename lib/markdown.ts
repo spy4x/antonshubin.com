@@ -21,6 +21,22 @@ interface LabelledCheckbox extends Tokens.Checkbox {
 }
 
 /**
+ * Marked's own `TextRenderer.html()` passes an inline HTML token's raw markup
+ * straight through (it's meant for content already known to be plain text,
+ * but an inline `html` token can still reach it inside a checklist label).
+ * Blog posts write their links as raw `<a target="_blank">` HTML rather than
+ * markdown syntax (see `addNewTabHints` below), so a checklist item with a
+ * link in it hits this. Dropping the tag entirely is safe here: the tag's
+ * own visible text is a separate, sibling text token that this renderer
+ * still renders normally, so only the markup disappears from the label.
+ */
+class PlainTextRenderer extends TextRenderer {
+  override html(): string {
+    return "";
+  }
+}
+
+/**
  * Renders a token array to plain text: markup resolved and stripped (a link
  * keeps its visible text, not its href; `**bold**` keeps just the word),
  * matching what a screen reader would actually announce for `aria-label`
@@ -34,7 +50,7 @@ function plainText(tokens: Tokens.Generic[]): string {
   // plain-text body — it's what marked itself uses internally for exactly
   // this (an image's alt text, for one).
   return Parser.parseInline(tokens, {
-    renderer: new TextRenderer() as unknown as Renderer,
+    renderer: new PlainTextRenderer() as unknown as Renderer,
   });
 }
 
