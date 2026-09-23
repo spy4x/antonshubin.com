@@ -2,8 +2,8 @@
   "nodeModulesDir": "manual",
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check && deno task test && deno task test:browser",
-    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno --ignore=test/lead-form.browser.test.ts",
-    "test:browser": "deno test -A test/lead-form.browser.test.ts",
+    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno --ignore=test/lead-form.browser.test.ts,test/a11y.browser.test.ts",
+    "test:browser": "deno test -A test/lead-form.browser.test.ts test/a11y.browser.test.ts",
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",
