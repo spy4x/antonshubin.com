@@ -18,7 +18,7 @@ export default define.page(function App({ Component }) {
 
         {/* Minimal critical CSS to prevent FOUC while CSS loads */}
         <style>
-          {`html,body{background-color:#0f172a}body,a,button{color:#e2e8f0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}
+          {`html,body{background-color:#0f172a}body{color:#e2e8f0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}
         </style>
 
         {/* Favicon + Apple Touch Icons (modern sizes only) */}

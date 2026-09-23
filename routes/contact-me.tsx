@@ -50,7 +50,7 @@ const contacts = [
     color:
       "bg-gray-600/20 text-gray-300 border-gray-600/30 hover:border-gray-400",
     btnClass:
-      "bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+      "bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Send email",
     hideArrow: false,
     downArrow: false,
@@ -62,7 +62,7 @@ const contacts = [
     href: "https://t.me/spy4x",
     color: "bg-sky-600/20 text-sky-400 border-sky-600/30 hover:border-sky-500",
     btnClass:
-      "bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+      "bg-sky-700 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
     btnText: "Message me",
     hideArrow: false,
     downArrow: false,

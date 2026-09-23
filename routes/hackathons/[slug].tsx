@@ -189,7 +189,7 @@ export default define.page(function HackathonDetail(ctx) {
                     <BookCallLink
                       url={h.ctaLink || SCHEDULE_URL}
                       target={h.ctaLink ? undefined : "_blank"}
-                      class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-sm"
+                      class="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-sm"
                     >
                       {h.ctaLabel || "Book a free intro call"}
                     </BookCallLink>

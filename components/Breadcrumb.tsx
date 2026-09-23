@@ -29,7 +29,7 @@ export function Breadcrumb({ items }: { items: Crumb[] }) {
                 </span>
               )}
             {i < items.length - 1 && (
-              <span aria-hidden="true" class="text-gray-600">/</span>
+              <span aria-hidden="true" class="text-gray-400">/</span>
             )}
           </li>
         ))}

@@ -226,7 +226,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
             type="submit"
             disabled={status.value.type === "submitting"}
             data-umami-event="form-submit-audit"
-            class="w-full px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            class="w-full px-8 py-3.5 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {status.value.type === "submitting" ? "Sending..." : (
               <>

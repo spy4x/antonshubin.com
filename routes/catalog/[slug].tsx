@@ -227,7 +227,7 @@ export default define.page(function CatalogDetail(ctx) {
                     key={j}
                     class="text-gray-500 flex items-start gap-2 text-sm"
                   >
-                    <span class="text-gray-600 shrink-0 mt-0.5">×</span>
+                    <span class="text-gray-400 shrink-0 mt-0.5">×</span>
                     {exc}
                   </li>
                 ))}
@@ -259,7 +259,7 @@ export default define.page(function CatalogDetail(ctx) {
             <div class="flex flex-wrap items-stretch gap-4">
               <a
                 href="/contact-me"
-                class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
               >
                 Talk about this
               </a>
