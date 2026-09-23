@@ -5,11 +5,11 @@ steps:
       - deno install
       # test/lead-form.browser.test.ts and test/a11y.browser.test.ts (deno
       # task test:browser, run inside "deno task check") drive a real
-      # Chromium. The base image has none,
-      # so install it — matching version pin in deno.json's "playwright"
-      # import, so the download always lands on the browser build that
-      # version expects — with OS deps included, since this container has
-      # none of the usual desktop libs a headless Chromium needs.
+      # Chromium. The base image has none, so install it at the version
+      # pinned in deno.json's "playwright" import (and test/browser.ts), so
+      # the download lands on the browser build that version expects, with
+      # OS deps included, since this container has none of the desktop libs
+      # a headless Chromium needs.
       - deno run -A npm:playwright@1.63.0 install --with-deps chromium
       - deno task check
     when:

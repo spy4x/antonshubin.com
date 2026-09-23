@@ -208,23 +208,23 @@ one server-rendered response with no hydration and no click. For that,
 `test/lead-form.browser.test.ts` drives real Chromium through Playwright
 (`npm:playwright@1.63.0`, pinned to that exact version — not a `^` range — in
 `deno.json`'s import map, because it must match the version in
-`.woodpecker.yml`'s install command exactly: each Playwright version expects one
-specific Chromium build, so a mismatch there downloads a different Chromium than
-the one this test launches. That it also happens to match the Chromium build
-already cached locally under `~/.cache/ms-playwright`, so running it locally
-downloads nothing, is a side effect of picking a recent version, not the reason
-for the pin). It still calls `startSite()` for the running server, stubs
-`/api/lead` with `page.route()` so no real network call is made, submits the
-lead form, and asserts on three things a plain HTML fetch of the pre-submit page
-can't show: that focus lands on the success heading (the screen-reader
-announcement for issue #157); that the page never scrolls further down than
-where it stood right before the click, sampling `scrollY` on every animation
-frame through the panels' 500ms transition (submitting with the button pinned to
-the bottom of the viewport — the only position that reproduces the jump — a
-`focus()` without `{ preventScroll: true }` on `islands/LeadForm.tsx`'s success
-heading scrolls the page down to the heading's still-collapsed position and back
-as the panel expands); and that the form and success panels swap their `inert`
-state.
+`.woodpecker.yml`'s install command and `PLAYWRIGHT_VERSION` in
+`test/browser.ts` exactly: each Playwright version expects one specific Chromium
+build, so a mismatch there downloads a different Chromium than the one this test
+launches. That it also happens to match the Chromium build already cached
+locally under `~/.cache/ms-playwright`, so running it locally downloads nothing,
+is a side effect of picking a recent version, not the reason for the pin). It
+still calls `startSite()` for the running server, stubs `/api/lead` with
+`page.route()` so no real network call is made, submits the lead form, and
+asserts on three things a plain HTML fetch of the pre-submit page can't show:
+that focus lands on the success heading (the screen-reader announcement for
+issue #157); that the page never scrolls further down than where it stood right
+before the click, sampling `scrollY` on every animation frame through the
+panels' 500ms transition (submitting with the button pinned to the bottom of the
+viewport — the only position that reproduces the jump — a `focus()` without
+`{ preventScroll: true }` on `islands/LeadForm.tsx`'s success heading scrolls
+the page down to the heading's still-collapsed position and back as the panel
+expands); and that the form and success panels swap their `inert` state.
 
 `test/a11y.browser.test.ts` (issue #165) is the other file in this task. It
 covers four things the server-rendered HTML in `test/a11y.test.ts` cannot see,
