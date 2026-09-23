@@ -283,16 +283,41 @@ above), not a silent skip. If Chromium is missing entirely (a fresh machine, or
 naming the exact install command instead of skipping — required, since a
 lead-form regression must fail the build, not vanish quietly.
 
-**`test/contrast.browser.test.ts` (issue #160)** runs axe-core's
+**`test/contrast.browser.test.ts` (issue #160)** runs axe-core 4.13.0's
 `color-contrast` rule, through the same Chromium/`startSite()` pattern as the
-two files above, against three representative pages (`/`, `/catalog`,
-`/blog/ship-it-today`) rather than the full sitemap — a regression guard only
-needs to catch a break in the fixed tokens or the two class edits that went with
-them, not repeat a full-site audit on every push. It imports `axe-core` (pinned
-in `deno.json`'s import map) and reads its `.source` string, the same way the
-one-off audit script that produced the PR's before/after counts injected it with
-`page.addScriptTag()`, so no network fetch happens in the test itself. Listed
-alongside the other two files in `test:browser`.
+two files above, against five representative pages (`/`, `/contact-me`,
+`/blog/ship-it-today`, `/blog/building-mcp-servers-with-deno`, and `/catalog`
+with its two nested `<details>` opened) rather than the full sitemap — a
+regression guard only needs to catch a break in the fixed tokens or the class
+edits that went with them, not repeat a full-site audit on every push. It
+imports `axe-core` (pinned exactly, like `playwright`, in `deno.json`'s import
+map) and reads its `.source` string, the same way the one-off audit script that
+produced the PR's before/after counts injected it with `page.addScriptTag()`, so
+no network fetch happens in the test itself.
+
+Two of the ten colour fixes this PR makes can't be proven by axe's own
+`violations` result, for reasons unrelated to the actual colour: axe's
+color-contrast rule skips any node excluded from the accessibility tree, so the
+breadcrumb separator's `aria-hidden="true"` "/" is invisible to it despite being
+visually rendered; and axe classifies a lone symbol character ("x", "✓") as
+"non-text content", so the catalog page's "not included" marker lands in
+`incomplete`, never `violations`, regardless of its colour. The test's
+`getContrastRatio()` helper computes the same WCAG relative-luminance formula
+axe itself uses directly from `getComputedStyle`, for those two elements only. A
+third fix (`--color-gray-400`) needs a synthetic probe rather than a real page:
+its one failing pairing pre-fix (text-gray-400 on bg-gray-700) only renders from
+`islands/GhStars.tsx`'s "fetch failed" fallback badge, which needs a live
+`api.github.com` call to reach — not something to make this test's result depend
+on, so the probe injects that exact class pairing onto an already-loaded page
+instead. The file's own header lists all ten fixes, which page or probe
+exercises each, how each was confirmed to turn the test red by reverting it
+locally, and the two fixes this test's page set doesn't reach at all (an image
+caption that only renders from one blog post's raw markdown HTML, and a second,
+differently-located copy of the catalog "x" fix on `routes/catalog/[slug].tsx`)
+— both admitted rather than claimed, per the same "flag a gap, don't claim it"
+reasoning as `test/a11y.test.ts`'s two uncovered lightbox buttons above.
+
+Listed alongside the other two files in `test:browser`.
 
 ## AI crawler optimization (SEO)
 
