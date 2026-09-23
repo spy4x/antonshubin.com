@@ -42,6 +42,21 @@ async function assertBuilt(): Promise<void> {
   }
 }
 
+/** Options for {@link startSite}. */
+export interface StartSiteOptions {
+  /**
+   * Env vars to overlay onto the spawned server's inherited environment.
+   * `Deno.Command` merges `env` into the current process's environment
+   * rather than replacing it (unless `clearEnv` is set, which this call
+   * never does), so each key here overrides the parent's value for that
+   * var — passing `{ SCHEDULE_URL: "" }` reliably tests the unset case even
+   * when the parent shell (local or CI) happens to have `SCHEDULE_URL` set.
+   * Omit entirely to keep the previous behavior of inheriting the parent
+   * env untouched.
+   */
+  env?: Record<string, string>;
+}
+
 /**
  * Boots the already-built production server (`deno serve -A _fresh/server.js`)
  * on a free port and waits until it answers, for a guard test to fetch pages
@@ -56,19 +71,6 @@ async function assertBuilt(): Promise<void> {
  * this function without a build, and `assertBuilt()` above turns that into a
  * loud failure instead of a silent skip.
  */
-/** Options for {@link startSite}. */
-export interface StartSiteOptions {
-  /**
-   * Env vars to overlay onto the spawned server's inherited environment.
-   * Each key replaces the parent process's value for that var, so passing
-   * `{ SCHEDULE_URL: "" }` reliably tests the unset case even when the
-   * parent shell (local or CI) happens to have `SCHEDULE_URL` set — the
-   * override always wins, it does not merely fill a gap. Omit entirely to
-   * keep the previous behavior of inheriting the parent env untouched.
-   */
-  env?: Record<string, string>;
-}
-
 export async function startSite(options: StartSiteOptions = {}): Promise<Site> {
   await assertBuilt();
 
@@ -90,7 +92,7 @@ export async function startSite(options: StartSiteOptions = {}): Promise<Site> {
   const command = new Deno.Command(Deno.execPath(), {
     args: ["serve", "-A", "--port", String(port), urlToPath(SERVER_ENTRY_URL)],
     cwd: urlToPath(ROOT_URL),
-    env: options.env ? { ...Deno.env.toObject(), ...options.env } : undefined,
+    env: options.env,
     stdin: "null",
     stdout: "null",
     stderr: "piped",
