@@ -13,7 +13,7 @@ import { marked } from "marked";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { jsonLd } from "../../lib/json-ld.ts";
+import { toJsonLd } from "../../lib/json-ld.ts";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
@@ -83,7 +83,7 @@ export default define.page(function CatalogDetail(ctx) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLd({
+          __html: toJsonLd({
             "@context": "https://schema.org",
             "@type": "Service",
             "@id": `https://antonshubin.com/catalog/${item.slug}#service`,

@@ -8,7 +8,7 @@ import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
-import { jsonLd } from "../lib/json-ld.ts";
+import { toJsonLd } from "../lib/json-ld.ts";
 
 interface Faq {
   q: string;
@@ -156,7 +156,7 @@ export default define.page(function HowIWork() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLd({
+          __html: toJsonLd({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             "mainEntity": faqs.map((f) => ({

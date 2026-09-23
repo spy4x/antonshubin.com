@@ -1,7 +1,7 @@
 import { Head } from "fresh/runtime";
 import { breadcrumbFromCanonical, head, ROLE } from "../lib/head.ts";
 import { SAME_AS_URLS } from "../lib/config.ts";
-import { jsonLd } from "../lib/json-ld.ts";
+import { toJsonLd } from "../lib/json-ld.ts";
 
 export function SEOHead() {
   const h = head.value;
@@ -37,7 +37,7 @@ export function SEOHead() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLd({
+          __html: toJsonLd({
             "@context": "https://schema.org",
             "@graph": [
               {
