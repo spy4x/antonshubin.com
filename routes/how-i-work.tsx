@@ -4,6 +4,7 @@ import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
@@ -56,6 +57,8 @@ function FaqItem({ faq }: { faq: Faq }) {
       <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
         <span>{faq.q}</span>
         <svg
+          aria-hidden="true"
+          focusable="false"
           class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -321,6 +324,7 @@ export default define.page(function HowIWork() {
                 class="hover:text-orange-300 underline underline-offset-4"
               >
                 open standalone
+                <NewTabHint />
               </a>
             </p>
           </div>

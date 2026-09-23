@@ -40,7 +40,8 @@ export default function CopyButton(
     <button
       onClick={handleCopy}
       class={`${className || ""} ${baseClass}`.trim()}
-      {...(title ? { title } : {})}
+      aria-live="polite"
+      {...(title && !copied.value ? { title, "aria-label": title } : {})}
     >
       {copied.value ? "✅ Copied!" : label}
     </button>

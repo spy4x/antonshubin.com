@@ -140,6 +140,34 @@ and `count()` (counts regex matches). `test/html.test.ts` tests the helpers
 themselves, because a `visibleText()` that keeps script bodies makes the FAQ
 guard pass against a broken page. `test/structure.test.ts` guards the site
 structure: catalog items, navigation, redirects, prices, home sections, labels.
+`test/a11y.test.ts` (issue #160) guards two things. First, that a nav link's
+`href` still matches what Fresh 2's own framework needs to auto-mark it current
+— islands/Menu.tsx sets no `aria-current` itself; Fresh's renderer puts
+`aria-current="page"`/`data-current="true"` on an exact `<a href>` match and
+`aria-current="true"`/`data-ancestor="true"` on a section-ancestor match, so the
+test pins both cases on real pages rather than testing our own code (there is
+none to test here — see the test file's own docs for the mutation that proves
+this still catches a real break, a typo'd `href`). Second, that an icon-only
+`<a>`/`<button>` keeps a real accessible name (`aria-label`, `aria-labelledby`,
+`title`, or visible/sr-only text) — the icon's own `aria-hidden` doesn't count,
+since hiding an icon from assistive tech without naming the control anywhere
+else leaves it with no name at all. Both guards only see markup from the built,
+non-hydrated HTML `test/harness.ts` fetches, so they don't cover the two
+lightboxes' close/prev/next buttons, which only exist once client JS opens the
+dialog. Nothing in the automated suite guards those buttons — the axe-core run
+in issue #160's PR body was a one-off manual check against a specific commit,
+not a standing test, so it protects nothing against a later regression. A real
+guard would need a browser-driven test in the shape of
+`test/lead-form.browser.test.ts`; none exists yet.
+
+`lib/markdown.test.ts` (issue #160) is not one of these — it tests
+`lib/markdown.ts` directly, with no server and no `test/harness.ts`, since a
+marked renderer is plain string-in/string-out. It guards the blog markdown a11y
+fixes (a checklist checkbox's `aria-label`, the new-tab hint on a
+`target="_blank"` link embedded in markdown, `tabindex` on a `<pre>`) against
+markdown shapes a rendered blog post doesn't happen to exercise: nested and
+loose checklists, inline markup inside a checklist item, and content that only
+looks like a tag or a link because it sits inside a fenced code block.
 
 **Design choice — A, build before test, not build-on-demand in the harness.**
 `deno task test` is now `deno task build && deno test ...`, so the site is built

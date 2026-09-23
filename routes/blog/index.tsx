@@ -113,6 +113,8 @@ export default define.page(function Blog(ctx) {
                   <div class="flex items-center gap-3 text-xs text-gray-500">
                     <span class="inline-flex items-center gap-1">
                       <svg
+                        aria-hidden="true"
+                        focusable="false"
                         class="w-3.5 h-3.5"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -144,6 +146,8 @@ export default define.page(function Blog(ctx) {
             class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               class="w-4 h-4"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

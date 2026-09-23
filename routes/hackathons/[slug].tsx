@@ -96,6 +96,8 @@ export default define.page(function HackathonDetail(ctx) {
               {h.prize && (
                 <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full">
                   <svg
+                    aria-hidden="true"
+                    focusable="false"
                     class="w-3.5 h-3.5"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -210,6 +212,8 @@ export default define.page(function HackathonDetail(ctx) {
                 class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
               >
                 <svg
+                  aria-hidden="true"
+                  focusable="false"
                   class="w-4 h-4"
                   fill="none"
                   viewBox="0 0 24 24"

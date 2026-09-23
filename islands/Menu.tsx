@@ -79,6 +79,7 @@ export default function Menu(
 
       <nav
         id="menu"
+        aria-label="Main"
         class="bg-gray-800 fixed inset-x-0 bottom-0 z-30 whitespace-nowrap sm:fixed sm:origin-top-left sm:-rotate-90 sm:translate-y-full sm:border-b sm:border-gray-700"
       >
         {/* Mobile menu content */}
@@ -110,10 +111,14 @@ export default function Menu(
             <div class="absolute inset-y-0 right-0 flex items-center sm:hidden">
               <button
                 type="button"
+                aria-expanded={isOpen.value}
+                aria-controls={isOpen.value ? "mobile-menu" : undefined}
                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                 onClick={toggleMenu}
               >
-                <span class="sr-only">Open main menu</span>
+                <span class="sr-only">
+                  {isOpen.value ? "Close main menu" : "Open main menu"}
+                </span>
                 {isOpen.value ? <CloseIcon /> : <MenuIcon />}
               </button>
             </div>
@@ -122,7 +127,11 @@ export default function Menu(
             <div class="flex-1 flex flex-row-reverse items-center justify-center sm:items-stretch sm:justify-start">
               <div class="flex-shrink-0 flex items-center sm:pl-6">
                 <div class="absolute inset-y-0 left-0 flex items-center sm:relative">
-                  <a href="/" class="flex items-center">
+                  <a
+                    href="/"
+                    aria-label="Anton Shubin — home"
+                    class="flex items-center"
+                  >
                     <img
                       class="h-10 w-10 rounded-full border border-gray-100 sm:rotate-90"
                       src="/img/photo-64.webp"

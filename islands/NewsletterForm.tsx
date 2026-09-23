@@ -50,8 +50,13 @@ export default function NewsletterForm() {
               type="email"
               required
               placeholder="you@example.com"
+              aria-label="Email address"
               value={email}
               onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
+              aria-invalid={status === "error" ? "true" : undefined}
+              aria-describedby={status === "error"
+                ? "newsletter-form-error"
+                : undefined}
               class="flex-1 min-w-[200px] px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-orange-500"
             />
             <button
@@ -62,7 +67,13 @@ export default function NewsletterForm() {
               {status === "loading" ? "..." : "Subscribe"}
             </button>
             {status === "error" && (
-              <p class="w-full text-red-400 text-xs mt-1">{msg}</p>
+              <p
+                id="newsletter-form-error"
+                role="alert"
+                class="w-full text-red-400 text-xs mt-1"
+              >
+                {msg}
+              </p>
             )}
           </>
         )}
