@@ -276,7 +276,7 @@ function rawJsonLdBlocks(html: string): string[] {
  * sitemap loop below to reach it. */
 const NON_SITEMAP_PAGES = ["/pay"];
 
-Deno.test("every sitemap page's JSON-LD blocks carry no raw <", async (t) => {
+Deno.test("every sitemap page and /pay's JSON-LD blocks carry no raw <", async (t) => {
   const site = await startSite();
   try {
     const paths = [...await sitemapPaths(site), ...NON_SITEMAP_PAGES];
