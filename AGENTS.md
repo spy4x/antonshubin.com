@@ -140,6 +140,15 @@ and `count()` (counts regex matches). `test/html.test.ts` tests the helpers
 themselves, because a `visibleText()` that keeps script bodies makes the FAQ
 guard pass against a broken page. `test/structure.test.ts` guards the site
 structure: catalog items, navigation, redirects, prices, home sections, labels.
+`test/a11y.test.ts` (issue #160) guards two markup-only regressions: the active
+nav section losing its `aria-current="page"` (checked on a nested page, since
+Fresh's own framework already back-fills `aria-current` on an exact URL match —
+a nested page is the one place islands/Menu.tsx's own `isActive()` provably
+controls the value), and an icon-only `<a>`/`<button>` losing both its name and
+its `aria-hidden` icon. It can only see markup from the built, non-hydrated HTML
+`test/harness.ts` fetches, so it does not cover the two lightboxes'
+close/prev/next buttons, which only exist once client JS opens the dialog —
+those stay covered by the axe-core run in the issue's PR body instead.
 
 **Design choice — A, build before test, not build-on-demand in the harness.**
 `deno task test` is now `deno task build && deno test ...`, so the site is built
