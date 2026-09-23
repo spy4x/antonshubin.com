@@ -200,6 +200,71 @@ Deno.test("a target=_blank link inside a fenced code block is left alone", async
   assertMatch(html, /&lt;a href=&quot;https:\/\/example\.com&quot;/);
 });
 
+Deno.test("an image alt with a quote is escaped, not a live attribute", async () => {
+  const md = '![" onfocus="x](i.png)\n';
+  const ours = await renderBlogMarkdown(md);
+  // The bug this guards: plain marked (pinned 17.0.1) writes an image's alt
+  // straight into `alt="${n}"` with no escaping at all, so this markdown
+  // renders `<img src="i.png" alt="" onfocus="x">` — a second, live
+  // attribute a browser or a screen reader would act on.
+  assertMatch(ours, /<img src="i\.png" alt="&quot; onfocus=&quot;x">/);
+  for (const img of ours.match(/<img[^>]*>/g) ?? []) {
+    assertEquals(/\son\w+="/i.test(img), false, img);
+  }
+});
+
+Deno.test("an image with formatted alt and a title renders like marked, alt escaped", async () => {
+  const md = '![a *b* "c"](x.png "my title")\n';
+  const ours = await renderBlogMarkdown(md);
+  // Apart from the alt escaping this guards, the rest of marked's own image
+  // handling (inline formatting flattened to plain text, the title
+  // attribute) must stay exactly as plain marked renders it.
+  assertMatch(
+    ours,
+    /<img src="x\.png" alt="a b &quot;c&quot;" title="my title">/,
+  );
+});
+
+Deno.test("a hidden <script> in one checklist item never hides the next item's text", async () => {
+  // Issue #166: the LabelRenderer this file's ariaLabelText() builds must be
+  // a fresh instance per item, not one shared across items — otherwise an
+  // unclosed <script> in one item leaves inHiddenTag stuck true and swallows
+  // every item after it. Mutation: hoist `new LabelRenderer()` out of
+  // ariaLabelText() into a module-level singleton reused on every call.
+  const md = "- [ ] <script>bad\n- [ ] visible text\n";
+  const ours = await renderBlogMarkdown(md);
+  assertMatch(ours, /aria-label="visible text"/);
+});
+
+Deno.test("an inline <BR> and <SCRIPT> in upper case are recognized like lower case", async () => {
+  // Mutation: drop the `i` flag from the <br>, <script>/<style> open, and
+  // </script>/</style> close patterns in LabelRenderer.html().
+  const brOurs = await renderBlogMarkdown("- [ ] one<BR>two\n");
+  assertMatch(brOurs, /aria-label="one two"/);
+  const scriptOurs = await renderBlogMarkdown(
+    "- [ ] <SCRIPT>hidden</SCRIPT>after\n",
+  );
+  assertMatch(scriptOurs, /aria-label="after"/);
+});
+
+Deno.test("a self-closing <br/> counts as a break in the label", async () => {
+  // Mutation: drop the `/` from the <br> pattern's character class
+  // (`/^<br[\s/>]/i` -> `/^<br[\s>]/i`), which stops matching `<br/>`.
+  const md = "- [ ] one<br/>two\n";
+  const ours = await renderBlogMarkdown(md);
+  assertMatch(ours, /aria-label="one two"/);
+});
+
+Deno.test("<scripts> is not mistaken for an opening <script> tag", async () => {
+  // Mutation: drop the `[\s>]` boundary after "script"/"style" in
+  // LabelRenderer.html() (`/^<(script|style)[\s>]/i` -> `/^<(script|style)/i`),
+  // which then matches the start of the word "scripts" too and hides the
+  // rest of the item's text.
+  const md = "- [ ] <scripts>not hidden</scripts>\n";
+  const ours = await renderBlogMarkdown(md);
+  assertMatch(ours, /aria-label="not hidden"/);
+});
+
 Deno.test("a real <pre> gets tabindex; an escaped <pre> inside code does not", async () => {
   const md = "```\n<pre>literal text</pre>\n```\n";
   const html = await renderBlogMarkdown(md);

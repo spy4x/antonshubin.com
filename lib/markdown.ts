@@ -107,6 +107,19 @@ function ariaLabelText(tokens: Tokens.Generic[]): string {
 }
 
 /**
+ * Percent-encodes a link/image href the same way marked's own (unexported)
+ * `cleanUrl` does, so the `image` override below only changes the `alt`
+ * attribute and otherwise matches plain marked byte for byte.
+ */
+function cleanUrl(href: string): string | null {
+  try {
+    return encodeURI(href).replace(/%25/g, "%");
+  } catch {
+    return null;
+  }
+}
+
+/**
  * A private `Marked` instance, scoped to blog posts only. `marked.use()` on
  * the shared default export would leak this renderer into every other
  * caller — routes/catalog/[slug].tsx renders catalog item descriptions
@@ -172,6 +185,28 @@ blogMarked.use({
       if (!label) return false;
       const checkedAttr = token.checked ? 'checked="" ' : "";
       return `<input aria-label="${label}" ${checkedAttr}disabled="" type="checkbox"> `;
+    },
+    /**
+     * Plain marked's own `image` renderer (marked 17.0.1) writes the alt text
+     * straight into `alt="${n}"` with no escaping at all — an alt of
+     * `" onfocus="x` produces a second, live attribute. This override is
+     * otherwise byte-for-byte the same logic (inline-formatted alt via the
+     * shared `TextRenderer`, the same `cleanUrl` href handling, the same
+     * `title` attribute), escaped the same way the checklist labels above
+     * are: `escapeNoEncode`, marked's own no-encode entity-aware pattern.
+     */
+    image({ href, title, text, tokens }) {
+      const alt = escapeNoEncode(
+        tokens
+          ? this.parser.parseInline(tokens, this.parser.textRenderer)
+          : text,
+      );
+      const cleanHref = cleanUrl(href);
+      if (cleanHref === null) return alt;
+      let out = `<img src="${cleanHref}" alt="${alt}"`;
+      if (title) out += ` title="${escapeEncode(title)}"`;
+      out += ">";
+      return out;
     },
   },
 });
