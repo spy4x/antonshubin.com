@@ -241,6 +241,23 @@ Deno.test("an image with formatted alt and a title renders like marked, alt esca
   assertMatch(ours, /title="Tom &amp; Jerry &quot;show&quot; O&#39;Brien"/);
 });
 
+Deno.test("a raw quote in an image title cannot add an attribute", async () => {
+  // Mutation: drop the title escape in lib/markdown.ts's image() override.
+  const md = '![a](x.png "a \\" onfocus=\\"x")\n';
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(ours, await marked(md));
+  assertMatch(ours, /title="a &quot; onfocus=&quot;x"/);
+});
+
+Deno.test("an image whose link cannot be encoded falls back to escaped alt text", async () => {
+  // A lone surrogate makes encodeURI throw, so marked renders the alt as text.
+  // Mutation: return the unescaped alt from that fallback branch.
+  const md = '![" onfocus="x](\uD800)\n';
+  const ours = await renderBlogMarkdown(md);
+  assertMatch(ours, /&quot; onfocus=&quot;x/);
+  assertEquals(ours.includes('" onfocus="'), false);
+});
+
 Deno.test("a hidden <script> in one checklist item never hides the next item's text", async () => {
   // Issue #166: the LabelRenderer this file's ariaLabelText() builds must be
   // a fresh instance per item, not one shared across items — otherwise an
