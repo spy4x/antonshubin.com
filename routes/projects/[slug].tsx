@@ -31,6 +31,58 @@ function splitParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Build the project's JSON-LD node from fields the `Project` interface
+ * already holds — no invented dates, ratings or facts. `SoftwareSourceCode`
+ * when the project links a repo (`ghRepo`), otherwise `CreativeWork`. The
+ * `author` points at the site-wide Person node from `components/SEOHead.tsx`
+ * (issue #167), same `@id` the BlogPosting JSON-LD in
+ * `routes/blog/[slug].tsx` uses.
+ *
+ * No `sourceOrganization`: `madeForName` is mostly a person (a LinkedIn
+ * profile), not an organization — typing all of them as `Organization` would
+ * invent a fact the Content rule in AGENTS.md forbids, and schema.org has no
+ * generic "made for" property that covers both a person and a company.
+ */
+function projectJsonLd(project: Project, canonical: string) {
+  const images = [
+    ...(project.logoImageURL
+      ? [`https://antonshubin.com${project.logoImageURL}`]
+      : []),
+    ...projectScreenshots(project).map((s) =>
+      `https://antonshubin.com${s.src}`
+    ),
+  ];
+
+  const codeRepository = project.ghRepo
+    ? `https://github.com/${project.ghRepo}`
+    : undefined;
+  // Financy's externalURL is its GitHub repo itself, so sameAs would just
+  // repeat codeRepository — only add it when it points somewhere else.
+  const sameAs = project.externalURL && !project.externalURLDead &&
+      project.externalURL !== codeRepository
+    ? [project.externalURL]
+    : undefined;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": project.ghRepo ? "SoftwareSourceCode" : "CreativeWork",
+    "@id": `${canonical}#project`,
+    "name": project.title,
+    "description": project.description,
+    "url": canonical,
+    ...(images.length > 0 ? { "image": images } : {}),
+    "author": { "@id": "https://antonshubin.com/#person" },
+    ...(project.tags && project.tags.length > 0
+      ? { "keywords": project.tags.join(", ") }
+      : {}),
+    ...(codeRepository ? { "codeRepository": codeRepository } : {}),
+    ...(sameAs ? { "sameAs": sameAs } : {}),
+    ...(project.archived ? { "creativeWorkStatus": "Archived" } : {}),
+    "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+  };
+}
+
 // Unknown slugs keep the friendly "Not Found" view below, but must answer with
 // a real 404 so search engines drop removed project pages instead of indexing
 // an empty 200.
@@ -83,6 +135,12 @@ export default define.page(function ProjectDetail(ctx) {
   return (
     <Layout currentPath="/projects">
       <SEOHead />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(projectJsonLd(project, head.value.canonical)),
+        }}
+      />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <Breadcrumb
           items={getBreadcrumb(head.value.canonical, head.value.title)}
