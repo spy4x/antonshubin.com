@@ -126,8 +126,10 @@ wrong reason. `test/structure.test.ts` guards site structure (catalog, nav,
 redirects, prices, labels). `test/a11y.test.ts` (#160) guards nav `aria-current`
 and icon-only accessible names, from server-rendered HTML only — it doesn't
 cover the two lightboxes' buttons, which only exist after client JS opens them
-(see "Browser-driven tests"). `lib/markdown.test.ts` (#160) tests
-`lib/markdown.ts` directly, no server needed.
+(see "Browser-driven tests"). `islands/Menu.tsx` sets no `aria-current` itself;
+Fresh's renderer adds it, and `test/a11y.test.ts` pins that — don't add it by
+hand. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
+needed.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds
@@ -135,8 +137,12 @@ itself; it throws a clear error naming the missing file and task if
 `_fresh/server.js` doesn't exist, so running `deno test` directly without a
 prior build fails loudly instead of skipping silently. `deno task test`'s
 permissions are narrow (`--allow-net=127.0.0.1,0.0.0.0`, `--allow-run=deno`) and
-apply to every file it runs — the browser-driven tests below need `-A`, so
-they're excluded via `--ignore` and run separately.
+apply to every file it runs — none can make an outbound call, so a test that
+looks network-shaped stubs `globalThis.fetch` itself. The browser-driven tests
+below need `-A`, so they're excluded via `--ignore` and run separately, also via
+`deno task test:browser`, which doesn't build either — it relies on running
+after `deno task test` inside `check`, and fails loudly (not silently) on its
+own before a build.
 
 **How to add a guard.** Call `startSite()`, fetch with `site.html()`/
 `site.get()`, assert with `count()`/`visibleText()`/`jsonLd()`, then
@@ -156,11 +162,14 @@ the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
-  page, and that the form/success panels swap `inert`.
+  page, and that the form/success panels swap `inert`. The success heading needs
+  `focus({ preventScroll: true })`; the test only reproduces the scroll jump
+  with the submit button pinned to the bottom of the viewport.
 - `test/a11y.browser.test.ts` (#165): the project and blog lightboxes' dialog
   naming, button names and focus-return to the trigger, and the mobile menu's
   Escape handling (closes it, returns focus, and does nothing when already
-  closed).
+  closed). The explicit `triggerRef.current?.focus()` calls in both lightboxes
+  are kept on purpose, even though native `<dialog>` already restores focus.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against five
   representative pages, plus synthetic probes for pairings axe can't reach on
