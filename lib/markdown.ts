@@ -1,10 +1,17 @@
 import { Marked, Parser, TextRenderer } from "marked";
 import type { Renderer, Tokens } from "marked";
 
-/** Escapes text for safe use inside a double-quoted HTML attribute value. */
+/**
+ * Escapes text for safe use inside a double-quoted HTML attribute value. An
+ * `&` that already starts an entity reference (`&amp;`, `&copy;`, `&#169;`)
+ * is left alone, so a label built from already-decoded markdown text (marked
+ * decodes `&amp;` to `&` in a text token, `&copy;` stays as-is) isn't
+ * double-escaped into `&amp;amp;` — the browser would then show the escaped
+ * text raw instead of decoding it back to what the visible text renders.
+ */
 function escapeAttr(text: string): string {
   return text
-    .replace(/&/g, "&amp;")
+    .replace(/&(?!#?\w+;)/g, "&amp;")
     .replace(/"/g, "&quot;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");

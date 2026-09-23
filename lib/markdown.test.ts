@@ -82,6 +82,18 @@ Deno.test("a checklist item with inline HTML gets a tag-free label", async () =>
   assertMatch(ours, /aria-label="see site"/);
 });
 
+Deno.test("a checklist item with entities keeps them, not double-escaped", async () => {
+  const md = "- [ ] Tom &amp; Jerry &copy;\n";
+  const ours = await renderBlogMarkdown(md);
+  const plain = await marked(md);
+  assertEquals(withoutAriaLabel(ours), plain);
+  // The bug this guards: escapeAttr() re-escaping an already-present entity
+  // reference, turning "&amp;" into "&amp;amp;" and "&copy;" into
+  // "&amp;copy;" — a browser would then show the escaped text raw instead of
+  // decoding it the same way it decodes the visible text.
+  assertMatch(ours, /aria-label="Tom &amp; Jerry &copy;"/);
+});
+
 Deno.test("a plain (non-task) list is untouched", async () => {
   const md = "- one\n- two\n";
   const ours = await renderBlogMarkdown(md);
