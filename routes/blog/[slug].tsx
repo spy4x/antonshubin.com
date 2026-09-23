@@ -269,7 +269,7 @@ export default define.page(function BlogArticle(ctx) {
                     <p class="text-gray-500 text-xs line-clamp-2">
                       {r.description}
                     </p>
-                    <p class="text-gray-600 text-xs mt-1.5">
+                    <p class="text-gray-400 text-xs mt-1.5">
                       {r.readTime} min read
                     </p>
                   </a>
@@ -413,7 +413,7 @@ export default define.page(function BlogArticle(ctx) {
               </span>
               <NewsletterForm />
             </div>
-            <p class="text-gray-600 text-xs mt-2">
+            <p class="text-gray-400 text-xs mt-2">
               No spam. Unsubscribe anytime.
             </p>
           </div>

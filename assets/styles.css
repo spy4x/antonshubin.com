@@ -7,14 +7,14 @@
   --color-gray-800: #1f2937;
   --color-gray-700: #374151;
   --color-gray-600: #4b5563;
-  --color-gray-500: #6b7280;
-  --color-gray-400: #9ca3af;
+  --color-gray-500: #8a919f;
+  --color-gray-400: #a7aeba;
   --color-gray-300: #d1d5db;
   --color-gray-200: #e5e7eb;
   --color-gray-100: #f3f4f6;
   --color-gray-50: #f9fafb;
   --color-orange-500: #f97316;
-  --color-orange-600: #ea580c;
+  --color-orange-600: #c2410c;
   --color-orange-100: #ffedd5;
 }
 
@@ -97,7 +97,7 @@
 
 .blog-content .img-title {
   @apply -translate-y-6;
-  @apply text-slate-500 text-center;
+  @apply text-gray-400 text-center;
 }
 
 .blog-content > .well {
@@ -133,7 +133,7 @@
 }
 
 .blog-content > p > code {
-  @apply font-mono bg-orange-500 rounded py-0.5 px-1 text-orange-100 text-base;
+  @apply font-mono bg-orange-600 rounded py-0.5 px-1 text-orange-100 text-base;
 }
 
 @media (min-width: 640px) {

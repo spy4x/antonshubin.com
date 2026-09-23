@@ -98,7 +98,7 @@ export default define.page(function Catalog() {
                             key={j}
                             class="text-gray-500 text-xs flex items-start gap-2"
                           >
-                            <span class="text-gray-600 shrink-0">×</span>
+                            <span class="text-gray-400 shrink-0">×</span>
                             {exc}
                           </li>
                         ))}

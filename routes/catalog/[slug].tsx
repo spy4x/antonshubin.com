@@ -227,7 +227,7 @@ export default define.page(function CatalogDetail(ctx) {
                     key={j}
                     class="text-gray-500 flex items-start gap-2 text-sm"
                   >
-                    <span class="text-gray-600 shrink-0 mt-0.5">×</span>
+                    <span class="text-gray-400 shrink-0 mt-0.5">×</span>
                     {exc}
                   </li>
                 ))}
