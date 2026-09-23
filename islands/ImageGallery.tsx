@@ -44,8 +44,12 @@ function GalleryImage(
 export default function ImageGallery({ images }: ImageGalleryProps) {
   const activeIndex = useSignal<number | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  // The thumbnail button that opened the lightbox, so closing it can put
+  // keyboard focus back where it started instead of dropping it to <body>.
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const openLightbox = (index: number) => {
+  const openLightbox = (index: number, trigger: HTMLButtonElement) => {
+    triggerRef.current = trigger;
     activeIndex.value = index;
     dialogRef.current?.showModal();
   };
@@ -53,6 +57,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
   const closeLightbox = () => {
     dialogRef.current?.close();
     activeIndex.value = null;
+    triggerRef.current?.focus();
   };
 
   const goNext = () => {
@@ -97,7 +102,8 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
           <button
             key={index}
             type="button"
-            onClick={() => openLightbox(index)}
+            onClick={(e) =>
+              openLightbox(index, e.currentTarget as HTMLButtonElement)}
             class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
           >
             <GalleryImage
@@ -111,6 +117,9 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
       {/* Lightbox Dialog */}
       <dialog
         ref={dialogRef}
+        aria-label={activeIndex.value !== null
+          ? images[activeIndex.value].alt
+          : undefined}
         class="fixed inset-0 w-full h-full max-w-none max-h-none m-0 p-0 bg-black/95 backdrop:bg-black/80"
         onClick={(e) => {
           if (e.target === dialogRef.current) closeLightbox();

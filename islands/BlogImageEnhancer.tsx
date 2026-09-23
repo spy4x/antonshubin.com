@@ -4,6 +4,9 @@ import { useEffect, useRef } from "preact/hooks";
 export default function BlogImageEnhancer() {
   const activeImage = useSignal<{ src: string; alt: string } | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  // The blog-content <img> that opened the lightbox, so closing it returns
+  // keyboard focus there instead of dropping it to <body>.
+  const triggerRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     // Find all images in blog-content and make them clickable
@@ -13,12 +16,29 @@ export default function BlogImageEnhancer() {
     const images = blogContent.querySelectorAll("img");
     images.forEach((img) => {
       img.style.cursor = "zoom-in";
-      img.addEventListener("click", () => {
+      // These images are plain markdown <img> tags with a click handler
+      // bolted on below — without tabindex/role/a keydown handler a
+      // keyboard or screen-reader user could never open the lightbox.
+      img.tabIndex = 0;
+      img.setAttribute("role", "button");
+      img.setAttribute(
+        "aria-label",
+        `View larger image: ${img.alt || "blog image"}`,
+      );
+      const open = () => {
+        triggerRef.current = img;
         activeImage.value = {
           src: img.src,
           alt: img.alt || "Blog image",
         };
         dialogRef.current?.showModal();
+      };
+      img.addEventListener("click", open);
+      img.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
       });
     });
   }, []);
@@ -26,6 +46,7 @@ export default function BlogImageEnhancer() {
   const closeLightbox = () => {
     dialogRef.current?.close();
     activeImage.value = null;
+    triggerRef.current?.focus();
   };
 
   useEffect(() => {
@@ -43,6 +64,7 @@ export default function BlogImageEnhancer() {
   return (
     <dialog
       ref={dialogRef}
+      aria-label={activeImage.value?.alt}
       class="fixed inset-0 w-full h-full max-w-none max-h-none m-0 p-0 bg-black/95 backdrop:bg-black/80"
       onClick={(e) => {
         if (e.target === dialogRef.current) closeLightbox();
