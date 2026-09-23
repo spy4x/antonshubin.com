@@ -1,7 +1,8 @@
-// Guards for issue #160: the nav's active-page marker and icon-only controls
-// must keep the accessible-name/aria-hidden attributes this PR added. Reads
-// the built site through test/harness.ts — see AGENTS.md "Rendered-page
-// tests". Assert on structure only, never on prose (same rule as
+// Guards for issue #160: the nav's active-page marker (which islands/Menu.tsx
+// leaves entirely to Fresh's own framework behavior — see the first test's
+// docs for why) and icon-only controls keeping an accessible name. Reads the
+// built site through test/harness.ts — see AGENTS.md "Rendered-page tests".
+// Assert on structure only, never on prose (same rule as
 // test/structure.test.ts and test/rendered.test.ts).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
@@ -20,52 +21,77 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 }
 
 /**
- * Fresh 2 itself auto-marks a matching `<a href>` with `aria-current`, so a
- * request for the catalog index (`/catalog`, an exact match) would carry
- * `aria-current="page"` even if islands/Menu.tsx never set the attribute —
- * confirmed by temporarily deleting the prop and rebuilding. A nested page
- * doesn't have that cover: Fresh's own logic marks an ancestor link
- * `aria-current="true"` (not "page"), so the request has to be for a nested
- * page under a section (here a catalog item under "Services", `/catalog`)
- * to prove islands/Menu.tsx's own `isActive()` — not the framework default —
- * is what puts `aria-current="page"` on the section's nav link.
+ * islands/Menu.tsx sets no `aria-current` of its own — Fresh 2's own
+ * renderer auto-marks any `<a href>` matching the current URL: an exact
+ * match gets `aria-current="page"` and `data-current="true"`, a section
+ * ancestor gets `aria-current="true"` and `data-ancestor="true"` (Fresh's
+ * `setActiveUrl` in its built server bundle; confirmed by adding and then
+ * removing an explicit `aria-current` prop in islands/Menu.tsx and
+ * rebuilding both times).
+ * That means a mutation that only deletes an `aria-current` prop from
+ * Menu.tsx cannot turn this test red, because there is no such prop to
+ * delete — Fresh fills the attribute unconditionally. What this test
+ * actually guards is the nav links' own `href`s: pin both of Fresh's cases
+ * (exact match on `/blog`, section-ancestor match on `/catalog` from a
+ * nested catalog item) so a typo'd or hardcoded `href` — which would make
+ * Fresh's own matching miss — still shows up here. Confirmed by mutating
+ * the Services link's `href` from `/catalog` to `/catalog-x` in
+ * islands/Menu.tsx: aria-current disappears from that link and this test
+ * goes red; restored afterward.
  */
 siteTest(
-  "the active nav section carries aria-current=page on a nested page",
+  "the nav marks an exact page 'page' and its section 'true'",
   async (site) => {
-    const html = await site.html("/catalog/zero-to-production-saas-mvp");
-    const menu = html.slice(
-      html.indexOf('id="desktop-menu"'),
-      html.indexOf("</nav>"),
+    const exactHtml = await site.html("/blog");
+    const exactMenu = exactHtml.slice(
+      exactHtml.indexOf('id="desktop-menu"'),
+      exactHtml.indexOf("</nav>"),
     );
-    const links = [...menu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g)].map((
-      m,
-    ) => m[0]);
-    assertEquals(links.length, 5, "expected the five agreed nav links");
-    const servicesLink = links.find((a) => /href="\/catalog"/.test(a));
+    const exactLinks = [...exactMenu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g)]
+      .map((m) => m[0]);
+    assertEquals(exactLinks.length, 5, "expected the five agreed nav links");
+    const blogLink = exactLinks.find((a) => /href="\/blog"/.test(a));
+    assert(blogLink, "no nav link points at /blog");
+    assert(
+      /aria-current="page"/.test(blogLink) &&
+        /data-current="true"/.test(blogLink),
+      `the /blog nav link is missing Fresh's exact-match markers: ${blogLink}`,
+    );
+    assertEquals(count(exactMenu, /aria-current="page"/g), 1);
+    assertEquals(count(exactMenu, /aria-current="true"/g), 0);
+
+    const nestedHtml = await site.html(
+      "/catalog/zero-to-production-saas-mvp",
+    );
+    const nestedMenu = nestedHtml.slice(
+      nestedHtml.indexOf('id="desktop-menu"'),
+      nestedHtml.indexOf("</nav>"),
+    );
+    const nestedLinks = [
+      ...nestedMenu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g),
+    ].map((m) => m[0]);
+    const servicesLink = nestedLinks.find((a) => /href="\/catalog"/.test(a));
     assert(servicesLink, "no nav link points at /catalog");
     assert(
-      /aria-current="page"/.test(servicesLink),
-      `the Services nav link lost aria-current="page": ${servicesLink}`,
+      /aria-current="true"/.test(servicesLink) &&
+        /data-ancestor="true"/.test(servicesLink),
+      `the Services nav link is missing Fresh's ancestor-match markers: ${servicesLink}`,
     );
-    assertEquals(
-      count(menu, /aria-current="page"/g),
-      1,
-      "more than one nav link is marked as the current page",
-    );
+    assertEquals(count(nestedMenu, /aria-current="true"/g), 1);
+    assertEquals(count(nestedMenu, /aria-current="page"/g), 0);
   },
 );
 
 /**
  * Finds every `<a>`/`<button>` in `html` whose only content is an inline
- * `<svg>` icon (no visible text) and returns the ones that name themselves to
- * assistive tech in neither way this PR relies on: an accessible name on the
- * control itself (`aria-label`/`aria-labelledby`/`title`), or the icon being
- * hidden from assistive tech (`aria-hidden="true"` on the `<svg>`) because
- * the name lives elsewhere (for example on an ancestor). Regex-based and
- * deliberately simple — this codebase never nests `<a>`/`<button>` — matching
- * the "own the small, no HTML-parser dependency" rule the other rendered-page
- * guards follow.
+ * `<svg>` icon (no visible or screen-reader-only text) and returns the ones
+ * with no accessible name at all: no `aria-label`, no `aria-labelledby`, no
+ * `title`. The icon's own `aria-hidden` is irrelevant to this check on
+ * purpose — hiding the icon from assistive tech without giving the control
+ * a name anywhere else leaves it with *no* name, which is worse, not
+ * better. Regex-based and deliberately simple — this codebase never nests
+ * `<a>`/`<button>` — matching the "own the small, no HTML-parser dependency"
+ * rule the other rendered-page guards follow.
  */
 function iconOnlyControlsMissingName(html: string): string[] {
   const problems: string[] = [];
@@ -77,8 +103,7 @@ function iconOnlyControlsMissingName(html: string): string[] {
     const hasNameOnControl = /\baria-label\s*=\s*"[^"]+"/i.test(attrs) ||
       /\baria-labelledby\s*=\s*"[^"]+"/i.test(attrs) ||
       /\btitle\s*=\s*"[^"]+"/i.test(attrs);
-    const iconIsHidden = /<svg\b[^>]*\baria-hidden\s*=\s*"true"/i.test(inner);
-    if (!hasNameOnControl && !iconIsHidden) {
+    if (!hasNameOnControl) {
       problems.push(`<${tag}${attrs}>`);
     }
   }
@@ -86,7 +111,7 @@ function iconOnlyControlsMissingName(html: string): string[] {
 }
 
 siteTest(
-  "every icon-only link or button has a name or hides its icon",
+  "every icon-only link or button has an accessible name",
   async (site) => {
     const sitemap = await site.html("/sitemap.xml");
     const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
@@ -98,7 +123,7 @@ siteTest(
       assertEquals(
         problems,
         [],
-        `${path} has an icon-only control with neither a name nor aria-hidden`,
+        `${path} has an icon-only control with no accessible name`,
       );
     }
   },

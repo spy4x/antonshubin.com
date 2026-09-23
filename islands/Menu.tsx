@@ -92,7 +92,6 @@ export default function Menu(
               {links.map((link) => (
                 <a
                   href={link.href}
-                  aria-current={isActive(link.href) ? "page" : undefined}
                   class={linkClass(link.href)}
                 >
                   <span class="inline-flex items-center gap-3">
@@ -162,7 +161,6 @@ export default function Menu(
                       key={link.href}
                       href={link.href}
                       data-nav-link
-                      aria-current={isActive(link.href) ? "page" : undefined}
                       class={desktopLinkClass(link.href)}
                     >
                       <span>{link.label}</span>
