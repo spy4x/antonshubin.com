@@ -99,6 +99,19 @@ instead of inventing or estimating one.
 is no deploy step in CI — deploying stays a manual, post-merge action (see
 Deploy above).
 
+The `check` step also installs Chromium before `deno task check` runs:
+`deno run -A npm:playwright@1.63.0 install --with-deps chromium`. That's for
+`test/lead-form.browser.test.ts` (see "Rendered-page tests" below), which
+`deno task check` runs via `deno task test:browser`. The base image has no
+browser and none of the OS libraries a headless Chromium needs, hence
+`--with-deps`; the version in that command must match the `"playwright"` entry
+in `deno.json`'s import map, since a version mismatch downloads a different
+Chromium build than the one the test launches. This was chosen over a separate
+CI step with its own image, because it keeps the browser test on the same
+container the rest of `check` already runs in, at the cost of that one extra
+install command per run — CI has no local cache to skip it with, the way a
+machine that already has `~/.cache/ms-playwright` populated does locally.
+
 A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
 runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
 `when: event: [push, pull_request]` keeps it from running on that same cron
@@ -154,6 +167,37 @@ and a test that pins a whole paragraph gets deleted the first time it goes red
 for the wrong reason, not fixed. Every response body must be consumed or
 cancelled (`res.body?.cancel()`) and every server stopped, even on failure, so
 tests keep passing Deno's resource and op sanitizers.
+
+**Browser-driven tests (issue #157).** Some behaviour only exists after
+client-side JS runs — an island's post-hydration DOM change, where focus lands
+after an interaction — and a `site.html()` fetch never sees it, because that's
+one server-rendered response with no hydration and no click. For that,
+`test/lead-form.browser.test.ts` drives real Chromium through Playwright
+(`npm:playwright@1.63.0`, pinned in `deno.json`'s import map to match the
+Chromium build already cached locally under `~/.cache/ms-playwright`, so running
+it locally downloads nothing). It still calls `startSite()` for the running
+server, stubs `/api/lead` with `page.route()` so no real network call is made,
+submits the lead form, and asserts on the two things a plain HTML fetch of the
+pre-submit page can't show: that focus lands on the success heading (the
+screen-reader announcement for issue #157) and that the form and success panels
+swap their `inert` state.
+
+That file runs under its own task, `deno task test:browser`, not the plain
+`deno task test` glob, and `deno task check` runs both. Two reasons for the
+split: the permissions differ (Playwright needs `-A` — launching a bundled
+browser touches sandboxing, home-directory lookups, and OS/WSL detection that
+land on narrower flags one at a time, so scoping it flag-by-flag bought nothing
+over granting it to this one file), and `deno task test` keeps the narrow
+permissions from "Permissions" above for every other test file rather than
+widening them for one browser-driven exception. `test:browser` doesn't build the
+site itself, same as `startSite()` doesn't — it relies on running after
+`deno task test` within `deno task check`, which built it as a side effect;
+running `deno task test:browser` on its own before a build hits the same loud
+`startSite()` failure as running `deno test` directly (see the design note
+above), not a silent skip. If Chromium is missing entirely (a fresh machine, or
+`PLAYWRIGHT_BROWSERS_PATH` pointed elsewhere), the test fails with an error
+naming the exact install command instead of skipping — required, since a
+lead-form regression must fail the build, not vanish quietly.
 
 ## AI crawler optimization (SEO)
 
