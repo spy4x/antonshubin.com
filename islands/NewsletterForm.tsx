@@ -50,7 +50,7 @@ export default function NewsletterForm() {
               type="email"
               required
               placeholder="you@example.com"
-              aria-label="you@example.com"
+              aria-label="Email address"
               value={email}
               onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
               aria-invalid={status === "error" ? "true" : undefined}
