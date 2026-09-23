@@ -1,4 +1,5 @@
 import { useSignal } from "@preact/signals";
+import { useEffect, useRef } from "preact/hooks";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
 
@@ -32,6 +33,11 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
 
   // Set page-load timestamp on mount
   const pageLoad = useSignal(Date.now());
+
+  // Focus moves to the success heading once the submit succeeds, so a screen
+  // reader announces it — see the note on the success wrapper below for why
+  // focus rather than a live region.
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -71,6 +77,17 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
 
   const isSuccess = status.value.type === "success";
 
+  // Runs after the DOM commits the success state, once the heading is no
+  // longer inside an `inert` subtree and can actually take focus.
+  useEffect(() => {
+    // `preventScroll` matters: the success panel is still `max-height: 0`
+    // at this instant (its own transition hasn't started), so an unguarded
+    // focus() scrolls the page down to where the panel will end up, then
+    // back up as the panel expands — a ~150ms jump-and-settle that doesn't
+    // happen on the server-rendered page at all.
+    if (isSuccess) successHeadingRef.current?.focus({ preventScroll: true });
+  }, [isSuccess]);
+
   return (
     <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 sm:p-6 relative overflow-hidden">
       {
@@ -80,6 +97,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
       }
       <div
         class="transition-all duration-500 ease-in-out"
+        data-lead-form="true"
         inert={isSuccess}
         style={{
           opacity: isSuccess ? 0 : 1,
@@ -246,7 +264,17 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           be Tab'd to (and silently activated) while this panel is collapsed
           to `maxHeight: 0` and `opacity: 0` — without it, Tab from the last
           form field reaches these controls and Enter loads a cross-origin
-          iframe invisibly. */
+          iframe invisibly.
+
+          The heading below gets focus once `isSuccess` flips (see the
+          `useEffect` above), which is also what announces the success
+          message to a screen reader. A live region was the other option, but
+          this whole section — including the heading's text — is already in
+          the DOM before submit (only collapsed and `inert`), so nothing about
+          it mutates at the moment of success; an `aria-live` region only
+          announces on a text mutation, not on an ancestor losing `inert` or
+          `max-height: 0`, so it would stay silent. Moving focus works because
+          it targets the heading node directly, independent of that. */
       }
       <div
         class="transition-all duration-500 ease-in-out text-center"
@@ -260,7 +288,12 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         }}
       >
         <div class="text-5xl mb-4">✅</div>
-        <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">
+        <h2
+          id="lead-success-heading"
+          ref={successHeadingRef}
+          tabIndex={-1}
+          class="text-2xl sm:text-3xl font-bold text-white mb-3 focus:outline-none"
+        >
           Your audit is queued
         </h2>
         <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">

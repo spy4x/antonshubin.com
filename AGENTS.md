@@ -23,8 +23,9 @@ specific to this repository.
 ## Tasks (from `deno.json`)
 
 ```bash
-deno task check                 # fmt --check + lint + type check + test
+deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
+deno task test:browser          # the Playwright lead-form test; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -99,6 +100,19 @@ instead of inventing or estimating one.
 is no deploy step in CI — deploying stays a manual, post-merge action (see
 Deploy above).
 
+The `check` step also installs Chromium before `deno task check` runs:
+`deno run -A npm:playwright@1.63.0 install --with-deps chromium`. That's for
+`test/lead-form.browser.test.ts` (see "Rendered-page tests" below), which
+`deno task check` runs via `deno task test:browser`. The base image has no
+browser and none of the OS libraries a headless Chromium needs, hence
+`--with-deps`; the version in that command must match the `"playwright"` entry
+in `deno.json`'s import map, since a version mismatch downloads a different
+Chromium build than the one the test launches. This was chosen over a separate
+CI step with its own image, because it keeps the browser test on the same
+container the rest of `check` already runs in, at the cost of that one extra
+install command per run — CI has no local cache to skip it with, the way a
+machine that already has `~/.cache/ms-playwright` populated does locally.
+
 A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
 runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
 `when: event: [push, pull_request]` keeps it from running on that same cron
@@ -143,8 +157,11 @@ already runs `deno task check`, which now builds as a side effect of
 **Permissions.** `deno task test` carries `--allow-net=127.0.0.1,0.0.0.0` (the
 free-port probe binds `0.0.0.0:0`, the harness then fetches `127.0.0.1`) and
 `--allow-run=deno` (to spawn the server as a child process). The flags apply to
-every test file, not only the harness, so no test can make a live outbound call;
-the tests that look network-shaped replace `globalThis.fetch` themselves.
+every test file run by that task, not only the harness, so none of them can make
+a live outbound call; the tests that look network-shaped replace
+`globalThis.fetch` themselves. The one exception is
+`test/lead-form.browser.test.ts`, which `deno task test:browser` runs with `-A`
+(see below).
 
 **How to add a guard.** Call `startSite()`, fetch a page with `site.html()` or
 `site.get()`, assert on structure or a short phrase with `count()` /
@@ -154,6 +171,48 @@ and a test that pins a whole paragraph gets deleted the first time it goes red
 for the wrong reason, not fixed. Every response body must be consumed or
 cancelled (`res.body?.cancel()`) and every server stopped, even on failure, so
 tests keep passing Deno's resource and op sanitizers.
+
+**Browser-driven tests (issue #157).** Some behaviour only exists after
+client-side JS runs — an island's post-hydration DOM change, where focus lands
+after an interaction — and a `site.html()` fetch never sees it, because that's
+one server-rendered response with no hydration and no click. For that,
+`test/lead-form.browser.test.ts` drives real Chromium through Playwright
+(`npm:playwright@1.63.0`, pinned to that exact version — not a `^` range — in
+`deno.json`'s import map, because it must match the version in
+`.woodpecker.yml`'s install command exactly: each Playwright version expects one
+specific Chromium build, so a mismatch there downloads a different Chromium than
+the one this test launches. That it also happens to match the Chromium build
+already cached locally under `~/.cache/ms-playwright`, so running it locally
+downloads nothing, is a side effect of picking a recent version, not the reason
+for the pin). It still calls `startSite()` for the running server, stubs
+`/api/lead` with `page.route()` so no real network call is made, submits the
+lead form, and asserts on three things a plain HTML fetch of the pre-submit page
+can't show: that focus lands on the success heading (the screen-reader
+announcement for issue #157); that the page never scrolls further down than
+where it stood right before the click, sampling `scrollY` on every animation
+frame through the panels' 500ms transition (submitting with the button pinned to
+the bottom of the viewport — the only position that reproduces the jump — a
+`focus()` without `{ preventScroll: true }` on `islands/LeadForm.tsx`'s success
+heading scrolls the page down to the heading's still-collapsed position and back
+as the panel expands); and that the form and success panels swap their `inert`
+state.
+
+That file runs under its own task, `deno task test:browser`, not the plain
+`deno task test` glob, and `deno task check` runs both. Two reasons for the
+split: the permissions differ (Playwright needs `-A` — launching a bundled
+browser touches sandboxing, home-directory lookups, and OS/WSL detection that
+land on narrower flags one at a time, so scoping it flag-by-flag bought nothing
+over granting it to this one file), and `deno task test` keeps the narrow
+permissions from "Permissions" above for every other test file rather than
+widening them for one browser-driven exception. `test:browser` doesn't build the
+site itself, same as `startSite()` doesn't — it relies on running after
+`deno task test` within `deno task check`, which built it as a side effect;
+running `deno task test:browser` on its own before a build hits the same loud
+`startSite()` failure as running `deno test` directly (see the design note
+above), not a silent skip. If Chromium is missing entirely (a fresh machine, or
+`PLAYWRIGHT_BROWSERS_PATH` pointed elsewhere), the test fails with an error
+naming the exact install command instead of skipping — required, since a
+lead-form regression must fail the build, not vanish quietly.
 
 ## AI crawler optimization (SEO)
 
