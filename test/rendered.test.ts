@@ -247,3 +247,65 @@ Deno.test("every sitemap page responds 200", async (t) => {
     await site.stop();
   }
 });
+
+/**
+ * Raw text of every `<script type="application/ld+json">` block, unparsed.
+ * Unlike `jsonLd()` in test/html.ts, this doesn't call `JSON.parse` — a value
+ * containing an unescaped `<` that doesn't spell `</script` (e.g. `<b>`)
+ * stays inside the tag and would slip past a check that only inspects the
+ * parsed object, since re-serialising a legitimately parsed string for
+ * comparison would show the same character either way.
+ *
+ * This regex has its own blind spot: an unescaped `</script` inside a value
+ * ends the match early, so the captured text never contains the `<` that
+ * caused it — the capture just stops being what the script tag actually
+ * held. The block-count check below catches that case instead.
+ */
+function rawJsonLdBlocks(html: string): string[] {
+  const pattern =
+    /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  return [...html.matchAll(pattern)].map((m) => m[1]);
+}
+
+Deno.test("every sitemap page's JSON-LD blocks carry no raw <", async (t) => {
+  const site = await startSite();
+  try {
+    const paths = await sitemapPaths(site);
+    assert(
+      paths.length > 0,
+      "sitemap.xml is empty — the loop below would pass vacuously",
+    );
+    for (const path of paths) {
+      await t.step(path, async () => {
+        const html = await site.html(path);
+
+        // An unescaped </script> inside a value ends its script tag early
+        // and turns whatever follows (up to the value's own literal
+        // </script>) into a second, real <script> element — so the page
+        // gains a script tag the JSON-LD markup never opened. jsonLd()
+        // also throws outright when what an opening ld+json tag now leads
+        // to isn't valid JSON, which a truncated block usually isn't.
+        const openTags = count(
+          html,
+          /<script[^>]*type=["']application\/ld\+json["'][^>]*>/gi,
+        );
+        const blocks = jsonLd(html);
+        assertEquals(
+          blocks.length,
+          openTags,
+          `${openTags} ld+json <script> tags on ${path} but ${blocks.length} parsed — a value likely broke out of its tag`,
+        );
+
+        const rawBlocks = rawJsonLdBlocks(html);
+        for (const [i, raw] of rawBlocks.entries()) {
+          assert(
+            !raw.includes("<"),
+            `raw < in JSON-LD block ${i} on ${path}`,
+          );
+        }
+      });
+    }
+  } finally {
+    await site.stop();
+  }
+});

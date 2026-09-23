@@ -10,6 +10,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
+import { jsonLd } from "../../lib/json-ld.ts";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -114,7 +115,7 @@ export default define.page(function BlogArticle(ctx) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: jsonLd({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             "@id": `https://antonshubin.com/blog/${article.slug}#article`,
