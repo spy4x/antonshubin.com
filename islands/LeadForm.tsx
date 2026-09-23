@@ -80,7 +80,12 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
   // Runs after the DOM commits the success state, once the heading is no
   // longer inside an `inert` subtree and can actually take focus.
   useEffect(() => {
-    if (isSuccess) successHeadingRef.current?.focus();
+    // `preventScroll` matters: the success panel is still `max-height: 0`
+    // at this instant (its own transition hasn't started), so an unguarded
+    // focus() scrolls the page down to where the panel will end up, then
+    // back up as the panel expands — a ~150ms jump-and-settle that doesn't
+    // happen on the server-rendered page at all.
+    if (isSuccess) successHeadingRef.current?.focus({ preventScroll: true });
   }, [isSuccess]);
 
   return (
