@@ -7,6 +7,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { CalendarIcon, CodeIcon, StarIcon } from "../../components/Icons.tsx";
+import { BookCallLink } from "../../components/BookCallLink.tsx";
 
 function getHackathonBySlug(slug: string): Hackathon | undefined {
   return hackathons.find((h) => h.slug === slug);
@@ -183,20 +184,20 @@ export default define.page(function HackathonDetail(ctx) {
                     milestones, zero-bloat architecture, no dev-team drama.
                   </p>
                   <div class="flex flex-wrap gap-3">
-                    <a
-                      href={h.ctaLink || SCHEDULE_URL}
+                    <BookCallLink
+                      url={h.ctaLink || SCHEDULE_URL}
                       target={h.ctaLink ? undefined : "_blank"}
                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-sm"
                     >
                       {h.ctaLabel || "Book a free intro call"}
-                    </a>
-                    <a
-                      href={SCHEDULE_URL}
+                    </BookCallLink>
+                    <BookCallLink
+                      url={SCHEDULE_URL}
                       target="_blank"
                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors text-sm"
                     >
                       Free intro call
-                    </a>
+                    </BookCallLink>
                   </div>
                 </div>
               </div>

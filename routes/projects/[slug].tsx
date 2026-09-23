@@ -8,6 +8,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import GhStars from "../../islands/GhStars.tsx";
+import { BookCallLink } from "../../components/BookCallLink.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -348,14 +349,14 @@ export default define.page(function ProjectDetail(ctx) {
                 >
                   Start a similar project
                 </a>
-                <a
-                  href={SCHEDULE_URL}
+                <BookCallLink
+                  url={SCHEDULE_URL}
                   target="_blank"
                   data-umami-event={`project-cta-${project.slug}-schedule`}
                   class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors"
                 >
                   Book a free intro call
-                </a>
+                </BookCallLink>
               </div>
               <a
                 href="/how-i-work"

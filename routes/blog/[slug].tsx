@@ -9,6 +9,7 @@ import NewsletterForm from "../../islands/NewsletterForm.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
+import { BookCallLink } from "../../components/BookCallLink.tsx";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -409,13 +410,13 @@ export default define.page(function BlogArticle(ctx) {
                 ← All articles
               </a>
               <div class="flex flex-wrap items-stretch gap-4">
-                <a
-                  href={SCHEDULE_URL}
+                <BookCallLink
+                  url={SCHEDULE_URL}
                   target="_blank"
                   class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-lg shadow transition-colors"
                 >
                   Book a free intro call
-                </a>
+                </BookCallLink>
                 <a
                   href="/catalog"
                   class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded-lg shadow transition-colors"

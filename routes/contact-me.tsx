@@ -97,8 +97,9 @@ export default define.page(function ContactMe() {
   head.value = {
     ...head.value,
     title: "Contact Anton Shubin",
-    description:
-      "Book a free 30-minute intro call, email me, or message me on Telegram.",
+    description: SCHEDULE_URL
+      ? "Book a free 30-minute intro call, email me, or message me on Telegram."
+      : "Email me or message me on Telegram.",
     canonical: "https://antonshubin.com/contact-me",
     ogType: "website",
   };

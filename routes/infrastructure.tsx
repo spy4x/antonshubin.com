@@ -2,6 +2,7 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { BookCallLink } from "../components/BookCallLink.tsx";
 import { catalogPath } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { getBreadcrumb, head } from "../lib/head.ts";
@@ -305,15 +306,15 @@ export default define.page(function Infrastructure() {
             >
               Request a free audit
             </a>
-            <a
-              href={SCHEDULE_URL}
+            <BookCallLink
+              url={SCHEDULE_URL}
               target="_blank"
               rel="noopener noreferrer"
               data-e2e="infrastructure-book-intro"
               class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 transition-colors"
             >
               Book an intro call
-            </a>
+            </BookCallLink>
           </div>
         </section>
       </div>

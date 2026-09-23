@@ -13,6 +13,7 @@ import { marked } from "marked";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
+import { BookCallLink } from "../../components/BookCallLink.tsx";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
   return catalogItems.find((i) => i.slug === slug);
@@ -261,13 +262,13 @@ export default define.page(function CatalogDetail(ctx) {
               >
                 Talk about this
               </a>
-              <a
-                href={SCHEDULE_URL}
+              <BookCallLink
+                url={SCHEDULE_URL}
                 target="_blank"
                 class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors"
               >
                 Book a free intro call
-              </a>
+              </BookCallLink>
             </div>
             <a
               href="/how-i-work"

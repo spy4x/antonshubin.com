@@ -6,6 +6,7 @@ import { type Project, projects } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { ROLE } from "../lib/head.ts";
 import LeadForm from "../islands/LeadForm.tsx";
+import { BookCallLink } from "../components/BookCallLink.tsx";
 import {
   ArrowRightIcon,
   CalendarIcon,
@@ -77,8 +78,8 @@ export default define.page(function Home(ctx) {
               </p>
 
               <div class="mt-6">
-                <a
-                  href={SCHEDULE_URL}
+                <BookCallLink
+                  url={SCHEDULE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-umami-event="hero-book-call"
@@ -87,7 +88,7 @@ export default define.page(function Home(ctx) {
                 >
                   <CalendarIcon class="w-5 h-5" />
                   Book a {INTRO_CALL}
-                </a>
+                </BookCallLink>
                 <p class="mt-3 text-sm text-gray-400">
                   Rather write?{" "}
                   <a
@@ -370,8 +371,8 @@ export default define.page(function Home(ctx) {
             Thirty minutes, free, no pitch. We talk about what you are building
             and whether I can help.
           </p>
-          <a
-            href={SCHEDULE_URL}
+          <BookCallLink
+            url={SCHEDULE_URL}
             target="_blank"
             rel="noopener noreferrer"
             data-umami-event="home-book-call"
@@ -380,7 +381,7 @@ export default define.page(function Home(ctx) {
           >
             <CalendarIcon class="w-5 h-5" />
             Book a {INTRO_CALL}
-          </a>
+          </BookCallLink>
           <p class="mt-4 text-sm text-gray-400">
             Rather write?{" "}
             <a
