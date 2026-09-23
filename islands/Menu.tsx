@@ -1,4 +1,5 @@
 import { useSignal } from "@preact/signals";
+import { useEffect, useRef } from "preact/hooks";
 import {
   BriefcaseIcon,
   CloseIcon,
@@ -41,10 +42,26 @@ export default function Menu(
   { currentPath, scheduleUrl: _scheduleUrl }: MenuProps,
 ) {
   const isOpen = useSignal(false);
+  // The accessible toggle button (aria-expanded/aria-controls below), so
+  // Escape can return keyboard focus there instead of dropping it to <body>.
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const toggleMenu = () => {
     isOpen.value = !isOpen.value;
   };
+
+  const closeMenu = () => {
+    isOpen.value = false;
+    toggleButtonRef.current?.focus();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen.value) closeMenu();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const isActive = (href: string) => {
     if (href === "/") return currentPath === "/";
@@ -74,6 +91,7 @@ export default function Menu(
           class="fixed inset-0 z-20"
           style="backdrop-filter: blur(5px); background-color: rgba(0, 0, 0, 0.3);"
           onClick={toggleMenu}
+          aria-hidden="true"
         />
       )}
 
@@ -110,6 +128,7 @@ export default function Menu(
             {/* Mobile menu button */}
             <div class="absolute inset-y-0 right-0 flex items-center sm:hidden">
               <button
+                ref={toggleButtonRef}
                 type="button"
                 aria-expanded={isOpen.value}
                 aria-controls={isOpen.value ? "mobile-menu" : undefined}
