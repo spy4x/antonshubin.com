@@ -184,10 +184,14 @@ for the pin). It still calls `startSite()` for the running server, stubs
 `/api/lead` with `page.route()` so no real network call is made, submits the
 lead form, and asserts on three things a plain HTML fetch of the pre-submit page
 can't show: that focus lands on the success heading (the screen-reader
-announcement for issue #157) with `{ preventScroll: true }` (dropping that
-option lets the still-collapsing success panel jerk the page around, since the
-element hasn't reached its final position yet), and that the form and success
-panels swap their `inert` state.
+announcement for issue #157); that the page never scrolls further down than
+where it stood right before the click, sampling `scrollY` on every animation
+frame through the panels' 500ms transition (submitting with the button pinned to
+the bottom of the viewport — the only position that reproduces the jump — a
+`focus()` without `{ preventScroll: true }` on `islands/LeadForm.tsx`'s success
+heading scrolls the page down to the heading's still-collapsed position and back
+as the panel expands); and that the form and success panels swap their `inert`
+state.
 
 That file runs under its own task, `deno task test:browser`, not the plain
 `deno task test` glob, and `deno task check` runs both. Two reasons for the
