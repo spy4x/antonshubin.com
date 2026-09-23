@@ -3,9 +3,8 @@ import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
-import { marked } from "marked";
+import { renderBlogMarkdown } from "../../lib/markdown.ts";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
-import BlogContentA11y from "../../islands/BlogContentA11y.tsx";
 import NewsletterForm from "../../islands/NewsletterForm.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
@@ -62,7 +61,7 @@ export const handler = define.handlers({
     const markdown = await getArticleContent(slug);
     // Strip YAML front matter (between first pair of --- delimiters)
     const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null;
-    const content = body ? await marked(body) : null;
+    const content = body ? await renderBlogMarkdown(body) : null;
 
     // Related posts: same category, exclude self, max 3
     const related = article
@@ -242,7 +241,6 @@ export default define.page(function BlogArticle(ctx) {
                     dangerouslySetInnerHTML={{ __html: content }}
                   />
                   <BlogImageEnhancer />
-                  <BlogContentA11y />
                 </>
               )
               : (
