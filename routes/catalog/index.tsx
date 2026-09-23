@@ -138,9 +138,11 @@ export default define.page(function Catalog() {
         </div>
 
         <div class="text-center mt-12">
-          <p class="text-gray-400 text-sm mb-4">
-            Not sure which fits your project?
-          </p>
+          {SCHEDULE_URL && (
+            <p class="text-gray-400 text-sm mb-4">
+              Not sure which fits your project?
+            </p>
+          )}
           <BookCallLink
             url={SCHEDULE_URL}
             target="_blank"

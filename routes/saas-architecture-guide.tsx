@@ -267,9 +267,11 @@ export default define.page(function SaasArchGuide() {
           <h2 class="text-xl font-bold text-white mb-3">
             Need help with your architecture?
           </h2>
-          <p class="text-gray-400 mb-5">
-            Book a free 30-minute intro call. No pitch, just advice.
-          </p>
+          {SCHEDULE_URL && (
+            <p class="text-gray-400 mb-5">
+              Book a free 30-minute intro call. No pitch, just advice.
+            </p>
+          )}
           <BookCallLink
             url={SCHEDULE_URL}
             target="_blank"
