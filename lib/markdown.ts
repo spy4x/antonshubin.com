@@ -1,20 +1,28 @@
 import { Marked, Parser, TextRenderer } from "marked";
 import type { Renderer, Tokens } from "marked";
 
+const ESCAPE_MAP: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
+
+/** Escapes every `&<>"'`, as marked does for a code span. */
+function escapeEncode(text: string): string {
+  return text.replace(/[&<>"']/g, (c) => ESCAPE_MAP[c]);
+}
+
 /**
- * Escapes text for safe use inside a double-quoted HTML attribute value. An
- * `&` that already starts an entity reference (`&amp;`, `&copy;`, `&#169;`)
- * is left alone, so a label built from already-decoded markdown text (marked
- * decodes `&amp;` to `&` in a text token, `&copy;` stays as-is) isn't
- * double-escaped into `&amp;amp;` — the browser would then show the escaped
- * text raw instead of decoding it back to what the visible text renders.
+ * Escapes `<>"'` and any `&` that does not already start an entity
+ * reference, with marked's own pattern, as marked does for prose text.
  */
-function escapeAttr(text: string): string {
-  return text
-    .replace(/&(?!#?\w+;)/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function escapeNoEncode(text: string): string {
+  return text.replace(
+    /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g,
+    (c) => ESCAPE_MAP[c],
+  );
 }
 
 /**
@@ -28,37 +36,61 @@ interface LabelledCheckbox extends Tokens.Checkbox {
 }
 
 /**
- * Marked's own `TextRenderer.html()` passes an inline HTML token's raw markup
- * straight through (it's meant for content already known to be plain text,
- * but an inline `html` token can still reach it inside a checklist label).
- * Blog posts write their links as raw `<a target="_blank">` HTML rather than
- * markdown syntax (see `addNewTabHints` below), so a checklist item with a
- * link in it hits this. Dropping the tag entirely is safe here: the tag's
- * own visible text is a separate, sibling text token that this renderer
- * still renders normally, so only the markup disappears from the label.
+ * Renders a checklist item's inline tokens to the text of its `aria-label`:
+ * the same escaped text marked puts on the page, with every tag dropped.
+ * Each token is escaped the way marked's own renderer escapes it (a code
+ * span fully, prose without re-encoding an existing entity), so the label
+ * a screen reader reads always decodes to the text a sighted reader sees.
+ * Escaping the joined plain text once instead gets code spans and
+ * backslash escapes wrong, because marked has already decoded those.
+ * Inline HTML is dropped: a raw `<a target="_blank">` link's visible text
+ * is a separate text token, so only the markup disappears.
  */
-class PlainTextRenderer extends TextRenderer {
-  override html(): string {
-    return "";
+class LabelRenderer extends TextRenderer {
+  declare parser: Parser;
+
+  override text(token: Tokens.Text | Tokens.Escape): string {
+    if ("tokens" in token && token.tokens) {
+      return this.parser.parseInline(token.tokens, this as unknown as Renderer);
+    }
+    return "escaped" in token && token.escaped
+      ? token.text
+      : escapeNoEncode(token.text);
+  }
+  override codespan({ text }: Tokens.Codespan): string {
+    return escapeEncode(text);
+  }
+  override strong({ tokens }: Tokens.Strong): string {
+    return this.parser.parseInline(tokens, this as unknown as Renderer);
+  }
+  override em({ tokens }: Tokens.Em): string {
+    return this.parser.parseInline(tokens, this as unknown as Renderer);
+  }
+  override del({ tokens }: Tokens.Del): string {
+    return this.parser.parseInline(tokens, this as unknown as Renderer);
+  }
+  override link({ tokens }: Tokens.Link): string {
+    return this.parser.parseInline(tokens, this as unknown as Renderer);
+  }
+  override image({ text }: Tokens.Image): string {
+    return escapeNoEncode(text);
+  }
+  override html({ text }: Tokens.HTML | Tokens.Tag): string {
+    return /^<br\b/i.test(text) ? " " : "";
+  }
+  override br(): string {
+    return " ";
   }
 }
 
 /**
- * Renders a token array to plain text: markup resolved and stripped (a link
- * keeps its visible text, not its href; `**bold**` keeps just the word),
- * matching what a screen reader would actually announce for `aria-label`
- * rather than raw, unrendered markdown syntax. `TextRenderer` is marked's
- * own renderer for exactly this (it backs, for example, an image's alt
- * text) — it does not escape HTML, so the caller still has to.
+ * Renders a checklist item's inline tokens to an attribute-safe label (see
+ * `LabelRenderer`), with whitespace collapsed.
  */
-function plainText(tokens: Tokens.Generic[]): string {
-  // marked's own types only accept a full Renderer here, but the whole point
-  // of TextRenderer is that it implements the same inline methods with a
-  // plain-text body — it's what marked itself uses internally for exactly
-  // this (an image's alt text, for one).
+function ariaLabelText(tokens: Tokens.Generic[]): string {
   return Parser.parseInline(tokens, {
-    renderer: new PlainTextRenderer() as unknown as Renderer,
-  });
+    renderer: new LabelRenderer() as unknown as Renderer,
+  }).replace(/\s+/g, " ").trim();
 }
 
 /**
@@ -106,7 +138,7 @@ blogMarked.use({
       }
     }
     if (!checkbox || !inlineTokens) return;
-    const label = plainText(inlineTokens).replace(/\s+/g, " ").trim();
+    const label = ariaLabelText(inlineTokens);
     if (label) checkbox._ariaLabel = label;
   },
   renderer: {
@@ -126,9 +158,7 @@ blogMarked.use({
       const label = (token as LabelledCheckbox)._ariaLabel;
       if (!label) return false;
       const checkedAttr = token.checked ? 'checked="" ' : "";
-      return `<input aria-label="${
-        escapeAttr(label)
-      }" ${checkedAttr}disabled="" type="checkbox"> `;
+      return `<input aria-label="${label}" ${checkedAttr}disabled="" type="checkbox"> `;
     },
   },
 });

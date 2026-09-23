@@ -87,11 +87,30 @@ Deno.test("a checklist item with entities keeps them, not double-escaped", async
   const ours = await renderBlogMarkdown(md);
   const plain = await marked(md);
   assertEquals(withoutAriaLabel(ours), plain);
-  // The bug this guards: escapeAttr() re-escaping an already-present entity
-  // reference, turning "&amp;" into "&amp;amp;" and "&copy;" into
-  // "&amp;copy;" — a browser would then show the escaped text raw instead of
-  // decoding it the same way it decodes the visible text.
+  // The bug this guards: an already-present entity reference re-escaped,
+  // "&amp;" into "&amp;amp;" and "&copy;" into "&amp;copy;", so a browser
+  // shows the escaped text raw instead of decoding it like the visible text.
   assertMatch(ours, /aria-label="Tom &amp; Jerry &copy;"/);
+});
+
+Deno.test("a checklist label escapes code spans and backslash escapes as the page does", async () => {
+  const md =
+    "- [ ] use `&amp;` literally\n- [ ] `&nbsp;` in CSS\n- [ ] slash \\&amp; here\n";
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  // Marked hands code spans and backslash escapes over already decoded and
+  // escapes them fully on the page; the label must do the same, or a screen
+  // reader reads "&" where the page shows "&amp;".
+  assertMatch(ours, /aria-label="use &amp;amp; literally"/);
+  assertMatch(ours, /aria-label="&amp;nbsp; in CSS"/);
+  assertMatch(ours, /aria-label="slash &amp;amp; here"/);
+});
+
+Deno.test("a raw <br> in a checklist item becomes a space in the label", async () => {
+  const md = "- [ ] <em>x</em> y<br>z\n";
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  assertMatch(ours, /aria-label="x y z"/);
 });
 
 Deno.test("a plain (non-task) list is untouched", async () => {
