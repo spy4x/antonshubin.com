@@ -37,6 +37,13 @@
 //      — /contact-me
 //   9 & 10. routes/blog/[slug].tsx's two captions (text-gray-600 -> gray-400)
 //      — both render on every blog post below
+//   11. The nine `bg-gradient-to-r from-orange-600 to-amber-500` CTA buttons,
+//      dropped for a solid bg-orange-600 (white on the gradient's amber-500
+//      end was 2.13:1; axe can't fail a gradient at all, only flag it
+//      `incomplete`, so `colorContrastResult()` below checks that bucket too,
+//      not just `violations`) — /catalog has one; assertNoContrastViolations
+//      checks it structurally on every page in the loop below regardless of
+//      whether that page has a gradient CTA
 //
 // #2 needs its own probe: --color-gray-400 was already comfortably above AA
 // (5.78:1) against gray-800, the background most of its real uses sit on —
@@ -97,18 +104,23 @@ interface AxeViolation {
 }
 interface AxeRunResult {
   violations: AxeViolation[];
+  incomplete: AxeViolation[];
 }
 
 /** Runs axe-core's WCAG 2 A/AA rules against `context` (a selector, element,
- * or Document) already loaded in `page`, and returns the color-contrast
- * violation nodes found, if any. Injects axe-core's own bundled source via
- * `addScriptTag` rather than fetching it, so the test makes no network call
- * of its own; `context` is passed as a string selector across the
- * `page.evaluate` boundary, since a live element handle can't cross it. */
-async function colorContrastViolations(
+ * or Document) already loaded in `page`. Injects axe-core's own bundled
+ * source via `addScriptTag` rather than fetching it, so the test makes no
+ * network call of its own; `context` is passed as a string selector across
+ * the `page.evaluate` boundary, since a live element handle can't cross it.
+ * Returns both the color-contrast violation nodes and the subset of its
+ * `incomplete` nodes axe couldn't verify because of a CSS gradient
+ * background — axe never puts a gradient in `violations`, only
+ * `incomplete`, so a gradient regression (see "no gradient CTAs" below)
+ * would otherwise pass a violations-only check silently. */
+async function colorContrastResult(
   page: Page,
   context: string,
-): Promise<AxeNode[]> {
+): Promise<{ violations: AxeNode[]; gradientIncomplete: AxeNode[] }> {
   await page.addScriptTag({ content: axeCore.source });
   const results = await page.evaluate(async (sel) => {
     // deno-lint-ignore no-explicit-any
@@ -117,22 +129,38 @@ async function colorContrastViolations(
       runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
     });
   }, context) as AxeRunResult;
-  return results.violations.find((v) => v.id === "color-contrast")?.nodes ?? [];
+  return {
+    violations:
+      results.violations.find((v) => v.id === "color-contrast")?.nodes ?? [],
+    gradientIncomplete:
+      (results.incomplete.find((v) => v.id === "color-contrast")?.nodes ?? [])
+        .filter((n) => n.failureSummary.includes("gradient")),
+  };
 }
 
 /** Navigates `page` to `path` and asserts zero axe color-contrast
- * violations there. */
+ * violations there, and no CSS-gradient background axe couldn't verify
+ * (see colorContrastResult's docs — this is how a "no gradient CTAs" fix
+ * gets proven, since axe never fails a gradient outright). */
 async function assertNoContrastViolations(
   page: Page,
   origin: string,
   path: string,
 ): Promise<void> {
   await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });
-  const nodes = await colorContrastViolations(page, "html");
+  const { violations, gradientIncomplete } = await colorContrastResult(
+    page,
+    "html",
+  );
   assertEquals(
-    nodes.map((n) => n.html),
+    violations.map((n) => n.html),
     [],
     `${path} must have zero axe color-contrast violations`,
+  );
+  assertEquals(
+    gradientIncomplete.map((n) => n.html),
+    [],
+    `${path} must have no gradient-background text axe couldn't verify`,
   );
 }
 
@@ -307,11 +335,22 @@ Deno.test("no WCAG AA colour-contrast violations across five representative page
           await summaries.nth(i).click();
         }
       }
-      const catalogNodes = await colorContrastViolations(page, "html");
+      const catalogResult = await colorContrastResult(page, "html");
       assertEquals(
-        catalogNodes.map((n) => n.html),
+        catalogResult.violations.map((n) => n.html),
         [],
         "/catalog, with its 'Not included' details open, must have zero axe color-contrast violations",
+      );
+      // /catalog's "Talk about this" button was one of the nine gradient CTAs
+      // (bg-gradient-to-r from-orange-600 to-amber-500, white text 2.13:1
+      // against the gradient's amber-500 end) fixed to a solid bg-orange-600.
+      // axe can't fail a gradient outright, only flag it `incomplete` — see
+      // colorContrastResult's docs — so this is what actually proves the fix
+      // stayed applied, not the violations assertion above.
+      assertEquals(
+        catalogResult.gradientIncomplete.map((n) => n.html),
+        [],
+        "/catalog must have no gradient-background text axe couldn't verify",
       );
 
       // The "x" marker itself: axe classifies it as "non-text content" and
@@ -339,12 +378,12 @@ Deno.test("no WCAG AA colour-contrast violations across five representative page
         document.body.appendChild(el);
       });
       try {
-        const probeNodes = await colorContrastViolations(
+        const probeResult = await colorContrastResult(
           page,
           "#contrast-probe-gray-400-on-gray-700",
         );
         assertEquals(
-          probeNodes.map((n) => n.html),
+          probeResult.violations.map((n) => n.html),
           [],
           "text-gray-400 on bg-gray-700 (islands/GhStars.tsx's fallback badge) must pass AA",
         );
