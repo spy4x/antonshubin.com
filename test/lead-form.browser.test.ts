@@ -17,14 +17,10 @@ import { startSite } from "./harness.ts";
 
 const PLAYWRIGHT_VERSION = "1.63.0";
 const FOCUS_TIMEOUT_MS = 5000;
-// Longer than the panels' 500ms CSS transition, so the scroll sampler (below)
+// Longer than the panels' 500ms CSS transition, so the scroll sampler below
 // keeps recording past the point where a scroll jump would show up.
 const SCROLL_SAMPLE_WINDOW_MS = 700;
-
-interface FocusCall {
-  id: string;
-  preventScroll: boolean;
-}
+const SUBMIT_SELECTOR = '[data-lead-form] button[type="submit"]';
 
 /**
  * True if the element matched by `selector` has the `inert` IDL property set,
@@ -38,47 +34,45 @@ function isInert(page: Page, selector: string): Promise<boolean> {
 }
 
 /**
- * Patches `HTMLElement.prototype.focus` (before the page's own scripts run)
- * to record every call's element id and whether `preventScroll` was set, into
- * `window.__focusCalls`. This is what actually makes the "no scroll jump"
- * guard deterministic: it checks the option the code passed, not a visual
- * side effect. Reading `window.scrollY` alone (see `startScrollSampling`
- * below) turned out to depend on the exact layout position `startSite()`'s
- * page happens to load at and on the rendering backend's timing — it caught
- * the jump when reproducing this issue manually, but not reliably across
- * viewports and browser builds, so it isn't load-bearing here on its own.
+ * Scrolls so the submit button sits at the very bottom edge of the viewport.
+ * The scroll jump this test guards against only shows up when the button
+ * (and the collapsed success panel right after it) starts at the bottom of
+ * the screen — with the button mid-viewport there's already room to reveal
+ * the panel without any scrolling, so `focus()` never needs to move the page
+ * and a dropped `preventScroll` goes unnoticed. This is done with
+ * `window.scrollBy` inside `page.evaluate`, not a Playwright scroll helper,
+ * so the position is exact and nothing auto-corrects it afterwards.
  */
-async function installFocusSpy(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    const nativeFocus = HTMLElement.prototype.focus;
-    (globalThis as unknown as { __focusCalls: FocusCall[] }).__focusCalls = [];
-    HTMLElement.prototype.focus = function (
-      this: HTMLElement,
-      options?: FocusOptions,
-    ) {
-      (globalThis as unknown as { __focusCalls: FocusCall[] }).__focusCalls
-        .push({
-          id: this.id,
-          preventScroll: options?.preventScroll === true,
-        });
-      return nativeFocus.call(this, options);
-    };
+async function scrollSubmitButtonToViewportBottom(page: Page): Promise<void> {
+  await page.locator(SUBMIT_SELECTOR).evaluate((el) => {
+    globalThis.scrollBy(
+      0,
+      el.getBoundingClientRect().bottom - globalThis.innerHeight,
+    );
   });
 }
 
-function readFocusCalls(page: Page): Promise<FocusCall[]> {
-  return page.evaluate(() =>
-    (globalThis as unknown as { __focusCalls: FocusCall[] }).__focusCalls
-  );
+/**
+ * Clicks the submit button via `element.click()` inside `page.evaluate`,
+ * instead of Playwright's own `locator.click()`. Playwright's click scrolls
+ * its target into view as part of its actionability checks — which would
+ * silently undo the positioning `scrollSubmitButtonToViewportBottom` just
+ * did (confirmed: at 390x844, `page.click()` scrolls even against the fixed,
+ * already-correct main branch). A plain DOM `click()` fires the same
+ * `onSubmit` handler without touching scroll position at all.
+ */
+async function clickSubmitButtonWithoutScrolling(page: Page): Promise<void> {
+  await page.locator(SUBMIT_SELECTOR).evaluate((el) => {
+    (el as HTMLElement).click();
+  });
 }
 
 /**
  * Starts sampling `window.scrollY` on every animation frame, for
- * `SCROLL_SAMPLE_WINDOW_MS`, into `window.__scrollSamples`. Call before the
- * action under test (the submit click) so the very first frames — where an
- * unguarded `.focus()` would yank the page down — are captured. See the
- * caveat on `installFocusSpy` above: this is a real-behaviour supplement, not
- * the primary guard.
+ * `SCROLL_SAMPLE_WINDOW_MS`, into `window.__scrollSamples`. Call right
+ * before the click so the very first frames — where an unguarded `.focus()`
+ * yanks the page down as the still-collapsed success panel is scrolled into
+ * view — are captured.
  */
 function startScrollSampling(page: Page): Promise<void> {
   return page.evaluate((windowMs) => {
@@ -125,9 +119,11 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
       );
     }
 
+    // Default 1280x720 viewport, deliberately not overridden: it's one of
+    // the two sizes (the other being 390x844) confirmed to reproduce the
+    // scroll jump against an unfixed heading focus.
     const page: Page = await browser.newPage();
     try {
-      await installFocusSpy(page);
       await page.route(
         "**/api/lead",
         (route: Route) =>
@@ -161,9 +157,10 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
       await page.fill("#lead-email", "ada@example.com");
       await page.fill("#lead-stack", "Deno + Fresh, looking for a review");
 
+      await scrollSubmitButtonToViewportBottom(page);
       const preSubmitScrollY = await page.evaluate(() => globalThis.scrollY);
       await startScrollSampling(page);
-      await page.click('[data-lead-form] button[type="submit"]');
+      await clickSubmitButtonWithoutScrolling(page);
 
       try {
         await page.waitForFunction(
@@ -181,28 +178,13 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
         );
       }
 
-      // Deterministic guard: the code must call focus({ preventScroll: true })
-      // on the success heading. This is what a dropped `preventScroll` option
-      // actually fails on — see the comment on installFocusSpy for why the
-      // scrollY sampling below isn't relied on alone.
-      const focusCalls = await readFocusCalls(page);
-      const successFocusCall = focusCalls.find((call) =>
-        call.id === "lead-success-heading"
-      );
-      assert(
-        successFocusCall,
-        "expected a focus() call on #lead-success-heading after submit",
-      );
-      assert(
-        successFocusCall.preventScroll,
-        "focus() on #lead-success-heading must pass { preventScroll: true } " +
-          "— without it, the still-collapsing success panel causes a visible " +
-          "scroll jump as the browser scrolls to the element's pre-transition " +
-          "position",
-      );
-
-      // Real-behaviour supplement: while the panels animate, the page should
-      // also never actually scroll further down than where it started.
+      // The actual regression guard: with the submit button pinned to the
+      // bottom of the viewport, a focus() call without { preventScroll: true }
+      // scrolls the page down to the heading's still-collapsed position and
+      // back as the success panel expands. Confirmed against this exact test
+      // (mutation: drop preventScroll) at all three sizes the bug was found
+      // at — 1280x720, 1280x800, 390x844 — and confirmed silent on main and
+      // on the fixed code.
       await page.waitForTimeout(SCROLL_SAMPLE_WINDOW_MS);
       const scrollSamples = await readScrollSamples(page);
       assert(
@@ -213,9 +195,7 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
       for (const sample of scrollSamples) {
         assert(
           sample <= preSubmitScrollY,
-          `scrollY rose to ${sample} (from ${preSubmitScrollY}) while the ` +
-            `success panel animated in — the success heading's focus() call ` +
-            `must pass { preventScroll: true }`,
+          `scrollY rose to ${sample} (from ${preSubmitScrollY})`,
         );
       }
 
