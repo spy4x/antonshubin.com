@@ -121,7 +121,7 @@ export default define.page(function Catalog() {
                 <div class="flex flex-wrap items-center gap-3">
                   <a
                     href="/contact-me"
-                    class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                    class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
                   >
                     Talk about this
                   </a>
