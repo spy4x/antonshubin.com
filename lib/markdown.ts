@@ -48,8 +48,12 @@ interface LabelledCheckbox extends Tokens.Checkbox {
  */
 class LabelRenderer extends TextRenderer {
   declare parser: Parser;
+  /** True between an inline <script> or <style> tag and its closing tag. */
+  private inHiddenTag = false;
 
   override text(token: Tokens.Text | Tokens.Escape): string {
+    // A script or style body is never on screen, so it stays out of the label.
+    if (this.inHiddenTag) return "";
     if ("tokens" in token && token.tokens) {
       return this.parser.parseInline(token.tokens, this as unknown as Renderer);
     }
@@ -82,7 +86,10 @@ class LabelRenderer extends TextRenderer {
       : escapeNoEncode(text);
   }
   override html({ text }: Tokens.HTML | Tokens.Tag): string {
-    return /^<br\s*\/?>$/i.test(text) ? " " : "";
+    if (/^<(script|style)[\s>]/i.test(text)) this.inHiddenTag = true;
+    else if (/^<\/(script|style)\s*>/i.test(text)) this.inHiddenTag = false;
+    // A <br>, with or without attributes, reads as a space; <br-x> does not.
+    return /^<br[\s/>]/i.test(text) ? " " : "";
   }
   override br(): string {
     return " ";

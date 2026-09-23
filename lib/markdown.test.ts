@@ -113,7 +113,7 @@ Deno.test("a raw <br> in a checklist item becomes a space in the label", async (
   assertMatch(ours, /aria-label="x y z"/);
 });
 
-Deno.test("text inside inline <kbd> or <code> cannot break out of the label", async () => {
+Deno.test("text inside inline <kbd> cannot break out of the label", async () => {
   const md =
     '- [ ] press <kbd>"</kbd> key\n- [ ] <kbd>" onfocus="alert(1)</kbd> x\n';
   const ours = await renderBlogMarkdown(md);
@@ -141,6 +141,29 @@ Deno.test("a hard line break and an image alt read like the page", async () => {
   const ours = await renderBlogMarkdown(md);
   assertEquals(withoutAriaLabel(ours), await marked(md));
   assertMatch(ours, /aria-label="one two a b c"/);
+});
+
+Deno.test("a <br> with attributes is a space in the label, <br-x> is not", async () => {
+  const md = '- [ ] one<br class="x">two\n- [ ] one<br-x>two\n';
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  assertMatch(ours, /aria-label="one two"/);
+  assertMatch(ours, /aria-label="onetwo"/);
+});
+
+Deno.test("an entity inside inline <kbd> or <code> decodes like the page", async () => {
+  const md = "- [ ] <kbd>&lt;</kbd> <code>&amp;</code> <kbd>a < b</kbd>\n";
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  // `&` is kept, so the entity decodes; a raw `<` is escaped.
+  assertMatch(ours, /aria-label="&lt; &amp; a &lt; b"/);
+});
+
+Deno.test("an inline <script> or <style> body stays out of the label", async () => {
+  const md = "- [ ] <script>var x = 1</script>after <style>a{}</style>end\n";
+  const ours = await renderBlogMarkdown(md);
+  assertEquals(withoutAriaLabel(ours), await marked(md));
+  assertMatch(ours, /aria-label="after end"/);
 });
 
 Deno.test("a plain (non-task) list is untouched", async () => {
