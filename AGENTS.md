@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # the Playwright lead-form test; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form + a11y tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -102,16 +102,17 @@ Deploy above).
 
 The `check` step also installs Chromium before `deno task check` runs:
 `deno run -A npm:playwright@1.63.0 install --with-deps chromium`. That's for
-`test/lead-form.browser.test.ts` (see "Rendered-page tests" below), which
-`deno task check` runs via `deno task test:browser`. The base image has no
-browser and none of the OS libraries a headless Chromium needs, hence
-`--with-deps`; the version in that command must match the `"playwright"` entry
-in `deno.json`'s import map, since a version mismatch downloads a different
-Chromium build than the one the test launches. This was chosen over a separate
-CI step with its own image, because it keeps the browser test on the same
-container the rest of `check` already runs in, at the cost of that one extra
-install command per run — CI has no local cache to skip it with, the way a
-machine that already has `~/.cache/ms-playwright` populated does locally.
+`test/lead-form.browser.test.ts` and `test/a11y.browser.test.ts` (see
+"Rendered-page tests" below), which `deno task check` runs via
+`deno task test:browser`. The base image has no browser and none of the OS
+libraries a headless Chromium needs, hence `--with-deps`; the version in that
+command must match the `"playwright"` entry in `deno.json`'s import map, since a
+version mismatch downloads a different Chromium build than the one the test
+launches. This was chosen over a separate CI step with its own image, because it
+keeps the browser test on the same container the rest of `check` already runs
+in, at the cost of that one extra install command per run — CI has no local
+cache to skip it with, the way a machine that already has
+`~/.cache/ms-playwright` populated does locally.
 
 A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
 runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
@@ -154,11 +155,10 @@ since hiding an icon from assistive tech without naming the control anywhere
 else leaves it with no name at all. Both guards only see markup from the built,
 non-hydrated HTML `test/harness.ts` fetches, so they don't cover the two
 lightboxes' close/prev/next buttons, which only exist once client JS opens the
-dialog. Nothing in the automated suite guards those buttons — the axe-core run
-in issue #160's PR body was a one-off manual check against a specific commit,
-not a standing test, so it protects nothing against a later regression. A real
-guard would need a browser-driven test in the shape of
-`test/lead-form.browser.test.ts`; none exists yet.
+dialog. The axe-core run in issue #160's PR body was a one-off manual check
+against a specific commit, not a standing test, so it protected nothing against
+a later regression by itself; `test/a11y.browser.test.ts` (issue #165) is the
+standing guard — see "Browser-driven tests" below.
 
 `lib/markdown.test.ts` (issue #160) is not one of these — it tests
 `lib/markdown.ts` directly, with no server and no `test/harness.ts`, since a
@@ -187,9 +187,10 @@ free-port probe binds `0.0.0.0:0`, the harness then fetches `127.0.0.1`) and
 `--allow-run=deno` (to spawn the server as a child process). The flags apply to
 every test file run by that task, not only the harness, so none of them can make
 a live outbound call; the tests that look network-shaped replace
-`globalThis.fetch` themselves. The one exception is
-`test/lead-form.browser.test.ts`, which `deno task test:browser` runs with `-A`
-(see below).
+`globalThis.fetch` themselves. The exceptions are
+`test/lead-form.browser.test.ts` and `test/a11y.browser.test.ts`, both listed in
+the `test` task's `--ignore` and run instead by `deno task test:browser` with
+`-A` (see below).
 
 **How to add a guard.** Call `startSite()`, fetch a page with `site.html()` or
 `site.get()`, assert on structure or a short phrase with `count()` /
@@ -225,17 +226,47 @@ heading scrolls the page down to the heading's still-collapsed position and back
 as the panel expands); and that the form and success panels swap their `inert`
 state.
 
-That file runs under its own task, `deno task test:browser`, not the plain
-`deno task test` glob, and `deno task check` runs both. Two reasons for the
-split: the permissions differ (Playwright needs `-A` — launching a bundled
-browser touches sandboxing, home-directory lookups, and OS/WSL detection that
-land on narrower flags one at a time, so scoping it flag-by-flag bought nothing
-over granting it to this one file), and `deno task test` keeps the narrow
-permissions from "Permissions" above for every other test file rather than
-widening them for one browser-driven exception. `test:browser` doesn't build the
-site itself, same as `startSite()` doesn't — it relies on running after
-`deno task test` within `deno task check`, which built it as a side effect;
-running `deno task test:browser` on its own before a build hits the same loud
+`test/a11y.browser.test.ts` (issue #165) is the other file in this task. It
+covers three things the server-rendered HTML in `test/a11y.test.ts` cannot see,
+because each only exists after client JS runs. First, the project-page lightbox
+(`islands/ImageGallery.tsx`, checked on `/projects/calltrack`, which has seven
+screenshots): opening it names the dialog after the current image
+(`"CallTrack screenshot 1"`), Close/Previous image/Next image each have a real
+accessible name, Next re-names the dialog to the next image, and focus returns
+to the thumbnail button that opened it after both Escape and Close — checked
+from two different thumbnails, so the assertion is against the specific trigger,
+not just "focus went somewhere." Second, the blog-post lightbox
+(`islands/BlogImageEnhancer.tsx`, checked on
+`/blog/from-office-job-to-freelance-to-my-startups`, which has an inline image):
+the same dialog name and Close-button-name and focus-return checks, plus that it
+has no Next/Previous buttons, since a blog post's lightbox only ever shows the
+one image that was clicked. Third, that Escape closes the mobile menu
+(`islands/Menu.tsx`) at a 390×844 viewport and returns focus to the toggle
+button — checked by first moving focus onto a menu link, so the assertion proves
+Escape moves focus back rather than merely observing focus that a native click
+handler already left in place. That last distinction matters for the other two:
+`<dialog>` elements restore focus to whatever was focused before `showModal()`
+on `close()`, in every browser, on their own, so removing the explicit
+`triggerRef.current?.focus()` call in `islands/ImageGallery.tsx` or
+`islands/BlogImageEnhancer.tsx` does not turn this test red — confirmed by
+removing each and re-running. The explicit calls stay anyway, as a
+self-contained guarantee that does not depend on every future browser keeping
+that native behaviour, but the test's real, provable coverage there is the
+dialog and button names, not that specific line. Removing the mobile menu's
+Escape handler, or any one of the dialog or button `aria-label`s, does turn the
+test red — confirmed the same way, by removing each and re-running.
+
+Both files run under `deno task test:browser`, not the plain `deno task test`
+glob, and `deno task check` runs both. Two reasons for the split: the
+permissions differ (Playwright needs `-A` — launching a bundled browser touches
+sandboxing, home-directory lookups, and OS/WSL detection that land on narrower
+flags one at a time, so scoping it flag-by-flag bought nothing over granting it
+to these files), and `deno task test` keeps the narrow permissions from
+"Permissions" above for every other test file rather than widening them for the
+browser-driven exceptions. `test:browser` doesn't build the site itself, same as
+`startSite()` doesn't — it relies on running after `deno task test` within
+`deno task check`, which built it as a side effect; running
+`deno task test:browser` on its own before a build hits the same loud
 `startSite()` failure as running `deno test` directly (see the design note
 above), not a silent skip. If Chromium is missing entirely (a fresh machine, or
 `PLAYWRIGHT_BROWSERS_PATH` pointed elsewhere), the test fails with an error
