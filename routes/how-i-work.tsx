@@ -4,6 +4,7 @@ import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
@@ -323,6 +324,7 @@ export default define.page(function HowIWork() {
                 class="hover:text-orange-300 underline underline-offset-4"
               >
                 open standalone
+                <NewTabHint />
               </a>
             </p>
           </div>

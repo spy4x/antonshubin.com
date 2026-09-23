@@ -9,6 +9,7 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import GhStars from "../../islands/GhStars.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
+import { NewTabHint } from "../../components/NewTabHint.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -131,6 +132,7 @@ export default define.page(function ProjectDetail(ctx) {
                           class="text-orange-400 hover:text-orange-300 normal-case tracking-normal font-medium"
                         >
                           {project.madeForName}
+                          <NewTabHint />
                         </a>
                       )
                       : (
@@ -151,8 +153,21 @@ export default define.page(function ProjectDetail(ctx) {
               </div>
             )}
 
-            {/* Title + external indicator */}
-            <div class="flex items-start gap-2 mb-5">
+            {
+              /* Title + external indicator. When the title itself is a link
+                (site is live) there is no <h1> anywhere on the page, so the
+                wrapping div stands in for it via role="heading" — the link
+                stays a real link, and no tag changes or elements move. */
+            }
+            <div
+              class="flex items-start gap-2 mb-5"
+              role={project.externalURL && !project.externalURLDead
+                ? "heading"
+                : undefined}
+              aria-level={project.externalURL && !project.externalURLDead
+                ? 1
+                : undefined}
+            >
               {project.externalURL && !project.externalURLDead
                 ? (
                   <a
@@ -161,6 +176,7 @@ export default define.page(function ProjectDetail(ctx) {
                     class="inline-flex items-baseline gap-2 text-3xl sm:text-4xl font-bold text-white hover:text-orange-400 transition-colors text-balance"
                   >
                     {project.title}
+                    <NewTabHint />
                     <svg
                       aria-hidden="true"
                       focusable="false"
@@ -269,6 +285,7 @@ export default define.page(function ProjectDetail(ctx) {
                           d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                         />
                       </svg>
+                      <NewTabHint />
                     </a>
                   )
               )}
@@ -290,6 +307,7 @@ export default define.page(function ProjectDetail(ctx) {
                   </svg>
                   GitHub
                   <GhStars repo={project.ghRepo} />
+                  <NewTabHint />
                 </a>
               )}
             </div>

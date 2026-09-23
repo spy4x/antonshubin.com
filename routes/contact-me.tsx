@@ -4,6 +4,7 @@ import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import {
   CalendarIcon,
@@ -148,6 +149,7 @@ export default define.page(function ContactMe() {
                 {c.downArrow && <span aria-hidden="true">↓</span>}
                 {!c.hideArrow && <ArrowRightIcon class="w-4 h-4" />}
               </span>
+              {c.href.startsWith("http") && <NewTabHint />}
             </a>
           ))}
         </div>
@@ -159,7 +161,7 @@ export default define.page(function ContactMe() {
                 href={p.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={p.name}
+                aria-label={`${p.name} (opens in a new tab)`}
                 title={p.name}
                 class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-orange-500 transition-colors"
               >
@@ -194,6 +196,7 @@ export default define.page(function ContactMe() {
                 class="underline hover:text-orange-300"
               >
                 open standalone
+                <NewTabHint />
               </a>.
             </p>
           </section>

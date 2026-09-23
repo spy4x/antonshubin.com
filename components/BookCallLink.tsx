@@ -1,4 +1,5 @@
 import type { ComponentChildren } from "preact";
+import { NewTabHint } from "./NewTabHint.tsx";
 
 interface BookCallLinkProps {
   /**
@@ -47,6 +48,7 @@ export function BookCallLink({
       class={className}
     >
       {children}
+      {target === "_blank" && <NewTabHint />}
     </a>
   );
 }

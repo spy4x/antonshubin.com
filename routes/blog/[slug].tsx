@@ -342,7 +342,7 @@ export default define.page(function BlogArticle(ctx) {
                 }`}
                 target="_blank"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
-                aria-label="Share on Twitter"
+                aria-label="Share on Twitter (opens in a new tab)"
               >
                 <svg
                   aria-hidden="true"
@@ -363,7 +363,7 @@ export default define.page(function BlogArticle(ctx) {
                 }`}
                 target="_blank"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
-                aria-label="Share on LinkedIn"
+                aria-label="Share on LinkedIn (opens in a new tab)"
               >
                 <svg
                   aria-hidden="true"

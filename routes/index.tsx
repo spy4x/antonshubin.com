@@ -7,6 +7,7 @@ import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { ROLE } from "../lib/head.ts";
 import LeadForm from "../islands/LeadForm.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import {
   ArrowRightIcon,
   CalendarIcon,
@@ -149,6 +150,7 @@ export default define.page(function Home(ctx) {
                 <p class="text-gray-400 text-xs sm:text-sm mt-1">{n.label}</p>
               </div>
             ))}
+            <NewTabHint />
           </a>
           <p class="text-gray-400 text-sm mb-8">
             Expert-Vetted on Upwork (top 1%), 6,600+ hours.{" "}
@@ -159,6 +161,7 @@ export default define.page(function Home(ctx) {
               class="text-orange-400 hover:text-orange-300 underline underline-offset-4"
             >
               Check it on my Upwork profile
+              <NewTabHint />
             </a>
           </p>
           <div class="grid gap-5 md:grid-cols-3">
@@ -314,6 +317,7 @@ export default define.page(function Home(ctx) {
               class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
             >
               View all reviews on <UpworkIcon class="w-auto h-4 text-white" />
+              <span class="sr-only">Upwork</span>
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -330,6 +334,7 @@ export default define.page(function Home(ctx) {
                   d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
                 />
               </svg>
+              <NewTabHint />
             </a>
           </div>
         </section>

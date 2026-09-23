@@ -3,6 +3,7 @@ import { Layout } from "../components/Layout.tsx";
 import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import CopyButton from "../islands/CopyButton.tsx";
 
 export default define.page(function Pay() {
@@ -216,6 +217,7 @@ export default define.page(function Pay() {
               >
                 Pay with Stripe
                 <ArrowRightIcon class="w-5 h-5" />
+                <NewTabHint />
               </a>
               <img
                 class="w-full max-w-[200px] mx-auto mt-6 object-cover"

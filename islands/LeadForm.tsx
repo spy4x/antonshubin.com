@@ -1,6 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
 
 interface FormState {
@@ -355,6 +356,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 class="text-gray-400 hover:text-orange-300 underline underline-offset-4 text-sm"
               >
                 Open standalone
+                <NewTabHint />
               </a>
             </p>
             <p class="text-gray-500 text-sm mt-4">
