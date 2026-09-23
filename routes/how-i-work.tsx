@@ -33,7 +33,9 @@ const faqs: Faq[] = [
   },
   {
     q: "What if I don't have a clear idea yet?",
-    a: "Book the free 30-minute intro call, or send me a paragraph about your idea or problem through the form on the home page and I will write back with 3 concrete recommendations. No cost, no pitch.",
+    a: SCHEDULE_URL
+      ? "Book the free 30-minute intro call, or send me a paragraph about your idea or problem through the form on the home page and I will write back with 3 concrete recommendations. No cost, no pitch."
+      : "Send me a paragraph about your idea or problem through the form on the home page and I will write back with 3 concrete recommendations. No cost, no pitch.",
     link: { href: "/#audit-form", label: "Send me your idea" },
   },
   {
