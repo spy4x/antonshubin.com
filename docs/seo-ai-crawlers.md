@@ -76,9 +76,12 @@ Four entities in a `@graph` array:
 - `author` points at the site-wide Person node's `@id`
   (`https://antonshubin.com/#person`), same one the BlogPosting JSON-LD in
   `routes/blog/[slug].tsx` uses for `author`/`publisher`
-- `codeRepository` when `ghRepo` is set, `sameAs` when the project has a live,
-  non-dead `externalURL`, `sourceOrganization` when `madeForName` is set,
+- `codeRepository` when `ghRepo` is set; `sameAs` when the project has a live,
+  non-dead `externalURL` that isn't already `codeRepository`;
   `creativeWorkStatus: "Archived"` when `archived` is true
+- No `sourceOrganization`: `madeForName` is mostly a person (a LinkedIn
+  profile), not an organization, and typing all of them as `Organization` would
+  invent a fact the Content rule forbids
 - Lets AI crawlers and search engines read each project as a distinct piece of
   work instead of a generic page
 

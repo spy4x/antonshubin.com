@@ -38,16 +38,31 @@ function splitParagraphs(text: string): string[] {
  * `author` points at the site-wide Person node from `components/SEOHead.tsx`
  * (issue #167), same `@id` the BlogPosting JSON-LD in
  * `routes/blog/[slug].tsx` uses.
+ *
+ * No `sourceOrganization`: `madeForName` is mostly a person (a LinkedIn
+ * profile), not an organization — typing all of them as `Organization` would
+ * invent a fact the Content rule in AGENTS.md forbids, and schema.org has no
+ * generic "made for" property that covers both a person and a company.
  */
 function projectJsonLd(project: Project, canonical: string) {
   const images = [
     ...(project.logoImageURL
       ? [`https://antonshubin.com${project.logoImageURL}`]
       : []),
-    ...(project.screenshotURLs ?? []).map((file) =>
-      `https://antonshubin.com/img/projects/${project.slug}/${file}`
+    ...projectScreenshots(project).map((s) =>
+      `https://antonshubin.com${s.src}`
     ),
   ];
+
+  const codeRepository = project.ghRepo
+    ? `https://github.com/${project.ghRepo}`
+    : undefined;
+  // Financy's externalURL is its GitHub repo itself, so sameAs would just
+  // repeat codeRepository — only add it when it points somewhere else.
+  const sameAs = project.externalURL && !project.externalURLDead &&
+      project.externalURL !== codeRepository
+    ? [project.externalURL]
+    : undefined;
 
   return {
     "@context": "https://schema.org",
@@ -61,21 +76,8 @@ function projectJsonLd(project: Project, canonical: string) {
     ...(project.tags && project.tags.length > 0
       ? { "keywords": project.tags.join(", ") }
       : {}),
-    ...(project.ghRepo
-      ? { "codeRepository": `https://github.com/${project.ghRepo}` }
-      : {}),
-    ...(project.externalURL && !project.externalURLDead
-      ? { "sameAs": [project.externalURL] }
-      : {}),
-    ...(project.madeForName
-      ? {
-        "sourceOrganization": {
-          "@type": "Organization",
-          "name": project.madeForName,
-          ...(project.madeForURL ? { "url": project.madeForURL } : {}),
-        },
-      }
-      : {}),
+    ...(codeRepository ? { "codeRepository": codeRepository } : {}),
+    ...(sameAs ? { "sameAs": sameAs } : {}),
     ...(project.archived ? { "creativeWorkStatus": "Archived" } : {}),
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
   };

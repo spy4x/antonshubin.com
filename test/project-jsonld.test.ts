@@ -35,8 +35,11 @@ function findProjectNode(blocks: unknown[]) {
       "@type": string;
       name: string;
       url: string;
+      image?: string[];
       author?: { "@id"?: string };
       codeRepository?: string;
+      sameAs?: string[];
+      sourceOrganization?: unknown;
     }
     | undefined;
 }
@@ -44,6 +47,10 @@ function findProjectNode(blocks: unknown[]) {
 siteTest(
   "every project page has exactly one project JSON-LD node",
   async (site) => {
+    // If lib/data.ts's filter above ever drops every project, the loop below
+    // would run zero times and the test would pass having checked nothing.
+    assert(allProjects.length > 0, "no project has a slug to test");
+
     for (const project of allProjects) {
       const html = await site.html(`/projects/${project.slug}`);
       const blocks = jsonLd(html);
@@ -61,8 +68,11 @@ siteTest(
         "@type": string;
         name: string;
         url: string;
+        image?: string[];
         author?: { "@id"?: string };
         codeRepository?: string;
+        sameAs?: string[];
+        sourceOrganization?: unknown;
       };
 
       assertEquals(
@@ -77,6 +87,21 @@ siteTest(
         `/projects/${project.slug}: url is not absolute (${node.url})`,
       );
 
+      // madeForName is mostly a person, not an organization — see the doc
+      // comment on projectJsonLd() in routes/projects/[slug].tsx.
+      assertEquals(
+        node.sourceOrganization,
+        undefined,
+        `/projects/${project.slug}: must not invent a sourceOrganization`,
+      );
+
+      for (const url of node.image ?? []) {
+        assert(
+          url.startsWith("https://"),
+          `/projects/${project.slug}: image URL is not absolute (${url})`,
+        );
+      }
+
       if (project.ghRepo) {
         assertEquals(
           node.codeRepository,
@@ -87,6 +112,21 @@ siteTest(
         assertEquals(node.codeRepository, undefined, project.slug);
       }
     }
+  },
+);
+
+siteTest(
+  "a dead external link produces no sameAs",
+  async (site) => {
+    const project = allProjects.find((p) => p.slug === "sogroya")!;
+    assert(
+      project.externalURL && project.externalURLDead,
+      "fixture project is no longer externalURLDead — pick another slug",
+    );
+    const html = await site.html(`/projects/${project.slug}`);
+    const node = findProjectNode(jsonLd(html));
+    assert(node, "no project JSON-LD node found");
+    assertEquals(node.sameAs, undefined, project.slug);
   },
 );
 
