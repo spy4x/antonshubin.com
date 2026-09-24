@@ -40,7 +40,7 @@ deno task video-kit             # transcript → titles, description, chapters, 
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
-deno task lcp                   # home page LCP, median of 7 cold Chromium loads (needs a build)
+deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B)
 ```
 
 `deno task check` fails on a failing test, same as a lint or type error — a red
@@ -95,59 +95,108 @@ free written audit carries no deadline.
 ## Visual system
 
 `assets/styles.css`'s `@theme` block is the only place a colour is defined
-(#184): Ink, Desk, Paper and Lamp are the four dark surfaces (page, rail/bar/
-footer, cards, active nav), Rule/Rule strong are hairline and control borders,
-Parchment/Graphite are primary/secondary text, Accent (`#f97316`, Ink text on
-it, hover `#fb923c`) is the one filled-button colour, and Sage/ Mist/Brick are
-status colours (ready-live/beta-info/risk-error). Every class in `routes/`,
-`components/` and `islands/` uses these tokens (`bg-ink`, `text-parchment`, …) —
-a raw Tailwind palette colour (`slate-*`, `gray-*`, `orange-*`, …) showing up
-again is a regression, not a style choice. `components/Button.tsx` is the one
-button component: `variant` defaults to `secondary` (an outline button);
-`variant="primary"` is `bg-accent text-ink` and is reserved for the Book action
-— using it anywhere else fails `test/visual-system.browser.test.ts`'s "the
-accent colour is a background only on the primary button and the nav's Book"
-guard. Not every Book call site has been ported to `<Button>` itself yet —
-several still carry an equivalent literal class string
-(`bg-accent text-ink hover:bg-accent-hover
-font-semibold rounded-lg transition-colors`)
-alongside `components/
-BookCallLink.tsx`, which owns the
-`href`/`target`/empty-`url` behaviour `<Button href=…>` doesn't.
-`components/StatusMark.tsx` renders a shape plus a word for a project/tool
+(#184): Ink, Desk, Paper and Lamp are the four dark surfaces (page; rail, bar
+and footer; cards; active nav item and sheet), Rule and Rule strong are hairline
+and control borders, Parchment and Graphite are primary and secondary text,
+Accent (`#f97316`, Ink text on it, hover `#fb923c`) is the one filled-button
+colour, and Sage, Mist and Brick are status colours (ready/live, beta/info,
+risk/error). Every class in `routes/`, `components/` and `islands/` uses these
+tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind palette colour
+(`slate-*`, `gray-*`, `orange-*`) showing up again is a regression, not a style
+choice.
+
+`components/Button.tsx` is the one button component. `variant` defaults to
+`secondary` (an outline button); `variant="primary"` (`bg-accent text-ink`) is
+reserved for the Book action, and a primary button carries `data-primary-book` —
+the marker `test/visual-system.browser.test.ts`'s "the accent colour is a
+background only on the primary button and the nav's Book" guard looks for,
+instead of guessing from text content or element shape.
+`buttonClass(variant, extra)` (also exported from `Button.tsx`) is the same
+class string as a plain string, for the handful of call sites that can't render
+`<Button>` directly: `components/BookCallLink.tsx` (every "Book a call" link on
+the site goes through it; it owns the `href`/`target`/empty-`url` behaviour
+`<Button
+href=…>` doesn't, and stamps `data-primary-book` itself for its default
+`variant="primary"`) and `islands/MeetEmbed.tsx`'s click-to-load facade.
+`buttonClass`'s base class string carries no padding, gap or text-size utility —
+two Tailwind classes for the same property don't reliably resolve by their order
+in one element's `class="..."` attribute, only by the order Tailwind happens to
+emit them in the compiled stylesheet, so every call site supplies its own sizing
+via `extra` instead of fighting a default.
+
+`components/StatusMark.tsx` renders a shape plus a word for a project or tool
 status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`) —
-never colour alone; used today on `routes/projects/
-index.tsx` and
+never colour alone; used today on `routes/projects/index.tsx` and
 `routes/projects/[slug].tsx`'s archived/outcome badges.
 
-Type: Literata 600 for headings (`h1`-`h3`, `.h1`, `.h2` in `assets/styles.css`
-set `font-family: var(--font-heading)` directly, so a heading can't accidentally
-render in a Tailwind utility's font — the cascade layer Tailwind's own utilities
-sit in loses to unlayered CSS regardless of selector specificity), IBM Plex Sans
-for body text, nav and buttons, Literata italic for margin notes (`.margin-note`
-utility, not yet used — later redesign issues wire it up) via
-`font-variant-numeric: tabular-nums` on `.price`. IBM Plex Mono only for
-`code`/`pre`/`kbd`. All three are self-hosted under `static/fonts/` (Latin +
-Cyrillic subsets, from `@fontsource`'s pre-split files — their `unicode-range`
-values are copied verbatim; OFL licence files are in the same directory),
-`font-display: swap`, with size-adjusted local fallback faces so the swap
-doesn't reflow the page. Only Literata 600 Latin and Plex Sans 400 Latin are
-preloaded (`routes/_app.tsx`, `fetchpriority="low"` — the home page's actual LCP
-element is the hero `<img fetchpriority="high">`, not text, and an unprioritized
-font preload measurably competed with it for bandwidth; see `scripts/lcp.ts`'s
-docs and the #184 PR body for the before/after numbers). `lib/csp.ts`'s
-`font-src 'self'` already covers same-origin font files — self-hosting needed no
-CSP change.
+### Type
 
-`scripts/lcp.ts` (`deno task lcp`, not part of `deno task check` — it needs a
-production build and several seconds per sample) measures the home page's
-Largest Contentful Paint: a mobile-emulated, 4x-CPU-throttled Chromium tab,
-median of several cold loads. Rerun it after any change that could affect the
-home page's hero image or its render path, and compare against a same-machine
-baseline measured the same way (a `git stash`-and-rebuild of `origin/main` in
-the same session is more reliable than a number from an earlier session — the
-sampled loads have real run-to-run variance, confirmed by measuring the exact
-same commit twice in a row and getting different medians).
+Literata 600 for headings — `h1`-`h3`, `.h1`, `.h2` in `assets/styles.css` set
+`font-family: var(--font-heading)` directly, so a heading can't accidentally
+render in a Tailwind utility's font: Tailwind wraps its own utilities in
+`@layer utilities`, which always loses to unlayered CSS like this rule
+regardless of selector specificity. IBM Plex Sans for body text, nav and
+buttons. Literata italic for margin notes and the Cyrillic tool marks (the
+`.margin-note` utility; not used yet — a later redesign issue wires it up).
+Tabular figures for prices, via `font-variant-numeric:
+tabular-nums` on the
+`.price` utility. IBM Plex Mono only for `code`, `pre` and `kbd`.
+
+All three are self-hosted under `assets/fonts/` (Latin and Cyrillic subsets,
+from `@fontsource`'s pre-split files — their `unicode-range` values are copied
+verbatim; OFL licence files sit alongside the `.woff2` files), referenced from
+`assets/styles.css` with a relative `url()` so Vite content-hashes them into
+`/assets/*` the same as every other asset (see "Cache-Control headers" below for
+why that matters) — never `static/fonts/`, which isn't Vite-processed.
+`font-display: swap` plus the fallback faces below keep first paint fast and the
+layout stable while the real fonts load.
+
+**No `<link rel="preload">` for any font.** Measured, interleaved,
+fresh-browser-per-sample (`scripts/lcp.ts --ab`) comparisons against
+`origin/main` proved a font preload made the home page's LCP worse, under CPU
+throttling and a throttled network alike, even deprioritized with
+`fetchpriority="low"` — because the home page's actual LCP element is the hero
+`<img fetchpriority="high">`, not text, and any early request competes with it
+for bandwidth. The hard "LCP no worse than before" rule beats issue #184's
+original preload suggestion here; see the #184 PR body for the numbers.
+
+**Fallback faces use real metrics, not guesses.** Each web font is followed
+immediately by its fallback face in the font stack
+(`"Literata", "Literata
+Fallback", serif`; same shape for Plex Sans), and each
+fallback face lists several `local()` names so it actually resolves on more than
+one OS (Georgia/Times New Roman/DejaVu Serif/Liberation Serif/Noto Serif for
+Literata; Arial/Helvetica/Liberation Sans/DejaVu Sans/Noto Sans for Plex Sans).
+The `size-adjust`/`ascent-override`/`descent-override`/ `line-gap-override`
+values are computed with the same formula Fontaine/ next/font use, from each web
+font's own OS/2 and hhea metrics (read straight from the `.woff2` files with
+`npm:fontkit`) against Georgia's and Arial's published metrics
+(`@capsizecss/metrics` — neither ships as a file this repo can read) — not
+guessed. Measured under the slow-network profile below, layout shift from the
+swap is effectively zero (cumulative layout shift ≈ 0.0004 on `/` at 390px).
+`lib/csp.ts`'s `font-src 'self'` already covered same-origin font files —
+self-hosting needed no CSP change.
+
+### `scripts/lcp.ts`
+
+`deno task lcp` (not part of `deno task check` — it needs a production build and
+several seconds per sample) measures the home page's Largest Contentful Paint,
+mobile viewport (390×844), in two modes: `cpu` (4x CPU throttling only) and
+`network` (CDP `Network.emulateNetworkConditions`, 150ms latency, 200 KB/s
+down/up, service worker blocked so every sample is a genuine first load) — both
+by default, since a regression can show up in only one of them. Reports every
+sample plus the median, min and max.
+
+`--ab <dirA> <dirB>` compares two already-built site directories (each needs its
+own `deno task build` first) instead of only the current worktree — alternating
+samples between them with a _fresh_ Chromium instance and a fresh server process
+per sample, not two long-lived servers measured back-to-back, so a slow run
+doesn't make whichever build was measured second look artificially better or
+worse (confirmed necessary: measuring the same commit twice in separate batches
+gave different medians before this mode existed). This is the reliable way to
+compare a branch against `origin/main`: clone or `git worktree add` a copy of
+`main`, build it, then
+`deno task lcp -- --ab <main copy> <this worktree> --n 15`.
 
 ## Content rule
 
@@ -366,23 +415,40 @@ const CORE_PAGES = new Set([
 
 Cache tiers:
 
-| Tier       | Duration                        | Targets                  | Use case                                                      |
-| ---------- | ------------------------------- | ------------------------ | ------------------------------------------------------------- |
-| Immutable  | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*` | Content-hashed files (fingerprint = immutable)                |
-| Images     | 7 days + stale-while-revalidate | `/img/*`                 | Photos, illustrations (rarely change)                         |
-| Core pages | 3 days + stale-while-revalidate | `CORE_PAGES` set         | SSR pages that update every few days                          |
-| No cache   | `no-cache, must-revalidate`     | `/sw.js`                 | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
+| Tier              | Duration                        | Targets                              | Use case                                                      |
+| ----------------- | ------------------------------- | ------------------------------------ | ------------------------------------------------------------- |
+| Immutable         | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*`             | Content-hashed files (fingerprint = immutable)                |
+| Images and static | 7 days + stale-while-revalidate | `/img/*`, favicons, `/manifest.json` | Photos, illustrations, small root files (rarely change)       |
+| Core pages        | 3 days + stale-while-revalidate | `CORE_PAGES` set                     | SSR pages that update every few days                          |
+| No cache          | `no-cache, must-revalidate`     | `/sw.js`                             | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
 
 Error responses (status ≥ 400) are never cached, regardless of which tier the
 path would otherwise fall into — a 404 must not survive in a browser or at the
 edge once the page comes back. A route that sets `no-store` itself (for example
 `routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it on
 staging and production alike, and the service worker never caches or serves such
-a response. Staging answers every response with
-`X-Robots-Tag: noindex,
-nofollow`; production sends `noindex` for any status ≥
-400 and `noindex, nofollow` for `/pay` and `/unsubscribe`
-(`routes/_middleware.ts`).
+a response.
+
+**A static-file tier always wins over Fresh's own default, even when `current`
+already says `no-store`** (#183 follow-up, fixed alongside #184): Fresh's
+`staticFiles()` middleware stamps a plain `Cache-Control: no-store` on any
+static file it doesn't itself recognise as content-hashed — which, before this
+fix, silently meant `/fonts/*` (self-hosted under `assets/fonts/`, Vite
+content-hashes them into `/assets/*` — see "Visual system" above), `/img/*`,
+favicons and any unstamped `/_fresh/*` JS chunk never got their real tier,
+because `cacheControlFor()` checked "does the response already say no-store?"
+_before_ checking whether the path was a recognised asset/image/static file.
+`cacheControlFor()` now checks the asset/image/static-root-file tiers first;
+only a path that doesn't match any of them still respects an existing `no-store`
+(which is how a route's own deliberate one, like `routes/unsubscribe.tsx`'s,
+keeps winning). `lib/cache-control.test.ts` pins both directions: a hashed
+font/image/favicon/JS chunk gets its tier even when `current` is already
+`"no-store"`, and `/unsubscribe` keeps `no-store` regardless.
+
+Staging answers every response with `X-Robots-Tag: noindex,
+nofollow`;
+production sends `noindex` for any status ≥ 400 and `noindex, nofollow` for
+`/pay` and `/unsubscribe` (`routes/_middleware.ts`).
 
 ## OG link-preview images
 

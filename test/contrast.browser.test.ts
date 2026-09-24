@@ -479,8 +479,13 @@ const TOKEN_PROBES: { name: string; textClass: string; bgClass: string }[] = [
     textClass: "text-graphite",
     bgClass: "bg-paper",
   },
+  // parchment/graphite-on-lamp above double as the secondary button's
+  // *hover* state (Button.tsx's secondary variant is `hover:bg-lamp`) — Lamp
+  // is otherwise only a resting-state surface (active nav item, sheet), so
+  // there's no separate "Lamp at rest" pairing to probe instead.
   { name: "graphite-on-lamp", textClass: "text-graphite", bgClass: "bg-lamp" },
   { name: "ink-on-accent", textClass: "text-ink", bgClass: "bg-accent" },
+  // The primary button's hover state (`hover:bg-accent-hover`).
   {
     name: "ink-on-accent-hover",
     textClass: "text-ink",
@@ -489,6 +494,11 @@ const TOKEN_PROBES: { name: string; textClass: string; bgClass: string }[] = [
   { name: "sage-on-ink", textClass: "text-sage", bgClass: "bg-ink" },
   { name: "mist-on-ink", textClass: "text-mist", bgClass: "bg-ink" },
   { name: "brick-on-ink", textClass: "text-brick", bgClass: "bg-ink" },
+  // Status-coloured pills (price/duration/client-project badges) sit on
+  // Lamp, not Ink — a separate pairing from the plain status-on-Ink set
+  // above.
+  { name: "sage-on-lamp", textClass: "text-sage", bgClass: "bg-lamp" },
+  { name: "mist-on-lamp", textClass: "text-mist", bgClass: "bg-lamp" },
 ];
 
 Deno.test("every visual-system token pairing passes WCAG AA (#184)", async () => {
