@@ -66,7 +66,7 @@ export const projects = {
       externalURL: "https://github.com/spy4x/financy",
       ghRepo: "spy4x/financy",
       description:
-        "Open-source, self-hostable finance tracking for individuals, families, and small businesses. Features double-entry accounting, multi-currency support, real-time collaboration, and PWA capabilities.",
+        "Open-source, self-hostable finance tracking for individuals, families, and small businesses. Double-entry bookkeeping for transfers between accounts, multi-currency support, real-time collaboration, and PWA capabilities.",
       logoImageURL: "/img/projects/financy/logo.svg",
       tags: [
         "Deno",
@@ -76,6 +76,7 @@ export const projects = {
         "Docker",
         "PWA",
       ],
+      outcome: "Being revived — active development, not yet in daily use.",
     },
     {
       title: "Air Quality Sensor",
@@ -128,7 +129,7 @@ export const projects = {
       archived: true,
     },
     {
-      title: "TodoApp — CalDAV Task Manager (PWA)",
+      title: "caldav-tasks-web",
       slug: "todoapp-caldav",
       externalURL: "https://github.com/spy4x/caldav-tasks-web",
       ghRepo: "spy4x/caldav-tasks-web",
@@ -139,7 +140,7 @@ export const projects = {
         "mobile-dashboard.png",
       ],
       description:
-        "My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface that speaks both Radicale and Stalwart), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos. Result: it ran 5 calendars and 140+ todos on a single Hetzner box, deployed in June 2026, including a Radicale-to-Stalwart migration that moved zero VTODO data.",
+        "Touch-first PWA for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface with a Radicale and a Stalwart implementation), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos.",
       tags: [
         "Vite",
         "Preact",
@@ -152,7 +153,7 @@ export const projects = {
         "CQRS",
       ],
       outcome:
-        "5 calendars, 140+ todos, deployed in June 2026. Radicale to Stalwart migration moved zero VTODO data.",
+        "Tested in production against Radicale; Nextcloud and Baikal are expected to work but untested; Stalwart support is currently broken (README has the details).",
     },
     {
       title: "caldav-mcp",
@@ -177,7 +178,7 @@ export const projects = {
       ghRepo: "spy4x/zond",
       logoImageURL: "/img/projects/zond/logo.svg",
       description:
-        "Internal health probe bridge for services behind SSO proxies. Originally Deno+TS, rewritten to Go as a single 10 MB distroless binary. Probes HTTP endpoints through Authelia-secured gateways — built for Gatus and other monitoring tools that lack SSO support.",
+        "Internal health probe bridge for services behind SSO proxies. Originally Deno+TS, rewritten to Go as a single 10 MB distroless binary. Sits beside the containers on the same Docker network and probes them directly, so Gatus and other monitoring tools that lack SSO support can still check services behind Authelia. Runs in production at probe-home.antonshubin.com.",
       tags: [
         "Go",
         "Docker",
@@ -712,7 +713,7 @@ export const blogArticles: BlogArticle[] = [
   {
     index: 13,
     title:
-      "mig: a 200-line meeting scheduler because Calendly alternatives are overkill",
+      "mig: a lightweight meeting scheduler because Calendly alternatives are overkill",
     slug: "mig-tiny-self-hosted-scheduler",
     description:
       "One owner, one URL, one feature: book a time slot. A single Deno binary, JSON-file storage, SMTP confirmations with ICS attachments, cancellable links signed with SHA-256 HMAC. Built because I needed a static meeting link, not a database.",
@@ -720,42 +721,6 @@ export const blogArticles: BlogArticle[] = [
     publishedAt: "2026-08-26",
     previewImageURL: "cover.svg",
     category: "dev-tips",
-  },
-];
-
-// Hand-picked, not date-sorted: these speak to cost control, AI integration,
-// and delivery speed — what the home page sells. Order is the display order.
-export const homeBlogSlugs: string[] = [
-  "cost-optimization-laboratory",
-  "building-mcp-servers-with-deno",
-  "rostok-self-hosted-scaffolder",
-];
-
-export interface YouTubeVideo {
-  title: string;
-  videoId: string;
-  publishedAt: string;
-}
-
-// Not shown on the home page until there are three new videos (issue #116):
-// the current list is from early 2024 and undercuts the pitch. Kept here so
-// it can come back once refreshed.
-export const youtubeVideos: YouTubeVideo[] = [
-  {
-    title: "Working on my GPT4 chatbot improvements (SvelteKit, SSE)",
-    videoId: "8a6LdZPki-s",
-    publishedAt: "2024-02-26",
-  },
-  {
-    title:
-      "Walking and Coding: Remaking my Air Quality dashboard with Bun, Turborepo, SvelteKit, Hono, Chart.js",
-    videoId: "opKoHblF7vE",
-    publishedAt: "2024-01-28",
-  },
-  {
-    title: "Working on my ChatGPT app (first 2 minutes are mute 😅)",
-    videoId: "KFIm-O8cJ20",
-    publishedAt: "2024-01-20",
   },
 ];
 
