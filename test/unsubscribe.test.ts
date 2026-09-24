@@ -58,6 +58,24 @@ Deno.test("renders a markup-containing address escaped, and a GET never removes 
   });
 });
 
+Deno.test("the confirm page tells crawlers not to index it", async () => {
+  // A 200, not one of the 400 states: those get noindex from their status
+  // alone, so only this page proves the /unsubscribe path rule itself.
+  const email = "user@example.com";
+  await withSubscribers(
+    [{ email, subscribedAt: "2026-01-01T00:00:00.000Z" }],
+    async (site) => {
+      const token = await createUnsubscribeToken(email, TEST_SECRET);
+      const res = await site.get(
+        `/unsubscribe?token=${encodeURIComponent(token)}`,
+      );
+      await res.body?.cancel();
+      assertEquals(res.status, 200);
+      assertEquals(res.headers.get("X-Robots-Tag"), "noindex, nofollow");
+    },
+  );
+});
+
 Deno.test("a token that doesn't verify — forged, or signed under a different secret — answers 'not recognised' and changes nothing", async () => {
   const subs: Subscriber[] = [
     { email: "user@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },

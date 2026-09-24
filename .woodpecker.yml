@@ -4,8 +4,8 @@ steps:
     commands:
       - deno install
       # test/lead-form.browser.test.ts, test/a11y.browser.test.ts,
-      # test/contrast.browser.test.ts and test/csp.browser.test.ts (deno
-      # task test:browser, run inside
+      # test/contrast.browser.test.ts, test/csp.browser.test.ts and
+      # test/sw-cache.browser.test.ts (deno task test:browser, run inside
       # "deno task check") drive a real Chromium. The base image has none,
       # so install it at the version
       # pinned in deno.json's "playwright" import (and test/browser.ts), so

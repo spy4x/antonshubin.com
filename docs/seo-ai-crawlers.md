@@ -95,8 +95,9 @@ Four entities in a `@graph` array:
 
 - `components/SEOHead.tsx` emits route-specific title, description, canonical,
   and index/noindex meta directives
-- `routes/_middleware.ts` emits extended `X-Robots-Tag` directives and preserves
-  staging noindex behavior
+- `routes/_middleware.ts` emits extended `X-Robots-Tag` directives, sends
+  `noindex` on any error status (every unmatched URL reaches it through
+  `routes/[...path].tsx`), and preserves staging noindex behavior
 
 ### 10. `/infrastructure` and Production Infrastructure Lab
 

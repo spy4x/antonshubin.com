@@ -40,14 +40,20 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// A response marked no-store (the unsubscribe page shows one subscriber's
+// address) is never written to the cache, and never served from it.
+const isNoStore = (response) =>
+  (response.headers.get("Cache-Control") || "").includes("no-store");
+
 // Fetch: stale-while-revalidate — serve cache instantly, refresh in background
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
+    caches.match(event.request).then((match) => {
+      const cached = match && !isNoStore(match) ? match : undefined;
       const fetchPromise = fetch(event.request).then((response) => {
-        if (response.ok && response.type === "basic") {
+        if (response.ok && response.type === "basic" && !isNoStore(response)) {
           const clone = response.clone();
           caches.open(CACHE).then((cache) => cache.put(event.request, clone));
         }
