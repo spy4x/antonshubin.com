@@ -199,12 +199,12 @@ the narrow `deno task test`.
   policy has to cover both — a request failing (no such host) is fine, a CSP
   violation isn't. See the test file's own header for why it samples pages
   instead of crawling the whole sitemap.
-- `test/sw-cache.browser.test.ts`: the service worker (`routes/sw.js.ts`) never
-  stores a `no-store` response in the Cache API and never serves one from it — a
-  signed unsubscribe link opened, submitted and reopened answers "Link not
-  recognised", not the cached form. It opens the pages under test in a second
-  tab once `navigator.serviceWorker.ready` resolves, because the tab that
-  registers the worker is not controlled by it.
+- `test/sw-cache.browser.test.ts` (#177 follow-up): the service worker
+  (`routes/sw.js.ts`) never stores a `no-store` response in the Cache API and
+  never serves one from it — a signed unsubscribe link opened, submitted and
+  reopened answers "Link not recognised", not the cached form. It opens the
+  pages under test in a second tab once `navigator.serviceWorker.ready`
+  resolves, because the tab that registers the worker is not controlled by it.
 
 ## Content-Security-Policy
 
@@ -273,11 +273,12 @@ Claude, Perplexity, and other AI crawlers — a primary traffic source.
 ## Cache-Control headers
 
 Cache policy lives in `lib/cache-control.ts`'s `cacheControlFor()`, a pure
-function unit-tested in `lib/cache-control.test.ts` (a test's fetch cannot set
-the staging Host), applied to every response by `main.ts`'s cache middleware.
-`/sw.js` sets its own header in `routes/sw.js.ts`. When adding or changing
-routes, update the `CORE_PAGES` set there if the new page should be cached at
-the edge:
+function unit-tested in `lib/cache-control.test.ts`, applied to every response
+by `main.ts`'s cache middleware. `fetch()` drops a `Host` header, so
+`test/unsubscribe.test.ts` checks the staging wiring with a raw HTTP request
+instead. `/sw.js` sets its own header in `routes/sw.js.ts`. When adding or
+changing routes, update the `CORE_PAGES` set there if the new page should be
+cached at the edge:
 
 ```ts
 const CORE_PAGES = new Set([

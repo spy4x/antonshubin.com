@@ -40,8 +40,9 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// A response marked no-store (the unsubscribe page shows one subscriber's
-// address) is never written to the cache, and never served from it.
+// The fetch handler never writes a response marked no-store (the unsubscribe
+// page shows one subscriber's address) to the cache, and never serves one
+// from it. The precache list above holds no such page.
 const isNoStore = (response) =>
   (response.headers.get("Cache-Control") || "").includes("no-store");
 

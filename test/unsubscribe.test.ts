@@ -76,6 +76,51 @@ Deno.test("the confirm page tells crawlers not to index it", async () => {
   );
 });
 
+/** Sends a raw HTTP/1.1 GET with its own Host header, which fetch() would
+ * drop, and returns the response's status line and headers, lowercased. */
+async function rawGet(site: Site, path: string, host: string) {
+  const { hostname, port } = new URL(site.origin);
+  const conn = await Deno.connect({ hostname, port: Number(port) });
+  try {
+    await conn.write(new TextEncoder().encode(
+      `GET ${path} HTTP/1.1\r\nHost: ${host}\r\nConnection: close\r\n\r\n`,
+    ));
+    let text = "";
+    const decoder = new TextDecoder();
+    for await (const chunk of conn.readable) {
+      text += decoder.decode(chunk, { stream: true });
+      if (text.includes("\r\n\r\n")) break;
+    }
+    return text.slice(0, text.indexOf("\r\n\r\n")).toLowerCase();
+  } finally {
+    try {
+      conn.close();
+    } catch {
+      // Already closed by breaking out of the readable stream.
+    }
+  }
+}
+
+Deno.test("staging keeps the confirm page's no-store", async () => {
+  // main.ts decides staging from the Host header (lib/cache-control.ts),
+  // which used to overwrite this page's no-store with "no-cache".
+  const email = "user@example.com";
+  await withSubscribers(
+    [{ email, subscribedAt: "2026-01-01T00:00:00.000Z" }],
+    async (site) => {
+      const token = await createUnsubscribeToken(email, TEST_SECRET);
+      const head = await rawGet(
+        site,
+        `/unsubscribe?token=${encodeURIComponent(token)}`,
+        "website-stag.example.com",
+      );
+      assert(head.startsWith("http/1.1 200"), head);
+      assert(head.includes("\r\ncache-control: no-store\r\n"), head);
+      assert(head.includes("\r\nx-robots-tag: noindex, nofollow\r\n"), head);
+    },
+  );
+});
+
 Deno.test("a token that doesn't verify — forged, or signed under a different secret — answers 'not recognised' and changes nothing", async () => {
   const subs: Subscriber[] = [
     { email: "user@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
