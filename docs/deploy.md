@@ -79,19 +79,32 @@ The app reads the file on every request, so no restart is needed.
 
 ## Env files
 
-| File            | Git       | Use                  |
-| --------------- | --------- | -------------------- |
-| `.env`          | ignored   | local dev            |
-| `.env.prod`     | ignored   | prod secrets         |
-| `.env.prod.age` | committed | encrypted (SOPS+age) |
-| `.env.example`  | committed | template             |
+| File                     | Git       | Use                          |
+| ------------------------ | --------- | ---------------------------- |
+| `.env`                   | ignored   | local dev                    |
+| `.env.age`               | ignored   | local dev, encrypted (age64) |
+| `.env.prod`              | ignored   | prod secrets                 |
+| `.env.prod.age`          | committed | encrypted (age64)            |
+| `.env.staging.local`     | ignored   | deploy:stag's temp env file  |
+| `.env.staging.local.age` | ignored   | its encrypted form (age64)   |
+| `.env.example`           | committed | template                     |
+
+Encryption is per value: `@spy4x/server/env-age64`
+(https://jsr.io/@spy4x/server/doc/env-age64), run via `deno task env:encrypt` /
+`deno task env:decrypt` / `deno task env:status`. No `sops` binary, no
+`.sops.yaml`.
 
 ## Age key
 
 ```bash
-age-keygen -o .age/key.txt
-# copy public key from output → paste into .sops.yaml
+deno task env:status   # keygen if none exists yet:
+deno run --node-modules-dir=none --no-prompt -R -W=. jsr:@spy4x/server@1.2.0/env-age64/cli keygen
 ```
+
+The key lives only in the main checkout's `.age/key.txt` (gitignored). Syncthing
+replicates it as part of `~/sync/code`; keep an offline copy as well. A linked
+git worktree needs no copy of its own: the module finds the main checkout's key
+itself.
 
 ## Verify
 

@@ -41,8 +41,9 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | `deno task update`               | Update Fresh                                                       |
 | `deno task deploy`               | Deploy production → antonshubin.com                                |
 | `deno task deploy:stag`          | Deploy staging → website-stag.antonshubin.com                      |
-| `deno task env:encrypt`          | `.env.prod` → `.env.prod.age`                                      |
-| `deno task env:decrypt`          | `.env.prod.age` → `.env.prod`                                      |
+| `deno task env:encrypt`          | Every `.env*` → its `.env*.age` (age64)                            |
+| `deno task env:decrypt`          | Every `.env*.age` → its plaintext (age64)                          |
+| `deno task env:status`           | Key presence + which env/age files exist                           |
 | `deno task publish:blog`         | Publish a blog post + a Dev.to draft                               |
 | `deno task launch-kit`           | Draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts      |
 | `deno task video-kit`            | Transcript → titles, description, chapters, blog draft             |
