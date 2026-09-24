@@ -110,11 +110,11 @@ export function SEOHead() {
                   `Upwork ${proof("expert-vetted")}`,
                   `Upwork ${proof("job-success")} Job Success`,
                 ],
-                // Not an award: an amount earned isn't an accolade, so it
-                // lives in disambiguatingDescription instead (#186).
-                "disambiguatingDescription": `${
-                  proof("earned")
-                }+ earned on Upwork across ${proof("jobs")}+ projects`,
+                // No schema.org property fits the Upwork earnings figure
+                // without overclaiming (disambiguatingDescription exists to
+                // tell apart similarly-named items, not to state earnings),
+                // and the figure is already visible on the page (#186) —
+                // left out of structured data entirely rather than misused.
                 "sameAs": [...SAME_AS_URLS],
                 // schema.org's n-ary-relation pattern: a plain "worksFor":
                 // {"@id": "...#org"} has no room for a role, so the value is
