@@ -204,7 +204,10 @@ Deno.test("the booking facade's iframe loads without a CSP violation", async () 
         'iframe[title="Schedule a call with Anton Shubin"]',
       );
       await frame.waitFor({ state: "visible" });
-      assertEquals(await frame.getAttribute("src"), `${SCHEDULE_URL}/embed`);
+      assertEquals(
+        await frame.getAttribute("src"),
+        `${SCHEDULE_URL}/embed?theme=dark`,
+      );
 
       await assertNoViolations(page, "after the booking iframe loaded");
     } finally {

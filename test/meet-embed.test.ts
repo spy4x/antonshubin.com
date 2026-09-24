@@ -24,6 +24,11 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 import { count } from "./html.ts";
+import {
+  embedUrl,
+  isEmbedHeightMessage,
+  MAX_EMBED_HEIGHT_PX,
+} from "../islands/MeetEmbed.tsx";
 
 const SCHEDULER_ORIGIN = "https://meet.example.com";
 const SCHEDULER_HOST = "meet.example.com";
@@ -227,6 +232,29 @@ function assertNoBookingBlock(html: string, path: string) {
   );
 }
 
+// A schemeless SCHEDULE_URL (a plausible config typo — "meet.example.com"
+// instead of "https://meet.example.com") must not 500 the pages that render
+// the booking facade. `embedUrl()` still builds a URL from it (schemeless,
+// so browser-side it resolves wrong — a separate, pre-existing concern, not
+// this test's point); MeetEmbed must not *throw* rendering it, server-side
+// or client-side.
+const SCHEMELESS_SCHEDULE_URL = "meet.example.com";
+
+Deno.test("/ renders 200, not 500, when SCHEDULE_URL has no scheme", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  Deno.env.set("SCHEDULE_URL", SCHEMELESS_SCHEDULE_URL);
+  const site = await startSite();
+  try {
+    const res = await site.get("/");
+    assertEquals(res.status, 200);
+    await res.body?.cancel();
+  } finally {
+    await site.stop();
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+    else Deno.env.set("SCHEDULE_URL", previous);
+  }
+});
+
 Deno.test("home page ships the booking facade and no iframe before a click", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
@@ -395,6 +423,182 @@ Deno.test("meet-embed guard rejects a CSS url() reference to the scheduler origi
   assert(
     fetchesFromOrigin(inStyleBlock, SCHEDULER_ORIGIN),
     "fetchesFromOrigin() must catch a CSS url() inside a <style> block",
+  );
+});
+
+Deno.test("embedUrl appends ?theme=dark and strips a trailing slash", () => {
+  assertEquals(
+    embedUrl("https://meet.example.com"),
+    "https://meet.example.com/embed?theme=dark",
+  );
+  assertEquals(
+    embedUrl("https://meet.example.com/"),
+    "https://meet.example.com/embed?theme=dark",
+  );
+  assertEquals(
+    embedUrl("https://meet.example.com///"),
+    "https://meet.example.com/embed?theme=dark",
+  );
+});
+
+Deno.test("embedUrl returns empty string when scheduleUrl is empty", () => {
+  assertEquals(embedUrl(""), "");
+});
+
+// isEmbedHeightMessage(): the mig:height postMessage filter. Each case below
+// starts from one valid message and breaks exactly one condition, so a
+// regression in any single check shows up as its own failing test.
+const ORIGIN = "https://meet.example.com";
+const SOURCE = { name: "iframe-window" } as unknown as Window;
+const OTHER_SOURCE = { name: "other-window" } as unknown as Window;
+
+function validEvent(
+  overrides: Partial<{ origin: string; source: Window; data: unknown }> = {},
+): Pick<MessageEvent, "origin" | "source" | "data"> {
+  return {
+    origin: ORIGIN,
+    source: SOURCE,
+    data: { type: "mig:height", height: 900 },
+    ...overrides,
+  };
+}
+
+Deno.test("isEmbedHeightMessage accepts a valid mig:height message", () => {
+  assertEquals(isEmbedHeightMessage(validEvent(), ORIGIN, SOURCE), 900);
+});
+
+Deno.test("isEmbedHeightMessage rejects the wrong origin", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ origin: "https://evil.example.com" }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects the wrong source window", () => {
+  assertEquals(
+    isEmbedHeightMessage(validEvent({ source: OTHER_SOURCE }), ORIGIN, SOURCE),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects a missing iframe window", () => {
+  assertEquals(isEmbedHeightMessage(validEvent(), ORIGIN, null), null);
+  assertEquals(isEmbedHeightMessage(validEvent(), ORIGIN, undefined), null);
+});
+
+Deno.test("isEmbedHeightMessage rejects a null data payload", () => {
+  assertEquals(
+    isEmbedHeightMessage(validEvent({ data: null }), ORIGIN, SOURCE),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects the wrong message type", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "not-mig-height", height: 900 } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects a non-numeric height", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: "900" } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects a NaN or Infinity height", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: NaN } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: Infinity } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects a zero height", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: 0 } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects a negative height", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: -10 } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+Deno.test("isEmbedHeightMessage rejects a non-integer height", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: 900.5 } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    null,
+  );
+});
+
+// A height over the cap is clamped, not rejected: mig's real height is
+// content the visitor needs (large system text, a validation error), so
+// rejecting it outright would leave the frame at an earlier step's height,
+// with most of the page scrolling inside it — worse than a frame capped at
+// a generous but finite height (see MAX_EMBED_HEIGHT_PX's own comment for
+// the real heights this is based on, up to 1482px at 320px/125% text).
+Deno.test("isEmbedHeightMessage clamps a height over the cap instead of rejecting it", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({ data: { type: "mig:height", height: 5000 } }),
+      ORIGIN,
+      SOURCE,
+    ),
+    MAX_EMBED_HEIGHT_PX,
+  );
+  assertEquals(MAX_EMBED_HEIGHT_PX, 2000);
+});
+
+Deno.test("isEmbedHeightMessage returns a height exactly at the cap unchanged", () => {
+  assertEquals(
+    isEmbedHeightMessage(
+      validEvent({
+        data: { type: "mig:height", height: MAX_EMBED_HEIGHT_PX },
+      }),
+      ORIGIN,
+      SOURCE,
+    ),
+    MAX_EMBED_HEIGHT_PX,
   );
 });
 

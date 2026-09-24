@@ -5,8 +5,8 @@ steps:
       - deno install
       # test/lead-form.browser.test.ts, test/a11y.browser.test.ts,
       # test/contrast.browser.test.ts, test/csp.browser.test.ts,
-      # test/sw-cache.browser.test.ts, test/visual-system.browser.test.ts and
-      # test/notes.browser.test.ts
+      # test/sw-cache.browser.test.ts, test/visual-system.browser.test.ts,
+      # test/notes.browser.test.ts and test/meet-embed.browser.test.ts
       # (deno task test:browser, run inside "deno task check") drive a real
       # Chromium. The base image has none,
       # so install it at the version

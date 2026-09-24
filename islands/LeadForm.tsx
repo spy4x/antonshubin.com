@@ -300,9 +300,17 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
       </div>
 
       {
-        /* Success section. maxHeight must clear the 760px iframe MeetEmbed
-          opens inline once clicked, so it's taller than the form section's.
-          `inert` until success, so the facade button and fallback link can't
+        /* Success section. maxHeight (2400px) must clear the tallest this
+          panel can get: MeetEmbed's iframe caps at MAX_EMBED_HEIGHT_PX
+          (MeetEmbed.tsx, 2000px as of mig#44) plus the icon, heading and
+          three paragraphs around it (roughly 300px, so at least cap + 350
+          for margin) — comfortably inside 2400px, with headroom to spare.
+          Raising MAX_EMBED_HEIGHT_PX means raising this maxHeight too, or a
+          taller-than-expected frame gets clipped by this panel's
+          `overflow: hidden` before the iframe's own height ever comes into
+          play. Taller than the form section's maxHeight (800px) for the
+          same reason. `inert` until success, so the facade button and
+          fallback link can't
           be Tab'd to (and silently activated) while this panel is collapsed
           to `maxHeight: 0` and `opacity: 0` — without it, Tab from the last
           form field reaches these controls and Enter loads a cross-origin
@@ -325,7 +333,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         style={{
           opacity: isSuccess ? 1 : 0,
           transform: isSuccess ? "translateY(0)" : "translateY(12px)",
-          maxHeight: isSuccess ? "1400px" : "0px",
+          maxHeight: isSuccess ? "2400px" : "0px",
           overflow: "hidden",
         }}
       >
