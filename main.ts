@@ -3,6 +3,7 @@ import type { State } from "./lib/utils.ts";
 import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
 import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
 import { cacheControlFor, isStagingHost } from "./lib/cache-control.ts";
+import { redirectTarget } from "./lib/redirects.ts";
 
 export const app = new App<State>();
 
@@ -51,6 +52,22 @@ app.use(async (ctx) => {
   });
   if (cacheControl) resp.headers.set("Cache-Control", cacheControl);
   return resp;
+});
+
+// Trailing-slash post/project URLs and retired slugs (#193) — placed after
+// the CSP and cache middlewares above, so a redirect response still gets
+// their headers: returning here without calling ctx.next() still lets those
+// two middlewares' post-ctx.next() code run, since they already called
+// ctx.next() and are waiting on it to resolve (see main.ts's own header rule
+// in AGENTS.md — change headers on the response ctx.next() returned, never
+// rebuild it; this middleware is the thing ctx.next() resolves to for them).
+app.use(async (ctx) => {
+  const target = redirectTarget(ctx.url.pathname);
+  if (!target) return await ctx.next();
+  return new Response(null, {
+    status: 301,
+    headers: { Location: target + ctx.url.search },
+  });
 });
 
 app.use(staticFiles());
