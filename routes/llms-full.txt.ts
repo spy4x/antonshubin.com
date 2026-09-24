@@ -74,9 +74,8 @@ export const handler = define.handlers({
       .join("\n");
 
     // Every featured client case study (featuredClientSlugs is ordered
-    // strongest-first), generated from lib/data.ts. Prints the outcome alone
-    // (see clientSummary's docs) rather than outcome-after-description,
-    // which repeated the outcome's own fact for several of these projects.
+    // strongest-first), generated from lib/data.ts: what each product is, then its outcome (see
+    // clientSummary's docs).
     const clientList = featuredClientSlugs
       .map((slug) => {
         const p = clientProject(slug);

@@ -31,6 +31,22 @@ Deno.test("neither llms file lists the YouTube channel as an open-source project
   }
 });
 
+Deno.test("both llms files say what the strongest client case study is, not only its outcome", async () => {
+  const site = await startSite();
+  try {
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const text = await site.html(llmsPath);
+      assertEquals(
+        text.includes("Gardens by the Bay"),
+        true,
+        `${llmsPath} dropped SmartLite's venue from its client line`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});
+
 Deno.test("fetching /llms.txt or /llms-full.txt does not change blog 'Read next' order", async () => {
   const site = await startSite();
   try {

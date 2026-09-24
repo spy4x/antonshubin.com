@@ -26,18 +26,14 @@ export function withOutcome(text: string, outcome?: string): string {
 }
 
 /**
- * A client case study's one-line summary for the llms files: the `outcome`
- * alone (it's written to stand on its own — it's the same text the home
- * page's case-study cards render with no description alongside it), falling
- * back to the description's first sentence for the rare project with no
- * `outcome`. Deliberately doesn't also print the description's first
- * sentence: for these six case studies that repeated the outcome's own
- * fact (e.g. SmartLite's lamp-pole count, Truth or Dare's darechat.me).
+ * A client case study's one-line summary for the llms files: what the product
+ * is (the description's first sentence, which carries the client and the
+ * venue), then its `outcome`. The two sometimes share a fact — a repeated
+ * phrase is cheaper than dropping the client or the venue from a file AI
+ * crawlers read.
  */
 export function clientSummary(p: Project): string {
-  return p.outcome
-    ? ensureEndPunctuation(p.outcome)
-    : firstSentence(p.description);
+  return withOutcome(firstSentence(p.description), p.outcome);
 }
 
 /**
