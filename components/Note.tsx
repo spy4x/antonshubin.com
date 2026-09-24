@@ -32,7 +32,7 @@ export function Note({ note }: { note: NoteData }) {
           </a>
         </>
       )}
-      {note.checkedOn && <>(checked on {note.checkedOn})</>}
+      {note.checkedOn && <>{" "}(checked on {note.checkedOn})</>}
     </p>
   );
 }

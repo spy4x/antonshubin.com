@@ -279,7 +279,7 @@ export default define.page(function Home(ctx) {
                 href={UPWORK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-semibold"
               >
                 View all reviews on{" "}
                 <UpworkIcon class="w-auto h-4 text-parchment" />

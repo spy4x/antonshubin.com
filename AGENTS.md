@@ -134,8 +134,10 @@ reference.
   `permission: true` — with none, the section doesn't render at all, and
   `test/structure.test.ts`'s home-page section-list check reflects that.
   `components/TestimonialCard.tsx` renders a visible entry's `sourceHref` as a
-  link, checked by `components/TestimonialCard.test.tsx` and by
-  `test/proof-promises-notes.test.ts` against a real permissioned entry.
+  link, checked by `components/TestimonialCard.test.tsx`;
+  `lib/testimonials.test.ts` runs `visibleTestimonials()` on sample lists, and
+  `test/proof-promises-notes.test.ts` checks the real list shows nothing until
+  an entry has both.
 - `lib/notes.ts` holds every margin note (`{ id, text, href?, checkedOn? }`) —
   the source or checked date behind a claim wrapped in
   `components/WithNote.tsx`, which stamps the claim with `data-note-ref="<id>"`.
@@ -382,11 +384,12 @@ the narrow `deno task test`.
   every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
   characters, excluding `©`/`®`/`™` and plain digits.
 - `test/notes.browser.test.ts` (#186): the margin note next to the home page's
-  Upwork proof line sits to the right of its claim at 1440px (the `.note-aside`
-  element's bounding box is right of and vertically beside the claim's) and
-  below it at 390px — the CSS breakpoint in `assets/styles.css`'s
-  `.note-wrap`/`.note-aside` rules, not checkable from server-rendered HTML
-  alone since it depends on computed layout.
+  Upwork proof line sits beside its claim with no horizontal scroll at 1100,
+  1280 and 1440px (the page's `scrollWidth` stays within the viewport and the
+  `.note-aside` element's right edge stays inside it) and below it at 390px —
+  the CSS breakpoint in `assets/styles.css`'s `.note-wrap`/`.note-aside` rules,
+  not checkable from server-rendered HTML alone since it depends on computed
+  layout.
 
 ## Content-Security-Policy
 

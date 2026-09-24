@@ -5,7 +5,7 @@ import { NewTabHint } from "./NewTabHint.tsx";
 /**
  * One testimonial card: five filled stars, the quote, the client's name and
  * role, and — when the entry carries one — a link to `sourceHref`. Pulled
- * out of `routes/index.tsx` so `components/TestimonialCard.test.ts` can
+ * out of `routes/index.tsx` so `components/TestimonialCard.test.tsx` can
  * render it directly and assert the source link exists, without needing a
  * real permissioned entry in `lib/testimonials.ts` to fetch a built page.
  */

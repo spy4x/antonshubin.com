@@ -31,11 +31,11 @@ const ongoing = catalogItem("cto-advisory-retainer");
 const faqs: Faq[] = [
   {
     q: "What if we start working together and it is not a good fit?",
-    a: `That is exactly why I offer a five-day refund. ${
-      promise("refund").desc
-    } We also start with a small first milestone: ${
-      decapitalize(promise("first-milestone").desc)
-    }`,
+    a: `That is exactly why I offer a ${
+      decapitalize(promise("refund").title)
+    }. ${promise("refund").desc} We also start with ${
+      decapitalize(promise("first-milestone").title)
+    }: ${decapitalize(promise("first-milestone").desc)}`,
   },
   {
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
@@ -109,8 +109,12 @@ export default define.page(function HowIWork() {
   head.value = {
     ...head.value,
     title: "How I Deliver — Anton Shubin",
-    description:
-      "Five promises, no fine print: a five-day refund, a small first milestone, full ownership from day one, weekly working software, and free bug fixes for 30 days.",
+    description: `Five promises, no fine print: ${
+      promises.map((p) => decapitalize(p.title)).join(", ").replace(
+        /, ([^,]*)$/,
+        ", and $1",
+      )
+    }.`,
     canonical: "https://antonshubin.com/how-i-work",
     ogType: "website",
   };
