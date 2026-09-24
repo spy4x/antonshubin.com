@@ -2,8 +2,9 @@
 
 ## Why
 
-Site gets zero Google organic traffic. `site:antonshubin.com` returns nothing.
-Without GSC, Google may not know the site exists at all.
+Google Search Console shows what Google actually indexes and which queries drive
+impressions — data the site doesn't otherwise have. Set it up if it isn't
+already, and use it to keep Coverage and Core Web Vitals errors down.
 
 ## Steps
 
@@ -21,10 +22,6 @@ Without GSC, Google may not know the site exists at all.
 ## Also
 
 - Bing Webmaster Tools: https://www.bing.com/webmasters
-- After indexing, check Core Web Vitals report in GSC
-- Monitor Search Analytics tab for which queries drive impressions
-
-## Verification
-
-- `site:antonshubin.com` returns results within 1-2 weeks
-- Umami shows google.com referrer traffic
+- Check Core Web Vitals report in GSC
+- Monitor Search Analytics tab for which queries drive impressions and organic
+  traffic
