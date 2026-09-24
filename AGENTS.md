@@ -129,7 +129,11 @@ cover the two lightboxes' buttons, which only exist after client JS opens them
 (see "Browser-driven tests"). `islands/Menu.tsx` sets no `aria-current` itself;
 Fresh's renderer adds it, and `test/a11y.test.ts` pins that — don't add it by
 hand. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
-needed.
+needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
+`UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
+preconnect links while browsers do. `routes/_app.tsx` makes that decision at
+render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is
+rendered.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds

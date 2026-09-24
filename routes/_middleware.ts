@@ -1,6 +1,6 @@
-// Bot detection for the Umami analytics script moved to lib/bots.ts, used by
-// routes/_app.tsx at render time (issue #179) — no response body to read or
-// rewrite here anymore.
+// Sets X-Robots-Tag per path. Leaving analytics out for known bots happens at
+// render time in routes/_app.tsx (see lib/bots.ts), not here, so no response
+// body is read or rewritten.
 export async function handler(
   ctx: { req: Request; url: URL; next: () => Promise<Response> },
 ): Promise<Response> {
