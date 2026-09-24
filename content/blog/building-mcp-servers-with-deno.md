@@ -21,8 +21,8 @@ I write MCP servers in Deno, not Node, for six concrete reasons:
 
 1. **Zero npm install.** MCP servers are small, single-purpose tools. The
    dependency tree of a typical Node MCP is 200MB+ of `node_modules` for what
-   should be a 200-line program. Deno imports URLs directly — the entire server
-   is a single binary you can `deno compile`.
+   should be a small program. Deno imports URLs directly — the entire server is
+   a single binary you can `deno compile`.
 2. **Built-in TypeScript.** No `tsconfig.json`, no `ts-node`, no `tsup`. Deno
    runs `.ts` files natively. Tooling stays out of the way.
 3. **Permission flags.** MCP servers run unattended in production. Deno's
@@ -229,8 +229,9 @@ headers.
 
 ## Production hardening
 
-The "hello world" version is 80 lines. The production version is ~200 lines
-because of the boring work that makes it survive a real environment.
+The "hello world" version is 80 lines. The production version stays a small
+program overall, but grows noticeably because of the boring work that makes it
+survive a real environment.
 
 ### 1. Structured logging
 

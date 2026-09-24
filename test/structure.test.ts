@@ -294,7 +294,7 @@ Deno.test("contact page offers three ways to reach me", async () => {
     );
     assert(
       visibleText(html).includes(
-        "Invoices are issued by NeatSoft PTE LTD, Singapore.",
+        "Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R), where I'm co-founder and CEO.",
       ),
     );
   } finally {

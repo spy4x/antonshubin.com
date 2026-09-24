@@ -1,5 +1,5 @@
 ---
-title: "mig: a 200-line meeting scheduler because Calendly alternatives are overkill"
+title: "mig: a lightweight meeting scheduler because Calendly alternatives are overkill"
 description: "One owner, one URL, one feature: book a time slot. A single Deno binary, JSON-file storage, SMTP confirmations with ICS attachments, cancellable links signed with SHA-256 HMAC. Built because I needed a static meeting link, not a database."
 publishedAt: "2026-08-26"
 readTime: 7
@@ -14,7 +14,7 @@ Most "Calendly alternatives" are heavyweight. Cal.com is Next.js + Postgres
 Neither is the right answer if you are a solo operator with one meeting type,
 one URL, and zero interest in running a database to send an email.
 
-`mig` is the 200-line scheduler I built for myself. It runs as a single Deno
+`mig` is the lightweight scheduler I built for myself. It runs as a single Deno
 binary, stores bookings in a JSON file, sends confirmations over SMTP, and signs
 cancellable links with SHA-256 HMAC. No DB, no admin UI, no Tailwind cluster.
 
@@ -63,7 +63,7 @@ WEEKLY_AVAILABILITY supports ranges (`MON-FRI 09:00-17:00`), split shifts
 
 ## What it deliberately does not do
 
-This is the design constraint that made the 200-line count possible:
+This is the design constraint that keeps mig lightweight:
 
 - **No user accounts.** The owner is whoever holds `HOST_EMAIL`. Visitors do not
   log in.

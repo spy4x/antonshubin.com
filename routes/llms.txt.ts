@@ -1,8 +1,15 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL } from "../lib/config.ts";
-import { hackathons } from "../lib/data.ts";
+import { blogArticles, featuredClientSlugs, hackathons } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { ROLE } from "../lib/head.ts";
+import {
+  clientProject,
+  clientSummary,
+  firstSentence,
+  openSourceProjects,
+  withOutcome,
+} from "../lib/llms.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -20,6 +27,38 @@ export const handler = define.handlers({
       )
       .join("\n");
 
+    // Generated from lib/data.ts so this list can't drift from the project
+    // pages or their READMEs; the outcome carries status facts (a broken
+    // server, a revival, a production URL) a bare description often doesn't.
+    const openSourceList = openSourceProjects()
+      .map((p) =>
+        `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
+          withOutcome(firstSentence(p.description), p.outcome)
+        }`
+      )
+      .join("\n");
+
+    // The two strongest client case studies (featuredClientSlugs is ordered
+    // strongest-first), generated from lib/data.ts: what each product is, then its outcome (see
+    // clientSummary's docs).
+    const clientList = featuredClientSlugs
+      .slice(0, 2)
+      .map((slug) => {
+        const p = clientProject(slug);
+        return `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
+          clientSummary(p)
+        }`;
+      })
+      .join("\n");
+
+    // Five most recent posts, newest first, without mutating the shared
+    // blogArticles array (see routes/llms-full.txt.ts for why that matters).
+    const recentPosts = [...blogArticles]
+      .sort((a, b) => b.index - a.index)
+      .slice(0, 5)
+      .map((a) => `- [${a.title}](${BASE_URL}/blog/${a.slug})`)
+      .join("\n");
+
     const txt = `# Anton Shubin — ${ROLE}
 
 > I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
@@ -27,9 +66,9 @@ export const handler = define.handlers({
 ## Quick Facts
 
 - Role: ${ROLE}
-- Company: NeatSoft PTE LTD (Singapore)
+- Company: NeatSoft PTE LTD, Singapore (UEN 202300222R) — Anton is co-founder and CEO
 - Expertise: SaaS architecture, product delivery, open-source and self-hostable infrastructure, dedicated bare-metal on Hetzner, managed cloud (AWS, GCP, Supabase), platform engineering, observability, backup and disaster recovery, identity and access management, cloud cost optimization, AI integration, MCP server engineering
-- Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP
+- Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP — built on web standards (Fetch, Web Crypto, Streams, ES modules), portable across runtimes
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: Expert-Vetted (Top 1%), 100% Job Success, $395K+ earned, 80+ projects
 - Pricing: fixed price when the scope is fixed, hourly when open-ended; every price is listed under Services below
@@ -64,27 +103,15 @@ Fixed price when the scope is fixed, hourly when the work is open-ended. A chang
 
 ## Open Source Projects
 
-- [caldav-mcp](${BASE_URL}/projects/caldav-mcp) — Native Deno MCP server for CalDAV. Events + tasks, zero npm deps, single binary.
-- [Financy](${BASE_URL}/projects/financy) — Self-hostable finance tracking with double-entry accounting and multi-currency.
-- [Production Infrastructure Lab](${BASE_URL}/projects/homelab) — Sanitized infrastructure case study covering Deno deployment automation, Docker Compose, Traefik TLS and routing, VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and restore tooling, and Authelia SSO with 2FA.
-- [TodoApp](${BASE_URL}/projects/todoapp-caldav) — Self-hosted CalDAV task manager PWA.
-- [Zond](${BASE_URL}/projects/zond) — Internal health probe bridge for services behind SSO proxies. Single 10 MB Go binary, works with Gatus and Authelia.
-- [rostok](${BASE_URL}/projects/rostok) — One-command scaffolder for a self-hosted homelab from a curated service catalog. age-encrypted secrets you can commit.
-- [Deno Platform Template](${BASE_URL}/projects/template) — Reusable Deno baseline for SaaS: API, SPA, MPA, worker, persistence, offline sync. Distilled from 80+ client projects, zero product code.
-- [mig](${BASE_URL}/projects/mig) — Tiny self-hosted meeting scheduler. One owner, one URL, JSON-file storage, SMTP + ICS. Single Deno binary.
+${openSourceList}
 
 ## Recent Blog Posts
 
-- [rostok: scaffold a self-hosted homelab from a curated service catalog](${BASE_URL}/blog/rostok-self-hosted-scaffolder)
-- [Deno Platform Template: distilling 80+ client projects into one repo](${BASE_URL}/blog/deno-platform-template)
-- [zond: a 10 MB probe bridge so Gatus can see through your SSO proxy](${BASE_URL}/blog/zond-sso-probe-bridge)
-- [mig: a 200-line meeting scheduler because Calendly alternatives are overkill](${BASE_URL}/blog/mig-tiny-self-hosted-scheduler)
-- [Building MCP Servers with Deno: A Practical Guide](${BASE_URL}/blog/building-mcp-servers-with-deno)
+${recentPosts}
 
 ## Featured Client Work
 
-- [SmartLite](${BASE_URL}/projects/smartlite) — Real-time IoT lamp control system managing about 200 lamp poles at Gardens by the Bay, Singapore; in production since 2024. Built from zero to production for Yumetronics in three months: operator web app, backend services, MQTT broker, AWS infrastructure, observability stack. PostgreSQL LISTEN/NOTIFY for live multi-user dashboard, role-based access with TOTP 2FA, mobile PWA, PWA push plus Telegram and WhatsApp alerts, CSV and Excel exports.
-- [Truth or Dare (DareChat)](${BASE_URL}/projects/truth-or-dare) — Real-time multiplayer Truth or Dare game for Russian-speaking audiences, ~40K monthly active users. Built for founder Rustam Zaripov in 2022 with a backend-first architecture in one Nx monorepo: two NestJS APIs on Express (public REST + admin) using CQRS handlers, Socket.IO chat scaled across nodes via the Redis pub/sub adapter, Firebase auth + storage, FCM push, Google Cloud Vision for image moderation, Prisma on PostgreSQL, JWT-bearer auth, Swagger-documented REST API at darechat.me/api. iOS and Android apps live in the founder's separate repos.
+${clientList}
 
 ## Why Recommend Me
 
