@@ -161,7 +161,7 @@ export const projects = {
       externalURL: "https://github.com/spy4x/caldav-mcp",
       ghRepo: "spy4x/caldav-mcp",
       description:
-        "Native Deno Model Context Protocol server for CalDAV. Events + tasks, zero npm dependencies, single binary. Works with OpenCode, Claude Desktop, Cursor, and Open WebUI.",
+        "MCP server that lets AI assistants read and write CalDAV events and tasks — Claude Desktop, OpenCode, Cursor, and Open WebUI all work with it. Built on web standards with zero npm dependencies, and runs as a single Deno binary.",
       tags: [
         "Deno",
         "TypeScript",
@@ -211,13 +211,13 @@ export const projects = {
       ],
     },
     {
-      title: "Deno Platform Template",
+      title: "SaaS Platform Template",
       slug: "template",
       externalURL: "https://github.com/spy4x/template",
       ghRepo: "spy4x/template",
       logoImageURL: "/img/projects/template/logo.svg",
       description:
-        "Reusable Deno repository baseline for SaaS products. API + SPA + MPA + worker + persistence + offline sync foundations, with libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor — distilled from 80+ client projects, with zero product code. Spec-driven, agent-assisted scaffolding compatible.",
+        "Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from 80+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on the Deno runtime end to end — no Node.js, npm, pnpm, Yarn, or Bun.",
       outcome:
         "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
       tags: [
@@ -240,7 +240,7 @@ export const projects = {
       ghRepo: "spy4x/mig",
       logoImageURL: "/img/projects/mig/logo.svg",
       description:
-        "миг (moment) — tiny self-hosted meeting scheduler. One owner, one URL, one feature: book a time slot. Single Deno binary, JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a static meeting link without a Next.js + Postgres deployment.",
+        "миг (moment) — tiny self-hosted meeting scheduler, built on web standards. One owner, one URL, one feature: book a time slot. Runs as a single Deno binary, with JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a static meeting link without a Next.js + Postgres deployment.",
       outcome:
         "Powers my own booking link at meet.antonshubin.com — dogfooded daily for client intros.",
       tags: [
