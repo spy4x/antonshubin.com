@@ -79,6 +79,11 @@ app.use(async (ctx) => {
   //   Edge TTL → 3 days
   // Without that rule, these headers still help the browser cache
   // and the PWA service worker (stale-while-revalidate).
+  // Before adding that rule: pages differ by user agent (routes/_app.tsx
+  // leaves Umami out for known bots, see lib/bots.ts) and Cloudflare ignores
+  // Vary for HTML. A single cached copy would reach everyone, so a bot's
+  // page would drop analytics for every visitor. The rule needs a cache key
+  // that separates bots from browsers.
 
   // Content-hashed assets — cache forever (fingerprint = immutable)
   if (isAsset(url)) {
