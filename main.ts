@@ -1,6 +1,6 @@
 import { App, staticFiles } from "fresh";
 import type { State } from "./lib/utils.ts";
-import { buildCsp, FRESH_NONCE_SYMBOL, originOf } from "./lib/csp.ts";
+import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
 import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
 
 export const app = new App<State>();
@@ -23,8 +23,7 @@ app.use(async (ctx) => {
 const SCHEDULE_ORIGIN = originOf(SCHEDULE_URL);
 app.use(async (ctx) => {
   const res = await ctx.next();
-  // deno-lint-ignore no-explicit-any
-  const nonce = (res as any)[FRESH_NONCE_SYMBOL] as string | undefined;
+  const nonce = readFreshNonce(res);
   res.headers.set(
     "Content-Security-Policy",
     buildCsp({

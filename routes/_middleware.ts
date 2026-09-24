@@ -1,4 +1,4 @@
-import { FRESH_NONCE_SYMBOL } from "../lib/csp.ts";
+import { copyFreshNonce } from "../lib/csp.ts";
 
 // Known AI crawlers, search bots, and social preview bots.
 // Kept in sync with robots.txt — these are welcome to crawl content
@@ -98,8 +98,7 @@ export async function handler(
     // to `res` — copy it, so main.ts's CSP middleware (which runs after this
     // one) still finds it and doesn't fall back to "no nonce, no inline
     // script" for bot requests.
-    // deno-lint-ignore no-explicit-any
-    (rewritten as any)[FRESH_NONCE_SYMBOL] = (res as any)[FRESH_NONCE_SYMBOL];
+    copyFreshNonce(res, rewritten);
     return rewritten;
   }
 
