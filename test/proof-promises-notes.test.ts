@@ -6,7 +6,7 @@
 // files themselves and every *.test.ts) and fail on a hand-written copy —
 // same reasoning as test/no-emoji.test.ts walking rendered pages instead of
 // trusting that a fix was applied everywhere.
-import { assert } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { proofFigures } from "../lib/proof.ts";
 import { promises } from "../lib/promises.ts";
 import { startSite } from "./harness.ts";
@@ -38,10 +38,13 @@ async function sourceFiles(exclude: string[]): Promise<string[]> {
 // Figures with punctuation specific enough that a plain substring match
 // won't false-positive on unrelated numbers elsewhere in the codebase (a
 // bare "80" or "100%" shows up in CSS/viewport values that have nothing to
-// do with Upwork). Each entry pairs a proof figure id with the exact
-// rendered substring a hand-written copy would contain.
+// do with Upwork, so "job-success" is grepped for as the full phrase
+// "100% Job Success" instead of the bare percentage). Each entry pairs a
+// proof figure id with the exact rendered substring a hand-written copy
+// would contain.
 const FIGURE_NEEDLES: Record<string, string> = {
   "jobs": "80+",
+  "job-success": "100% Job Success",
   "earned": "395K",
   "hours": "6,600",
   "expert-vetted": "Expert-Vetted",
@@ -49,15 +52,10 @@ const FIGURE_NEEDLES: Record<string, string> = {
 };
 
 Deno.test("every proof figure appears in source only through lib/proof.ts", async () => {
-  // "job-success" (100%) has no needle: a bare "100%" shows up in CSS/layout
-  // values unrelated to Upwork, so it can't be grepped for without
-  // false-positives — "100% Job Success" as a full phrase is covered
-  // because every hand-written copy of it also restated one of the other
-  // figures right next to it (see the copies this guard replaced, #186 PR
-  // body).
-  assert(
-    proofFigures.every((f) => f.id === "job-success" || f.id in FIGURE_NEEDLES),
-    "FIGURE_NEEDLES is missing an id from lib/proof.ts",
+  assertEquals(
+    proofFigures.map((f) => f.id).sort(),
+    Object.keys(FIGURE_NEEDLES).sort(),
+    "FIGURE_NEEDLES is missing or has an extra id compared to lib/proof.ts",
   );
   const files = await sourceFiles(["lib/proof.ts"]);
   for (const [id, needle] of Object.entries(FIGURE_NEEDLES)) {
