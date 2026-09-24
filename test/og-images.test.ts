@@ -20,10 +20,16 @@ interface PngInfo {
   bytes: number;
 }
 
+/** The 8-byte magic every PNG file starts with. */
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+
 /**
  * Reads a PNG's IHDR chunk (signature: 8 bytes, then length+"IHDR"+width+
  * height, big-endian) to get its pixel size, without an image-decoding
- * dependency — the file format guarantees IHDR is the first chunk.
+ * dependency — the file format guarantees IHDR is the first chunk. Checks
+ * the signature first, so a corrupt or non-PNG file at the path fails with
+ * a clear message instead of a plausible-looking wrong width/height read
+ * from whatever bytes happen to be at offsets 16/20.
  */
 async function pngInfo(relativePath: string): Promise<PngInfo> {
   const url = new URL(relativePath, OG_ROOT);
@@ -35,6 +41,9 @@ async function pngInfo(relativePath: string): Promise<PngInfo> {
       `missing OG image: static/img/og/${relativePath} — run \`deno task og\` to generate it`,
     );
   }
+  const isPng = data.length >= 8 &&
+    PNG_SIGNATURE.every((byte, i) => data[i] === byte);
+  assert(isPng, `static/img/og/${relativePath} is not a valid PNG file`);
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
   const width = view.getUint32(16);
   const height = view.getUint32(20);

@@ -24,6 +24,7 @@ import { launchChromium } from "../test/browser.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { ROLE } from "../lib/head.ts";
 import type { Browser } from "playwright";
+import { fromFileUrl } from "@std/path";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
@@ -98,7 +99,10 @@ async function render(
   try {
     await page.setContent(html, { waitUntil: "load" });
     await Deno.mkdir(new URL("./", outUrl), { recursive: true });
-    await page.screenshot({ path: outUrl.pathname, type: "png" });
+    // Playwright's `path` option is an OS path, not a URL — `.pathname`
+    // isn't one (unescaped, and wrong on Windows), so go through
+    // `@std/path`'s `fromFileUrl`.
+    await page.screenshot({ path: fromFileUrl(outUrl), type: "png" });
     const info = await Deno.stat(outUrl);
     return info.size;
   } finally {
