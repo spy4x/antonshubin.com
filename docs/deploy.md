@@ -61,12 +61,12 @@ The job reports to NTFY and healthchecks. To see this repository's last run:
 ssh cloudlab 'grep antonshubin ~/backup.log | tail -5'
 ```
 
-Restore on cloudlab, as root (the job runs as root and owns the repository):
+Restore on cloudlab, as root: the job runs as root and owns the repository. Open
+a root shell with `ssh -t cloudlab sudo -i`, then:
 
 ```bash
-sudo -i
-set -a; . ~spy4x/cloudlab/apps/.env.root; set +a
-export RESTIC_PASSWORD="$BACKUPS_PASSWORD"
+# .env.root is not valid shell, so read the one value instead of sourcing it
+export RESTIC_PASSWORD="$(grep '^BACKUPS_PASSWORD=' ~spy4x/cloudlab/apps/.env.root | cut -d= -f2-)"
 REPO=~spy4x/cloudlab/sync/cloud-light-backups/antonshubin
 restic -r "$REPO" snapshots
 restic -r "$REPO" restore latest --target /tmp/antonshubin-restore

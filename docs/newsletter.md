@@ -25,6 +25,10 @@ app directory, so the file survives deploys, and it is backed up nightly — see
 
 ## Sending a newsletter
 
+Send from the production container on cloudlab. It has the subscriber list
+mounted and the SMTP settings in its environment. Your machine has neither, so
+running the script locally reaches nobody.
+
 ```bash
 # Write your content as HTML (unsubscribe link auto-appended)
 cat > /tmp/newsletter.html << 'EOF'
@@ -33,8 +37,9 @@ cat > /tmp/newsletter.html << 'EOF'
 <a href="https://antonshubin.com/blog/slug">Read full article →</a>
 EOF
 
-# Send to all subscribers
-deno run -A scripts/send-newsletter.ts "Newsletter Title" /tmp/newsletter.html
+# Copy it into the container, then send to all subscribers
+ssh cloudlab 'docker exec -i antonshubincom-web sh -c "cat > /tmp/newsletter.html"' < /tmp/newsletter.html
+ssh cloudlab 'docker exec antonshubincom-web deno run -A scripts/send-newsletter.ts "Newsletter Title" /tmp/newsletter.html'
 ```
 
 ## Publishing a new blog post with newsletter notification
@@ -51,6 +56,9 @@ This will:
 4. Send newsletter to all subscribers notifying about the new post
 5. Stage the changes for commit
 
+Step 4 runs on your machine, which has no subscriber list, so it currently
+emails nobody (#180). Send the announcement from the server as above.
+
 ## Markdown format
 
 ```markdown
@@ -66,8 +74,10 @@ Article content here...
 
 ## Viewing subscribers
 
+The file is on cloudlab and owned by root:
+
 ```bash
-cat data/subscribers.json
+ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/subscribers.json'
 ```
 
 ## Unsubscribe handling
