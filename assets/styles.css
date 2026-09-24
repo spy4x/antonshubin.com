@@ -216,25 +216,31 @@ h4,
 /*
  * Margin note layout (#186), via components/WithNote.tsx. Below 1100px the
  * note (.note-aside) sits inline under its claim, spaced like a normal
- * paragraph. From 1100px it moves into a 240px column to the right of the
- * claim, positioned relative to .note-wrap — a CSS-only placement chosen so
- * it works inside today's page containers without restructuring them; the
- * page layouts themselves are rebuilt in later redesign issues.
+ * paragraph. From 1100px .note-wrap becomes a two-column grid — the claim in
+ * column one, the note in a 240px column two — reserved *inside* the
+ * wrapper's own box rather than positioned absolutely into the page's
+ * margin. An absolutely-positioned note needs empty page width beyond the
+ * text column to sit in, which today's centered `max-w-4xl` container only
+ * has from about 1490px, causing horizontal scroll below that; a grid
+ * column is bounded by the wrapper itself, so it can never overflow the
+ * page, at the cost of narrowing the claim's own column instead of using
+ * space beside it. Chosen so it works inside today's page containers
+ * without restructuring them; the page layouts themselves are rebuilt in
+ * later redesign issues.
  */
-.note-wrap {
-  position: relative;
-}
-
 .note-aside {
   margin-top: 0.5rem;
 }
 
 @media (min-width: 1100px) {
+  .note-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    column-gap: 24px;
+    align-items: start;
+  }
+
   .note-aside {
-    position: absolute;
-    top: 0;
-    left: calc(100% + 24px);
-    width: 240px;
     margin-top: 0;
   }
 }

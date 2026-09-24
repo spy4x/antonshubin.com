@@ -7,8 +7,9 @@ import { Note } from "./Note.tsx";
  * column beside the claim from 1100px (`.note-wrap`/`.note-aside` in
  * `assets/styles.css`), and renders inline under the claim below that. `id`
  * looks the note up in `lib/notes.ts` and throws on a typo, and is also
- * stamped as `data-note-ref` on the wrapper — what `test/structure.test.ts`'s
- * note guard and `test/notes.browser.test.ts` scan for. This is a small
+ * stamped as `data-note-ref` on the wrapper — what
+ * `test/proof-promises-notes.test.ts`'s note guard and
+ * `test/notes.browser.test.ts` scan for. This is a small
  * wrapper rather than a page-layout change on purpose: the page layouts
  * themselves are rebuilt in later redesign issues.
  */
