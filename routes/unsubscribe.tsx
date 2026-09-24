@@ -102,14 +102,14 @@ function Body(data: PageData) {
     case "confirm":
       return (
         <>
-          <h1 class="text-2xl font-bold text-white mb-6">
+          <h1 class="text-2xl font-bold text-parchment mb-6">
             Unsubscribe {data.email} from the newsletter?
           </h1>
           <form method="post">
             <input type="hidden" name="token" value={data.token} />
             <button
               type="submit"
-              class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              class="bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors px-6 py-3"
             >
               Unsubscribe
             </button>
@@ -119,12 +119,12 @@ function Body(data: PageData) {
     case "done":
       return (
         <>
-          <h1 class="text-2xl font-bold text-white mb-6">
+          <h1 class="text-2xl font-bold text-parchment mb-6">
             You're unsubscribed
           </h1>
           <a
             href="/"
-            class="text-orange-400 hover:text-orange-300 font-medium"
+            class="text-accent hover:text-accent hover:underline font-medium"
           >
             ← Back to home
           </a>
@@ -133,10 +133,10 @@ function Body(data: PageData) {
     case "not-recognised":
       return (
         <>
-          <h1 class="text-2xl font-bold text-white mb-4">
+          <h1 class="text-2xl font-bold text-parchment mb-4">
             Link not recognised
           </h1>
-          <p class="text-gray-400">
+          <p class="text-graphite">
             This link is not valid, or it was already used. If you already
             unsubscribed, there's nothing more to do.
           </p>
@@ -145,10 +145,10 @@ function Body(data: PageData) {
     case "outdated":
       return (
         <>
-          <h1 class="text-2xl font-bold text-white mb-4">
+          <h1 class="text-2xl font-bold text-parchment mb-4">
             Link out of date
           </h1>
-          <p class="text-gray-400">
+          <p class="text-graphite">
             This link is from an older email and no longer works. Use the link
             in a newer email, or reply to the email and ask.
           </p>
@@ -157,10 +157,10 @@ function Body(data: PageData) {
     case "error":
       return (
         <>
-          <h1 class="text-2xl font-bold text-white mb-4">
+          <h1 class="text-2xl font-bold text-parchment mb-4">
             Something went wrong
           </h1>
-          <p class="text-gray-400">Try again in a moment.</p>
+          <p class="text-graphite">Try again in a moment.</p>
         </>
       );
   }

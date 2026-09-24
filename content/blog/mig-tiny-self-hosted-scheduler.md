@@ -22,7 +22,7 @@ cancellable links with SHA-256 HMAC. No DB, no admin UI, no Tailwind cluster.
 
 ```
 ┌──────────┐    ┌──────────┐    ┌──────────┐
-│ Visitor  │───▶│   mig    │───▶│  Owner   │
+│ Visitor  │───>│   mig    │───>│  Owner   │
 │ (anyone) │    │ (single) │    │  (you)   │
 └──────────┘    └──────────┘    └──────────┘
                      │

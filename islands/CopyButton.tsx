@@ -1,4 +1,5 @@
 import { useSignal } from "@preact/signals";
+import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
 
 interface CopyButtonProps {
   elementId: string;
@@ -8,7 +9,7 @@ interface CopyButtonProps {
 }
 
 export default function CopyButton(
-  { elementId, label = "📋 Copy address", class: className, title }:
+  { elementId, label = "Copy address", class: className, title }:
     CopyButtonProps,
 ) {
   const copied = useSignal(false);
@@ -34,7 +35,7 @@ export default function CopyButton(
   };
 
   const baseClass =
-    "text-xs text-green-400 hover:text-green-300 transition-colors";
+    "inline-flex items-center gap-1 text-xs text-sage hover:text-sage transition-colors";
 
   return (
     <button
@@ -43,7 +44,17 @@ export default function CopyButton(
       aria-live="polite"
       {...(title && !copied.value ? { title, "aria-label": title } : {})}
     >
-      {copied.value ? "✅ Copied!" : label}
+      {copied.value
+        ? (
+          <>
+            <CheckIcon class="w-3.5 h-3.5" /> Copied!
+          </>
+        )
+        : (
+          <>
+            <CopyIcon class="w-3.5 h-3.5" /> {label}
+          </>
+        )}
     </button>
   );
 }

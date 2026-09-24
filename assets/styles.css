@@ -1,67 +1,252 @@
 @import "tailwindcss";
 
-/* Custom colors */
+/*
+ * Visual system (#184). Semantic, dark-only tokens — see AGENTS.md "Visual
+ * system" for the full rule set. Every colour on the site must come from one
+ * of these; never a raw Tailwind palette colour (slate-*, orange-*, etc.).
+ * Tailwind v4 turns each `--color-*` custom property into utilities
+ * automatically (`bg-ink`, `text-parchment`, `border-rule`, ...).
+ */
 @theme {
-  --color-slate-900: #0f172a;
-  --color-slate-800: #1e293b;
-  --color-gray-800: #1f2937;
-  --color-gray-700: #374151;
-  --color-gray-600: #4b5563;
-  --color-gray-500: #8a919f;
-  --color-gray-400: #a7aeba;
-  --color-gray-300: #d1d5db;
-  --color-gray-200: #e5e7eb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-50: #f9fafb;
-  --color-orange-500: #f97316;
-  --color-orange-600: #c2410c;
-  --color-orange-100: #ffedd5;
+  --color-ink: #15120f; /* page background */
+  --color-desk: #1c1916; /* rail, bar, footer */
+  --color-paper: #25211d; /* cards, code blocks, screenshot mats */
+  --color-lamp: #2f2a26; /* active nav item, sheet */
+  --color-rule: #413c38; /* hairlines */
+  --color-rule-strong: #857f79; /* control borders */
+  --color-parchment: #efebe2; /* primary text */
+  --color-graphite: #bcb7af; /* secondary text */
+  --color-accent: #f97316; /* the one filled action: Book. Ink text on it. */
+  --color-accent-hover: #fb923c;
+  --color-sage: #83d494; /* ready / live */
+  --color-mist: #8ec5ec; /* beta / info */
+  --color-brick: #f87e77; /* risk / errors */
+
+  --font-heading: "Literata", "Literata Fallback", serif;
+  --font-sans: "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
+    monospace;
 }
 
-/* Shared */
+/*
+ * Self-hosted type (#184). Latin + Cyrillic subsets only (the site has no
+ * Greek/Vietnamese copy). `font-src 'self'` in lib/csp.ts already covers
+ * same-origin files — nothing to loosen there. `font-display: swap` plus the
+ * size-adjusted fallback faces below keep the swap from shifting layout.
+ * unicode-range values are copied verbatim from the upstream @fontsource
+ * packages (Literata / IBM Plex Sans / IBM Plex Mono, all OFL — licence
+ * files are in assets/fonts/, alongside the woff2 files themselves so Vite
+ * content-hashes them into `/assets/*` (the immutable cache tier —
+ * see AGENTS.md "Cache-Control headers"), the same as every other asset.
+ *
+ * No `<link rel="preload">` for any font (routes/_app.tsx doesn't have one):
+ * measured, a font preload competed with the home page's actual LCP element
+ * (the hero `<img fetchpriority="high">`) for bandwidth and made LCP worse,
+ * even deprioritized with `fetchpriority="low"` — see scripts/lcp.ts's docs
+ * and the #184 PR body for the numbers. `font-display: swap` plus the
+ * fallback faces below are what keep first paint fast and layout stable
+ * instead.
+ */
+@font-face {
+  font-family: "Literata";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/literata-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Literata";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/literata-cyrillic-600-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+/* Italic: margin notes, and the Cyrillic tool marks (utility defined below). */
+@font-face {
+  font-family: "Literata";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/literata-latin-400-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Literata";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/literata-cyrillic-400-italic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-sans-cyrillic-400-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-sans-cyrillic-600-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Size-adjusted local fallbacks so the swap from system font to webfont
+ * doesn't reflow the page. Each `local()` tries, in order, a font Fontaine/
+ * next/font's own metrics collection (@capsizecss/metrics) has published
+ * data for, so the override values below are actually correct for whichever
+ * one resolves, not just the first. The override formula (same one Fontaine
+ * uses): for a fallback face standing in for `webfont`,
+ *
+ *   sizeAdjust    = (webfont.xWidthAvg / webfont.upm) / (fallback.xWidthAvg / fallback.upm)
+ *   ascentOverride  = (webfont.ascent  / webfont.upm) / sizeAdjust
+ *   descentOverride = (|webfont.descent| / webfont.upm) / sizeAdjust
+ *   lineGapOverride = (webfont.lineGap / webfont.upm) / sizeAdjust
+ *
+ * computed from each font's own OS/2/hhea metrics (Literata 600 and IBM
+ * Plex Sans 400 read directly from the woff2 files with `npm:fontkit`;
+ * Georgia and Arial from @capsizecss/metrics' published tables, since
+ * neither ships as a file this repo can read) — not guessed. Georgia is
+ * used as Literata's reference fallback (both serif) and Arial as Plex
+ * Sans's (both sans-serif); the other `local()` names in each list are
+ * close enough substitutes on platforms without Georgia/Arial installed
+ * that the same override numbers stay a reasonable approximation for them
+ * too, which a guessed pair of numbers wouldn't have been for any of them.
+ */
+@font-face {
+  font-family: "Literata Fallback";
+  src:
+    local("Georgia"), local("Times New Roman"), local("DejaVu Serif"),
+    local("Liberation Serif"), local("Noto Serif");
+  size-adjust: 112.16%;
+  ascent-override: 104.94%;
+  descent-override: 27.46%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Fallback";
+  src:
+    local("Arial"), local("Helvetica"), local("Liberation Sans"),
+    local("DejaVu Sans"), local("Noto Sans");
+  size-adjust: 101.17%;
+  ascent-override: 101.32%;
+  descent-override: 27.18%;
+  line-gap-override: 0%;
+}
+
+body {
+  @apply bg-ink text-parchment;
+  font-family: var(--font-sans);
+}
+
+/* islands/Menu.tsx rotates #menu -90deg into a vertical desktop rail; the
+   rail's on-screen height is this rule's width before rotation. */
 @media (min-width: 640px) {
   #menu {
     width: 100vh;
   }
 }
 
+h1,
+h2,
+h3,
+h4,
+.h1,
+.h2 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+/* Cyrillic tool marks and margin notes (#184). */
+.margin-note {
+  font-family: var(--font-heading);
+  font-style: italic;
+}
+
+/* Tabular figures for prices (#184). */
+.price {
+  font-variant-numeric: tabular-nums;
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+}
+
 .h1 {
   @apply text-2xl sm:text-3xl;
-  @apply tracking-wide text-white font-medium;
+  @apply tracking-wide text-parchment;
 }
 
 .h2 {
   @apply text-xl sm:text-2xl;
-  @apply tracking-wide text-white font-medium;
-}
-
-/* About me */
-.current-work {
-  @apply border-2 border-gray-700;
-  @apply bg-gray-800;
-  @apply px-4 py-6;
-  @apply rounded-lg;
-}
-
-/* Projects */
-.project-badge {
-  @apply tracking-wide inline-flex items-center px-2 rounded text-sm
-    bg-orange-500 text-gray-50 py-0.5 my-1 mr-2;
+  @apply tracking-wide text-parchment;
 }
 
 /* Blog */
 .blog-content a {
-  @apply underline decoration-orange-500;
+  @apply underline decoration-accent;
 }
 
 .blog-content > h2 {
   @apply mt-12 mb-4;
-  @apply text-3xl text-slate-100;
+  @apply text-3xl text-parchment;
 }
 
 .blog-content > h3 {
   @apply mt-10 mb-4;
-  @apply text-2xl text-slate-50;
+  @apply text-2xl text-parchment;
 }
 
 .blog-content > p {
@@ -97,29 +282,29 @@
 
 .blog-content .img-title {
   @apply -translate-y-6;
-  @apply text-gray-400 text-center;
+  @apply text-graphite text-center;
 }
 
 .blog-content > .well {
   @apply px-6 py-4 my-6 mx-auto;
-  @apply border-2 border-gray-700 rounded-lg;
-  @apply bg-gray-800;
+  @apply border-2 border-rule rounded-lg;
+  @apply bg-paper;
 }
 
 .blog-content > .well.well--warning {
-  @apply border-orange-500;
+  @apply border-accent;
 }
 
 .blog-content > .well.well--warning > p:before {
-  @apply text-orange-500;
-  content: "⚠️";
+  @apply text-accent;
+  content: "Warning: ";
 }
 
 .blog-content > blockquote {
-  @apply text-gray-50 italic text-2xl font-light;
-  @apply relative py-8 px-6 bg-gray-800/50 md:px-10;
+  @apply text-parchment italic text-2xl font-light;
+  @apply relative py-8 px-6 bg-paper/50 md:px-10;
   @apply my-12 md:mx-28;
-  @apply border-l-4 border-orange-500;
+  @apply border-l-4 border-accent;
   letter-spacing: 0.0125rem;
 }
 
@@ -128,12 +313,12 @@
 }
 
 .blog-content > pre {
-  @apply overflow-x-auto p-4 rounded-md bg-gray-800 text-gray-300 mb-4
+  @apply overflow-x-auto p-4 rounded-md bg-paper text-graphite mb-4
     font-mono;
 }
 
 .blog-content > p > code {
-  @apply font-mono bg-orange-600 rounded py-0.5 px-1 text-orange-100 text-base;
+  @apply font-mono bg-lamp rounded py-0.5 px-1 text-parchment text-base;
 }
 
 @media (min-width: 640px) {
@@ -144,28 +329,6 @@
   .blog-content > .well {
     max-width: 80%;
   }
-}
-
-.btn {
-  position: relative;
-  @apply inline-flex items-center gap-2;
-  @apply text-white text-base font-medium;
-  @apply bg-orange-500 border-0 py-2 px-6 rounded;
-  @apply focus:outline-none hover:bg-orange-600;
-}
-
-#menu.menu-ready-for-animation {
-  transition: transform 0.3s ease;
-}
-
-body.mobile-menu-hidden > #menu {
-  @apply translate-y-20;
-}
-
-#mobile-menu-shadow {
-  @apply fixed inset-0 z-20;
-  backdrop-filter: blur(5px);
-  background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* Image Gallery Lightbox */

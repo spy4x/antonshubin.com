@@ -104,11 +104,11 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             type="button"
             onClick={(e) =>
               openLightbox(index, e.currentTarget as HTMLButtonElement)}
-            class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
+            class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-accent rounded-lg overflow-hidden transition-transform"
           >
             <GalleryImage
               {...image}
-              class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-gray-700 hover:border-orange-500 transition-colors"
+              class="h-60 sm:h-70 w-auto object-cover rounded-lg border border-rule hover:border-accent transition-colors"
             />
           </button>
         ))}
@@ -131,7 +131,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             <button
               type="button"
               onClick={closeLightbox}
-              class="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
+              class="absolute top-4 right-4 z-10 p-2 text-parchment/70 hover:text-parchment bg-black/50 rounded-full transition-colors"
               aria-label="Close"
             >
               <svg
@@ -156,7 +156,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={goPrev}
-                class="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
+                class="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 text-parchment/70 hover:text-parchment bg-black/50 rounded-full transition-colors"
                 aria-label="Previous image"
               >
                 <svg
@@ -188,7 +188,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={goNext}
-                class="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
+                class="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 text-parchment/70 hover:text-parchment bg-black/50 rounded-full transition-colors"
                 aria-label="Next image"
               >
                 <svg
@@ -210,7 +210,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             )}
 
             {/* Image counter */}
-            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm bg-black/50 px-3 py-1 rounded-full">
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-parchment/70 text-sm bg-black/50 px-3 py-1 rounded-full">
               {activeIndex.value + 1} / {images.length}
             </div>
           </div>

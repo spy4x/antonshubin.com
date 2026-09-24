@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import Button from "../components/Button.tsx";
 
 export default function SWUpdater() {
   const [available, setAvailable] = useState(false);
@@ -47,15 +48,15 @@ export default function SWUpdater() {
     return null;
   }
   return (
-    <div class="fixed top-0 left-0 right-0 z-50 flex items-center gap-3 bg-orange-600 px-4 py-3 text-white shadow-lg sm:top-4 sm:left-auto sm:right-4 sm:w-auto sm:rounded-lg">
+    <div class="fixed top-0 left-0 right-0 z-50 flex items-center gap-3 bg-paper border border-rule px-4 py-3 text-parchment shadow-lg sm:top-4 sm:left-auto sm:right-4 sm:w-auto sm:rounded-lg">
       <span class="text-sm">New version available</span>
-      <button
+      <Button
         type="button"
         onClick={reload}
-        class="ml-auto sm:ml-0 cursor-pointer rounded bg-white px-3 py-1 text-sm font-semibold text-gray-900 hover:bg-orange-100"
+        class="ml-auto sm:ml-0 px-3 py-1 text-sm"
       >
         Reload
-      </button>
+      </Button>
     </div>
   );
 }

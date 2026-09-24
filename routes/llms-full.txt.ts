@@ -136,11 +136,11 @@ Fixed price when the scope is fixed, hourly when the work is open-ended. A chang
 
 ## Promises (Why Founders Trust Me)
 
-1. **Five-Day Refund** — if in the first five days you feel this is not working, tell me and I refund what you paid
-2. **A Small First Milestone** — we start with one or two weeks of work; if either of us wants to stop at the end of it, we stop, you keep everything built so far
-3. **You Own Everything From Day One** — code, accounts, servers and keys are in your name
-4. **Weekly Working Software** — you see working software every week, with a short written update; calls when they help, not on a schedule for its own sake
-5. **Free Bug Fixes for 30 Days** — bugs in what I delivered are fixed free for 30 days
+1. **Five-day refund** — if in the first five days you feel this is not working, tell me and I refund what you paid
+2. **A small first milestone** — we start with one or two weeks of work; if either of us wants to stop at the end of it, we stop, you keep everything built so far
+3. **You own everything from day one** — code, accounts, servers and keys are in your name
+4. **Weekly working software** — you see working software every week, with a short written update; calls when they help, not on a schedule for its own sake
+5. **Free bug fixes for 30 days** — bugs in what I delivered are fixed free for 30 days
 
 Also constraint-led architecture: platform choices follow product, compliance, recovery, team, and cost needs, not a one-size-fits-all default.
 

@@ -31,7 +31,7 @@ behind SSO, and your monitoring tool does not have credentials.
 
 ```
 ┌──────────┐     ┌──────────┐     ┌─────────────┐
-│  Gatus   │────▶│  Zond    │────▶│ hl-metube   │
+│  Gatus   │────>│  Zond    │────>│ hl-metube   │
 │ (cloud)  │     │ (home)   │     │ :8081       │
 └──────────┘     └──────────┘     └─────────────┘
 ```

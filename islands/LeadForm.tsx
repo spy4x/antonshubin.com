@@ -1,6 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
-import { ArrowRightIcon } from "../components/Icons.tsx";
+import { ArrowRightIcon, CheckIcon, SearchIcon } from "../components/Icons.tsx";
 import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
 
 interface FormState {
@@ -108,7 +108,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
   }, [isSuccess]);
 
   return (
-    <div class="bg-gray-800 rounded-xl border border-orange-500/40 p-4 sm:p-6 relative overflow-hidden">
+    <div class="bg-paper rounded-xl border border-accent/40 p-4 sm:p-6 relative overflow-hidden">
       {
         /* Form section. `inert` once success shows, so its now-hidden inputs
           drop out of the tab order and out of assistive tech, matching the
@@ -125,17 +125,17 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           overflow: "hidden",
         }}
       >
-        <div class="text-3xl mb-4 text-center">🔍</div>
-        <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3 text-center">
+        <SearchIcon class="w-9 h-9 mb-4 mx-auto text-graphite" />
+        <h2 class="text-2xl sm:text-3xl font-bold text-parchment mb-3 text-center">
           Not sure where to start?
         </h2>
-        <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6 text-center">
+        <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6 text-center">
           Send me your idea or your current app and I'll write back with 3
           concrete architectural improvements.
-          <span class="text-orange-400 font-semibold block sm:inline">
+          <span class="text-accent font-semibold block sm:inline">
             {" "}No cost.
           </span>{" "}
-          <span class="text-orange-400 font-semibold block sm:inline">
+          <span class="text-accent font-semibold block sm:inline">
             No commitment.
           </span>
         </p>
@@ -167,7 +167,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               aria-describedby={errorField === "lead-name"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
               required
             />
           </div>
@@ -186,7 +186,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               aria-describedby={errorField === "lead-email"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
               required
             />
           </div>
@@ -207,7 +207,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 ? "lead-form-error"
                 : undefined}
               rows={4}
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-y disabled:opacity-50"
               required
             />
           </div>
@@ -216,7 +216,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
             <p
               id="lead-form-error"
               role="alert"
-              class="text-red-400 text-sm text-center"
+              class="text-brick text-sm text-center"
             >
               {status.value.message}
             </p>
@@ -226,7 +226,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
             type="submit"
             disabled={status.value.type === "submitting"}
             data-umami-event="form-submit-audit"
-            class="w-full px-8 py-3.5 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            class="w-full px-8 py-3.5 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {status.value.type === "submitting" ? "Sending..." : (
               <>
@@ -237,12 +237,12 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           </button>
         </form>
 
-        <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-5 text-gray-500 text-xs">
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-5 text-graphite text-xs">
           <span class="inline-flex items-center gap-1">
             <svg
               aria-hidden="true"
               focusable="false"
-              class="w-3.5 h-3.5 text-green-400"
+              class="w-3.5 h-3.5 text-sage"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -261,7 +261,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
             <svg
               aria-hidden="true"
               focusable="false"
-              class="w-3.5 h-3.5 text-green-400"
+              class="w-3.5 h-3.5 text-sage"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -280,7 +280,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
             <svg
               aria-hidden="true"
               focusable="false"
-              class="w-3.5 h-3.5 text-green-400"
+              class="w-3.5 h-3.5 text-sage"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -328,16 +328,16 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           overflow: "hidden",
         }}
       >
-        <div class="text-5xl mb-4">✅</div>
+        <CheckIcon class="w-14 h-14 mb-4 mx-auto text-sage" />
         <h2
           id="lead-success-heading"
           ref={successHeadingRef}
           tabIndex={-1}
-          class="text-2xl sm:text-3xl font-bold text-white mb-3 focus:outline-none"
+          class="text-2xl sm:text-3xl font-bold text-parchment mb-3 focus:outline-none"
         >
           Your audit is queued
         </h2>
-        <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
+        <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6">
           I'll review what you sent and write back with 3 concrete architectural
           improvements.
           {scheduleUrl &&
@@ -352,12 +352,12 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-umami-event="meet-embed-fallback-click"
-                class="text-gray-400 hover:text-orange-300 underline underline-offset-4 text-sm"
+                class="text-graphite hover:text-accent underline underline-offset-4 text-sm"
               >
                 Open standalone
               </a>
             </p>
-            <p class="text-gray-500 text-sm mt-4">
+            <p class="text-graphite text-sm mt-4">
               No pressure. It's a free 30-minute call.
             </p>
           </>

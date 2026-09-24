@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP and service-worker tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker and visual-system tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -40,6 +40,7 @@ deno task video-kit             # transcript → titles, description, chapters, 
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
+deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B)
 ```
 
 `deno task check` fails on a failing test, same as a lint or type error — a red
@@ -90,6 +91,113 @@ The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
 Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
 item. The five promises on `/how-i-work` are the only promises on the site; the
 free written audit carries no deadline.
+
+## Visual system
+
+`assets/styles.css`'s `@theme` block is the only place a colour is defined
+(#184): Ink, Desk, Paper and Lamp are the four dark surfaces (page; rail, bar
+and footer; cards; active nav item and sheet), Rule and Rule strong are hairline
+and control borders, Parchment and Graphite are primary and secondary text,
+Accent (`#f97316`, Ink text on it, hover `#fb923c`) is the one filled-button
+colour, and Sage, Mist and Brick are status colours (ready/live, beta/info,
+risk/error). Every class in `routes/`, `components/` and `islands/` uses these
+tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind palette colour
+(`slate-*`, `gray-*`, `orange-*`) showing up again is a regression, not a style
+choice.
+
+`components/Button.tsx` is the one button component. `variant` defaults to
+`secondary` (an outline button); `variant="primary"` (`bg-accent text-ink`) is
+reserved for the Book action, and a primary button carries `data-primary-book` —
+the marker `test/visual-system.browser.test.ts`'s "the accent colour is a
+background only on the primary button and the nav's Book" guard looks for,
+instead of guessing from text content or element shape.
+`buttonClass(variant, extra)` (also exported from `Button.tsx`) is the same
+class string as a plain string, for the handful of call sites that can't render
+`<Button>` directly: `components/BookCallLink.tsx` (every "Book a call" link on
+the site goes through it; it owns the `href`/`target`/empty-`url` behaviour
+`<Button
+href=…>` doesn't, and stamps `data-primary-book` itself for its default
+`variant="primary"`) and `islands/MeetEmbed.tsx`'s click-to-load facade.
+`buttonClass`'s base class string carries no padding, gap or text-size utility —
+two Tailwind classes for the same property don't reliably resolve by their order
+in one element's `class="..."` attribute, only by the order Tailwind happens to
+emit them in the compiled stylesheet, so every call site supplies its own sizing
+via `extra` instead of fighting a default.
+
+`components/StatusMark.tsx` renders a shape plus a word for a project or tool
+status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`) —
+never colour alone; used today on `routes/projects/index.tsx` and
+`routes/projects/[slug].tsx`'s archived/outcome badges.
+
+### Type
+
+Literata 600 for headings — `h1`-`h3`, `.h1`, `.h2` in `assets/styles.css` set
+`font-family: var(--font-heading)` directly, so a heading can't accidentally
+render in a Tailwind utility's font: Tailwind wraps its own utilities in
+`@layer utilities`, which always loses to unlayered CSS like this rule
+regardless of selector specificity. IBM Plex Sans for body text, nav and
+buttons. Literata italic for margin notes and the Cyrillic tool marks (the
+`.margin-note` utility; not used yet — a later redesign issue wires it up).
+Tabular figures for prices, via `font-variant-numeric: tabular-nums` on the
+`.price` utility. IBM Plex Mono only for `code`, `pre` and `kbd`. Plex Sans
+ships only the 400 and 600 weights: `font-medium` (500) has no file and renders
+as 400, so use `font-semibold` for anything meant to look bold.
+
+All three are self-hosted under `assets/fonts/` (Latin and Cyrillic subsets,
+from `@fontsource`'s pre-split files — their `unicode-range` values are copied
+verbatim; OFL licence files sit alongside the `.woff2` files), referenced from
+`assets/styles.css` with a relative `url()` so Vite content-hashes them into
+`/assets/*` the same as every other asset (see "Cache-Control headers" below for
+why that matters) — never `static/fonts/`, which isn't Vite-processed.
+`font-display: swap` plus the fallback faces below keep first paint fast and the
+layout stable while the real fonts load.
+
+**No `<link rel="preload">` for any font.** Measured, interleaved,
+fresh-browser-per-sample (`scripts/lcp.ts --ab`) comparisons against
+`origin/main` proved a font preload made the home page's LCP worse, under CPU
+throttling and a throttled network alike, even deprioritized with
+`fetchpriority="low"` — because the home page's actual LCP element is the hero
+`<img fetchpriority="high">`, not text, and any early request competes with it
+for bandwidth. The hard "LCP no worse than before" rule beats issue #184's
+original preload suggestion here; see the #184 PR body for the numbers.
+
+**Fallback faces use real metrics, not guesses.** Each web font is followed
+immediately by its fallback face in the font stack
+(`"Literata", "Literata
+Fallback", serif`; same shape for Plex Sans), and each
+fallback face lists several `local()` names so it actually resolves on more than
+one OS (Georgia/Times New Roman/DejaVu Serif/Liberation Serif/Noto Serif for
+Literata; Arial/Helvetica/Liberation Sans/DejaVu Sans/Noto Sans for Plex Sans).
+The `size-adjust`/`ascent-override`/`descent-override`/ `line-gap-override`
+values are computed with the same formula Fontaine/ next/font use, from each web
+font's own OS/2 and hhea metrics (read straight from the `.woff2` files with
+`npm:fontkit`) against Georgia's and Arial's published metrics
+(`@capsizecss/metrics` — neither ships as a file this repo can read) — not
+guessed. Measured under the slow-network profile below, layout shift from the
+swap is effectively zero (cumulative layout shift ≈ 0.0004 on `/` at 390px).
+`lib/csp.ts`'s `font-src 'self'` already covered same-origin font files —
+self-hosting needed no CSP change.
+
+### `scripts/lcp.ts`
+
+`deno task lcp` (not part of `deno task check` — it needs a production build and
+several seconds per sample) measures the home page's Largest Contentful Paint,
+mobile viewport (390×844), in two modes: `cpu` (4x CPU throttling only) and
+`network` (CDP `Network.emulateNetworkConditions`, 150ms latency, 200 KB/s
+down/up, service worker blocked so every sample is a genuine first load) — both
+by default, since a regression can show up in only one of them. Reports every
+sample plus the median, min and max.
+
+`--ab <dirA> <dirB>` compares two already-built site directories (each needs its
+own `deno task build` first) instead of only the current worktree — alternating
+samples between them with a _fresh_ Chromium instance and a fresh server process
+per sample, not two long-lived servers measured back-to-back, so a slow run
+doesn't make whichever build was measured second look artificially better or
+worse (confirmed necessary: measuring the same commit twice in separate batches
+gave different medians before this mode existed). This is the reliable way to
+compare a branch against `origin/main`: clone or `git worktree add` a copy of
+`main`, build it, then
+`deno task lcp -- --ab <main copy> <this worktree> --n 15`.
 
 ## Content rule
 
@@ -162,13 +270,13 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-five files below and fails loudly, naming the install command, if none is found.
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all six
+files below and fails loudly, naming the install command, if none is found.
 Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All
-five call `startSite()` and run under `deno task test:browser` with `-A`, not
-the narrow `deno task test`.
+— a mismatch downloads a different Chromium build than the one launched. All six
+call `startSite()` and run under `deno task test:browser` with `-A`, not the
+narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
@@ -206,6 +314,16 @@ the narrow `deno task test`.
   reopened answers "Link not recognised", not the cached form. It opens the
   pages under test in a second tab once `navigator.serviceWorker.ready`
   resolves, because the tab that registers the worker is not controlled by it.
+- `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
+  renders in a monospace font; the accent colour is painted as a background only
+  by the primary button and the Book action (scans computed `background-color`
+  on representative pages against a live-resolved `bg-accent` probe, so a token
+  edit can't desync the check from `assets/styles.css`); Literata and IBM Plex
+  Sans show up in `document.fonts` and every font request is same-origin, with
+  no CSP violation. `test/no-emoji.test.ts` (not browser-driven — a plain
+  `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
+  every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
+  characters, excluding `©`/`®`/`™` and plain digits.
 
 ## Content-Security-Policy
 
@@ -298,23 +416,40 @@ const CORE_PAGES = new Set([
 
 Cache tiers:
 
-| Tier       | Duration                        | Targets                  | Use case                                                      |
-| ---------- | ------------------------------- | ------------------------ | ------------------------------------------------------------- |
-| Immutable  | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*` | Content-hashed files (fingerprint = immutable)                |
-| Images     | 7 days + stale-while-revalidate | `/img/*`                 | Photos, illustrations (rarely change)                         |
-| Core pages | 3 days + stale-while-revalidate | `CORE_PAGES` set         | SSR pages that update every few days                          |
-| No cache   | `no-cache, must-revalidate`     | `/sw.js`                 | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
+| Tier              | Duration                        | Targets                              | Use case                                                      |
+| ----------------- | ------------------------------- | ------------------------------------ | ------------------------------------------------------------- |
+| Immutable         | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*`             | Content-hashed files (fingerprint = immutable)                |
+| Images and static | 7 days + stale-while-revalidate | `/img/*`, favicons, `/manifest.json` | Photos, illustrations, small root files (rarely change)       |
+| Core pages        | 3 days + stale-while-revalidate | `CORE_PAGES` set                     | SSR pages that update every few days                          |
+| No cache          | `no-cache, must-revalidate`     | `/sw.js`                             | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
 
 Error responses (status ≥ 400) are never cached, regardless of which tier the
 path would otherwise fall into — a 404 must not survive in a browser or at the
 edge once the page comes back. A route that sets `no-store` itself (for example
 `routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it on
 staging and production alike, and the service worker never caches or serves such
-a response. Staging answers every response with
-`X-Robots-Tag: noindex,
-nofollow`; production sends `noindex` for any status ≥
-400 and `noindex, nofollow` for `/pay` and `/unsubscribe`
-(`routes/_middleware.ts`).
+a response.
+
+**A static-file tier always wins over Fresh's own default, even when `current`
+already says `no-store`** (#183 follow-up, fixed alongside #184): Fresh's
+`staticFiles()` middleware stamps a plain `Cache-Control: no-store` on any
+static file it doesn't itself recognise as content-hashed — which, before this
+fix, silently meant `/fonts/*` (self-hosted under `assets/fonts/`, Vite
+content-hashes them into `/assets/*` — see "Visual system" above), `/img/*`,
+favicons and any unstamped `/_fresh/*` JS chunk never got their real tier,
+because `cacheControlFor()` checked "does the response already say no-store?"
+_before_ checking whether the path was a recognised asset/image/static file.
+`cacheControlFor()` now checks the asset/image/static-root-file tiers first;
+only a path that doesn't match any of them still respects an existing `no-store`
+(which is how a route's own deliberate one, like `routes/unsubscribe.tsx`'s,
+keeps winning). `lib/cache-control.test.ts` pins both directions: a hashed
+font/image/favicon/JS chunk gets its tier even when `current` is already
+`"no-store"`, and `/unsubscribe` keeps `no-store` regardless.
+
+Staging answers every response with `X-Robots-Tag: noindex,
+nofollow`;
+production sends `noindex` for any status ≥ 400 and `noindex, nofollow` for
+`/pay` and `/unsubscribe` (`routes/_middleware.ts`).
 
 ## OG link-preview images
 

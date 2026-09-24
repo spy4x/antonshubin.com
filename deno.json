@@ -2,8 +2,8 @@
   "nodeModulesDir": "manual",
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check && deno task test && deno task test:browser",
-    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno --ignore=test/lead-form.browser.test.ts,test/a11y.browser.test.ts,test/contrast.browser.test.ts,test/csp.browser.test.ts,test/sw-cache.browser.test.ts",
-    "test:browser": "deno test -A test/lead-form.browser.test.ts test/a11y.browser.test.ts test/contrast.browser.test.ts test/csp.browser.test.ts test/sw-cache.browser.test.ts",
+    "test": "deno task build && deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0 --allow-run=deno --ignore=test/lead-form.browser.test.ts,test/a11y.browser.test.ts,test/contrast.browser.test.ts,test/csp.browser.test.ts,test/sw-cache.browser.test.ts,test/visual-system.browser.test.ts",
+    "test:browser": "deno test -A test/lead-form.browser.test.ts test/a11y.browser.test.ts test/contrast.browser.test.ts test/csp.browser.test.ts test/sw-cache.browser.test.ts test/visual-system.browser.test.ts",
     "dev": "vite",
     "build": "vite build",
     "start": "deno serve -A _fresh/server.js",
@@ -17,6 +17,7 @@
     "video-kit": "deno run -A scripts/video-kit.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
+    "lcp": "deno run -A scripts/lcp.ts",
     "og": "deno run -A scripts/og-images.ts"
   },
   "lint": {

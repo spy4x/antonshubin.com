@@ -307,7 +307,7 @@ Deno.test("contact-me ships the booking facade behind #book, no iframe before a 
       '/contact-me: no element with id="book" found',
     );
     assert(
-      body.includes("Book a Free 30-min Intro Call"),
+      body.includes("Book a free 30-min intro call"),
       "/contact-me: booking heading not found",
     );
   } finally {
@@ -365,7 +365,7 @@ Deno.test("contact-me renders no #book section or link when SCHEDULE_URL is unse
       "/contact-me: a card still links to #book with SCHEDULE_URL unset",
     );
     assert(
-      !body.includes("Book a Free 30-min Intro Call"),
+      !body.includes("Book a free 30-min intro call"),
       "/contact-me: booking heading still rendered with SCHEDULE_URL unset",
     );
   } finally {

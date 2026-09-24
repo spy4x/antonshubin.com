@@ -3,7 +3,14 @@ import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
-import { ArrowRightIcon } from "../components/Icons.tsx";
+import {
+  ArrowRightIcon,
+  CalendarIcon,
+  KeyIcon,
+  ShieldIcon,
+  TargetIcon,
+  WrenchIcon,
+} from "../components/Icons.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
@@ -53,14 +60,14 @@ function FaqItem({ faq }: { faq: Faq }) {
   return (
     <details
       data-faq
-      class="bg-gray-800 rounded-xl border border-gray-700 p-4 group open:border-orange-500 transition-colors"
+      class="bg-paper rounded-xl border border-rule p-4 group open:border-accent transition-colors"
     >
-      <summary class="text-white font-medium cursor-pointer list-none flex items-center justify-between">
+      <summary class="text-parchment font-medium cursor-pointer list-none flex items-center justify-between">
         <span>{faq.q}</span>
         <svg
           aria-hidden="true"
           focusable="false"
-          class="w-5 h-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform"
+          class="w-5 h-5 text-graphite shrink-0 group-open:rotate-180 transition-transform"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -74,11 +81,11 @@ function FaqItem({ faq }: { faq: Faq }) {
           />
         </svg>
       </summary>
-      <p class="text-gray-400 text-sm mt-3 leading-relaxed">{faq.a}</p>
+      <p class="text-graphite text-sm mt-3 leading-relaxed">{faq.a}</p>
       {faq.link && (
         <a
           href={faq.link.href}
-          class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 underline text-sm mt-2"
+          class="inline-flex items-center gap-1 text-accent hover:text-accent underline text-sm mt-2"
         >
           {faq.link.label}
           <ArrowRightIcon class="w-4 h-4" />
@@ -89,7 +96,7 @@ function FaqItem({ faq }: { faq: Faq }) {
 }
 
 interface PolicyItem {
-  icon: string;
+  icon: "shield" | "target" | "key" | "calendar" | "wrench";
   title: string;
   desc: string;
   why: string;
@@ -98,39 +105,39 @@ interface PolicyItem {
 
 const policies: PolicyItem[] = [
   {
-    icon: "🛡️",
-    title: "Five-Day Refund",
+    icon: "shield",
+    title: "Five-day refund",
     desc:
       "If in the first five days you feel this is not working, tell me and I refund what you paid.",
     why:
       "In fifteen years the few engagements that needed a refund all showed it within two or three days, so five days is a promise I can keep.",
   },
   {
-    icon: "🎯",
-    title: "A Small First Milestone",
+    icon: "target",
+    title: "A small first milestone",
     desc:
       "We start with one or two weeks of work. If either of us wants to stop at the end of it, we stop — you keep everything built so far.",
     why:
       "You don't have to commit to months of work before we know the collaboration is right.",
   },
   {
-    icon: "🔑",
-    title: "You Own Everything From Day One",
+    icon: "key",
+    title: "You own everything from day one",
     desc: "Code, accounts, servers and keys are in your name.",
     why:
       "Your product is your asset. Nothing about how I work should get in the way of you taking it wherever you need it.",
   },
   {
-    icon: "🗓️",
-    title: "Weekly Working Software",
+    icon: "calendar",
+    title: "Weekly working software",
     desc:
       "You see working software every week, with a short written update. Calls when they help, not on a schedule for its own sake.",
     why:
       "You always know where the project stands, without sitting through meetings that do not move it forward.",
   },
   {
-    icon: "🔧",
-    title: "Free Bug Fixes for 30 Days",
+    icon: "wrench",
+    title: "Free bug fixes for 30 days",
     desc: "Bugs in what I delivered are fixed free for 30 days.",
     why:
       "I stand behind what I build. If something I shipped breaks, I fix it on my time, not yours.",
@@ -168,10 +175,10 @@ export default define.page(function HowIWork() {
         }}
       />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <h1 class="text-3xl sm:text-4xl font-bold text-white text-center mb-2">
-          How I Deliver
+        <h1 class="text-3xl sm:text-4xl font-bold text-parchment text-center mb-2">
+          How I deliver
         </h1>
-        <p class="text-gray-400 text-center mb-10 sm:mb-12 text-base sm:text-lg">
+        <p class="text-graphite text-center mb-10 sm:mb-12 text-base sm:text-lg">
           Five promises, no fine print.
         </p>
 
@@ -180,19 +187,25 @@ export default define.page(function HowIWork() {
             <div
               key={i}
               data-promise
-              class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-4"
+              class="bg-paper rounded-xl border border-rule p-3 sm:p-4"
             >
               <div class="flex items-start gap-4 sm:gap-6">
-                <div class="text-3xl shrink-0 mt-1">{p.icon}</div>
+                <div class="shrink-0 mt-1 text-accent">
+                  {p.icon === "shield" && <ShieldIcon class="w-7 h-7" />}
+                  {p.icon === "target" && <TargetIcon class="w-7 h-7" />}
+                  {p.icon === "key" && <KeyIcon class="w-7 h-7" />}
+                  {p.icon === "calendar" && <CalendarIcon class="w-7 h-7" />}
+                  {p.icon === "wrench" && <WrenchIcon class="w-7 h-7" />}
+                </div>
                 <div class="min-w-0">
-                  <h2 class="text-xl font-semibold text-white mb-2">
+                  <h2 class="text-xl font-semibold text-parchment mb-2">
                     {p.title}
                   </h2>
-                  <p class="text-gray-300 text-sm sm:text-base leading-relaxed mb-3">
+                  <p class="text-graphite text-sm sm:text-base leading-relaxed mb-3">
                     {p.desc}
                   </p>
-                  <p class="text-gray-400 text-base leading-relaxed border-l-2 border-gray-600 pl-3">
-                    <span class="text-orange-400 font-medium">
+                  <p class="text-graphite text-base leading-relaxed border-l-2 border-rule-strong pl-3">
+                    <span class="text-accent font-medium">
                       Why this matters:
                     </span>{" "}
                     {p.why}
@@ -200,7 +213,7 @@ export default define.page(function HowIWork() {
                   {p.link && (
                     <a
                       href={p.link}
-                      class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium mt-3"
+                      class="inline-flex items-center gap-1 text-accent hover:text-accent hover:underline transition-colors text-sm font-medium mt-3"
                     >
                       View details and pricing
                       <ArrowRightIcon class="w-4 h-4" />
@@ -212,36 +225,36 @@ export default define.page(function HowIWork() {
           ))}
         </div>
 
-        <p class="text-gray-400 text-center max-w-2xl mx-auto mt-8 text-sm sm:text-base">
+        <p class="text-graphite text-center max-w-2xl mx-auto mt-8 text-sm sm:text-base">
           Pricing: fixed price when the scope is fixed, hourly when the work is
           open-ended. A change to scope gets a quote before I start on it.
         </p>
 
         <section id="ai-augmented" class="mt-16 scroll-mt-4">
-          <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">
-            AI-Augmented Execution
+          <h2 class="text-2xl sm:text-3xl font-bold text-parchment text-center mb-2">
+            AI-augmented execution
           </h2>
-          <p class="text-gray-400 text-center mb-8 text-base">
+          <p class="text-graphite text-center mb-8 text-base">
             Human-owned architecture + spec-driven development. Two rules I
             keep, two alternatives I avoid.
           </p>
           <div class="grid gap-5 md:grid-cols-2">
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
-              <h3 class="text-base font-semibold text-white mb-2">
+            <div class="p-4 bg-paper rounded-xl border border-rule">
+              <h3 class="text-base font-semibold text-parchment mb-2">
                 What "human-owned" means
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 Every architectural decision is made by me, not by a model. I
                 draft specs, choose stacks, and own the system diagram. AI
                 assists with boilerplate, refactors, and test scaffolding — the
                 parts where consistency matters more than judgement.
               </p>
             </div>
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
-              <h3 class="text-base font-semibold text-white mb-2">
+            <div class="p-4 bg-paper rounded-xl border border-rule">
+              <h3 class="text-base font-semibold text-parchment mb-2">
                 What "spec-driven" means
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 Every change starts as a written spec — a brief paragraph on
                 intent, edge cases, and acceptance criteria. Code follows the
                 spec, not the other way around. If the spec changes, the diff
@@ -249,14 +262,14 @@ export default define.page(function HowIWork() {
                 intent before implementation.
               </p>
             </div>
-            <div class="p-4 bg-gray-800 rounded-xl border border-orange-900/40">
-              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+            <div class="p-4 bg-paper rounded-xl border border-accent/40">
+              <p class="text-xs uppercase tracking-wide text-accent font-semibold mb-2">
                 Vs vibe-coding
               </p>
-              <h3 class="text-base font-semibold text-white mb-2">
+              <h3 class="text-base font-semibold text-parchment mb-2">
                 What "AI owns the architecture" looks like
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 Ask an LLM to "build me a SaaS", paste the output, ship it. No
                 system diagram. No stack rationale. Three weeks in: tech debt
                 the model can't see, dependencies it picked for vibes, auth
@@ -264,14 +277,14 @@ export default define.page(function HowIWork() {
                 decisions in it.
               </p>
             </div>
-            <div class="p-4 bg-gray-800 rounded-xl border border-orange-900/40">
-              <p class="text-xs uppercase tracking-wide text-orange-400 font-semibold mb-2">
+            <div class="p-4 bg-paper rounded-xl border border-accent/40">
+              <p class="text-xs uppercase tracking-wide text-accent font-semibold mb-2">
                 Vs code-first
               </p>
-              <h3 class="text-base font-semibold text-white mb-2">
+              <h3 class="text-base font-semibold text-parchment mb-2">
                 What "ship now, spec later" looks like
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 Move fast, write code, document when there's time. There is no
                 time. Six months later, no one remembers why the auth flow skips
                 email verification for legacy users, or why that one table has
@@ -280,12 +293,12 @@ export default define.page(function HowIWork() {
               </p>
             </div>
           </div>
-          <p class="mt-6 text-gray-400 text-sm text-center">
+          <p class="mt-6 text-graphite text-sm text-center">
             Stack I work with: Deno, Preact, TypeScript, PostgreSQL, Docker,
             MCP, self-hosted infra. See{" "}
             <a
               href="/infrastructure"
-              class="inline-flex items-center gap-1 text-orange-400 hover:text-orange-300 underline font-medium"
+              class="inline-flex items-center gap-1 text-accent hover:text-accent underline font-medium"
             >
               my infrastructure setup
               <ArrowRightIcon class="w-4 h-4" />
@@ -296,10 +309,10 @@ export default define.page(function HowIWork() {
 
         {/* FAQ Section */}
         <section class="mt-16">
-          <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">
+          <h2 class="text-2xl sm:text-3xl font-bold text-parchment text-center mb-2">
             Frequently Asked Questions
           </h2>
-          <p class="text-gray-400 text-center mb-10 text-base">
+          <p class="text-graphite text-center mb-10 text-base">
             Honest answers to the questions I get most often.
           </p>
           <div class="space-y-4 max-w-3xl mx-auto">
@@ -315,14 +328,14 @@ export default define.page(function HowIWork() {
         {SCHEDULE_URL && (
           <div class="text-center mt-16">
             <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
-            <p class="mt-4 text-gray-400 text-sm">
+            <p class="mt-4 text-graphite text-sm">
               Or{" "}
               <a
                 href={SCHEDULE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-umami-event="meet-embed-fallback-click"
-                class="hover:text-orange-300 underline underline-offset-4"
+                class="hover:text-accent underline underline-offset-4"
               >
                 open standalone
                 <NewTabHint />

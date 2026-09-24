@@ -1,7 +1,7 @@
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
-import { ArrowRightIcon } from "../components/Icons.tsx";
+import { ArrowRightIcon, CheckIcon } from "../components/Icons.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { catalogPath } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
@@ -81,13 +81,13 @@ export default define.page(function Infrastructure() {
         />
 
         <header class="text-center mb-12 sm:mb-16">
-          <p class="text-sm font-semibold uppercase tracking-widest text-orange-400 mb-3">
+          <p class="text-sm font-semibold uppercase tracking-widest text-accent mb-3">
             Operational judgment, made visible
           </p>
-          <h1 class="text-3xl sm:text-5xl font-bold text-white text-balance mb-5">
+          <h1 class="text-3xl sm:text-5xl font-bold text-parchment text-balance mb-5">
             Production Infrastructure, Owned End to End
           </h1>
-          <p class="text-gray-300 text-base sm:text-xl leading-relaxed max-w-3xl mx-auto">
+          <p class="text-graphite text-base sm:text-xl leading-relaxed max-w-3xl mx-auto">
             Shipping the product is half the job. Deployment, observability,
             recovery, security, and cost controls need to be designed with it —
             so the business gets a system designed for operability after launch.
@@ -98,11 +98,11 @@ export default define.page(function Infrastructure() {
           <div class="mb-6">
             <h2
               id="operational-outcomes"
-              class="text-2xl sm:text-3xl font-bold text-white mb-3"
+              class="text-2xl sm:text-3xl font-bold text-parchment mb-3"
             >
               What ownership looks like in production
             </h2>
-            <p class="text-gray-400 text-base sm:text-lg leading-relaxed max-w-3xl">
+            <p class="text-graphite text-base sm:text-lg leading-relaxed max-w-3xl">
               Founders should not need to manage infrastructure. They should
               know how product risk is controlled, what happens when something
               fails, and whether another team can take over cleanly.
@@ -112,13 +112,16 @@ export default define.page(function Infrastructure() {
             {outcomes.map((outcome) => (
               <article
                 key={outcome.title}
-                class="bg-gray-800 rounded-xl border border-gray-700 p-5"
+                class="bg-paper rounded-xl border border-rule p-5"
               >
-                <h3 class="text-lg font-semibold text-white mb-2">
-                  <span class="text-orange-400" aria-hidden="true">✓</span>{" "}
+                <h3 class="text-lg font-semibold text-parchment mb-2">
+                  <CheckIcon
+                    class="w-4 h-4 inline text-accent"
+                    aria-hidden="true"
+                  />{" "}
                   {outcome.title}
                 </h3>
-                <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                <p class="text-graphite text-sm sm:text-base leading-relaxed">
                   {outcome.description}
                 </p>
               </article>
@@ -128,55 +131,55 @@ export default define.page(function Infrastructure() {
 
         <section
           aria-labelledby="workload-fit"
-          class="bg-gray-800 rounded-xl border border-gray-700 p-5 sm:p-7 mb-12 sm:mb-16"
+          class="bg-paper rounded-xl border border-rule p-5 sm:p-7 mb-12 sm:mb-16"
         >
           <h2
             id="workload-fit"
-            class="text-2xl sm:text-3xl font-bold text-white mb-3"
+            class="text-2xl sm:text-3xl font-bold text-parchment mb-3"
           >
             Infrastructure follows the workload
           </h2>
-          <p class="text-gray-300 leading-relaxed mb-6">
+          <p class="text-graphite leading-relaxed mb-6">
             There is no universal self-hosting template. Recommendation follows
             workload, team capability, compliance needs, recovery targets, and
             budget.
           </p>
           <div class="grid gap-4 lg:grid-cols-3 mb-6">
-            <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
-              <h3 class="text-lg font-semibold text-white mb-2">
+            <article class="bg-ink/50 rounded-lg border border-rule p-4">
+              <h3 class="text-lg font-semibold text-parchment mb-2">
                 Open-source, self-hostable — the default
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 FOSS preferred for cost discipline, performance, portability,
                 and auditability. Dedicated hardware on Hetzner when the
                 workload justifies it — single-tenant CPU, NVMe, predictable
                 cost.
               </p>
             </article>
-            <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
-              <h3 class="text-lg font-semibold text-white mb-2">
+            <article class="bg-ink/50 rounded-lg border border-rule p-4">
+              <h3 class="text-lg font-semibold text-parchment mb-2">
                 Managed cloud when the business calls for it
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 AWS, GCP, Supabase, and friends are the right choice when they
                 remove meaningful operational risk, satisfy compliance needs, or
                 let a small team move faster. Recommendation is workload-fit,
                 not ideology.
               </p>
             </article>
-            <article class="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
-              <h3 class="text-lg font-semibold text-white mb-2">
+            <article class="bg-ink/50 rounded-lg border border-rule p-4">
+              <h3 class="text-lg font-semibold text-parchment mb-2">
                 Hybrid when constraints differ
               </h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-graphite text-sm leading-relaxed">
                 Keep managed services where they remove risk while placing
                 stable workloads on dedicated hardware where control and
                 capacity matter more. Most production setups end up here.
               </p>
             </article>
           </div>
-          <p class="text-gray-300 leading-relaxed mb-3">Decision follows:</p>
-          <ul class="grid gap-2 sm:grid-cols-2 text-gray-400">
+          <p class="text-graphite leading-relaxed mb-3">Decision follows:</p>
+          <ul class="grid gap-2 sm:grid-cols-2 text-graphite">
             <li>— Compliance and data-control requirements</li>
             <li>— Elasticity and traffic patterns</li>
             <li>— User geography and latency</li>
@@ -190,11 +193,11 @@ export default define.page(function Infrastructure() {
           <div class="mb-6">
             <h2
               id="operational-proof"
-              class="text-2xl sm:text-3xl font-bold text-white mb-3"
+              class="text-2xl sm:text-3xl font-bold text-parchment mb-3"
             >
               Production and operational proof
             </h2>
-            <p class="text-gray-400 text-base sm:text-lg leading-relaxed max-w-3xl">
+            <p class="text-graphite text-base sm:text-lg leading-relaxed max-w-3xl">
               Client production work shows outcome ownership. Sanitized case
               studies make the operating practice concrete without exposing
               sensitive topology.
@@ -205,15 +208,15 @@ export default define.page(function Infrastructure() {
             <a
               href="/projects/smartlite"
               data-e2e="infrastructure-view-smartlite"
-              class="group min-h-44 rounded-xl border border-gray-700 bg-gray-800 p-5 transition-colors hover:border-orange-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+              class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              <p class="text-sm font-semibold text-orange-400 mb-2">
+              <p class="text-sm font-semibold text-accent mb-2">
                 Professional production proof
               </p>
-              <h3 class="text-xl font-semibold text-white mb-2 group-hover:text-orange-300">
+              <h3 class="text-xl font-semibold text-parchment mb-2 group-hover:text-accent">
                 SmartLite
               </h3>
-              <p class="text-gray-400 leading-relaxed">
+              <p class="text-graphite leading-relaxed">
                 End-to-end ownership of a live IoT control platform: product,
                 backend, infrastructure, deployment, observability, alerts, and
                 access controls.
@@ -222,15 +225,15 @@ export default define.page(function Infrastructure() {
             <a
               href="/projects/homelab"
               data-e2e="infrastructure-view-homelab"
-              class="group min-h-44 rounded-xl border border-gray-700 bg-gray-800 p-5 transition-colors hover:border-orange-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+              class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              <p class="text-sm font-semibold text-orange-400 mb-2">
+              <p class="text-sm font-semibold text-accent mb-2">
                 Operational engineering proof
               </p>
-              <h3 class="text-xl font-semibold text-white mb-2 group-hover:text-orange-300">
+              <h3 class="text-xl font-semibold text-parchment mb-2 group-hover:text-accent">
                 Production Infrastructure Lab
               </h3>
-              <p class="text-gray-400 leading-relaxed">
+              <p class="text-graphite leading-relaxed">
                 Reusable infrastructure as code showing versioned delivery,
                 monitoring, recovery tooling, and identity controls.
               </p>
@@ -241,30 +244,30 @@ export default define.page(function Infrastructure() {
             {proofAreas.map((area, index) => (
               <details
                 key={area.title}
-                class="group bg-gray-800 rounded-xl border border-gray-700 open:border-orange-500/50"
+                class="group bg-paper rounded-xl border border-rule open:border-accent/50"
               >
                 <summary
                   data-e2e={`infrastructure-proof-${index + 1}`}
-                  class="min-h-14 cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-inset rounded-xl"
+                  class="min-h-14 cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset rounded-xl"
                 >
                   <span class="flex items-start justify-between gap-4">
                     <span>
-                      <span class="block text-lg font-semibold text-white mb-1">
+                      <span class="block text-lg font-semibold text-parchment mb-1">
                         {area.title}
                       </span>
-                      <span class="block text-gray-400 text-sm sm:text-base leading-relaxed">
+                      <span class="block text-graphite text-sm sm:text-base leading-relaxed">
                         {area.summary}
                       </span>
                     </span>
                     <span
                       aria-hidden="true"
-                      class="text-orange-400 text-xl transition-transform group-open:rotate-45"
+                      class="text-accent text-xl transition-transform group-open:rotate-45"
                     >
                       +
                     </span>
                   </span>
                 </summary>
-                <div class="px-5 pb-5 text-gray-300 text-sm sm:text-base leading-relaxed border-t border-gray-700 pt-4">
+                <div class="px-5 pb-5 text-graphite text-sm sm:text-base leading-relaxed border-t border-rule pt-4">
                   {area.details}
                 </div>
               </details>
@@ -274,18 +277,18 @@ export default define.page(function Infrastructure() {
 
         <section
           aria-labelledby="discovery-heading"
-          class="bg-gray-800 rounded-xl border border-orange-500/40 p-5 sm:p-7 text-center"
+          class="bg-paper rounded-xl border border-accent/40 p-5 sm:p-7 text-center"
         >
-          <p class="text-sm font-semibold uppercase tracking-widest text-orange-400 mb-2">
+          <p class="text-sm font-semibold uppercase tracking-widest text-accent mb-2">
             Start with decisions, not vendors
           </p>
           <h2
             id="discovery-heading"
-            class="text-2xl sm:text-3xl font-bold text-white mb-3"
+            class="text-2xl sm:text-3xl font-bold text-parchment mb-3"
           >
             Map the operating model before committing to the build
           </h2>
-          <p class="text-gray-300 leading-relaxed max-w-2xl mx-auto mb-5">
+          <p class="text-graphite leading-relaxed max-w-2xl mx-auto mb-5">
             Every build I take on opens with a short discovery sprint: an
             architecture blueprint, the main risks, an operating-cost estimate,
             and a phased scope grounded in your product and team.
@@ -294,7 +297,7 @@ export default define.page(function Infrastructure() {
             <a
               href={catalogPath("zero-to-production-saas-mvp")}
               data-e2e="infrastructure-start-discovery"
-              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 transition-all duration-200"
+              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               See how a build starts
               <ArrowRightIcon class="w-5 h-5" />
@@ -302,7 +305,7 @@ export default define.page(function Infrastructure() {
             <a
               href="/#audit-form"
               data-e2e="infrastructure-request-audit"
-              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 transition-colors"
+              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Request a free audit
             </a>
@@ -311,7 +314,7 @@ export default define.page(function Infrastructure() {
               target="_blank"
               rel="noopener noreferrer"
               data-e2e="infrastructure-book-intro"
-              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 transition-colors"
+              class="min-h-11 justify-center gap-2 px-6 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-hover"
             >
               Book an intro call
             </BookCallLink>

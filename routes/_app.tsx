@@ -12,19 +12,32 @@ export default define.page(function App({ Component, req }) {
   const isCrawler = isBot(req.headers.get("user-agent") || "");
 
   return (
-    <html lang="en" class="h-full bg-slate-900">
+    <html lang="en" class="h-full bg-ink">
       <head>
         <meta charset="utf-8" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0"
         />
-        <meta name="theme-color" content="#0f172a" />
+        <meta name="theme-color" content="#15120f" />
 
         {/* Minimal critical CSS to prevent FOUC while CSS loads */}
         <style>
-          {`html,body{background-color:#0f172a}body{color:#e2e8f0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}
+          {`html,body{background-color:#15120f}body{color:#efebe2}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}
         </style>
+
+        {
+          /* No font preload (#184 review): measured, interleaved,
+            fresh-browser-per-sample comparisons proved both preloads made
+            the home page's LCP worse — CPU-only and slow-network alike —
+            even deprioritized with fetchpriority="low", because the home
+            page's actual LCP element is the hero <img fetchpriority="high">
+            below, not text, and any extra early request competes with it.
+            See scripts/lcp.ts's docs and the PR body for the numbers.
+            font-display: swap plus assets/styles.css's size-adjusted
+            fallback faces are what keep text visible immediately and the
+            layout stable once the real fonts arrive instead. */
+        }
 
         {/* Favicon + Apple Touch Icons (modern sizes only) */}
         <link
@@ -78,7 +91,7 @@ export default define.page(function App({ Component, req }) {
       <body class="h-full">
         <a
           href="#main-content"
-          class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-orange-600 focus:text-white focus:font-semibold"
+          class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-parchment focus:text-ink focus:font-semibold"
         >
           Skip to main content
         </a>
