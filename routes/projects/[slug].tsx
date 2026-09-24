@@ -11,6 +11,7 @@ import GhStars from "../../islands/GhStars.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
+import StatusMark from "../../components/StatusMark.tsx";
 
 function getAllProjects(): Project[] {
   return [...projects.my, ...projects.freelance];
@@ -104,13 +105,13 @@ export default define.page(function ProjectDetail(ctx) {
     return (
       <Layout currentPath={ctx.url.pathname}>
         <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-bold text-white mb-4">Not Found</h1>
-          <p class="text-gray-400 mb-6">
+          <h1 class="text-3xl font-bold text-parchment mb-4">Not Found</h1>
+          <p class="text-graphite mb-6">
             The project you're looking for does not exist.
           </p>
           <a
             href="/projects"
-            class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
           >
             ← Back to projects
           </a>
@@ -151,11 +152,11 @@ export default define.page(function ProjectDetail(ctx) {
           items={getBreadcrumb(head.value.canonical, project.title)}
         />
 
-        <article class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <article class="bg-paper rounded-xl border border-rule overflow-hidden">
           {/* ── Hero ──────────────────────────────────────────────────── */}
-          <header class="p-6 sm:p-8 border-b border-gray-700">
+          <header class="p-6 sm:p-8 border-b border-rule">
             {/* Logo plate */}
-            <div class="h-32 sm:h-40 mb-6 flex items-center justify-center bg-gray-900/60 rounded-lg overflow-hidden">
+            <div class="h-32 sm:h-40 mb-6 flex items-center justify-center bg-ink/60 rounded-lg overflow-hidden">
               {project.logoImageURL
                 ? (
                   <img
@@ -170,13 +171,13 @@ export default define.page(function ProjectDetail(ctx) {
                 ? (
                   <span
                     style={project.logoTextStyle}
-                    class="text-3xl sm:text-4xl font-semibold text-white"
+                    class="text-3xl sm:text-4xl font-semibold text-parchment"
                   >
                     {project.logoText}
                   </span>
                 )
                 : (
-                  <span class="text-white text-2xl sm:text-3xl font-bold">
+                  <span class="text-parchment text-2xl sm:text-3xl font-bold">
                     {project.title}
                   </span>
                 )}
@@ -184,7 +185,7 @@ export default define.page(function ProjectDetail(ctx) {
 
             {/* Eyebrow (built for / role) */}
             {(project.madeForName || project.role) && (
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs uppercase tracking-wide text-gray-500 mb-2">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs uppercase tracking-wide text-graphite mb-2">
                 {project.madeForName && (
                   <span>
                     Built for {project.madeForURL
@@ -192,14 +193,14 @@ export default define.page(function ProjectDetail(ctx) {
                         <a
                           href={project.madeForURL}
                           target="_blank"
-                          class="text-orange-400 hover:text-orange-300 normal-case tracking-normal font-medium"
+                          class="text-accent hover:text-accent normal-case tracking-normal font-medium"
                         >
                           {project.madeForName}
                           <NewTabHint />
                         </a>
                       )
                       : (
-                        <span class="text-orange-400 normal-case tracking-normal font-medium">
+                        <span class="text-accent normal-case tracking-normal font-medium">
                           {project.madeForName}
                         </span>
                       )}
@@ -208,7 +209,7 @@ export default define.page(function ProjectDetail(ctx) {
                 {project.role && (
                   <span>
                     Role{" "}
-                    <span class="text-gray-300 normal-case tracking-normal font-medium">
+                    <span class="text-graphite normal-case tracking-normal font-medium">
                       {project.role}
                     </span>
                   </span>
@@ -236,7 +237,7 @@ export default define.page(function ProjectDetail(ctx) {
                   <a
                     href={project.externalURL}
                     target="_blank"
-                    class="inline-flex items-baseline gap-2 text-3xl sm:text-4xl font-bold text-white hover:text-orange-400 transition-colors text-balance"
+                    class="inline-flex items-baseline gap-2 text-3xl sm:text-4xl font-bold text-parchment hover:text-accent transition-colors text-balance"
                   >
                     {project.title}
                     <NewTabHint />
@@ -259,7 +260,7 @@ export default define.page(function ProjectDetail(ctx) {
                   </a>
                 )
                 : (
-                  <h1 class="text-3xl sm:text-4xl font-bold text-white text-balance">
+                  <h1 class="text-3xl sm:text-4xl font-bold text-parchment text-balance">
                     {project.title}
                   </h1>
                 )}
@@ -268,34 +269,18 @@ export default define.page(function ProjectDetail(ctx) {
             {/* Status badges */}
             <div class="flex flex-wrap items-center gap-2 mb-6">
               {project.outcome && (
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/15 text-green-400 text-xs font-medium rounded-full">
-                  <svg
-                    aria-hidden="true"
-                    focusable="false"
-                    class="w-3.5 h-3.5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {project.outcome}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-lamp text-xs font-medium rounded-full">
+                  <StatusMark status="outcome" label={project.outcome} />
                 </span>
               )}
               {isClientProject && (
-                <span class="inline-flex items-center px-2.5 py-1 bg-blue-600/15 text-blue-400 text-xs font-medium rounded-full">
+                <span class="inline-flex items-center px-2.5 py-1 bg-lamp text-mist text-xs font-medium rounded-full">
                   Client project
                 </span>
               )}
               {project.archived && (
-                <span class="inline-flex items-center px-2.5 py-1 bg-gray-600 text-gray-300 text-xs font-medium rounded-full">
-                  Archived
+                <span class="inline-flex items-center px-2.5 py-1 bg-lamp text-xs font-medium rounded-full">
+                  <StatusMark status="archived" />
                 </span>
               )}
             </div>
@@ -305,7 +290,7 @@ export default define.page(function ProjectDetail(ctx) {
               {project.externalURL && (
                 project.externalURLDead
                   ? (
-                    <span class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-700 text-gray-400 rounded-lg text-sm">
+                    <span class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp text-graphite rounded-lg text-sm">
                       <svg
                         aria-hidden="true"
                         focusable="false"
@@ -330,7 +315,7 @@ export default define.page(function ProjectDetail(ctx) {
                       href={project.externalURL}
                       target="_blank"
                       data-umami-event={`project-cta-${project.slug}-external`}
-                      class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp hover:bg-rule-strong text-parchment rounded-lg text-sm font-medium transition-colors"
                     >
                       Visit project site
                       <svg
@@ -357,7 +342,7 @@ export default define.page(function ProjectDetail(ctx) {
                   href={`https://github.com/${project.ghRepo}`}
                   target="_blank"
                   data-umami-event={`project-cta-${project.slug}-github`}
-                  class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp hover:bg-rule-strong text-parchment rounded-lg text-sm font-medium transition-colors"
                 >
                   <svg
                     aria-hidden="true"
@@ -377,26 +362,26 @@ export default define.page(function ProjectDetail(ctx) {
           </header>
 
           {/* ── About ────────────────────────────────────────────────── */}
-          <section class="p-6 sm:p-8 border-b border-gray-700">
-            <h2 class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-4">
+          <section class="p-6 sm:p-8 border-b border-rule">
+            <h2 class="text-xs uppercase tracking-wider text-graphite font-semibold mb-4">
               About
             </h2>
-            <div class="space-y-4 text-gray-300 leading-relaxed text-base">
+            <div class="space-y-4 text-graphite leading-relaxed text-base">
               {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
             </div>
           </section>
 
           {/* ── Tech tags ─────────────────────────────────────────────── */}
           {project.tags && project.tags.length > 0 && (
-            <section class="p-6 sm:p-8 border-b border-gray-700">
-              <h2 class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-4">
+            <section class="p-6 sm:p-8 border-b border-rule">
+              <h2 class="text-xs uppercase tracking-wider text-graphite font-semibold mb-4">
                 Built with
               </h2>
               <div class="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    class="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm"
+                    class="px-3 py-1 bg-lamp text-graphite rounded-full text-sm"
                   >
                     {tag}
                   </span>
@@ -407,11 +392,11 @@ export default define.page(function ProjectDetail(ctx) {
 
           {/* ── Video ─────────────────────────────────────────────────── */}
           {project.videoURL && (
-            <section class="p-6 sm:p-8 border-b border-gray-700">
-              <h2 class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-4">
+            <section class="p-6 sm:p-8 border-b border-rule">
+              <h2 class="text-xs uppercase tracking-wider text-graphite font-semibold mb-4">
                 Video overview
               </h2>
-              <div class="aspect-video rounded-lg overflow-hidden bg-gray-900">
+              <div class="aspect-video rounded-lg overflow-hidden bg-ink">
                 <iframe
                   src={project.videoURL}
                   title={`Video overview: ${project.title}`}
@@ -426,8 +411,8 @@ export default define.page(function ProjectDetail(ctx) {
 
           {/* ── Screenshots ───────────────────────────────────────────── */}
           {project.screenshotURLs && project.screenshotURLs.length > 0 && (
-            <section class="p-6 sm:p-8 border-b border-gray-700">
-              <h2 class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-4">
+            <section class="p-6 sm:p-8 border-b border-rule">
+              <h2 class="text-xs uppercase tracking-wider text-graphite font-semibold mb-4">
                 Screenshots ({project.screenshotURLs.length})
               </h2>
               <ImageGallery images={projectScreenshots(project)} />
@@ -435,13 +420,13 @@ export default define.page(function ProjectDetail(ctx) {
           )}
 
           {/* ── Footer CTA ────────────────────────────────────────────── */}
-          <footer class="px-6 sm:px-8 py-6 bg-gray-900/50">
+          <footer class="px-6 sm:px-8 py-6 bg-ink/50">
             <div class="flex flex-wrap items-center justify-between gap-4">
               <div class="flex flex-wrap items-stretch gap-3">
                 <a
                   href="/contact-me"
                   data-umami-event={`project-cta-${project.slug}-contact`}
-                  class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                  class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors"
                 >
                   Start a similar project
                 </a>
@@ -449,7 +434,7 @@ export default define.page(function ProjectDetail(ctx) {
                   url={SCHEDULE_URL}
                   target="_blank"
                   data-umami-event={`project-cta-${project.slug}-schedule`}
-                  class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors"
+                  class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg shadow transition-colors"
                 >
                   Book a free intro call
                 </BookCallLink>
@@ -457,7 +442,7 @@ export default define.page(function ProjectDetail(ctx) {
               <a
                 href="/how-i-work"
                 data-umami-event={`project-cta-${project.slug}-how-i-work`}
-                class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium text-sm"
               >
                 How I work
                 <svg
@@ -485,7 +470,7 @@ export default define.page(function ProjectDetail(ctx) {
         <div class="mt-6 text-center">
           <a
             href="/projects"
-            class="inline-flex items-center gap-2 text-gray-400 hover:text-orange-400 transition-colors text-sm font-medium"
+            class="inline-flex items-center gap-2 text-graphite hover:text-accent transition-colors text-sm font-medium"
           >
             ← All projects
           </a>

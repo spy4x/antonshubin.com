@@ -40,7 +40,7 @@ export default function NewsletterForm() {
     >
       {status === "done"
         ? (
-          <span class="px-3 py-2 bg-green-600/20 text-green-400 text-sm font-medium rounded-lg">
+          <span class="px-3 py-2 bg-sage/15 text-sage text-sm font-medium rounded-lg">
             Subscribed! Check your inbox.
           </span>
         )
@@ -57,12 +57,12 @@ export default function NewsletterForm() {
               aria-describedby={status === "error"
                 ? "newsletter-form-error"
                 : undefined}
-              class="flex-1 min-w-[200px] px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-orange-500"
+              class="flex-1 min-w-[200px] px-3 py-2 bg-ink border border-rule-strong rounded-lg text-parchment text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
             />
             <button
               type="submit"
               disabled={status === "loading"}
-              class="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+              class="px-4 py-2 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
             >
               {status === "loading" ? "..." : "Subscribe"}
             </button>
@@ -70,7 +70,7 @@ export default function NewsletterForm() {
               <p
                 id="newsletter-form-error"
                 role="alert"
-                class="w-full text-red-400 text-xs mt-1"
+                class="w-full text-brick text-xs mt-1"
               >
                 {msg}
               </p>

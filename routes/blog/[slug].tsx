@@ -84,13 +84,13 @@ export default define.page(function BlogArticle(ctx) {
     return (
       <Layout currentPath={ctx.url.pathname}>
         <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-bold text-white mb-4">Not Found</h1>
-          <p class="text-gray-400 mb-6">
+          <h1 class="text-3xl font-bold text-parchment mb-4">Not Found</h1>
+          <p class="text-graphite mb-6">
             The article you're looking for does not exist.
           </p>
           <a
             href="/blog"
-            class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
           >
             ← Back to blog
           </a>
@@ -151,9 +151,9 @@ export default define.page(function BlogArticle(ctx) {
           items={getBreadcrumb(head.value.canonical, article.title)}
         />
 
-        <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <div class="bg-paper rounded-xl border border-rule overflow-hidden">
           {/* Preview image */}
-          <div class="aspect-video overflow-hidden bg-gray-700">
+          <div class="aspect-video overflow-hidden bg-lamp">
             <img
               src={`/img/blog/${article.slug}/${article.previewImageURL}`}
               alt={article.title}
@@ -166,9 +166,9 @@ export default define.page(function BlogArticle(ctx) {
             {/* Tag */}
             {article.category && (() => {
               const colors: Record<string, string> = {
-                "startups": "bg-orange-600/15 text-orange-400",
-                "dev-tips": "bg-blue-600/15 text-blue-400",
-                "personal": "bg-gray-600/15 text-gray-400",
+                "startups": "bg-lamp text-accent",
+                "dev-tips": "bg-mist/15 text-mist",
+                "personal": "bg-rule-strong/15 text-graphite",
               };
               const labels: Record<string, string> = {
                 "startups": "Startups",
@@ -188,7 +188,7 @@ export default define.page(function BlogArticle(ctx) {
 
             {/* Article meta */}
             {/* Article meta */}
-            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-4">
+            <div class="flex flex-wrap items-center gap-3 text-sm text-graphite mb-4">
               <span>{prettyDate(article.publishedAt)}</span>
               <span>·</span>
               <span class="inline-flex items-center gap-1">
@@ -212,10 +212,10 @@ export default define.page(function BlogArticle(ctx) {
               </span>
             </div>
 
-            <h1 class="text-2xl sm:text-3xl font-bold text-white mb-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-parchment mb-4">
               {article.title}
             </h1>
-            <p class="text-gray-400 text-base sm:text-lg leading-relaxed mb-8">
+            <p class="text-graphite text-base sm:text-lg leading-relaxed mb-8">
               {article.description}
             </p>
 
@@ -236,21 +236,21 @@ export default define.page(function BlogArticle(ctx) {
             )}
 
             {/* Divider */}
-            <div class="h-px bg-gray-700 mb-8" />
+            <div class="h-px bg-lamp mb-8" />
 
             {/* Article content */}
             {content
               ? (
                 <>
                   <div
-                    class="blog-content text-gray-200 leading-relaxed"
+                    class="blog-content text-parchment leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: content }}
                   />
                   <BlogImageEnhancer />
                 </>
               )
               : (
-                <p class="text-gray-400">
+                <p class="text-graphite">
                   Content not available. Please check back later.
                 </p>
               )}
@@ -258,23 +258,23 @@ export default define.page(function BlogArticle(ctx) {
 
           {/* Related posts — same category interlinking */}
           {related && related.length > 0 && (
-            <div class="px-4 pt-6 pb-4 bg-gray-800 border-t border-gray-700">
-              <h3 class="text-base font-semibold text-gray-400 mb-4">
+            <div class="px-4 pt-6 pb-4 bg-paper border-t border-rule">
+              <h3 class="text-base font-semibold text-graphite mb-4">
                 Read next
               </h3>
               <div class="grid gap-3 sm:grid-cols-2">
                 {related.map((r) => (
                   <a
                     href={`/blog/${r.slug}`}
-                    class="block p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group"
+                    class="block p-4 bg-ink/50 rounded-lg hover:bg-ink transition-colors group"
                   >
-                    <p class="text-white text-sm font-medium group-hover:text-orange-400 transition-colors leading-snug mb-1">
+                    <p class="text-parchment text-sm font-medium group-hover:text-accent transition-colors leading-snug mb-1">
                       {r.title}
                     </p>
-                    <p class="text-gray-500 text-xs line-clamp-2">
+                    <p class="text-graphite text-xs line-clamp-2">
                       {r.description}
                     </p>
-                    <p class="text-gray-400 text-xs mt-1.5">
+                    <p class="text-graphite text-xs mt-1.5">
                       {r.readTime} min read
                     </p>
                   </a>
@@ -285,14 +285,14 @@ export default define.page(function BlogArticle(ctx) {
 
           {/* Previous / Next article navigation */}
           {(prev || next) && (
-            <div class="grid gap-4 sm:grid-cols-2 p-4 bg-gray-800 border-t border-gray-700">
+            <div class="grid gap-4 sm:grid-cols-2 p-4 bg-paper border-t border-rule">
               {prev
                 ? (
                   <a
                     href={`/blog/${prev.slug}`}
-                    class="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group"
+                    class="flex items-center gap-4 p-4 bg-ink/50 rounded-lg hover:bg-ink transition-colors group"
                   >
-                    <div class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-700">
+                    <div class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-lamp">
                       <img
                         src={`/img/blog/${prev.slug}/${prev.previewImageURL}`}
                         alt={prev.title}
@@ -301,8 +301,8 @@ export default define.page(function BlogArticle(ctx) {
                       />
                     </div>
                     <div class="min-w-0">
-                      <p class="text-gray-500 text-sm mb-1">← Previous</p>
-                      <p class="text-white text-base font-medium group-hover:text-orange-400 transition-colors">
+                      <p class="text-graphite text-sm mb-1">← Previous</p>
+                      <p class="text-parchment text-base font-medium group-hover:text-accent transition-colors">
                         {prev.title}
                       </p>
                     </div>
@@ -313,9 +313,9 @@ export default define.page(function BlogArticle(ctx) {
                 ? (
                   <a
                     href={`/blog/${next.slug}`}
-                    class="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group sm:text-right sm:flex-row-reverse"
+                    class="flex items-center gap-4 p-4 bg-ink/50 rounded-lg hover:bg-ink transition-colors group sm:text-right sm:flex-row-reverse"
                   >
-                    <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-700">
+                    <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-lamp">
                       <img
                         src={`/img/blog/${next.slug}/${next.previewImageURL}`}
                         alt={next.title}
@@ -324,8 +324,8 @@ export default define.page(function BlogArticle(ctx) {
                       />
                     </div>
                     <div class="min-w-0">
-                      <p class="text-gray-500 text-xs mb-1">Next →</p>
-                      <p class="text-white text-sm font-medium truncate group-hover:text-orange-400 transition-colors">
+                      <p class="text-graphite text-xs mb-1">Next →</p>
+                      <p class="text-parchment text-sm font-medium truncate group-hover:text-accent transition-colors">
                         {next.title}
                       </p>
                     </div>
@@ -336,9 +336,9 @@ export default define.page(function BlogArticle(ctx) {
           )}
 
           {/* Share buttons */}
-          <div class="px-8 py-4 bg-gray-800 border-t border-gray-700">
+          <div class="px-8 py-4 bg-paper border-t border-rule">
             <div class="flex flex-wrap items-center gap-3">
-              <span class="text-gray-500 text-sm font-medium">Share:</span>
+              <span class="text-graphite text-sm font-medium">Share:</span>
               <a
                 href={`https://twitter.com/intent/tweet?text=${
                   encodeURIComponent(`"${article.title}" by @antonshubin`)
@@ -348,7 +348,7 @@ export default define.page(function BlogArticle(ctx) {
                   )
                 }`}
                 target="_blank"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lamp hover:bg-rule-strong text-graphite text-sm rounded-lg transition-colors"
                 aria-label="Share on Twitter (opens in a new tab)"
               >
                 <svg
@@ -369,7 +369,7 @@ export default define.page(function BlogArticle(ctx) {
                   )
                 }`}
                 target="_blank"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lamp hover:bg-rule-strong text-graphite text-sm rounded-lg transition-colors"
                 aria-label="Share on LinkedIn (opens in a new tab)"
               >
                 <svg
@@ -391,7 +391,7 @@ export default define.page(function BlogArticle(ctx) {
                     `I thought you'd find this interesting:\n\n${article.title}\n\nhttps://antonshubin.com/blog/${article.slug}?utm_source=email&utm_medium=social&utm_campaign=blog-share`,
                   )
                 }`}
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lamp hover:bg-rule-strong text-graphite text-sm rounded-lg transition-colors"
                 aria-label="Share via email"
               >
                 <svg
@@ -411,24 +411,24 @@ export default define.page(function BlogArticle(ctx) {
           </div>
 
           {/* Newsletter signup */}
-          <div class="px-8 py-5 bg-gray-800 border-t border-gray-700">
+          <div class="px-8 py-5 bg-paper border-t border-rule">
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <span class="text-gray-300 text-sm font-medium shrink-0">
+              <span class="text-graphite text-sm font-medium shrink-0">
                 Get new posts via email:
               </span>
               <NewsletterForm />
             </div>
-            <p class="text-gray-400 text-xs mt-2">
+            <p class="text-graphite text-xs mt-2">
               No spam. Unsubscribe anytime.
             </p>
           </div>
 
           {/* Footer CTA */}
-          <div class="px-8 py-6 bg-gray-900/50 border-t border-gray-700">
+          <div class="px-8 py-6 bg-ink/50 border-t border-rule">
             <div class="flex flex-wrap items-center justify-between gap-4">
               <a
                 href="/blog"
-                class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium text-sm"
               >
                 ← All articles
               </a>
@@ -436,13 +436,13 @@ export default define.page(function BlogArticle(ctx) {
                 <BookCallLink
                   url={SCHEDULE_URL}
                   target="_blank"
-                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold rounded-lg shadow transition-colors"
+                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-accent text-ink hover:bg-accent-hover text-sm font-semibold rounded-lg transition-colors"
                 >
                   Book a free intro call
                 </BookCallLink>
                 <a
                   href="/catalog"
-                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded-lg shadow transition-colors"
+                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-lamp hover:bg-rule-strong text-parchment text-sm font-semibold rounded-lg shadow transition-colors"
                 >
                   View services
                 </a>

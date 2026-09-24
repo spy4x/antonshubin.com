@@ -78,7 +78,7 @@ export default function MeetEmbed({ url }: MeetEmbedProps) {
         type="button"
         onClick={() => loaded.value = true}
         data-umami-event="meet-embed-click-to-load"
-        class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+        class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-hover"
       >
         <CalendarIcon class="w-5 h-5" />
         Book a free 30-min intro call

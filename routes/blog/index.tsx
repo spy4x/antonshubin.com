@@ -19,9 +19,9 @@ const TAG_LABELS: Record<string, string> = {
 };
 
 const TAG_COLORS: Record<string, string> = {
-  startups: "bg-orange-600/15 text-orange-400",
-  "dev-tips": "bg-blue-600/15 text-blue-400",
-  personal: "bg-gray-600/15 text-gray-400",
+  startups: "bg-lamp text-accent",
+  "dev-tips": "bg-mist/15 text-mist",
+  personal: "bg-rule-strong/15 text-graphite",
 };
 
 export default define.page(function Blog(ctx) {
@@ -47,8 +47,8 @@ export default define.page(function Blog(ctx) {
         items={getBreadcrumb(head.value.canonical, head.value.title)}
       />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Blog</h1>
-        <p class="text-gray-400 mb-8 text-base sm:text-lg">
+        <h1 class="text-3xl sm:text-4xl font-bold text-parchment mb-2">Blog</h1>
+        <p class="text-graphite mb-8 text-base sm:text-lg">
           Architecture insights, SaaS lessons, and production patterns from 80+
           shipped projects.
         </p>
@@ -60,14 +60,14 @@ export default define.page(function Blog(ctx) {
             const href = t.key === "all" ? "/blog" : `/blog?tab=${t.key}`;
             return active
               ? (
-                <span class="px-4 py-1.5 rounded-full bg-orange-600 text-white text-sm font-medium transition-colors">
+                <span class="px-4 py-1.5 rounded-full bg-lamp text-parchment text-sm font-medium transition-colors">
                   {t.label}
                 </span>
               )
               : (
                 <a
                   href={href}
-                  class="px-4 py-1.5 rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600 text-sm transition-colors"
+                  class="px-4 py-1.5 rounded-full bg-lamp text-graphite hover:bg-rule-strong text-sm transition-colors"
                 >
                   {t.label}
                 </a>
@@ -81,10 +81,10 @@ export default define.page(function Blog(ctx) {
             <a
               key={article.slug}
               href={`/blog/${article.slug}`}
-              class="block p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-all group"
+              class="block p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-all group"
             >
               <div class="flex flex-col sm:flex-row gap-5">
-                <div class="w-full sm:w-48 h-32 shrink-0 rounded-lg overflow-hidden bg-gray-700">
+                <div class="w-full sm:w-48 h-32 shrink-0 rounded-lg overflow-hidden bg-lamp">
                   <img
                     src={`/img/blog/${article.slug}/${article.previewImageURL}`}
                     alt={article.title}
@@ -104,13 +104,13 @@ export default define.page(function Blog(ctx) {
                       </span>
                     )}
                   </div>
-                  <h2 class="text-lg sm:text-xl font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+                  <h2 class="text-lg sm:text-xl font-semibold text-parchment group-hover:text-accent transition-colors mb-2">
                     {article.title}
                   </h2>
-                  <p class="text-gray-400 text-sm leading-relaxed mb-3">
+                  <p class="text-graphite text-sm leading-relaxed mb-3">
                     {article.description}
                   </p>
-                  <div class="flex items-center gap-3 text-xs text-gray-500">
+                  <div class="flex items-center gap-3 text-xs text-graphite">
                     <span class="inline-flex items-center gap-1">
                       <svg
                         aria-hidden="true"
@@ -143,7 +143,7 @@ export default define.page(function Blog(ctx) {
         <div class="mt-10 text-center">
           <a
             href="/rss.xml"
-            class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors text-sm font-medium"
           >
             <svg
               aria-hidden="true"

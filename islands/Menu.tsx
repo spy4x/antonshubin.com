@@ -71,15 +71,15 @@ export default function Menu(
   const linkClass = (href: string) =>
     `block px-3 py-2 rounded-md text-base font-medium ${
       isActive(href)
-        ? "bg-orange-600 text-white"
-        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        ? "bg-lamp text-parchment"
+        : "text-graphite hover:bg-lamp hover:text-parchment"
     }`;
 
   const desktopLinkClass = (href: string) =>
     `flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium ${
       isActive(href)
-        ? "bg-orange-600 text-white"
-        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        ? "bg-lamp text-parchment"
+        : "text-graphite hover:bg-lamp hover:text-parchment"
     }`;
 
   return (
@@ -98,13 +98,13 @@ export default function Menu(
       <nav
         id="menu"
         aria-label="Main"
-        class="bg-gray-800 fixed inset-x-0 bottom-0 z-30 whitespace-nowrap sm:fixed sm:origin-top-left sm:-rotate-90 sm:translate-y-full sm:border-b sm:border-gray-700"
+        class="bg-paper fixed inset-x-0 bottom-0 z-30 whitespace-nowrap sm:fixed sm:origin-top-left sm:-rotate-90 sm:translate-y-full sm:border-b sm:border-rule"
       >
         {/* Mobile menu content */}
         {isOpen.value && (
           <div
             id="mobile-menu"
-            class="border-t border-gray-700 sm:hidden"
+            class="border-t border-rule sm:hidden"
           >
             <div class="px-4 py-3 space-y-1">
               {links.map((link) => (
@@ -123,7 +123,7 @@ export default function Menu(
         )}
 
         {/* Bottom bar */}
-        <div class="max-w-7xl mx-auto px-2 border-t border-gray-700 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-2 border-t border-rule sm:px-6 lg:px-8">
           <div class="relative flex items-center justify-between h-16">
             {/* Mobile menu button */}
             <div class="absolute inset-y-0 right-0 flex items-center sm:hidden">
@@ -132,7 +132,7 @@ export default function Menu(
                 type="button"
                 aria-expanded={isOpen.value}
                 aria-controls={isOpen.value ? "mobile-menu" : undefined}
-                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                class="inline-flex items-center justify-center p-2 rounded-md text-graphite hover:text-parchment hover:bg-lamp focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
                 onClick={toggleMenu}
               >
                 <span class="sr-only">
@@ -152,7 +152,7 @@ export default function Menu(
                     class="flex items-center"
                   >
                     <img
-                      class="h-10 w-10 rounded-full border border-gray-100 sm:rotate-90"
+                      class="h-10 w-10 rounded-full border border-rule-strong sm:rotate-90"
                       src="/img/photo-64.webp"
                       alt="Photo of Anton Shubin"
                       width="40"
@@ -162,7 +162,7 @@ export default function Menu(
                 </div>
                 <button
                   type="button"
-                  class="text-white text-xl ml-3 justify-self-center sm:hidden"
+                  class="text-parchment text-xl ml-3 justify-self-center sm:hidden"
                   onClick={toggleMenu}
                 >
                   Menu

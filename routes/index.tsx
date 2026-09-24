@@ -62,17 +62,17 @@ export default define.page(function Home(ctx) {
         <section data-home-section="hero" class="mb-16 md:mb-24">
           <div class="flex flex-col lg:flex-row lg:items-center lg:gap-12">
             <div class="flex-1 mb-8 lg:mb-0">
-              <h1 class="text-4xl font-bold text-gray-100 mb-6 sm:text-5xl">
+              <h1 class="text-4xl font-bold text-parchment mb-6 sm:text-5xl">
                 Anton Shubin — {ROLE}
               </h1>
-              <p class="text-base text-gray-300 sm:text-lg md:text-xl mb-4">
+              <p class="text-base text-graphite sm:text-lg md:text-xl mb-4">
                 I build and run SaaS products{" "}
-                <span class="text-white font-semibold bg-orange-600 px-2 py-0.5 rounded-md whitespace-nowrap">
+                <span class="text-accent font-semibold whitespace-nowrap">
                   end to end
                 </span>
                 {", and you own the code, the servers and the keys from day one."}
               </p>
-              <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+              <p class="text-sm sm:text-base text-graphite leading-relaxed">
                 Fixed price when the scope is fixed, hourly when it's
                 open-ended. A change to the scope gets a quote before I start on
                 it.
@@ -85,17 +85,17 @@ export default define.page(function Home(ctx) {
                   rel="noopener noreferrer"
                   data-umami-event="hero-book-call"
                   data-e2e="hero-book-call"
-                  class="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200 text-base"
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors text-base"
                 >
                   <CalendarIcon class="w-5 h-5" />
                   Book a {INTRO_CALL}
                 </BookCallLink>
-                <p class="mt-3 text-sm text-gray-400">
+                <p class="mt-3 text-sm text-graphite">
                   {SCHEDULE_URL && "Rather write? "}
                   <a
                     href="#audit-form"
                     data-umami-event="hero-audit-link"
-                    class="text-orange-400 hover:text-orange-300 underline underline-offset-4"
+                    class="text-accent hover:text-accent underline underline-offset-4"
                   >
                     Get a free written audit
                   </a>
@@ -142,23 +142,23 @@ export default define.page(function Home(ctx) {
             {proofNumbers.map((n) => (
               <div
                 key={n.label}
-                class="p-3 sm:p-4 bg-gray-800 rounded-xl border border-gray-700 group-hover:border-orange-500 transition-colors text-center"
+                class="p-3 sm:p-4 bg-paper rounded-xl border border-rule group-hover:border-accent transition-colors text-center"
               >
-                <p class="text-2xl sm:text-4xl font-bold text-white">
+                <p class="text-2xl sm:text-4xl font-bold text-parchment">
                   {n.value}
                 </p>
-                <p class="text-gray-400 text-xs sm:text-sm mt-1">{n.label}</p>
+                <p class="text-graphite text-xs sm:text-sm mt-1">{n.label}</p>
               </div>
             ))}
             <NewTabHint />
           </a>
-          <p class="text-gray-400 text-sm mb-8">
+          <p class="text-graphite text-sm mb-8">
             Expert-Vetted on Upwork (top 1%), 6,600+ hours.{" "}
             <a
               href={UPWORK_URL}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-orange-400 hover:text-orange-300 underline underline-offset-4"
+              class="text-accent hover:text-accent underline underline-offset-4"
             >
               Check it on my Upwork profile
               <NewTabHint />
@@ -170,18 +170,18 @@ export default define.page(function Home(ctx) {
                 key={p.slug}
                 href={`/projects/${p.slug}`}
                 data-e2e={`home-view-${p.slug}`}
-                class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+                class="p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-colors group flex flex-col"
               >
-                <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors">
+                <h3 class="text-lg font-semibold text-parchment group-hover:text-accent transition-colors">
                   {p.title}
                 </h3>
-                <p class="text-xs uppercase tracking-wide text-gray-500 mt-1 mb-3">
+                <p class="text-xs uppercase tracking-wide text-graphite mt-1 mb-3">
                   {p.role}
                 </p>
-                <p class="text-gray-300 text-sm leading-relaxed flex-1">
+                <p class="text-graphite text-sm leading-relaxed flex-1">
                   {p.outcome}
                 </p>
-                <span class="mt-3 inline-flex items-center gap-1 text-sm text-orange-400 font-medium">
+                <span class="mt-3 inline-flex items-center gap-1 text-sm text-accent font-medium">
                   Read the case study
                   <ArrowRightIcon class="w-4 h-4" />
                 </span>
@@ -191,7 +191,7 @@ export default define.page(function Home(ctx) {
           <div class="mt-6 text-right">
             <a
               href="/projects"
-              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
             >
               See all work
               <ArrowRightIcon class="w-4 h-4" />
@@ -208,25 +208,25 @@ export default define.page(function Home(ctx) {
                 key={item.slug}
                 href={`/catalog/${item.slug}`}
                 data-umami-event={`home-offer-${item.slug}`}
-                class="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-orange-500 transition-colors group flex flex-col"
+                class="p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-colors group flex flex-col"
               >
                 <div class="text-3xl mb-3">{item.icon}</div>
-                <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors mb-2">
+                <h3 class="text-lg font-semibold text-parchment group-hover:text-accent transition-colors mb-2">
                   {item.shortTitle}
                 </h3>
-                <p class="text-gray-400 text-sm mb-3 flex-1 leading-relaxed">
+                <p class="text-graphite text-sm mb-3 flex-1 leading-relaxed">
                   {item.summary}
                 </p>
-                <span class="inline-block px-2.5 py-0.5 bg-green-600/40 text-green-300 text-xs font-medium rounded-full mt-auto self-start">
+                <span class="inline-block px-2.5 py-0.5 bg-sage/15 text-sage text-xs font-medium rounded-full mt-auto self-start">
                   {priceLabel(item)}
                 </span>
-                <span class="text-gray-500 text-xs mt-1.5">
+                <span class="text-graphite text-xs mt-1.5">
                   {item.delivery}
                 </span>
               </a>
             ))}
           </div>
-          <p class="text-gray-400 text-sm mt-6">
+          <p class="text-graphite text-sm mt-6">
             A price that says "from" gets a quote for your scope before any work
             starts.
           </p>
@@ -237,72 +237,76 @@ export default define.page(function Home(ctx) {
           <h2 class="h1 mb-8">What clients say</h2>
           <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Testimonial 1: MVP Development */}
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
               <div class="flex gap-1 items-center mb-3">
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <span class="ml-1 text-white font-medium text-sm">5.0</span>
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <span class="ml-1 text-parchment font-medium text-sm">5.0</span>
               </div>
-              <p class="text-sm italic text-gray-300 mb-4 leading-relaxed flex-1">
+              <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
                 "Anton was a terrific partner to me in developing an MVP of a
                 web app I've been dreaming of for ages. He is a highly skilled
                 developer, a super resourceful problem-solver, and a
                 conscientious and communicative collaborator."
               </p>
               <div>
-                <p class="font-medium text-white text-sm">Startup Founder</p>
-                <p class="text-gray-400 text-sm">
+                <p class="font-medium text-parchment text-sm">
+                  Startup Founder
+                </p>
+                <p class="text-graphite text-sm">
                   MVP Development
                 </p>
               </div>
             </div>
 
             {/* Testimonial 2: Technical Lead */}
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
               <div class="flex gap-1 items-center mb-3">
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <span class="ml-1 text-white font-medium text-sm">5.0</span>
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <span class="ml-1 text-parchment font-medium text-sm">5.0</span>
               </div>
-              <p class="text-sm italic text-gray-300 mb-4 leading-relaxed flex-1">
+              <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
                 "He isn't one of the type of developers that just says 'sure, I
                 can do that.' He's thoughtful and will give his honest feedback
                 and advice on everything. Overall, 12/10 of a developer. I
                 really got lucky with Anton."
               </p>
               <div>
-                <p class="font-medium text-white text-sm">Product Owner</p>
-                <p class="text-gray-400 text-sm">
+                <p class="font-medium text-parchment text-sm">Product Owner</p>
+                <p class="text-graphite text-sm">
                   Tech Lead • $55,749 • 7+ months
                 </p>
               </div>
             </div>
 
             {/* Testimonial 3: Consultation */}
-            <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 flex flex-col">
+            <div class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
               <div class="flex gap-1 items-center mb-3">
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <StarIcon class="text-orange-500 w-4 h-4" filled />
-                <span class="ml-1 text-white font-medium text-sm">5.0</span>
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <StarIcon class="text-accent w-4 h-4" filled />
+                <span class="ml-1 text-parchment font-medium text-sm">5.0</span>
               </div>
-              <p class="text-sm italic text-gray-300 mb-4 leading-relaxed flex-1">
+              <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
                 "On an hour consultation, he killed it. He didn't just talk, we
                 got work done during the call. He was very knowledgeable on
                 pretty much everything I needed and I'll certainly be going back
                 more than a few times."
               </p>
               <div>
-                <p class="font-medium text-white text-sm">Startup Founder</p>
-                <p class="text-gray-400 text-sm">
+                <p class="font-medium text-parchment text-sm">
+                  Startup Founder
+                </p>
+                <p class="text-graphite text-sm">
                   Technical Consultation
                 </p>
               </div>
@@ -314,9 +318,10 @@ export default define.page(function Home(ctx) {
             <a
               href="https://www.upwork.com/freelancers/ashubin"
               target="_blank"
-              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
             >
-              View all reviews on <UpworkIcon class="w-auto h-4 text-white" />
+              View all reviews on{" "}
+              <UpworkIcon class="w-auto h-4 text-parchment" />
               <span class="sr-only">Upwork</span>
               <svg
                 aria-hidden="true"
@@ -346,20 +351,20 @@ export default define.page(function Home(ctx) {
             {steps.map((s, i) => (
               <li
                 key={s.title}
-                class="p-4 bg-gray-800 rounded-xl border border-gray-700"
+                class="p-4 bg-paper rounded-xl border border-rule"
               >
-                <p class="text-orange-400 font-bold text-lg mb-2">{i + 1}</p>
-                <h3 class="text-lg font-semibold text-white mb-2">
+                <p class="text-accent font-bold text-lg mb-2">{i + 1}</p>
+                <h3 class="text-lg font-semibold text-parchment mb-2">
                   {s.title}
                 </h3>
-                <p class="text-gray-400 text-sm leading-relaxed">{s.desc}</p>
+                <p class="text-graphite text-sm leading-relaxed">{s.desc}</p>
               </li>
             ))}
           </ol>
           <div class="mt-6 text-right">
             <a
               href="/how-i-work"
-              class="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
             >
               The five promises in full
               <ArrowRightIcon class="w-4 h-4" />
@@ -375,7 +380,7 @@ export default define.page(function Home(ctx) {
         >
           <h2 class="h1 mb-4">Let's talk</h2>
           {SCHEDULE_URL && (
-            <p class="text-gray-300 text-base sm:text-lg max-w-xl mx-auto mb-6">
+            <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6">
               Thirty minutes, free, no pitch. We talk about what you are
               building and whether I can help.
             </p>
@@ -386,17 +391,17 @@ export default define.page(function Home(ctx) {
             rel="noopener noreferrer"
             data-umami-event="home-book-call"
             data-primary-cta
-            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg font-semibold rounded-lg text-white bg-green-700 shadow-lg shadow-green-500/25 hover:scale-105 hover:shadow-xl hover:shadow-green-500/30 transition-all duration-200"
+            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors"
           >
             <CalendarIcon class="w-5 h-5" />
             Book a {INTRO_CALL}
           </BookCallLink>
-          <p class="mt-4 text-sm text-gray-400">
+          <p class="mt-4 text-sm text-graphite">
             {SCHEDULE_URL && "Rather write? "}
             <a
               href="#audit-form"
               data-umami-event="cta-audit-link"
-              class="text-orange-400 hover:text-orange-300 underline underline-offset-4"
+              class="text-accent hover:text-accent underline underline-offset-4"
             >
               Send me your idea or your app for a free written audit
             </a>

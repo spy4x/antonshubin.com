@@ -76,7 +76,7 @@ export default function BlogImageEnhancer() {
           <button
             type="button"
             onClick={closeLightbox}
-            class="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white bg-black/50 rounded-full transition-colors"
+            class="absolute top-4 right-4 z-10 p-2 text-parchment/70 hover:text-parchment bg-black/50 rounded-full transition-colors"
             aria-label="Close"
           >
             <svg

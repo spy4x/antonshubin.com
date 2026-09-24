@@ -17,7 +17,7 @@ export function Layout({ children, currentPath }: LayoutProps) {
       />
       <main id="main-content" class="p-4 pb-24 sm:ml-16 md:p-12">
         {children}
-        <footer class="max-w-4xl mx-auto mt-16 pt-6 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <footer class="max-w-4xl mx-auto mt-16 pt-6 border-t border-rule text-center text-graphite text-sm">
           <p>
             Outside work I ride enduro, ski and scuba dive. Based in Da Nang,
             Vietnam.
