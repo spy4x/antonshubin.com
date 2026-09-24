@@ -5,6 +5,7 @@ import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { ROLE } from "../lib/head.ts";
 import {
   clientProject,
+  clientSummary,
   firstSentence,
   openSourceProjects,
   withOutcome,
@@ -38,13 +39,15 @@ export const handler = define.handlers({
       .join("\n");
 
     // The two strongest client case studies (featuredClientSlugs is ordered
-    // strongest-first), generated from lib/data.ts.
+    // strongest-first), generated from lib/data.ts. Prints the outcome alone
+    // (see clientSummary's docs) rather than outcome-after-description,
+    // which repeated the outcome's own fact for several of these projects.
     const clientList = featuredClientSlugs
       .slice(0, 2)
       .map((slug) => {
         const p = clientProject(slug);
         return `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
-          withOutcome(firstSentence(p.description), p.outcome)
+          clientSummary(p)
         }`;
       })
       .join("\n");

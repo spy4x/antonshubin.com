@@ -15,6 +15,22 @@ function readNextSlugs(html: string): string[] {
   return matches.map((m) => m[1]);
 }
 
+Deno.test("neither llms file lists the YouTube channel as an open-source project", async () => {
+  const site = await startSite();
+  try {
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const text = await site.html(llmsPath);
+      assertEquals(
+        text.includes("YouTube Tech Channel"),
+        false,
+        `${llmsPath} lists the YouTube channel among the open-source projects`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});
+
 Deno.test("fetching /llms.txt or /llms-full.txt does not change blog 'Read next' order", async () => {
   const site = await startSite();
   try {

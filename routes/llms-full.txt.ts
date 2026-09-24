@@ -10,7 +10,7 @@ import {
 import { ROLE } from "../lib/head.ts";
 import {
   clientProject,
-  firstSentence,
+  clientSummary,
   openSourceProjects,
   withOutcome,
 } from "../lib/llms.ts";
@@ -74,12 +74,14 @@ export const handler = define.handlers({
       .join("\n");
 
     // Every featured client case study (featuredClientSlugs is ordered
-    // strongest-first), generated from lib/data.ts.
+    // strongest-first), generated from lib/data.ts. Prints the outcome alone
+    // (see clientSummary's docs) rather than outcome-after-description,
+    // which repeated the outcome's own fact for several of these projects.
     const clientList = featuredClientSlugs
       .map((slug) => {
         const p = clientProject(slug);
         return `- **${p.title}** (${BASE_URL}/projects/${p.slug}) — ${
-          withOutcome(firstSentence(p.description), p.outcome)
+          clientSummary(p)
         }`;
       })
       .join("\n");
