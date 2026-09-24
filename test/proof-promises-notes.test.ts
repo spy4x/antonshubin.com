@@ -7,8 +7,9 @@
 // same reasoning as test/no-emoji.test.ts walking rendered pages instead of
 // trusting that a fix was applied everywhere.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { proofFigures } from "../lib/proof.ts";
+import { proof, proofFigures } from "../lib/proof.ts";
 import { promises } from "../lib/promises.ts";
+import { testimonials, visibleTestimonials } from "../lib/testimonials.ts";
 import { startSite } from "./harness.ts";
 import { jsonLd } from "./html.ts";
 import { note } from "../lib/notes.ts";
@@ -69,7 +70,45 @@ Deno.test("every proof figure appears in source only through lib/proof.ts", asyn
   }
 });
 
-Deno.test("every promise title appears in source only through lib/promises.ts", async () => {
+// A quoted `"80"` or `"100%"` string literal is exactly the shape
+// routes/index.tsx's proofNumbers array used before this PR
+// (`{ value: "80", label: … }`) — a bare, unquoted 80 or 100% is too common
+// elsewhere (viewport widths, CSS) to grep for safely, but the quoted-string
+// form a hand-written revert of that array would take is specific. One
+// legitimate quoted "100%" exists outside lib/proof.ts: islands/MeetEmbed.tsx's
+// CSS `width: "100%"`, which is not an Upwork figure — allowlisted by name,
+// not by value, so it doesn't quietly cover a real regression.
+const QUOTED_LITERAL_ALLOWLIST: Record<string, string[]> = {
+  '"100%"': ["islands/MeetEmbed.tsx"],
+};
+
+Deno.test('a quoted "80" or "100%" string literal does not restate the proof strip by hand', async () => {
+  const files = await sourceFiles(["lib/proof.ts"]);
+  for (const needle of ['"80"', '"100%"']) {
+    const allowed = QUOTED_LITERAL_ALLOWLIST[needle] ?? [];
+    for (const file of files) {
+      if (allowed.some((a) => file.endsWith(a))) continue;
+      const text = await Deno.readTextFile(file);
+      assert(
+        !text.includes(needle),
+        `${file} hand-writes the quoted literal ${needle} instead of reading lib/proof.ts`,
+      );
+    }
+  }
+});
+
+Deno.test('"top 1%" (any case) appears only through lib/proof.ts', async () => {
+  const files = await sourceFiles(["lib/proof.ts"]);
+  for (const file of files) {
+    const text = await Deno.readTextFile(file);
+    assert(
+      !/top 1%/i.test(text),
+      `${file} hand-writes "top 1%" instead of reading lib/proof.ts`,
+    );
+  }
+});
+
+Deno.test("every promise title and desc appears in source only through lib/promises.ts", async () => {
   const files = await sourceFiles(["lib/promises.ts"]);
   for (const p of promises) {
     for (const file of files) {
@@ -77,6 +116,33 @@ Deno.test("every promise title appears in source only through lib/promises.ts", 
       assert(
         !text.includes(p.title),
         `${file} hand-writes promise title "${p.title}" instead of reading lib/promises.ts`,
+      );
+      assert(
+        !text.includes(p.desc),
+        `${file} hand-writes promise desc "${p.desc}" instead of reading lib/promises.ts`,
+      );
+    }
+  }
+});
+
+// Key terms a paraphrase could restate without quoting a promise's full
+// `desc` word for word — the exact drift issue #186 exists to prevent
+// ("30 days" in one place, "60 days" in another). Each needle is a phrase
+// specific enough to the promise's own wording that it doesn't collide with
+// unrelated prose (see FIGURE_NEEDLES above for the same reasoning).
+const PROMISE_TERM_NEEDLES: Record<string, string> = {
+  "first-milestone": "one or two weeks of work",
+  "free-bugfixes": "fixed free for 30 days",
+};
+
+Deno.test("key promise terms appear in source only through lib/promises.ts", async () => {
+  const files = await sourceFiles(["lib/promises.ts"]);
+  for (const [id, needle] of Object.entries(PROMISE_TERM_NEEDLES)) {
+    for (const file of files) {
+      const text = await Deno.readTextFile(file);
+      assert(
+        !text.includes(needle),
+        `${file} hand-writes promise "${id}"'s term "${needle}" instead of reading lib/promises.ts`,
       );
     }
   }
@@ -140,6 +206,54 @@ Deno.test("no JSON-LD award field carries a money figure", async () => {
       awardsSeen > 0,
       "no award field found — the check above would pass vacuously",
     );
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("no JSON-LD block on the home page states the earnings figure", async () => {
+  const site = await startSite();
+  try {
+    const html = await site.html("/");
+    const scripts = [
+      ...html.matchAll(
+        /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
+      ),
+    ].map((m) => m[1]);
+    assert(scripts.length > 0, "no JSON-LD block found on /");
+    for (const raw of scripts) {
+      assert(
+        !raw.includes(proof("earned")),
+        `a JSON-LD block states the earnings figure ("${
+          proof("earned")
+        }") — it belongs on the page, not in structured data (#186 review)`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("visibleTestimonials only renders entries with both a source and permission, and a rendered one links its source", async () => {
+  const permissioned = testimonials.map((t) => ({
+    ...t,
+    sourceHref: "https://example.com/review",
+    permission: true,
+  }));
+  assertEquals(visibleTestimonials(permissioned).length, permissioned.length);
+  assertEquals(visibleTestimonials(testimonials), []);
+
+  const site = await startSite();
+  try {
+    const html = await site.html("/");
+    if (visibleTestimonials(testimonials).length > 0) {
+      for (const t of visibleTestimonials(testimonials)) {
+        assert(
+          t.sourceHref !== undefined && html.includes(`href="${t.sourceHref}"`),
+          `testimonial "${t.id}" is visible but the page has no link to its sourceHref`,
+        );
+      }
+    }
   } finally {
     await site.stop();
   }
