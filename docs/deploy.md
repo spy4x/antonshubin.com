@@ -98,7 +98,7 @@ Encryption is per value: `@spy4x/server/env-age64`
 
 ```bash
 deno task env:status   # keygen if none exists yet:
-deno run --no-prompt -R -W=. jsr:@spy4x/server@1.2.0/env-age64/cli keygen
+deno run --node-modules-dir=none --no-prompt -R -W=. jsr:@spy4x/server@1.2.0/env-age64/cli keygen
 ```
 
 The key lives only in the main checkout's `.age/key.txt` (gitignored). Syncthing
