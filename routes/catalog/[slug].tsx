@@ -72,6 +72,7 @@ export default define.page(function CatalogDetail(ctx) {
   head.value = {
     ...head.value,
     title: `${item.title} — Anton Shubin`,
+    pageName: item.title,
     description: item.summary,
     canonical: `https://antonshubin.com/catalog/${item.slug}`,
     ogType: "website",
@@ -92,15 +93,11 @@ export default define.page(function CatalogDetail(ctx) {
             "serviceType": item.title,
             "provider": { "@id": "https://antonshubin.com/#person" },
             "areaServed": "Worldwide",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "5.0",
-              "bestRating": "5",
-              "ratingCount": "80",
-              "url": "https://www.upwork.com/freelancers/ashubin",
-              "description":
-                "Upwork-verified rating: 5.0/5.0 across 80+ engagements.",
-            },
+            // No aggregateRating: 80 is the Upwork job count, not a review
+            // count, and there is no on-page review snippet to back a
+            // schema.org rating — Google's review-snippet rules require one
+            // (#193). The Upwork line is shown visibly instead, elsewhere on
+            // the site.
             // One Offer per price, built from the same lib/catalog.ts entry as the
             // visible price above — see catalogOffers for how "from" is published.
             "offers": catalogOffers(item, BASE_URL),
@@ -109,7 +106,7 @@ export default define.page(function CatalogDetail(ctx) {
       />
       <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <Breadcrumb
-          items={getBreadcrumb(head.value.canonical, head.value.title)}
+          items={getBreadcrumb(head.value.canonical, item.title)}
         />
 
         <div class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-4 md:p-8">

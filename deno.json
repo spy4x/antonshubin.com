@@ -16,7 +16,8 @@
     "launch-kit": "deno run -A scripts/launch-kit.ts",
     "video-kit": "deno run -A scripts/video-kit.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
-    "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts"
+    "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
+    "og": "deno run -A scripts/og-images.ts"
   },
   "lint": {
     "rules": {
@@ -29,6 +30,7 @@
     "@/": "./",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
     "@std/net": "jsr:@std/net@^1.0.6",
+    "@std/path": "jsr:@std/path@^1.1.2",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
     "fresh": "jsr:@fresh/core@^2.3.3",
     "marked": "npm:marked@^17.0.1",

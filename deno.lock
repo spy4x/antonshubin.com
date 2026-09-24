@@ -1502,6 +1502,7 @@
       "jsr:@fresh/plugin-vite@^1.0.8",
       "jsr:@std/front-matter@^1.0.9",
       "jsr:@std/net@^1.0.6",
+      "jsr:@std/path@^1.1.2",
       "npm:@preact/signals@^2.9.0",
       "npm:@tailwindcss/vite@^4.1.18",
       "npm:axe-core@4.13.0",

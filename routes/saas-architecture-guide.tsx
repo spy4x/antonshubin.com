@@ -15,6 +15,7 @@ export default define.page(function SaasArchGuide() {
   head.value = {
     ...head.value,
     title: "SaaS Architecture Guide — Anton Shubin",
+    pageName: "SaaS Architecture Guide",
     description:
       "From idea to production: architecture patterns, infrastructure decisions, CI/CD, AI integration, and lessons learned building 80+ projects.",
     canonical: "https://antonshubin.com/saas-architecture-guide",
@@ -23,15 +24,18 @@ export default define.page(function SaasArchGuide() {
 
   // Organize content by topic
   const startupPosts = blogArticles.filter((a) => a.category === "startups");
-  const allProj = [...projects.my, ...projects.freelance].filter((p) =>
-    p.slug && !p.archived
-  );
+  // "Real case studies" (#193): client work (projects.freelance), not the
+  // tools Anton builds and runs for himself (projects.my) — a founder
+  // reading this guide wants proof he has shipped for other people's
+  // businesses, not a list of his own side projects. Archived engagements
+  // are dropped the same way the rest of the site drops them.
+  const allProj = projects.freelance.filter((p) => p.slug && !p.archived);
 
   return (
     <Layout currentPath="/saas-architecture-guide">
       <SEOHead />
       <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
+        items={getBreadcrumb(head.value.canonical, "SaaS Architecture Guide")}
       />
       <div class="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -99,7 +103,7 @@ export default define.page(function SaasArchGuide() {
             Going from napkin sketch to production. Real projects I've built.
           </p>
           <ul class="space-y-3">
-            {allProj.slice(0, 6).map((p) => (
+            {allProj.map((p) => (
               <li>
                 <a
                   href={`/projects/${p.slug}`}

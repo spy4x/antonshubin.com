@@ -25,6 +25,18 @@ Allow: /
 
 User-agent: Applebot-Extended
 Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
 `;
 
     return new Response(txt, {

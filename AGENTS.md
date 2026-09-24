@@ -39,6 +39,7 @@ deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.t
 deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
+deno task og                    # regenerate the 1200x630 OG link-preview PNGs
 ```
 
 `deno task check` fails on a failing test, same as a lint or type error — a red
@@ -314,3 +315,37 @@ a response. Staging answers every response with
 nofollow`; production sends `noindex` for any status ≥
 400 and `noindex, nofollow` for `/pay` and `/unsubscribe`
 (`routes/_middleware.ts`).
+
+## OG link-preview images
+
+`scripts/og-images.ts` generates the 1200×630 PNGs committed under
+`static/img/og/`: one per blog post (`blog/<slug>.png`), one per project page
+(`projects/<slug>.png`), and one landscape default for the site (`default.png`,
+`lib/head.ts`'s `DEFAULTS.ogImage`) — replacing the SVG covers and the old
+1200×1800 portrait photo, none of which LinkedIn, X, Facebook or Slack render as
+a link preview. It renders each PNG from the post/project title and description
+already in `lib/data.ts`, never from the committed cover SVGs, through the
+Chromium already pinned for the browser-driven tests (`test/browser.ts`'s
+`launchChromium()`) instead of adding a new image-rendering dependency.
+
+Regeneration is one command: `deno task og`. Run it whenever a post or project
+title or description changes, then commit the changed PNGs — for example after
+#201 renames the mig post from "200-line" to "lightweight". This script is
+dev-machine only: the production Docker build (`denoland/deno:2.9.0`, no
+Chromium) never runs it, it only serves the PNGs already committed.
+`test/og-images.test.ts` guards that every post and project has its PNG at
+exactly 1200×630, reading each file's PNG header directly — deterministic and
+offline, no browser needed to run the check itself.
+
+## Redirect table
+
+`lib/redirects.ts`'s `redirectTarget()` is the 301 table for URLs that no longer
+exist as written: a trailing slash on a `/blog/<slug>` or `/projects/<slug>`
+URL, and blog slugs retired by a rename (today: the CalDAV post). It's a pure
+function, unit-tested in `lib/redirects.test.ts` without a server — the same
+pattern as `lib/csp.ts` and `lib/cache-control.ts`. `main.ts` wires it as its
+own middleware, placed after the CSP and cache middlewares but before
+`staticFiles()`/`app.fsRoutes()`: a redirect response still needs the CSP and
+cache headers every other response gets, and it gets them because those two
+middlewares set headers on whatever `ctx.next()` resolves to, which is this
+middleware's response when it doesn't call `ctx.next()` itself.
