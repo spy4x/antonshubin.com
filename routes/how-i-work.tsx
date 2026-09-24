@@ -14,7 +14,7 @@ import {
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
-import { promise, promises } from "../lib/promises.ts";
+import { decapitalize, promise, promises } from "../lib/promises.ts";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
 import { toJsonLd } from "../lib/json-ld.ts";
 
@@ -33,7 +33,9 @@ const faqs: Faq[] = [
     q: "What if we start working together and it is not a good fit?",
     a: `That is exactly why I offer a five-day refund. ${
       promise("refund").desc
-    } We also start with a small first milestone — one or two weeks of work — so if either of us wants to stop at the end of it, we stop, and you keep everything built so far.`,
+    } We also start with a small first milestone: ${
+      decapitalize(promise("first-milestone").desc)
+    }`,
   },
   {
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
@@ -52,7 +54,9 @@ const faqs: Faq[] = [
   },
   {
     q: "What if my project needs more work after launch?",
-    a: `Bugs in what I delivered are fixed free for 30 days. For ongoing needs after that there is the Ongoing item in my catalog (${
+    a: `${
+      promise("free-bugfixes").desc
+    } For ongoing needs after that there is the Ongoing item in my catalog (${
       priceLabel(ongoing)
     }), which covers post-launch support. You can also fund a new milestone at any time; if the scope changes, I quote it before I start.`,
     link: { href: catalogPath(ongoing.slug), label: ongoing.title },

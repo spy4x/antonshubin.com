@@ -5,18 +5,19 @@ import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts";
 import { type Project, projects } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
-import { promise } from "../lib/promises.ts";
+import { decapitalize, promise } from "../lib/promises.ts";
+import { firstSentence } from "../lib/llms.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
 import { ROLE } from "../lib/head.ts";
 import { WithNote } from "../components/WithNote.tsx";
 import LeadForm from "../islands/LeadForm.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
+import { TestimonialCard } from "../components/TestimonialCard.tsx";
 import {
   ArrowRightIcon,
   CalendarIcon,
   CatalogIcon,
-  StarIcon,
   UpworkIcon,
 } from "../components/Icons.tsx";
 
@@ -39,12 +40,20 @@ const caseStudies: Project[] = ["smartlite", "foodrazor", "corecircle"].map(
   },
 );
 
+/** Strips a single trailing period, for splicing a promise's `desc` mid-sentence. */
+function withoutPeriod(text: string): string {
+  return text.replace(/\.$/, "");
+}
+
 /**
- * Three steps, drawn from the five promises on /how-i-work and nothing else.
- * The first-milestone step's title and its first two sentences come from
- * lib/promises.ts verbatim; the previous copy paraphrased them
- * ("Either of us can stop..." instead of "If either of us wants to
- * stop..."), which /how-i-work's wording now wins per #186.
+ * Three steps, drawn from the five promises on /how-i-work and nothing else
+ * — every sentence that states a promise is spliced from `lib/promises.ts`
+ * (`promise(id).desc`), not hand-written, so a promise term can't drift
+ * between /how-i-work and here. Step 1 ("We talk") isn't a promise, so it
+ * stays hand-written. The first-milestone step's title and its first two
+ * sentences come from lib/promises.ts verbatim; the previous copy
+ * paraphrased them ("Either of us can stop..." instead of "If either of us
+ * wants to stop..."), which /how-i-work's wording now wins per #186.
  */
 const steps = [
   {
@@ -58,8 +67,11 @@ const steps = [
   },
   {
     title: "Working software every week",
-    desc:
-      "You see working software every week, with a short written update. Code, accounts, servers and keys are in your name from day one, and bugs in what I delivered are fixed free for 30 days.",
+    desc: `${firstSentence(promise("weekly-software").desc)} ${
+      withoutPeriod(promise("ownership").desc)
+    } from day one, and ${
+      decapitalize(withoutPeriod(promise("free-bugfixes").desc))
+    }.`,
   },
 ];
 
@@ -258,36 +270,7 @@ export default define.page(function Home(ctx) {
           <section data-home-section="testimonials" class="mb-16 md:mb-24">
             <h2 class="h1 mb-8">What clients say</h2>
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {visible.map((t) => (
-                <div
-                  key={t.id}
-                  class="p-4 bg-paper rounded-xl border border-rule flex flex-col"
-                >
-                  <div class="flex gap-1 items-center mb-3">
-                    <StarIcon class="text-accent w-4 h-4" filled />
-                    <StarIcon class="text-accent w-4 h-4" filled />
-                    <StarIcon class="text-accent w-4 h-4" filled />
-                    <StarIcon class="text-accent w-4 h-4" filled />
-                    <StarIcon class="text-accent w-4 h-4" filled />
-                    <span class="ml-1 text-parchment font-medium text-sm">
-                      5.0
-                    </span>
-                  </div>
-                  <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
-                    "{t.quote}"
-                  </p>
-                  <div>
-                    <p class="font-medium text-parchment text-sm">
-                      {t.name}
-                    </p>
-                    {t.role && (
-                      <p class="text-graphite text-sm">
-                        {t.role}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
+              {visible.map((t) => <TestimonialCard key={t.id} t={t} />)}
             </div>
 
             {/* Link to Upwork */}
