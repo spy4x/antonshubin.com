@@ -20,13 +20,13 @@ function HackathonCard({ h }: { h: Hackathon }) {
         <img
           src={h.photos[0]}
           alt={`${h.title} hackathon`}
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          class="w-full h-full object-cover transition-transform duration-500"
           loading="lazy"
         />
         {/* Win/loss badge */}
         {h.won
           ? (
-            <div class="absolute top-3 right-3 flex items-center gap-1 px-3 py-1.5 bg-mist/20 backdrop-blur-sm text-mist text-xs font-bold rounded-full">
+            <div class="absolute top-3 right-3 flex items-center gap-1 px-3 py-1.5 bg-lamp text-mist text-xs font-bold rounded-full">
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -40,7 +40,7 @@ function HackathonCard({ h }: { h: Hackathon }) {
             </div>
           )
           : (
-            <div class="absolute top-3 right-3 flex items-center gap-1 px-3 py-1.5 bg-ink/60 backdrop-blur-sm text-graphite text-xs font-medium rounded-full">
+            <div class="absolute top-3 right-3 flex items-center gap-1 px-3 py-1.5 bg-lamp text-graphite text-xs font-medium rounded-full">
               {h.place || "Participant"}
             </div>
           )}
@@ -133,7 +133,7 @@ export default define.page(function Hackathons(ctx) {
         {/* Hero section — marketing-driven */}
         <div class="mb-12">
           <h1 class="text-3xl sm:text-4xl font-bold text-parchment mb-3">
-            Hackathons & Competitive Engineering
+            Hackathons & competitive engineering
           </h1>
           <p class="text-graphite text-base sm:text-lg leading-relaxed max-w-2xl">
             I compete in hackathons to stress-test my architecture skills under
@@ -207,13 +207,13 @@ export default define.page(function Hackathons(ctx) {
             <BookCallLink
               url={SCHEDULE_URL}
               target="_blank"
-              class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors hover:scale-105"
+              class="gap-2 px-6 py-3"
             >
               Book a free intro call
             </BookCallLink>
             <a
               href="/catalog"
-              class="inline-flex items-center gap-2 px-6 py-3 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg transition-colors"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-rule-strong hover:bg-lamp text-parchment font-semibold rounded-lg transition-colors"
             >
               View services
             </a>

@@ -104,7 +104,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             type="button"
             onClick={(e) =>
               openLightbox(index, e.currentTarget as HTMLButtonElement)}
-            class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-accent rounded-lg overflow-hidden transition-transform hover:scale-[1.02]"
+            class="flex-shrink-0 snap-start cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-accent rounded-lg overflow-hidden transition-transform"
           >
             <GalleryImage
               {...image}

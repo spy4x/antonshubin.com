@@ -39,13 +39,13 @@ export default define.page(function NotFound() {
           </a>
           <a
             href="/catalog"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-rule-strong hover:bg-lamp text-parchment font-semibold rounded-lg transition-colors"
           >
             View services
           </a>
           <a
             href="/contact-me"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-rule-strong hover:bg-lamp text-parchment font-semibold rounded-lg transition-colors"
           >
             Contact me
           </a>

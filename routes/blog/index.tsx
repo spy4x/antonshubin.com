@@ -88,7 +88,7 @@ export default define.page(function Blog(ctx) {
                   <img
                     src={`/img/blog/${article.slug}/${article.previewImageURL}`}
                     alt={article.title}
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    class="w-full h-full object-cover transition-transform duration-300"
                     loading="lazy"
                   />
                 </div>
@@ -143,7 +143,7 @@ export default define.page(function Blog(ctx) {
         <div class="mt-10 text-center">
           <a
             href="/rss.xml"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors text-sm font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors text-sm font-medium"
           >
             <svg
               aria-hidden="true"

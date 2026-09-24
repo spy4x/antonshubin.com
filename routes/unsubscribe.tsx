@@ -124,7 +124,7 @@ function Body(data: PageData) {
           </h1>
           <a
             href="/"
-            class="text-accent hover:text-accent font-medium"
+            class="text-accent hover:text-accent hover:underline font-medium"
           >
             ← Back to home
           </a>

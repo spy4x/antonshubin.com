@@ -90,7 +90,7 @@ export default define.page(function BlogArticle(ctx) {
           </p>
           <a
             href="/blog"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
           >
             ← Back to blog
           </a>
@@ -348,7 +348,7 @@ export default define.page(function BlogArticle(ctx) {
                   )
                 }`}
                 target="_blank"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lamp hover:bg-rule-strong text-graphite text-sm rounded-lg transition-colors"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-rule-strong hover:bg-lamp text-graphite text-sm rounded-lg transition-colors"
                 aria-label="Share on Twitter (opens in a new tab)"
               >
                 <svg
@@ -369,7 +369,7 @@ export default define.page(function BlogArticle(ctx) {
                   )
                 }`}
                 target="_blank"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lamp hover:bg-rule-strong text-graphite text-sm rounded-lg transition-colors"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-rule-strong hover:bg-lamp text-graphite text-sm rounded-lg transition-colors"
                 aria-label="Share on LinkedIn (opens in a new tab)"
               >
                 <svg
@@ -391,7 +391,7 @@ export default define.page(function BlogArticle(ctx) {
                     `I thought you'd find this interesting:\n\n${article.title}\n\nhttps://antonshubin.com/blog/${article.slug}?utm_source=email&utm_medium=social&utm_campaign=blog-share`,
                   )
                 }`}
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lamp hover:bg-rule-strong text-graphite text-sm rounded-lg transition-colors"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-rule-strong hover:bg-lamp text-graphite text-sm rounded-lg transition-colors"
                 aria-label="Share via email"
               >
                 <svg
@@ -428,7 +428,7 @@ export default define.page(function BlogArticle(ctx) {
             <div class="flex flex-wrap items-center justify-between gap-4">
               <a
                 href="/blog"
-                class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
               >
                 ← All articles
               </a>
@@ -436,13 +436,13 @@ export default define.page(function BlogArticle(ctx) {
                 <BookCallLink
                   url={SCHEDULE_URL}
                   target="_blank"
-                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-accent text-ink hover:bg-accent-hover text-sm font-semibold rounded-lg transition-colors"
+                  class="justify-center gap-1 px-5 py-2.5 text-sm"
                 >
                   Book a free intro call
                 </BookCallLink>
                 <a
                   href="/catalog"
-                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-lamp hover:bg-rule-strong text-parchment text-sm font-semibold rounded-lg shadow transition-colors"
+                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment text-sm font-semibold rounded-lg transition-colors"
                 >
                   View services
                 </a>

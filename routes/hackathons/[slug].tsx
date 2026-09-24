@@ -37,7 +37,7 @@ export default define.page(function HackathonDetail(ctx) {
           </p>
           <a
             href="/hackathons"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
           >
             &larr; Back to hackathons
           </a>
@@ -193,14 +193,15 @@ export default define.page(function HackathonDetail(ctx) {
                     <BookCallLink
                       url={h.ctaLink || SCHEDULE_URL}
                       target={h.ctaLink ? undefined : "_blank"}
-                      class="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors text-sm"
+                      class="gap-2 px-5 py-2.5 text-sm"
                     >
                       {h.ctaLabel || "Book a free intro call"}
                     </BookCallLink>
                     <BookCallLink
                       url={SCHEDULE_URL}
                       target="_blank"
-                      class="inline-flex items-center gap-2 px-5 py-2.5 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg transition-colors text-sm"
+                      variant="secondary"
+                      class="gap-2 px-5 py-2.5 text-sm"
                     >
                       Free intro call
                     </BookCallLink>
@@ -213,7 +214,7 @@ export default define.page(function HackathonDetail(ctx) {
             <div class="mt-6">
               <a
                 href="/hackathons"
-                class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
               >
                 <svg
                   aria-hidden="true"

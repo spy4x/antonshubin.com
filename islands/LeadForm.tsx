@@ -167,7 +167,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               aria-describedby={errorField === "lead-name"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
               required
             />
           </div>
@@ -186,7 +186,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
               aria-describedby={errorField === "lead-email"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
               required
             />
           </div>
@@ -207,7 +207,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 ? "lead-form-error"
                 : undefined}
               rows={4}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-y disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-y disabled:opacity-50"
               required
             />
           </div>

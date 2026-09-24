@@ -176,7 +176,7 @@ export default define.page(function HowIWork() {
       />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-parchment text-center mb-2">
-          How I Deliver
+          How I deliver
         </h1>
         <p class="text-graphite text-center mb-10 sm:mb-12 text-base sm:text-lg">
           Five promises, no fine print.
@@ -213,7 +213,7 @@ export default define.page(function HowIWork() {
                   {p.link && (
                     <a
                       href={p.link}
-                      class="inline-flex items-center gap-1 text-accent hover:text-accent transition-colors text-sm font-medium mt-3"
+                      class="inline-flex items-center gap-1 text-accent hover:text-accent hover:underline transition-colors text-sm font-medium mt-3"
                     >
                       View details and pricing
                       <ArrowRightIcon class="w-4 h-4" />
@@ -232,7 +232,7 @@ export default define.page(function HowIWork() {
 
         <section id="ai-augmented" class="mt-16 scroll-mt-4">
           <h2 class="text-2xl sm:text-3xl font-bold text-parchment text-center mb-2">
-            AI-Augmented Execution
+            AI-augmented execution
           </h2>
           <p class="text-graphite text-center mb-8 text-base">
             Human-owned architecture + spec-driven development. Two rules I

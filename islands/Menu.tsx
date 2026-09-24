@@ -88,8 +88,7 @@ export default function Menu(
       {isOpen.value && (
         <div
           id="mobile-menu-shadow"
-          class="fixed inset-0 z-20"
-          style="backdrop-filter: blur(5px); background-color: rgba(0, 0, 0, 0.3);"
+          class="fixed inset-0 z-20 bg-ink/70"
           onClick={toggleMenu}
           aria-hidden="true"
         />
@@ -98,7 +97,7 @@ export default function Menu(
       <nav
         id="menu"
         aria-label="Main"
-        class="bg-paper fixed inset-x-0 bottom-0 z-30 whitespace-nowrap sm:fixed sm:origin-top-left sm:-rotate-90 sm:translate-y-full sm:border-b sm:border-rule"
+        class="bg-desk fixed inset-x-0 bottom-0 z-30 whitespace-nowrap sm:fixed sm:origin-top-left sm:-rotate-90 sm:translate-y-full sm:border-b sm:border-rule"
       >
         {/* Mobile menu content */}
         {isOpen.value && (

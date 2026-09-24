@@ -111,7 +111,7 @@ export default define.page(function ProjectDetail(ctx) {
           </p>
           <a
             href="/projects"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
+            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
           >
             ← Back to projects
           </a>
@@ -193,7 +193,7 @@ export default define.page(function ProjectDetail(ctx) {
                         <a
                           href={project.madeForURL}
                           target="_blank"
-                          class="text-accent hover:text-accent normal-case tracking-normal font-medium"
+                          class="text-accent hover:text-accent hover:underline normal-case tracking-normal font-medium"
                         >
                           {project.madeForName}
                           <NewTabHint />
@@ -315,7 +315,7 @@ export default define.page(function ProjectDetail(ctx) {
                       href={project.externalURL}
                       target="_blank"
                       data-umami-event={`project-cta-${project.slug}-external`}
-                      class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp hover:bg-rule-strong text-parchment rounded-lg text-sm font-medium transition-colors"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment rounded-lg text-sm font-medium transition-colors"
                     >
                       Visit project site
                       <svg
@@ -342,7 +342,7 @@ export default define.page(function ProjectDetail(ctx) {
                   href={`https://github.com/${project.ghRepo}`}
                   target="_blank"
                   data-umami-event={`project-cta-${project.slug}-github`}
-                  class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp hover:bg-rule-strong text-parchment rounded-lg text-sm font-medium transition-colors"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment rounded-lg text-sm font-medium transition-colors"
                 >
                   <svg
                     aria-hidden="true"
@@ -434,7 +434,7 @@ export default define.page(function ProjectDetail(ctx) {
                   url={SCHEDULE_URL}
                   target="_blank"
                   data-umami-event={`project-cta-${project.slug}-schedule`}
-                  class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg shadow transition-colors"
+                  class="justify-center gap-1 px-6 py-3"
                 >
                   Book a free intro call
                 </BookCallLink>
@@ -442,7 +442,7 @@ export default define.page(function ProjectDetail(ctx) {
               <a
                 href="/how-i-work"
                 data-umami-event={`project-cta-${project.slug}-how-i-work`}
-                class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
               >
                 How I work
                 <svg

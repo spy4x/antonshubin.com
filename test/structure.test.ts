@@ -611,3 +611,25 @@ siteTest(
     }
   },
 );
+
+siteTest(
+  "a catalog icon name never appears as visible text on / or /catalog",
+  async (site) => {
+    // routes/index.tsx and routes/catalog/index.tsx both render
+    // item.icon through CatalogIcon — a regression that swaps that
+    // back to printing the bare string ("target", "search", ...)
+    // would otherwise slip through unnoticed, since the names read as
+    // plausible words rather than obviously broken markup.
+    const iconNames = catalogItems.map((i) => i.icon);
+    for (const path of ["/", "/catalog"]) {
+      const html = await site.html(path);
+      const text = visibleText(html).toLowerCase();
+      for (const name of iconNames) {
+        assert(
+          !new RegExp(`\\b${name}\\b`).test(text),
+          `${path} renders the catalog icon name "${name}" as visible text`,
+        );
+      }
+    }
+  },
+);

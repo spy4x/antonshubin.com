@@ -64,7 +64,7 @@ export default define.page(function CatalogDetail(ctx) {
           </p>
           <a
             href="/catalog"
-            class="text-accent hover:text-accent transition-colors"
+            class="text-accent hover:text-accent hover:underline transition-colors"
           >
             ← Back to catalog
           </a>
@@ -276,14 +276,14 @@ export default define.page(function CatalogDetail(ctx) {
               <BookCallLink
                 url={SCHEDULE_URL}
                 target="_blank"
-                class="inline-flex items-center justify-center gap-1 px-6 py-3 bg-lamp hover:bg-rule-strong text-parchment font-semibold rounded-lg shadow transition-colors"
+                class="justify-center gap-1 px-6 py-3"
               >
                 Book a free intro call
               </BookCallLink>
             </div>
             <a
               href="/how-i-work"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium text-sm"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
             >
               How I work
               <svg

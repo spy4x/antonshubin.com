@@ -208,7 +208,7 @@ export default define.page(function Infrastructure() {
             <a
               href="/projects/smartlite"
               data-e2e="infrastructure-view-smartlite"
-              class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+              class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <p class="text-sm font-semibold text-accent mb-2">
                 Professional production proof
@@ -225,7 +225,7 @@ export default define.page(function Infrastructure() {
             <a
               href="/projects/homelab"
               data-e2e="infrastructure-view-homelab"
-              class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+              class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <p class="text-sm font-semibold text-accent mb-2">
                 Operational engineering proof
@@ -314,7 +314,7 @@ export default define.page(function Infrastructure() {
               target="_blank"
               rel="noopener noreferrer"
               data-e2e="infrastructure-book-intro"
-              class="min-h-11 inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-hover"
+              class="min-h-11 justify-center gap-2 px-6 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-hover"
             >
               Book an intro call
             </BookCallLink>

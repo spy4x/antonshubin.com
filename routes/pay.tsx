@@ -196,7 +196,7 @@ export default define.page(function Pay() {
             <div class="mt-auto px-5 sm:px-6 pb-5 sm:pb-6">
               <a
                 href="/contact-me"
-                class="inline-flex items-center gap-1 text-accent hover:text-accent text-sm transition-colors"
+                class="inline-flex items-center gap-1 text-accent hover:text-accent hover:underline text-sm transition-colors"
               >
                 From outside US? Contact me
                 <ArrowRightIcon class="w-4 h-4" />
@@ -218,7 +218,7 @@ export default define.page(function Pay() {
                 href="https://buy.stripe.com/4gw171g4hcwC06IdQS"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 px-6 py-3 bg-mist/15 text-parchment font-semibold rounded-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-xl transition-all duration-200"
+                class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors"
               >
                 Pay with Stripe
                 <ArrowRightIcon class="w-5 h-5" />

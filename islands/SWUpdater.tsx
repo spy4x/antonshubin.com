@@ -53,7 +53,7 @@ export default function SWUpdater() {
       <Button
         type="button"
         onClick={reload}
-        class="ml-auto sm:ml-0 !px-3 !py-1 text-sm"
+        class="ml-auto sm:ml-0 px-3 py-1 text-sm"
       >
         Reload
       </Button>

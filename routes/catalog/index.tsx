@@ -130,7 +130,7 @@ export default define.page(function Catalog() {
                   </a>
                   <a
                     href={`/catalog/${item.slug}`}
-                    class="inline-flex items-center gap-1 px-4 py-2 bg-lamp hover:bg-rule-strong text-parchment text-sm font-medium rounded-lg transition-colors"
+                    class="inline-flex items-center gap-1 px-4 py-2 bg-transparent border border-rule-strong hover:bg-lamp text-parchment text-sm font-medium rounded-lg transition-colors"
                   >
                     Details
                   </a>
@@ -149,7 +149,7 @@ export default define.page(function Catalog() {
           <BookCallLink
             url={SCHEDULE_URL}
             target="_blank"
-            class="inline-block px-8 py-3.5 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors"
+            class="px-8 py-3.5"
           >
             Book a free 30-min intro call
           </BookCallLink>

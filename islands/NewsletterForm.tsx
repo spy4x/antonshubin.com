@@ -57,7 +57,7 @@ export default function NewsletterForm() {
               aria-describedby={status === "error"
                 ? "newsletter-form-error"
                 : undefined}
-              class="flex-1 min-w-[200px] px-3 py-2 bg-ink border border-rule-strong rounded-lg text-parchment text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+              class="flex-1 min-w-[200px] px-3 py-2 bg-ink border border-rule-strong rounded-lg text-parchment text-sm placeholder-graphite focus:outline-none focus:border-accent"
             />
             <button
               type="submit"

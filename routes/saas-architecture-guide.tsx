@@ -59,7 +59,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href="/blog/how-chatgpt-can-help-you-design-system-architecture"
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → How ChatGPT Can Help You Design System Architecture
               </a>
@@ -71,7 +71,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href="/blog/self-hosted-caldav-web-ui-tasks-org"
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → The missing piece in a self-hosted CalDAV stack: a web UI for
                 Tasks.org
@@ -85,7 +85,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href={catalogPath(audit.slug)}
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → {audit.title} ({priceLabel(audit)})
               </a>
@@ -107,7 +107,7 @@ export default define.page(function SaasArchGuide() {
               <li>
                 <a
                   href={`/projects/${p.slug}`}
-                  class="text-accent hover:text-accent transition-colors font-medium"
+                  class="text-accent hover:text-accent hover:underline transition-colors font-medium"
                 >
                   → {p.title}
                 </a>
@@ -117,7 +117,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href={catalogPath(build.slug)}
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → {build.title} ({priceLabel(build)})
               </a>
@@ -139,7 +139,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href="/blog/setting-up-your-own-ci-cd-server-with-drone-ci"
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → Setting Up Your Own CI/CD Server with Drone CI
               </a>
@@ -152,7 +152,7 @@ export default define.page(function SaasArchGuide() {
               <a
                 href="/infrastructure"
                 data-e2e="architecture-guide-production-operations"
-                class="inline-flex min-h-11 items-center text-accent hover:text-accent transition-colors font-medium"
+                class="inline-flex min-h-11 items-center text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → Production Operations Practice
               </a>
@@ -179,7 +179,7 @@ export default define.page(function SaasArchGuide() {
               <a
                 href="/infrastructure"
                 data-e2e="architecture-guide-infrastructure-rubric"
-                class="inline-flex min-h-11 items-center text-accent hover:text-accent transition-colors font-medium"
+                class="inline-flex min-h-11 items-center text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → Managed Cloud, Dedicated, or Hybrid
               </a>
@@ -192,7 +192,7 @@ export default define.page(function SaasArchGuide() {
               <a
                 href="/projects/homelab"
                 data-e2e="architecture-guide-homelab-proof"
-                class="inline-flex min-h-11 items-center text-accent hover:text-accent transition-colors font-medium"
+                class="inline-flex min-h-11 items-center text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → Production Infrastructure Lab
               </a>
@@ -217,7 +217,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href="/blog/building-mcp-servers-with-deno"
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → Building MCP Servers with Deno: A Practical Guide
               </a>
@@ -229,7 +229,7 @@ export default define.page(function SaasArchGuide() {
             <li>
               <a
                 href={catalogPath(build.slug)}
-                class="text-accent hover:text-accent transition-colors font-medium"
+                class="text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
                 → AI integration and MCP servers, built under {build.shortTitle}
                 {" "}
@@ -256,7 +256,7 @@ export default define.page(function SaasArchGuide() {
               <li>
                 <a
                   href={`/blog/${p.slug}`}
-                  class="text-accent hover:text-accent transition-colors font-medium"
+                  class="text-accent hover:text-accent hover:underline transition-colors font-medium"
                 >
                   → {p.title}
                 </a>
@@ -281,7 +281,7 @@ export default define.page(function SaasArchGuide() {
             <BookCallLink
               url={SCHEDULE_URL}
               target="_blank"
-              class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors hover:scale-105"
+              class="gap-2 px-6 py-3"
             >
               Book a free intro call
             </BookCallLink>
