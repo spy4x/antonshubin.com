@@ -48,7 +48,14 @@ export const testimonials: Testimonial[] = [
   },
 ];
 
-/** The subset a page may render: a confirmed public source and permission. */
-export function visibleTestimonials(): Testimonial[] {
-  return testimonials.filter((t) => t.sourceHref && t.permission);
+/**
+ * The subset a page may render: a confirmed public source and permission.
+ * `list` defaults to `testimonials` so a page needs no argument; a test
+ * passes a synthetic list to check the filter itself without editing the
+ * real data.
+ */
+export function visibleTestimonials(
+  list: Testimonial[] = testimonials,
+): Testimonial[] {
+  return list.filter((t) => t.sourceHref && t.permission);
 }
