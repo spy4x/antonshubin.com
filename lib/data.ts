@@ -24,6 +24,12 @@ export interface Project {
   outcome?: string;
   /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
   ghRepo?: string;
+  /**
+   * True for my own open-source tools (as opposed to a video channel or an
+   * archived, no-longer-maintained project). Drives the "Open Source
+   * Projects" list in both llms files — see lib/llms.ts.
+   */
+  openSource?: boolean;
 }
 
 export interface BlogArticle {
@@ -44,6 +50,7 @@ export const projects = {
     {
       title: "Production Infrastructure Lab",
       slug: "homelab",
+      openSource: true,
       description:
         "Sanitized production infrastructure case study demonstrating end-to-end operational ownership. Reusable infrastructure as code and Deno automation coordinate Docker Compose delivery behind Traefik, VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and restore tooling, and Authelia SSO with 2FA.",
       role: "Platform Engineering & Operations",
@@ -63,10 +70,11 @@ export const projects = {
     {
       title: "Financy",
       slug: "financy",
+      openSource: true,
       externalURL: "https://github.com/spy4x/financy",
       ghRepo: "spy4x/financy",
       description:
-        "Open-source, self-hostable finance tracking for individuals, families, and small businesses. Double-entry bookkeeping for transfers between accounts, multi-currency support, real-time collaboration, and PWA capabilities.",
+        "Self-hosted finance tracker for a person or a family — open source, work in progress, not ready for everyday use. Targets multi-currency accounts and group or family collaboration with role-based access; transfers between accounts follow double-entry principles.",
       logoImageURL: "/img/projects/financy/logo.svg",
       tags: [
         "Deno",
@@ -76,11 +84,13 @@ export const projects = {
         "Docker",
         "PWA",
       ],
-      outcome: "Being revived — active development, not yet in daily use.",
+      outcome:
+        "See the project's roadmap for what's built versus still planned.",
     },
     {
       title: "Air Quality Sensor",
       slug: "air-quality-sensor",
+      openSource: true,
       externalURL: "https://github.com/spy4x/air-quality-sensor",
       ghRepo: "spy4x/air-quality-sensor",
       description:
@@ -131,6 +141,7 @@ export const projects = {
     {
       title: "caldav-tasks-web",
       slug: "todoapp-caldav",
+      openSource: true,
       externalURL: "https://github.com/spy4x/caldav-tasks-web",
       ghRepo: "spy4x/caldav-tasks-web",
       screenshotURLs: [
@@ -158,6 +169,7 @@ export const projects = {
     {
       title: "caldav-mcp",
       slug: "caldav-mcp",
+      openSource: true,
       externalURL: "https://github.com/spy4x/caldav-mcp",
       ghRepo: "spy4x/caldav-mcp",
       description:
@@ -174,6 +186,7 @@ export const projects = {
     {
       title: "Zond",
       slug: "zond",
+      openSource: true,
       externalURL: "https://github.com/spy4x/zond",
       ghRepo: "spy4x/zond",
       logoImageURL: "/img/projects/zond/logo.svg",
@@ -192,6 +205,7 @@ export const projects = {
     {
       title: "rostok",
       slug: "rostok",
+      openSource: true,
       externalURL: "https://github.com/spy4x/rostok",
       ghRepo: "spy4x/rostok",
       logoImageURL: "/img/projects/rostok/logo.svg",
@@ -211,13 +225,14 @@ export const projects = {
       ],
     },
     {
-      title: "SaaS Platform Template",
+      title: "Deno Platform Template",
       slug: "template",
+      openSource: true,
       externalURL: "https://github.com/spy4x/template",
       ghRepo: "spy4x/template",
       logoImageURL: "/img/projects/template/logo.svg",
       description:
-        "Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from 80+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on the Deno runtime end to end — no Node.js, npm, pnpm, Yarn, or Bun.",
+        "Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from 80+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.",
       outcome:
         "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
       tags: [
@@ -236,6 +251,7 @@ export const projects = {
     {
       title: "mig",
       slug: "mig",
+      openSource: true,
       externalURL: "https://github.com/spy4x/mig",
       ghRepo: "spy4x/mig",
       logoImageURL: "/img/projects/mig/logo.svg",
@@ -294,8 +310,7 @@ export const projects = {
       screenshotSize: { width: 1440, height: 1000 },
       madeForName: "Yumetronics",
       madeForURL: "https://yumetronics.com.sg/",
-      outcome:
-        "Built solo in 3 months; ~200 lamp poles in production since 2024",
+      outcome: "Built solo in 3 months, from zero prior code.",
     },
     {
       title: "Truth or Dare (DareChat)",
@@ -334,7 +349,7 @@ export const projects = {
       madeForName: "Rustam Zaripov",
       madeForURL: "https://www.linkedin.com/in/rustam-zaripov-69436559/",
       outcome:
-        "~40K monthly active users — live at darechat.me with Swagger-documented public REST API at darechat.me/api",
+        "~40K monthly active users, with a Swagger-documented public REST API at darechat.me/api.",
     },
     {
       title: "FoodRazor",
@@ -451,7 +466,7 @@ export const projects = {
       ],
       madeForName: "Novo Nordisk",
       madeForURL: "https://www.novonordisk.com/",
-      outcome: "Launched in 2023 for worldwide Novo Nordisk client use",
+      outcome: "Launched in 2023 for worldwide Novo Nordisk client use.",
     },
     {
       title: "Connectful",
