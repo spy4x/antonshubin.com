@@ -32,8 +32,9 @@ deno task start                 # run the production server
 deno task update                # update Fresh
 deno task deploy                # production → antonshubin.com
 deno task deploy:stag           # staging   → website-stag.antonshubin.com
-deno task env:encrypt           # .env.prod → .env.prod.age
-deno task env:decrypt           # .env.prod.age → .env.prod
+deno task env:encrypt           # every .env* → its .env*.age (age64)
+deno task env:decrypt           # every .env*.age → its plaintext (age64)
+deno task env:status            # key presence + which env/age files exist
 deno task publish:blog          # publish a blog post + a Dev.to draft
 deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
 deno task video-kit             # transcript → titles, description, chapters, blog draft
@@ -48,12 +49,15 @@ test blocks the merge exactly like a red lint.
 
 ## Environment setup for a new worktree
 
-The age decrypt key is not part of this repo; `scripts/decrypt.ts` reads it from
-`.age/key.txt` and expects it copied in from `~/sync/code/homelab/.age/` if
-missing. Run `deno task env:decrypt` after placing the key to turn
-`.env.prod.age` into `.env.prod`. Agents never copy an env file (`.env`,
-`.env.prod`, or the key itself) between checkouts or worktrees — decrypt it
-fresh in each one.
+The age decrypt key is not part of this repo. Encryption is
+`@spy4x/server/env-age64` (jsr:@spy4x/server@1.2.0/env-age64), per-value age64
+in TypeScript — no `sops` binary, no `.sops.yaml`. It reads `.age/key.txt`,
+which lives only in the main checkout: Syncthing replicates it as part of
+`~/sync/code`; keep an offline copy as well. A linked git worktree needs no copy
+of its own: the module finds the MAIN checkout's key itself by reading the
+worktree's `.git` file. Run `deno task env:decrypt` to turn `.env.prod.age` into
+`.env.prod`. Agents never copy an env file (`.env`, `.env.prod`, or the key
+itself) between checkouts or worktrees — decrypt it fresh in each one.
 
 ## Deploy
 
