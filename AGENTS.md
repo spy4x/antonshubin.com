@@ -63,6 +63,11 @@ The deploy script passes the local commit hash to the remote build as
 Nothing is written back to a tracked file, so a deploy leaves `git status` clean
 — see `docs/deploy.md`.
 
+The newsletter subscriber list (`data/subscribers.json`) lives on the host:
+`compose.yml` bind-mounts the app directory's `data/`, and the deploy's
+`rsync --delete` excludes `/data/`. Keep both, or a deploy empties the list.
+Backup and restore are in `docs/deploy.md` "Subscriber data".
+
 ## Code style
 
 Double quotes, no semicolons, 2-space indent, 100 columns — this is what
@@ -129,7 +134,11 @@ cover the two lightboxes' buttons, which only exist after client JS opens them
 (see "Browser-driven tests"). `islands/Menu.tsx` sets no `aria-current` itself;
 Fresh's renderer adds it, and `test/a11y.test.ts` pins that — don't add it by
 hand. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
-needed.
+needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
+`UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
+preconnect links while browsers do. `routes/_app.tsx` makes that decision at
+render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is
+rendered.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds
@@ -202,11 +211,10 @@ policy exists to close). No nonce means no inline script runs, full stop.
 Fresh writes each render's nonce onto the `Response` at
 `Symbol.for("__freshNonce")` and stamps the same value onto every JSX
 `<script>`/`<style>` vnode it renders — `main.ts`'s middleware reads it back
-after `ctx.next()` and hands it to `buildCsp()`. `routes/_middleware.ts`'s bot
-rewrite builds a _new_ `Response`, which doesn't carry the symbol over on its
-own, so that middleware copies it by hand — drop that copy and bot requests
-silently lose their nonce (not visitor-facing, but still a value the CSP
-middleware here relies on).
+after `ctx.next()` and hands it to `buildCsp()`. A middleware that rebuilds a
+response with `new Response(...)` drops the symbol, and that page then runs no
+inline script at all (Fresh's boot script included), so change headers on the
+response `ctx.next()` returned instead of rebuilding it.
 
 **To allow a new origin** (a new analytics host, a new embed), edit
 `lib/csp.ts`'s `buildCsp()` directly — it's a pure function (no `Deno.env`

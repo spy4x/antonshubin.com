@@ -1,4 +1,4 @@
-data/subscribers.json
+/data/
 .env
 .env.*
 _fresh/

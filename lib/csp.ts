@@ -4,9 +4,8 @@
  * `middlewares/csp.ts`): Fresh's nonce mode falls back to `'unsafe-inline'`
  * for `script-src`/`style-src` whenever a response carries no render nonce
  * — exactly the hand-built-HTML case this policy exists to close (JSON
- * responses, redirects, the bot-rewritten HTML in
- * `routes/_middleware.ts`). Here, no nonce means no inline script is
- * allowed, full stop.
+ * responses, redirects, any `new Response(html)`). Here, no nonce means no
+ * inline script is allowed, full stop.
  *
  * Pure and side-effect-free — no `Deno.env` reads — so it's testable without
  * touching the runtime; `main.ts` reads env-derived origins and passes them
@@ -23,21 +22,14 @@
 export const FRESH_NONCE_SYMBOL: unique symbol = Symbol.for("__freshNonce");
 
 /** Symbol-keyed properties (like `FRESH_NONCE_SYMBOL`) aren't part of
- * `Response`'s type, so reading or writing one needs a cast; this narrows it
- * to exactly that shape instead of `any`. */
+ * `Response`'s type, so reading one needs a cast; this narrows it to exactly
+ * that shape instead of `any`. */
 type ResponseWithSymbols = Record<symbol, string | undefined>;
 
 /** Reads the render nonce Fresh attached to `res`, if any (see
  * `FRESH_NONCE_SYMBOL`). */
 export function readFreshNonce(res: Response): string | undefined {
   return (res as unknown as ResponseWithSymbols)[FRESH_NONCE_SYMBOL];
-}
-
-/** Copies the render nonce from `source` onto `target` — for a rebuilt
- * `Response` (`new Response(...)`) that would otherwise lose it. */
-export function copyFreshNonce(source: Response, target: Response): void {
-  (target as unknown as ResponseWithSymbols)[FRESH_NONCE_SYMBOL] =
-    readFreshNonce(source);
 }
 
 export interface CspOptions {

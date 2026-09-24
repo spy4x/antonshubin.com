@@ -11,9 +11,14 @@
  *   deno task deploy:stag      # staging   → website-stag.antonshubin.com
  *
  * Steps:
- *  1. Rsync source (excluding .git, .age, node_modules, _fresh, and .dockerignore patterns)
+ *  1. Rsync source (excluding .git, .age, node_modules, _fresh, data, and .dockerignore patterns)
  *  2. Rsync env files separately (blocked by .dockerignore from step 1)
- *  3. SSH to the server: BUILD_ID=<commit hash> docker compose up -d --build
+ *  3. SSH to the server: mkdir -p data, then BUILD_ID=<commit hash> docker compose up -d --build
+ *
+ * `data/` on the server holds the newsletter subscriber list, bind-mounted into
+ * the container by compose.yml. Step 1 never deletes or overwrites it, and step
+ * 3 creates it on a fresh target so it belongs to the deploy user, not to root
+ * (Docker creates a missing bind-mount source as root). See docs/deploy.md.
  */
 
 // Cloud server (23.88.101.28). antonshubin.com used to run on the home server
@@ -91,10 +96,13 @@ try {
   }
   const BUILD_ID = buildIdResult.stdout.trim();
 
-  // Step 1: source code (exclude env files via dockerignore filter)
+  // Step 1: source code (exclude env files via dockerignore filter).
+  // `/data/` is excluded explicitly, not only through .dockerignore: rsync
+  // never deletes an excluded path, even with --delete, and the subscriber
+  // list there must survive a later edit of .dockerignore.
   console.log("  rsync source...");
   const r1 = await run(
-    `rsync -avz --delete --exclude='.git' --exclude='.age/' --exclude='node_modules/' --exclude='_fresh/' --filter=':- .dockerignore' ./ ${REMOTE}`,
+    `rsync -avz --delete --exclude='.git' --exclude='.age/' --exclude='node_modules/' --exclude='_fresh/' --exclude='/data/' --filter=':- .dockerignore' ./ ${REMOTE}`,
   );
   if (r1.code !== 0) {
     throw new Error(r1.stderr);
@@ -114,8 +122,8 @@ try {
   const composeCmd = isStaging
     // Staging: cp .env.staging.local → .env.prod for compose.yml's env_file,
     // and set PROJECT for the container_name variable in compose.yml
-    ? `cd ${REMOTE_PATH} && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
-    : `cd ${REMOTE_PATH} && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
+    ? `cd ${REMOTE_PATH} && mkdir -p data && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
+    : `cd ${REMOTE_PATH} && mkdir -p data && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
   const r3 = await run(
     `ssh ${SERVER} '${composeCmd}'`,
   );

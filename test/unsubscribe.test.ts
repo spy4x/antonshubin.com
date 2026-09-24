@@ -190,10 +190,10 @@ Deno.test("the CSP header's nonce equals every inline script's nonce", async () 
 });
 
 Deno.test("the CSP header's nonce equals every inline script's nonce for a Googlebot-UA request", async () => {
-  // routes/_middleware.ts copies the render nonce onto the bot-rewritten
-  // response — without that copy, main.ts's CSP middleware finds no nonce
-  // and falls back to a script-src that blocks every inline script,
-  // breaking hydration for crawlers with a bot user agent.
+  // Bots get a different render (routes/_app.tsx leaves Umami out, see
+  // lib/bots.ts). If that path ever rebuilds the response, the render nonce
+  // is lost and main.ts's policy blocks every inline script, which breaks
+  // hydration for crawlers.
   await withSubscribers([], async (site) => {
     await assertNoncePinned(site, "/", {
       headers: { "user-agent": GOOGLEBOT_UA },
