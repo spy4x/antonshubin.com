@@ -79,19 +79,30 @@ The app reads the file on every request, so no restart is needed.
 
 ## Env files
 
-| File            | Git       | Use                  |
-| --------------- | --------- | -------------------- |
-| `.env`          | ignored   | local dev            |
-| `.env.prod`     | ignored   | prod secrets         |
-| `.env.prod.age` | committed | encrypted (SOPS+age) |
-| `.env.example`  | committed | template             |
+| File            | Git       | Use                          |
+| --------------- | --------- | ---------------------------- |
+| `.env`          | ignored   | local dev                    |
+| `.env.age`      | ignored   | local dev, encrypted (age64) |
+| `.env.prod`     | ignored   | prod secrets                 |
+| `.env.prod.age` | committed | encrypted (age64)            |
+| `.env.example`  | committed | template                     |
+
+Encryption is per value: `@spy4x/server/env-age64`
+(https://jsr.io/@spy4x/server/doc/env-age64), run via `deno task env:encrypt` /
+`deno task env:decrypt` / `deno task env:status`. No `sops` binary, no
+`.sops.yaml`.
 
 ## Age key
 
 ```bash
-age-keygen -o .age/key.txt
-# copy public key from output → paste into .sops.yaml
+deno task env:status   # keygen if none exists yet:
+deno run --no-prompt -R -W=. @spy4x/server/env-age64/cli keygen
 ```
+
+The key lives at `.age/key.txt` (gitignored). Back it up the same way the SOPS
+key was backed up: a copy at `~/sync/code/homelab/.age/` — restore it there if
+this repo's copy is ever lost. A linked git worktree needs no copy: the module
+finds the main checkout's key itself.
 
 ## Verify
 
