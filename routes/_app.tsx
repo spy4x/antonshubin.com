@@ -27,34 +27,17 @@ export default define.page(function App({ Component, req }) {
         </style>
 
         {
-          /* Font budget (#184): only the two files the first paint needs —
-            Literata 600 for the H1, Plex Sans 400 for body text — Latin
-            subset only (a Cyrillic-only visitor repaints once the matching
-            Cyrillic file arrives unpreloaded, same as any other subset).
-            fetchpriority="low": the home page's actual LCP element is the
-            hero <img fetchpriority="high"> (routes/index.tsx), not text —
-            an unprioritized font preload competed with it for bandwidth on
-            a throttled connection and pushed LCP out (see the PR body's
-            before/after numbers); low keeps these two requests from ever
-            outrunning that image while still starting well before the
-            fonts would otherwise be discovered. */
+          /* No font preload (#184 review): measured, interleaved,
+            fresh-browser-per-sample comparisons proved both preloads made
+            the home page's LCP worse — CPU-only and slow-network alike —
+            even deprioritized with fetchpriority="low", because the home
+            page's actual LCP element is the hero <img fetchpriority="high">
+            below, not text, and any extra early request competes with it.
+            See scripts/lcp.ts's docs and the PR body for the numbers.
+            font-display: swap plus assets/styles.css's size-adjusted
+            fallback faces are what keep text visible immediately and the
+            layout stable once the real fonts arrive instead. */
         }
-        <link
-          rel="preload"
-          href="/fonts/literata-latin-600-normal.woff2"
-          as="font"
-          type="font/woff2"
-          crossorigin="anonymous"
-          fetchpriority="low"
-        />
-        <link
-          rel="preload"
-          href="/fonts/ibm-plex-sans-latin-400-normal.woff2"
-          as="font"
-          type="font/woff2"
-          crossorigin="anonymous"
-          fetchpriority="low"
-        />
 
         {/* Favicon + Apple Touch Icons (modern sizes only) */}
         <link
@@ -108,7 +91,7 @@ export default define.page(function App({ Component, req }) {
       <body class="h-full">
         <a
           href="#main-content"
-          class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-accent focus:text-ink focus:font-semibold"
+          class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-parchment focus:text-ink focus:font-semibold"
         >
           Skip to main content
         </a>
