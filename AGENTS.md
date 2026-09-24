@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP and service-worker tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker and visual-system tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -40,6 +40,7 @@ deno task video-kit             # transcript → titles, description, chapters, 
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
+deno task lcp                   # home page LCP, median of 7 cold Chromium loads (needs a build)
 ```
 
 `deno task check` fails on a failing test, same as a lint or type error — a red
@@ -90,6 +91,63 @@ The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
 Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
 item. The five promises on `/how-i-work` are the only promises on the site; the
 free written audit carries no deadline.
+
+## Visual system
+
+`assets/styles.css`'s `@theme` block is the only place a colour is defined
+(#184): Ink, Desk, Paper and Lamp are the four dark surfaces (page, rail/bar/
+footer, cards, active nav), Rule/Rule strong are hairline and control borders,
+Parchment/Graphite are primary/secondary text, Accent (`#f97316`, Ink text on
+it, hover `#fb923c`) is the one filled-button colour, and Sage/ Mist/Brick are
+status colours (ready-live/beta-info/risk-error). Every class in `routes/`,
+`components/` and `islands/` uses these tokens (`bg-ink`, `text-parchment`, …) —
+a raw Tailwind palette colour (`slate-*`, `gray-*`, `orange-*`, …) showing up
+again is a regression, not a style choice. `components/Button.tsx` is the one
+button component: `variant` defaults to `secondary` (an outline button);
+`variant="primary"` is `bg-accent text-ink` and is reserved for the Book action
+— using it anywhere else fails `test/visual-system.browser.test.ts`'s "the
+accent colour is a background only on the primary button and the nav's Book"
+guard. Not every Book call site has been ported to `<Button>` itself yet —
+several still carry an equivalent literal class string
+(`bg-accent text-ink hover:bg-accent-hover
+font-semibold rounded-lg transition-colors`)
+alongside `components/
+BookCallLink.tsx`, which owns the
+`href`/`target`/empty-`url` behaviour `<Button href=…>` doesn't.
+`components/StatusMark.tsx` renders a shape plus a word for a project/tool
+status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`) —
+never colour alone; used today on `routes/projects/
+index.tsx` and
+`routes/projects/[slug].tsx`'s archived/outcome badges.
+
+Type: Literata 600 for headings (`h1`-`h3`, `.h1`, `.h2` in `assets/styles.css`
+set `font-family: var(--font-heading)` directly, so a heading can't accidentally
+render in a Tailwind utility's font — the cascade layer Tailwind's own utilities
+sit in loses to unlayered CSS regardless of selector specificity), IBM Plex Sans
+for body text, nav and buttons, Literata italic for margin notes (`.margin-note`
+utility, not yet used — later redesign issues wire it up) via
+`font-variant-numeric: tabular-nums` on `.price`. IBM Plex Mono only for
+`code`/`pre`/`kbd`. All three are self-hosted under `static/fonts/` (Latin +
+Cyrillic subsets, from `@fontsource`'s pre-split files — their `unicode-range`
+values are copied verbatim; OFL licence files are in the same directory),
+`font-display: swap`, with size-adjusted local fallback faces so the swap
+doesn't reflow the page. Only Literata 600 Latin and Plex Sans 400 Latin are
+preloaded (`routes/_app.tsx`, `fetchpriority="low"` — the home page's actual LCP
+element is the hero `<img fetchpriority="high">`, not text, and an unprioritized
+font preload measurably competed with it for bandwidth; see `scripts/lcp.ts`'s
+docs and the #184 PR body for the before/after numbers). `lib/csp.ts`'s
+`font-src 'self'` already covers same-origin font files — self-hosting needed no
+CSP change.
+
+`scripts/lcp.ts` (`deno task lcp`, not part of `deno task check` — it needs a
+production build and several seconds per sample) measures the home page's
+Largest Contentful Paint: a mobile-emulated, 4x-CPU-throttled Chromium tab,
+median of several cold loads. Rerun it after any change that could affect the
+home page's hero image or its render path, and compare against a same-machine
+baseline measured the same way (a `git stash`-and-rebuild of `origin/main` in
+the same session is more reliable than a number from an earlier session — the
+sampled loads have real run-to-run variance, confirmed by measuring the exact
+same commit twice in a row and getting different medians).
 
 ## Content rule
 
@@ -162,13 +220,13 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-five files below and fails loudly, naming the install command, if none is found.
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all six
+files below and fails loudly, naming the install command, if none is found.
 Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All
-five call `startSite()` and run under `deno task test:browser` with `-A`, not
-the narrow `deno task test`.
+— a mismatch downloads a different Chromium build than the one launched. All six
+call `startSite()` and run under `deno task test:browser` with `-A`, not the
+narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
@@ -206,6 +264,16 @@ the narrow `deno task test`.
   reopened answers "Link not recognised", not the cached form. It opens the
   pages under test in a second tab once `navigator.serviceWorker.ready`
   resolves, because the tab that registers the worker is not controlled by it.
+- `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
+  renders in a monospace font; the accent colour is painted as a background only
+  by the primary button and the Book action (scans computed `background-color`
+  on representative pages against a live-resolved `bg-accent` probe, so a token
+  edit can't desync the check from `assets/styles.css`); Literata and IBM Plex
+  Sans show up in `document.fonts` and every font request is same-origin, with
+  no CSP violation. `test/no-emoji.test.ts` (not browser-driven — a plain
+  `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
+  every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
+  characters, excluding `©`/`®`/`™` and plain digits.
 
 ## Content-Security-Policy
 
