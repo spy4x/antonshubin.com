@@ -234,7 +234,13 @@ Deno.test("no JSON-LD block on the home page states the earnings figure", async 
   }
 });
 
-Deno.test("visibleTestimonials only renders entries with both a source and permission, and a rendered one links its source", async () => {
+// This only checks the filter's own logic against the real data (the list
+// itself, empty today) — whether a *visible* one actually links its source
+// is checked at the component level instead, in
+// components/TestimonialCard.test.tsx, since today's data has no visible
+// entry to fetch a built page and find. Checking it here against the real
+// (always-empty) list would pass vacuously no matter what the markup does.
+Deno.test("visibleTestimonials(testimonials) is empty until a real entry has a source and permission", () => {
   const permissioned = testimonials.map((t) => ({
     ...t,
     sourceHref: "https://example.com/review",
@@ -242,19 +248,4 @@ Deno.test("visibleTestimonials only renders entries with both a source and permi
   }));
   assertEquals(visibleTestimonials(permissioned).length, permissioned.length);
   assertEquals(visibleTestimonials(testimonials), []);
-
-  const site = await startSite();
-  try {
-    const html = await site.html("/");
-    if (visibleTestimonials(testimonials).length > 0) {
-      for (const t of visibleTestimonials(testimonials)) {
-        assert(
-          t.sourceHref !== undefined && html.includes(`href="${t.sourceHref}"`),
-          `testimonial "${t.id}" is visible but the page has no link to its sourceHref`,
-        );
-      }
-    }
-  } finally {
-    await site.stop();
-  }
 });
