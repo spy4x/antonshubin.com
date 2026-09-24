@@ -17,6 +17,8 @@ export interface PromiseItem {
   id: string;
   icon: PromiseIcon;
   title: string;
+  /** The promise as a noun phrase for use mid-sentence ("a five-day refund"). */
+  phrase: string;
   desc: string;
   /** "Why this matters", shown under the promise on /how-i-work. */
   why: string;
@@ -27,6 +29,7 @@ export const promises: PromiseItem[] = [
     id: "refund",
     icon: "shield",
     title: "Five-day refund",
+    phrase: "a five-day refund",
     desc:
       "If in the first five days you feel this is not working, tell me and I refund what you paid.",
     why:
@@ -36,6 +39,7 @@ export const promises: PromiseItem[] = [
     id: "first-milestone",
     icon: "target",
     title: "A small first milestone",
+    phrase: "a small first milestone",
     desc:
       "We start with one or two weeks of work. If either of us wants to stop at the end of it, we stop — you keep everything built so far.",
     why:
@@ -45,6 +49,7 @@ export const promises: PromiseItem[] = [
     id: "ownership",
     icon: "key",
     title: "You own everything from day one",
+    phrase: "full ownership from day one",
     desc: "Code, accounts, servers and keys are in your name.",
     why:
       "Your product is your asset. Nothing about how I work should get in the way of you taking it wherever you need it.",
@@ -53,6 +58,7 @@ export const promises: PromiseItem[] = [
     id: "weekly-software",
     icon: "calendar",
     title: "Weekly working software",
+    phrase: "weekly working software",
     desc:
       "You see working software every week, with a short written update. Calls when they help, not on a schedule for its own sake.",
     why:
@@ -62,6 +68,7 @@ export const promises: PromiseItem[] = [
     id: "free-bugfixes",
     icon: "wrench",
     title: "Free bug fixes for 30 days",
+    phrase: "free bug fixes for 30 days",
     desc: "Bugs in what I delivered are fixed free for 30 days.",
     why:
       "I stand behind what I build. If something I shipped breaks, I fix it on my time, not yours.",

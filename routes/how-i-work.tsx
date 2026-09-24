@@ -31,11 +31,11 @@ const ongoing = catalogItem("cto-advisory-retainer");
 const faqs: Faq[] = [
   {
     q: "What if we start working together and it is not a good fit?",
-    a: `That is exactly why I offer a ${
-      decapitalize(promise("refund").title)
-    }. ${promise("refund").desc} We also start with ${
-      decapitalize(promise("first-milestone").title)
-    }: ${decapitalize(promise("first-milestone").desc)}`,
+    a: `That is exactly why I offer ${promise("refund").phrase}. ${
+      promise("refund").desc
+    } We also start with ${promise("first-milestone").phrase}: ${
+      decapitalize(promise("first-milestone").desc)
+    }`,
   },
   {
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
@@ -110,7 +110,7 @@ export default define.page(function HowIWork() {
     ...head.value,
     title: "How I Deliver — Anton Shubin",
     description: `Five promises, no fine print: ${
-      promises.map((p) => decapitalize(p.title)).join(", ").replace(
+      promises.map((p) => p.phrase).join(", ").replace(
         /, ([^,]*)$/,
         ", and $1",
       )

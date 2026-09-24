@@ -108,7 +108,7 @@ Deno.test('"top 1%" (any case) appears only through lib/proof.ts', async () => {
   }
 });
 
-Deno.test("every promise title (any case) and desc appears in source only through lib/promises.ts", async () => {
+Deno.test("every promise title, phrase (any case) and desc appears in source only through lib/promises.ts", async () => {
   const files = await sourceFiles(["lib/promises.ts"]);
   for (const p of promises) {
     for (const file of files) {
@@ -116,6 +116,10 @@ Deno.test("every promise title (any case) and desc appears in source only throug
       assert(
         !text.toLowerCase().includes(p.title.toLowerCase()),
         `${file} hand-writes promise title "${p.title}" instead of reading lib/promises.ts`,
+      );
+      assert(
+        !text.toLowerCase().includes(p.phrase.toLowerCase()),
+        `${file} hand-writes promise phrase "${p.phrase}" instead of reading lib/promises.ts`,
       );
       assert(
         !text.includes(p.desc),
