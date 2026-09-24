@@ -4,23 +4,28 @@ import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts";
 import { type Project, projects } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
+import { proof } from "../lib/proof.ts";
+import { decapitalize, promise } from "../lib/promises.ts";
+import { firstSentence } from "../lib/llms.ts";
+import { visibleTestimonials } from "../lib/testimonials.ts";
 import { ROLE } from "../lib/head.ts";
+import { WithNote } from "../components/WithNote.tsx";
 import LeadForm from "../islands/LeadForm.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
+import { TestimonialCard } from "../components/TestimonialCard.tsx";
 import {
   ArrowRightIcon,
   CalendarIcon,
   CatalogIcon,
-  StarIcon,
   UpworkIcon,
 } from "../components/Icons.tsx";
 
 /** The three numbers of the proof strip. All three are on my Upwork profile. */
 const proofNumbers = [
-  { value: "80", label: "jobs on Upwork" },
-  { value: "100%", label: "Job Success" },
-  { value: "$395K", label: "earned on Upwork" },
+  { value: proof("jobs"), label: "jobs on Upwork" },
+  { value: proof("job-success"), label: "Job Success" },
+  { value: proof("earned"), label: "earned on Upwork" },
 ];
 
 /**
@@ -35,7 +40,21 @@ const caseStudies: Project[] = ["smartlite", "foodrazor", "corecircle"].map(
   },
 );
 
-/** Three steps, drawn from the five promises on /how-i-work and nothing else. */
+/** Strips a single trailing period, for splicing a promise's `desc` mid-sentence. */
+function withoutPeriod(text: string): string {
+  return text.replace(/\.$/, "");
+}
+
+/**
+ * Three steps, drawn from the five promises on /how-i-work and nothing else
+ * — every sentence that states a promise is spliced from `lib/promises.ts`
+ * (`promise(id).desc`), not hand-written, so a promise term can't drift
+ * between /how-i-work and here. Step 1 ("We talk") isn't a promise, so it
+ * stays hand-written. The first-milestone step's title and its first two
+ * sentences come from lib/promises.ts verbatim; the previous copy
+ * paraphrased them ("Either of us can stop..." instead of "If either of us
+ * wants to stop..."), which /how-i-work's wording now wins per #186.
+ */
 const steps = [
   {
     title: "We talk",
@@ -43,18 +62,21 @@ const steps = [
       "A free 30-minute call. Tell me what you need and I will tell you how I would go about it.",
   },
   {
-    title: "A small first milestone",
-    desc:
-      "We start with one or two weeks of work. Either of us can stop at the end of it, and you keep everything built so far. If in the first five days you feel this is not working, I refund what you paid.",
+    title: promise("first-milestone").title,
+    desc: `${promise("first-milestone").desc} ${promise("refund").desc}`,
   },
   {
     title: "Working software every week",
-    desc:
-      "You see working software every week, with a short written update. Code, accounts, servers and keys are in your name from day one, and bugs in what I delivered are fixed free for 30 days.",
+    desc: `${firstSentence(promise("weekly-software").desc)} ${
+      withoutPeriod(promise("ownership").desc)
+    } from day one, and ${
+      decapitalize(withoutPeriod(promise("free-bugfixes").desc))
+    }.`,
   },
 ];
 
 export default define.page(function Home(ctx) {
+  const visible = visibleTestimonials();
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
@@ -153,18 +175,21 @@ export default define.page(function Home(ctx) {
             ))}
             <NewTabHint />
           </a>
-          <p class="text-graphite text-sm mb-8">
-            Expert-Vetted on Upwork (top 1%), 6,600+ hours.{" "}
-            <a
-              href={UPWORK_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-accent hover:text-accent underline underline-offset-4"
-            >
-              Check it on my Upwork profile
-              <NewTabHint />
-            </a>
-          </p>
+          <WithNote id="upwork-profile" class="mb-8">
+            <p class="text-graphite text-sm">
+              {proof("expert-vetted")} on Upwork ({proof("top-percent")
+                .toLowerCase()}), {proof("hours")}+ hours.{" "}
+              <a
+                href={UPWORK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-accent hover:text-accent underline underline-offset-4"
+              >
+                Check it on my Upwork profile
+                <NewTabHint />
+              </a>
+            </p>
+          </WithNote>
           <div class="grid gap-5 md:grid-cols-3">
             {caseStudies.map((p) => (
               <a
@@ -236,117 +261,50 @@ export default define.page(function Home(ctx) {
           </p>
         </section>
 
-        {/* Testimonial Section */}
-        <section data-home-section="testimonials" class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">What clients say</h2>
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* Testimonial 1: MVP Development */}
-            <div class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
-              <div class="flex gap-1 items-center mb-3">
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <span class="ml-1 text-parchment font-medium text-sm">5.0</span>
-              </div>
-              <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
-                "Anton was a terrific partner to me in developing an MVP of a
-                web app I've been dreaming of for ages. He is a highly skilled
-                developer, a super resourceful problem-solver, and a
-                conscientious and communicative collaborator."
-              </p>
-              <div>
-                <p class="font-medium text-parchment text-sm">
-                  Startup Founder
-                </p>
-                <p class="text-graphite text-sm">
-                  MVP Development
-                </p>
-              </div>
+        {
+          /* Testimonial Section — renders only entries lib/testimonials.ts
+          clears for publishing (a source link and Anton's permission); see
+          #186. Empty today, so this section renders nothing. */
+        }
+        {visible.length > 0 && (
+          <section data-home-section="testimonials" class="mb-16 md:mb-24">
+            <h2 class="h1 mb-8">What clients say</h2>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {visible.map((t) => <TestimonialCard key={t.id} t={t} />)}
             </div>
 
-            {/* Testimonial 2: Technical Lead */}
-            <div class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
-              <div class="flex gap-1 items-center mb-3">
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <span class="ml-1 text-parchment font-medium text-sm">5.0</span>
-              </div>
-              <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
-                "He isn't one of the type of developers that just says 'sure, I
-                can do that.' He's thoughtful and will give his honest feedback
-                and advice on everything. Overall, 12/10 of a developer. I
-                really got lucky with Anton."
-              </p>
-              <div>
-                <p class="font-medium text-parchment text-sm">Product Owner</p>
-                <p class="text-graphite text-sm">
-                  Tech Lead • $55,749 • 7+ months
-                </p>
-              </div>
-            </div>
-
-            {/* Testimonial 3: Consultation */}
-            <div class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
-              <div class="flex gap-1 items-center mb-3">
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <StarIcon class="text-accent w-4 h-4" filled />
-                <span class="ml-1 text-parchment font-medium text-sm">5.0</span>
-              </div>
-              <p class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
-                "On an hour consultation, he killed it. He didn't just talk, we
-                got work done during the call. He was very knowledgeable on
-                pretty much everything I needed and I'll certainly be going back
-                more than a few times."
-              </p>
-              <div>
-                <p class="font-medium text-parchment text-sm">
-                  Startup Founder
-                </p>
-                <p class="text-graphite text-sm">
-                  Technical Consultation
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Link to Upwork */}
-          <div class="mt-6 text-right">
-            <a
-              href="https://www.upwork.com/freelancers/ashubin"
-              target="_blank"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
-            >
-              View all reviews on{" "}
-              <UpworkIcon class="w-auto h-4 text-parchment" />
-              <span class="sr-only">Upwork</span>
-              <svg
-                aria-hidden="true"
-                focusable="false"
-                class="w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
+            {/* Link to Upwork */}
+            <div class="mt-6 text-right">
+              <a
+                href={UPWORK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-semibold"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                />
-              </svg>
-              <NewTabHint />
-            </a>
-          </div>
-        </section>
+                View all reviews on{" "}
+                <UpworkIcon class="w-auto h-4 text-parchment" />
+                <span class="sr-only">Upwork</span>
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  class="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                  />
+                </svg>
+                <NewTabHint />
+              </a>
+            </div>
+          </section>
+        )}
 
         {/* 5. How it works — three steps drawn from the five promises */}
         <section data-home-section="how-it-works" class="mb-16 md:mb-24">

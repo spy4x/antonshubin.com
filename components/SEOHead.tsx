@@ -6,6 +6,7 @@ import {
   SITE_DESCRIPTION,
 } from "../lib/head.ts";
 import { SAME_AS_URLS } from "../lib/config.ts";
+import { proof } from "../lib/proof.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
 
 export function SEOHead() {
@@ -106,10 +107,14 @@ export function SEOHead() {
                   "Tech Debt Remediation",
                 ],
                 "award": [
-                  "Upwork Expert-Vetted",
-                  "Upwork 100% Job Success",
-                  "$395K+ earned on Upwork across 80+ projects",
+                  `Upwork ${proof("expert-vetted")}`,
+                  `Upwork ${proof("job-success")} Job Success`,
                 ],
+                // No schema.org property fits the Upwork earnings figure
+                // without overclaiming (disambiguatingDescription exists to
+                // tell apart similarly-named items, not to state earnings),
+                // and the figure is already visible on the page (#186) —
+                // left out of structured data entirely rather than misused.
                 "sameAs": [...SAME_AS_URLS],
                 // schema.org's n-ary-relation pattern: a plain "worksFor":
                 // {"@id": "...#org"} has no room for a role, so the value is

@@ -96,6 +96,60 @@ Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
 item. The five promises on `/how-i-work` are the only promises on the site; the
 free written audit carries no deadline.
 
+## Proof, promises, testimonials and notes
+
+Four more `lib/*.ts` files hold the only written copy of a category of claim
+(#186), the same pattern as `lib/catalog.ts` for prices — each exports a lookup
+that throws on a typo, so a bad id fails the build instead of shipping a broken
+reference.
+
+- `lib/proof.ts` is the only place an Upwork number or label (jobs, job success
+  rate, amount earned, hours, Expert-Vetted, Top 1%) is written. The home page,
+  `components/SEOHead.tsx`'s JSON-LD, the sitemap comment, both llms files,
+  `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
+  `routes/saas-architecture-guide.tsx`, `routes/api/subscribe.ts`'s confirmation
+  email and `lib/data.ts`'s template project all read a value through
+  `proof(id)`. `test/proof-promises-notes.test.ts`'s proof guard scans
+  `routes/`, `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and
+  every `*.test.ts`) for each figure's exact rendered text — including the
+  quoted-literal and case-insensitive forms a hand revert of the home proof
+  strip would take (with an explicit allowlist entry for
+  `islands/MeetEmbed.tsx`'s unrelated CSS `width: "100%"`) — and fails on a
+  hand-written copy.
+- `lib/promises.ts` holds the five promises' title, description and "why this
+  matters" text. `/how-i-work` is where this wording was written and reviewed,
+  so its copy is canonical; `routes/how-i-work.tsx`'s FAQ answers, the home
+  page's "How it works" steps (two of the three — the first, "We talk", isn't a
+  promise), both llms files' Promises sections and `lib/catalog.ts`'s bug-fix
+  bullet all splice a promise's `title`/`desc` through `promise(id)` (and
+  `decapitalize()`/`firstSentence()` where a sentence needs to read as part of a
+  longer one) instead of restating it. The same guard test scans for each
+  promise's exact `title` and `desc` text, plus a short list of promise-specific
+  key terms ("one or two weeks of work", "fixed free for 30 days"), outside
+  `lib/promises.ts`.
+- `lib/testimonials.ts` holds every testimonial, each with a `permission` flag.
+  `visibleTestimonials(list = testimonials)` takes an optional list so a test
+  can check the filter itself without editing real data; `routes/index.tsx`'s
+  testimonials section renders only entries with both `sourceHref` and
+  `permission: true` — with none, the section doesn't render at all, and
+  `test/structure.test.ts`'s home-page section-list check reflects that.
+  `components/TestimonialCard.tsx` renders a visible entry's `sourceHref` as a
+  link, checked by `components/TestimonialCard.test.tsx`;
+  `lib/testimonials.test.ts` runs `visibleTestimonials()` on sample lists, and
+  `test/proof-promises-notes.test.ts` checks the real list shows nothing until
+  an entry has both.
+- `lib/notes.ts` holds every margin note (`{ id, text, href?, checkedOn? }`) —
+  the source or checked date behind a claim wrapped in
+  `components/WithNote.tsx`, which stamps the claim with `data-note-ref="<id>"`.
+  `test/proof-promises-notes.test.ts`'s note guard fetches every page in
+  `/sitemap.xml` and fails if a `data-note-ref` doesn't resolve to a note
+  carrying `href` or `checkedOn`. The note itself sits in a `.note-wrap` CSS
+  grid column from 1100px (`assets/styles.css`), reserved inside the wrapper's
+  own box rather than positioned into the page's margin, so it can't cause
+  horizontal scroll regardless of viewport width — `test/notes.browser.test.ts`
+  asserts `document.documentElement.scrollWidth` and the note's right edge never
+  exceed the viewport, at 1100/1280/1440px.
+
 ## Visual system
 
 `assets/styles.css`'s `@theme` block is the only place a colour is defined
@@ -141,11 +195,12 @@ render in a Tailwind utility's font: Tailwind wraps its own utilities in
 `@layer utilities`, which always loses to unlayered CSS like this rule
 regardless of selector specificity. IBM Plex Sans for body text, nav and
 buttons. Literata italic for margin notes and the Cyrillic tool marks (the
-`.margin-note` utility; not used yet — a later redesign issue wires it up).
-Tabular figures for prices, via `font-variant-numeric: tabular-nums` on the
-`.price` utility. IBM Plex Mono only for `code`, `pre` and `kbd`. Plex Sans
-ships only the 400 and 600 weights: `font-medium` (500) has no file and renders
-as 400, so use `font-semibold` for anything meant to look bold.
+`.margin-note` utility, wired up by `components/Note.tsx` since #186; the
+Cyrillic tool marks are still a later redesign issue). Tabular figures for
+prices, via `font-variant-numeric: tabular-nums` on the `.price` utility. IBM
+Plex Mono only for `code`, `pre` and `kbd`. Plex Sans ships only the 400 and 600
+weights: `font-medium` (500) has no file and renders as 400, so use
+`font-semibold` for anything meant to look bold.
 
 All three are self-hosted under `assets/fonts/` (Latin and Cyrillic subsets,
 from `@fontsource`'s pre-split files — their `unicode-range` values are copied
@@ -274,13 +329,13 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all six
-files below and fails loudly, naming the install command, if none is found.
-Playwright's version must match exactly across `deno.json`'s import map,
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
+seven files below and fails loudly, naming the install command, if none is
+found. Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All six
-call `startSite()` and run under `deno task test:browser` with `-A`, not the
-narrow `deno task test`.
+— a mismatch downloads a different Chromium build than the one launched. All
+seven call `startSite()` and run under `deno task test:browser` with `-A`, not
+the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
@@ -328,6 +383,13 @@ narrow `deno task test`.
   `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
   every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
   characters, excluding `©`/`®`/`™` and plain digits.
+- `test/notes.browser.test.ts` (#186): the margin note next to the home page's
+  Upwork proof line sits beside its claim with no horizontal scroll at 1100,
+  1280 and 1440px (the page's `scrollWidth` stays within the viewport and the
+  `.note-aside` element's right edge stays inside it) and below it at 390px —
+  the CSS breakpoint in `assets/styles.css`'s `.note-wrap`/`.note-aside` rules,
+  not checkable from server-rendered HTML alone since it depends on computed
+  layout.
 
 ## Content-Security-Policy
 

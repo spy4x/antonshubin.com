@@ -4,6 +4,7 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { blogArticles, prettyDate } from "../../lib/data.ts";
+import { proof } from "../../lib/proof.ts";
 
 const TABS = [
   { key: "all", label: "All" },
@@ -49,8 +50,8 @@ export default define.page(function Blog(ctx) {
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-parchment mb-2">Blog</h1>
         <p class="text-graphite mb-8 text-base sm:text-lg">
-          Architecture insights, SaaS lessons, and production patterns from 80+
-          shipped projects.
+          Architecture insights, SaaS lessons, and production patterns from{" "}
+          {proof("jobs")}+ shipped projects.
         </p>
 
         {/* Filter tabs */}

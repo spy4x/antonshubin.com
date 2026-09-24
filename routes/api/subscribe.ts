@@ -10,6 +10,7 @@ import {
 } from "../../lib/config.ts";
 import { loadSubscribers, saveSubscribers } from "../../lib/subscribers.ts";
 import { unsubscribeLink } from "../../lib/unsubscribe.ts";
+import { proof } from "../../lib/proof.ts";
 
 // ── Simple SMTP send (reuses lead.ts pattern) ──────────────────────────
 async function sendMail(
@@ -135,7 +136,9 @@ export const handler = define.handlers({
       email,
       SMTP_FROM || SMTP_USERNAME,
       "Welcome to Anton Shubin's newsletter",
-      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from 80+ projects.\n\nHere's a good place to start:\n${BASE_URL}/saas-architecture-guide\n\nUnsubscribe anytime:\n${link}\n\n— Anton`,
+      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
+        proof("jobs")
+      }+ projects.\n\nHere's a good place to start:\n${BASE_URL}/saas-architecture-guide\n\nUnsubscribe anytime:\n${link}\n\n— Anton`,
     ).catch((err) => console.error("[SUBSCRIBE] welcome failed:", err));
 
     // Notify owner

@@ -3,6 +3,7 @@ import { blogArticles, hackathons } from "../lib/data.ts";
 import { projects } from "../lib/data.ts";
 import { BASE_URL } from "../lib/config.ts";
 import { catalogItems } from "../lib/catalog.ts";
+import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
 
 export const handler = define.handlers({
@@ -126,7 +127,9 @@ export const handler = define.handlers({
 <!--
   Site: Anton Shubin — ${ROLE}
   Description: I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
-  Expert-Vetted (Top 1%). 100% Job Success. $395K+ earned. 80+ projects.
+  ${proof("expert-vetted")} (${proof("top-percent")}). ${
+      proof("job-success")
+    } Job Success. ${proof("earned")}+ earned. ${proof("jobs")}+ projects.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${urls}

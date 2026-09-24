@@ -9,9 +9,13 @@
  * The same list is used on Upwork and neatsoft.dev, so changing a number here
  * is the first of three edits, not the only one.
  *
- * This module has no imports on purpose, so tests and scripts can load it
- * without environment access.
+ * This module reads no environment variable, so tests and scripts can load
+ * it without environment access; its one import, `lib/promises.ts`, is the
+ * same (#186 — the MVP item's bug-fix-window bullet reads that promise's
+ * title instead of restating it).
  */
+
+import { promise } from "./promises.ts";
 
 /** Billing period of a price. Absent means a one-time price. */
 export type PricePeriod = "hour" | "month";
@@ -165,7 +169,7 @@ export const catalogItems: CatalogItem[] = [
       "Admin dashboard (user management, content moderation, basic analytics)",
       "Docker deployment on your server (staging + production)",
       "CI/CD pipeline + automated backups",
-      "Free bug fixes for 30 days + handoff walkthrough",
+      `${promise("free-bugfixes").title} + handoff walkthrough`,
     ],
     exclusions: [
       "Native mobile apps (iOS/Android) — web-responsive only",
