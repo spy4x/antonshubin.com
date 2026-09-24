@@ -16,6 +16,12 @@
 /** Billing period of a price. Absent means a one-time price. */
 export type PricePeriod = "hour" | "month";
 
+/**
+ * Icon name for a catalog item, rendered through `components/Icons.tsx`
+ * (#184) — the catalog used to carry a raw emoji here.
+ */
+export type CatalogIconName = "target" | "search" | "rocket" | "briefcase";
+
 export interface CatalogPrice {
   /** Whole US dollars. Every price on the list is a whole number. */
   usd: number;
@@ -30,7 +36,7 @@ export interface CatalogExample {
 }
 
 export interface CatalogItem {
-  icon: string;
+  icon: CatalogIconName;
   slug: string;
   /** Full title: page heading, `<title>`, JSON-LD name. */
   title: string;
@@ -59,7 +65,7 @@ export const INTRO_CALL = "free 30-minute intro call";
 
 export const catalogItems: CatalogItem[] = [
   {
-    icon: "🎯",
+    icon: "target",
     slug: "strategy-call",
     title: "Strategy Session — 60 Minutes",
     shortTitle: "Strategy session",
@@ -88,7 +94,7 @@ export const catalogItems: CatalogItem[] = [
     ],
   },
   {
-    icon: "🔍",
+    icon: "search",
     slug: "codebase-health-audit",
     title: "Code Audit & Refactoring Roadmap",
     shortTitle: "Code audit",
@@ -118,7 +124,7 @@ export const catalogItems: CatalogItem[] = [
     ],
   },
   {
-    icon: "🚀",
+    icon: "rocket",
     slug: "zero-to-production-saas-mvp",
     title: "Build: SaaS MVP, From Idea to Production",
     shortTitle: "Build: MVP",
@@ -178,7 +184,7 @@ export const catalogItems: CatalogItem[] = [
     ],
   },
   {
-    icon: "👔",
+    icon: "briefcase",
     slug: "cto-advisory-retainer",
     title: "Ongoing: Fractional CTO, Hourly or on Retainer",
     shortTitle: "Ongoing",
