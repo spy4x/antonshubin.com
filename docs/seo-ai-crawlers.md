@@ -120,6 +120,12 @@ Analytics (Umami) is configured via environment variables in `lib/config.ts`:
   `https://stats.antonshubin.com/script.js`)
 - `UMAMI_ID` — Umami website ID
 
+`routes/_app.tsx` leaves the Umami `<script>` and its preconnect links out of
+the page for known bots (the same crawlers this doc welcomes via `robots.txt`),
+so a bot that runs JavaScript does not inflate visitor counts. The bot list and
+the `isBot()` check live in `lib/bots.ts`; `_middleware.ts` no longer touches
+the response body (issue #179).
+
 Set these in `.env`. Never hardcode them in `_app.tsx`.
 
 ## Update Rules

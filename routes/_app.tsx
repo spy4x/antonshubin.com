@@ -2,9 +2,14 @@ import { define } from "../lib/utils.ts";
 import { UMAMI_ID, UMAMI_PRECONNECT_ORIGIN, UMAMI_URL } from "../lib/config.ts";
 import SWUpdater from "../islands/SWUpdater.tsx";
 import { resetHead } from "../lib/head.ts";
+import { isBot } from "../lib/bots.ts";
 
-export default define.page(function App({ Component }) {
+export default define.page(function App({ Component, req }) {
   resetHead();
+
+  // Known bots (issue #179) get no analytics script: deciding here, before
+  // anything renders, means no regex rewriting the response body afterward.
+  const isCrawler = isBot(req.headers.get("user-agent") || "");
 
   return (
     <html lang="en" class="h-full bg-slate-900">
@@ -52,8 +57,8 @@ export default define.page(function App({ Component }) {
           href="https://antonshubin.com/rss.xml"
         />
 
-        {/* Analytics */}
-        {UMAMI_URL && UMAMI_ID && (
+        {/* Analytics — skipped for known bots, see isCrawler above */}
+        {UMAMI_URL && UMAMI_ID && !isCrawler && (
           <>
             {UMAMI_PRECONNECT_ORIGIN && (
               <>
