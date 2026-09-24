@@ -95,24 +95,37 @@ Deno.test("the accent colour is a background only on the primary button and the 
           const accentRgb = getComputedStyle(probe).backgroundColor;
           probe.remove();
 
+          const inkProbe = document.createElement("div");
+          inkProbe.style.display = "none";
+          inkProbe.className = "text-ink";
+          document.body.appendChild(inkProbe);
+          const inkAccentTextRgb = getComputedStyle(inkProbe).color;
+          inkProbe.remove();
+
           const found: string[] = [];
           for (const el of document.querySelectorAll("*")) {
             const bg = getComputedStyle(el).backgroundColor;
             if (bg !== accentRgb) continue;
-            // A link whose href is the booking URL (the nav's Book, or any
-            // page's primary "Book a ... call" action) is the one allowed use.
-            const href = (el as HTMLAnchorElement).href ?? "";
-            const isBookingLink = href.includes("cal.example.com");
-            // A <button type="button"> with no href, used by
-            // islands/MeetEmbed.tsx's click-to-load facade, is the other
-            // allowed shape of the same Book action.
-            const isBookingButton = el.tagName === "BUTTON" &&
-              (el.textContent ?? "").toLowerCase().includes("book");
-            if (!isBookingLink && !isBookingButton) {
+            // The only allowed use: an element `components/Button.tsx`,
+            // `components/BookCallLink.tsx` or a hand-marked primary Book
+            // facade (islands/MeetEmbed.tsx, routes/contact-me.tsx) stamped
+            // with `data-primary-book` — never guessed from text content
+            // ("book" appears in plenty of non-CTA copy) or element shape.
+            const isPrimaryBook = el.hasAttribute("data-primary-book");
+            if (!isPrimaryBook) {
               found.push(
                 `${el.tagName.toLowerCase()}.${
                   Array.from(el.classList).join(".")
                 }`,
+              );
+              continue;
+            }
+            // The marked element must actually have Ink text — the other
+            // half of "Ink text on Accent" that a bg-only check can't see.
+            const inkRgb = getComputedStyle(el).color;
+            if (inkRgb !== inkAccentTextRgb) {
+              found.push(
+                `${el.tagName.toLowerCase()}[data-primary-book] has non-Ink text: ${inkRgb}`,
               );
             }
           }
@@ -149,26 +162,58 @@ Deno.test("Literata and IBM Plex Sans load from self with no CSP violation (#184
     });
     try {
       await page.goto(site.origin, { waitUntil: "networkidle" });
-      // Force both font families to actually be used and requested, then
-      // wait for the font-face set to settle.
+      // The home page's H1 (Literata 600) and body text (Plex Sans 400) use
+      // both families in their actual rendered text, which is what triggers
+      // the browser to load them — document.fonts.ready only waits for
+      // *triggered* loads to settle, it doesn't force an unused @font-face
+      // declaration to load. A @font-face rule is registered in
+      // `document.fonts` the moment the stylesheet parses, regardless of
+      // whether the file behind it ever loads successfully — so checking
+      // for family names alone (the previous version of this test) passes
+      // even when the actual file 404s. `status` is the only field that
+      // tells the two apart: it starts "unloaded", and only becomes
+      // "loaded" after the browser actually fetched and parsed the file, or
+      // "error" if that failed.
       await page.evaluate(async () => {
         await document.fonts.ready;
       });
-      const families = await page.evaluate(() => {
-        const names = new Set<string>();
+      const faces = await page.evaluate(() => {
         // deno-lint-ignore no-explicit-any
-        (document.fonts as any).forEach((f: FontFace) => names.add(f.family));
-        return [...names];
+        return [...(document.fonts as any)].map((f: FontFace) => ({
+          family: f.family,
+          weight: f.weight,
+          style: f.style,
+          status: f.status,
+        }));
       });
-      assert(
-        families.some((f) => f.includes("Literata")),
-        `document.fonts must include Literata, got: ${families.join(", ")}`,
+      const literata600 = faces.find((f) =>
+        f.family.includes("Literata") && f.style === "normal" &&
+        (f.weight === "600" || f.weight === "600 600")
+      );
+      const plexSans400 = faces.find((f) =>
+        f.family.includes("IBM Plex Sans") && f.style === "normal" &&
+        (f.weight === "400" || f.weight === "400 400" ||
+          f.weight === "normal")
       );
       assert(
-        families.some((f) => f.includes("IBM Plex Sans")),
-        `document.fonts must include IBM Plex Sans, got: ${
-          families.join(", ")
+        literata600,
+        `no Literata 600 normal face registered, got: ${JSON.stringify(faces)}`,
+      );
+      assert(
+        plexSans400,
+        `no IBM Plex Sans 400 normal face registered, got: ${
+          JSON.stringify(faces)
         }`,
+      );
+      assertEquals(
+        literata600.status,
+        "loaded",
+        `Literata 600 must actually load (status "loaded"), got "${literata600.status}"`,
+      );
+      assertEquals(
+        plexSans400.status,
+        "loaded",
+        `IBM Plex Sans 400 must actually load (status "loaded"), got "${plexSans400.status}"`,
       );
 
       // Every font request must be same-origin: font-src 'self' in

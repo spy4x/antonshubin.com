@@ -15,6 +15,7 @@ import {
   YouTubeIcon,
 } from "../components/Icons.tsx";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
+import { buttonClass } from "../components/Button.tsx";
 
 /**
  * The ways to reach me. Everything else is an icon below. The "Book a call"
@@ -29,8 +30,8 @@ const contacts = [
       desc: "A free 30-minute intro call. Pick a time that works for you.",
       href: "#book",
       color: "bg-sage/15 text-sage border-sage/30 hover:border-sage",
-      btnClass:
-        "bg-accent hover:bg-accent-hover text-ink px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+      btnClass: buttonClass("primary", "px-4 py-2 text-sm inline-block"),
+      isPrimaryBook: true,
       // The glyph is rendered separately, wrapped in an `aria-hidden` span, so
       // a screen reader doesn't read "downwards arrow" after the label.
       btnText: "Book now",
@@ -48,8 +49,8 @@ const contacts = [
     href: "mailto:anton@antonshubin.com",
     color:
       "bg-rule-strong/20 text-graphite border-rule-strong/30 hover:border-rule-strong",
-    btnClass:
-      "bg-transparent border border-rule-strong hover:bg-lamp text-parchment px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+    btnClass: buttonClass("secondary", "px-4 py-2 text-sm inline-block"),
+    isPrimaryBook: false,
     btnText: "Send email",
     hideArrow: false,
     downArrow: false,
@@ -60,8 +61,8 @@ const contacts = [
     desc: "Quick messages. Best for async chat and file sharing.",
     href: "https://t.me/spy4x",
     color: "bg-mist/20 text-mist border-mist/30 hover:border-mist",
-    btnClass:
-      "bg-transparent border border-rule-strong hover:bg-lamp text-parchment px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block",
+    btnClass: buttonClass("secondary", "px-4 py-2 text-sm inline-block"),
+    isPrimaryBook: false,
     btnText: "Message me",
     hideArrow: false,
     downArrow: false,
@@ -111,7 +112,7 @@ export default define.page(function ContactMe() {
       />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-parchment text-center mb-2">
-          Get in Touch
+          Get in touch
         </h1>
         <p class="text-graphite text-center mb-10 sm:mb-12 text-base sm:text-lg">
           {CONTACT_COUNT_WORD[contacts.length]}{" "}
@@ -143,7 +144,10 @@ export default define.page(function ContactMe() {
                 <h2 class="text-lg font-semibold text-parchment">{c.title}</h2>
               </div>
               <p class="text-graphite text-sm mb-4">{c.desc}</p>
-              <span class={c.btnClass + " inline-flex items-center gap-1"}>
+              <span
+                class={c.btnClass + " inline-flex items-center gap-1"}
+                {...(c.isPrimaryBook ? { "data-primary-book": true } : {})}
+              >
                 {c.btnText}
                 {c.downArrow && <span aria-hidden="true">↓</span>}
                 {!c.hideArrow && <ArrowRightIcon class="w-4 h-4" />}
@@ -178,7 +182,7 @@ export default define.page(function ContactMe() {
         {SCHEDULE_URL && (
           <section id="book" class="mt-12 scroll-mt-4">
             <h2 class="text-2xl font-bold text-parchment text-center mb-2">
-              Book a Free 30-min Intro Call
+              Book a free 30-min intro call
             </h2>
             <p class="text-graphite text-center mb-6 text-sm">
               Roles, press, or a quick question — email or Telegram above.

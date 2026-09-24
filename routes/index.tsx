@@ -11,6 +11,7 @@ import { NewTabHint } from "../components/NewTabHint.tsx";
 import {
   ArrowRightIcon,
   CalendarIcon,
+  CatalogIcon,
   StarIcon,
   UpworkIcon,
 } from "../components/Icons.tsx";
@@ -85,7 +86,7 @@ export default define.page(function Home(ctx) {
                   rel="noopener noreferrer"
                   data-umami-event="hero-book-call"
                   data-e2e="hero-book-call"
-                  class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors text-base"
+                  class="gap-2 px-6 py-3 text-base"
                 >
                   <CalendarIcon class="w-5 h-5" />
                   Book a {INTRO_CALL}
@@ -191,7 +192,7 @@ export default define.page(function Home(ctx) {
           <div class="mt-6 text-right">
             <a
               href="/projects"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
             >
               See all work
               <ArrowRightIcon class="w-4 h-4" />
@@ -210,7 +211,10 @@ export default define.page(function Home(ctx) {
                 data-umami-event={`home-offer-${item.slug}`}
                 class="p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-colors group flex flex-col"
               >
-                <div class="text-3xl mb-3">{item.icon}</div>
+                <CatalogIcon
+                  name={item.icon}
+                  class="w-8 h-8 mb-3 text-accent"
+                />
                 <h3 class="text-lg font-semibold text-parchment group-hover:text-accent transition-colors mb-2">
                   {item.shortTitle}
                 </h3>
@@ -318,7 +322,7 @@ export default define.page(function Home(ctx) {
             <a
               href="https://www.upwork.com/freelancers/ashubin"
               target="_blank"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
             >
               View all reviews on{" "}
               <UpworkIcon class="w-auto h-4 text-parchment" />
@@ -364,7 +368,7 @@ export default define.page(function Home(ctx) {
           <div class="mt-6 text-right">
             <a
               href="/how-i-work"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent transition-colors font-medium"
+              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
             >
               The five promises in full
               <ArrowRightIcon class="w-4 h-4" />
@@ -391,7 +395,7 @@ export default define.page(function Home(ctx) {
             rel="noopener noreferrer"
             data-umami-event="home-book-call"
             data-primary-cta
-            class="inline-flex items-center gap-2.5 px-8 py-3.5 text-lg bg-accent text-ink hover:bg-accent-hover font-semibold rounded-lg transition-colors"
+            class="gap-2.5 px-8 py-3.5 text-lg"
           >
             <CalendarIcon class="w-5 h-5" />
             Book a {INTRO_CALL}
