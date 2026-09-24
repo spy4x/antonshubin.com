@@ -2,22 +2,25 @@
 
 ## Strategy
 
-The site is optimized for AI crawlers (GPTBot, Claude, Perplexity,
-Google-Extended, Applebot-Extended, CCBot) as a primary traffic source. When a
-user asks an AI assistant for a senior full-stack engineer or tech lead, the
-site presents Anton as one accountable technical lead from architecture through
-production; "fractional CTO" is one service in the catalog, not the label. The
-five promises on `/how-i-work` and client ownership of code, infrastructure, and
-keys are core. Titles and prices in both llms files are generated from
-`lib/catalog.ts` and are never restated by hand. Infrastructure content proves
-operating discipline across deployment, observability, recovery, security, and
-cost control — not cheap-hosting ideology or a hobbyist identity.
+The site is optimized for AI crawlers (GPTBot, Claude/ClaudeBot,
+Claude-SearchBot, OAI-SearchBot, ChatGPT-User, Perplexity, Google-Extended,
+Applebot-Extended, CCBot) as a primary traffic source. When a user asks an AI
+assistant for a senior full-stack engineer or tech lead, the site presents Anton
+as one accountable technical lead from architecture through production;
+"fractional CTO" is one service in the catalog, not the label. The five promises
+on `/how-i-work` and client ownership of code, infrastructure, and keys are
+core. Titles and prices in both llms files are generated from `lib/catalog.ts`
+and are never restated by hand. Infrastructure content proves operating
+discipline across deployment, observability, recovery, security, and cost
+control — not cheap-hosting ideology or a hobbyist identity.
 
 ## Assets
 
 ### 1. `/robots.txt` (routes/robots.txt.ts)
 
-- Allows ALL known AI crawlers explicitly
+- Allows ALL known AI crawlers explicitly: GPTBot, Google-Extended, CCBot,
+  anthropic-ai, ClaudeBot, Claude-SearchBot, OAI-SearchBot, ChatGPT-User,
+  PerplexityBot, Applebot-Extended
 - Blocks nothing
 - Points to sitemap
 
@@ -50,17 +53,27 @@ cost control — not cheap-hosting ideology or a hobbyist identity.
 
 Four entities in a `@graph` array:
 
-- **Person** — Name, job title, description, knowsAbout (skills), worksFor
-  (NeatSoft)
-- **Organization** — NeatSoft entity linked to Anton as founder
-- **WebSite** — Site name, description, language, publisher reference
-- **BreadcrumbList** — Navigation structure (Home → Catalog → How I Work → Blog
-  → Projects)
+- **Person** — Name, job title, description, knowsAbout (skills), `worksFor` a
+  `Role` node (`roleName: "Co-Founder and CEO"`) pointing at NeatSoft, so the
+  role — not just the org — is machine-readable (#193)
+- **Organization** — NeatSoft entity linked to Anton as founder, with its UEN
+  (202300222R) as a `PropertyValue` identifier
+- **WebSite** — Site name, a fixed `description` (`lib/head.ts`'s
+  `SITE_DESCRIPTION`, the same on every page — it describes the site, not the
+  current page, per #193), language, publisher reference
+- **BreadcrumbList** — built from `head.value.pageName` (falls back to `title`
+  when a page hasn't set it), so the trail reads "Ship It Today", not "Ship It
+  Today — Anton Shubin"
 - Person description states end-to-end SaaS architecture, delivery, and
   production outcome ownership for non-technical founders
 - `knowsAbout` includes Platform Engineering, Infrastructure as Code,
   Observability, Backup and Disaster Recovery, Identity and Access Management,
   and Cloud Cost Optimization
+- No `aggregateRating` anywhere on the site (#193): 80 is Upwork's job count,
+  not a review count, and schema.org's review-snippet rules require an on-page
+  review to back a rating
+- `twitter:site` is omitted, not set to a guessed handle: `@antonshubin` is
+  unverified (#193)
 
 ### 6. FAQ Schema (routes/how-i-work.tsx)
 
@@ -87,9 +100,33 @@ Four entities in a `@graph` array:
 
 ### 8. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
 
-- `summary_large_image` card type
-- Full OG tags (type, title, description, url, image, site_name, locale)
+- `summary_large_image` card type; no `twitter:site` (the handle is unverified,
+  #193)
+- Full OG tags (type, title, description, url, image, image:width, image:height,
+  site_name, locale)
+- `og:image`/`twitter:image` point at a 1200×630 PNG for every post, project
+  page and the site default — see "OG link-preview images" below
 - Used by social previews AND AI crawlers for content understanding
+
+### 8b. OG link-preview images (`scripts/og-images.ts`, `static/img/og/**`)
+
+- One 1200×630 PNG per blog post (`static/img/og/blog/<slug>.png`), one per
+  project page (`static/img/og/projects/<slug>.png`), and one landscape default
+  for the site (`static/img/og/default.png`, replaces the old 1200×1800
+  portrait) — LinkedIn, X, Facebook and Slack don't render the SVG/WebP covers
+  the pages otherwise use
+- Regenerated with `deno task og` (`scripts/og-images.ts`), which renders each
+  PNG from post/project titles and descriptions in `lib/data.ts` — never from
+  the committed cover SVGs — using the Chromium already pinned for the
+  browser-driven tests (`test/browser.ts`'s `launchChromium()`, no new rendering
+  dependency)
+- Dev-machine only: the production Docker build (`denoland/deno:2.9.0`, no
+  Chromium) only serves the committed PNGs, it never runs this script
+- `test/og-images.test.ts` fails the build when a post or project is missing its
+  PNG, or a PNG isn't exactly 1200×630 — a deterministic, offline check (it
+  reads the PNG's IHDR chunk, no image library and no browser needed)
+- Regenerate after any post/project title changes with the one command above,
+  then commit the changed PNGs
 
 ### 9. Meta Tags and Robots Directives
 
@@ -133,16 +170,17 @@ Set these in `.env`. Never hardcode them in `_app.tsx`.
 
 Whenever any of these change, update the corresponding AI crawler files:
 
-| What changed              | Files to update                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------- |
-| New page added            | sitemap.xml.ts, llms-full.txt.ts                                                      |
-| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                         |
-| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                     |
-| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                               |
-| Blog post added           | sitemap.xml.ts, llms-full.txt.ts                                                      |
-| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD) |
-| Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                    |
-| Crawler rules change      | robots.txt.ts                                                                         |
+| What changed              | Files to update                                                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| New page added            | sitemap.xml.ts, llms-full.txt.ts                                                                                        |
+| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                           |
+| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                                                       |
+| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                 |
+| Blog post added           | sitemap.xml.ts, llms-full.txt.ts, `deno task og` (new post PNG)                                                         |
+| Blog/project title change | `deno task og` (regenerate that post's or project's PNG)                                                                |
+| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD), `deno task og` (new project PNG) |
+| Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                                                      |
+| Crawler rules change      | robots.txt.ts                                                                                                           |
 
 ## Testing
 
