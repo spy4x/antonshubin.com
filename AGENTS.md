@@ -108,7 +108,7 @@ Deploy above).
 The `check` step also installs Chromium before `deno task check` runs:
 `deno run -A npm:playwright@1.63.0 install --with-deps chromium` — the base
 image has none of the OS libraries a headless Chromium needs. That's for the
-three browser-driven tests under "Browser-driven tests" below. The version must
+four browser-driven tests under "Browser-driven tests" below. The version must
 match `deno.json`'s `"playwright"` pin exactly, or the install downloads a
 different Chromium build than the one the tests launch.
 
@@ -162,11 +162,11 @@ own before a build.
 
 Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-three files below and fails loudly, naming the install command, if none is
-found. Playwright's version must match exactly across `deno.json`'s import map,
+four files below and fails loudly, naming the install command, if none is found.
+Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
 — a mismatch downloads a different Chromium build than the one launched. All
-three call `startSite()` and run under `deno task test:browser` with `-A`, not
+four call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
@@ -187,6 +187,63 @@ the narrow `deno task test`.
   symbol character, a gradient background. Colour tokens live in
   `assets/styles.css`'s `@theme` block. See the test file's own header for which
   of the fix's colour changes each page or probe covers, and the two it doesn't.
+- `test/csp.browser.test.ts` (#177): the Content-Security-Policy (see
+  "Content-Security-Policy" below) actually holds in a real browser —
+  `securitypolicyviolation` events, not just the header's text — across every
+  static page and one representative page per dynamic route, the `/contact-me`
+  booking facade's runtime `<iframe>`, and a full unsubscribe link (GET the
+  confirm page, POST the form). Two negative controls prove the listener and the
+  policy do something: an inline `<script>` with no `nonce` is blocked and
+  reported, and an iframe to a disallowed origin is reported. Served with
+  placeholder `SCHEDULE_URL`/`UMAMI_URL`/`UMAMI_ID` (RFC 2606 hosts) so the
+  policy has to cover both — a request failing (no such host) is fine, a CSP
+  violation isn't. See the test file's own header for why it samples pages
+  instead of crawling the whole sitemap.
+
+## Content-Security-Policy
+
+`lib/csp.ts`'s `buildCsp()` builds the `Content-Security-Policy` header value;
+`main.ts` wires it into its own middleware (not Fresh's `csp()` — see the file's
+header for why: Fresh's nonce mode falls back to `'unsafe-inline'` when a
+response carries no render nonce, which is exactly the hand-built-HTML case this
+policy exists to close). No nonce means no inline script runs, full stop.
+
+Fresh writes each render's nonce onto the `Response` at
+`Symbol.for("__freshNonce")` and stamps the same value onto every JSX
+`<script>`/`<style>` vnode it renders — `main.ts`'s middleware reads it back
+after `ctx.next()` and hands it to `buildCsp()`. A middleware that rebuilds a
+response with `new Response(...)` drops the symbol, and that page then runs no
+inline script at all (Fresh's boot script included), so change headers on the
+response `ctx.next()` returned instead of rebuilding it.
+
+**To allow a new origin** (a new analytics host, a new embed), edit
+`lib/csp.ts`'s `buildCsp()` directly — it's a pure function (no `Deno.env`
+reads), unit-tested in `lib/csp.test.ts`. `main.ts` only computes the origins
+`UMAMI_PRECONNECT_ORIGIN` (`lib/config.ts` — empty unless Umami is genuinely
+cross-origin) and `SCHEDULE_URL`'s origin, and passes them in.
+
+**The nonce pin**: `test/unsubscribe.test.ts` fetches `/`, reads the
+`'nonce-...'` token off the `Content-Security-Policy` header, and asserts it
+equals every rendered `<script nonce="...">`'s value — a plain HTML check, no
+browser needed, since Fresh already stamped both from the same render.
+`test/csp.browser.test.ts` (see "Browser-driven tests" above) is the
+complementary real-browser check: that the policy is actually _enforced_, not
+just present and internally consistent.
+
+## Newsletter subscribers & unsubscribe links
+
+`lib/subscribers.ts` owns the subscriber list (`SUBSCRIBERS_FILE`, default
+`data/subscribers.json`) — `routes/api/subscribe.ts`, `routes/unsubscribe.tsx`
+and `scripts/send-newsletter.ts` all read and write through it, never the file
+directly. `lib/unsubscribe.ts` signs and verifies unsubscribe tokens with
+`UNSUBSCRIBE_SECRET` (`lib/config.ts`'s `getUnsubscribeSecret()` throws if it's
+unset or under 32 characters — generate one with `openssl rand -base64 48`, see
+`.env.example`) and its `unsubscribeLink()` is the one helper every outgoing
+email uses to build `${BASE_URL}/unsubscribe?token=...`.
+`routes/api/unsubscribe.ts` only redirects old `?email=...` links (sent before
+#177) to `/unsubscribe`, dropping the address; opening a link never removes
+anyone — only a `POST` to `/unsubscribe` with a verified token does. See
+docs/newsletter.md for the full data format and endpoint list.
 
 ## AI crawler optimization (SEO)
 

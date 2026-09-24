@@ -116,19 +116,26 @@ interface AxeRunResult {
 
 /** Runs axe-core's WCAG 2 A/AA rules against `context` (a selector, element,
  * or Document) already loaded in `page`. Injects axe-core's own bundled
- * source via `addScriptTag` rather than fetching it, so the test makes no
- * network call of its own; `context` is passed as a string selector across
- * the `page.evaluate` boundary, since a live element handle can't cross it.
- * Returns both the color-contrast violation nodes and the subset of its
- * `incomplete` nodes axe couldn't verify because of a CSS gradient
- * background — axe never puts a gradient in `violations`, only
- * `incomplete`, so a gradient regression (see "no gradient CTAs" below)
- * would otherwise pass a violations-only check silently. */
+ * source via `page.evaluate` rather than `addScriptTag`, so the test makes no
+ * network call of its own — and, since #177, so it isn't itself a same-page
+ * inline `<script>` the site's own Content-Security-Policy would have to
+ * allow: `addScriptTag({ content })` inserts a real DOM `<script>` element
+ * with no `nonce`, which the CSP (correctly) refuses to run, while
+ * `page.evaluate` runs through the browser's automation protocol, outside
+ * the page's own script loading and therefore outside its CSP, the same way
+ * this file's own `page.evaluate` calls that read computed styles already
+ * are. `context` is passed as a string selector across the `page.evaluate`
+ * boundary, since a live element handle can't cross it. Returns both the
+ * color-contrast violation nodes and the subset of its `incomplete` nodes
+ * axe couldn't verify because of a CSS gradient background — axe never puts
+ * a gradient in `violations`, only `incomplete`, so a gradient regression
+ * (see "no gradient CTAs" below) would otherwise pass a violations-only
+ * check silently. */
 async function colorContrastResult(
   page: Page,
   context: string,
 ): Promise<{ violations: AxeNode[]; gradientIncomplete: AxeNode[] }> {
-  await page.addScriptTag({ content: axeCore.source });
+  await page.evaluate(axeCore.source);
   const results = await page.evaluate(async (sel) => {
     // deno-lint-ignore no-explicit-any
     const axe = (globalThis as any).axe;

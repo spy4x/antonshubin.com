@@ -17,11 +17,12 @@ app directory, so the file survives deploys, and it is backed up nightly — see
 
 ## Endpoints
 
-| Method | Path                         | Description                               |
-| ------ | ---------------------------- | ----------------------------------------- |
-| POST   | `/api/subscribe`             | Subscribe email (JSON: `{"email":"..."}`) |
-| GET    | `/api/unsubscribe?email=...` | One-click unsubscribe page                |
-| POST   | `/api/unsubscribe`           | Unsubscribe via JSON                      |
+| Method | Path                     | Description                                                                                      |
+| ------ | ------------------------ | ------------------------------------------------------------------------------------------------ |
+| POST   | `/api/subscribe`         | Subscribe email (JSON: `{"email":"..."}`)                                                        |
+| GET    | `/unsubscribe?token=...` | Confirm page for a signed unsubscribe link — shows the address, removes nothing                  |
+| POST   | `/unsubscribe`           | Removes the subscriber `token` verifies for (form body or query, RFC 8058-compatible)            |
+| GET    | `/api/unsubscribe`       | Legacy: 301s an old `?email=...` link (sent before #177) to `/unsubscribe`, dropping the address |
 
 ## Sending a newsletter
 
@@ -82,8 +83,14 @@ ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/subscribers.json'
 
 ## Unsubscribe handling
 
-All automated emails include an unsubscribe link. The `/api/unsubscribe` page
-removes the email from `data/subscribers.json`. No confirmation needed.
+Every automated email links to `/unsubscribe?token=...` — a signed token built
+by `lib/unsubscribe.ts`'s `unsubscribeLink()`, never the address itself (see
+AGENTS.md "Newsletter subscribers & unsubscribe links"). Opening the link only
+shows a confirm page with the address; removal needs a `POST` (the on-page form,
+or a mail client's one-click unsubscribe) with a token that verifies. A forged
+token and an address that's already been removed both answer "link not
+recognised" — the same response either way, on purpose. Requires
+`UNSUBSCRIBE_SECRET` (see `.env.example`).
 
 ## Backup
 

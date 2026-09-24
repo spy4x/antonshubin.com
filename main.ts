@@ -1,5 +1,7 @@
 import { App, staticFiles } from "fresh";
 import type { State } from "./lib/utils.ts";
+import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
+import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
 
 export const app = new App<State>();
 
@@ -12,6 +14,25 @@ app.use(async (ctx) => {
     return Response.redirect(target.toString(), 301);
   }
   return await ctx.next();
+});
+
+// Content-Security-Policy (#177) — every response, not just pages. Own
+// middleware instead of Fresh's csp() — see lib/csp.ts's header for why.
+// SCHEDULE_URL/UMAMI_URL don't change per request, so their origins are
+// computed once here rather than on every response.
+const SCHEDULE_ORIGIN = originOf(SCHEDULE_URL);
+app.use(async (ctx) => {
+  const res = await ctx.next();
+  const nonce = readFreshNonce(res);
+  res.headers.set(
+    "Content-Security-Policy",
+    buildCsp({
+      nonce,
+      umamiOrigin: UMAMI_PRECONNECT_ORIGIN,
+      scheduleOrigin: SCHEDULE_ORIGIN,
+    }),
+  );
+  return res;
 });
 
 // Core static page routes that change infrequently (cached 3 days at edge).
