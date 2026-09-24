@@ -19,6 +19,13 @@ Deno.test("redirects the retired CalDAV slug to the post that absorbed it", () =
   assertEquals(target, "/blog/self-hosted-caldav-web-ui-tasks-org");
 });
 
+Deno.test("resolves the retired CalDAV slug with a trailing slash in one hop, not two", () => {
+  const target = redirectTarget(
+    "/blog/self-hosted-caldav-pwa-architecture/",
+  );
+  assertEquals(target, "/blog/self-hosted-caldav-web-ui-tasks-org");
+});
+
 Deno.test("the retired CalDAV slug's target is a real post", () => {
   const target = redirectTarget("/blog/self-hosted-caldav-pwa-architecture")!;
   const slug = target.replace("/blog/", "");

@@ -18,18 +18,25 @@ const RETIRED_BLOG_SLUGS: Record<string, string> = {
  * `/blog/<slug>/` or `/projects/<slug>/` redirects to the slash-free form
  * regardless of whether `<slug>` itself is valid — an unknown slug then
  * 404s the normal way instead of via a broken trailing-slash 404.
+ *
+ * The trailing slash is stripped before the retired-slug lookup, so
+ * `/blog/self-hosted-caldav-pwa-architecture/` resolves in one 301, not a
+ * 301-to-a-301: a visitor (or crawler) following the old slug with a
+ * trailing slash lands on the current post directly.
  */
 export function redirectTarget(pathname: string): string | undefined {
   // "/" is the one route that keeps its trailing slash and must never redirect.
   if (pathname === "/") return undefined;
 
   const trailingSlash = pathname.match(/^(\/(?:blog|projects)\/[^/]+)\/$/);
-  if (trailingSlash) return trailingSlash[1];
+  const withoutTrailingSlash = trailingSlash ? trailingSlash[1] : pathname;
 
-  const retired = pathname.match(/^\/blog\/([^/]+)$/);
+  const retired = withoutTrailingSlash.match(/^\/blog\/([^/]+)$/);
   if (retired && RETIRED_BLOG_SLUGS[retired[1]]) {
     return `/blog/${RETIRED_BLOG_SLUGS[retired[1]]}`;
   }
+
+  if (trailingSlash) return withoutTrailingSlash;
 
   return undefined;
 }
