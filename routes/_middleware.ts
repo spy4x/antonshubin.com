@@ -1,3 +1,5 @@
+import { FRESH_NONCE_SYMBOL } from "../lib/csp.ts";
+
 // Known AI crawlers, search bots, and social preview bots.
 // Kept in sync with robots.txt — these are welcome to crawl content
 // but we skip analytics scripts so they don't pollute stats.
@@ -84,11 +86,18 @@ export async function handler(
         /<script\s+defer\s+src="[^"]*"\s+data-website-id="[^"]*"\s*><\/script>/gi,
         "",
       );
-    return new Response(clean, {
+    const rewritten = new Response(clean, {
       status: res.status,
       statusText: res.statusText,
       headers: res.headers,
     });
+    // `new Response(...)` doesn't carry over the render nonce Fresh attached
+    // to `res` — copy it, so main.ts's CSP middleware (which runs after this
+    // one) still finds it and doesn't fall back to "no nonce, no inline
+    // script" for bot requests.
+    // deno-lint-ignore no-explicit-any
+    (rewritten as any)[FRESH_NONCE_SYMBOL] = (res as any)[FRESH_NONCE_SYMBOL];
+    return rewritten;
   }
 
   return res;
