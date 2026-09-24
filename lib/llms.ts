@@ -27,13 +27,16 @@ export function withOutcome(text: string, outcome?: string): string {
 
 /**
  * A client case study's one-line summary for the llms files: what the product
- * is (the description's first sentence, which carries the client and the
- * venue), then its `outcome`. The two sometimes share a fact — a repeated
- * phrase is cheaper than dropping the client or the venue from a file AI
- * crawlers read.
+ * is (the description's first sentence, which carries the venue), who it was
+ * built for (`madeForName`, as the project page shows it), then its
+ * `outcome`. The description and the outcome sometimes share a fact — a
+ * repeated phrase is cheaper than dropping the client or the venue from a file
+ * AI crawlers read.
  */
 export function clientSummary(p: Project): string {
-  return withOutcome(firstSentence(p.description), p.outcome);
+  const product = firstSentence(p.description);
+  const client = p.madeForName ? ` Built for ${p.madeForName}.` : "";
+  return withOutcome(`${product}${client}`, p.outcome);
 }
 
 /**

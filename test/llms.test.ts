@@ -41,6 +41,11 @@ Deno.test("both llms files say what the strongest client case study is, not only
         true,
         `${llmsPath} dropped SmartLite's venue from its client line`,
       );
+      assertEquals(
+        text.includes("Built for Yumetronics."),
+        true,
+        `${llmsPath} dropped SmartLite's client from its client line`,
+      );
     }
   } finally {
     await site.stop();
