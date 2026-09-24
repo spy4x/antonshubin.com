@@ -35,7 +35,7 @@ async function sitemapPaths(site: { html(path: string): Promise<string> }) {
   );
 }
 
-const NON_SITEMAP_PAGES = ["/pay"];
+const NON_SITEMAP_PAGES = ["/pay", "/llms.txt", "/llms-full.txt"];
 
 Deno.test("no emoji renders on any page in the sitemap (#184)", async (t) => {
   const site = await startSite();
