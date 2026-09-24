@@ -29,6 +29,16 @@ Deno.test("deploy rsync excludes /data/, so --delete never touches the list", ()
     rsync.includes("--exclude='/data/'"),
     "the rsync --delete step must exclude '/data/'",
   );
+  // Either of these would bring data/ back into the transfer: --delete-excluded
+  // deletes excluded paths too, and an --include wins over a later --exclude.
+  assert(
+    !rsync.includes("--delete-excluded"),
+    "rsync must not use --delete-excluded",
+  );
+  assert(
+    !rsync.includes("--include"),
+    "rsync must not --include anything back",
+  );
 });
 
 Deno.test("the image never carries a local data/ directory", () => {
