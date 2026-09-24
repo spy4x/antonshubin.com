@@ -63,6 +63,11 @@ The deploy script passes the local commit hash to the remote build as
 Nothing is written back to a tracked file, so a deploy leaves `git status` clean
 — see `docs/deploy.md`.
 
+The newsletter subscriber list (`data/subscribers.json`) lives on the host:
+`compose.yml` bind-mounts the app directory's `data/`, and the deploy's
+`rsync --delete` excludes `/data/`. Keep both, or a deploy empties the list.
+Backup and restore are in `docs/deploy.md` "Subscriber data".
+
 ## Code style
 
 Double quotes, no semicolons, 2-space indent, 100 columns — this is what

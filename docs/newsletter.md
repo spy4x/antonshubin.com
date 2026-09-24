@@ -3,9 +3,9 @@
 ## How it works
 
 Emails collected via the blog newsletter form are stored in
-`data/subscribers.json` on the server. This file persists across deploys
-(excluded from rsync via `.dockerignore`). Backed up nightly via homelab backup
-system.
+`data/subscribers.json`. On the server that directory is bind-mounted from the
+app directory, so the file survives deploys, and it is backed up nightly — see
+[deploy.md "Subscriber data"](deploy.md#subscriber-data).
 
 ## Data format
 
@@ -77,11 +77,5 @@ removes the email from `data/subscribers.json`. No confirmation needed.
 
 ## Backup
 
-Subscriber data is backed up nightly as part of the homelab backup system
-(`antonshubin` backup config). To restore:
-
-```bash
-# On the home server
-cd ~/sync/code/homelab/scripts/backup
-deno run -A restore.ts antonshubin
-```
+Backed up nightly by cloudlab's restic job. Where it runs, what it keeps and how
+to restore: [deploy.md "Backup"](deploy.md#backup).
