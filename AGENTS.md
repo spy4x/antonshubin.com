@@ -92,6 +92,42 @@ Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
 item. The five promises on `/how-i-work` are the only promises on the site; the
 free written audit carries no deadline.
 
+## Proof, promises, testimonials and notes
+
+Four more `lib/*.ts` files hold the only written copy of a category of claim
+(#186), the same pattern as `lib/catalog.ts` for prices — each exports a lookup
+that throws on a typo, so a bad id fails the build instead of shipping a broken
+reference.
+
+- `lib/proof.ts` is the only place an Upwork number or label (jobs, job success
+  rate, amount earned, hours, Expert-Vetted, Top 1%) is written. The home page,
+  `components/SEOHead.tsx`'s JSON-LD, the sitemap comment, both llms files,
+  `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
+  `routes/saas-architecture-guide.tsx`, `routes/api/subscribe.ts`'s confirmation
+  email and `lib/data.ts`'s template project all read a value through
+  `proof(id)`. `test/structure.test.ts`'s proof guard scans `routes/`,
+  `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and every
+  `*.test.ts`) for each figure's exact rendered text and fails on a hand-written
+  copy.
+- `lib/promises.ts` holds the five promises' title, description and "why this
+  matters" text. `/how-i-work` is where this wording was written and reviewed,
+  so its copy is canonical; `routes/index.tsx`'s "How it works" steps, both llms
+  files' Promises sections and `lib/catalog.ts`'s "Free bug fixes for 30 days"
+  bullet read a promise's `title`/`desc` through `promise(id)` instead of
+  restating it. The same guard test scans for each promise's exact `title` text
+  outside `lib/promises.ts`.
+- `lib/testimonials.ts` holds every testimonial, each with a `permission` flag.
+  `routes/index.tsx`'s testimonials section renders only entries with both
+  `sourceHref` and `permission: true` (`visibleTestimonials()`) — with none, the
+  section doesn't render at all, and `test/structure.test.ts` reflects that in
+  its expected home-page section list.
+- `lib/notes.ts` holds every margin note (`{ id, text, href?, checkedOn? }`) —
+  the source or checked date behind a claim wrapped in
+  `components/WithNote.tsx`, which stamps the claim with `data-note-ref="<id>"`.
+  `test/structure.test.ts`'s note guard fetches every page in `/sitemap.xml` and
+  fails if a `data-note-ref` doesn't resolve to a note carrying `href` or
+  `checkedOn`.
+
 ## Visual system
 
 `assets/styles.css`'s `@theme` block is the only place a colour is defined
@@ -270,13 +306,13 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all six
-files below and fails loudly, naming the install command, if none is found.
-Playwright's version must match exactly across `deno.json`'s import map,
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
+seven files below and fails loudly, naming the install command, if none is
+found. Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All six
-call `startSite()` and run under `deno task test:browser` with `-A`, not the
-narrow `deno task test`.
+— a mismatch downloads a different Chromium build than the one launched. All
+seven call `startSite()` and run under `deno task test:browser` with `-A`, not
+the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
@@ -324,6 +360,12 @@ narrow `deno task test`.
   `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
   every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
   characters, excluding `©`/`®`/`™` and plain digits.
+- `test/notes.browser.test.ts` (#186): the margin note next to the home page's
+  Upwork proof line sits to the right of its claim at 1440px (the `.note-aside`
+  element's bounding box is right of and vertically beside the claim's) and
+  below it at 390px — the CSS breakpoint in `assets/styles.css`'s
+  `.note-wrap`/`.note-aside` rules, not checkable from server-rendered HTML
+  alone since it depends on computed layout.
 
 ## Content-Security-Policy
 
