@@ -33,7 +33,7 @@ type ButtonProps =
 // later in a given element's `class="..."` string. Every call site supplies
 // its own sizing via `extra`/`class` instead of fighting a default here.
 const BASE =
-  "inline-flex items-center rounded-lg font-medium font-sans transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ink";
+  "inline-flex items-center rounded-lg font-semibold font-sans transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ink";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   // The one filled-accent action on the site: Book. Never any other button.

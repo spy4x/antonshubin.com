@@ -30,7 +30,7 @@ const contacts = [
       desc: "A free 30-minute intro call. Pick a time that works for you.",
       href: "#book",
       color: "bg-sage/15 text-sage border-sage/30 hover:border-sage",
-      btnClass: buttonClass("primary", "px-4 py-2 text-sm inline-block"),
+      btnClass: buttonClass("primary", "px-4 py-2 text-sm"),
       isPrimaryBook: true,
       // The glyph is rendered separately, wrapped in an `aria-hidden` span, so
       // a screen reader doesn't read "downwards arrow" after the label.

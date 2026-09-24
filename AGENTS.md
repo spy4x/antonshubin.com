@@ -138,9 +138,10 @@ render in a Tailwind utility's font: Tailwind wraps its own utilities in
 regardless of selector specificity. IBM Plex Sans for body text, nav and
 buttons. Literata italic for margin notes and the Cyrillic tool marks (the
 `.margin-note` utility; not used yet — a later redesign issue wires it up).
-Tabular figures for prices, via `font-variant-numeric:
-tabular-nums` on the
-`.price` utility. IBM Plex Mono only for `code`, `pre` and `kbd`.
+Tabular figures for prices, via `font-variant-numeric: tabular-nums` on the
+`.price` utility. IBM Plex Mono only for `code`, `pre` and `kbd`. Plex Sans
+ships only the 400 and 600 weights: `font-medium` (500) has no file and renders
+as 400, so use `font-semibold` for anything meant to look bold.
 
 All three are self-hosted under `assets/fonts/` (Latin and Cyrillic subsets,
 from `@fontsource`'s pre-split files — their `unicode-range` values are copied
