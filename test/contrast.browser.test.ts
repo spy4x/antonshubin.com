@@ -403,32 +403,133 @@ Deno.test("no WCAG AA colour-contrast violations across six representative pages
         `catalog "not included" x marker contrast ratio must be >= 4.5, got ${catalogXRatio}`,
       );
 
-      // Synthetic probe for --color-gray-400: see the file header for why
-      // no real page exercises its one failing pairing (text-gray-400 on
-      // bg-gray-700, islands/GhStars.tsx's fallback badge) deterministically.
+      // Synthetic probe for the old --color-gray-400/gray-700 pairing: see
+      // the file header for why no real page exercises it deterministically.
+      // #184 renamed the tokens this probe guards (islands/GhStars.tsx's
+      // fallback badge now uses bg-lamp/text-graphite, not the raw Tailwind
+      // gray-*), and moved the site off Tailwind's default gray palette
+      // entirely, so the class names below were updated to match rather
+      // than left pinned to a palette the site no longer overrides.
       // Reuses the already-loaded /catalog page's stylesheet.
       await page.evaluate(() => {
         const el = document.createElement("span");
-        el.id = "contrast-probe-gray-400-on-gray-700";
-        el.className = "bg-gray-700 text-gray-400";
+        el.id = "contrast-probe-graphite-on-lamp";
+        el.className = "bg-lamp text-graphite";
         el.textContent = "GitHub";
         document.body.appendChild(el);
       });
       try {
         const probeResult = await colorContrastResult(
           page,
-          "#contrast-probe-gray-400-on-gray-700",
+          "#contrast-probe-graphite-on-lamp",
         );
         assertEquals(
           probeResult.violations.map((n) => n.html),
           [],
-          "text-gray-400 on bg-gray-700 (islands/GhStars.tsx's fallback badge) must pass AA",
+          "text-graphite on bg-lamp (islands/GhStars.tsx's fallback badge, #184 token rename) must pass AA",
         );
       } finally {
         await page.evaluate(() => {
-          document.getElementById("contrast-probe-gray-400-on-gray-700")
+          document.getElementById("contrast-probe-graphite-on-lamp")
             ?.remove();
         });
+      }
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+// --- Visual-system tokens (#184) --------------------------------------
+//
+// The pairings above guard the pre-#184 palette; this block guards the new
+// semantic tokens (assets/styles.css's @theme) the same way the file's own
+// synthetic-probe pattern does for a pairing no real page exercises
+// deterministically: inject the class combination directly, ask axe (or, for
+// the two pairings axe treats specially, `getContrastRatio`) to judge only
+// that element. Every pairing below is one this PR's design explicitly
+// requires to hold: Parchment/Graphite text on each of the four surfaces,
+// Ink text on the accent (and its hover shade — the only background besides
+// Lamp accent is ever painted on, primary buttons and the nav's Book), and
+// the three status colours (Sage/Mist/Brick) on the page background Ink.
+const TOKEN_PROBES: { name: string; textClass: string; bgClass: string }[] = [
+  { name: "parchment-on-ink", textClass: "text-parchment", bgClass: "bg-ink" },
+  {
+    name: "parchment-on-desk",
+    textClass: "text-parchment",
+    bgClass: "bg-desk",
+  },
+  {
+    name: "parchment-on-paper",
+    textClass: "text-parchment",
+    bgClass: "bg-paper",
+  },
+  {
+    name: "parchment-on-lamp",
+    textClass: "text-parchment",
+    bgClass: "bg-lamp",
+  },
+  { name: "graphite-on-ink", textClass: "text-graphite", bgClass: "bg-ink" },
+  { name: "graphite-on-desk", textClass: "text-graphite", bgClass: "bg-desk" },
+  {
+    name: "graphite-on-paper",
+    textClass: "text-graphite",
+    bgClass: "bg-paper",
+  },
+  { name: "graphite-on-lamp", textClass: "text-graphite", bgClass: "bg-lamp" },
+  { name: "ink-on-accent", textClass: "text-ink", bgClass: "bg-accent" },
+  {
+    name: "ink-on-accent-hover",
+    textClass: "text-ink",
+    bgClass: "bg-accent-hover",
+  },
+  { name: "sage-on-ink", textClass: "text-sage", bgClass: "bg-ink" },
+  { name: "mist-on-ink", textClass: "text-mist", bgClass: "bg-ink" },
+  { name: "brick-on-ink", textClass: "text-brick", bgClass: "bg-ink" },
+];
+
+Deno.test("every visual-system token pairing passes WCAG AA (#184)", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await browser.newPage();
+    try {
+      // Any built page carries the stylesheet with the tokens — home is as
+      // good as any, and it's already covered above for the pre-existing set.
+      await page.goto(site.origin, { waitUntil: "networkidle" });
+      for (const probe of TOKEN_PROBES) {
+        const id = `contrast-probe-${probe.name}`;
+        await page.evaluate(({ id, textClass, bgClass }) => {
+          const el = document.createElement("div");
+          el.id = id;
+          // Padding so the element paints a real background rect for the
+          // canvas-based ratio check below (a zero-size box has none).
+          el.className = `${bgClass} ${textClass}`;
+          el.style.padding = "8px";
+          el.textContent = "Sample text";
+          document.body.appendChild(el);
+        }, { id, textClass: probe.textClass, bgClass: probe.bgClass });
+        try {
+          const result = await colorContrastResult(page, `#${id}`);
+          assertEquals(
+            result.violations.map((n) => n.html),
+            [],
+            `${probe.name} (${probe.textClass} on ${probe.bgClass}) must pass AA`,
+          );
+          const ratio = await getContrastRatio(page, `#${id}`);
+          assert(
+            ratio !== null && ratio >= 4.5,
+            `${probe.name} ratio must be >= 4.5 (AA for normal text), got ${ratio}`,
+          );
+        } finally {
+          await page.evaluate((id) => {
+            document.getElementById(id)?.remove();
+          }, id);
+        }
       }
     } finally {
       await page.close();
