@@ -84,8 +84,7 @@ export const projects = {
         "Docker",
         "PWA",
       ],
-      outcome:
-        "See the project's roadmap for what's built versus still planned.",
+      outcome: "Being revived — work in progress, not ready for everyday use.",
     },
     {
       title: "Air Quality Sensor",
@@ -310,7 +309,8 @@ export const projects = {
       screenshotSize: { width: 1440, height: 1000 },
       madeForName: "Yumetronics",
       madeForURL: "https://yumetronics.com.sg/",
-      outcome: "Built solo in 3 months, from zero prior code.",
+      outcome:
+        "Built solo in 3 months; about 200 lamp poles in production since 2024.",
     },
     {
       title: "Truth or Dare (DareChat)",
@@ -349,7 +349,7 @@ export const projects = {
       madeForName: "Rustam Zaripov",
       madeForURL: "https://www.linkedin.com/in/rustam-zaripov-69436559/",
       outcome:
-        "~40K monthly active users, with a Swagger-documented public REST API at darechat.me/api.",
+        "~40K monthly active users — live at darechat.me with a Swagger-documented public REST API at darechat.me/api.",
     },
     {
       title: "FoodRazor",
