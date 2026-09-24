@@ -65,6 +65,27 @@ export async function createUnsubscribeToken(
   return toBase64Url(sig);
 }
 
+/** Verifies `signature` (already-decoded token bytes) against `email` under
+ * an already-imported `key` — the shared step `verifyUnsubscribeToken` and
+ * `findSubscriberByToken` both build on, so neither one imports the key or
+ * decodes the token more than once per call. */
+function verifySignature(
+  key: CryptoKey,
+  signature: Uint8Array,
+  email: string,
+): Promise<boolean> {
+  return crypto.subtle.verify(
+    "HMAC",
+    key,
+    // Uint8Array.from()'s TS type is generic over ArrayBufferLike (which
+    // includes SharedArrayBuffer), while `verify()` wants the narrower
+    // ArrayBuffer-backed BufferSource -- this array is always freshly
+    // allocated by `fromBase64Url`, never shared, so the cast is safe.
+    signature as BufferSource,
+    ENC.encode(`unsubscribe:${normalize(email)}`),
+  );
+}
+
 /** Constant-time check that `token` was signed for `email` under `secret`
  * (via `crypto.subtle.verify`, not a string comparison). */
 export async function verifyUnsubscribeToken(
@@ -75,22 +96,14 @@ export async function verifyUnsubscribeToken(
   const bytes = fromBase64Url(token);
   if (!bytes) return false;
   const key = await importHmacKey(secret);
-  return await crypto.subtle.verify(
-    "HMAC",
-    key,
-    // Uint8Array.from()'s TS type is generic over ArrayBufferLike (which
-    // includes SharedArrayBuffer), while `verify()` wants the narrower
-    // ArrayBuffer-backed BufferSource -- this array is always freshly
-    // allocated by `fromBase64Url`, never shared, so the cast is safe.
-    bytes as BufferSource,
-    ENC.encode(`unsubscribe:${normalize(email)}`),
-  );
+  return await verifySignature(key, bytes, email);
 }
 
 /**
  * Finds which subscriber, if any, `token` was issued for. A token carries no
  * email, so this recomputes the expected token for every stored address and
- * compares. A forged token and an address that was already removed both
+ * compares — decoding `token` and importing `secret` once, not once per
+ * subscriber. A forged token and an address that was already removed both
  * return `undefined` — the caller can't tell them apart, and neither can
  * whoever is holding the link.
  */
@@ -99,8 +112,11 @@ export async function findSubscriberByToken(
   token: string,
   secret: string,
 ): Promise<Subscriber | undefined> {
+  const bytes = fromBase64Url(token);
+  if (!bytes) return undefined;
+  const key = await importHmacKey(secret);
   for (const subscriber of subscribers) {
-    if (await verifyUnsubscribeToken(subscriber.email, token, secret)) {
+    if (await verifySignature(key, bytes, subscriber.email)) {
       return subscriber;
     }
   }
