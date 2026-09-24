@@ -1,9 +1,7 @@
-// Rendered-page guards for #177: hand-built HTML that echoed its `email`
-// parameter unescaped, and an unsubscribe that fired on a plain GET with no
-// proof of ownership. Reads the built site through test/harness.ts — see
-// AGENTS.md "Rendered-page tests". Each test gets its own temp
-// SUBSCRIBERS_FILE and a throwaway UNSUBSCRIBE_SECRET, never the repo's
-// data/subscribers.json.
+// Rendered-page guards for the unsubscribe flow (see #177). Reads the built
+// site through test/harness.ts — see AGENTS.md "Rendered-page tests". Each
+// test gets its own temp SUBSCRIBERS_FILE and a throwaway
+// UNSUBSCRIBE_SECRET, never the repo's data/subscribers.json.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, visibleText } from "./html.ts";

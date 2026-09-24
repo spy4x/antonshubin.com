@@ -36,10 +36,9 @@ async function subscriberForToken(token: string) {
 }
 
 // GET shows the confirm/not-recognised/outdated states; POST is the only
-// thing that ever removes an address (#177 — opening a link alone used to
-// be enough). Old ?email=-only links (no `token` at all) get their own
-// "outdated" wording — see routes/api/unsubscribe.ts, the redirect target
-// they still hit.
+// thing that ever removes an address (see #177). A link with no `token` at
+// all gets its own "outdated" wording — see routes/api/unsubscribe.ts, the
+// redirect target it still hits.
 export const handler = define.handlers({
   async GET(ctx) {
     const token = ctx.url.searchParams.get("token");

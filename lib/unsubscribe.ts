@@ -1,8 +1,6 @@
 /**
- * Signed unsubscribe tokens (#177). Before this, `/api/unsubscribe` removed
- * any address on a plain `GET ?email=...` — no proof the visitor owned the
- * address. Now a link carries a token instead of the address itself, and the
- * server only acts on a token it can verify.
+ * Signed unsubscribe tokens (see #177). A link carries a token, never the
+ * subscriber's address, and the server only acts on a token it can verify.
  *
  * Token = base64url(HMAC-SHA256(secret, "unsubscribe:" + normalized email)).
  * The token carries no email of its own, so verifying one means recomputing
