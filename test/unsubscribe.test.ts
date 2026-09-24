@@ -144,28 +144,71 @@ Deno.test("GET /api/unsubscribe redirects to /unsubscribe, dropping any email an
   });
 });
 
+const GOOGLEBOT_UA =
+  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+
+/** Fetches `path` from `site`, asserts the response carries a CSP header
+ * whose `script-src` nonce equals every inline `<script>`'s own `nonce`
+ * attribute, and returns the status and body for further assertions. */
+async function assertNoncePinned(
+  site: Site,
+  path: string,
+  init?: RequestInit,
+): Promise<{ status: number; html: string }> {
+  const res = await site.get(path, init);
+  const csp = res.headers.get("Content-Security-Policy");
+  assert(
+    csp,
+    `every response must carry a Content-Security-Policy header (${path})`,
+  );
+  const nonceMatch = csp!.match(/'nonce-([^']+)'/);
+  assert(
+    nonceMatch,
+    `script-src must carry a nonce on a rendered page (${path})`,
+  );
+  const nonce = nonceMatch![1];
+
+  const html = await res.text();
+  const scriptNonces = [...html.matchAll(/<script\b[^>]*\bnonce="([^"]+)"/g)]
+    .map((m) => m[1]);
+  assert(
+    scriptNonces.length > 0,
+    `expected at least one <script> to render on ${path}`,
+  );
+  for (const found of scriptNonces) {
+    assertEquals(
+      found,
+      nonce,
+      `every inline script's nonce must equal the CSP header's nonce (${path})`,
+    );
+  }
+  return { status: res.status, html };
+}
+
 Deno.test("the CSP header's nonce equals every inline script's nonce", async () => {
   await withSubscribers([], async (site) => {
-    const res = await site.get("/");
-    const csp = res.headers.get("Content-Security-Policy");
-    assert(csp, "every response must carry a Content-Security-Policy header");
-    const nonceMatch = csp!.match(/'nonce-([^']+)'/);
-    assert(nonceMatch, "script-src must carry a nonce on a rendered page");
-    const nonce = nonceMatch![1];
+    await assertNoncePinned(site, "/");
+  });
+});
 
-    const html = await res.text();
-    const scriptNonces = [...html.matchAll(/<script\b[^>]*\bnonce="([^"]+)"/g)]
-      .map((m) => m[1]);
-    assert(
-      scriptNonces.length > 0,
-      "the home page must render at least one <script>",
-    );
-    for (const found of scriptNonces) {
-      assertEquals(
-        found,
-        nonce,
-        "every inline script's nonce must equal the CSP header's nonce",
-      );
-    }
+Deno.test("the CSP header's nonce equals every inline script's nonce for a Googlebot-UA request", async () => {
+  // routes/_middleware.ts copies the render nonce onto the bot-rewritten
+  // response — without that copy, main.ts's CSP middleware finds no nonce
+  // and falls back to a script-src that blocks every inline script,
+  // breaking hydration for crawlers with a bot user agent.
+  await withSubscribers([], async (site) => {
+    await assertNoncePinned(site, "/", {
+      headers: { "user-agent": GOOGLEBOT_UA },
+    });
+  });
+});
+
+Deno.test("an unmatched URL still gets a nonce-pinned CSP and a 404 status", async () => {
+  // See #177 R-001: routes/[...path].tsx routes an unmatched URL through
+  // the same middleware chain as every other page, instead of Fresh's
+  // error-handler path, which runs outside it.
+  await withSubscribers([], async (site) => {
+    const { status } = await assertNoncePinned(site, "/no-such-page");
+    assertEquals(status, 404);
   });
 });

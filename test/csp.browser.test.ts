@@ -12,6 +12,10 @@
 //   pattern (/blog/[slug], /projects/[slug], /catalog/[slug],
 //   /hackathons/[slug] if any exist) — see representativePaths()'s docs for
 //   why this isn't a full ~48-page sitemap crawl.
+// - An unmatched URL (/no-such-page, see #177 R-001): zero violations, same
+//   as any other page, plus a mobile-viewport check that the mobile menu
+//   still hydrates there (proof client JS actually ran, not just that
+//   nothing tried to and so violated nothing).
 // - The /contact-me booking facade: clicking it inserts a same-policy
 //   cross-origin <iframe> (frame-src) at runtime, which only exists after
 //   client JS runs (islands/MeetEmbed.tsx) — never in the server-rendered
@@ -39,6 +43,7 @@ const SCHEDULE_URL = "https://meet.example.com";
 const UMAMI_URL = "https://umami.example.com/script.js";
 const UMAMI_ID = "00000000-0000-0000-0000-000000000000";
 const TEST_SECRET = "t".repeat(32);
+const MOBILE_VIEWPORT = { width: 390, height: 844 };
 
 interface Violation {
   directive: string;
@@ -121,7 +126,14 @@ Deno.test("no CSP violations on any static page or representative dynamic page",
     const page = await browser.newPage();
     try {
       await registerViolationListener(page);
-      const paths = representativePaths(await sitemapPaths(site));
+      // /no-such-page matches no sitemap entry and no route — see #177
+      // R-001: it must get the same CSP-enforced middleware chain as every
+      // page the sitemap lists, so it's added here explicitly rather than
+      // being found by representativePaths().
+      const paths = [
+        ...representativePaths(await sitemapPaths(site)),
+        "/no-such-page",
+      ];
       assert(
         paths.length >= 5,
         "expected several representative paths, got too few to be a real check",
@@ -131,6 +143,37 @@ Deno.test("no CSP violations on any static page or representative dynamic page",
         await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
         await assertNoViolations(page, `on ${path}`);
       }
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the mobile menu still hydrates on an unmatched URL", async () => {
+  // Zero CSP violations alone doesn't prove client JS ran — it's also true
+  // of a page where hydration silently never started. This drives the
+  // mobile menu open, same as test/a11y.browser.test.ts's Escape-handling
+  // tests, as the concrete proof.
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    try {
+      await registerViolationListener(page);
+      await page.goto(`${site.origin}/no-such-page`, {
+        waitUntil: "networkidle",
+      });
+      await assertNoViolations(page, "on /no-such-page");
+
+      const toggle = page.getByRole("button", { name: "Open main menu" });
+      await toggle.click();
+      await page.locator("#mobile-menu").waitFor({ state: "visible" });
+
+      await assertNoViolations(page, "after opening the mobile menu");
     } finally {
       await page.close();
     }
