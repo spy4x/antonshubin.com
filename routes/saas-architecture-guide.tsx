@@ -6,6 +6,7 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { blogArticles, projects } from "../lib/data.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
+import { proof } from "../lib/proof.ts";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 
 const audit = catalogItem("codebase-health-audit");
@@ -17,7 +18,9 @@ export default define.page(function SaasArchGuide() {
     title: "SaaS Architecture Guide — Anton Shubin",
     pageName: "SaaS Architecture Guide",
     description:
-      "From idea to production: architecture patterns, infrastructure decisions, CI/CD, AI integration, and lessons learned building 80+ projects.",
+      `From idea to production: architecture patterns, infrastructure decisions, CI/CD, AI integration, and lessons learned building ${
+        proof("jobs")
+      }+ projects.`,
     canonical: "https://antonshubin.com/saas-architecture-guide",
     ogType: "article",
   };
@@ -43,7 +46,7 @@ export default define.page(function SaasArchGuide() {
         </h1>
         <p class="text-graphite text-lg mb-8 leading-relaxed">
           From idea to production — architecture patterns, infrastructure
-          decisions, and lessons learned from 80+ projects.
+          decisions, and lessons learned from {proof("jobs")}+ projects.
         </p>
 
         {/* 1. Architecture Design */}
@@ -249,7 +252,7 @@ export default define.page(function SaasArchGuide() {
             Production Patterns &amp; Lessons
           </h2>
           <p class="text-graphite mb-4">
-            Real-world lessons from shipping 80+ projects.
+            Real-world lessons from shipping {proof("jobs")}+ projects.
           </p>
           <ul class="space-y-3">
             {startupPosts.map((p) => (

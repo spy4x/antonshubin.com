@@ -1,3 +1,5 @@
+import { proof } from "./proof.ts";
+
 export interface Project {
   title: string;
   slug?: string;
@@ -231,7 +233,9 @@ export const projects = {
       ghRepo: "spy4x/template",
       logoImageURL: "/img/projects/template/logo.svg",
       description:
-        "Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from 80+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.",
+        `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
+          proof("jobs")
+        }+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.`,
       outcome:
         "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
       tags: [
@@ -704,8 +708,9 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     index: 11,
-    title:
-      "Deno Platform Template: distilling 80+ client projects into one repo",
+    title: `Deno Platform Template: distilling ${
+      proof("jobs")
+    }+ client projects into one repo`,
     slug: "deno-platform-template",
     description:
       "What I learned shipping the same SaaS skeleton over and over for paying clients. Group core, personal groups, REST + CQRS, offline sync, an outbox processor — and a deliberate decision to ship it as a template, not a framework.",

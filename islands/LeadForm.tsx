@@ -1,6 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 import { ArrowRightIcon, CheckIcon, SearchIcon } from "../components/Icons.tsx";
+import { proof } from "../lib/proof.ts";
 import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
 
 interface FormState {
@@ -255,7 +256,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Expert-Vetted (Top 1%)
+            {proof("expert-vetted")} ({proof("top-percent")})
           </span>
           <span class="inline-flex items-center gap-1">
             <svg
@@ -274,7 +275,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            80+ projects shipped
+            {proof("jobs")}+ projects shipped
           </span>
           <span class="inline-flex items-center gap-1">
             <svg
@@ -293,7 +294,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            100% Job Success
+            {proof("job-success")} Job Success
           </span>
         </div>
       </div>
