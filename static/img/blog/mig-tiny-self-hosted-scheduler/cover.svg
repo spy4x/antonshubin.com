@@ -4,7 +4,7 @@
   <text x="70" y="160" font-family="system-ui" font-size="64" font-weight="bold"
     fill="#a78bfa">mig</text>
   <text x="70" y="220" font-family="system-ui" font-size="30"
-    fill="#94a3b8">A 200-line meeting scheduler</text>
+    fill="#94a3b8">A lightweight meeting scheduler</text>
   <text x="70" y="260" font-family="system-ui" font-size="30"
     fill="#94a3b8">because Calendly alternatives are overkill</text>
   <text x="70" y="380" font-family="ui-monospace,monospace" font-size="22"
