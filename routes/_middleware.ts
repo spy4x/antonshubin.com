@@ -1,6 +1,6 @@
-// Sets X-Robots-Tag per path. Leaving analytics out for known bots happens at
-// render time in routes/_app.tsx (see lib/bots.ts), not here, so no response
-// body is read or rewritten.
+// Sets X-Robots-Tag per path and status. Leaving analytics out for known bots
+// happens at render time in routes/_app.tsx (see lib/bots.ts), not here, so no
+// response body is read or rewritten.
 export async function handler(
   ctx: { req: Request; url: URL; next: () => Promise<Response> },
 ): Promise<Response> {
@@ -17,6 +17,10 @@ export async function handler(
     pathname === "/unsubscribe"
   ) {
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
+  } else if (res.status >= 400) {
+    // routes/[...path].tsx sends every unmatched URL through here, so a 404
+    // for /no-such-page or /img/nope.png must not invite indexing.
+    res.headers.set("X-Robots-Tag", "noindex");
   } else {
     res.headers.set(
       "X-Robots-Tag",

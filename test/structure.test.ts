@@ -368,3 +368,20 @@ siteTest(
     assertEquals(bad, [], "internal links that do not answer 200");
   },
 );
+
+// Since routes/[...path].tsx (#177), every unmatched URL runs through
+// routes/_middleware.ts, which used to invite indexing on all of them.
+siteTest("a missing page tells crawlers not to index it", async (site) => {
+  for (const path of ["/no-such-page", "/img/nope.png", "/blog/no-such-post"]) {
+    const res = await site.get(path);
+    await res.body?.cancel();
+    assertEquals(res.status, 404, path);
+    assertEquals(res.headers.get("X-Robots-Tag"), "noindex", path);
+  }
+  const home = await site.get("/");
+  await home.body?.cancel();
+  assert(
+    home.headers.get("X-Robots-Tag")?.startsWith("index"),
+    "a real page must still invite indexing",
+  );
+});

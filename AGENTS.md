@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form + a11y + contrast tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP and service-worker tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -108,7 +108,7 @@ Deploy above).
 The `check` step also installs Chromium before `deno task check` runs:
 `deno run -A npm:playwright@1.63.0 install --with-deps chromium` — the base
 image has none of the OS libraries a headless Chromium needs. That's for the
-four browser-driven tests under "Browser-driven tests" below. The version must
+five browser-driven tests under "Browser-driven tests" below. The version must
 match `deno.json`'s `"playwright"` pin exactly, or the install downloads a
 different Chromium build than the one the tests launch.
 
@@ -162,11 +162,11 @@ own before a build.
 
 Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-four files below and fails loudly, naming the install command, if none is found.
+five files below and fails loudly, naming the install command, if none is found.
 Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
 — a mismatch downloads a different Chromium build than the one launched. All
-four call `startSite()` and run under `deno task test:browser` with `-A`, not
+five call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
@@ -199,6 +199,12 @@ the narrow `deno task test`.
   policy has to cover both — a request failing (no such host) is fine, a CSP
   violation isn't. See the test file's own header for why it samples pages
   instead of crawling the whole sitemap.
+- `test/sw-cache.browser.test.ts` (#177 follow-up): the service worker
+  (`routes/sw.js.ts`) never stores a `no-store` response in the Cache API and
+  never serves one from it — a signed unsubscribe link opened, submitted and
+  reopened answers "Link not recognised", not the cached form. It opens the
+  pages under test in a second tab once `navigator.serviceWorker.ready`
+  resolves, because the tab that registers the worker is not controlled by it.
 
 ## Content-Security-Policy
 
@@ -266,9 +272,13 @@ Claude, Perplexity, and other AI crawlers — a primary traffic source.
 
 ## Cache-Control headers
 
-Cache policy lives in `main.ts` as middleware, except `/sw.js`, which sets its
-own header in `routes/sw.js.ts`. When adding or changing routes, update the
-`CORE_PAGES` set if the new page should be cached at the edge:
+Cache policy lives in `lib/cache-control.ts`'s `cacheControlFor()`, a pure
+function unit-tested in `lib/cache-control.test.ts`, applied to every response
+by `main.ts`'s cache middleware. `fetch()` drops a `Host` header, so
+`test/unsubscribe.test.ts` checks the staging wiring with a raw HTTP request
+instead. `/sw.js` sets its own header in `routes/sw.js.ts`. When adding or
+changing routes, update the `CORE_PAGES` set there if the new page should be
+cached at the edge:
 
 ```ts
 const CORE_PAGES = new Set([
@@ -294,6 +304,13 @@ Cache tiers:
 | Core pages | 3 days + stale-while-revalidate | `CORE_PAGES` set         | SSR pages that update every few days                          |
 | No cache   | `no-cache, must-revalidate`     | `/sw.js`                 | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
 
-Error responses (status ≥ 400) are never cached, in `main.ts`'s middleware,
-regardless of which tier the path would otherwise fall into — a 404 must not
-survive in a browser or at the edge once the page comes back.
+Error responses (status ≥ 400) are never cached, regardless of which tier the
+path would otherwise fall into — a 404 must not survive in a browser or at the
+edge once the page comes back. A route that sets `no-store` itself (for example
+`routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it on
+staging and production alike, and the service worker never caches or serves such
+a response. Staging answers every response with
+`X-Robots-Tag: noindex,
+nofollow`; production sends `noindex` for any status ≥
+400 and `noindex, nofollow` for `/pay` and `/unsubscribe`
+(`routes/_middleware.ts`).

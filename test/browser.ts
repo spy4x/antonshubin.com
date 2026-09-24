@@ -1,10 +1,9 @@
-// Shared setup for the browser-driven tests (test/lead-form.browser.test.ts,
-// test/a11y.browser.test.ts, test/contrast.browser.test.ts) — all three
-// launch Chromium through the same pinned Playwright version. An upgrade
-// changes that version here, in deno.json's import map and in
-// .woodpecker.yml's install command (AGENTS.md cites it too). See AGENTS.md
-// "Browser-driven tests" for why these tests need Chromium and their own
-// `-A` task instead of the plain `deno task test` glob.
+// Shared setup for the browser-driven tests (test/*.browser.test.ts, listed in
+// deno.json's test:browser task) — every one launches Chromium through the
+// same pinned Playwright version. An upgrade changes that version here, in
+// deno.json's import map and in .woodpecker.yml's install command (AGENTS.md
+// cites it too). See AGENTS.md "Browser-driven tests" for why these tests need
+// Chromium and their own `-A` task instead of the plain `deno task test` glob.
 import { chromium } from "playwright";
 import type { Browser } from "playwright";
 
