@@ -15,8 +15,6 @@ videos/
 # Generated video-kit drafts
 key.txt
 # Local private files
-marketing-refactoring.md
-neatsoft.dev.md
 node_modules/
 # npm + other dependencies
 .playwright-mcp/
