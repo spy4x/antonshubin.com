@@ -8,32 +8,8 @@ import {
   SMTP_PORT,
   SMTP_USERNAME,
 } from "../../lib/config.ts";
-
-export interface Subscriber {
-  email: string;
-  subscribedAt: string;
-}
-
-// JSON file-backed subscriber storage (persists in container, backup manually)
-const DATA_FILE = "data/subscribers.json";
-
-function loadSubscribers(): Subscriber[] {
-  try {
-    const raw = Deno.readTextFileSync(DATA_FILE);
-    return JSON.parse(raw) as Subscriber[];
-  } catch {
-    return [];
-  }
-}
-
-function saveSubscribers(list: Subscriber[]): void {
-  try {
-    Deno.mkdirSync("data", { recursive: true });
-    Deno.writeTextFileSync(DATA_FILE, JSON.stringify(list, null, 2));
-  } catch (err) {
-    console.error("[SUBSCRIBE] failed to save:", err);
-  }
-}
+import { loadSubscribers, saveSubscribers } from "../../lib/subscribers.ts";
+import { unsubscribeLink } from "../../lib/unsubscribe.ts";
 
 // ── Simple SMTP send (reuses lead.ts pattern) ──────────────────────────
 async function sendMail(
@@ -131,17 +107,35 @@ export const handler = define.handlers({
       return Response.json({ ok: true, message: "Already subscribed" });
     }
 
+    // Build the unsubscribe link before saving anything: a missing or too
+    // short UNSUBSCRIBE_SECRET fails the whole request instead of saving an
+    // address whose unsubscribe link would never work.
+    let link: string;
+    try {
+      link = await unsubscribeLink(email);
+    } catch (err) {
+      console.error("[SUBSCRIBE] cannot build unsubscribe link:", err);
+      return Response.json({ error: "Server misconfigured" }, {
+        status: 500,
+      });
+    }
+
     subs.push({ email, subscribedAt: new Date().toISOString() });
-    saveSubscribers(subs);
+    try {
+      saveSubscribers(subs);
+    } catch (err) {
+      console.error("[SUBSCRIBE] failed to save:", err);
+      return Response.json({ error: "Could not save subscription" }, {
+        status: 500,
+      });
+    }
 
     // Welcome the subscriber
     sendMail(
       email,
       SMTP_FROM || SMTP_USERNAME,
       "Welcome to Anton Shubin's newsletter",
-      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from 80+ projects.\n\nHere's a good place to start:\n${BASE_URL}/saas-architecture-guide\n\nUnsubscribe anytime:\n${BASE_URL}/api/unsubscribe?email=${
-        encodeURIComponent(email)
-      }\n\n— Anton`,
+      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from 80+ projects.\n\nHere's a good place to start:\n${BASE_URL}/saas-architecture-guide\n\nUnsubscribe anytime:\n${link}\n\n— Anton`,
     ).catch((err) => console.error("[SUBSCRIBE] welcome failed:", err));
 
     // Notify owner
@@ -149,9 +143,7 @@ export const handler = define.handlers({
       CONTACT_EMAIL,
       SMTP_FROM || SMTP_USERNAME,
       `[Newsletter] New subscriber: ${email}`,
-      `${email} subscribed.\nTotal subscribers: ${subs.length}\n\nUnsubscribe: ${BASE_URL}/api/unsubscribe?email=${
-        encodeURIComponent(email)
-      }`,
+      `${email} subscribed.\nTotal subscribers: ${subs.length}\n\nUnsubscribe: ${link}`,
     ).catch((err) => console.error("[SUBSCRIBE] notify failed:", err));
 
     return Response.json({ ok: true });

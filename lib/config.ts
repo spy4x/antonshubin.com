@@ -23,6 +23,25 @@ export const UMAMI_PRECONNECT_ORIGIN = crossOriginPreconnect(
   BASE_URL,
 );
 
+/**
+ * Secret key for signing unsubscribe links (#177). Read at call time, not at
+ * module load: the rest of the site boots fine without it, so only the code
+ * path that actually needs a token (building or verifying one) should fail,
+ * and only when it's called. Throws instead of falling back to an empty or
+ * short secret — a weak or missing key would make tokens guessable or
+ * trivially forgeable.
+ */
+export function getUnsubscribeSecret(): string {
+  const secret = Deno.env.get("UNSUBSCRIBE_SECRET") || "";
+  if (secret.length < 32) {
+    throw new Error(
+      "UNSUBSCRIBE_SECRET is not set or shorter than 32 characters. " +
+        "Generate one with `openssl rand -base64 48` (see .env.example).",
+    );
+  }
+  return secret;
+}
+
 export const CONTACT_EMAIL = Deno.env.get("CONTACT_EMAIL") || "";
 export const SMTP_HOST = Deno.env.get("SMTP_HOST") || "";
 export const SMTP_PORT = parseInt(Deno.env.get("SMTP_PORT") || "587");

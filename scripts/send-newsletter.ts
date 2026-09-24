@@ -9,22 +9,9 @@
  * The body file/text supports HTML. Unsubscribe link is auto-appended.
  */
 
-const DATA_FILE = "data/subscribers.json";
-const BASE_URL = "https://antonshubin.com";
-
-interface Subscriber {
-  email: string;
-  subscribedAt: string;
-}
-
-function loadSubscribers(): Subscriber[] {
-  try {
-    return JSON.parse(Deno.readTextFileSync(DATA_FILE));
-  } catch {
-    console.error("No subscribers found at", DATA_FILE);
-    Deno.exit(1);
-  }
-}
+import { loadSubscribers } from "@/lib/subscribers.ts";
+import { BASE_URL, getUnsubscribeSecret } from "@/lib/config.ts";
+import { unsubscribeLink } from "@/lib/unsubscribe.ts";
 
 const [subject, bodyArg] = Deno.args;
 if (!subject || !bodyArg) {
@@ -54,6 +41,15 @@ if (!host || !user || !pass) {
   Deno.exit(1);
 }
 
+// Fail before sending anything rather than partway through the list —
+// every unsubscribe link needs this to build.
+try {
+  getUnsubscribeSecret();
+} catch (err) {
+  console.error(err instanceof Error ? err.message : err);
+  Deno.exit(1);
+}
+
 const subs = loadSubscribers();
 console.log(`Sending to ${subs.length} subscribers...`);
 
@@ -61,11 +57,9 @@ let sent = 0;
 let failed = 0;
 
 for (const sub of subs) {
-  const unsubscribeLink = `${BASE_URL}/api/unsubscribe?email=${
-    encodeURIComponent(sub.email)
-  }`;
+  const link = await unsubscribeLink(sub.email);
   const fullBody =
-    `${body}\n\n---\n<a href="${unsubscribeLink}">Unsubscribe</a> | ${BASE_URL}`;
+    `${body}\n\n---\n<a href="${link}">Unsubscribe</a> | ${BASE_URL}`;
 
   try {
     const conn = await Deno.connectTls({ hostname: host, port });
