@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker and visual-system tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes and meet-embed tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -330,11 +330,11 @@ own before a build.
 
 Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-seven files below and fails loudly, naming the install command, if none is
+eight files below and fails loudly, naming the install command, if none is
 found. Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
 — a mismatch downloads a different Chromium build than the one launched. All
-seven call `startSite()` and run under `deno task test:browser` with `-A`, not
+eight call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
@@ -390,6 +390,14 @@ the narrow `deno task test`.
   the CSS breakpoint in `assets/styles.css`'s `.note-wrap`/`.note-aside` rules,
   not checkable from server-rendered HTML alone since it depends on computed
   layout.
+- `test/meet-embed.browser.test.ts` (mig#44): `islands/MeetEmbed.tsx`'s
+  `message` listener actually resizes the booking iframe to the height a
+  `mig:height` message reports, and keeps applying later messages, not just the
+  first one — against a tiny stub `/embed` server this test starts itself
+  (`SCHEDULE_URL` pointed at it), not a real mig instance. A second case proves
+  the "same origin, wrong window" guard: a same-origin sibling iframe posting a
+  spoofed `mig:height` message never resizes the booking iframe, because
+  `event.source` isn't that iframe's own `contentWindow`.
 
 ## Content-Security-Policy
 
