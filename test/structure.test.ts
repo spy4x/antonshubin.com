@@ -10,6 +10,7 @@ import {
   catalogRedirects,
   formatPrice,
 } from "../lib/catalog.ts";
+import { blogArticles, projects } from "../lib/data.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -385,3 +386,196 @@ siteTest("a missing page tells crawlers not to index it", async (site) => {
     "a real page must still invite indexing",
   );
 });
+
+siteTest("no page emits an aggregateRating", async (site) => {
+  for (
+    const path of [
+      "/",
+      ...catalogItems.map((i) => `/catalog/${i.slug}`),
+      `/projects/${projects.freelance[0].slug}`,
+      `/blog/${blogArticles[0].slug}`,
+    ]
+  ) {
+    const html = await site.html(path);
+    assert(
+      !html.includes("aggregateRating"),
+      `${path} still emits aggregateRating (#193)`,
+    );
+  }
+});
+
+siteTest(
+  "trailing-slash post and project URLs redirect to the slash-free form",
+  async (site) => {
+    const post = blogArticles[0].slug;
+    const res = await site.get(`/blog/${post}/?utm_source=x`);
+    await res.body?.cancel();
+    assertEquals(res.status, 301);
+    assertEquals(
+      (res.headers.get("location") ?? "").replace(site.origin, ""),
+      `/blog/${post}?utm_source=x`,
+    );
+
+    const project = projects.freelance[0].slug;
+    const res2 = await site.get(`/projects/${project}/`);
+    await res2.body?.cancel();
+    assertEquals(res2.status, 301);
+    assertEquals(
+      (res2.headers.get("location") ?? "").replace(site.origin, ""),
+      `/projects/${project}`,
+    );
+  },
+);
+
+siteTest(
+  "the retired CalDAV slug redirects to the post that absorbed it",
+  async (site) => {
+    const res = await site.get("/blog/self-hosted-caldav-pwa-architecture");
+    await res.body?.cancel();
+    assertEquals(res.status, 301);
+    assertEquals(
+      (res.headers.get("location") ?? "").replace(site.origin, ""),
+      "/blog/self-hosted-caldav-web-ui-tasks-org",
+    );
+  },
+);
+
+siteTest("the home page itself never redirects", async (site) => {
+  const res = await site.get("/");
+  await res.body?.cancel();
+  assertEquals(res.status, 200);
+});
+
+siteTest(
+  "every post and project page points og:image at its 1200x630 PNG",
+  async (site) => {
+    for (const article of blogArticles) {
+      const html = await site.html(`/blog/${article.slug}`);
+      assert(
+        html.includes(
+          `property="og:image" content="https://antonshubin.com/img/og/blog/${article.slug}.png"`,
+        ),
+        `/blog/${article.slug}: og:image is not its PNG`,
+      );
+      assert(html.includes('property="og:image:width" content="1200"'));
+      assert(html.includes('property="og:image:height" content="630"'));
+    }
+    for (const project of [...projects.my, ...projects.freelance]) {
+      if (!project.slug) continue;
+      const html = await site.html(`/projects/${project.slug}`);
+      assert(
+        html.includes(
+          `property="og:image" content="https://antonshubin.com/img/og/projects/${project.slug}.png"`,
+        ),
+        `/projects/${project.slug}: og:image is not its PNG`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the home page's og:image is the landscape default, not the portrait photo",
+  async (site) => {
+    const html = await site.html("/");
+    assert(
+      html.includes(
+        'property="og:image" content="https://antonshubin.com/img/og/default.png"',
+      ),
+      "home page og:image is not the new default PNG",
+    );
+    const ogImageTag = html.match(/<meta property="og:image" content="[^"]*"/)
+      ?.[0] ?? "";
+    assert(
+      !ogImageTag.includes("photo-big.webp"),
+      "home page og:image still points at the old portrait photo",
+    );
+  },
+);
+
+siteTest(
+  "twitter:site is not set (the handle is unverified, #193)",
+  async (site) => {
+    const html = await site.html("/");
+    assert(
+      !html.includes('name="twitter:site"'),
+      "twitter:site should be removed until the handle is verified",
+    );
+  },
+);
+
+siteTest(
+  "the breadcrumb's last item is the bare page name, not the full <title>",
+  async (site) => {
+    const article = blogArticles[0];
+    const html = await site.html(`/blog/${article.slug}`);
+    const breadcrumb = jsonLd(html)
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
+      .find((n) => (n as { "@type"?: string })["@type"] === "BreadcrumbList") as
+        | { itemListElement: { name: string }[] }
+        | undefined;
+    assert(breadcrumb, "no BreadcrumbList JSON-LD");
+    const last = breadcrumb.itemListElement.at(-1)!;
+    assertEquals(last.name, article.title);
+  },
+);
+
+siteTest(
+  "the WebSite JSON-LD description is the same on every page",
+  async (site) => {
+    const paths = ["/", "/catalog", `/blog/${blogArticles[0].slug}`];
+    const descriptions = new Set<string>();
+    for (const path of paths) {
+      const html = await site.html(path);
+      const website = jsonLd(html)
+        .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
+        .find((n) => (n as { "@type"?: string })["@type"] === "WebSite") as
+          | { description: string }
+          | undefined;
+      assert(website, `${path}: no WebSite JSON-LD`);
+      descriptions.add(website.description);
+    }
+    assertEquals(descriptions.size, 1, "WebSite description differs by page");
+  },
+);
+
+siteTest(
+  "the Person JSON-LD states Anton's role at NeatSoft",
+  async (site) => {
+    const html = await site.html("/");
+    const person = jsonLd(html)
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
+      .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
+        | { worksFor: { roleName?: string } }
+        | undefined;
+    assert(person, "no Person in the JSON-LD");
+    assertEquals(person.worksFor.roleName, "Co-Founder and CEO");
+  },
+);
+
+siteTest(
+  "/saas-architecture-guide's 'Building the MVP' section lists real case studies, not tools",
+  async (site) => {
+    const html = await site.html("/saas-architecture-guide");
+    // Scoped to the "Building the MVP" section: /projects/homelab is also
+    // linked, on purpose, from the unrelated "Infrastructure & Cost
+    // Optimization" section further down as infra proof, not a case study.
+    const start = html.indexOf("Building the MVP");
+    const end = html.indexOf("CI/CD &amp; DevOps");
+    assert(start > 0 && end > start, "could not find the MVP section");
+    const section = html.slice(start, end);
+    for (const project of projects.freelance) {
+      if (!project.slug || project.archived) continue;
+      assert(
+        section.includes(`href="/projects/${project.slug}"`),
+        `the MVP section does not link case study ${project.slug}`,
+      );
+    }
+    for (const project of projects.my) {
+      if (!project.slug) continue;
+      assert(
+        !section.includes(`href="/projects/${project.slug}"`),
+        `the MVP section links tool ${project.slug}, expected only client work`,
+      );
+    }
+  },
+);
