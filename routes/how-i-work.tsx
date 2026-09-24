@@ -14,6 +14,7 @@ import {
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
+import { promise, promises } from "../lib/promises.ts";
 import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
 import { toJsonLd } from "../lib/json-ld.ts";
 
@@ -30,7 +31,9 @@ const ongoing = catalogItem("cto-advisory-retainer");
 const faqs: Faq[] = [
   {
     q: "What if we start working together and it is not a good fit?",
-    a: "That is exactly why I offer a five-day refund. If in the first five days you feel this is not working, tell me and I refund what you paid. We also start with a small first milestone — one or two weeks of work — so if either of us wants to stop at the end of it, we stop, and you keep everything built so far.",
+    a: `That is exactly why I offer a five-day refund. ${
+      promise("refund").desc
+    } We also start with a small first milestone — one or two weeks of work — so if either of us wants to stop at the end of it, we stop, and you keep everything built so far.`,
   },
   {
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
@@ -95,54 +98,8 @@ function FaqItem({ faq }: { faq: Faq }) {
   );
 }
 
-interface PolicyItem {
-  icon: "shield" | "target" | "key" | "calendar" | "wrench";
-  title: string;
-  desc: string;
-  why: string;
-  link?: string;
-}
-
-const policies: PolicyItem[] = [
-  {
-    icon: "shield",
-    title: "Five-day refund",
-    desc:
-      "If in the first five days you feel this is not working, tell me and I refund what you paid.",
-    why:
-      "In fifteen years the few engagements that needed a refund all showed it within two or three days, so five days is a promise I can keep.",
-  },
-  {
-    icon: "target",
-    title: "A small first milestone",
-    desc:
-      "We start with one or two weeks of work. If either of us wants to stop at the end of it, we stop — you keep everything built so far.",
-    why:
-      "You don't have to commit to months of work before we know the collaboration is right.",
-  },
-  {
-    icon: "key",
-    title: "You own everything from day one",
-    desc: "Code, accounts, servers and keys are in your name.",
-    why:
-      "Your product is your asset. Nothing about how I work should get in the way of you taking it wherever you need it.",
-  },
-  {
-    icon: "calendar",
-    title: "Weekly working software",
-    desc:
-      "You see working software every week, with a short written update. Calls when they help, not on a schedule for its own sake.",
-    why:
-      "You always know where the project stands, without sitting through meetings that do not move it forward.",
-  },
-  {
-    icon: "wrench",
-    title: "Free bug fixes for 30 days",
-    desc: "Bugs in what I delivered are fixed free for 30 days.",
-    why:
-      "I stand behind what I build. If something I shipped breaks, I fix it on my time, not yours.",
-  },
-];
+// No promise carries a link today; the type below keeps room for one.
+const policies: (typeof promises[number] & { link?: string })[] = promises;
 
 export default define.page(function HowIWork() {
   head.value = {
