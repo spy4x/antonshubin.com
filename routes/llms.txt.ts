@@ -1,19 +1,14 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL } from "../lib/config.ts";
-import {
-  blogArticles,
-  featuredClientSlugs,
-  hackathons,
-  projects,
-} from "../lib/data.ts";
+import { blogArticles, featuredClientSlugs, hackathons } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { ROLE } from "../lib/head.ts";
-
-/** Text up to and including the first ". " — a one-line summary for a longer description. */
-function firstSentence(text: string): string {
-  const end = text.indexOf(". ");
-  return end === -1 ? text : text.slice(0, end + 1);
-}
+import {
+  clientProject,
+  firstSentence,
+  openSourceProjects,
+  withOutcome,
+} from "../lib/llms.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -31,15 +26,13 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // Every non-archived open-source project, generated from lib/data.ts so
-    // this list can't drift from the project pages or their READMEs.
-    const openSourceProjects = projects.my.filter((p) =>
-      !p.archived && p.title !== "YouTube Tech Channel"
-    );
-    const openSourceList = openSourceProjects
+    // Generated from lib/data.ts so this list can't drift from the project
+    // pages or their READMEs; the outcome carries status facts (a broken
+    // server, a revival, a production URL) a bare description often doesn't.
+    const openSourceList = openSourceProjects()
       .map((p) =>
         `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
-          firstSentence(p.description)
+          withOutcome(firstSentence(p.description), p.outcome)
         }`
       )
       .join("\n");
@@ -49,11 +42,10 @@ export const handler = define.handlers({
     const clientList = featuredClientSlugs
       .slice(0, 2)
       .map((slug) => {
-        const p = projects.freelance.find((x) => x.slug === slug);
-        if (!p) throw new Error(`lib/data.ts: no freelance project "${slug}"`);
+        const p = clientProject(slug);
         return `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
-          firstSentence(p.description)
-        }${p.outcome ? ` ${p.outcome}` : ""}`;
+          withOutcome(firstSentence(p.description), p.outcome)
+        }`;
       })
       .join("\n");
 

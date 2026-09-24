@@ -1,8 +1,8 @@
-// Guards routes/llms-full.txt.ts against re-introducing the in-place
-// `blogArticles.sort()` bug: since `blogArticles` is a module-level array
-// shared by every request in the process, sorting it in place there used to
-// reorder "Read next" on every blog post page after the first fetch of
-// /llms-full.txt. See AGENTS.md "Rendered-page tests".
+// Guards routes/llms.txt.ts and routes/llms-full.txt.ts against an in-place
+// `blogArticles.sort()`: since `blogArticles` is a module-level array shared
+// by every request in the process, sorting it in place in either route used
+// to reorder "Read next" on every blog post page after the first fetch of
+// that route. See AGENTS.md "Rendered-page tests".
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 
@@ -15,7 +15,7 @@ function readNextSlugs(html: string): string[] {
   return matches.map((m) => m[1]);
 }
 
-Deno.test("fetching /llms-full.txt does not change blog 'Read next' order", async () => {
+Deno.test("fetching /llms.txt or /llms-full.txt does not change blog 'Read next' order", async () => {
   const site = await startSite();
   try {
     // A dev-tips post with several dev-tips siblings, so "Read next" has a
@@ -29,12 +29,16 @@ Deno.test("fetching /llms-full.txt does not change blog 'Read next' order", asyn
       "the fixture post has no 'Read next' section — pick a post with related articles",
     );
 
-    const llmsRes = await site.get("/llms-full.txt");
-    assertEquals(llmsRes.status, 200);
-    await llmsRes.text();
+    // Both llms routes build a blog-post list; either one sorting the shared
+    // blogArticles array in place would reorder "Read next" afterwards.
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const res = await site.get(llmsPath);
+      assertEquals(res.status, 200, llmsPath);
+      await res.text();
 
-    const after = readNextSlugs(await site.html(path));
-    assertEquals(after, before);
+      const after = readNextSlugs(await site.html(path));
+      assertEquals(after, before, `order changed after fetching ${llmsPath}`);
+    }
   } finally {
     await site.stop();
   }
