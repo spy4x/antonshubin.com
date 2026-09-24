@@ -415,6 +415,15 @@ siteTest(
       (res.headers.get("location") ?? "").replace(site.origin, ""),
       `/blog/${post}?utm_source=x`,
     );
+    // Guards main.ts's middleware order: the redirect middleware sits after
+    // the CSP middleware, so a 301 still gets a CSP header set on whatever
+    // ctx.next() returned. Moving the redirect middleware ahead of the CSP
+    // one (verified by hand, then reverted) makes this go red — a 301 with
+    // no Content-Security-Policy header.
+    assert(
+      res.headers.get("Content-Security-Policy"),
+      "a redirect response has no Content-Security-Policy header",
+    );
 
     const project = projects.freelance[0].slug;
     const res2 = await site.get(`/projects/${project}/`);
@@ -435,6 +444,17 @@ siteTest(
     assertEquals(res.status, 301);
     assertEquals(
       (res.headers.get("location") ?? "").replace(site.origin, ""),
+      "/blog/self-hosted-caldav-web-ui-tasks-org",
+    );
+
+    // The trailing-slash form resolves in one hop, not a 301-to-a-301.
+    const res2 = await site.get(
+      "/blog/self-hosted-caldav-pwa-architecture/",
+    );
+    await res2.body?.cancel();
+    assertEquals(res2.status, 301);
+    assertEquals(
+      (res2.headers.get("location") ?? "").replace(site.origin, ""),
       "/blog/self-hosted-caldav-web-ui-tasks-org",
     );
   },
@@ -506,16 +526,28 @@ siteTest(
 siteTest(
   "the breadcrumb's last item is the bare page name, not the full <title>",
   async (site) => {
+    async function lastBreadcrumbName(path: string): Promise<string> {
+      const html = await site.html(path);
+      const breadcrumb = jsonLd(html)
+        .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
+        .find((n) =>
+          (n as { "@type"?: string })["@type"] === "BreadcrumbList"
+        ) as { itemListElement: { name: string }[] } | undefined;
+      assert(breadcrumb, `${path}: no BreadcrumbList JSON-LD`);
+      return breadcrumb.itemListElement.at(-1)!.name;
+    }
+
     const article = blogArticles[0];
-    const html = await site.html(`/blog/${article.slug}`);
-    const breadcrumb = jsonLd(html)
-      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
-      .find((n) => (n as { "@type"?: string })["@type"] === "BreadcrumbList") as
-        | { itemListElement: { name: string }[] }
-        | undefined;
-    assert(breadcrumb, "no BreadcrumbList JSON-LD");
-    const last = breadcrumb.itemListElement.at(-1)!;
-    assertEquals(last.name, article.title);
+    assertEquals(
+      await lastBreadcrumbName(`/blog/${article.slug}`),
+      article.title,
+    );
+
+    const project = projects.freelance[0];
+    assertEquals(
+      await lastBreadcrumbName(`/projects/${project.slug}`),
+      project.title,
+    );
   },
 );
 

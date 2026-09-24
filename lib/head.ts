@@ -6,6 +6,18 @@ export interface PageHead {
   description: string;
   canonical: string;
   ogImage: string;
+  /**
+   * `ogImage`'s pixel size, when known — printed as `og:image:width`/
+   * `og:image:height` (components/SEOHead.tsx). Every generated OG PNG
+   * (scripts/og-images.ts) is exactly 1200x630, but `ogImage` isn't always
+   * one of those: routes/hackathons/[slug].tsx points it at an arbitrary
+   * event photo instead, so a page that does that must leave these unset
+   * (or explicitly clear them — DEFAULTS below sets 1200x630, and a page
+   * that changes `ogImage` without also touching these would otherwise
+   * inherit the wrong size, `resetHead()` notwithstanding).
+   */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   ogType: "profile" | "article" | "website" | "service";
   noindex?: boolean;
   /**
@@ -40,6 +52,8 @@ const DEFAULTS: PageHead = {
   // `deno task og` (scripts/og-images.ts); see AGENTS.md "OG image
   // generator".
   ogImage: "https://antonshubin.com/img/og/default.png",
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
   ogType: "profile",
 };
 

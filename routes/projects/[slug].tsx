@@ -133,6 +133,8 @@ export default define.page(function ProjectDetail(ctx) {
     // above keeps the real logo/screenshots; LinkedIn, X, Facebook and Slack
     // don't render SVG link previews, and most project logos are SVG.
     ogImage: `https://antonshubin.com/img/og/projects/${slug}.png`,
+    ogImageWidth: 1200,
+    ogImageHeight: 630,
   };
 
   return (

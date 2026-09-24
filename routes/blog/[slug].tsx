@@ -110,6 +110,8 @@ export default define.page(function BlogArticle(ctx) {
     // above stays as the JSON-LD "image" and the in-page preview; LinkedIn,
     // X, Facebook and Slack don't render SVG link previews.
     ogImage: `https://antonshubin.com/img/og/blog/${article.slug}.png`,
+    ogImageWidth: 1200,
+    ogImageHeight: 630,
   };
 
   return (

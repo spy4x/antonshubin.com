@@ -53,6 +53,10 @@ export default define.page(function HackathonDetail(ctx) {
     canonical: `https://antonshubin.com/hackathons/${h.slug}`,
     ogType: "article",
     ogImage: `https://antonshubin.com${h.photos[0]}`,
+    // Not a generated 1200x630 PNG — an event photo of unknown size, so the
+    // inherited DEFAULTS size (1200x630, lib/head.ts) must not carry over.
+    ogImageWidth: undefined,
+    ogImageHeight: undefined,
   };
 
   return (
