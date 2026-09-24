@@ -7,6 +7,9 @@ data/subscribers.json
 # Environment files
 .env.*.local
 .env.prod
+.env.age
+# dev .env's own encrypted form was never tracked before age64 either; only
+# .env.prod.age is committed
 _fresh/
 # Fresh build directory
 launches/
