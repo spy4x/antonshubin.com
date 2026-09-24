@@ -173,7 +173,7 @@ export default define.page(function ContactMe() {
 
         <p class="mt-8 text-center text-gray-400 text-sm">
           Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R),
-          where Anton is co-founder and CEO.
+          where I'm co-founder and CEO.
         </p>
 
         {SCHEDULE_URL && (
