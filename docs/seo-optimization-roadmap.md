@@ -65,7 +65,9 @@ can build on it.
 **Fix:** Added to `components/SEOHead.tsx` Person block:
 
 - `image`, `givenName`, `familyName`, `email`, `knowsLanguage` (`["en", "ru"]`)
-- `award` (Expert-Vetted, 100% Job Success, $395K+)
+- `award` (Expert-Vetted, 100% Job Success — the earnings figure was moved out
+  of `award` in #186: it isn't an award, and no other schema.org property fit it
+  without overclaiming, so it's left out of structured data entirely)
 - `sameAs` spread from `lib/config.ts` (`SAME_AS_URLS`)
 - `worksFor` now references `@id: "https://neatsoft.dev/#org"`
 

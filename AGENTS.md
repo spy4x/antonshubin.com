@@ -109,28 +109,44 @@ reference.
   `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
   `routes/saas-architecture-guide.tsx`, `routes/api/subscribe.ts`'s confirmation
   email and `lib/data.ts`'s template project all read a value through
-  `proof(id)`. `test/structure.test.ts`'s proof guard scans `routes/`,
-  `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and every
-  `*.test.ts`) for each figure's exact rendered text and fails on a hand-written
-  copy.
+  `proof(id)`. `test/proof-promises-notes.test.ts`'s proof guard scans
+  `routes/`, `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and
+  every `*.test.ts`) for each figure's exact rendered text — including the
+  quoted-literal and case-insensitive forms a hand revert of the home proof
+  strip would take (with an explicit allowlist entry for
+  `islands/MeetEmbed.tsx`'s unrelated CSS `width: "100%"`) — and fails on a
+  hand-written copy.
 - `lib/promises.ts` holds the five promises' title, description and "why this
   matters" text. `/how-i-work` is where this wording was written and reviewed,
-  so its copy is canonical; `routes/index.tsx`'s "How it works" steps, both llms
-  files' Promises sections and `lib/catalog.ts`'s "Free bug fixes for 30 days"
-  bullet read a promise's `title`/`desc` through `promise(id)` instead of
-  restating it. The same guard test scans for each promise's exact `title` text
-  outside `lib/promises.ts`.
+  so its copy is canonical; `routes/how-i-work.tsx`'s FAQ answers, the home
+  page's "How it works" steps (two of the three — the first, "We talk", isn't a
+  promise), both llms files' Promises sections and `lib/catalog.ts`'s bug-fix
+  bullet all splice a promise's `title`/`desc` through `promise(id)` (and
+  `decapitalize()`/`firstSentence()` where a sentence needs to read as part of a
+  longer one) instead of restating it. The same guard test scans for each
+  promise's exact `title` and `desc` text, plus a short list of promise-specific
+  key terms ("one or two weeks of work", "fixed free for 30 days"), outside
+  `lib/promises.ts`.
 - `lib/testimonials.ts` holds every testimonial, each with a `permission` flag.
-  `routes/index.tsx`'s testimonials section renders only entries with both
-  `sourceHref` and `permission: true` (`visibleTestimonials()`) — with none, the
-  section doesn't render at all, and `test/structure.test.ts` reflects that in
-  its expected home-page section list.
+  `visibleTestimonials(list = testimonials)` takes an optional list so a test
+  can check the filter itself without editing real data; `routes/index.tsx`'s
+  testimonials section renders only entries with both `sourceHref` and
+  `permission: true` — with none, the section doesn't render at all, and
+  `test/structure.test.ts`'s home-page section-list check reflects that.
+  `components/TestimonialCard.tsx` renders a visible entry's `sourceHref` as a
+  link, checked by `components/TestimonialCard.test.tsx` and by
+  `test/proof-promises-notes.test.ts` against a real permissioned entry.
 - `lib/notes.ts` holds every margin note (`{ id, text, href?, checkedOn? }`) —
   the source or checked date behind a claim wrapped in
   `components/WithNote.tsx`, which stamps the claim with `data-note-ref="<id>"`.
-  `test/structure.test.ts`'s note guard fetches every page in `/sitemap.xml` and
-  fails if a `data-note-ref` doesn't resolve to a note carrying `href` or
-  `checkedOn`.
+  `test/proof-promises-notes.test.ts`'s note guard fetches every page in
+  `/sitemap.xml` and fails if a `data-note-ref` doesn't resolve to a note
+  carrying `href` or `checkedOn`. The note itself sits in a `.note-wrap` CSS
+  grid column from 1100px (`assets/styles.css`), reserved inside the wrapper's
+  own box rather than positioned into the page's margin, so it can't cause
+  horizontal scroll regardless of viewport width — `test/notes.browser.test.ts`
+  asserts `document.documentElement.scrollWidth` and the note's right edge never
+  exceed the viewport, at 1100/1280/1440px.
 
 ## Visual system
 
@@ -177,11 +193,12 @@ render in a Tailwind utility's font: Tailwind wraps its own utilities in
 `@layer utilities`, which always loses to unlayered CSS like this rule
 regardless of selector specificity. IBM Plex Sans for body text, nav and
 buttons. Literata italic for margin notes and the Cyrillic tool marks (the
-`.margin-note` utility; not used yet — a later redesign issue wires it up).
-Tabular figures for prices, via `font-variant-numeric: tabular-nums` on the
-`.price` utility. IBM Plex Mono only for `code`, `pre` and `kbd`. Plex Sans
-ships only the 400 and 600 weights: `font-medium` (500) has no file and renders
-as 400, so use `font-semibold` for anything meant to look bold.
+`.margin-note` utility, wired up by `components/Note.tsx` since #186; the
+Cyrillic tool marks are still a later redesign issue). Tabular figures for
+prices, via `font-variant-numeric: tabular-nums` on the `.price` utility. IBM
+Plex Mono only for `code`, `pre` and `kbd`. Plex Sans ships only the 400 and 600
+weights: `font-medium` (500) has no file and renders as 400, so use
+`font-semibold` for anything meant to look bold.
 
 All three are self-hosted under `assets/fonts/` (Latin and Cyrillic subsets,
 from `@fontsource`'s pre-split files — their `unicode-range` values are copied

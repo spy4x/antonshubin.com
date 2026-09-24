@@ -3,8 +3,9 @@
  * `/how-i-work` is where this wording was written and reviewed, so it wins
  * whenever another copy disagreed — `routes/how-i-work.tsx`, both llms
  * files, the home page's "How it works" steps and the FAQ's first answer all
- * read from here. `test/structure.test.ts`'s promise guard fails when a
- * title shows up hand-written outside this file.
+ * read from here. `test/proof-promises-notes.test.ts`'s promise guard fails
+ * when a title, a full `desc` or a key term shows up hand-written outside
+ * this file.
  *
  * This module has no imports on purpose, so tests and scripts can load it
  * without environment access — same reason `lib/catalog.ts` has none.

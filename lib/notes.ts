@@ -4,9 +4,9 @@ import { UPWORK_URL } from "./config.ts";
  * Margin notes: the redesign's signature element (#184, #186) — a short
  * first-person sentence that gives a claim a source link or a checked date.
  * `components/WithNote.tsx` looks a note up by id and stamps the claim it
- * wraps with `data-note-ref="<id>"`; `test/structure.test.ts`'s note guard
- * fails when a `data-note-ref` on a rendered page doesn't resolve to a note
- * with `href` or `checkedOn`.
+ * wraps with `data-note-ref="<id>"`; `test/proof-promises-notes.test.ts`'s
+ * note guard fails when a `data-note-ref` on a rendered page doesn't resolve
+ * to a note with `href` or `checkedOn`.
  */
 export interface Note {
   id: string;

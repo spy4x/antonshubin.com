@@ -4,8 +4,9 @@
  * comment, both llms files, `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
  * `routes/saas-architecture-guide.tsx`, `routes/api/subscribe.ts` and
  * `lib/data.ts` all read a value from here instead of writing a number or a
- * qualitative label by hand. `test/structure.test.ts`'s proof guard fails
- * when one of these values shows up hand-written outside this file.
+ * qualitative label by hand. `test/proof-promises-notes.test.ts`'s proof
+ * guard fails when one of these values shows up hand-written outside this
+ * file.
  *
  * This module has no imports on purpose, so tests and scripts can load it
  * without environment access — same reason `lib/catalog.ts` has none.
