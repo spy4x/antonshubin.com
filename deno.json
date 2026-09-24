@@ -16,7 +16,8 @@
     "launch-kit": "deno run -A scripts/launch-kit.ts",
     "video-kit": "deno run -A scripts/video-kit.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
-    "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts"
+    "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
+    "og": "deno run -A scripts/og-images.ts"
   },
   "lint": {
     "rules": {
