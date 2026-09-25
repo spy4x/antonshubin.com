@@ -6,6 +6,7 @@ import {
   verifyUnsubscribeToken,
 } from "./unsubscribe.ts";
 import { getUnsubscribeSecret } from "./config.ts";
+import { oldCodeToken } from "../test/old-unsubscribe-token.ts";
 
 const SECRET_A = "a".repeat(32);
 const SECRET_B = "b".repeat(32);
@@ -130,5 +131,113 @@ Deno.test("unsubscribeLink rejects when UNSUBSCRIBE_SECRET is missing, before to
     await assertRejects(() => unsubscribeLink("user@example.com"));
   } finally {
     if (prior !== undefined) Deno.env.set("UNSUBSCRIBE_SECRET", prior);
+  }
+});
+
+// ── #233: the ts-libs codec format, and links sent before it ─────────────
+
+/** Produced by the pre-#233 `createUnsubscribeToken("user@example.com",
+ * SECRET_A)` on origin/main at 042df38. */
+const OLD_TOKEN_LITERAL = "oVzVbqNqkv9tmkTtVtYFuhqkv5Z_zcrst9MqqqcBQk4";
+
+/** What `createUnsubscribeToken("user@example.com", SECRET_A)` returns in the
+ * codec format. Pinned so a change to the purpose, version, payload or bound
+ * context — which would break every link already sent — fails here. */
+const NEW_TOKEN_LITERAL =
+  "eyJwdXJwb3NlIjoidW5zdWJzY3JpYmUiLCJ2ZXJzaW9uIjoxLCJwYXlsb2FkIjp7fX0." +
+  "DEwtNhLMmOB45aqDyVYaop6_lt6rH5WBLSDVeoyLDYA";
+
+const SUBSCRIBERS = [
+  { email: "a@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+  { email: "user@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
+];
+
+Deno.test("signs new links in the codec format, with no address in the token", async () => {
+  const token = await createUnsubscribeToken(" User@Example.com ", SECRET_A);
+  assertEquals(token, NEW_TOKEN_LITERAL);
+  const [envelope] = token.split(".");
+  const json = atob(envelope.replaceAll("-", "+").replaceAll("_", "/"));
+  assertEquals(JSON.parse(json), {
+    purpose: "unsubscribe",
+    version: 1,
+    payload: {},
+  });
+  assert(!token.toLowerCase().includes("example"));
+});
+
+Deno.test("a pinned token from the old code still finds its subscriber", async () => {
+  assertEquals(
+    await oldCodeToken("user@example.com", SECRET_A),
+    OLD_TOKEN_LITERAL,
+  );
+  const match = await findSubscriberByToken(
+    SUBSCRIBERS,
+    OLD_TOKEN_LITERAL,
+    SECRET_A,
+  );
+  assertEquals(match?.email, "user@example.com");
+  assert(
+    await verifyUnsubscribeToken(
+      "user@example.com",
+      OLD_TOKEN_LITERAL,
+      SECRET_A,
+    ),
+  );
+});
+
+Deno.test("an old-code token computed for any address still finds that subscriber", async () => {
+  const token = await oldCodeToken("A@example.com ", SECRET_A);
+  const match = await findSubscriberByToken(SUBSCRIBERS, token, SECRET_A);
+  assertEquals(match?.email, "a@example.com");
+});
+
+Deno.test("an old-code token under another secret, or for a removed address, matches nobody", async () => {
+  const foreign = await oldCodeToken("user@example.com", SECRET_B);
+  assertEquals(
+    await findSubscriberByToken(SUBSCRIBERS, foreign, SECRET_A),
+    undefined,
+  );
+  assert(
+    !(await verifyUnsubscribeToken("user@example.com", foreign, SECRET_A)),
+  );
+  const removed = await oldCodeToken("gone@example.com", SECRET_A);
+  assertEquals(
+    await findSubscriberByToken(SUBSCRIBERS, removed, SECRET_A),
+    undefined,
+  );
+});
+
+Deno.test("refuses, without throwing, a copy of an old token that is not in the old shape", async () => {
+  // The old code decoded any base64url, padded or not. A padded or truncated
+  // copy of a genuine old token is not a link anyone was sent.
+  for (
+    const token of [`${OLD_TOKEN_LITERAL}=`, OLD_TOKEN_LITERAL.slice(0, 42)]
+  ) {
+    assertEquals(
+      await findSubscriberByToken(SUBSCRIBERS, token, SECRET_A),
+      undefined,
+      token,
+    );
+  }
+});
+
+Deno.test("getUnsubscribeSecret refuses a secret the codec would refuse", () => {
+  const prior = Deno.env.get("UNSUBSCRIBE_SECRET");
+  try {
+    for (const secret of [` ${"x".repeat(30)} `, `${"x".repeat(31)}é`]) {
+      Deno.env.set("UNSUBSCRIBE_SECRET", secret);
+      let threw = false;
+      try {
+        getUnsubscribeSecret();
+      } catch {
+        threw = true;
+      }
+      assert(threw, `must throw for ${JSON.stringify(secret)}`);
+    }
+    Deno.env.set("UNSUBSCRIBE_SECRET", `  ${SECRET_A}  `);
+    assertEquals(getUnsubscribeSecret(), `  ${SECRET_A}  `);
+  } finally {
+    if (prior === undefined) Deno.env.delete("UNSUBSCRIBE_SECRET");
+    else Deno.env.set("UNSUBSCRIBE_SECRET", prior);
   }
 });

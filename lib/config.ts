@@ -30,13 +30,20 @@ export const UMAMI_PRECONNECT_ORIGIN = crossOriginPreconnect(
  * and only when it's called. Throws instead of falling back to an empty or
  * short secret — a weak or missing key would make tokens guessable or
  * trivially forgeable.
+ *
+ * The rule is the ts-libs signed payload codec's (#233), so a secret this
+ * accepts never makes the codec throw later: printable ASCII only, and at
+ * least 32 characters once surrounding whitespace is trimmed. The secret
+ * itself is used untrimmed, as it always was, so existing links still verify.
  */
 export function getUnsubscribeSecret(): string {
   const secret = Deno.env.get("UNSUBSCRIBE_SECRET") || "";
-  if (secret.length < 32) {
+  const trimmed = secret.trim();
+  if (trimmed.length < 32 || !/^[\x20-\x7e]+$/.test(trimmed)) {
     throw new Error(
-      "UNSUBSCRIBE_SECRET is not set or shorter than 32 characters. " +
-        "Generate one with `openssl rand -base64 48` (see .env.example).",
+      "UNSUBSCRIBE_SECRET is not set, shorter than 32 characters, or not " +
+        "printable ASCII. Generate one with `openssl rand -base64 48` " +
+        "(see .env.example).",
     );
   }
   return secret;
