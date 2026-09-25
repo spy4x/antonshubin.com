@@ -6,7 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
-import { groupedTools, tools } from "../lib/tools.ts";
+import { groupedTools, tool, tools } from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
 
 /** The word components/StatusMark.tsx prints for each tool status. */
@@ -84,16 +84,44 @@ siteTest(
 );
 
 siteTest(
-  "every tool page shows the CI status recorded in the snapshot",
+  "every CI pill reads the status recorded in the snapshot",
   async (site) => {
+    for (const path of ["/tools", ...tools.map((t) => `/tools/${t.slug}`)]) {
+      const html = await site.html(path);
+      const pills = [
+        ...html.matchAll(/<a[^>]*data-ci-status="[^"]*"[^>]*>([\s\S]*?)<\/a>/g),
+      ]
+        .map((m) => visibleText(m[1]));
+      const expected = path === "/tools"
+        ? tools.map((t) => `CI ${ciReading(repoSnapshot(t.repo).ci).word}`)
+        : [`CI ${ciReading(repoSnapshot(tool(path.slice(7)).repo).ci).word}`];
+      assertEquals(pills, expected, path);
+    }
+  },
+);
+
+siteTest(
+  "an unpublished tool's version reads as publishing on the hub row and the fact card",
+  async (site) => {
+    const hub = await site.html("/tools");
     for (const t of tools) {
-      const html = await site.html(`/tools/${t.slug}`);
-      const word = ciReading(repoSnapshot(t.repo).ci).word;
-      const shown = [...html.matchAll(/data-ci-status="([^"]+)"/g)].map((m) =>
-        m[1]
+      const rowStart = hub.indexOf(`data-tool="${t.slug}"`);
+      const row = hub.slice(rowStart, hub.indexOf("</li>", rowStart));
+      const hubVersion = visibleText(
+        row.match(/<span data-version[^>]*>([\s\S]*?)<\/span>/)![1],
       );
-      assert(shown.length > 0, `${t.slug} shows no CI status`);
-      for (const s of shown) assertEquals(s, word, t.slug);
+      const page = await site.html(`/tools/${t.slug}`);
+      const cardVersion = visibleText(
+        page.match(/<span data-version[^>]*>([\s\S]*?)<\/span>/)![1],
+      );
+      const { version, name } = t.registry;
+      if (t.registry.published) {
+        assertEquals(hubVersion, `${version} on ${name}`, t.slug);
+        assertEquals(cardVersion, version, t.slug);
+      } else {
+        assertEquals(hubVersion, `Publishing ${version} to ${name}`, t.slug);
+        assertEquals(cardVersion, `${version}, publishing to ${name}`, t.slug);
+      }
     }
   },
 );
@@ -175,14 +203,45 @@ siteTest(
 );
 
 siteTest(
-  "a planned link between repos is marked planned, not stated as fact",
+  "each link between repos is labelled Planned or Today, as lib/tools.ts says",
   async (site) => {
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
+      const labels = [
+        ...html.matchAll(
+          /<li[^>]*data-relation="[^"]*"[^>]*>([\s\S]*?)<\/li>/g,
+        ),
+      ]
+        .map((m) => visibleText(m[1]).split(" ")[0]);
       assertEquals(
-        count(html, /data-relation="planned"/g),
-        t.fits.filter((f) => f.planned).length,
+        labels,
+        t.fits.map((f) => (f.planned ? "Planned" : "Today")),
         t.slug,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the /tools row and both llms files credit Eirene for preact-components",
+  async (site) => {
+    const hub = await site.html("/tools");
+    const rowStart = hub.indexOf('data-tool="preact-components"');
+    const row = hub.slice(rowStart, hub.indexOf("</li>", rowStart));
+    const credit = row.match(/<p[^>]*data-credit[^>]*>([\s\S]*?)<\/p>/)?.[1] ??
+      "";
+    assert(
+      visibleText(credit).includes("Eirene"),
+      "no visible Eirene credit on the /tools row",
+    );
+    assert(credit.includes('href="https://github.com/Eirene"'));
+    assert(credit.includes('href="https://isorokina.com/"'));
+    for (const path of ["/llms.txt", "/llms-full.txt"]) {
+      const line = (await site.html(path)).split("\n")
+        .find((l) => l.includes("/tools/preact-components)")) ?? "";
+      assert(
+        line.includes("Eirene"),
+        `${path}: the preact-components line does not name Eirene`,
       );
     }
   },
