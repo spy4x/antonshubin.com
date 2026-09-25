@@ -456,12 +456,12 @@ pinned exactly in `deno.json`); nothing in the repo talks SMTP by hand.
 `lib/mail.ts` maps the `SMTP_*` env values onto it: SMTP counts as configured
 only when `SMTP_HOST`, `SMTP_USERNAME` and `SMTP_PASSWORD` are all set,
 `SMTP_FROM` falls back to `SMTP_USERNAME`, and the connection is implicit TLS on
-every port, as the old hand-written client was. `lib/lead-mail.ts`
-(`/api/lead`), `lib/subscribe-mail.ts` (`/api/subscribe`) and
-`lib/newsletter.ts` (`scripts/send-newsletter.ts`) build the messages and log a
-failed send instead of throwing; a send counts as done only when the relay
-accepted it. Their tests pass a fake transport from `test/fake-mail.ts`, so no
-test opens a connection.
+every port, as the old hand-written client was. EHLO announces the site's own
+hostname (from `DOMAIN`). `lib/lead-mail.ts` (`/api/lead`), `lib/subscribe.ts`
+with `lib/subscribe-mail.ts` (`/api/subscribe`) and `lib/newsletter.ts`
+(`scripts/send-newsletter.ts`) build the messages and log a failed send instead
+of throwing; a send counts as done only when the relay accepted it. Their tests
+pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 
 ## AI crawler optimization (SEO)
 
