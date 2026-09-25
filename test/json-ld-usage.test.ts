@@ -77,7 +77,11 @@ Deno.test("every ld+json block under routes/, components/, islands/ uses toJsonL
     }
     totalBlocks += tokens.length;
   }
-  assertEquals(totalBlocks, 5, "expected exactly 5 ld+json blocks (#172)");
+  assertEquals(
+    totalBlocks,
+    6,
+    "expected exactly 6 ld+json blocks (#172, #189)",
+  );
 });
 
 Deno.test("no JSON.stringify sits inside a dangerouslySetInnerHTML block", async () => {

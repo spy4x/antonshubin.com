@@ -49,7 +49,7 @@ siteTest(
     );
     const exactLinks = [...exactMenu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g)]
       .map((m) => m[0]);
-    assertEquals(exactLinks.length, 5, "expected the five agreed nav links");
+    assertEquals(exactLinks.length, 6, "expected the six agreed nav links");
     const blogLink = exactLinks.find((a) => /href="\/blog"/.test(a));
     assert(blogLink, "no nav link points at /blog");
     assert(

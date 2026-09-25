@@ -17,7 +17,14 @@ const PLACEHOLDER_SCHEDULE_URL = "https://cal.example.com/book";
  * body text in different contexts — the same sampling reasoning
  * test/csp.browser.test.ts and test/contrast.browser.test.ts use rather than
  * crawling the full sitemap on every push. */
-const PAGES = ["/", "/catalog", "/how-i-work", "/blog/ship-it-today"];
+const PAGES = [
+  "/",
+  "/catalog",
+  "/how-i-work",
+  "/blog/ship-it-today",
+  "/tools",
+  "/tools/ts-libs",
+];
 
 Deno.test("no monospace font renders in a heading, nav item or button (#184)", async () => {
   const site = await startSite({

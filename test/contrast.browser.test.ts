@@ -307,7 +307,7 @@ Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch p
  * or it never sees them (#175). */
 const PLACEHOLDER_SCHEDULE_URL = "https://cal.example.com/book";
 
-Deno.test("no WCAG AA colour-contrast violations across six representative pages", async () => {
+Deno.test("no WCAG AA colour-contrast violations across nine representative pages", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   });
@@ -323,6 +323,11 @@ Deno.test("no WCAG AA colour-contrast violations across six representative pages
           "/blog/ship-it-today",
           "/blog/building-mcp-servers-with-deno",
           "/pay",
+          // #189: the tools hub and both tool pages (status marks, CI
+          // pills, the fact card and the unpublished install line).
+          "/tools",
+          "/tools/ts-libs",
+          "/tools/preact-components",
         ]
       ) {
         await assertNoContrastViolations(page, site.origin, path);
