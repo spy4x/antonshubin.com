@@ -1,5 +1,6 @@
 import { define } from "../../lib/utils.ts";
 import {
+  BASE_URL,
   CONTACT_EMAIL,
   SMTP_FROM,
   SMTP_HOST,
@@ -7,6 +8,8 @@ import {
   SMTP_PORT,
   SMTP_USERNAME,
 } from "../../lib/config.ts";
+import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
+import { notifyOwner } from "../../lib/lead-mail.ts";
 
 interface LeadPayload {
   name: string;
@@ -84,64 +87,16 @@ function validate(payload: unknown): {
   };
 }
 
-// ── SMTP ─────────────────────────────────────────────────────────────
-async function sendMail(
-  to: string,
-  from: string,
-  subject: string,
-  text: string,
-): Promise<void> {
-  const conn = await Deno.connectTls({
-    hostname: SMTP_HOST,
-    port: SMTP_PORT,
-  });
-  const buf = new Uint8Array(4096);
-  const enc = new TextEncoder();
-
-  async function read(): Promise<string> {
-    const n = await conn.read(buf);
-    return new TextDecoder().decode(buf.subarray(0, n ?? 0));
-  }
-
-  async function cmd(line: string): Promise<string> {
-    await conn.write(enc.encode(line + "\r\n"));
-    return read();
-  }
-
-  await read();
-  await cmd(`EHLO ${SMTP_HOST}`);
-  await cmd("AUTH LOGIN");
-  await cmd(btoa(SMTP_USERNAME));
-  await cmd(btoa(SMTP_PASSWORD));
-  await cmd(`MAIL FROM:<${from}>`);
-  await cmd(`RCPT TO:<${to}>`);
-  await cmd("DATA");
-  await conn.write(
-    enc.encode(
-      `From: ${from}\r\nTo: ${to}\r\nSubject: ${subject}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n${text}\r\n.\r\n`,
-    ),
-  );
-  await read();
-  await cmd("QUIT");
-  conn.close();
-}
-
-async function notifyOwner(lead: LeadPayload): Promise<void> {
-  if (!SMTP_HOST || !SMTP_USERNAME || !SMTP_PASSWORD || !CONTACT_EMAIL) {
-    console.log(
-      "[LEAD] SMTP not configured, logging lead:",
-      JSON.stringify(lead),
-    );
-    return;
-  }
-
-  console.log("[LEAD] sending via " + SMTP_HOST + ":" + SMTP_PORT);
-  const subject = `[Lead] Architecture audit request from ${lead.name}`;
-  const text =
-    `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`;
-  await sendMail(CONTACT_EMAIL, SMTP_FROM || SMTP_USERNAME, subject, text);
-  console.log("[LEAD] sent OK");
-}
+// ── Mail ─────────────────────────────────────────────────────────────
+const SMTP = smtpSettings({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  user: SMTP_USERNAME,
+  pass: SMTP_PASSWORD,
+  from: SMTP_FROM,
+  ehloName: new URL(BASE_URL).hostname,
+});
+const SENDER = SMTP ? createSiteSender(SMTP) : null;
 
 // ── Handler ──────────────────────────────────────────────────────────
 export const handler = define.handlers({
@@ -166,7 +121,11 @@ export const handler = define.handlers({
       return Response.json({ error: result.error }, { status: 400 });
     }
 
-    notifyOwner(result.data).catch((err) => {
+    notifyOwner(result.data, {
+      sender: SENDER,
+      contactEmail: CONTACT_EMAIL,
+      relay: SMTP_HOST + ":" + SMTP_PORT,
+    }).catch((err) => {
       console.error("[LEAD] failed:", err);
     });
 

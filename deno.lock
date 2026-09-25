@@ -10,13 +10,19 @@
     "jsr:@fresh/core@^2.2.0": "2.3.3",
     "jsr:@fresh/core@^2.3.3": "2.3.3",
     "jsr:@fresh/plugin-vite@^1.0.8": "1.0.8",
+    "jsr:@hono/hono@4.13.8": "4.13.8",
+    "jsr:@spy4x/email@1.4.0": "1.4.0",
+    "jsr:@spy4x/platform@1.4.0": "1.4.0",
     "jsr:@spy4x/server@1.2.0": "1.2.0",
+    "jsr:@spy4x/time@^1.4.0": "1.4.0",
+    "jsr:@spy4x/validation@^1.4.0": "1.4.0",
     "jsr:@std/assert@1": "1.0.17",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
     "jsr:@std/collections@^1.1.3": "1.1.3",
+    "jsr:@std/crypto@1.1.0": "1.1.0",
     "jsr:@std/dotenv@~0.225.5": "0.225.6",
     "jsr:@std/encoding@1.0.11": "1.0.11",
-    "jsr:@std/encoding@^1.0.10": "1.0.10",
+    "jsr:@std/encoding@^1.0.10": "1.0.11",
     "jsr:@std/fmt@^1.0.7": "1.0.10",
     "jsr:@std/fmt@^1.0.8": "1.0.10",
     "jsr:@std/front-matter@^1.0.9": "1.0.9",
@@ -37,6 +43,7 @@
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/semver@^1.0.6": "1.0.8",
     "jsr:@std/toml@^1.0.3": "1.0.11",
+    "jsr:@std/ulid@1.0.0": "1.0.0",
     "jsr:@std/uuid@^1.0.9": "1.1.0",
     "jsr:@std/yaml@^1.0.5": "1.0.10",
     "npm:@babel/core@^7.28.0": "7.29.7",
@@ -44,7 +51,7 @@
     "npm:@mjackson/node-fetch-server@0.7": "0.7.0",
     "npm:@noble/ciphers@^2.1.1": "2.4.0",
     "npm:@noble/curves@^2.0.1": "2.0.1",
-    "npm:@noble/hashes@^2.0.1": "2.4.0",
+    "npm:@noble/hashes@^2.0.1": "2.0.1",
     "npm:@noble/post-quantum@~0.5.3": "0.5.4",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@preact/signals@^2.5.1": "2.9.2_preact@10.29.3",
@@ -52,11 +59,13 @@
     "npm:@prefresh/vite@^2.4.8": "2.4.12_preact@10.29.3_vite@7.3.1",
     "npm:@scure/base@2": "2.4.0",
     "npm:@tailwindcss/vite@^4.1.18": "4.1.18_vite@7.3.1",
+    "npm:arktype@2.2.3": "2.2.3",
     "npm:axe-core@4.13.0": "4.13.0",
     "npm:esbuild-wasm@~0.25.11": "0.25.12",
     "npm:esbuild@0.25.7": "0.25.7",
     "npm:esbuild@~0.25.5": "0.25.12",
     "npm:marked@^17.0.1": "17.0.1",
+    "npm:nodemailer@10.0.10": "10.0.10",
     "npm:playwright@1.63.0": "1.63.0",
     "npm:preact-render-to-string@^6.6.3": "6.7.0_preact@10.29.3",
     "npm:preact@^10.28.2": "10.29.3",
@@ -136,12 +145,45 @@
         "npm:vite@^7.1.4"
       ]
     },
+    "@hono/hono@4.13.8": {
+      "integrity": "bbb566d9ebb81e74c0d7eeff1f9221ba9f3fda6f1832e5ca66cbddcecb2f7fec"
+    },
+    "@spy4x/email@1.4.0": {
+      "integrity": "3f854a192e5f7e77b6fa754f2acb18a91ae73599dc24556e1198a6ed5cf0a1c1",
+      "dependencies": [
+        "jsr:@spy4x/time",
+        "jsr:@std/encoding@1.0.11",
+        "npm:nodemailer"
+      ]
+    },
+    "@spy4x/platform@1.4.0": {
+      "integrity": "c843c560b0d8ea0c2f9ccc7092cf9e15ccacecbec7691cfce42a35c0d4acef6d",
+      "dependencies": [
+        "jsr:@hono/hono",
+        "jsr:@spy4x/time",
+        "jsr:@spy4x/validation",
+        "jsr:@std/crypto",
+        "jsr:@std/encoding@1.0.11",
+        "jsr:@std/path@1.1.6",
+        "jsr:@std/ulid",
+        "npm:arktype"
+      ]
+    },
     "@spy4x/server@1.2.0": {
       "integrity": "4f4c7b7f40efbf48e3f65c844a8700a9f7807c7c5ebbe35d5cf3b698f169a74a",
       "dependencies": [
         "jsr:@age/age-encryption",
         "jsr:@std/encoding@1.0.11",
         "jsr:@std/path@1.1.6"
+      ]
+    },
+    "@spy4x/time@1.4.0": {
+      "integrity": "0afc1a9f1ec4334015829f05b7999f422d6740fe5c78ae2b3222229fddc299a2"
+    },
+    "@spy4x/validation@1.4.0": {
+      "integrity": "362f4ca9fad0bb288c1432a45e8381bee1f80ccf1c9756c152fee1bd1c8277a5",
+      "dependencies": [
+        "npm:arktype"
       ]
     },
     "@std/assert@1.0.17": {
@@ -155,6 +197,9 @@
     },
     "@std/collections@1.1.3": {
       "integrity": "bf8b0818886df6a32b64c7d3b037a425111f28278d69fd0995aeb62777c986b0"
+    },
+    "@std/crypto@1.1.0": {
+      "integrity": "b8d6d0a6377a32b213af2661ed7bf1062d94feac0c57def5526a8e74a95c3ec8"
     },
     "@std/dotenv@0.225.6": {
       "integrity": "1d6f9db72f565bd26790fa034c26e45ecb260b5245417be76c2279e5734c421b"
@@ -223,6 +268,9 @@
         "jsr:@std/collections"
       ]
     },
+    "@std/ulid@1.0.0": {
+      "integrity": "d41c3d27a907714413649fee864b7cde8d42ee68437d22b79d5de4f81d808780"
+    },
     "@std/uuid@1.1.0": {
       "integrity": "6268db2ccf172849c9be80763354ca305d49ef4af41fe995623d44fcc3f7457c",
       "dependencies": [
@@ -234,6 +282,15 @@
     }
   },
   "npm": {
+    "@ark/schema@0.56.2": {
+      "integrity": "sha512-Qx4D2JFbBWpntiHZaTv7bGG4H/M2rigiknezKg/WVyDSaLdE4YCcWAOoFB7pjjDqHbbV2OqRfntm1nnXvwMexg==",
+      "dependencies": [
+        "@ark/util"
+      ]
+    },
+    "@ark/util@0.56.2": {
+      "integrity": "sha512-9kU2sUE38FZEGG7l3hamYMBieLYEJh2L1mrYD2eXpT+78EnQSV1bhjxJhnxGBMSTbtwpBSDNSK+K60WvaI/DTQ=="
+    },
     "@babel/code-frame@7.29.7": {
       "integrity": "sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==",
       "dependencies": [
@@ -841,20 +898,17 @@
     "@noble/curves@2.0.1": {
       "integrity": "sha512-vs1Az2OOTBiP4q0pwjW5aF0xp9n4MxVrmkFBxc6EKZc6ddYx5gaZiAsZoq0uRRXWbi3AT/sBqn05eRPtn1JCPw==",
       "dependencies": [
-        "@noble/hashes@2.0.1"
+        "@noble/hashes"
       ]
     },
     "@noble/hashes@2.0.1": {
       "integrity": "sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw=="
     },
-    "@noble/hashes@2.4.0": {
-      "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
-    },
     "@noble/post-quantum@0.5.4": {
       "integrity": "sha512-leww0zzIirrvwaYMPI9fj6aRIlA/c6Y0/lifQQ1YOOyHEr0MNH3yYpjXeiVG+tWdPps4XxGclFWX2INPO3Yo5w==",
       "dependencies": [
         "@noble/curves",
-        "@noble/hashes@2.0.1"
+        "@noble/hashes"
       ]
     },
     "@opentelemetry/api@1.9.1": {
@@ -1128,6 +1182,20 @@
     },
     "@types/estree@1.0.8": {
       "integrity": "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w=="
+    },
+    "arkregex@0.0.8": {
+      "integrity": "sha512-PJcx6G1kQTgLKPUbeYlYecDRaKq15AMSGVajlKFYWlPeJRQL+j3dKE6tyMs40HZ99djS1l9Vhl3ezAHy9JBIqQ==",
+      "dependencies": [
+        "@ark/util"
+      ]
+    },
+    "arktype@2.2.3": {
+      "integrity": "sha512-7W+0RLTUNJiBFIIZXwOQxSR8Z273IAd6IvqBeG9+gHnQKFsIx2C0iOtGTmMrPnlX4qLXyc5+ll7A0BIj9WrbTg==",
+      "dependencies": [
+        "@ark/schema",
+        "@ark/util",
+        "arkregex"
+      ]
     },
     "axe-core@4.13.0": {
       "integrity": "sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A=="
@@ -1416,6 +1484,9 @@
     "node-releases@2.0.50": {
       "integrity": "sha512-J6l92tKHX6w8Jy5nO1Vuc01NoIiRGi/d6qBKVxh+IQ8Cr3b6HbVNfKiF8ZpFKufTwpwxMmce2W3iQZ861ZRyTg=="
     },
+    "nodemailer@10.0.10": {
+      "integrity": "sha512-He9XskOFms62SyAKkLu8CcGcYHAo+BSHSsORI8s4PJH8qZgZY4L4lDfvyN0twvmbpyG+eGrxpyBlskj9d9rJ8A=="
+    },
     "picocolors@1.1.1": {
       "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="
     },
@@ -1555,11 +1626,14 @@
     "dependencies": [
       "jsr:@fresh/core@^2.3.3",
       "jsr:@fresh/plugin-vite@^1.0.8",
+      "jsr:@spy4x/email@1.4.0",
+      "jsr:@spy4x/platform@1.4.0",
       "jsr:@std/front-matter@^1.0.9",
       "jsr:@std/net@^1.0.6",
       "jsr:@std/path@^1.1.2",
       "npm:@preact/signals@^2.9.0",
       "npm:@tailwindcss/vite@^4.1.18",
+      "npm:arktype@2.2.3",
       "npm:axe-core@4.13.0",
       "npm:marked@^17.0.1",
       "npm:playwright@1.63.0",

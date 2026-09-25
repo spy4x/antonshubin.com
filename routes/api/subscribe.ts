@@ -10,52 +10,18 @@ import {
 } from "../../lib/config.ts";
 import { loadSubscribers, saveSubscribers } from "../../lib/subscribers.ts";
 import { unsubscribeLink } from "../../lib/unsubscribe.ts";
-import { proof } from "../../lib/proof.ts";
+import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
+import { addSubscriber } from "../../lib/subscribe.ts";
 
-// ── Simple SMTP send (reuses lead.ts pattern) ──────────────────────────
-async function sendMail(
-  to: string,
-  from: string,
-  subject: string,
-  text: string,
-): Promise<void> {
-  if (!SMTP_HOST || !SMTP_USERNAME || !SMTP_PASSWORD) {
-    console.log("[SUBSCRIBE] SMTP not configured, skipping mail");
-    return;
-  }
-  const conn = await Deno.connectTls({
-    hostname: SMTP_HOST,
-    port: SMTP_PORT,
-  });
-  const buf = new Uint8Array(4096);
-  const enc = new TextEncoder();
-
-  async function read(): Promise<string> {
-    const n = await conn.read(buf);
-    return new TextDecoder().decode(buf.subarray(0, n ?? 0));
-  }
-  async function cmd(line: string): Promise<string> {
-    await conn.write(enc.encode(line + "\r\n"));
-    return read();
-  }
-
-  await read();
-  await cmd(`EHLO ${SMTP_HOST}`);
-  await cmd("AUTH LOGIN");
-  await cmd(btoa(SMTP_USERNAME));
-  await cmd(btoa(SMTP_PASSWORD));
-  await cmd(`MAIL FROM:<${from}>`);
-  await cmd(`RCPT TO:<${to}>`);
-  await cmd("DATA");
-  await conn.write(
-    enc.encode(
-      `From: ${from}\r\nTo: ${to}\r\nSubject: ${subject}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n${text}\r\n.\r\n`,
-    ),
-  );
-  await read();
-  await cmd("QUIT");
-  conn.close();
-}
+const SMTP = smtpSettings({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  user: SMTP_USERNAME,
+  pass: SMTP_PASSWORD,
+  from: SMTP_FROM,
+  ehloName: new URL(BASE_URL).hostname,
+});
+const SENDER = SMTP ? createSiteSender(SMTP) : null;
 
 // ── In-memory rate limiter ──────────────────────────────────────────────
 const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>();
@@ -94,7 +60,11 @@ export const handler = define.handlers({
 
     if (
       !body.email || typeof body.email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email) ||
+      // A control character or a lone UTF-16 surrogate: no mail can reach
+      // it, and the unsubscribe codec refuses to sign it, so it would sit in
+      // the list and fail every send.
+      /[\p{Cc}\p{Cs}]/u.test(body.email)
     ) {
       return Response.json({ error: "Valid email is required" }, {
         status: 400,
@@ -102,53 +72,13 @@ export const handler = define.handlers({
     }
 
     const email = body.email.trim().toLowerCase();
-    const subs = loadSubscribers();
-
-    if (subs.some((s) => s.email === email)) {
-      return Response.json({ ok: true, message: "Already subscribed" });
-    }
-
-    // Build the unsubscribe link before saving anything: a missing or too
-    // short UNSUBSCRIBE_SECRET fails the whole request instead of saving an
-    // address whose unsubscribe link would never work.
-    let link: string;
-    try {
-      link = await unsubscribeLink(email);
-    } catch (err) {
-      console.error("[SUBSCRIBE] cannot build unsubscribe link:", err);
-      return Response.json({ error: "Server misconfigured" }, {
-        status: 500,
-      });
-    }
-
-    subs.push({ email, subscribedAt: new Date().toISOString() });
-    try {
-      saveSubscribers(subs);
-    } catch (err) {
-      console.error("[SUBSCRIBE] failed to save:", err);
-      return Response.json({ error: "Could not save subscription" }, {
-        status: 500,
-      });
-    }
-
-    // Welcome the subscriber
-    sendMail(
-      email,
-      SMTP_FROM || SMTP_USERNAME,
-      "Welcome to Anton Shubin's newsletter",
-      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
-        proof("jobs")
-      }+ projects.\n\nHere's a good place to start:\n${BASE_URL}/saas-architecture-guide\n\nUnsubscribe anytime:\n${link}\n\n— Anton`,
-    ).catch((err) => console.error("[SUBSCRIBE] welcome failed:", err));
-
-    // Notify owner
-    sendMail(
-      CONTACT_EMAIL,
-      SMTP_FROM || SMTP_USERNAME,
-      `[Newsletter] New subscriber: ${email}`,
-      `${email} subscribed.\nTotal subscribers: ${subs.length}\n\nUnsubscribe: ${link}`,
-    ).catch((err) => console.error("[SUBSCRIBE] notify failed:", err));
-
-    return Response.json({ ok: true });
+    // Mails go out after the answer; addSubscriber logs their failures.
+    const outcome = await addSubscriber(email, {
+      load: loadSubscribers,
+      save: saveSubscribers,
+      unsubscribeLink,
+      mail: { sender: SENDER, contactEmail: CONTACT_EMAIL, baseUrl: BASE_URL },
+    });
+    return Response.json(outcome.body, { status: outcome.status });
   },
 });

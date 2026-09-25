@@ -30,10 +30,13 @@
   "exclude": ["**/_fresh/*", "launches/**", "videos/**"],
   "imports": {
     "@/": "./",
+    "@spy4x/email": "jsr:@spy4x/email@1.4.0",
+    "@spy4x/platform": "jsr:@spy4x/platform@1.4.0",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
     "@std/net": "jsr:@std/net@^1.0.6",
     "@std/path": "jsr:@std/path@^1.1.2",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
+    "arktype": "npm:arktype@2.2.3",
     "fresh": "jsr:@fresh/core@^2.3.3",
     "marked": "npm:marked@^17.0.1",
     "preact": "npm:preact@^10.29.1",

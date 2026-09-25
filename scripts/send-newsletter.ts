@@ -12,6 +12,8 @@
 import { loadSubscribers } from "@/lib/subscribers.ts";
 import { BASE_URL, getUnsubscribeSecret } from "@/lib/config.ts";
 import { unsubscribeLink } from "@/lib/unsubscribe.ts";
+import { createSiteSender, smtpSettings } from "@/lib/mail.ts";
+import { sendNewsletter } from "@/lib/newsletter.ts";
 
 const [subject, bodyArg] = Deno.args;
 if (!subject || !bodyArg) {
@@ -28,13 +30,17 @@ try {
   body = bodyArg; // treat as inline text
 }
 
-const from = Deno.env.get("SMTP_FROM") || Deno.env.get("SMTP_USERNAME") || "";
-const host = Deno.env.get("SMTP_HOST") || "";
-const port = parseInt(Deno.env.get("SMTP_PORT") || "465");
-const user = Deno.env.get("SMTP_USERNAME") || "";
-const pass = Deno.env.get("SMTP_PASSWORD") || "";
+// Port 465 is this script's default, as before; the routes default to 587.
+const smtp = smtpSettings({
+  host: Deno.env.get("SMTP_HOST") || "",
+  port: parseInt(Deno.env.get("SMTP_PORT") || "465"),
+  user: Deno.env.get("SMTP_USERNAME") || "",
+  pass: Deno.env.get("SMTP_PASSWORD") || "",
+  from: Deno.env.get("SMTP_FROM") || "",
+  ehloName: new URL(BASE_URL).hostname,
+});
 
-if (!host || !user || !pass) {
+if (!smtp) {
   console.error(
     "SMTP not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD.",
   );
@@ -53,47 +59,13 @@ try {
 const subs = loadSubscribers();
 console.log(`Sending to ${subs.length} subscribers...`);
 
-let sent = 0;
-let failed = 0;
-
-for (const sub of subs) {
-  const link = await unsubscribeLink(sub.email);
-  const fullBody =
-    `${body}\n\n---\n<a href="${link}">Unsubscribe</a> | ${BASE_URL}`;
-
-  try {
-    const conn = await Deno.connectTls({ hostname: host, port });
-    const buf = new Uint8Array(4096);
-    const enc = new TextEncoder();
-    const read = async () => {
-      const n = await conn.read(buf);
-      return new TextDecoder().decode(buf.subarray(0, n ?? 0));
-    };
-    const cmd = async (line: string) => {
-      await conn.write(enc.encode(line + "\r\n"));
-      return read();
-    };
-
-    await read();
-    await cmd(`EHLO ${host}`);
-    await cmd("AUTH LOGIN");
-    await cmd(btoa(user));
-    await cmd(btoa(pass));
-    await cmd(`MAIL FROM:<${from}>`);
-    await cmd(`RCPT TO:<${sub.email}>`);
-    await cmd("DATA");
-    await conn.write(enc.encode(
-      `From: ${from}\r\nTo: ${sub.email}\r\nSubject: ${subject}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n${fullBody}\r\n.\r\n`,
-    ));
-    await read();
-    await cmd("QUIT");
-    conn.close();
-    sent++;
-    console.log(`  ✓ ${sub.email}`);
-  } catch (err) {
-    failed++;
-    console.error(`  ✗ ${sub.email}:`, err);
-  }
-}
+const { sent, failed } = await sendNewsletter({
+  subscribers: subs,
+  subject,
+  body,
+  baseUrl: BASE_URL,
+  unsubscribeLink,
+  sender: createSiteSender(smtp),
+});
 
 console.log(`\nDone. Sent: ${sent}, Failed: ${failed}`);

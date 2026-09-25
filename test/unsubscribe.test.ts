@@ -6,6 +6,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, visibleText } from "./html.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
+import { oldCodeToken } from "./old-unsubscribe-token.ts";
 import type { Subscriber } from "../lib/subscribers.ts";
 
 const TEST_SECRET = "t".repeat(32);
@@ -165,6 +166,30 @@ Deno.test("a valid POST removes only the matching subscriber", async () => {
     const html = await res.text();
     assert(visibleText(html).includes("You're unsubscribed"));
 
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
+    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
+  });
+});
+
+Deno.test("a link sent before #233, in the old token format, still unsubscribes", async () => {
+  const subs: Subscriber[] = [
+    { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+    { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
+  ];
+  await withSubscribers(subs, async (site, file) => {
+    const token = await oldCodeToken("leave@example.com", TEST_SECRET);
+    const confirm = await site.html(
+      `/unsubscribe?token=${encodeURIComponent(token)}`,
+    );
+    assert(visibleText(confirm).includes("leave@example.com"));
+
+    const res = await site.get("/unsubscribe", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: `token=${encodeURIComponent(token)}`,
+    });
+    assertEquals(res.status, 200);
+    assert(visibleText(await res.text()).includes("You're unsubscribed"));
     const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
     assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
   });
