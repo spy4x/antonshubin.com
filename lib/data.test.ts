@@ -46,6 +46,17 @@ Deno.test("the archive is newest first, and a same-year tie keeps the data order
   ]);
 });
 
+Deno.test("Microwork's tags are AngularJS, MongoDB and AWS EC2, with no Firebase", () => {
+  const microwork = projects.freelance.find((p) => p.slug === "microwork");
+  assert(microwork?.tags, "microwork has no tags");
+  for (const tag of ["AngularJS", "MongoDB", "AWS EC2"]) {
+    assert(microwork.tags.includes(tag), `microwork lacks tag ${tag}`);
+  }
+  for (const tag of ["Firebase", "Firestore"]) {
+    assert(!microwork.tags.includes(tag), `microwork still tagged ${tag}`);
+  }
+});
+
 Deno.test("every blog article slug is unique", () => {
   const slugs = blogArticles.map((a) => a.slug);
   assert(

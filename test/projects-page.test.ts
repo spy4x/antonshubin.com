@@ -1,7 +1,8 @@
 // #232: /projects splits client work into Highlights and Archive, the home
 // page's work cards take the first three highlights, and every card or row
-// shows its period. Checked on the built pages, since the wiring lives in the
-// route files.
+// shows its period. Also guards what #231 (#239) added without a test: the
+// margin notes on the FoodRazor, Corecircle and Sogroya pages. Checked on the
+// built pages, since the wiring lives in the route files.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { visibleText } from "./html.ts";
@@ -172,6 +173,24 @@ siteTest(
             formatPeriod(p.period!),
           ),
         `home card ${slug} does not show ${formatPeriod(p.period!)}`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the FoodRazor, Corecircle and Sogroya pages carry their margin notes",
+  async (site) => {
+    const expected: Record<string, string> = {
+      foodrazor: "foodrazor-acquired",
+      corecircle: "corecircle-users",
+      sogroya: "sogroya-live",
+    };
+    for (const [slug, id] of Object.entries(expected)) {
+      const html = await site.html(`/projects/${slug}`);
+      assert(
+        html.includes(`data-note-ref="${id}"`),
+        `/projects/${slug} lacks margin note ${id}`,
       );
     }
   },
