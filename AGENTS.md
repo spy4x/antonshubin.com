@@ -434,15 +434,20 @@ just present and internally consistent.
 `lib/subscribers.ts` owns the subscriber list (`SUBSCRIBERS_FILE`, default
 `data/subscribers.json`) — `routes/api/subscribe.ts`, `routes/unsubscribe.tsx`
 and `scripts/send-newsletter.ts` all read and write through it, never the file
-directly. `lib/unsubscribe.ts` signs and verifies unsubscribe tokens with
+directly. `lib/unsubscribe.ts` signs and verifies unsubscribe tokens with the
+ts-libs signed payload codec (`jsr:@spy4x/platform/signed-payload`: purpose
+`unsubscribe`, version 1, empty payload, the normalized address as bound
+context, so the token holds no address) and still accepts the pre-#233
+bare-signature tokens until #237 removes that path. The key is
 `UNSUBSCRIBE_SECRET` (`lib/config.ts`'s `getUnsubscribeSecret()` throws if it's
-unset or under 32 characters — generate one with `openssl rand -base64 48`, see
-`.env.example`) and its `unsubscribeLink()` is the one helper every outgoing
-email uses to build `${BASE_URL}/unsubscribe?token=...`.
-`routes/api/unsubscribe.ts` only redirects old `?email=...` links (sent before
-#177) to `/unsubscribe`, dropping the address; opening a link never removes
-anyone — only a `POST` to `/unsubscribe` with a verified token does. See
-docs/newsletter.md for the full data format and endpoint list.
+unset, under 32 characters or not printable ASCII — generate one with
+`openssl rand -base64 48`, see `.env.example`) and its `unsubscribeLink()` is
+the one helper every outgoing email uses to build
+`${BASE_URL}/unsubscribe?token=...`. `routes/api/unsubscribe.ts` only redirects
+old `?email=...` links (sent before #177) to `/unsubscribe`, dropping the
+address; opening a link never removes anyone — only a `POST` to `/unsubscribe`
+with a verified token does. See docs/newsletter.md for the full data format and
+endpoint list.
 
 ## Outgoing mail
 
