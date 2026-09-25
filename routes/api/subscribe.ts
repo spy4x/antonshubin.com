@@ -11,7 +11,7 @@ import {
 import { loadSubscribers, saveSubscribers } from "../../lib/subscribers.ts";
 import { unsubscribeLink } from "../../lib/unsubscribe.ts";
 import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
-import { sendSubscribeMails } from "../../lib/subscribe-mail.ts";
+import { addSubscriber } from "../../lib/subscribe.ts";
 
 const SMTP = smtpSettings({
   host: SMTP_HOST,
@@ -19,6 +19,7 @@ const SMTP = smtpSettings({
   user: SMTP_USERNAME,
   pass: SMTP_PASSWORD,
   from: SMTP_FROM,
+  ehloName: new URL(BASE_URL).hostname,
 });
 const SENDER = SMTP ? createSiteSender(SMTP) : null;
 
@@ -59,7 +60,11 @@ export const handler = define.handlers({
 
     if (
       !body.email || typeof body.email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email) ||
+      // A control character or a lone UTF-16 surrogate: no mail can reach
+      // it, and the unsubscribe codec refuses to sign it, so it would sit in
+      // the list and fail every send.
+      /[\p{Cc}\p{Cs}]/u.test(body.email)
     ) {
       return Response.json({ error: "Valid email is required" }, {
         status: 400,
@@ -67,41 +72,13 @@ export const handler = define.handlers({
     }
 
     const email = body.email.trim().toLowerCase();
-    const subs = loadSubscribers();
-
-    if (subs.some((s) => s.email === email)) {
-      return Response.json({ ok: true, message: "Already subscribed" });
-    }
-
-    // Build the unsubscribe link before saving anything: a missing or too
-    // short UNSUBSCRIBE_SECRET fails the whole request instead of saving an
-    // address whose unsubscribe link would never work.
-    let link: string;
-    try {
-      link = await unsubscribeLink(email);
-    } catch (err) {
-      console.error("[SUBSCRIBE] cannot build unsubscribe link:", err);
-      return Response.json({ error: "Server misconfigured" }, {
-        status: 500,
-      });
-    }
-
-    subs.push({ email, subscribedAt: new Date().toISOString() });
-    try {
-      saveSubscribers(subs);
-    } catch (err) {
-      console.error("[SUBSCRIBE] failed to save:", err);
-      return Response.json({ error: "Could not save subscription" }, {
-        status: 500,
-      });
-    }
-
-    // Welcome the subscriber and notify the owner, without waiting for either.
-    sendSubscribeMails(
-      { email, total: subs.length, unsubscribeLink: link },
-      { sender: SENDER, contactEmail: CONTACT_EMAIL, baseUrl: BASE_URL },
-    ).catch((err) => console.error("[SUBSCRIBE] mail failed:", err));
-
-    return Response.json({ ok: true });
+    // Mails go out after the answer; addSubscriber logs their failures.
+    const outcome = await addSubscriber(email, {
+      load: loadSubscribers,
+      save: saveSubscribers,
+      unsubscribeLink,
+      mail: { sender: SENDER, contactEmail: CONTACT_EMAIL, baseUrl: BASE_URL },
+    });
+    return Response.json(outcome.body, { status: outcome.status });
   },
 });
