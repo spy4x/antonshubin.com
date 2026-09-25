@@ -39,7 +39,7 @@ export const notes: Note[] = [
   },
   {
     id: "sogroya-live",
-    text: "I checked that the site answers.",
+    text: "Live when I last checked.",
     checkedOn: "2026-09-25",
   },
 ];

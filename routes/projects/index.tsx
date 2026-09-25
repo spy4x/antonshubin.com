@@ -89,7 +89,7 @@ function ProjectCard({
             {project.madeForName}
           </span>
           {project.period && (
-            <span data-project-period>
+            <span data-project-period class="normal-case tracking-normal">
               {` · ${formatPeriod(project.period)}`}
             </span>
           )}

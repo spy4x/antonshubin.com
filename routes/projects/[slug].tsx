@@ -321,7 +321,7 @@ export default define.page(function ProjectDetail(ctx) {
                 {project.period && (
                   <span data-project-period>
                     Period{" "}
-                    <span class="text-graphite normal-case tracking-normal font-medium">
+                    <span class="text-graphite normal-case tracking-normal">
                       {formatPeriod(project.period)}
                     </span>
                   </span>
@@ -417,7 +417,6 @@ export default define.page(function ProjectDetail(ctx) {
                       ))}
                     </blockquote>
                     <figcaption class="mt-2 pl-4 text-sm text-graphite">
-                      {reviews.length > 1 && <>Contract {t.contract} ·{" "}</>}
                       {project.period && (
                         <>{formatPeriod(project.period)} ·{" "}</>
                       )}
