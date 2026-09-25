@@ -127,17 +127,22 @@ reference.
   promise's exact `title` and `desc` text, plus a short list of promise-specific
   key terms ("one or two weeks of work", "fixed free for 30 days"), outside
   `lib/promises.ts`.
-- `lib/testimonials.ts` holds every testimonial, each with a `permission` flag.
-  `visibleTestimonials(list = testimonials)` takes an optional list so a test
-  can check the filter itself without editing real data; `routes/index.tsx`'s
-  testimonials section renders only entries with both `sourceHref` and
-  `permission: true` — with none, the section doesn't render at all, and
-  `test/structure.test.ts`'s home-page section-list check reflects that.
-  `components/TestimonialCard.tsx` renders a visible entry's `sourceHref` as a
-  link, checked by `components/TestimonialCard.test.tsx`;
-  `lib/testimonials.test.ts` runs `visibleTestimonials()` on sample lists, and
-  `test/proof-promises-notes.test.ts` checks the real list shows nothing until
-  an entry has both.
+- `lib/testimonials.ts` holds every client review (#231): public Upwork reviews
+  copied verbatim from the portfolio archive, the client's spelling included,
+  each tied to a client project by `projectSlug` (`testimonialProject()` throws
+  on a typo) and cited by project and period, never by the client's personal
+  name. An `excerpt` is only exact pieces of its `quote` joined by " … " — cut
+  around a misspelling, never fix it. `lib/testimonials.test.ts` checks the
+  slugs, the excerpts and the pinned misspellings. A project page shows its
+  visible reviews in full; `routes/index.tsx` shows the three excerpts in
+  `homeTestimonialIds` through `components/TestimonialCard.tsx`, and
+  `test/reviews.test.ts` checks both on the built pages. `visibleTestimonials()`
+  still filters on `sourceHref` and `permission: true`.
+- Every client project in `lib/data.ts` carries a `period` (`lib/data.test.ts`
+  fails without one), rendered by `formatPeriod()` ("2021", "2018–2019",
+  "2024–now") on the cards, the project page eyebrow and the JSON-LD
+  `dateCreated`. `outcomeNote`/`externalURLNote` attach a margin note to a
+  project's outcome or live link.
 - `lib/notes.ts` holds every margin note (`{ id, text, href?, checkedOn? }`) —
   the source or checked date behind a claim wrapped in
   `components/WithNote.tsx`, which stamps the claim with `data-note-ref="<id>"`.

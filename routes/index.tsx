@@ -7,7 +7,12 @@ import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
 import { decapitalize, promise } from "../lib/promises.ts";
 import { firstSentence } from "../lib/llms.ts";
-import { visibleTestimonials } from "../lib/testimonials.ts";
+import {
+  homeTestimonialIds,
+  testimonial,
+  testimonialProject,
+  visibleTestimonials,
+} from "../lib/testimonials.ts";
 import { ROLE } from "../lib/head.ts";
 import { WithNote } from "../components/WithNote.tsx";
 import LeadForm from "../islands/LeadForm.tsx";
@@ -76,7 +81,7 @@ const steps = [
 ];
 
 export default define.page(function Home(ctx) {
-  const visible = visibleTestimonials();
+  const visible = visibleTestimonials(homeTestimonialIds.map(testimonial));
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
@@ -262,15 +267,22 @@ export default define.page(function Home(ctx) {
         </section>
 
         {
-          /* Testimonial Section — renders only entries lib/testimonials.ts
-          clears for publishing (a source link and Anton's permission); see
-          #186. Empty today, so this section renders nothing. */
+          /* Testimonial Section — three review excerpts picked in
+          lib/testimonials.ts's homeTestimonialIds (#231), each naming and
+          linking its project. Renders only entries cleared for publishing (a
+          source link and Anton's permission; see #186). */
         }
         {visible.length > 0 && (
           <section data-home-section="testimonials" class="mb-16 md:mb-24">
             <h2 class="h1 mb-8">What clients say</h2>
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {visible.map((t) => <TestimonialCard key={t.id} t={t} />)}
+              {visible.map((t) => (
+                <TestimonialCard
+                  key={t.id}
+                  t={t}
+                  project={testimonialProject(t)}
+                />
+              ))}
             </div>
 
             {/* Link to Upwork */}
