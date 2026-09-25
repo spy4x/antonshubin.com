@@ -224,7 +224,7 @@ export const tools: Tool[] = [
     fits: [
       {
         text:
-          "preact-components imports @spy4x/platform, @spy4x/time and @spy4x/validation.",
+          "preact-components shares the @spy4x scope on JSR and imports @spy4x/platform, @spy4x/time and @spy4x/validation.",
         href: "/tools/preact-components",
         planned: false,
       },
@@ -252,10 +252,10 @@ export const tools: Tool[] = [
     repo: "spy4x/preact-components",
     registry: {
       name: "JSR",
-      url: "https://jsr.io/@preact-components",
+      url: "https://jsr.io/@spy4x",
       version: "0.1.0",
       published: false,
-      install: "deno add jsr:@preact-components/ui@0.1.0",
+      install: "deno add jsr:@spy4x/preact-ui@0.1.0",
     },
     licence: "MIT",
     runtime:
@@ -274,16 +274,16 @@ export const tools: Tool[] = [
     },
     ci: { provider: "woodpecker", repoId: 9 },
     packages: [
-      "@preact-components/cn",
-      "@preact-components/icons",
-      "@preact-components/signals",
-      "@preact-components/theme",
-      "@preact-components/charts",
-      "@preact-components/system",
-      "@preact-components/ui",
-      "@preact-components/crud",
-      "@preact-components/map",
-      "@preact-components/ui-guide",
+      "@spy4x/preact-cn",
+      "@spy4x/preact-icons",
+      "@spy4x/preact-signals",
+      "@spy4x/preact-theme",
+      "@spy4x/preact-charts",
+      "@spy4x/preact-system",
+      "@spy4x/preact-ui",
+      "@spy4x/preact-crud",
+      "@spy4x/preact-map",
+      "@spy4x/preact-ui-guide",
     ],
     useIf: [
       "You build a Preact app with Tailwind and want components that render on the server and hydrate in the browser.",
@@ -298,7 +298,7 @@ export const tools: Tool[] = [
     fits: [
       {
         text:
-          "Imports @spy4x/platform, @spy4x/time and @spy4x/validation from ts-libs.",
+          "Shares the @spy4x scope on JSR with ts-libs, and imports @spy4x/platform, @spy4x/time and @spy4x/validation from it.",
         href: "/tools/ts-libs",
         planned: false,
       },
