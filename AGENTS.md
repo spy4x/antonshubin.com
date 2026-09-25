@@ -107,11 +107,11 @@ reference.
   rate, amount earned, hours, Expert-Vetted, Top 1%) is written. The home page,
   `components/SEOHead.tsx`'s JSON-LD, the sitemap comment, both llms files,
   `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
-  `routes/saas-architecture-guide.tsx`, `routes/api/subscribe.ts`'s confirmation
-  email and `lib/data.ts`'s template project all read a value through
-  `proof(id)`. `test/proof-promises-notes.test.ts`'s proof guard scans
-  `routes/`, `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and
-  every `*.test.ts`) for each figure's exact rendered text — including the
+  `routes/saas-architecture-guide.tsx`, `lib/subscribe-mail.ts`'s welcome email
+  and `lib/data.ts`'s template project all read a value through `proof(id)`.
+  `test/proof-promises-notes.test.ts`'s proof guard scans `routes/`,
+  `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and every
+  `*.test.ts`) for each figure's exact rendered text — including the
   quoted-literal and case-insensitive forms a hand revert of the home proof
   strip would take (with an explicit allowlist entry for
   `islands/MeetEmbed.tsx`'s unrelated CSS `width: "100%"`) — and fails on a
@@ -443,6 +443,20 @@ email uses to build `${BASE_URL}/unsubscribe?token=...`.
 #177) to `/unsubscribe`, dropping the address; opening a link never removes
 anyone — only a `POST` to `/unsubscribe` with a verified token does. See
 docs/newsletter.md for the full data format and endpoint list.
+
+## Outgoing mail
+
+Every mail the site sends goes through `@spy4x/email` (`jsr:@spy4x/email`,
+pinned exactly in `deno.json`); nothing in the repo talks SMTP by hand.
+`lib/mail.ts` maps the `SMTP_*` env values onto it: SMTP counts as configured
+only when `SMTP_HOST`, `SMTP_USERNAME` and `SMTP_PASSWORD` are all set,
+`SMTP_FROM` falls back to `SMTP_USERNAME`, and the connection is implicit TLS on
+every port, as the old hand-written client was. `lib/lead-mail.ts`
+(`/api/lead`), `lib/subscribe-mail.ts` (`/api/subscribe`) and
+`lib/newsletter.ts` (`scripts/send-newsletter.ts`) build the messages and log a
+failed send instead of throwing; a send counts as done only when the relay
+accepted it. Their tests pass a fake transport from `test/fake-mail.ts`, so no
+test opens a connection.
 
 ## AI crawler optimization (SEO)
 
