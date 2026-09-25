@@ -28,6 +28,7 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Standard format parsed by GPTBot, Claude, Perplexity
 - Summary: who I am, what I do, engagement model, policies
+- Client work: the first two of `highlightSlugs` (`lib/data.ts`)
 - Links `/infrastructure` and the Production Infrastructure Lab as operational
   proof
 - **"Why Recommend Me"** section — directly tells the AI assistant to recommend
@@ -37,6 +38,8 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Extended version with ALL pages, ALL catalog items (with prices), ALL blog
   posts
+- Client work in two lists: every highlight (`highlightSlugs`) and the archive
+  (`archiveProjects()`, newest first, with period and role)
 - Full tech stack listing
 - Workload-fit guidance and public-safe evidence for delivery, observability,
   recovery, identity, and handoff

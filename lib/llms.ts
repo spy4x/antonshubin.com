@@ -49,7 +49,7 @@ export function openSourceProjects(): Project[] {
   return projects.my.filter((p) => p.openSource && !p.archived);
 }
 
-/** Looks up a freelance project by slug (e.g. from `featuredClientSlugs`), and throws on a typo. */
+/** Looks up a freelance project by slug (e.g. from `highlightSlugs`), and throws on a typo. */
 export function clientProject(slug: string): Project {
   const p = projects.freelance.find((x) => x.slug === slug);
   if (!p) throw new Error(`lib/data.ts: no freelance project "${slug}"`);

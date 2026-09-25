@@ -33,6 +33,11 @@ export interface Project {
    * one (`lib/data.test.ts`); `formatPeriod()` renders it.
    */
   period?: Period;
+  /**
+   * Something the client company achieved later, without Anton: shown on the
+   * project's /projects archive row, worded as the company's outcome.
+   */
+  companyOutcome?: { text: string; href: string };
   /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
   ghRepo?: string;
   /**
@@ -588,6 +593,11 @@ export const projects = {
       logoImageURL: "/img/projects/sajari/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp"],
       period: { from: 2014 },
+      companyOutcome: {
+        text: "Later renamed Search.io and acquired by Algolia in 2022",
+        href:
+          "https://www.algolia.com/about/news/algolia-disrupts-market-with-search-io-acquisition-ushering-in-a-new-era-of-search-and-discovery",
+      },
       madeForName: "Hamish Ogilvy",
       madeForURL: "https://www.linkedin.com/in/hamishogilvy/",
     },
@@ -607,18 +617,48 @@ export const projects = {
 };
 
 /**
- * The six client case studies shown first on /projects, strongest first. Every
- * other client project, and my archived ones, go into the one-line list of
- * older work.
+ * The client projects a buyer sees first, in the order /projects shows them;
+ * the home page's work cards take the first three and llms.txt the first two.
+ *
+ * The rule (#232): a project is a highlight when it is from 2018 or later and
+ * has either an outcome a visitor can check (a live product, a public
+ * acquisition, scale with a source) or a client review about work a buyer
+ * would hire for today. Corecircle stays one even if its acquisition claim is
+ * dropped: its review is the best rescue story on the site.
+ *
+ * Every other client project is in the archive (`archiveProjects()`).
  */
-export const featuredClientSlugs: string[] = [
+export const highlightSlugs: string[] = [
   "smartlite",
   "foodrazor",
   "corecircle",
+  "roley",
+  "connectful",
   "truth-or-dare",
-  "sogroya",
-  "gopingu",
 ];
+
+/** The highlight projects in `highlightSlugs` order; throws on a typo. */
+export function highlightProjects(): Project[] {
+  return highlightSlugs.map((slug) => {
+    const project = projects.freelance.find((p) => p.slug === slug);
+    if (!project) {
+      throw new Error(`highlightSlugs: no client project "${slug}"`);
+    }
+    return project;
+  });
+}
+
+/**
+ * Every client project that is not a highlight, newest first by
+ * `period.from`. Projects that start in the same year keep the order they
+ * have in `projects.freelance` (the sort is stable). Derived, never listed by
+ * hand, so a new client project lands in the archive until it is promoted.
+ */
+export function archiveProjects(): Project[] {
+  return projects.freelance
+    .filter((p) => !highlightSlugs.includes(p.slug ?? ""))
+    .sort((a, b) => (b.period?.from ?? 0) - (a.period?.from ?? 0));
+}
 
 export const blogArticles: BlogArticle[] = [
   {
