@@ -193,15 +193,16 @@ export default define.page(function SaasArchGuide() {
             </li>
             <li>
               <a
-                href="/projects/homelab"
-                data-e2e="architecture-guide-homelab-proof"
+                href="/projects/rostok"
+                data-e2e="architecture-guide-rostok-proof"
                 class="inline-flex min-h-11 items-center text-accent hover:text-accent hover:underline transition-colors font-medium"
               >
-                → Production Infrastructure Lab
+                → rostok
               </a>
               <p class="text-graphite text-sm mt-0.5">
-                Sanitized case study of reusable IaC, Deno deployment
-                automation, monitoring, recovery tooling, and identity controls.
+                The open-source scaffolder I deploy my own servers with: four
+                instances in different regions, each running a different set of
+                services.
               </p>
             </li>
           </ul>

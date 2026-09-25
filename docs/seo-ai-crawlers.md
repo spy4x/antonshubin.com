@@ -142,10 +142,8 @@ Four entities in a `@graph` array:
   security, cost control, and change ownership in founder-readable terms
 - Managed cloud and dedicated infrastructure are presented as workload-fit
   decisions, not ideology
-- `/projects/homelab` provides a public-safe summary: reusable IaC, Deno
-  deployment automation, Docker Compose, Traefik TLS and routing,
-  VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and
-  restore tooling, and Authelia SSO with 2FA
+- `/projects/rostok` (the old `/projects/homelab` answers 301 there) is the
+  open-source scaffolder Anton deploys his own servers with
 - Private endpoints, IP addresses, sensitive topology, personal service
   inventory, secrets, and unsupported cost or reliability claims stay out of
   crawler copy
