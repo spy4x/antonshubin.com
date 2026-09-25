@@ -141,6 +141,19 @@ Deno.test("four of the eight reviewing clients hired Anton again, counted from t
   );
 });
 
+Deno.test("a follow-on pair counts when only its second project is reviewed", () => {
+  const corecircle = {
+    ...base,
+    projectSlug: "corecircle",
+    sourceHref: "https://example.com",
+    permission: true,
+  };
+  const r = repeatClients([corecircle]);
+  assertEquals(r.reviewed, 1);
+  assertEquals(r.followOn.length, 1);
+  assertEquals(r.rehiredOnSameProject, []);
+});
+
 Deno.test("a project with one reviewed contract is not a repeat client", () => {
   const one = { ...base, sourceHref: "https://example.com", permission: true };
   const r = repeatClients([one], []);

@@ -41,7 +41,8 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // The first two highlights (highlightSlugs is ordered strongest-first), generated from lib/data.ts: what each product is, then its outcome (see
+    // The first two highlights (highlightSlugs is ordered strongest-first),
+    // generated from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
     const clientList = highlightSlugs
       .slice(0, 2)

@@ -92,7 +92,7 @@ siteTest(
 );
 
 siteTest(
-  "each archive row shows its role, its first review excerpt, and links its page",
+  "each archive row shows its role, its first review excerpt with its source link, and links its page",
   async (site) => {
     const rows = chunks(
       section(await site.html("/projects"), "archive"),
@@ -113,6 +113,10 @@ siteTest(
       assert(
         text.includes(review.excerpt),
         `${p.slug}'s row lacks the excerpt of ${review.id}`,
+      );
+      assert(
+        review.sourceHref && row.includes(`href="${review.sourceHref}"`),
+        `${p.slug}'s row does not link the source of ${review.id}`,
       );
     }
     assert(excerpts > 0, "no archive row has a review — checked nothing");

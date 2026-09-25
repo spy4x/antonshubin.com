@@ -269,14 +269,15 @@ export interface RepeatClients {
   reviewed: number;
   /** Projects whose client signed more than one contract on that project. */
   rehiredOnSameProject: Project[];
-  /** Follow-on pairs whose first project has a visible review. */
+  /** Follow-on pairs where either project has a visible review. */
   followOn: { from: Project; to: Project; possessive: string }[];
 }
 
 /**
  * Counts repeat clients from `testimonials`: a project with more than one
  * reviewed contract, or a follow-on pair, is one repeat client. A project in
- * a pair is counted once, through the pair. `list` defaults to the real data
+ * a pair is counted once, through the pair, when either of its projects has
+ * a visible review. `list` defaults to the real data
  * so a test can pass a synthetic one.
  */
 export function repeatClients(
@@ -294,7 +295,9 @@ export function repeatClients(
     new Set(list.filter((t) => t.projectSlug === slug).map((t) => t.contract))
       .size;
   const followOn = pairs
-    .filter((x) => reviewedSlugs.includes(x.from))
+    .filter((x) =>
+      reviewedSlugs.includes(x.from) || reviewedSlugs.includes(x.to)
+    )
     .map((x) => ({
       from: find(x.from),
       to: find(x.to),

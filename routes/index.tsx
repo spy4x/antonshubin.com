@@ -212,7 +212,7 @@ export default define.page(function Home(ctx) {
                 <p class="text-graphite text-sm leading-relaxed flex-1">
                   {p.outcome}
                 </p>
-                <span class="mt-3 inline-flex items-center gap-1 text-sm text-accent font-medium">
+                <span class="mt-3 inline-flex items-center gap-1 text-sm text-accent font-semibold">
                   Read the case study
                   <ArrowRightIcon class="w-4 h-4" />
                 </span>

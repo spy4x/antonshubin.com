@@ -181,9 +181,25 @@ function ArchiveRow({ project }: { project: Project }) {
         {firstSentence(project.description)}
       </p>
       {review && (
-        <blockquote class="mt-3 pl-3 border-l-2 border-rule-strong text-sm text-parchment italic">
-          “{review.excerpt}”
-        </blockquote>
+        <figure class="mt-3 pl-3 border-l-2 border-rule-strong text-sm">
+          <blockquote class="inline text-parchment italic">
+            “{review.excerpt}”
+          </blockquote>
+          {review.sourceHref && (
+            <figcaption class="inline text-graphite">
+              {" · "}
+              <a
+                href={review.sourceHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 text-accent hover:text-accent underline underline-offset-4"
+              >
+                Review on Upwork
+                <NewTabHint />
+              </a>
+            </figcaption>
+          )}
+        </figure>
       )}
       {project.companyOutcome && (
         <p data-company-outcome class="mt-3 text-sm text-graphite">
