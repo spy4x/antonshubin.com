@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"
+  viewBox="0 0 1200 630" role="img"
+  aria-label="Opus 5.5 vs Sonnet 5: cost per 100 changed lines">
+  <rect width="1200" height="630" fill="#15120f" />
+  <text x="70" y="120" font-family="Literata, Georgia, serif" font-size="60"
+    font-weight="600" fill="#efebe2">Opus 5.5 vs Sonnet 5</text>
+  <text x="70" y="178" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="30"
+    fill="#bcb7af">The pricier model wrote my code for about half the cost</text>
+  <text x="70" y="270" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="20" fill="#bcb7af"
+    letter-spacing="1">COST PER 100 CHANGED LINES, SEP 23–25</text>
+  <text x="70" y="330" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="26" fill="#efebe2">Sonnet 5</text>
+  <path d="M250 300h635a4 4 0 0 1 4 4v36a4 4 0 0 1 -4 4h-635z" fill="#3593d0" />
+  <text x="905" y="333"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="28"
+    font-weight="600" fill="#efebe2">$2.13</text>
+  <text x="70" y="410" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="26" fill="#efebe2">Opus 5.5</text>
+  <path d="M250 380h113a4 4 0 0 1 4 4v36a4 4 0 0 1 -4 4h-113z" fill="#cf7a1f" />
+  <text x="383" y="413"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="28"
+    font-weight="600" fill="#efebe2">$0.39</text>
+  <text x="70" y="500" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="26"
+    fill="#efebe2">Like for like: <tspan font-weight="600">0.45×</tspan> Sonnet's cost. 197 PRs, 411 reviewer agents.</text>
+  <text x="70" y="580" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="22" fill="#bcb7af">antonshubin.com</text>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300"
+  viewBox="0 0 640 300" role="img"
+  aria-label="Opus 5.5 cost relative to Sonnet 5: 0.77 times up to the first review (range 0.52 to 1.13), 0.45 times for the whole PR (range 0.29 to 0.71)">
+  <rect width="640" height="300" rx="12" fill="#25211d" />
+  <text x="24" y="38" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="19" font-weight="600"
+    fill="#efebe2">Opus 5.5 cost relative to Sonnet 5, like for like</text>
+  <text x="24" y="60" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="14"
+    fill="#bcb7af">Same size, task kind, repo and session. Dot: estimate. Line: range.</text>
+  <line x1="440" y1="106" x2="440" y2="226" stroke="#bcb7af" stroke-width="1.5"
+    stroke-dasharray="5 5" />
+  <text x="40" y="92" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="15" fill="#efebe2">Up to the first review</text>
+  <line x1="248.0" y1="130" x2="491.99999999999994" y2="130" stroke="#cf7a1f"
+    stroke-width="2" stroke-linecap="round" />
+  <circle cx="348.0" cy="130" r="8" fill="#cf7a1f" stroke="#25211d"
+    stroke-width="2" />
+  <text x="348.0" y="116"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    font-weight="600" fill="#efebe2" text-anchor="middle">0.77×</text>
+  <text x="501.99999999999994" y="135"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="13"
+    fill="#bcb7af">range 0.52–1.13</text>
+  <text x="40" y="164" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="15" fill="#efebe2">Whole PR, fix rounds included</text>
+  <line x1="156.0" y1="202" x2="324.0" y2="202" stroke="#cf7a1f"
+    stroke-width="2" stroke-linecap="round" />
+  <circle cx="220.0" cy="202" r="8" fill="#cf7a1f" stroke="#25211d"
+    stroke-width="2" />
+  <text x="220.0" y="188"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    font-weight="600" fill="#efebe2" text-anchor="middle">0.45×</text>
+  <text x="334.0" y="207"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="13"
+    fill="#bcb7af">range 0.29–0.71</text>
+  <line x1="40" y1="226" x2="560.0" y2="226" stroke="#413c38"
+    stroke-width="1" />
+  <text x="40" y="246" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="13" fill="#bcb7af" text-anchor="middle">0×</text>
+  <text x="240.0" y="246"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="13"
+    fill="#bcb7af" text-anchor="middle">0.5×</text>
+  <text x="432" y="246"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="13"
+    fill="#bcb7af">1× = Sonnet's cost</text>
+  <text x="24" y="278" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="14"
+    fill="#efebe2">The first draft costs about the same. The saving is in the fix rounds.</text>
+</svg>

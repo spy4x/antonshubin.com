@@ -344,6 +344,21 @@ kbd {
   @apply font-bold;
 }
 
+.blog-content > table {
+  @apply block overflow-x-auto my-8 text-base;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.blog-content > table th,
+.blog-content > table td {
+  @apply px-4 py-2 text-left border-b border-rule whitespace-nowrap;
+}
+
+.blog-content > table th {
+  @apply font-semibold text-graphite;
+}
+
 .blog-content > pre {
   @apply overflow-x-auto p-4 rounded-md bg-paper text-graphite mb-4
     font-mono;
