@@ -110,8 +110,8 @@ the first review, against Sonnet's 97.
 about 71% of implementer spend. A Sonnet implementer that had already grown a
 900K context paid $5.60–6.40 for a small last-round fix, because it re-read
 everything to make it. Opus carried a smaller context (a median peak of 170K
-against Sonnet's 246K), and in the 5 Opus lanes of my controlled experiment it
-needed a median of 2 review rounds against Sonnet's 3.
+against Sonnet's 246K), and in the 5 Opus lanes of the fair split I describe at
+the end it needed a median of 2 review rounds against Sonnet's 3.
 
 ### Most PRs fail their first review
 
@@ -183,12 +183,12 @@ It isn't a controlled experiment. I chose which tasks went to Opus, the sample
 is small (19 Opus 5.5 PRs), and list prices are a stand-in for subscription
 usage. I started a fair split, with every other lane on Opus 5.5 regardless of
 the task, and stopped it early: the like-for-like comparison and the token
-counts pointed the same way: Opus 5.5 was cheaper, probably around half, and at
+counts pointed the same way. Opus 5.5 was cheaper, probably around half, and at
 worst no more expensive.
 
-One gap favours Opus in these numbers. In 3 of the 7 Opus PRs that failed their
-first review, the lead agent made the fix itself, so that fix's cost is missing
-from Opus's total. That happened in only 1 of 89 Sonnet cases.
+One gap favours Opus in these numbers. In at least 3 of the 8 Opus PRs that
+failed their first review, the lead agent made the fix itself, so that fix's
+cost is missing from Opus's total. That happened in only 1 of 89 Sonnet cases.
 
 The lesson I'd keep even if the model prices change next month: in agent work,
 you pay for steps and context, not for tokens. Measure calls and context per
