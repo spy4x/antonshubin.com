@@ -15,7 +15,7 @@ export function InstallLine({ tool, id }: { tool: Tool; id: string }) {
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
         <code
           id={id}
-          class={`text-sm break-all ${
+          class={`text-sm break-words ${
             registry.published ? "text-parchment" : "text-graphite"
           }`}
         >

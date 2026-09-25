@@ -35,7 +35,7 @@ export default function CopyButton(
   };
 
   const baseClass =
-    "inline-flex items-center gap-1 text-xs text-sage hover:text-sage transition-colors";
+    "inline-flex items-center min-h-6 gap-1 text-xs text-sage hover:text-sage transition-colors";
 
   return (
     <button

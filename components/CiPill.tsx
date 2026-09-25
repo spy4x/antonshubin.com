@@ -18,7 +18,7 @@ export function CiPill(
       data-ci-status={word}
       class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-lamp rounded-full hover:underline underline-offset-4"
     >
-      <span class="sr-only">CI:</span>
+      <span class="text-sm text-parchment">CI</span>
       {
         /* A CI word, not a tool status, so it takes StatusMark's shape and
           colour but its own word. */
