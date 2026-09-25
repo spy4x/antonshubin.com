@@ -1,7 +1,14 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { type Project, projects, projectScreenshots } from "../../lib/data.ts";
+import {
+  formatPeriod,
+  type Project,
+  projects,
+  projectScreenshots,
+} from "../../lib/data.ts";
+import { projectTestimonials } from "../../lib/testimonials.ts";
+import { WithNote } from "../../components/WithNote.tsx";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
@@ -81,6 +88,7 @@ function projectJsonLd(project: Project, canonical: string) {
     ...(codeRepository ? { "codeRepository": codeRepository } : {}),
     ...(sameAs ? { "sameAs": sameAs } : {}),
     ...(project.archived ? { "creativeWorkStatus": "Archived" } : {}),
+    ...(project.period ? { "dateCreated": String(project.period.from) } : {}),
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
   };
 }
@@ -122,6 +130,7 @@ export default define.page(function ProjectDetail(ctx) {
 
   const isClientProject = projects.freelance.some((p) => p.slug === slug);
   const paragraphs = splitParagraphs(project.description);
+  const reviews = projectTestimonials(slug);
 
   head.value = {
     ...head.value,
@@ -137,6 +146,101 @@ export default define.page(function ProjectDetail(ctx) {
     ogImageWidth: 1200,
     ogImageHeight: 630,
   };
+
+  const statusBadges = (
+    <div class="flex flex-wrap items-center gap-2 mb-6">
+      {project.outcome && (
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-lamp text-xs font-medium rounded-full">
+          <StatusMark status="outcome" label={project.outcome} />
+        </span>
+      )}
+      {isClientProject && (
+        <span class="inline-flex items-center px-2.5 py-1 bg-lamp text-mist text-xs font-medium rounded-full">
+          Client project
+        </span>
+      )}
+      {project.archived && (
+        <span class="inline-flex items-center px-2.5 py-1 bg-lamp text-xs font-medium rounded-full">
+          <StatusMark status="archived" />
+        </span>
+      )}
+    </div>
+  );
+
+  const actions = (
+    <div class="flex flex-wrap items-center gap-3">
+      {project.externalURL && (
+        project.externalURLDead
+          ? (
+            <span class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp text-graphite rounded-lg text-sm">
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                />
+              </svg>
+              {project.externalURL.replace(/^https?:\/\//, "")} [site offline]
+            </span>
+          )
+          : (
+            <a
+              href={project.externalURL}
+              target="_blank"
+              data-umami-event={`project-cta-${project.slug}-external`}
+              class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment rounded-lg text-sm font-medium transition-colors"
+            >
+              Visit project site
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              <NewTabHint />
+            </a>
+          )
+      )}
+      {project.ghRepo && (
+        <a
+          href={`https://github.com/${project.ghRepo}`}
+          target="_blank"
+          data-umami-event={`project-cta-${project.slug}-github`}
+          class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment rounded-lg text-sm font-medium transition-colors"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          </svg>
+          GitHub
+          <GhStars repo={project.ghRepo} />
+          <NewTabHint />
+        </a>
+      )}
+    </div>
+  );
 
   return (
     <Layout currentPath="/projects">
@@ -183,8 +287,8 @@ export default define.page(function ProjectDetail(ctx) {
                 )}
             </div>
 
-            {/* Eyebrow (built for / role) */}
-            {(project.madeForName || project.role) && (
+            {/* Eyebrow (built for / role / period) */}
+            {(project.madeForName || project.role || project.period) && (
               <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs uppercase tracking-wide text-graphite mb-2">
                 {project.madeForName && (
                   <span>
@@ -211,6 +315,14 @@ export default define.page(function ProjectDetail(ctx) {
                     Role{" "}
                     <span class="text-graphite normal-case tracking-normal font-medium">
                       {project.role}
+                    </span>
+                  </span>
+                )}
+                {project.period && (
+                  <span data-project-period>
+                    Period{" "}
+                    <span class="text-graphite normal-case tracking-normal font-medium">
+                      {formatPeriod(project.period)}
                     </span>
                   </span>
                 )}
@@ -266,99 +378,15 @@ export default define.page(function ProjectDetail(ctx) {
                 )}
             </div>
 
-            {/* Status badges */}
-            <div class="flex flex-wrap items-center gap-2 mb-6">
-              {project.outcome && (
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-lamp text-xs font-medium rounded-full">
-                  <StatusMark status="outcome" label={project.outcome} />
-                </span>
-              )}
-              {isClientProject && (
-                <span class="inline-flex items-center px-2.5 py-1 bg-lamp text-mist text-xs font-medium rounded-full">
-                  Client project
-                </span>
-              )}
-              {project.archived && (
-                <span class="inline-flex items-center px-2.5 py-1 bg-lamp text-xs font-medium rounded-full">
-                  <StatusMark status="archived" />
-                </span>
-              )}
-            </div>
+            {/* Status badges; the outcome's source note sits beside them */}
+            {project.outcomeNote
+              ? <WithNote id={project.outcomeNote}>{statusBadges}</WithNote>
+              : statusBadges}
 
-            {/* Primary actions */}
-            <div class="flex flex-wrap items-center gap-3">
-              {project.externalURL && (
-                project.externalURLDead
-                  ? (
-                    <span class="inline-flex items-center gap-2 px-4 py-2.5 bg-lamp text-graphite rounded-lg text-sm">
-                      <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                        />
-                      </svg>
-                      {project.externalURL.replace(/^https?:\/\//, "")}{" "}
-                      [site offline]
-                    </span>
-                  )
-                  : (
-                    <a
-                      href={project.externalURL}
-                      target="_blank"
-                      data-umami-event={`project-cta-${project.slug}-external`}
-                      class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Visit project site
-                      <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                      <NewTabHint />
-                    </a>
-                  )
-              )}
-              {project.ghRepo && (
-                <a
-                  href={`https://github.com/${project.ghRepo}`}
-                  target="_blank"
-                  data-umami-event={`project-cta-${project.slug}-github`}
-                  class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment rounded-lg text-sm font-medium transition-colors"
-                >
-                  <svg
-                    aria-hidden="true"
-                    focusable="false"
-                    class="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                  GitHub
-                  <GhStars repo={project.ghRepo} />
-                  <NewTabHint />
-                </a>
-              )}
-            </div>
+            {/* Primary actions; a live link's checked date sits beside them */}
+            {project.externalURLNote
+              ? <WithNote id={project.externalURLNote}>{actions}</WithNote>
+              : actions}
           </header>
 
           {/* ── About ────────────────────────────────────────────────── */}
@@ -370,6 +398,46 @@ export default define.page(function ProjectDetail(ctx) {
               {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
             </div>
           </section>
+
+          {/* ── Client reviews (#231) ────────────────────────────────── */}
+          {reviews.length > 0 && (
+            <section
+              data-project-reviews
+              class="p-6 sm:p-8 border-b border-rule"
+            >
+              <h2 class="text-xs uppercase tracking-wider text-graphite font-semibold mb-4">
+                What the client said
+              </h2>
+              <div class="space-y-6">
+                {reviews.map((t) => (
+                  <figure key={t.id}>
+                    <blockquote class="space-y-3 text-graphite italic leading-relaxed border-l-2 border-rule-strong pl-4">
+                      {t.quote.split(/\n+/).map((para, i) => (
+                        <p key={i}>{para}</p>
+                      ))}
+                    </blockquote>
+                    <figcaption class="mt-2 pl-4 text-sm text-graphite">
+                      {reviews.length > 1 && <>Contract {t.contract} ·{" "}</>}
+                      {project.period && (
+                        <>{formatPeriod(project.period)} ·{" "}</>
+                      )}
+                      {t.sourceHref && (
+                        <a
+                          href={t.sourceHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-accent hover:text-accent underline underline-offset-4"
+                        >
+                          Review on Upwork
+                          <NewTabHint />
+                        </a>
+                      )}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* ── Tech tags ─────────────────────────────────────────────── */}
           {project.tags && project.tags.length > 0 && (
