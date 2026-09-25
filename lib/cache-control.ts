@@ -11,6 +11,7 @@ export const CORE_PAGES = new Set([
   "/contact-me",
   "/blog",
   "/projects",
+  "/tools",
   "/catalog",
   "/pay",
   "/saas-architecture-guide",

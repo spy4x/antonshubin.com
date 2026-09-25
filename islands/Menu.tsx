@@ -8,6 +8,7 @@ import {
   MailIcon,
   MenuIcon,
   PenIcon,
+  WrenchIcon,
 } from "../components/Icons.tsx";
 
 interface MenuProps {
@@ -21,7 +22,7 @@ interface NavLink {
   icon: preact.ComponentChildren;
 }
 
-/** Work, Services, How I work, Blog, Contact — the photo links home. */
+/** Work, Services, How I work, Tools, Blog, Contact — the photo links home. */
 const links: NavLink[] = [
   { href: "/projects", label: "Work", icon: <FolderIcon class="w-5 h-5" /> },
   { href: "/catalog", label: "Services", icon: <GridIcon class="w-5 h-5" /> },
@@ -30,6 +31,7 @@ const links: NavLink[] = [
     label: "How I work",
     icon: <BriefcaseIcon class="w-5 h-5" />,
   },
+  { href: "/tools", label: "Tools", icon: <WrenchIcon class="w-5 h-5" /> },
   { href: "/blog", label: "Blog", icon: <PenIcon class="w-5 h-5" /> },
   {
     href: "/contact-me",

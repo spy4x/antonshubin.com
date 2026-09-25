@@ -3,6 +3,7 @@ import { blogArticles, hackathons } from "../lib/data.ts";
 import { projects } from "../lib/data.ts";
 import { BASE_URL } from "../lib/config.ts";
 import { catalogItems } from "../lib/catalog.ts";
+import { tools } from "../lib/tools.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
 
@@ -39,6 +40,12 @@ export const handler = define.handlers({
         loc: "/projects",
         priority: "0.8",
         changefreq: "monthly",
+        lastmod: undefined,
+      },
+      {
+        loc: "/tools",
+        priority: "0.8",
+        changefreq: "weekly",
         lastmod: undefined,
       },
       {
@@ -93,6 +100,14 @@ export const handler = define.handlers({
       lastmod: undefined as string | undefined,
     }));
 
+    // Generated from lib/tools.ts, like the catalog pages above.
+    const toolUrls = tools.map((t) => ({
+      loc: `/tools/${t.slug}`,
+      priority: "0.7",
+      changefreq: "monthly" as const,
+      lastmod: undefined as string | undefined,
+    }));
+
     const hackathonUrls = hackathons.map((h) => ({
       loc: `/hackathons/${h.slug}`,
       priority: "0.6",
@@ -105,6 +120,7 @@ export const handler = define.handlers({
       ...blogUrls,
       ...projectUrls,
       ...catalogUrls,
+      ...toolUrls,
       ...hackathonUrls,
     ];
 

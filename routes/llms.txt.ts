@@ -10,6 +10,7 @@ import {
   clientSummary,
   firstSentence,
   openSourceProjects,
+  toolLines,
   withOutcome,
 } from "../lib/llms.ts";
 
@@ -105,11 +106,16 @@ ${promisesList}
 - [Production Infrastructure](${BASE_URL}/infrastructure) — Operational proof of deployable, observable, recoverable, and transferable systems
 - [Contact](${BASE_URL}/contact-me)
 - [Blog](${BASE_URL}/blog)
-- [Work](${BASE_URL}/projects)${hackathonsLink}
+- [Work](${BASE_URL}/projects)
+- [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install${hackathonsLink}
 
 ## Open Source Projects
 
 ${openSourceList}
+
+## Tools
+
+${toolLines(BASE_URL)}
 
 ## Recent Blog Posts
 
