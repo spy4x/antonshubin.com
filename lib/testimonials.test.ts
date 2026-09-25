@@ -115,7 +115,7 @@ Deno.test("the home page shows Roley contract 1, Corecircle and Connectful contr
   for (const id of homeTestimonialIds) testimonial(id);
 });
 
-Deno.test("a project's reviews come back in contract order", () => {
+Deno.test("microwork's four reviews come back first contract first", () => {
   assertEquals(
     projectTestimonials("microwork").map((t) => t.contract),
     [1, 2, 3, 4],
