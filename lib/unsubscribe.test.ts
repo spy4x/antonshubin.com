@@ -143,9 +143,9 @@ const OLD_TOKEN_LITERAL = "oVzVbqNqkv9tmkTtVtYFuhqkv5Z_zcrst9MqqqcBQk4"; // gitl
 /** What `createUnsubscribeToken("user@example.com", SECRET_A)` returns in the
  * codec format. Pinned so a change to the purpose, version, payload or bound
  * context — which would break every link already sent — fails here. */
-const NEW_TOKEN_LITERAL =
+const NEW_TOKEN_LITERAL = // gitleaks:allow
   "eyJwdXJwb3NlIjoidW5zdWJzY3JpYmUiLCJ2ZXJzaW9uIjoxLCJwYXlsb2FkIjp7fX0." +
-  "DEwtNhLMmOB45aqDyVYaop6_lt6rH5WBLSDVeoyLDYA"; // gitleaks:allow
+  "DEwtNhLMmOB45aqDyVYaop6_lt6rH5WBLSDVeoyLDYA";
 
 const SUBSCRIBERS = [
   { email: "a@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },

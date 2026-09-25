@@ -4,7 +4,7 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 
-Deno.test("refuses with 400 an address no mail can reach, and stores nothing", async () => {
+Deno.test("refuses with 400 an address no mail can reach, and still accepts a valid one", async () => {
   const dir = await Deno.makeTempDir();
   const file = `${dir}/subscribers.json`;
   try {
@@ -34,6 +34,23 @@ Deno.test("refuses with 400 an address no mail can reach, and stores nothing", a
         assertEquals(await res.json(), { error: "Valid email is required" });
       }
       assertEquals(JSON.parse(await Deno.readTextFile(file)), []);
+
+      // A valid address still gets through, lowercased. Guards the refusal
+      // above against refusing too much (e.g. the regex losing its u flag).
+      const ok = await site.get("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-forwarded-for": "192.0.2.99",
+        },
+        body: JSON.stringify({ email: "Reader@Example.com" }),
+      });
+      assertEquals(ok.status, 200);
+      assertEquals(await ok.json(), { ok: true });
+      const stored: { email: string }[] = JSON.parse(
+        await Deno.readTextFile(file),
+      );
+      assertEquals(stored.map((s) => s.email), ["reader@example.com"]);
     } finally {
       await site.stop();
     }
