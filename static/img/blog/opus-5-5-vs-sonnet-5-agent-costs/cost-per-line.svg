@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="324"
+  viewBox="0 0 640 324" role="img"
+  aria-label="Implementer cost per 100 changed lines: Sep 20–21 Sonnet 5 $1.57, Opus 5 $2.45; Sep 23–25 Sonnet 5 $2.13, Opus 5.5 $0.39">
+  <rect width="640" height="324" rx="12" fill="#25211d" />
+  <text x="24" y="38" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="19" font-weight="600"
+    fill="#efebe2">Implementer cost per 100 changed lines</text>
+  <text x="24" y="60" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="14" fill="#bcb7af">Same days compared, API list prices</text>
+  <text x="24" y="102" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="13" font-weight="600" fill="#bcb7af"
+    letter-spacing="0.5">SEP 20–21</text>
+  <text x="108" y="132"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    fill="#efebe2" text-anchor="end">Sonnet 5</text>
+  <path d="M120 114h232a4 4 0 0 1 4 4v18a4 4 0 0 1 -4 4h-232z" fill="#3593d0" />
+  <text x="365" y="132"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    font-weight="600" fill="#efebe2">$1.57</text>
+  <text x="412" y="132"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="14"
+    fill="#bcb7af">30 calls</text>
+  <text x="108" y="168"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    fill="#efebe2" text-anchor="end">Opus 5</text>
+  <path d="M120 150h364a4 4 0 0 1 4 4v18a4 4 0 0 1 -4 4h-364z" fill="#8f72d6" />
+  <text x="497" y="168"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    font-weight="600" fill="#efebe2">$2.45</text>
+  <text x="544" y="168"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="14"
+    fill="#bcb7af">15 calls</text>
+  <text x="24" y="200" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="13" font-weight="600" fill="#bcb7af"
+    letter-spacing="0.5">SEP 23–25</text>
+  <text x="108" y="230"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    fill="#efebe2" text-anchor="end">Sonnet 5</text>
+  <path d="M120 212h316a4 4 0 0 1 4 4v18a4 4 0 0 1 -4 4h-316z" fill="#3593d0" />
+  <text x="449" y="230"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    font-weight="600" fill="#efebe2">$2.13</text>
+  <text x="496" y="230"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="14"
+    fill="#bcb7af">38 calls</text>
+  <text x="108" y="266"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    fill="#efebe2" text-anchor="end">Opus 5.5</text>
+  <path d="M120 248h54a4 4 0 0 1 4 4v18a4 4 0 0 1 -4 4h-54z" fill="#cf7a1f" />
+  <text x="187" y="266"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
+    font-weight="600" fill="#efebe2">$0.39</text>
+  <text x="234" y="266"
+    font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="14"
+    fill="#bcb7af">6 calls</text>
+  <line x1="120" y1="84" x2="120" y2="278" stroke="#413c38" stroke-width="1" />
+  <text x="24" y="304" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
+    font-size="13"
+    fill="#bcb7af">Calls: API calls per 100 changed lines (additions + deletions).</text>
+</svg>
