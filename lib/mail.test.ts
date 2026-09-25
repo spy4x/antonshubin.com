@@ -64,3 +64,16 @@ Deno.test("folds each run of line breaks and control characters in subject text 
   assertEquals(subjectSafe("a\tb\u0000c"), "a b c");
   assertEquals(subjectSafe("Zoë"), "Zoë");
 });
+
+Deno.test("announces the site's hostname in EHLO, not the container's", async () => {
+  const settings = smtpSettings({ ...ENV, ehloName: "antonshubin.com" });
+  assert(settings);
+  const relay = fakeRelay();
+  const result = await fakeSender(relay, settings).send({
+    to: "owner@example.com",
+    subject: "Hello",
+    text: "Body",
+  });
+  assert(result.ok);
+  assertEquals(relay.configs[0].name, "antonshubin.com");
+});

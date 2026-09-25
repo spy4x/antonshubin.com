@@ -1,5 +1,6 @@
 import { define } from "../../lib/utils.ts";
 import {
+  BASE_URL,
   CONTACT_EMAIL,
   SMTP_FROM,
   SMTP_HOST,
@@ -93,6 +94,7 @@ const SMTP = smtpSettings({
   user: SMTP_USERNAME,
   pass: SMTP_PASSWORD,
   from: SMTP_FROM,
+  ehloName: new URL(BASE_URL).hostname,
 });
 const SENDER = SMTP ? createSiteSender(SMTP) : null;
 

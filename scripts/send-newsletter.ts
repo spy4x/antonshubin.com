@@ -37,6 +37,7 @@ const smtp = smtpSettings({
   user: Deno.env.get("SMTP_USERNAME") || "",
   pass: Deno.env.get("SMTP_PASSWORD") || "",
   from: Deno.env.get("SMTP_FROM") || "",
+  ehloName: new URL(BASE_URL).hostname,
 });
 
 if (!smtp) {

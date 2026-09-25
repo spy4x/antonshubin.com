@@ -20,6 +20,9 @@ export interface SmtpSettings {
   pass: string;
   /** `From` mailbox: SMTP_FROM, or SMTP_USERNAME when SMTP_FROM is empty. */
   from: string;
+  /** Name announced in EHLO; the site's own hostname. Absent: nodemailer
+   * uses the machine's, which inside a container is `[127.0.0.1]`. */
+  ehloName?: string;
 }
 
 /** Raw SMTP_* values, as `lib/config.ts` or a script reads them. */
@@ -29,6 +32,8 @@ export interface SmtpEnvValues {
   user: string;
   pass: string;
   from: string;
+  /** The site's hostname, for EHLO (from `DOMAIN` via `BASE_URL`). */
+  ehloName?: string;
 }
 
 /**
@@ -43,6 +48,7 @@ export function smtpSettings(values: SmtpEnvValues): SmtpSettings | null {
     user: values.user,
     pass: values.pass,
     from: values.from || values.user,
+    ...(values.ehloName ? { ehloName: values.ehloName } : {}),
   };
 }
 
@@ -52,7 +58,9 @@ export function smtpSettings(values: SmtpEnvValues): SmtpSettings | null {
  * Implicit TLS is forced on every port, because the hand-written clients this
  * replaces always opened the connection with `Deno.connectTls`, whatever
  * SMTP_PORT said; the library's own default would switch a non-465 port to
- * STARTTLS and change what production connects with.
+ * STARTTLS and change what production connects with. EHLO announces
+ * `ehloName` when given: the old clients sent the relay's own hostname, and
+ * nodemailer's default inside a container is `[127.0.0.1]`.
  *
  * The sender is built on the first send, not here, so a bad SMTP_FROM or
  * SMTP_PORT fails that send — logged like any other failure — instead of
@@ -67,7 +75,11 @@ export function createSiteSender(
   return {
     send(message: EmailMessage): Promise<SendResult> {
       try {
-        sender ??= createSmtpSender({ ...settings, secure: true }, factory);
+        const { ehloName, ...smtp } = settings;
+        sender ??= createSmtpSender(
+          { ...smtp, secure: true, ...(ehloName ? { name: ehloName } : {}) },
+          factory,
+        );
       } catch (err) {
         return Promise.resolve({
           ok: false,
