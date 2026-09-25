@@ -1,6 +1,6 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL } from "../lib/config.ts";
-import { blogArticles, featuredClientSlugs, hackathons } from "../lib/data.ts";
+import { blogArticles, hackathons, highlightSlugs } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { decapitalize, promise, promises } from "../lib/promises.ts";
 import { proof } from "../lib/proof.ts";
@@ -41,10 +41,9 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // The two strongest client case studies (featuredClientSlugs is ordered
-    // strongest-first), generated from lib/data.ts: what each product is, then its outcome (see
+    // The first two highlights (highlightSlugs is ordered strongest-first), generated from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
-    const clientList = featuredClientSlugs
+    const clientList = highlightSlugs
       .slice(0, 2)
       .map((slug) => {
         const p = clientProject(slug);
@@ -121,7 +120,7 @@ ${toolLines(BASE_URL)}
 
 ${recentPosts}
 
-## Featured Client Work
+## Client Work Highlights
 
 ${clientList}
 

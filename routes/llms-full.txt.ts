@@ -1,6 +1,12 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL } from "../lib/config.ts";
-import { blogArticles, featuredClientSlugs, hackathons } from "../lib/data.ts";
+import {
+  archiveProjects,
+  blogArticles,
+  formatPeriod,
+  hackathons,
+  highlightSlugs,
+} from "../lib/data.ts";
 import {
   catalogItem,
   catalogItems,
@@ -13,6 +19,7 @@ import { ROLE } from "../lib/head.ts";
 import {
   clientProject,
   clientSummary,
+  firstSentence,
   openSourceProjects,
   toolLines,
   withOutcome,
@@ -76,15 +83,28 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // Every featured client case study (featuredClientSlugs is ordered
-    // strongest-first), generated from lib/data.ts: what each product is, then its outcome (see
+    // Every highlight (highlightSlugs is ordered strongest-first), generated
+    // from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
-    const clientList = featuredClientSlugs
+    const clientList = highlightSlugs
       .map((slug) => {
         const p = clientProject(slug);
         return `- **${p.title}** (${BASE_URL}/projects/${p.slug}) — ${
           clientSummary(p)
         }`;
+      })
+      .join("\n");
+
+    // Every other client project, newest first (archiveProjects()), with its
+    // period and role; a company's own later outcome is labelled as theirs.
+    const archiveList = archiveProjects()
+      .map((p) => {
+        const company = p.companyOutcome
+          ? ` The company's outcome: ${p.companyOutcome.text} (${p.companyOutcome.href}).`
+          : "";
+        return `- **${p.title}** (${BASE_URL}/projects/${p.slug}) — ${
+          formatPeriod(p.period!)
+        }, ${p.role}. ${firstSentence(p.description)}${company}`;
       })
       .join("\n");
 
@@ -173,9 +193,13 @@ ${openSourceList}
 
 ### Tools
 ${toolLines(BASE_URL)}
-### Featured Client Work
+### Client Work: Highlights
 
 ${clientList}
+
+### Client Work: Archive
+
+${archiveList}
 
 ### Tech Stack Used
 Deno, Node.js, TypeScript, Preact, React, Fresh, Hono, Angular, Svelte, PostgreSQL, Valkey/Redis, MongoDB, Firebase, Docker, Podman, Traefik, VictoriaMetrics, Gatus, Restic, Authelia, Hetzner, AWS, GCP, OpenAI, Claude, DeepSeek, Stripe, Tailwind CSS, WebSockets, PWA

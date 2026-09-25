@@ -4,11 +4,17 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import {
-  featuredClientSlugs,
+  archiveProjects,
   formatPeriod,
+  highlightProjects,
   type Project,
   projects,
 } from "../../lib/data.ts";
+import { firstSentence } from "../../lib/llms.ts";
+import {
+  projectTestimonials,
+  repeatClientsLine,
+} from "../../lib/testimonials.ts";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
 import {
   ArchiveIcon,
@@ -50,6 +56,7 @@ function ProjectCard({
   return (
     <Wrapper
       href={href}
+      data-highlight={client ? project.slug : undefined}
       target={opensInNewTab ? "_blank" : undefined}
       class={`block p-5 bg-paper rounded-xl border-2 border-rule transition-all group flex flex-col h-full ${
         project.archived
@@ -85,7 +92,7 @@ function ProjectCard({
       {client && project.madeForName && (
         <p class="text-xs uppercase tracking-wide text-graphite mb-1.5">
           Built for{" "}
-          <span class="text-accent font-medium normal-case tracking-normal">
+          <span class="text-accent font-semibold normal-case tracking-normal">
             {project.madeForName}
           </span>
           {project.period && (
@@ -114,14 +121,14 @@ function ProjectCard({
           </div>
         )}
         {project.outcome && (
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-lamp text-xs font-medium rounded-full">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-lamp text-xs font-semibold rounded-full">
             <StatusMark status="outcome" label={project.outcome} />
           </div>
         )}
         {project.ghRepo && <GhStars repo={project.ghRepo} />}
       </div>
 
-      <span class="inline-flex items-center gap-1 text-sm text-accent group-hover:text-accent transition-colors font-medium">
+      <span class="inline-flex items-center gap-1 text-sm text-accent group-hover:text-accent transition-colors font-semibold">
         View details
         <svg
           aria-hidden="true"
@@ -145,6 +152,64 @@ function ProjectCard({
   );
 }
 
+/**
+ * One ruled archive row: period · name · role, one line on what it was, the
+ * first contract's review excerpt if the project has one, the company's own
+ * later outcome if recorded, and a link to the project page.
+ */
+function ArchiveRow({ project }: { project: Project }) {
+  const review = projectTestimonials(project.slug ?? "")[0];
+  return (
+    <li
+      data-archive-row={project.slug}
+      class="py-5 border-t border-rule first:border-t-0"
+    >
+      <p class="text-xs uppercase tracking-wide text-graphite mb-1">
+        {project.period && (
+          <span data-project-period class="price">
+            {formatPeriod(project.period)}
+          </span>
+        )}
+        {project.role && (
+          <span class="normal-case tracking-normal">
+            {` · ${project.role}`}
+          </span>
+        )}
+      </p>
+      <h3 class="text-lg font-semibold text-parchment">{project.title}</h3>
+      <p class="text-graphite text-sm leading-relaxed mt-1">
+        {firstSentence(project.description)}
+      </p>
+      {review && (
+        <blockquote class="mt-3 pl-3 border-l-2 border-rule-strong text-sm text-parchment italic">
+          “{review.excerpt}”
+        </blockquote>
+      )}
+      {project.companyOutcome && (
+        <p data-company-outcome class="mt-3 text-sm text-graphite">
+          The company:{" "}
+          <a
+            href={project.companyOutcome.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent hover:text-accent underline underline-offset-4"
+          >
+            {project.companyOutcome.text}
+            <NewTabHint />
+          </a>
+          .
+        </p>
+      )}
+      <a
+        href={`/projects/${project.slug}`}
+        class="mt-3 inline-flex items-center gap-1 text-sm text-accent hover:text-accent font-semibold"
+      >
+        View details<span class="sr-only">: {project.title}</span>
+      </a>
+    </li>
+  );
+}
+
 export default define.page(function Projects(ctx) {
   const activeProjects = projects.my.filter((p) => !p.archived);
   head.value = {
@@ -155,19 +220,12 @@ export default define.page(function Projects(ctx) {
     canonical: "https://antonshubin.com/projects",
     ogType: "website",
   };
-  // A typo in featuredClientSlugs must fail loudly, not shrink the grid.
-  const clientProjects = featuredClientSlugs.map((slug) => {
-    const project = projects.freelance.find((p) => p.slug === slug);
-    if (!project) throw new Error(`featuredClientSlugs: no project "${slug}"`);
-    return project;
-  });
-  const olderWork = [
-    ...projects.freelance.filter((p) =>
-      !featuredClientSlugs.includes(p.slug ?? "")
-    ),
-    ...projects.my.filter((p) => p.archived),
-  ];
-  const hasAny = activeProjects.length > 0 || olderWork.length > 0 ||
+  // highlightProjects() throws on a typo, so a bad slug fails loudly.
+  const clientProjects = highlightProjects();
+  const archive = archiveProjects();
+  // Retired tools of my own: never client work, so never in the archive.
+  const archivedTools = projects.my.filter((p) => p.archived);
+  const hasAny = activeProjects.length > 0 || archive.length > 0 ||
     clientProjects.length > 0;
 
   if (!hasAny) {
@@ -207,10 +265,14 @@ export default define.page(function Projects(ctx) {
           .
         </p>
 
+        <p data-repeat-clients class="text-parchment mb-10">
+          {repeatClientsLine()}
+        </p>
+
         {clientProjects.length > 0 && (
-          <>
+          <section data-projects-section="highlights">
             <h2 class="text-xl font-semibold text-parchment mb-6 flex items-center gap-2">
-              <BriefcaseIcon class="w-5 h-5 text-accent" /> Client case studies
+              <BriefcaseIcon class="w-5 h-5 text-accent" /> Highlights
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
               {clientProjects.map((project) => (
@@ -221,7 +283,20 @@ export default define.page(function Projects(ctx) {
                 />
               ))}
             </div>
-          </>
+          </section>
+        )}
+
+        {archive.length > 0 && (
+          <section data-projects-section="archive" class="mb-16">
+            <h2 class="text-xl font-semibold text-parchment mb-2 flex items-center gap-2">
+              <ArchiveIcon class="w-5 h-5 text-graphite" /> Archive
+            </h2>
+            <ul class="border-y border-rule">
+              {archive.map((project) => (
+                <ArchiveRow key={project.slug} project={project} />
+              ))}
+            </ul>
+          </section>
         )}
 
         {activeProjects.length > 0 && (
@@ -240,39 +315,28 @@ export default define.page(function Projects(ctx) {
           </>
         )}
 
-        {olderWork.length > 0 && (
-          <>
-            <h2 class="text-xl font-semibold text-parchment mb-4 flex items-center gap-2">
-              <ArchiveIcon class="w-5 h-5 text-graphite" />
-              <span>Older work</span>
-            </h2>
-            <p data-older-work class="text-graphite leading-relaxed mb-10">
-              {olderWork.map((project, i) => {
-                const href = project.slug
-                  ? `/projects/${project.slug}`
-                  : project.externalURL;
-                return (
-                  <span key={project.title}>
-                    {i > 0 && " · "}
-                    <a
-                      href={href}
-                      target={project.slug ? undefined : "_blank"}
-                      rel={project.slug ? undefined : "noopener noreferrer"}
-                      class="text-accent hover:text-accent underline underline-offset-4"
-                    >
-                      {project.title}
-                      {!project.slug && <NewTabHint />}
-                    </a>
-                    {project.period && (
-                      <span data-project-period>
-                        {` (${formatPeriod(project.period)})`}
-                      </span>
-                    )}
-                  </span>
-                );
-              })}
-            </p>
-          </>
+        {archivedTools.length > 0 && (
+          <p data-archived-tools class="text-graphite leading-relaxed mb-10">
+            Archived tools: {archivedTools.map((project, i) => {
+              const href = project.slug
+                ? `/projects/${project.slug}`
+                : project.externalURL;
+              return (
+                <span key={project.title}>
+                  {i > 0 && " · "}
+                  <a
+                    href={href}
+                    target={project.slug ? undefined : "_blank"}
+                    rel={project.slug ? undefined : "noopener noreferrer"}
+                    class="text-accent hover:text-accent underline underline-offset-4"
+                  >
+                    {project.title}
+                    {!project.slug && <NewTabHint />}
+                  </a>
+                </span>
+              );
+            })}
+          </p>
         )}
       </div>
     </Layout>

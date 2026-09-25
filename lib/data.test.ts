@@ -1,23 +1,49 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import {
+  archiveProjects,
   blogArticles,
-  featuredClientSlugs,
   formatPeriod,
+  highlightProjects,
+  highlightSlugs,
   projects,
 } from "./data.ts";
 
-Deno.test("every featured client slug resolves to a freelance project", () => {
-  assert(
-    featuredClientSlugs.length > 0,
-    "featuredClientSlugs is empty — the loop below would run zero times and pass vacuously",
-  );
-  for (const slug of featuredClientSlugs) {
-    const project = projects.freelance.find((p) => p.slug === slug);
+Deno.test("the highlights are the six projects #232 names, in its order", () => {
+  assertEquals(highlightProjects().map((p) => p.slug), [
+    "smartlite",
+    "foodrazor",
+    "corecircle",
+    "roley",
+    "connectful",
+    "truth-or-dare",
+  ]);
+});
+
+Deno.test("every client project is a highlight or in the archive, never both", () => {
+  const archive = archiveProjects().map((p) => p.slug);
+  assert(archive.length > 0, "the archive is empty");
+  for (const p of projects.freelance) {
+    const inHighlights = highlightSlugs.includes(p.slug!);
+    const inArchive = archive.includes(p.slug);
     assert(
-      project,
-      `featuredClientSlugs: no freelance project with slug "${slug}"`,
+      inHighlights !== inArchive,
+      `${p.slug}: highlight ${inHighlights}, archive ${inArchive}`,
     );
   }
+  for (const p of projects.my) {
+    assert(!archive.includes(p.slug), `tool ${p.slug} is in the archive`);
+  }
+});
+
+Deno.test("the archive is newest first, and a same-year tie keeps the data order", () => {
+  assertEquals(archiveProjects().map((p) => p.slug), [
+    "sogroya",
+    "gopingu",
+    "code-review",
+    "microwork",
+    "calltrack",
+    "sajari",
+  ]);
 });
 
 Deno.test("every blog article slug is unique", () => {

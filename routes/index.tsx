@@ -2,7 +2,7 @@ import { define } from "../lib/utils.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts";
-import { type Project, projects } from "../lib/data.ts";
+import { formatPeriod, highlightProjects, type Project } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
 import { decapitalize, promise } from "../lib/promises.ts";
@@ -34,16 +34,11 @@ const proofNumbers = [
 ];
 
 /**
- * The three case studies named on the home page. Role and outcome are read
- * from lib/data.ts, so a figure lives in one place.
+ * The home page's work cards: the first three highlights (`highlightSlugs`
+ * in lib/data.ts). Role, period and outcome are read from there, so a figure
+ * lives in one place.
  */
-const caseStudies: Project[] = ["smartlite", "foodrazor", "corecircle"].map(
-  (slug) => {
-    const project = projects.freelance.find((p) => p.slug === slug);
-    if (!project) throw new Error(`routes/index.tsx: no project "${slug}"`);
-    return project;
-  },
-);
+const caseStudies: Project[] = highlightProjects().slice(0, 3);
 
 /** Strips a single trailing period, for splicing a promise's `desc` mid-sentence. */
 function withoutPeriod(text: string): string {
@@ -208,6 +203,11 @@ export default define.page(function Home(ctx) {
                 </h3>
                 <p class="text-xs uppercase tracking-wide text-graphite mt-1 mb-3">
                   {p.role}
+                  {p.period && (
+                    <span data-project-period class="normal-case">
+                      {` · ${formatPeriod(p.period)}`}
+                    </span>
+                  )}
                 </p>
                 <p class="text-graphite text-sm leading-relaxed flex-1">
                   {p.outcome}

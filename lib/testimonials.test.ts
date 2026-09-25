@@ -3,6 +3,8 @@ import {
   EXCERPT_JOIN,
   homeTestimonialIds,
   projectTestimonials,
+  repeatClients,
+  repeatClientsLine,
   type Testimonial,
   testimonial,
   testimonialProject,
@@ -119,5 +121,34 @@ Deno.test("microwork's four reviews come back first contract first", () => {
   assertEquals(
     projectTestimonials("microwork").map((t) => t.contract),
     [1, 2, 3, 4],
+  );
+});
+
+Deno.test("four of the eight reviewing clients hired Anton again, counted from the reviews", () => {
+  const r = repeatClients();
+  assertEquals(r.reviewed, 8);
+  assertEquals(r.rehiredOnSameProject.map((p) => p.slug), [
+    "foodrazor",
+    "roley",
+    "microwork",
+  ]);
+  assertEquals(r.followOn.map((x) => [x.from.slug, x.to.slug]), [
+    ["connectful", "corecircle"],
+  ]);
+  assertEquals(
+    repeatClientsLine(r),
+    "Four of the eight clients who reviewed me hired me again (FoodRazor, Roley, Microwork), and Connectful's founder hired me again for her next product, Corecircle.",
+  );
+});
+
+Deno.test("a project with one reviewed contract is not a repeat client", () => {
+  const one = { ...base, sourceHref: "https://example.com", permission: true };
+  const r = repeatClients([one], []);
+  assertEquals(r.reviewed, 1);
+  assertEquals(r.rehiredOnSameProject, []);
+  const two = { ...one, id: "example-2", contract: 2 };
+  assertEquals(
+    repeatClients([one, two], []).rehiredOnSameProject.map((p) => p.slug),
+    ["roley"],
   );
 });

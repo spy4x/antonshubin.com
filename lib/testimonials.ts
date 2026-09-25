@@ -246,3 +246,116 @@ export function projectTestimonials(slug: string): Testimonial[] {
     .filter((t) => t.projectSlug === slug)
     .sort((a, b) => a.contract - b.contract);
 }
+
+/**
+ * A client who reviewed Anton on one project and hired him again for their
+ * next product: the two projects count as one client. `possessive` is the
+ * founder's pronoun, for the sentence `repeatClientsLine()` builds.
+ */
+export interface FollowOnHire {
+  from: string;
+  to: string;
+  possessive: string;
+}
+
+/** Connectful's founder hired Anton again for Corecircle (#232). */
+export const followOnHires: FollowOnHire[] = [
+  { from: "connectful", to: "corecircle", possessive: "her" },
+];
+
+/** Who reviewed Anton, and who of them hired him again, from the review data. */
+export interface RepeatClients {
+  /** Distinct clients with a visible review; a follow-on pair is one client. */
+  reviewed: number;
+  /** Projects whose client signed more than one contract on that project. */
+  rehiredOnSameProject: Project[];
+  /** Follow-on pairs whose first project has a visible review. */
+  followOn: { from: Project; to: Project; possessive: string }[];
+}
+
+/**
+ * Counts repeat clients from `testimonials`: a project with more than one
+ * reviewed contract, or a follow-on pair, is one repeat client. A project in
+ * a pair is counted once, through the pair. `list` defaults to the real data
+ * so a test can pass a synthetic one.
+ */
+export function repeatClients(
+  list: Testimonial[] = visibleTestimonials(),
+  pairs: FollowOnHire[] = followOnHires,
+): RepeatClients {
+  const find = (slug: string) => {
+    const p = projects.freelance.find((x) => x.slug === slug);
+    if (!p) throw new Error(`lib/testimonials.ts: no client project "${slug}"`);
+    return p;
+  };
+  const inPair = new Set(pairs.flatMap((x) => [x.from, x.to]));
+  const reviewedSlugs = [...new Set(list.map((t) => t.projectSlug))];
+  const contracts = (slug: string) =>
+    new Set(list.filter((t) => t.projectSlug === slug).map((t) => t.contract))
+      .size;
+  const followOn = pairs
+    .filter((x) => reviewedSlugs.includes(x.from))
+    .map((x) => ({
+      from: find(x.from),
+      to: find(x.to),
+      possessive: x.possessive,
+    }));
+  return {
+    reviewed: reviewedSlugs.filter((s) => !inPair.has(s)).length +
+      followOn.length,
+    rehiredOnSameProject: reviewedSlugs
+      .filter((s) => !inPair.has(s) && contracts(s) > 1)
+      .map(find),
+    followOn,
+  };
+}
+
+const NUMBER_WORDS = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+];
+
+/** A count as a word up to twelve, as digits above. */
+function numberWord(n: number): string {
+  return NUMBER_WORDS[n] ?? `${n}`;
+}
+
+/** A project's name without its tagline: "Roley — Make a Movie!" → "Roley". */
+function shortTitle(p: Project): string {
+  return p.title.split(" — ")[0];
+}
+
+/**
+ * The repeat-clients line on /projects, worded as Anton approved it on 26 Sep
+ * (#232), with every count and name read from `repeatClients()`.
+ */
+export function repeatClientsLine(r: RepeatClients = repeatClients()): string {
+  const repeat = r.rehiredOnSameProject.length + r.followOn.length;
+  const count = numberWord(repeat);
+  const names = r.rehiredOnSameProject.map(shortTitle).join(", ");
+  const pairs = r.followOn
+    .map((x) =>
+      `${
+        shortTitle(x.from)
+      }'s founder hired me again for ${x.possessive} next product, ${
+        shortTitle(x.to)
+      }`
+    )
+    .join(", and ");
+  return `${count[0].toUpperCase()}${count.slice(1)} of the ${
+    numberWord(r.reviewed)
+  } clients who reviewed me hired me again${names ? ` (${names})` : ""}${
+    pairs ? `, and ${pairs}` : ""
+  }.`;
+}
