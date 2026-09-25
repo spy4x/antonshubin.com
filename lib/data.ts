@@ -748,7 +748,7 @@ export const blogArticles: BlogArticle[] = [
       "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost",
     slug: "opus-5-5-vs-sonnet-5-agent-costs",
     description:
-      "I priced five days of my coding-agent transcripts: 197 PRs and 411 reviewer agents across Sonnet 5, Opus 5, Opus 5.5 and Fable 5.1. Opus 5.5 lists at twice Sonnet's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed.",
+      "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed.",
     readTime: 8,
     publishedAt: "2026-09-26",
     previewImageURL: "cover.svg",

@@ -1,6 +1,6 @@
 ---
 title: "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost"
-description: "I priced five days of my coding-agent transcripts: 197 PRs and 411 reviewer agents across Sonnet 5, Opus 5, Opus 5.5 and Fable 5.1. Opus 5.5 lists at twice Sonnet's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
+description: "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
 publishedAt: "2026-09-26"
 readTime: 8
 previewImageURL: "cover.svg"
@@ -24,7 +24,7 @@ whether a test goes red, and checks the PR description's claims. Nothing merges
 until a reviewer passes it. A failed review ("needs-fix") goes back to the
 implementer for another round.
 
-Between September 20 and 25 that produced 197 implementer PRs and 411 reviewer
+Between September 20 and 25 that produced 203 implementer PRs and 411 reviewer
 agents across four models. I pay a flat subscription, so the dollars below are
 API list prices, used as a measure of how much of my usage limit each agent
 burned.
@@ -57,9 +57,10 @@ So the price per token matters less than you'd think. What matters is how many
 steps an agent takes and how much it carries through each one.
 
 Cached reads cost the same $0.20 per million tokens on Opus 5.5 and Sonnet 5.
-Only input, output and cache writes cost twice as much on Opus. For my
-implementers, cached reads were about three quarters of the bill, so the same
-call costs only about 25% more on Opus 5.5, not twice as much.
+Only input, output and cache writes cost twice as much on Opus. For my Sonnet
+implementers, cached reads were about three quarters of the bill (the median
+lane), so the same call costs only about 25% more on Opus 5.5, not twice as
+much.
 
 ![The same agent call priced on each model. Cached reads, three quarters of Sonnet's cost, are the same price on both, so Opus 5.5 costs 1.25 times as much per call, not 2 times](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/per-call-price.svg)
 
@@ -107,23 +108,24 @@ the first review, against Sonnet's 97.
 
 **The saving is in the fix rounds.** In the September 24 window, fix rounds were
 about 71% of implementer spend. A Sonnet implementer that had already grown a
-900K context paid $5–6 for a small last-round fix, because it re-read everything
-to make it. Opus carried a smaller context (a peak of 170K against Sonnet's
-246K), and in the lanes logged so far it needed fewer rounds.
+900K context paid $5.60–6.40 for a small last-round fix, because it re-read
+everything to make it. Opus carried a smaller context (a median peak of 170K
+against Sonnet's 246K), and in the 5 Opus lanes of my controlled experiment it
+needed a median of 2 review rounds against Sonnet's 3.
 
-### Nobody passes the first review
+### Most PRs fail their first review
 
 On ordinary code, most PRs from every model failed their first review. Sonnet 5
-and Opus 5 passed 12–20% of the time. On September 24, all 20 PRs that changed
-production code failed their first review.
+and Opus 5 passed 12–20% of the time. In one six-hour window on September 24,
+all 20 PRs that changed production code failed their first review.
 
 Opus 5.5's raw first-review pass rate looks great: 10 of 18. But almost all of
 those passes were auth work that I had routed to Opus and that Fable reviewed.
 On other code, Opus 5.5 passed 1 of 7, which is too few to say anything. Look at
-why PRs fail, and the model matters less: at least 7 of those 20 failures on
-September 24 were tests that stayed green on broken code, or a PR description
-that claimed something untrue. A smarter model doesn't fix that; a stricter
-process does.
+why PRs fail, and the model matters less: at least 7 of those 20 failures were
+tests that stayed green on broken code, or a PR description that claimed
+something untrue. I don't expect a smarter model to fix that, so I changed the
+process instead; it's too early to know whether that worked.
 
 ## More reasoning effort cost more and bought nothing
 
@@ -147,7 +149,7 @@ proof. It was enough to stop me guessing effort up front.
 On the same kind of PR in the same days, with both priced at Opus 5.5's rates, a
 review round cost $1.36 on Opus 5.5 and $1.50 on Fable 5.1: about the same
 amount of work. At real list prices, Fable cost about 2.7 times more, and it was
-slower (8 minutes a round against 6).
+slower (a median of 9 minutes a round against 6.5).
 
 Fable wasn't stricter either. On Sonnet-written code in the same days, it
 blocked 17 of 19 first submissions, and Opus 5.5 blocked 74 of 92. That is no
@@ -168,7 +170,7 @@ added that class of bug to the reviewer's checklist.
   second failed review names a real behaviour defect.
 - **Compact at 400K tokens instead of about 967K.** The single largest saving in
   the analysis: it caps how much every call has to re-read. Reviewers, which
-  peak around 277K, never hit it.
+  peaked at 277K in the window I measured, never hit it.
 - **A 1-hour cache for reviewers.** Re-reviews usually arrive after the default
   5-minute cache has expired, so the reviewer paid to rebuild its whole context.
 - **Proof for every test.** Each test a PR adds or changes needs a line in the
@@ -181,7 +183,12 @@ It isn't a controlled experiment. I chose which tasks went to Opus, the sample
 is small (19 Opus 5.5 PRs), and list prices are a stand-in for subscription
 usage. I started a fair split, with every other lane on Opus 5.5 regardless of
 the task, and stopped it early: the like-for-like comparison and the token
-counts pointed the same way, and Opus was probably no more expensive.
+counts pointed the same way: Opus 5.5 was cheaper, probably around half, and at
+worst no more expensive.
+
+One gap favours Opus in these numbers. In 3 of the 7 Opus PRs that failed their
+first review, the lead agent made the fix itself, so that fix's cost is missing
+from Opus's total. That happened in only 1 of 89 Sonnet cases.
 
 The lesson I'd keep even if the model prices change next month: in agent work,
 you pay for steps and context, not for tokens. Measure calls and context per

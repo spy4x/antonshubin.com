@@ -12,14 +12,14 @@
     stroke-dasharray="5 5" />
   <text x="40" y="92" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
     font-size="15" fill="#efebe2">Up to the first review</text>
-  <line x1="248.0" y1="130" x2="491.99999999999994" y2="130" stroke="#cf7a1f"
+  <line x1="248.0" y1="130" x2="492.0" y2="130" stroke="#cf7a1f"
     stroke-width="2" stroke-linecap="round" />
   <circle cx="348.0" cy="130" r="8" fill="#cf7a1f" stroke="#25211d"
     stroke-width="2" />
   <text x="348.0" y="116"
     font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15"
     font-weight="600" fill="#efebe2" text-anchor="middle">0.77×</text>
-  <text x="501.99999999999994" y="135"
+  <text x="502.0" y="135"
     font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="13"
     fill="#bcb7af">range 0.52–1.13</text>
   <text x="40" y="164" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"

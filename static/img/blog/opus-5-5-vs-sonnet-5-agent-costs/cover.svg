@@ -24,7 +24,7 @@
     font-weight="600" fill="#efebe2">$0.39</text>
   <text x="70" y="500" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
     font-size="26"
-    fill="#efebe2">Like for like: <tspan font-weight="600">0.45×</tspan> Sonnet's cost. 197 PRs, 411 reviewer agents.</text>
+    fill="#efebe2">Like for like: <tspan font-weight="600">0.45×</tspan> Sonnet's cost. 203 PRs, 411 reviewer agents.</text>
   <text x="70" y="580" font-family="IBM Plex Sans, Arial, Helvetica, sans-serif"
     font-size="22" fill="#bcb7af">antonshubin.com</text>
 </svg>
