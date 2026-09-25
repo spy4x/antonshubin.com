@@ -1,5 +1,6 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
 import { sendNewsletter } from "./newsletter.ts";
+import { createUnsubscribeToken } from "./unsubscribe.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
 const SUBSCRIBERS = [
@@ -49,4 +50,31 @@ Deno.test("counts a send the relay refuses as failed, not sent", async () => {
   assertEquals(result, { sent: 1, failed: 1 });
   assertEquals(log.lines, ["  ✓ one@example.com"]);
   assertStringIncludes(log.errors[0], "  ✗ two@example.com:");
+});
+
+Deno.test("a stored address the unsubscribe codec cannot sign costs one mail, not the run", async () => {
+  // A lone UTF-16 surrogate: the codec refuses to sign it, so building this
+  // subscriber's link throws.
+  const subscribers = [
+    SUBSCRIBERS[0],
+    { email: "\ud800x@example.com", subscribedAt: "2026-01-03T00:00:00.000Z" },
+    SUBSCRIBERS[1],
+  ];
+  const relay = fakeRelay();
+  const log = recordingLog();
+  const result = await sendNewsletter({
+    subscribers,
+    subject: "Issue 1",
+    body: "<p>Hello</p>",
+    baseUrl: "https://example.com",
+    unsubscribeLink: (email) => createUnsubscribeToken(email, "s".repeat(32)),
+    sender: fakeSender(relay),
+    log,
+  });
+  assertEquals(result, { sent: 2, failed: 1 });
+  assertEquals(relay.mails.map((m) => m.to), [["one@example.com"], [
+    "two@example.com",
+  ]]);
+  assertEquals(log.errors.length, 1);
+  assertStringIncludes(log.errors[0], "  ✗ \ud800x@example.com:");
 });
