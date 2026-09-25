@@ -4,6 +4,7 @@
 // so it runs under the narrow `deno task test`, not `deno task test:browser`.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { blogArticles, projects } from "../lib/data.ts";
+import { tools } from "../lib/tools.ts";
 
 const OG_ROOT = new URL("../static/img/og/", import.meta.url);
 
@@ -89,4 +90,19 @@ Deno.test("the site has a 1200x630 landscape default OG PNG", async () => {
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
   );
+});
+
+Deno.test("every tool page and the tools hub have a 1200x630 OG preview PNG", async () => {
+  assert(tools.length > 0, "no tools to check");
+  for (
+    const relative of [...tools.map((t) => `tools/${t.slug}.png`), "tools.png"]
+  ) {
+    const { width, height, bytes } = await pngInfo(relative);
+    assertEquals(width, WIDTH, `${relative}: width`);
+    assertEquals(height, HEIGHT, `${relative}: height`);
+    assert(
+      bytes < MAX_BYTES,
+      `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
+    );
+  }
 });

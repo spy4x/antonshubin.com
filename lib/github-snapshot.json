@@ -1,0 +1,27 @@
+{
+  "checkedOn": "2026-09-25",
+  "repos": {
+    "spy4x/ts-libs": {
+      "stars": 0,
+      "licence": "MIT",
+      "pushedAt": "2026-09-25T16:43:41Z",
+      "ci": {
+        "status": "success",
+        "pipeline": 333,
+        "at": "2026-09-25T04:11:12.000Z",
+        "url": "https://ci.antonshubin.com/repos/10/pipeline/333"
+      }
+    },
+    "spy4x/preact-components": {
+      "stars": 0,
+      "licence": "MIT",
+      "pushedAt": "2026-09-25T16:44:34Z",
+      "ci": {
+        "status": "success",
+        "pipeline": 851,
+        "at": "2026-09-25T15:20:07.000Z",
+        "url": "https://ci.antonshubin.com/repos/9/pipeline/851"
+      }
+    }
+  }
+}

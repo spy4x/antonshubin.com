@@ -1,8 +1,9 @@
 #!/usr/bin/env -S deno run -A
 /**
  * Generates the 1200×630 link-preview PNGs this site commits under
- * `static/img/og/`: one per blog post, one per project page, and one
- * landscape default for the site (#193).
+ * `static/img/og/`: one per blog post, one per project page, one per tool
+ * page plus the `/tools` hub (#189), and one landscape default for the site
+ * (#193).
  *
  * Run with:
  *   deno task og
@@ -23,6 +24,7 @@
 import { launchChromium } from "../test/browser.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { ROLE } from "../lib/head.ts";
+import { tools } from "../lib/tools.ts";
 import type { Browser } from "playwright";
 import { fromFileUrl } from "@std/path";
 
@@ -136,6 +138,25 @@ async function main() {
       console.log(`projects/${project.slug}.png  ${fmtBytes(bytes)}`);
       count++;
     }
+
+    for (const t of tools) {
+      const html = cardHtml(`${t.name}: ${t.job}`, oneLine(t.summary));
+      const outUrl = new URL(`tools/${t.slug}.png`, OG_DIR);
+      const bytes = await render(browser, html, outUrl);
+      console.log(`tools/${t.slug}.png  ${fmtBytes(bytes)}`);
+      count++;
+    }
+
+    const toolsHubBytes = await render(
+      browser,
+      cardHtml(
+        "Tools I build and run myself",
+        "Open-source tools, each with its status, CI status and install.",
+      ),
+      new URL("tools.png", OG_DIR),
+    );
+    console.log(`tools.png  ${fmtBytes(toolsHubBytes)}`);
+    count++;
 
     const defaultHtml = cardHtml("Anton Shubin", ROLE);
     const defaultBytes = await render(

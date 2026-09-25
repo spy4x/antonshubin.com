@@ -4,6 +4,7 @@
 // the linked READMEs. Generate from lib/data.ts here instead.
 import type { Project } from "./data.ts";
 import { projects } from "./data.ts";
+import { type Tool, tools } from "./tools.ts";
 
 /** Text up to and including the first ". " — a one-line summary for a longer description. */
 export function firstSentence(text: string): string {
@@ -53,4 +54,36 @@ export function clientProject(slug: string): Project {
   const p = projects.freelance.find((x) => x.slug === slug);
   if (!p) throw new Error(`lib/data.ts: no freelance project "${slug}"`);
   return p;
+}
+
+/** A status word as a reader of the llms files needs it: the same words `/tools` shows. */
+const STATUS_WORDS: Record<Tool["status"], string> = {
+  ready: "Ready",
+  beta: "Beta",
+  wip: "WIP",
+  paused: "Paused",
+  archived: "Archived",
+};
+
+/**
+ * One tool's line for the llms files, from `lib/tools.ts` only: its job,
+ * status, licence and install. An unpublished tool says so instead of
+ * offering a command that cannot work yet.
+ */
+export function toolSummary(t: Tool): string {
+  const install = t.registry.published
+    ? `Install: \`${t.registry.install}\` (${t.registry.name}).`
+    : `Not yet on ${t.registry.name}: ${t.registry.version} is being published now.`;
+  const job = `${t.job.charAt(0).toUpperCase()}${t.job.slice(1)}.`;
+  const credit = t.credit ? ` ${t.credit.text}` : "";
+  return `${job}${credit} Status: ${
+    STATUS_WORDS[t.status]
+  }. ${t.licence}. ${install}`;
+}
+
+/** Every tool in `lib/tools.ts`, as llms-file lines linking its `/tools/<slug>` page. */
+export function toolLines(baseUrl: string, list: Tool[] = tools): string {
+  return list
+    .map((t) => `- [${t.name}](${baseUrl}/tools/${t.slug}) — ${toolSummary(t)}`)
+    .join("\n");
 }

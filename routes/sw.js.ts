@@ -14,6 +14,7 @@ const PRECACHE_URLS = [
   "/contact-me",
   "/blog",
   "/projects",
+  "/tools",
   "/pay",
   "/manifest.json",
 ];

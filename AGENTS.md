@@ -150,6 +150,25 @@ reference.
   asserts `document.documentElement.scrollWidth` and the note's right edge never
   exceed the viewport, at 1100/1280/1440px.
 
+## Tools registry
+
+`lib/tools.ts` is the only list of open-source tools (#189): `/tools`,
+`/tools/<slug>`, the sitemap and both llms files read it, and adding a tool is
+adding an entry there. A tool's `registry.published` decides whether its pinned
+install command is offered with a copy button or marked "Not yet available";
+flip it to `true` the day that version is really on its registry.
+
+Numbers that change on their own — stars, licence GitHub detected, last push,
+and the latest push pipeline's status on the default branch in Woodpecker — live
+in `lib/github-snapshot.json`, written by
+`deno run -A scripts/github-snapshot.ts` (read through `lib/github-snapshot.ts`)
+and committed, so pages render from a file, never a live call. It sits in
+`lib/`, not `data/`: the deploy's rsync excludes `/data/` and `compose.yml`
+bind-mounts the host's `data/` over it, so nothing committed under `data/`
+reaches production. Rerun the script and commit the JSON when a CI status
+matters; `test/tools.test.ts` checks each page shows what the snapshot holds.
+Each tool page's 1200×630 preview comes from `deno task og`, like a post's.
+
 ## Visual system
 
 `assets/styles.css`'s `@theme` block is the only place a colour is defined
@@ -481,6 +500,7 @@ const CORE_PAGES = new Set([
   "/contact-me",
   "/blog",
   "/projects",
+  "/tools",
   "/catalog",
   "/pay",
   "/saas-architecture-guide",
@@ -529,7 +549,8 @@ production sends `noindex` for any status ≥ 400 and `noindex, nofollow` for
 
 `scripts/og-images.ts` generates the 1200×630 PNGs committed under
 `static/img/og/`: one per blog post (`blog/<slug>.png`), one per project page
-(`projects/<slug>.png`), and one landscape default for the site (`default.png`,
+(`projects/<slug>.png`), one per tool page (`tools/<slug>.png`) plus the hub
+(`tools.png`), and one landscape default for the site (`default.png`,
 `lib/head.ts`'s `DEFAULTS.ogImage`) — replacing the SVG covers and the old
 1200×1800 portrait photo, none of which LinkedIn, X, Facebook or Slack render as
 a link preview. It renders each PNG from the post/project title and description

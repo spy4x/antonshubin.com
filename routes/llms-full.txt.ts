@@ -14,6 +14,7 @@ import {
   clientProject,
   clientSummary,
   openSourceProjects,
+  toolLines,
   withOutcome,
 } from "../lib/llms.ts";
 
@@ -160,6 +161,7 @@ ${catalogList}
 - **How I Work:** ${BASE_URL}/how-i-work — Five promises, pricing, and FAQ
 - **Contact:** ${BASE_URL}/contact-me — Book a call, email, or Telegram
 - **Projects:** ${BASE_URL}/projects — Client work and open-source
+- **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **Production Infrastructure:** ${BASE_URL}/infrastructure — Operational proof: deployable, observable, recoverable, and transferable systems. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 - **Blog:** ${BASE_URL}/blog — Technical articles
 ${hackathonsSection}
@@ -168,6 +170,9 @@ ${blogList}
 
 ### Open Source Projects
 ${openSourceList}
+
+### Tools
+${toolLines(BASE_URL)}
 ### Featured Client Work
 
 ${clientList}
