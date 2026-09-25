@@ -170,17 +170,18 @@ Set these in `.env`. Never hardcode them in `_app.tsx`.
 
 Whenever any of these change, update the corresponding AI crawler files:
 
-| What changed              | Files to update                                                                                                         |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| New page added            | sitemap.xml.ts, llms-full.txt.ts                                                                                        |
-| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                           |
-| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                                                       |
-| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                 |
-| Blog post added           | sitemap.xml.ts, llms-full.txt.ts, `deno task og` (new post PNG)                                                         |
-| Blog/project title change | `deno task og` (regenerate that post's or project's PNG)                                                                |
-| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD), `deno task og` (new project PNG) |
-| Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                                                      |
-| Crawler rules change      | robots.txt.ts                                                                                                           |
+| What changed              | Files to update                                                                                                                                |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| New page added            | sitemap.xml.ts, llms-full.txt.ts                                                                                                               |
+| Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                                                  |
+| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                                                                              |
+| Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                                        |
+| Blog post added           | sitemap.xml.ts, llms-full.txt.ts, `deno task og` (new post PNG)                                                                                |
+| Blog/project title change | `deno task og` (regenerate that post's or project's PNG)                                                                                       |
+| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD), `deno task og` (new project PNG)                        |
+| Tool added                | `lib/tools.ts` only: sitemap, both llms files and the `/tools` pages read it; then `deno run -A scripts/github-snapshot.ts` and `deno task og` |
+| Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                                                                             |
+| Crawler rules change      | robots.txt.ts                                                                                                                                  |
 
 ## Testing
 
