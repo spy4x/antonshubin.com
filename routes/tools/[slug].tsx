@@ -150,9 +150,11 @@ export default define.page(function ToolPage(ctx) {
                 <StatusMark status={tool.status} />
               </Fact>
               <Fact label="Version">
-                {tool.registry.published
-                  ? tool.registry.version
-                  : `${tool.registry.version}, publishing to ${tool.registry.name}`}
+                <span data-version>
+                  {tool.registry.published
+                    ? tool.registry.version
+                    : `${tool.registry.version}, publishing to ${tool.registry.name}`}
+                </span>
               </Fact>
               <Fact label="Licence">{tool.licence}</Fact>
               <Fact label="Runs on">{tool.runtime}</Fact>

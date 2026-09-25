@@ -77,7 +77,7 @@ export const toolGroups: ToolGroup[] = [
 
 /** What each status word means, for the status key on `/tools`. */
 export const statusMeanings: Record<ToolStatus, string> = {
-  ready: "Published and used in production. Safe to depend on.",
+  ready: "Published on its registry and used in my own projects.",
   beta: "Works and is in use, but the API may still change before 1.0.",
   wip: "Being built. Not ready for someone else to depend on.",
   paused: "Works as it is, but I am not working on it right now.",
@@ -191,10 +191,14 @@ export const tools: Tool[] = [
     },
     licence: "MIT",
     runtime:
-      "Deno on the server; @spy4x/time and @spy4x/validation also run in a browser, untested there",
+      "Deno on the server; @spy4x/time, @spy4x/validation, @spy4x/platform's browser entry points and @spy4x/realtime's client run in a browser",
     usedFor:
-      "This site encrypts its environment files with @spy4x/server's age64 module, and more of the site is moving over to these packages now.",
+      "My SaaS template imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
     proofLinks: [
+      {
+        label: "The template's imports in deno.jsonc",
+        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+      },
       {
         label: "This site's env tasks in deno.json",
         href: "https://github.com/spy4x/antonshubin.com/blob/main/deno.json",
@@ -224,9 +228,15 @@ export const tools: Tool[] = [
     fits: [
       {
         text:
-          "preact-components shares the @spy4x scope on JSR and imports @spy4x/platform, @spy4x/time and @spy4x/validation.",
+          "preact-components imports @spy4x/platform, @spy4x/time and @spy4x/validation.",
         href: "/tools/preact-components",
         planned: false,
+      },
+      {
+        text:
+          "preact-components will publish under the same @spy4x scope on JSR, as @spy4x/preact-*.",
+        href: "/tools/preact-components",
+        planned: true,
       },
       {
         text: "This site runs its env-file encryption on @spy4x/server.",
@@ -234,16 +244,17 @@ export const tools: Tool[] = [
         planned: false,
       },
       {
-        text: "My SaaS template will import it.",
-        href: "https://github.com/spy4x/template",
-        planned: true,
+        text:
+          "My SaaS template imports @spy4x/validation, @spy4x/platform and @spy4x/server.",
+        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+        planned: false,
       },
     ],
   },
   {
     slug: "preact-components",
     name: "preact-components",
-    job: "server-rendered Preact and Tailwind components you own",
+    job: "server-rendered Preact and Tailwind components",
     summary:
       "A Preact port of Eirene's design system: components, design tokens, icons, charts and signals helpers in ten packages. Every module is a standard ES module that renders to HTML on the server and hydrates in the browser, with keyboard handling and focus written by hand. The tests and the build run on Deno.",
     kind: "component-library",
@@ -288,7 +299,7 @@ export const tools: Tool[] = [
     useIf: [
       "You build a Preact app with Tailwind and want components that render on the server and hydrate in the browser.",
       "You want charts rendered as SVG on the server.",
-      "You want to own your components' keyboard handling and focus instead of wrapping a third-party kit.",
+      "You want to see every component running, with its code, in a live guide before you pick it.",
     ],
     dontUseIf: [
       "Your app is React: these are Preact components.",
@@ -298,9 +309,15 @@ export const tools: Tool[] = [
     fits: [
       {
         text:
-          "Shares the @spy4x scope on JSR with ts-libs, and imports @spy4x/platform, @spy4x/time and @spy4x/validation from it.",
+          "Imports @spy4x/platform, @spy4x/time and @spy4x/validation from ts-libs.",
         href: "/tools/ts-libs",
         planned: false,
+      },
+      {
+        text:
+          "Will publish under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
+        href: "/tools/ts-libs",
+        planned: true,
       },
       {
         text: "My SaaS template will import it once it is published.",

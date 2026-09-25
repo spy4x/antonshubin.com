@@ -74,7 +74,9 @@ export function toolSummary(t: Tool): string {
   const install = t.registry.published
     ? `Install: \`${t.registry.install}\` (${t.registry.name}).`
     : `Not yet on ${t.registry.name}: ${t.registry.version} is being published now.`;
-  return `${t.name}: ${t.job}. Status: ${
+  const job = `${t.job.charAt(0).toUpperCase()}${t.job.slice(1)}.`;
+  const credit = t.credit ? ` ${t.credit.text}` : "";
+  return `${job}${credit} Status: ${
     STATUS_WORDS[t.status]
   }. ${t.licence}. ${install}`;
 }

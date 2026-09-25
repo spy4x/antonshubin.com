@@ -35,6 +35,19 @@ function ToolRow({ tool }: { tool: Tool }) {
         </a>
       </h3>
       <p class="mt-1 text-graphite">{tool.job}.</p>
+      {tool.credit && (
+        <p data-credit class="mt-1 text-sm text-parchment">
+          {tool.credit.text}{" "}
+          {tool.credit.links.map((l, i) => (
+            <span key={l.href}>
+              {i > 0 && " · "}
+              <a href={l.href} class="text-accent underline underline-offset-4">
+                {l.label}
+              </a>
+            </span>
+          ))}
+        </p>
+      )}
       {tool.live && (
         <p class="mt-1">
           <a
@@ -47,7 +60,7 @@ function ToolRow({ tool }: { tool: Tool }) {
       )}
       <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-graphite">
         <StatusMark status={tool.status} />
-        <span>
+        <span data-version>
           {tool.registry.published
             ? `${tool.registry.version} on ${tool.registry.name}`
             : `Publishing ${tool.registry.version} to ${tool.registry.name}`}
