@@ -177,7 +177,7 @@ export default define.page(function ToolPage(ctx) {
                 )}
               </Fact>
               <Fact label="CI">
-                <CiPill ci={snap.ci} pipelinesUrl={ciUrl(tool)} />
+                <CiPill ci={snap.ci} pipelinesUrl={ciUrl(tool)} labelHidden />
                 <span class="block mt-1 text-sm text-graphite">
                   Checked {githubSnapshot.checkedOn}
                 </span>

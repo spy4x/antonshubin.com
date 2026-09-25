@@ -9,7 +9,12 @@ import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
  * live badge image, so the page is the same on every request.
  */
 export function CiPill(
-  { ci, pipelinesUrl }: { ci: CiSnapshot | null; pipelinesUrl: string },
+  { ci, pipelinesUrl, labelHidden = false }: {
+    ci: CiSnapshot | null;
+    pipelinesUrl: string;
+    /** Keep "CI" for screen readers only, where a visible "CI" label already sits beside the pill. */
+    labelHidden?: boolean;
+  },
 ) {
   const { word, mark } = ciReading(ci);
   return (
@@ -18,7 +23,7 @@ export function CiPill(
       data-ci-status={word}
       class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-lamp rounded-full hover:underline underline-offset-4"
     >
-      <span class="text-sm text-parchment">CI</span>
+      <span class={labelHidden ? "sr-only" : "text-sm text-parchment"}>CI</span>
       {
         /* A CI word, not a tool status, so it takes StatusMark's shape and
           colour but its own word. */
