@@ -1,14 +1,21 @@
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
+  EXCERPT_JOIN,
+  homeTestimonialIds,
+  projectTestimonials,
   type Testimonial,
+  testimonial,
+  testimonialProject,
   testimonials,
   visibleTestimonials,
 } from "./testimonials.ts";
 
 const base: Omit<Testimonial, "sourceHref" | "permission"> = {
-  id: "example",
+  id: "example-1",
+  projectSlug: "roley",
+  contract: 1,
   quote: "Great work.",
-  name: "A Client",
+  excerpt: "Great work.",
 };
 
 Deno.test("a testimonial with a source and permission is visible", () => {
@@ -34,9 +41,83 @@ Deno.test("a testimonial with a source but no permission is not visible", () => 
   assertEquals(visibleTestimonials([t]), []);
 });
 
-Deno.test("the real testimonial list ships with nothing visible yet", () => {
-  // Not a pin on `permission` staying false forever — once Anton approves a
-  // quote (sourceHref + permission: true), this goes red on purpose, and the
-  // fix is to update this assertion, not lib/testimonials.ts.
-  assertEquals(visibleTestimonials(testimonials), []);
+Deno.test("every testimonial's projectSlug resolves to a client project", () => {
+  assert(
+    testimonials.length > 0,
+    "no testimonials — the loop would pass vacuously",
+  );
+  for (const t of testimonials) {
+    assertEquals(testimonialProject(t).slug, t.projectSlug, t.id);
+  }
+});
+
+Deno.test("a testimonial naming an unknown project throws instead of rendering", () => {
+  assertThrows(
+    () =>
+      testimonialProject({
+        ...base,
+        projectSlug: "rolley",
+        permission: true,
+      }),
+    Error,
+    'names no client project "rolley"',
+  );
+});
+
+Deno.test("a typo'd testimonial id throws instead of returning undefined", () => {
+  assertThrows(() => testimonial("roley-9"), Error, 'no testimonial "roley-9"');
+});
+
+Deno.test("every excerpt is made only of verbatim pieces of its own quote, in order", () => {
+  for (const t of testimonials) {
+    const pieces = t.excerpt.split(EXCERPT_JOIN);
+    let from = 0;
+    for (const piece of pieces) {
+      assert(piece.trim().length > 0, `${t.id}: empty excerpt piece`);
+      const at = t.quote.indexOf(piece, from);
+      assert(
+        at >= 0,
+        `${t.id}: excerpt piece is not a verbatim, in-order part of its quote: "${piece}"`,
+      );
+      from = at + piece.length;
+    }
+  }
+});
+
+Deno.test("the client's own spelling stays in the quotes", () => {
+  // Never correct a client's review; cut around a misspelling in the excerpt instead.
+  const pinned: Record<string, string[]> = {
+    "calltrack-1": ["gratest", "terxt", "communcation"],
+    "microwork-2": ["he has he taken"],
+    "foodrazor-2": ["work with him the future"],
+  };
+  for (const [id, words] of Object.entries(pinned)) {
+    for (const word of words) {
+      assert(testimonial(id).quote.includes(word), `${id} lost "${word}"`);
+    }
+  }
+});
+
+Deno.test("each review is one contract, and ids follow the project and contract", () => {
+  const ids = testimonials.map((t) => t.id);
+  assertEquals(new Set(ids).size, ids.length, "duplicate testimonial ids");
+  for (const t of testimonials) {
+    assertEquals(t.id, `${t.projectSlug}-${t.contract}`);
+  }
+});
+
+Deno.test("every real testimonial links its source and is cleared for the site", () => {
+  assertEquals(visibleTestimonials(testimonials), testimonials);
+});
+
+Deno.test("the home page shows Roley contract 1, Corecircle and Connectful contract 1", () => {
+  assertEquals(homeTestimonialIds, ["roley-1", "corecircle-1", "connectful-1"]);
+  for (const id of homeTestimonialIds) testimonial(id);
+});
+
+Deno.test("microwork's four reviews come back first contract first", () => {
+  assertEquals(
+    projectTestimonials("microwork").map((t) => t.contract),
+    [1, 2, 3, 4],
+  );
 });

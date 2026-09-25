@@ -142,9 +142,7 @@ siteTest(
  * not my prices. Add a page here when it starts showing a price.
  */
 const PRICE_PAGES: Record<string, string[]> = {
-  // Upwork earnings. The $55,749 contract value under a testimonial only
-  // shows once lib/testimonials.ts has a permissioned entry (#186) — the
-  // list ships empty today, so the amount isn't present to allow.
+  // Upwork earnings. Testimonials carry no dollar figure (#231).
   "/": ["$395K"],
   "/catalog": [],
   ...Object.fromEntries(catalogItems.map((i) => [`/catalog/${i.slug}`, []])),
@@ -596,7 +594,7 @@ siteTest(
   "/saas-architecture-guide's 'Building the MVP' section lists real case studies, not tools",
   async (site) => {
     const html = await site.html("/saas-architecture-guide");
-    // Scoped to the "Building the MVP" section: /projects/homelab is also
+    // Scoped to the "Building the MVP" section: /projects/rostok is also
     // linked, on purpose, from the unrelated "Infrastructure & Cost
     // Optimization" section further down as infra proof, not a case study.
     const start = html.indexOf("Building the MVP");

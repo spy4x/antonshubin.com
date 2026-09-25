@@ -25,6 +25,23 @@ export const notes: Note[] = [
     // No checkedOn: the date these figures were last read is a fact Anton
     // hasn't supplied yet (see the needs-decision comment on issue #186).
   },
+  {
+    id: "foodrazor-acquired",
+    text: "Acquired by OrderEZ, reported by e27 in February 2023.",
+    href:
+      "https://e27.co/fb-ops-management-platform-orderez-acquires-foodrazor-20230216/",
+  },
+  {
+    id: "corecircle-users",
+    text: "The founder said 200K users in her June 2022 interview.",
+    href:
+      "https://foundersfeature.substack.com/p/founders-feature-054-corecircle",
+  },
+  {
+    id: "sogroya-live",
+    text: "Live when I last checked.",
+    checkedOn: "2026-09-25",
+  },
 ];
 
 /** Looks a note up by id and throws on a typo, so a bad id fails the build, not a visitor. */

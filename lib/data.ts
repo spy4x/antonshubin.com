@@ -24,6 +24,15 @@ export interface Project {
   madeForURL?: string;
   archived?: boolean;
   outcome?: string;
+  /** Margin note id (`lib/notes.ts`) that sources `outcome`. */
+  outcomeNote?: string;
+  /** Margin note id (`lib/notes.ts`) that sources the live `externalURL`. */
+  externalURLNote?: string;
+  /**
+   * When the work happened, in whole years. Every client project carries
+   * one (`lib/data.test.ts`); `formatPeriod()` renders it.
+   */
+  period?: Period;
   /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
   ghRepo?: string;
   /**
@@ -32,6 +41,22 @@ export interface Project {
    * Projects" list in both llms files — see lib/llms.ts.
    */
   openSource?: boolean;
+}
+
+/** Years a project ran: `to` omitted means one year, `ongoing` means still running. */
+export interface Period {
+  from: number;
+  to?: number;
+  ongoing?: boolean;
+}
+
+/** "2021", "2018–2019" or "2024–now", with an en dash. */
+export function formatPeriod(period: Period): string {
+  if (period.ongoing) return `${period.from}–now`;
+  if (period.to && period.to !== period.from) {
+    return `${period.from}–${period.to}`;
+  }
+  return `${period.from}`;
 }
 
 export interface BlogArticle {
@@ -49,26 +74,6 @@ export interface BlogArticle {
 
 export const projects = {
   my: [
-    {
-      title: "Production Infrastructure Lab",
-      slug: "homelab",
-      openSource: true,
-      description:
-        "Sanitized production infrastructure case study demonstrating end-to-end operational ownership. Reusable infrastructure as code and Deno automation coordinate Docker Compose delivery behind Traefik, VictoriaMetrics and Gatus monitoring, Restic integrity checks, retention and restore tooling, and Authelia SSO with 2FA.",
-      role: "Platform Engineering & Operations",
-      logoImageURL: "/img/projects/homelab/logo.svg",
-      tags: [
-        "Deno",
-        "TypeScript",
-        "Docker",
-        "Ansible",
-        "Traefik",
-        "VictoriaMetrics",
-        "Gatus",
-        "Restic",
-        "Authelia",
-      ],
-    },
     {
       title: "Financy",
       slug: "financy",
@@ -213,7 +218,7 @@ export const projects = {
       description:
         "росток (sprout) — one-command scaffolder for a self-hosted homelab from a curated service catalog. The CLI writes your servers/, config.json, and .env files; every secret mutation is auto-encrypted to .env.age via age64 so secrets stay safe to commit. Bridges my homelab IaC knowledge into a reusable tool others can run.",
       outcome:
-        "Drives the deployment pipeline behind /infrastructure — same commands used to ship my own homelab.",
+        "Deploys my own servers: four instances in different regions, each running a different set of services.",
       tags: [
         "Deno",
         "TypeScript",
@@ -311,6 +316,7 @@ export const projects = {
         "12-profile.png",
       ],
       screenshotSize: { width: 1440, height: 1000 },
+      period: { from: 2024, ongoing: true },
       madeForName: "Yumetronics",
       madeForURL: "https://yumetronics.com.sg/",
       outcome:
@@ -322,7 +328,7 @@ export const projects = {
       externalURL: "https://darechat.me",
       role: "Tech Lead & Architect",
       description:
-        "Real-time multiplayer Truth or Dare game for Russian-speaking audiences, live at darechat.me. Built for founder Rustam Zaripov in 2022 with a backend-first architecture in one Nx monorepo: two NestJS APIs on Express (public REST + admin) using CQRS handlers, Swagger-documented at darechat.me/api, Socket.IO chat scaled across nodes via the Redis pub/sub adapter, Firebase auth + storage + FCM push notifications, Google Cloud Vision for user-uploaded image moderation, and Prisma on PostgreSQL with backup infrastructure on Postgres 18. JWT-bearer auth across both APIs, custom Nx libraries for shared command/query handlers, and MinIO-compatible media storage. The marketing site (SvelteKit) and an Angular web app consume the same public REST API that mobile clients do — iOS and Android apps live in the founder's separate repos.",
+        "Real-time multiplayer Truth or Dare game for Russian-speaking audiences, live at darechat.me. Built for founder Rustam Zaripov in 2022 with a backend-first architecture in one Nx monorepo: two NestJS APIs on Express (public REST + admin) using CQRS handlers, Swagger-documented at darechat.me/api, Socket.IO chat scaled across nodes via the Redis pub/sub adapter, Firebase auth + storage + FCM push notifications, Google Cloud Vision for user-uploaded image moderation, and Prisma on PostgreSQL. JWT-bearer auth across both APIs, custom Nx libraries for shared command/query handlers, and MinIO-compatible media storage. The marketing site (SvelteKit) and an Angular web app consume the same public REST API that mobile clients do — iOS and Android apps live in the founder's separate repos.",
       tags: [
         "Nest.js",
         "Express.js",
@@ -350,6 +356,7 @@ export const projects = {
         "05-truth-or-dare.webp",
         "06-players-list.webp",
       ],
+      period: { from: 2022 },
       madeForName: "Rustam Zaripov",
       madeForURL: "https://www.linkedin.com/in/rustam-zaripov-69436559/",
       outcome:
@@ -378,12 +385,20 @@ export const projects = {
         "4.webp",
         "5.webp",
         "6.webp",
+        "7.webp",
+        "8.webp",
+        "9.webp",
+        "10.webp",
+        "11.webp",
+        "12.webp",
       ],
       videoURL: "https://youtube.com/embed/IL3M0A7g0SE",
+      period: { from: 2018, to: 2019 },
       madeForName: "Michael Distel",
       madeForURL: "https://www.linkedin.com/in/michaeldistel/",
       outcome:
         "Scaled across 10 countries and hundreds of restaurants; acquired in 2023",
+      outcomeNote: "foodrazor-acquired",
     },
     {
       title: "Corecircle",
@@ -405,7 +420,9 @@ export const projects = {
       externalURL: "https://corecircle.com",
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
-      outcome: "Scaled to 200K+ online users; acquired in 2024",
+      period: { from: 2021 },
+      outcome: "Scaled to 200K+ users; acquired in 2024",
+      outcomeNote: "corecircle-users",
     },
     {
       title: "Roley — Make a Movie!",
@@ -439,20 +456,21 @@ export const projects = {
         "08-watch-mobile.png",
         "09-auth-mobile.png",
       ],
+      period: { from: 2023, to: 2025 },
       madeForName: "Lila King",
       madeForURL: "https://www.linkedin.com/in/lila-king-66b94b",
       outcome:
-        "Shipped the whole app end-to-end. Client went quiet before launch, so I rebuilt it as a portfolio piece — the originals belonged to them, this one's mine.",
+        "Built the MVP end to end. The client changed course to an offline business just before launch.",
     },
     {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
       logoImageURL: "/img/projects/sogroya/logo.svg",
       logoImageStyle: "background: white; border-radius: 0.5rem;",
-      externalURL: "https://www.sogroyadosereminder.com/",
-      externalURLDead: true,
+      externalURL: "https://sogroyadosereminder.com",
+      externalURLNote: "sogroya-live",
       description:
-        "A four-step multilingual web app for setting once-weekly Sogroya medication reminders on mobile and desktop calendars. I built the SvelteKit + TypeScript SPA, five-language flow (English, French, German, Portuguese, and Japanese), privacy consent, dose/day/time selection, and in-browser ICS generation. Static deployment kept the experience fast, backend-free, and easy to distribute globally. Completed in 2023 and remained publicly accessible on its branded domain through at least July 2025. The original project site is now offline.",
+        "A four-step multilingual web app for setting once-weekly Sogroya medication reminders on mobile and desktop calendars. I built the SvelteKit + TypeScript SPA, five-language flow (English, French, German, Portuguese, and Japanese), privacy consent, dose/day/time selection, and in-browser ICS generation. Static deployment kept the experience fast, backend-free, and easy to distribute globally.",
       role: "Full-stack",
       tags: [
         "SvelteKit",
@@ -468,6 +486,7 @@ export const projects = {
         "03-schedule.png",
         "04-download.png",
       ],
+      period: { from: 2023 },
       madeForName: "Novo Nordisk",
       madeForURL: "https://www.novonordisk.com/",
       outcome: "Launched in 2023 for worldwide Novo Nordisk client use.",
@@ -492,19 +511,21 @@ export const projects = {
       externalURLDead: true,
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
+      period: { from: 2020, to: 2021 },
       outcome: "Showed fast growth during the COVID-19 pandemic",
     },
     {
       title: "GoPingu",
       slug: "gopingu",
-      role: "Full-stack",
-      tags: ["Angular", "Node.js", "Express.js", "Firebase", "Firestore"],
+      role: "Team lead & tech lead (full-stack)",
+      tags: ["Angular", "Node.js", "Firebase", "Firestore"],
       logoImageURL: "/img/projects/gopingu/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
       description:
         "Manage marketing teams via a Trello-like app that utilized a marketplace for project templates.",
       externalURL: "https://app.gopingu.com",
       externalURLDead: true,
+      period: { from: 2018 },
       madeForName: "Peter Visser",
       madeForURL: "https://www.linkedin.com/in/peter-visser-04331820a/",
       outcome:
@@ -517,10 +538,18 @@ export const projects = {
       externalURLDead: true,
       description:
         "Human text classification service freelance platform. Earn money by classifying things.",
-      role: "Full-stack",
-      tags: ["Angular", "Node.js", "Express.js", "Firebase", "Firestore"],
+      role: "Team lead & tech lead (full-stack)",
+      tags: ["AngularJS", "Node.js", "Express.js", "MongoDB", "AWS EC2"],
       logoImageURL: "/img/projects/microwork/logo.svg",
-      screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
+      screenshotURLs: [
+        "1.webp",
+        "2.webp",
+        "3.webp",
+        "4.webp",
+        "5.webp",
+        "6.webp",
+      ],
+      period: { from: 2015, to: 2016 },
       madeForName: "Andy Gough",
       madeForURL: "https://www.linkedin.com/in/andy-gough-bb262b55/",
     },
@@ -528,10 +557,11 @@ export const projects = {
       title: "CallTrack",
       slug: "calltrack",
       externalURL: "https://ctrk.net",
+      externalURLDead: true,
       description:
         "Analyze calls data from your call center and manage phone numbers based on various rules.",
       role: "Frontend",
-      tags: ["Angular"],
+      tags: ["AngularJS"],
       logoImageURL: "/img/projects/calltrack/logo.svg",
       screenshotURLs: [
         "1.webp",
@@ -542,6 +572,7 @@ export const projects = {
         "6.webp",
         "7.webp",
       ],
+      period: { from: 2014 },
       madeForName: "Thomas Wusatiuk",
       madeForURL: "https://www.linkedin.com/in/wusatiuk/",
     },
@@ -553,9 +584,10 @@ export const projects = {
       externalURLDead: true,
       description:
         "Dashboard single-page application for search and recommendations engine as a service.",
-      tags: ["Angular"],
+      tags: ["AngularJS"],
       logoImageURL: "/img/projects/sajari/logo.svg",
-      screenshotURLs: ["1.webp", "2.webp", "3.webp"],
+      screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp"],
+      period: { from: 2014 },
       madeForName: "Hamish Ogilvy",
       madeForURL: "https://www.linkedin.com/in/hamishogilvy/",
     },
@@ -564,8 +596,9 @@ export const projects = {
       slug: "code-review",
       externalURL: "https://spy4x.github.io/pb-code-review",
       description:
-        "Code review report for a Node.js REST API codebase. Callback hell, code inconsistency and fun.",
-      role: "Audit",
+        "Code review report for a Node.js REST API codebase. Callback hell, code inconsistency and fun. After the report I interviewed seven Node.js developers in two weeks and hired the one who took the code forward.",
+      role: "Audit and hiring",
+      period: { from: 2017 },
       tags: ["Node.js", "Express.js"],
       logoImageURL: "/img/projects/code-review/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],

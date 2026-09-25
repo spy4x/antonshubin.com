@@ -1,12 +1,17 @@
 // The 301 redirect table for URLs that no longer exist as written: a
 // trailing slash on a post or project URL, and a slug retired by a rename
-// (#193). Pure and unit-tested without a server, the same pattern lib/csp.ts
+// (#193, #231). Pure and unit-tested without a server, the same pattern lib/csp.ts
 // uses — main.ts's middleware is the only caller, and it's the one that
 // touches the request.
 
 /** Old blog slug -> the post that absorbed it. */
 const RETIRED_BLOG_SLUGS: Record<string, string> = {
   "self-hosted-caldav-pwa-architecture": "self-hosted-caldav-web-ui-tasks-org",
+};
+
+/** Old project slug -> the project that replaced it (#231: homelab was reborn as rostok). */
+const RETIRED_PROJECT_SLUGS: Record<string, string> = {
+  "homelab": "rostok",
 };
 
 /**
@@ -34,6 +39,11 @@ export function redirectTarget(pathname: string): string | undefined {
   const retired = withoutTrailingSlash.match(/^\/blog\/([^/]+)$/);
   if (retired && RETIRED_BLOG_SLUGS[retired[1]]) {
     return `/blog/${RETIRED_BLOG_SLUGS[retired[1]]}`;
+  }
+
+  const retiredProject = withoutTrailingSlash.match(/^\/projects\/([^/]+)$/);
+  if (retiredProject && RETIRED_PROJECT_SLUGS[retiredProject[1]]) {
+    return `/projects/${RETIRED_PROJECT_SLUGS[retiredProject[1]]}`;
   }
 
   if (trailingSlash) return withoutTrailingSlash;

@@ -238,18 +238,12 @@ Deno.test("no JSON-LD block on the home page states the earnings figure", async 
   }
 });
 
-// This only checks the filter's own logic against the real data (the list
-// itself, empty today) — whether a *visible* one actually links its source
-// is checked at the component level instead, in
-// components/TestimonialCard.test.tsx, since today's data has no visible
-// entry to fetch a built page and find. Checking it here against the real
-// (always-empty) list would pass vacuously no matter what the markup does.
-Deno.test("visibleTestimonials(testimonials) is empty until a real entry has a source and permission", () => {
-  const permissioned = testimonials.map((t) => ({
-    ...t,
-    sourceHref: "https://example.com/review",
-    permission: true,
-  }));
-  assertEquals(visibleTestimonials(permissioned).length, permissioned.length);
-  assertEquals(visibleTestimonials(testimonials), []);
+// #231: every review is a real, public Upwork review (sourceHref) cleared
+// for the site; the unsourced "$55,749" figure and the "consultation" quote
+// that matched no review are gone and must not come back.
+Deno.test("lib/testimonials.ts holds only sourced reviews and no dollar figure", async () => {
+  assert(testimonials.length > 0, "no testimonials");
+  assertEquals(visibleTestimonials(testimonials), testimonials);
+  const text = await Deno.readTextFile("lib/testimonials.ts");
+  assert(!/\$\s?\d/.test(text), "lib/testimonials.ts states a dollar figure");
 });

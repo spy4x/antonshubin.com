@@ -3,7 +3,12 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
-import { featuredClientSlugs, type Project, projects } from "../../lib/data.ts";
+import {
+  featuredClientSlugs,
+  formatPeriod,
+  type Project,
+  projects,
+} from "../../lib/data.ts";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
 import {
   ArchiveIcon,
@@ -83,6 +88,11 @@ function ProjectCard({
           <span class="text-accent font-medium normal-case tracking-normal">
             {project.madeForName}
           </span>
+          {project.period && (
+            <span data-project-period class="normal-case tracking-normal">
+              {` · ${formatPeriod(project.period)}`}
+            </span>
+          )}
         </p>
       )}
 
@@ -253,6 +263,11 @@ export default define.page(function Projects(ctx) {
                       {project.title}
                       {!project.slug && <NewTabHint />}
                     </a>
+                    {project.period && (
+                      <span data-project-period>
+                        {` (${formatPeriod(project.period)})`}
+                      </span>
+                    )}
                   </span>
                 );
               })}

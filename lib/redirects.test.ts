@@ -1,6 +1,6 @@
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { redirectTarget } from "./redirects.ts";
-import { blogArticles } from "./data.ts";
+import { blogArticles, projects } from "./data.ts";
 
 Deno.test("redirects a trailing-slash post URL to the slash-free form", () => {
   assertEquals(redirectTarget("/blog/ship-it-today/"), "/blog/ship-it-today");
@@ -44,4 +44,15 @@ Deno.test("leaves an ordinary post or project URL alone", () => {
 Deno.test("leaves unrelated trailing-slash paths alone", () => {
   assertEquals(redirectTarget("/catalog/"), undefined);
   assertEquals(redirectTarget("/blog/"), undefined);
+});
+
+Deno.test("redirects the retired homelab project to rostok, with or without a trailing slash", () => {
+  assertEquals(redirectTarget("/projects/homelab"), "/projects/rostok");
+  assertEquals(redirectTarget("/projects/homelab/"), "/projects/rostok");
+});
+
+Deno.test("the retired homelab slug's target is a real project and homelab itself is gone", () => {
+  const all = [...projects.my, ...projects.freelance];
+  assert(all.some((p) => p.slug === "rostok"), "no rostok project");
+  assert(!all.some((p) => p.slug === "homelab"), "homelab is still a project");
 });

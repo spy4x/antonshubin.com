@@ -118,7 +118,7 @@ siteTest(
 siteTest(
   "a dead external link produces no sameAs",
   async (site) => {
-    const project = allProjects.find((p) => p.slug === "sogroya")!;
+    const project = allProjects.find((p) => p.slug === "connectful")!;
     assert(
       project.externalURL && project.externalURLDead,
       "fixture project is no longer externalURLDead — pick another slug",
@@ -162,5 +162,24 @@ siteTest(
     if (project.tags && project.tags.length > 0) {
       assertEquals(record.keywords, project.tags.join(", "));
     }
+  },
+);
+
+siteTest(
+  "a client project's JSON-LD dateCreated is the first year of its period",
+  async (site) => {
+    let checked = 0;
+    for (const project of projects.freelance) {
+      const html = await site.html(`/projects/${project.slug}`);
+      const node = findProjectNode(jsonLd(html));
+      assert(node, `${project.slug}: no project JSON-LD node found`);
+      assertEquals(
+        (node as unknown as Record<string, unknown>).dateCreated,
+        String(project.period!.from),
+        project.slug,
+      );
+      checked++;
+    }
+    assert(checked > 0, "no client project checked");
   },
 );

@@ -37,7 +37,7 @@ const proofAreas = [
     summary:
       "Infrastructure changes travel with product changes, so releases can be reviewed, repeated, and handed over.",
     details:
-      "My public Production Infrastructure Lab uses reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing. Configuration and deployment logic stay versioned rather than living as undocumented server steps.",
+      "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing. Configuration and deployment logic stay versioned rather than living as undocumented server steps.",
   },
   {
     title: "Failure detection",
@@ -223,19 +223,20 @@ export default define.page(function Infrastructure() {
               </p>
             </a>
             <a
-              href="/projects/homelab"
-              data-e2e="infrastructure-view-homelab"
+              href="/projects/rostok"
+              data-e2e="infrastructure-view-rostok"
               class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <p class="text-sm font-semibold text-accent mb-2">
                 Operational engineering proof
               </p>
               <h3 class="text-xl font-semibold text-parchment mb-2 group-hover:text-accent">
-                Production Infrastructure Lab
+                rostok
               </h3>
               <p class="text-graphite leading-relaxed">
-                Reusable infrastructure as code showing versioned delivery,
-                monitoring, recovery tooling, and identity controls.
+                The open-source scaffolder I deploy my own servers with: four
+                instances in different regions, each running a different set of
+                services.
               </p>
             </a>
           </div>
