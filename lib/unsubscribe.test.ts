@@ -138,14 +138,14 @@ Deno.test("unsubscribeLink rejects when UNSUBSCRIBE_SECRET is missing, before to
 
 /** Produced by the pre-#233 `createUnsubscribeToken("user@example.com",
  * SECRET_A)` on origin/main at 042df38. */
-const OLD_TOKEN_LITERAL = "oVzVbqNqkv9tmkTtVtYFuhqkv5Z_zcrst9MqqqcBQk4";
+const OLD_TOKEN_LITERAL = "oVzVbqNqkv9tmkTtVtYFuhqkv5Z_zcrst9MqqqcBQk4"; // gitleaks:allow
 
 /** What `createUnsubscribeToken("user@example.com", SECRET_A)` returns in the
  * codec format. Pinned so a change to the purpose, version, payload or bound
  * context — which would break every link already sent — fails here. */
 const NEW_TOKEN_LITERAL =
   "eyJwdXJwb3NlIjoidW5zdWJzY3JpYmUiLCJ2ZXJzaW9uIjoxLCJwYXlsb2FkIjp7fX0." +
-  "DEwtNhLMmOB45aqDyVYaop6_lt6rH5WBLSDVeoyLDYA";
+  "DEwtNhLMmOB45aqDyVYaop6_lt6rH5WBLSDVeoyLDYA"; // gitleaks:allow
 
 const SUBSCRIBERS = [
   { email: "a@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
@@ -208,10 +208,16 @@ Deno.test("an old-code token under another secret, or for a removed address, mat
 });
 
 Deno.test("refuses, without throwing, a copy of an old token that is not in the old shape", async () => {
-  // The old code decoded any base64url, padded or not. A padded or truncated
-  // copy of a genuine old token is not a link anyone was sent.
+  // Only the exact old shape reaches the old verifier: 43 base64url
+  // characters. The old code refused these three as well, so nothing changes
+  // for them; the 44-character one guards the shape check itself, because a
+  // longer token that got through would reach `atob` and throw.
   for (
-    const token of [`${OLD_TOKEN_LITERAL}=`, OLD_TOKEN_LITERAL.slice(0, 42)]
+    const token of [
+      `${OLD_TOKEN_LITERAL}=`,
+      `${OLD_TOKEN_LITERAL}A`,
+      OLD_TOKEN_LITERAL.slice(0, 42),
+    ]
   ) {
     assertEquals(
       await findSubscriberByToken(SUBSCRIBERS, token, SECRET_A),
