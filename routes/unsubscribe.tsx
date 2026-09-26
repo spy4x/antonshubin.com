@@ -92,19 +92,21 @@ export const handler = define.handlers({
       });
     }
     const secret = unsubscribeSecret();
-    let removed: boolean;
+    let match;
     try {
-      // The lookup and the removal run as one change under the lock (#254),
-      // so a subscribe landing in between cannot write the address back.
-      removed = await updateSubscribers(async (list) => {
-        const match = secret &&
-          await findSubscriberByToken(list, token, secret);
-        if (!match) return { result: false };
-        return {
-          list: list.filter((s) => s.email !== match.email),
-          result: true,
-        };
-      });
+      // The token is checked against a plain read, outside the lock, so a
+      // flood of bad tokens never holds the lock (#254). Only the removal of
+      // the matched address runs under it, as one change, so a subscribe
+      // landing in between cannot write the address back.
+      match = secret &&
+        await findSubscriberByToken(await loadSubscribers(), token, secret);
+      if (match) {
+        const email = match.email;
+        await updateSubscribers((list) => ({
+          list: list.filter((s) => s.email !== email),
+          result: null,
+        }));
+      }
     } catch (err) {
       console.error("[UNSUBSCRIBE] failed to save:", err);
       return page<PageData>({ state: "error" }, {
@@ -112,7 +114,7 @@ export const handler = define.handlers({
         headers: NO_STORE,
       });
     }
-    if (!removed) {
+    if (!match) {
       return page<PageData>({ state: "not-recognised" }, {
         status: 400,
         headers: NO_STORE,
