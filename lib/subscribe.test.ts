@@ -50,12 +50,13 @@ Deno.test("saves a new subscriber, then welcomes them with their own unsubscribe
   assertStringIncludes(String(notice.text), `Unsubscribe: ${link}`);
 });
 
-Deno.test("answers 'Already subscribed' for a stored address, and neither saves nor mails", async () => {
+Deno.test("answers a stored address exactly as a new one, and neither saves nor mails", async () => {
   const { relay, saved, deps } = setup(linkFor);
-  const outcome = await addSubscriber("old@example.com", deps);
-  await outcome.mails;
-  assertEquals(outcome.body, { ok: true, message: "Already subscribed" });
+  const known = await addSubscriber("old@example.com", deps);
+  await known.mails;
   assertEquals([saved.length, relay.mails.length], [0, 0]);
+  const fresh = await addSubscriber("new@example.com", deps);
+  assertEquals([known.status, known.body], [fresh.status, fresh.body]);
 });
 
 Deno.test("answers 400 to an email field that is not a bare address, and neither saves nor mails", async () => {
@@ -85,18 +86,20 @@ Deno.test("stores a bare address trimmed and lowercased", async () => {
   ]);
 });
 
-Deno.test("answers 500 and saves nothing when the unsubscribe link cannot be built", async () => {
-  const { relay, saved, log, deps } = setup(() =>
-    Promise.reject(new Error("UNSUBSCRIBE_SECRET is not set"))
-  );
-  const outcome = await addSubscriber("new@example.com", deps);
-  await outcome.mails;
-  assertEquals([outcome.status, outcome.body], [500, {
-    error: "Server misconfigured",
-  }]);
-  assertEquals([saved.length, relay.mails.length], [0, 0]);
-  assertStringIncludes(
-    log.errors[0],
-    "[SUBSCRIBE] cannot build unsubscribe link:",
-  );
+Deno.test("answers 500 and saves nothing when the unsubscribe link cannot be built, for a known address too", async () => {
+  for (const email of ["new@example.com", "old@example.com"]) {
+    const { relay, saved, log, deps } = setup(() =>
+      Promise.reject(new Error("UNSUBSCRIBE_SECRET is not set"))
+    );
+    const outcome = await addSubscriber(email, deps);
+    await outcome.mails;
+    assertEquals([outcome.status, outcome.body], [500, {
+      error: "Server misconfigured",
+    }], email);
+    assertEquals([saved.length, relay.mails.length], [0, 0]);
+    assertStringIncludes(
+      log.errors[0],
+      "[SUBSCRIBE] cannot build unsubscribe link:",
+    );
+  }
 });

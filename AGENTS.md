@@ -546,7 +546,8 @@ endpoint list.
 The email field of `/api/subscribe` and `/api/lead` goes through
 `lib/email-field.ts`'s `bareAddress()` (`@spy4x/email`'s `isAddress()`, #255):
 only a bare address passes, so a display name, `<`, `>` or `"` answers 400, and
-only the bare address is stored or mailed.
+only the bare address is stored or mailed. `/api/subscribe` answers a known
+address exactly as a new one, so it cannot test who is on the list.
 
 ## Outgoing mail
 

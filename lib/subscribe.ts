@@ -36,8 +36,10 @@ export interface AddSubscriberOutcome {
  * list is read, so nothing is stored and nothing is mailed. The address is
  * stored lowercased.
  *
- * The unsubscribe link is built before anything is saved: a missing or
- * unusable UNSUBSCRIBE_SECRET fails the whole request instead of saving an
+ * A known address gets the same answer as a new one, so the route cannot be
+ * used to test whether an address is on the list. For the same reason the
+ * unsubscribe link is built first, for both: a missing or unusable
+ * UNSUBSCRIBE_SECRET fails every request the same way, instead of saving an
  * address whose unsubscribe link would never work.
  */
 export async function addSubscriber(
@@ -56,15 +58,6 @@ export async function addSubscriber(
     };
   }
 
-  const subs = deps.load();
-  if (subs.some((s) => s.email === email)) {
-    return {
-      status: 200,
-      body: { ok: true, message: "Already subscribed" },
-      mails: none,
-    };
-  }
-
   let link: string;
   try {
     link = await deps.unsubscribeLink(email);
@@ -75,6 +68,11 @@ export async function addSubscriber(
       body: { error: "Server misconfigured" },
       mails: none,
     };
+  }
+
+  const subs = deps.load();
+  if (subs.some((s) => s.email === email)) {
+    return { status: 200, body: { ok: true }, mails: none };
   }
 
   subs.push({
