@@ -145,5 +145,7 @@ it with the `devto` / `blog` row.
 
 ## Review cadence
 
-`deno task weekly-numbers` reports the week's top campaigns by visits; see
-[`docs/weekly-numbers.md`](./weekly-numbers.md).
+Campaign results are reviewed weekly in the Sunday `deno task weekly-numbers`
+report. Its "Umami — top campaigns (7 days)" section ranks the week's
+`utm_campaign` values by visitors (see
+[`docs/weekly-numbers.md`](./weekly-numbers.md)).
