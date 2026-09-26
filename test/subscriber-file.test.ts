@@ -5,6 +5,8 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
+import { denoFileSystem } from "@spy4x/platform/server/deno-fs";
+import { FileLock } from "@spy4x/platform/server/file-lock";
 
 const SECRET = "t".repeat(32);
 const AT = "2026-01-01T00:00:00.000Z";
@@ -92,5 +94,27 @@ Deno.test("an unparseable subscriber file answers 500 everywhere and is never ov
     assertEquals(answers.map((r) => r.status), [500, 500, 500]);
     assertEquals(await Deno.readTextFile(file), raw);
     assertEquals(await Deno.readTextFile(`${file}.invalid`), raw);
+  });
+});
+
+Deno.test("a bad-token unsubscribe answers 400 at once while another process holds the lock", async () => {
+  await withSite(async (site, file) => {
+    await Deno.writeTextFile(
+      file,
+      JSON.stringify([{ email: "keep@example.com", subscribedAt: AT }]),
+    );
+    // Held by this test process, as a second process would hold it. The token
+    // check runs outside the lock, so it neither waits for it nor fails on it.
+    const lock = new FileLock({ fs: denoFileSystem, path: `${file}.lock` });
+    await lock.acquire();
+    try {
+      const res = await site.get("/unsubscribe?token=forged", {
+        method: "POST",
+      });
+      await res.body?.cancel();
+      assertEquals(res.status, 400);
+    } finally {
+      await lock.release();
+    }
   });
 });
