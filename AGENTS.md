@@ -4,6 +4,30 @@ The global agent instructions own Git Flow, branch naming, commit convention,
 pull-request discipline and the merge protocol. This file only adds what is
 specific to this repository.
 
+## Anton's goals and this site's role
+
+Every page and every post exists to move Anton's goals forward, so read them
+before writing anything for the site. They live in `~/sync/code/ai-memory/`:
+`profile.md` ("Goals", "How I sell", "Proof I can show") and `situation.md` (the
+current plan, targets and dates). The numbers and the private parts stay there,
+never in this public repository.
+
+In short, as of September 2026:
+
+- **Now: paid client work.** Buyers arrive from Upwork, referrals and LinkedIn.
+  The site does not bring them; it closes them. A visitor should leave convinced
+  that Anton is a senior full-stack engineer and tech lead they can trust with
+  money, and know how to book a call.
+- **Next: his own products and the YouTube channel.** The open-source tools on
+  `/tools` get one launch at a time; stars, issues and requests decide which
+  gets product hours. Videos come from the week's real work.
+- **Long term: a public record of expertise** that compounds: posts, tools and
+  talks that search engines, AI crawlers and people can find and cite years
+  later.
+
+A change that serves none of these is not worth making. A published post beats a
+perfect draft: ship it rather than polish it.
+
 ## Project structure
 
 ```
@@ -539,11 +563,13 @@ pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 ## Publishing a blog post
 
 `docs/publishing.md` is the whole flow, from "I want a blog post about X" to a
-live post: draft in Anton's voice (`docs/voice.md`, learned from the five oldest
-posts), a pull request with the post file and its `lib/data.ts` entry, review,
-merge, deploy, then `deno task publish:blog <slug>`. That script writes no file:
-it checks the post answers 200 live, creates the Dev.to draft and prints every
-channel's tagged link and the newsletter preview. Three hard rules:
+live post: a brief that judges the post as an SEO specialist, a marketer, a
+psychologist and a personal-brand adviser against the goals above, a draft in
+Anton's voice (`docs/voice.md`, learned from the five oldest posts), a pull
+request with the post file and its `lib/data.ts` entry, review, merge, deploy,
+then `deno task publish:blog <slug>`. That script writes no file: it checks the
+post answers 200 live, creates the Dev.to draft and prints every channel's
+tagged link and the newsletter preview. Three hard rules:
 
 - **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
   text per channel with its tagged link and show it in chat; Anton pastes it.
