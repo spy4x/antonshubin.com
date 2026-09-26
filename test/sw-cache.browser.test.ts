@@ -7,10 +7,12 @@
 // recognised". Only a real browser runs a service worker, so this drives
 // Chromium like the other test/*.browser.test.ts files.
 //
-// Each test lets the worker take control first: the page that registers it
-// is not controlled until the worker claims it, so the pages under test are
-// opened in a second tab of the same browser context, after
+// The first two tests let the worker take control first: the page that
+// registers it is not controlled until the worker claims it, so the pages
+// under test are opened in a second tab of the same browser context, after
 // `navigator.serviceWorker.ready`, whose navigations the worker intercepts.
+// The third checks the opposite: a page from test/browser.ts's `newPage()`
+// gets no service worker at all.
 //
 // Runs under `deno task test:browser` (its own -A task) — see AGENTS.md
 // "Browser-driven tests".
