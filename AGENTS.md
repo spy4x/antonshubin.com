@@ -581,7 +581,8 @@ page. Never retry a test on this error.
   worker replaces one that already controlled the page. A second test deploys a
   new worker by restarting the site on the same port with a new `BUILD_ID`
   (`startSite()`'s `port` option), and checks the "Reload" button still reloads
-  the page onto it.
+  the page onto it. A third does the same for a returning visitor, whose page a
+  worker already controls when the island mounts.
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`

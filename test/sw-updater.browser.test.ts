@@ -3,8 +3,10 @@
 // service worker taking control for the first time fires one too: the page
 // reloaded by itself a second after it opened, and a booking frame opened on
 // /contact-me in that second was gone. The first test is that first visit, with
-// service workers allowed. The second pins the reload the island exists for:
-// the "New version available" button still reloads onto the new worker.
+// service workers allowed. The other two pin the reload the island exists
+// for: the "New version available" button still reloads onto the new worker,
+// both during that first visit and for a returning visitor whose page a
+// worker already controls when it loads.
 //
 // Runs under `deno task test:browser` (its own -A task) — see AGENTS.md
 // "Browser-driven tests".
@@ -81,7 +83,13 @@ Deno.test("a first visit is never reloaded when the service worker takes control
   }
 });
 
-Deno.test("the update button still reloads the page onto the new service worker", async () => {
+/**
+ * Visits /contact-me until a worker controls it, deploys a new worker, clicks
+ * "Reload" and asserts the page reloads onto that worker. With `returning`,
+ * the page is reloaded once before the deploy, so the island mounts on a page
+ * a worker already controls, as it does for a returning visitor.
+ */
+async function assertUpdateButtonReloads(returning: boolean): Promise<void> {
   let site = await startSite({ env: { BUILD_ID: "first-deploy" } });
   const port = Number(new URL(site.origin).port);
   let browser: Browser | undefined;
@@ -99,6 +107,16 @@ Deno.test("the update button still reloads the page onto the new service worker"
       1,
       "the first visit reloaded, so the update below proves nothing",
     );
+    let expectedLoads = 2;
+    if (returning) {
+      await page.reload({ waitUntil: "load" });
+      assertEquals(
+        await page.evaluate(() => navigator.serviceWorker.controller !== null),
+        true,
+        "the returning visit must load already controlled",
+      );
+      expectedLoads = 3;
+    }
 
     // A deploy: same origin, new build id, so /sw.js changes and the
     // browser's update check installs a new worker next to the active one.
@@ -117,7 +135,7 @@ Deno.test("the update button still reloads the page onto the new service worker"
 
     assertEquals(
       loads,
-      2,
+      expectedLoads,
       "clicking the update button did not reload the page",
     );
     // The new worker's activation deletes every cache but its own, the
@@ -146,4 +164,12 @@ Deno.test("the update button still reloads the page onto the new service worker"
     await browser?.close();
     await site.stop();
   }
+}
+
+Deno.test("the update button still reloads the page onto the new service worker", async () => {
+  await assertUpdateButtonReloads(false);
+});
+
+Deno.test("a returning visitor's update button reloads onto the new service worker", async () => {
+  await assertUpdateButtonReloads(true);
 });
