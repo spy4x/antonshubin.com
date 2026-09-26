@@ -234,9 +234,9 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "preact-components will publish under the same @spy4x scope on JSR, as @spy4x/preact-*.",
+          "preact-components publishes under the same @spy4x scope on JSR, as @spy4x/preact-*.",
         href: "/tools/preact-components",
-        planned: true,
+        planned: false,
       },
       {
         text: "This site runs its env-file encryption on @spy4x/server.",
@@ -265,7 +265,7 @@ export const tools: Tool[] = [
       name: "JSR",
       url: "https://jsr.io/@spy4x",
       version: "0.1.0",
-      published: false,
+      published: true,
       install: "deno add jsr:@spy4x/preact-ui@0.1.0",
     },
     licence: "MIT",
@@ -315,9 +315,9 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "Will publish under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
+          "Publishes under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
         href: "/tools/ts-libs",
-        planned: true,
+        planned: false,
       },
       {
         text: "My SaaS template will import it once it is published.",
