@@ -173,7 +173,7 @@ async function umamiMetricSection(
 }
 
 export const fetchUmamiTopPagesSection = () =>
-  umamiMetricSection("Umami — top pages (7 days)", "url", "page");
+  umamiMetricSection("Umami — top pages (7 days)", "path", "page");
 
 export const fetchUmamiReferrersSection = () =>
   umamiMetricSection("Umami — top referrers (7 days)", "referrer", "referrer");
