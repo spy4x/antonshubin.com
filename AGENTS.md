@@ -17,16 +17,13 @@ In short, as of September 2026:
 - **Now: paid client work.** Buyers arrive from Upwork, referrals and LinkedIn.
   The site does not bring them; it closes them. A visitor should leave convinced
   that Anton is a senior full-stack engineer and tech lead they can trust with
-  money, and know how to book a call.
+  their project and budget, and know how to book a call.
 - **Next: his own products and the YouTube channel.** The open-source tools on
   `/tools` get one launch at a time; stars, issues and requests decide which
   gets product hours. Videos come from the week's real work.
-- **Long term: a public record of expertise** that compounds: posts, tools and
-  talks that search engines, AI crawlers and people can find and cite years
-  later.
-
-A change that serves none of these is not worth making. A published post beats a
-perfect draft: ship it rather than polish it.
+- **Personal brand** (Anton's request, 26 September 2026): every post should
+  build the reputation he sells on, so the posts add up to one recognisable body
+  of work instead of scattered pieces.
 
 ## Project structure
 

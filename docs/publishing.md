@@ -31,8 +31,10 @@ Anton's goals, not whether it is interesting.
   worth writing.
 - **Psychologist.** What makes this reader start, keep reading and trust the
   author? Open with the reader's problem or a concrete result, not with
-  background. Show proof through specifics: real numbers, code, screenshots,
-  what went wrong. Answer the reader's likely doubt before they raise it. No
+  background, then say what the post is and who it is for, as
+  [voice.md](voice.md) "How a post opens" describes. Show proof through
+  specifics: code, screenshots, what went wrong, and numbers under AGENTS.md
+  "Content rule" only. Answer the reader's likely doubt before they raise it. No
   fake urgency, invented scarcity, flattery or other manipulation: trust is the
   point, and one trick costs it.
 - **Personal-brand adviser.** Does the post make Anton look like what he sells:
@@ -46,10 +48,13 @@ The brief ends with a verdict. If the post serves no goal, or a different angle
 serves them clearly better, say so in chat and propose that angle before
 drafting; Anton decides. Otherwise the brief goes, in full, into the pull
 request body, and the reviewer checks the draft against it. The repository is
-public, so the brief names goals the way AGENTS.md does and never copies a
-number or a private detail from ai-memory. Where the harness has them, the
-`marketing-seo` and `psychologist` agents can read the finished draft against
-the brief before the pull request opens.
+public, and so is everything a post produces. The ai-memory files are for
+understanding the goals, never a source to quote: the brief, the post, the
+channel texts and the newsletter never copy a number or a private detail from
+them. A figure comes from Anton in the session (AGENTS.md "Content rule") or,
+for Upwork figures, from `lib/proof.ts` through `proof(id)`. Where the harness
+has them, the `marketing-seo` and `psychologist` agents can read the finished
+draft against the brief before the pull request opens.
 
 ## 1. Draft
 
@@ -113,11 +118,11 @@ The agent writes one text per channel in Anton's voice ([voice.md](voice.md)
   own link from `deno task links /blog/<slug> --content r-<subreddit>`;
 - a Hacker News title (`hn` link).
 
-Each text follows the brief from step 0: the reader it named, their problem in
-the first line, one concrete result from the post, and the tagged link. Write
-for the channel's own readers and rules: Reddit and Hacker News punish anything
-that reads as self-promotion, so lead there with what the reader learns. Skip a
-channel the brief ruled out, and say which and why.
+The brief from step 0 picks the reader and the one result each text carries;
+[voice.md](voice.md) "Channel texts" decides each channel's shape and how it
+opens. Reddit and Hacker News punish anything that reads as self-promotion, so
+the result there is what the reader learns, not what Anton did. Skip a channel
+the brief ruled out, and say which and why.
 
 It shows them in chat and stops there. The texts are not saved to a file: the
 links can be printed again any time with `deno task links`.
