@@ -37,7 +37,7 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 /** Starts a stub "mig" server whose `/embed` page posts `mig:height`
  * messages to `window.parent`, and whose `/spoof.html` page posts one that
@@ -107,7 +107,7 @@ Deno.test("the booking iframe resizes to the height mig's stub reports", async (
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
@@ -176,7 +176,7 @@ Deno.test("the booking iframe takes the height from mig's first and only message
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
@@ -241,7 +241,7 @@ Deno.test("the listener ignores a message whose origin is spoofed but whose sour
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
@@ -303,7 +303,7 @@ Deno.test("a same-origin message from a different window never resizes the ifram
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",

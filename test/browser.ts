@@ -5,7 +5,7 @@
 // cites it too). See AGENTS.md "Browser-driven tests" for why these tests need
 // Chromium and their own `-A` task instead of the plain `deno task test` glob.
 import { chromium } from "playwright";
-import type { Browser } from "playwright";
+import type { Browser, BrowserContextOptions, Page } from "playwright";
 
 /**
  * Must match the `"playwright"` entry in deno.json's import map and the
@@ -38,4 +38,20 @@ export async function launchChromium(): Promise<Browser> {
       { cause },
     );
   }
+}
+
+/**
+ * Opens a page with service workers blocked. The site registers
+ * `/sw.js` on every page, and once that worker takes control
+ * islands/SWUpdater.tsx reloads the page — on a busy machine that reload
+ * lands mid-test, and the next `page.evaluate` fails with "Execution
+ * context was destroyed" (#219). Every browser test that isn't about the
+ * service worker opens its pages through this; test/sw-cache.browser.test.ts
+ * is, and uses `browser.newContext()` directly.
+ */
+export function newPage(
+  browser: Browser,
+  options: BrowserContextOptions = {},
+): Promise<Page> {
+  return browser.newPage({ ...options, serviceWorkers: "block" });
 }

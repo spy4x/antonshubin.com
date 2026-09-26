@@ -31,7 +31,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { type Site, startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
 
 // RFC 2606 reserved hosts: a real DNS lookup for these either fails or hits
@@ -123,7 +123,7 @@ Deno.test("no CSP violations on any static page or representative dynamic page",
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await registerViolationListener(page);
       // /no-such-page matches no sitemap entry and no route — see #177
@@ -161,7 +161,7 @@ Deno.test("the mobile menu still hydrates on an unmatched URL", async () => {
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    const page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
       await registerViolationListener(page);
       await page.goto(`${site.origin}/no-such-page`, {
@@ -190,7 +190,7 @@ Deno.test("the booking facade's iframe loads without a CSP violation", async () 
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await registerViolationListener(page);
       await page.goto(`${site.origin}/contact-me`, {
@@ -234,7 +234,7 @@ Deno.test("a signed unsubscribe link loads and its form submits without a CSP vi
     let browser: Browser | undefined;
     try {
       browser = await launchChromium();
-      const page = await browser.newPage();
+      const page = await newPage(browser);
       try {
         await registerViolationListener(page);
         const token = await createUnsubscribeToken(email, TEST_SECRET);
@@ -266,7 +266,7 @@ Deno.test("negative controls: an unnonced inline script is blocked and reported,
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       await registerViolationListener(page);
       await page.goto(site.origin, { waitUntil: "networkidle" });

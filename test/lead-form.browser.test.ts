@@ -13,7 +13,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page, Route } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 const FOCUS_TIMEOUT_MS = 5000;
 // Longer than the panels' 500ms CSS transition, so the scroll sampler below
@@ -104,7 +104,7 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
     // Default 1280x720 viewport, deliberately not overridden: it's one of
     // the two sizes (the other being 390x844) confirmed to reproduce the
     // scroll jump against an unfixed heading focus.
-    const page: Page = await browser.newPage();
+    const page: Page = await newPage(browser);
     try {
       await page.route(
         "**/api/lead",
