@@ -27,7 +27,7 @@ export interface NavLinkGroup {
   links: { href: string; label: string }[];
 }
 
-const WORK: NavItem = { href: "/projects", label: "Work", icon: "work" };
+const WORK: NavItem = { href: "/work", label: "Work", icon: "work" };
 const SERVICES: NavItem = {
   href: "/catalog",
   label: "Services",

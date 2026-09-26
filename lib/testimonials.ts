@@ -14,7 +14,7 @@ import { type Project, projects } from "./data.ts";
  * the project's `madeForName`/`madeForURL` (`components/ReviewSource.tsx`),
  * replacing the no-name rule recorded on #186.
  *
- * A project page (`routes/projects/[slug].tsx`) shows every visible review
+ * A project page (`routes/work/[slug].tsx`) shows every visible review
  * of its project in full; the home page shows the excerpts listed in
  * `homeTestimonialIds`.
  */
@@ -362,7 +362,7 @@ function shortTitle(p: Project): string {
 }
 
 /**
- * The repeat-clients line on /projects, worded as Anton approved it on 26 Sep
+ * The repeat-clients line on /work, worded as Anton approved it on 26 Sep
  * (#232), with every count and name read from `repeatClients()`.
  */
 export function repeatClientsLine(r: RepeatClients = repeatClients()): string {

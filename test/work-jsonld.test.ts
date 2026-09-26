@@ -1,4 +1,4 @@
-// Guards the project JSON-LD added for issue #167: every /projects/<slug>
+// Guards the project JSON-LD added for issue #167: every /work/<slug>
 // page must carry exactly one project node (SoftwareSourceCode when the
 // project has a repo, CreativeWork otherwise) whose author points at the
 // site-wide Person node.
@@ -20,7 +20,7 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   });
 }
 
-// A project without a `slug` has no /projects/<slug> route (e.g. an entry
+// A project without a `slug` has no /work/<slug> route (e.g. an entry
 // only shown inline, like "YouTube Tech Channel" or "The Seed") — skip it.
 const allProjects = [...projects.my, ...projects.freelance].filter((p) =>
   p.slug
@@ -52,7 +52,7 @@ siteTest(
     assert(allProjects.length > 0, "no project has a slug to test");
 
     for (const project of allProjects) {
-      const html = await site.html(`/projects/${project.slug}`);
+      const html = await site.html(`/work/${project.slug}`);
       const blocks = jsonLd(html);
       const projectNodes = blocks.filter((d) => {
         const type = (d as { "@type"?: string })["@type"];
@@ -61,7 +61,7 @@ siteTest(
       assertEquals(
         projectNodes.length,
         1,
-        `/projects/${project.slug}: expected exactly one project JSON-LD node`,
+        `/work/${project.slug}: expected exactly one project JSON-LD node`,
       );
 
       const node = projectNodes[0] as {
@@ -84,21 +84,21 @@ siteTest(
       assertEquals(node.name, project.title, project.slug);
       assert(
         /^https:\/\//.test(node.url),
-        `/projects/${project.slug}: url is not absolute (${node.url})`,
+        `/work/${project.slug}: url is not absolute (${node.url})`,
       );
 
       // madeForName is mostly a person, not an organization — see the doc
-      // comment on projectJsonLd() in routes/projects/[slug].tsx.
+      // comment on projectJsonLd() in routes/work/[slug].tsx.
       assertEquals(
         node.sourceOrganization,
         undefined,
-        `/projects/${project.slug}: must not invent a sourceOrganization`,
+        `/work/${project.slug}: must not invent a sourceOrganization`,
       );
 
       for (const url of node.image ?? []) {
         assert(
           url.startsWith("https://"),
-          `/projects/${project.slug}: image URL is not absolute (${url})`,
+          `/work/${project.slug}: image URL is not absolute (${url})`,
         );
       }
 
@@ -123,7 +123,7 @@ siteTest(
       project.externalURL && project.externalURLDead,
       "fixture project is no longer externalURLDead — pick another slug",
     );
-    const html = await site.html(`/projects/${project.slug}`);
+    const html = await site.html(`/work/${project.slug}`);
     const node = findProjectNode(jsonLd(html));
     assert(node, "no project JSON-LD node found");
     assertEquals(node.sameAs, undefined, project.slug);
@@ -134,7 +134,7 @@ siteTest(
   "a project page's JSON-LD carries the required schema.org fields",
   async (site) => {
     const project = allProjects.find((p) => p.slug === "smartlite")!;
-    const html = await site.html(`/projects/${project.slug}`);
+    const html = await site.html(`/work/${project.slug}`);
     const node = findProjectNode(jsonLd(html));
     assert(node, "no project JSON-LD node found");
     const record = node as unknown as Record<string, unknown>;
@@ -170,7 +170,7 @@ siteTest(
   async (site) => {
     let checked = 0;
     for (const project of projects.freelance) {
-      const html = await site.html(`/projects/${project.slug}`);
+      const html = await site.html(`/work/${project.slug}`);
       const node = findProjectNode(jsonLd(html));
       assert(node, `${project.slug}: no project JSON-LD node found`);
       assertEquals(

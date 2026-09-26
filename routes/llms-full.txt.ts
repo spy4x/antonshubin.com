@@ -77,7 +77,7 @@ export const handler = define.handlers({
     // server, a revival, a production URL) a bare description often doesn't.
     const openSourceList = openSourceProjects()
       .map((p) =>
-        `- **${p.title}** (${BASE_URL}/projects/${p.slug}) — ${
+        `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
           withOutcome(p.description, p.outcome)
         }`
       )
@@ -89,7 +89,7 @@ export const handler = define.handlers({
     const clientList = highlightSlugs
       .map((slug) => {
         const p = clientProject(slug);
-        return `- **${p.title}** (${BASE_URL}/projects/${p.slug}) — ${
+        return `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
           clientSummary(p)
         }`;
       })
@@ -102,7 +102,7 @@ export const handler = define.handlers({
         const company = p.companyOutcome
           ? ` The company's outcome: ${p.companyOutcome.text} (${p.companyOutcome.href}).`
           : "";
-        return `- **${p.title}** (${BASE_URL}/projects/${p.slug}) — ${
+        return `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
           formatPeriod(p.period!)
         }, ${p.role}. ${firstSentence(p.description)}${company}`;
       })
@@ -180,7 +180,7 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 ${catalogList}
 - **How I Work:** ${BASE_URL}/how-i-work — Five promises, pricing, and FAQ
 - **Contact:** ${BASE_URL}/contact-me — Book a call, email, or Telegram
-- **Projects:** ${BASE_URL}/projects — Client work and open-source
+- **Work:** ${BASE_URL}/work — Client work: highlights first, then the archive
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **Production Infrastructure:** ${BASE_URL}/infrastructure — Operational proof: deployable, observable, recoverable, and transferable systems. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 - **Blog:** ${BASE_URL}/blog — Technical articles

@@ -62,7 +62,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
     browser = await launchChromium();
     const page: Page = await newPage(browser);
     try {
-      await page.goto(`${site.origin}/projects/calltrack`, {
+      await page.goto(`${site.origin}/work/calltrack`, {
         waitUntil: "networkidle",
       });
 
@@ -134,7 +134,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
     browser = await launchChromium();
     const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
-      await page.goto(`${site.origin}/projects/smartlite`, {
+      await page.goto(`${site.origin}/work/smartlite`, {
         waitUntil: "networkidle",
       });
       const counter = page.locator("[data-gallery-counter]");
@@ -204,7 +204,7 @@ Deno.test("a portrait gallery's Next walks to the last screenshot and Previous w
     const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
       // Roley: nine phone screenshots, several in view at once at 1440px.
-      await page.goto(`${site.origin}/projects/roley`, {
+      await page.goto(`${site.origin}/work/roley`, {
         waitUntil: "networkidle",
       });
       const next = page.getByRole("button", { name: "Next screenshot" });
@@ -237,7 +237,7 @@ Deno.test("a gallery that fits without scrolling offers no Next or Previous", as
     const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
       // Connectful: three phone screenshots, all in view at 1440px.
-      await page.goto(`${site.origin}/projects/connectful`, {
+      await page.goto(`${site.origin}/work/connectful`, {
         waitUntil: "networkidle",
       });
       const overflow = await page.locator("[data-gallery-strip]").evaluate(
@@ -272,8 +272,8 @@ Deno.test("the six sample project pages have no horizontal scroll and no axe vio
       const page: Page = await newPage(browser, { viewport });
       try {
         for (const slug of SAMPLE_PROJECTS) {
-          const where = `/projects/${slug} at ${viewport.width}px`;
-          await page.goto(`${site.origin}/projects/${slug}`, {
+          const where = `/work/${slug} at ${viewport.width}px`;
+          await page.goto(`${site.origin}/work/${slug}`, {
             waitUntil: "networkidle",
           });
           const scrollWidth = await page.evaluate(() =>

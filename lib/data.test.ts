@@ -108,7 +108,7 @@ Deno.test("every client project maps to a real catalog item, except the two fron
   }
 });
 
-Deno.test("More work ranks by shared tags, then by the /projects order, and never lists the page itself", () => {
+Deno.test("More work ranks by shared tags, then by the /work order, and never lists the page itself", () => {
   const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!;
   // Roley and DareChat share four tags each; Roley is the earlier highlight.
   // Corecircle and Sogroya share one each; Corecircle is a highlight.

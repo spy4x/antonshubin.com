@@ -87,7 +87,7 @@ function humanize(slug: string): string {
  *
  * Href values are WITHOUT trailing slashes (e.g. "/blog" not "/blog/").
  * A [slug] route 404s when the path ends in a trailing slash
- * (e.g. /projects/smartlite/ 404s, /projects/smartlite is 200), so
+ * (e.g. /work/smartlite/ 404s, /work/smartlite is 200), so
  * canonical values, breadcrumb hrefs and sitemap loc values are all
  * written without a trailing slash. The root "/" is the only exception
  * (kept for correctness).

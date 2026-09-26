@@ -61,7 +61,7 @@ Deno.test("every client project line in both llms files carries its period", asy
       let checked = 0;
       for (const p of projects.freelance) {
         const line = lines.find((l) =>
-          l.startsWith("- ") && l.includes(`/projects/${p.slug})`)
+          l.startsWith("- ") && l.includes(`/work/${p.slug})`)
         );
         if (!line) continue;
         checked++;

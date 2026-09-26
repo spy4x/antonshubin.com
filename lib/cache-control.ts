@@ -10,7 +10,7 @@ export const CORE_PAGES = new Set([
   "/infrastructure",
   "/contact-me",
   "/blog",
-  "/projects",
+  "/work",
   "/tools",
   "/catalog",
   "/pay",

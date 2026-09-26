@@ -3,25 +3,18 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
-import {
-  archiveProjects,
-  formatPeriod,
-  highlightProjects,
-  type Project,
-  projects,
-} from "../../lib/data.ts";
+import { formatPeriod, type Project } from "../../lib/data.ts";
 import { firstSentence } from "../../lib/llms.ts";
+import { repeatClientsLine } from "../../lib/testimonials.ts";
 import {
-  projectTestimonials,
-  repeatClientsLine,
-} from "../../lib/testimonials.ts";
+  type ArchiveEntry,
+  clientWork,
+  WORK_PATH,
+  workHref,
+} from "../../lib/work.ts";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
 import { ReviewSource } from "../../components/ReviewSource.tsx";
-import {
-  ArchiveIcon,
-  BriefcaseIcon,
-  WrenchIcon,
-} from "../../components/Icons.tsx";
+import { ArchiveIcon, BriefcaseIcon } from "../../components/Icons.tsx";
 import StatusMark from "../../components/StatusMark.tsx";
 import GhStars from "../../islands/GhStars.tsx";
 
@@ -47,7 +40,7 @@ function ProjectCard({
 }) {
   const Wrapper = project.slug || project.externalURL ? "a" : "div";
   const href = project.slug
-    ? `/projects/${project.slug}`
+    ? workHref(project.slug)
     : project.externalURL || undefined;
   const opensInNewTab = !!(project.externalURL && !project.slug);
   const hasLogo = !!project.logoImageURL;
@@ -159,8 +152,8 @@ function ProjectCard({
  * first contract's review excerpt if the project has one, the company's own
  * later outcome if recorded, and a link to the project page.
  */
-function ArchiveRow({ project }: { project: Project }) {
-  const review = projectTestimonials(project.slug ?? "")[0];
+function ArchiveRow({ entry }: { entry: ArchiveEntry }) {
+  const { project, review } = entry;
   return (
     <li
       data-archive-row={project.slug}
@@ -209,7 +202,7 @@ function ArchiveRow({ project }: { project: Project }) {
         </p>
       )}
       <a
-        href={`/projects/${project.slug}`}
+        href={workHref(project.slug ?? "")}
         class="mt-3 inline-flex items-center gap-1 text-sm text-accent hover:text-accent font-semibold"
       >
         View details<span class="sr-only">: {project.title}</span>
@@ -218,33 +211,27 @@ function ArchiveRow({ project }: { project: Project }) {
   );
 }
 
-export default define.page(function Projects(ctx) {
-  const activeProjects = projects.my.filter((p) => !p.archived);
+export default define.page(function Work(ctx) {
   head.value = {
     ...head.value,
-    title: "Projects — Anton Shubin",
+    title: "Work — Anton Shubin",
+    pageName: "Work",
     description:
-      "Client work, open-source products, and production infrastructure proof by Anton Shubin.",
-    canonical: "https://antonshubin.com/projects",
+      "Client work by Anton Shubin: highlights first, then the archive, with each client's review.",
+    canonical: `https://antonshubin.com${WORK_PATH}`,
     ogType: "website",
   };
-  // highlightProjects() throws on a typo, so a bad slug fails loudly.
-  const clientProjects = highlightProjects();
-  const archive = archiveProjects();
-  // Retired tools of my own: never client work, so never in the archive.
-  const archivedTools = projects.my.filter((p) => p.archived);
-  const hasAny = activeProjects.length > 0 || archive.length > 0 ||
-    clientProjects.length > 0;
+  // clientWork() throws on a highlightSlugs typo, so a bad slug fails loudly.
+  const { highlights, archive } = clientWork();
+  const breadcrumb = getBreadcrumb(head.value.canonical, "Work");
 
-  if (!hasAny) {
+  if (highlights.length === 0 && archive.length === 0) {
     return (
       <Layout currentPath={ctx.url.pathname}>
         <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
           <SEOHead />
-          <Breadcrumb
-            items={getBreadcrumb(head.value.canonical, head.value.title)}
-          />
-          <h1 class="text-3xl font-bold text-parchment mb-4">Projects</h1>
+          <Breadcrumb items={breadcrumb} />
+          <h1 class="text-3xl font-bold text-parchment mb-4">Work</h1>
           <p class="text-graphite">No projects to display yet.</p>
         </div>
       </Layout>
@@ -254,16 +241,14 @@ export default define.page(function Projects(ctx) {
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
-      <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
-      />
+      <Breadcrumb items={breadcrumb} />
       <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <h1 class="text-3xl sm:text-4xl font-bold text-parchment mb-2">
-          Projects
+          Work
         </h1>
         <p class="text-graphite mb-10 sm:mb-12 text-base sm:text-lg">
-          Client work first, then my open-source tools. How I run things in
-          production is on the{" "}
+          Client work, highlights first. How I run things in production is on
+          the{" "}
           <a
             href="/infrastructure"
             class="text-accent hover:text-accent underline underline-offset-4"
@@ -277,13 +262,13 @@ export default define.page(function Projects(ctx) {
           {repeatClientsLine()}
         </p>
 
-        {clientProjects.length > 0 && (
+        {highlights.length > 0 && (
           <section data-projects-section="highlights">
             <h2 class="text-xl font-semibold text-parchment mb-6 flex items-center gap-2">
               <BriefcaseIcon class="w-5 h-5 text-accent" /> Highlights
             </h2>
             <div class="grid gap-6 md:grid-cols-2 mb-16">
-              {clientProjects.map((project) => (
+              {highlights.map((project) => (
                 <ProjectCard
                   key={project.title}
                   project={project}
@@ -300,51 +285,11 @@ export default define.page(function Projects(ctx) {
               <ArchiveIcon class="w-5 h-5 text-graphite" /> Archive
             </h2>
             <ul class="border-y border-rule">
-              {archive.map((project) => (
-                <ArchiveRow key={project.slug} project={project} />
+              {archive.map((entry) => (
+                <ArchiveRow key={entry.project.slug} entry={entry} />
               ))}
             </ul>
           </section>
-        )}
-
-        {activeProjects.length > 0 && (
-          <>
-            <h2 class="text-xl font-semibold text-parchment mb-6 flex items-center gap-2">
-              <WrenchIcon class="w-5 h-5 text-accent" /> Open-source tools
-            </h2>
-            <div class="grid gap-6 md:grid-cols-2 mb-16">
-              {activeProjects.map((project) => (
-                <ProjectCard
-                  key={project.title}
-                  project={project}
-                />
-              ))}
-            </div>
-          </>
-        )}
-
-        {archivedTools.length > 0 && (
-          <p data-archived-tools class="text-graphite leading-relaxed mb-10">
-            Archived tools: {archivedTools.map((project, i) => {
-              const href = project.slug
-                ? `/projects/${project.slug}`
-                : project.externalURL;
-              return (
-                <span key={project.title}>
-                  {i > 0 && " · "}
-                  <a
-                    href={href}
-                    target={project.slug ? undefined : "_blank"}
-                    rel={project.slug ? undefined : "noopener noreferrer"}
-                    class="text-accent hover:text-accent underline underline-offset-4"
-                  >
-                    {project.title}
-                    {!project.slug && <NewTabHint />}
-                  </a>
-                </span>
-              );
-            })}
-          </p>
         )}
       </div>
     </Layout>

@@ -51,7 +51,7 @@ function Fact(
 
 const linkClass = "text-accent underline underline-offset-4";
 
-// An unknown slug answers a real 404, like /projects/<slug>, so a removed
+// An unknown slug answers a real 404, like /work/<slug>, so a removed
 // tool page drops out of search instead of indexing an empty 200.
 export const handler = define.handlers({
   GET(ctx) {

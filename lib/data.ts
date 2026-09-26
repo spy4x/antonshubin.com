@@ -52,7 +52,7 @@ export interface Project {
   period?: Period;
   /**
    * Something the client company achieved later, without Anton: shown on the
-   * project's /projects archive row, worded as the company's outcome.
+   * project's /work archive row, worded as the company's outcome.
    */
   companyOutcome?: { text: string; href: string };
   /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
@@ -651,7 +651,7 @@ export const projects = {
 };
 
 /**
- * The client projects a buyer sees first, in the order /projects shows them;
+ * The client projects a buyer sees first, in the order /work shows them;
  * the home page's work cards take the first three and llms.txt the first two.
  *
  * The rule (#232): a project is a highlight when it is from 2018 or later and
@@ -952,7 +952,7 @@ export function projectScreenshots(
 
 /**
  * Other client projects to show under "More work" on a project page: ranked
- * by how many `tags` they share with `project`, with the /projects order
+ * by how many `tags` they share with `project`, with the /work order
  * (the highlights, then the archive) breaking ties. `project` itself is
  * never in the list.
  */

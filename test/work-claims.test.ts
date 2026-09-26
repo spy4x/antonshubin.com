@@ -49,7 +49,7 @@ const EXTRA_PATHS = [
 
 const projectPaths = [...projects.my, ...projects.freelance]
   .filter((p) => p.slug)
-  .map((p) => `/projects/${p.slug}`);
+  .map((p) => `/work/${p.slug}`);
 
 const blogPaths = blogArticles.map((a) => `/blog/${a.slug}`);
 
@@ -79,7 +79,7 @@ siteTest(
       "no /catalog/<slug> page is in the guard's page set",
     );
     assert(
-      paths.includes("/projects/todoapp-caldav"),
+      paths.includes("/work/todoapp-caldav"),
       "the caldav project page is missing from the guard's page set",
     );
   },

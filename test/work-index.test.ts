@@ -1,4 +1,4 @@
-// #232: /projects splits client work into Highlights and Archive, the home
+// #232: /work splits client work into Highlights and Archive, the home
 // page's work cards take the first three highlights, and every card or row
 // shows its period. Also guards what #231 (#239) added without a test: the
 // margin notes on the FoodRazor, Corecircle and Sogroya pages. Checked on the
@@ -26,10 +26,10 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   });
 }
 
-/** The HTML of one `data-projects-section` on /projects; throws when it is missing. */
+/** The HTML of one `data-projects-section` on /work; throws when it is missing. */
 function section(html: string, name: string): string {
   const start = html.indexOf(`data-projects-section="${name}"`);
-  assert(start > 0, `/projects has no ${name} section`);
+  assert(start > 0, `/work has no ${name} section`);
   return html.slice(start, html.indexOf("</section>", start));
 }
 
@@ -47,9 +47,9 @@ function chunks(html: string, attr: string): Map<string, string> {
 }
 
 siteTest(
-  "/projects lists every client project once, in Highlights or Archive, and no tool",
+  "/work lists every client project once, in Highlights or Archive, and no tool",
   async (site) => {
-    const html = await site.html("/projects");
+    const html = await site.html("/work");
     const highlights = attrValues(
       section(html, "highlights"),
       "data-highlight",
@@ -72,16 +72,39 @@ siteTest(
 );
 
 siteTest(
-  "every /projects highlight card and archive row shows its project's period",
+  "/work links no tool page and no channel, only client work",
   async (site) => {
-    const html = await site.html("/projects");
+    const html = await site.html("/work");
+    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    assert(main.length > 0, "/work has no <main>");
+    for (const p of projects.my) {
+      if (p.slug) {
+        assert(
+          !main.includes(`href="/work/${p.slug}"`),
+          `/work links tool page ${p.slug}`,
+        );
+      }
+      if (p.externalURL) {
+        assert(
+          !main.includes(`href="${p.externalURL}"`),
+          `/work links ${p.title} (${p.externalURL})`,
+        );
+      }
+    }
+  },
+);
+
+siteTest(
+  "every /work highlight card and archive row shows its project's period",
+  async (site) => {
+    const html = await site.html("/work");
     const cards = new Map([
       ...chunks(section(html, "highlights"), "data-highlight"),
       ...chunks(section(html, "archive"), "data-archive-row"),
     ]);
     for (const p of projects.freelance) {
       const chunk = cards.get(p.slug!);
-      assert(chunk, `/projects has no card or row for ${p.slug}`);
+      assert(chunk, `/work has no card or row for ${p.slug}`);
       assert(
         /data-project-period/.test(chunk) &&
           visibleText(chunk).includes(formatPeriod(p.period!)),
@@ -95,7 +118,7 @@ siteTest(
   "each archive row shows its role, its first review excerpt with its source link, and links its page",
   async (site) => {
     const rows = chunks(
-      section(await site.html("/projects"), "archive"),
+      section(await site.html("/work"), "archive"),
       "data-archive-row",
     );
     let excerpts = 0;
@@ -104,7 +127,7 @@ siteTest(
       const text = visibleText(row);
       assert(text.includes(p.role!), `${p.slug}'s row lacks its role`);
       assert(
-        row.includes(`href="/projects/${p.slug}"`),
+        row.includes(`href="/work/${p.slug}"`),
         `${p.slug}'s row does not link its page`,
       );
       const review = projectTestimonials(p.slug!)[0];
@@ -131,7 +154,7 @@ siteTest(
   "Sajari's archive row links Algolia's acquisition as the company's outcome",
   async (site) => {
     const rows = chunks(
-      section(await site.html("/projects"), "archive"),
+      section(await site.html("/work"), "archive"),
       "data-archive-row",
     );
     const row = rows.get("sajari")!;
@@ -151,8 +174,8 @@ siteTest(
   },
 );
 
-siteTest("/projects shows the repeat-clients line", async (site) => {
-  const html = await site.html("/projects");
+siteTest("/work shows the repeat-clients line", async (site) => {
+  const html = await site.html("/work");
   const start = html.indexOf("data-repeat-clients");
   assert(start > 0, "no repeat-clients line");
   assert(
@@ -195,10 +218,10 @@ siteTest(
       sogroya: "sogroya-live",
     };
     for (const [slug, id] of Object.entries(expected)) {
-      const html = await site.html(`/projects/${slug}`);
+      const html = await site.html(`/work/${slug}`);
       assert(
         html.includes(`data-note-ref="${id}"`),
-        `/projects/${slug} lacks margin note ${id}`,
+        `/work/${slug} lacks margin note ${id}`,
       );
     }
   },
@@ -220,20 +243,20 @@ siteTest(
       all.filter((p) => p.logoPlate).map((p) => p.slug).sort(),
       ["roley", "sogroya"],
     );
-    const list = await site.html("/projects");
+    const list = await site.html("/work");
     for (const p of all) {
       if (!p.logoImageURL) continue;
-      const pages = [["/projects", list]];
+      const pages = [["/work", list]];
       if (p.slug) {
         pages.push([
-          `/projects/${p.slug}`,
-          await site.html(`/projects/${p.slug}`),
+          `/work/${p.slug}`,
+          await site.html(`/work/${p.slug}`),
         ]);
       }
       for (const [path, html] of pages) {
         const cls = imgClass(html, p.logoImageURL);
-        // Archive rows on /projects show no logo; a project page always does.
-        if (cls === undefined && path === "/projects") continue;
+        // Archive rows on /work show no logo; a project page always does.
+        if (cls === undefined && path === "/work") continue;
         assert(cls !== undefined, `${p.slug} page renders no logo`);
         const onPlate = cls.split(" ").includes("bg-parchment");
         assertEquals(
@@ -243,7 +266,7 @@ siteTest(
         );
       }
     }
-    // Roley is a Highlight, so its /projects card must have been checked too.
+    // Roley is a Highlight, so its /work card must have been checked too.
     assert(
       imgClass(list, "/img/projects/roley/logo.svg")?.includes("bg-parchment"),
     );

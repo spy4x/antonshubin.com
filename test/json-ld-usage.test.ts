@@ -7,7 +7,7 @@
 // variable, not some other shape this scan doesn't recognise. A mismatch
 // between the two counts, or a captured token that isn't `toJsonLd(`, fails
 // the test rather than silently checking fewer blocks than actually exist
-// (see test/rendered.test.ts and test/projects-claims.test.ts for why a
+// (see test/rendered.test.ts and test/work-claims.test.ts for why a
 // page-based gap is real: /pay needed a hand-written entry there because
 // it's noindex and not in the sitemap loop).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
