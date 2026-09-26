@@ -264,9 +264,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "0.1.0",
+      version: "0.1.1",
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@0.1.0",
+      install: "deno add jsr:@spy4x/preact-ui@0.1.1",
     },
     licence: "MIT",
     runtime:
@@ -321,7 +321,7 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "My SaaS template pins four @spy4x/preact-* packages and takes its useUrlFilters hook from @spy4x/preact-signals.",
+          "My SaaS template builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
         href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
         planned: false,
       },
