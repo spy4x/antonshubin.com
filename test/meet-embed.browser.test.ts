@@ -164,9 +164,10 @@ Deno.test("the booking iframe resizes to the height mig's stub reports", async (
 // that loaded first had its only message dropped and stayed at the 760px
 // fallback. The stub here posts exactly one message, as early as it can.
 // `requestAnimationFrame` is held back on this page so a paint-deferred effect
-// runs on Preact's 100ms fallback timer instead, well after a frame served from
-// 127.0.0.1 has loaded: that makes a late listener lose the race every time,
-// not only in a slow engine.
+// runs on Preact's 35ms fallback timer instead. On an idle machine the stub's
+// message arrives 16-20ms after the frame is inserted, so a late listener loses
+// the race by about 15ms. Keep the stub posting as early as it can: a delay of
+// 15ms or more would let the old late-listener code pass.
 Deno.test("the booking iframe takes the height from mig's first and only message", async () => {
   const stub = startStubMig();
   const site = await startSite({
