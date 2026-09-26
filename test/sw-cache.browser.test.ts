@@ -151,7 +151,8 @@ Deno.test("a no-store response already in the cache is never served from it", as
 Deno.test("a page from newPage() never gets a service worker, so SWUpdater can't reload it mid-test", async () => {
   // Every other browser test opens its pages through newPage(). With the
   // worker allowed, it activates within a second on the first page, claims
-  // it, and islands/SWUpdater.tsx reloads the page (#219).
+  // it, and islands/SWUpdater.tsx used to reload the page then (#219, until
+  // #259).
   const site = await startSite();
   let browser: Browser | undefined;
   try {

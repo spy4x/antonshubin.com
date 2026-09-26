@@ -34,9 +34,17 @@ export default function SWUpdater() {
       console.error("[SW] registration failed:", err);
     });
 
-    // When a new SW takes over, reload the page
+    // Reload only when a new worker replaces one that already controlled the
+    // page, which is the update the button asks for. On a first visit no
+    // worker controls the page, and the first one taking control is no
+    // update: reloading then drops whatever the visitor opened (#259).
+    let controlled = navigator.serviceWorker.controller !== null;
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      globalThis.location.reload();
+      if (controlled) {
+        globalThis.location.reload();
+        return;
+      }
+      controlled = true;
     });
   }, []);
 
