@@ -49,7 +49,7 @@ Deno.test("every POST route answers 413 to an over-cap body, streamed or not", a
           method: "POST",
           headers: {
             "content-type": type,
-            "x-forwarded-for": `198.51.100.${i + 1}`,
+            "x-real-ip": `198.51.100.${i + 1}`,
           },
           body,
         });

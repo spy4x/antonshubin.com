@@ -20,14 +20,15 @@ Deno.test("refuses with 400 an address no mail can reach, and still accepts a va
     try {
       // A lone surrogate, which the unsubscribe codec refuses to sign, and a
       // control character, which no mail header can carry. Distinct
-      // x-forwarded-for values keep the per-IP rate limit out of the way.
+      // x-real-ip values (standing in for Traefik) keep the per-client rate
+      // limit out of the way.
       const bad = ["\ud800x@example.com", "a\u0001b@example.com"];
       for (const [i, email] of bad.entries()) {
         const res = await site.get("/api/subscribe", {
           method: "POST",
           headers: {
             "content-type": "application/json",
-            "x-forwarded-for": `192.0.2.${i + 1}`,
+            "x-real-ip": `192.0.2.${i + 1}`,
           },
           body: JSON.stringify({ email }),
         });
@@ -42,7 +43,7 @@ Deno.test("refuses with 400 an address no mail can reach, and still accepts a va
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-forwarded-for": "192.0.2.99",
+          "x-real-ip": "192.0.2.99",
         },
         body: JSON.stringify({ email: "Reader@Example.com" }),
       });
@@ -73,14 +74,15 @@ Deno.test("both routes answer 400 to an address with a display name, and store n
       },
     });
     try {
-      // Distinct x-forwarded-for values keep the per-IP rate limit away.
+      // Distinct x-real-ip values (standing in for Traefik) keep the per-client
+      // rate limit away.
       let ip = 0;
       const post = (path: string, body: string) =>
         site.get(path, {
           method: "POST",
           headers: {
             "content-type": "application/json",
-            "x-forwarded-for": `198.51.100.${++ip}`,
+            "x-real-ip": `198.51.100.${++ip}`,
           },
           body,
         });
@@ -128,7 +130,7 @@ Deno.test("both routes answer 400 to a JSON null body, and store nothing", async
           method: "POST",
           headers: {
             "content-type": "application/json",
-            "x-forwarded-for": `203.0.113.${i + 1}`,
+            "x-real-ip": `203.0.113.${i + 1}`,
           },
           body: "null",
         });
