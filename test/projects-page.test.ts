@@ -228,7 +228,9 @@ siteTest(
       }
       for (const [path, html] of pages) {
         const cls = imgClass(html, p.logoImageURL);
-        if (cls === undefined) continue;
+        // Archive rows on /projects show no logo; a project page always does.
+        if (cls === undefined && path === "/projects") continue;
+        assert(cls !== undefined, `${p.slug} page renders no logo`);
         const onPlate = cls.split(" ").includes("bg-parchment");
         assertEquals(
           onPlate,
@@ -237,7 +239,7 @@ siteTest(
         );
       }
     }
-    // Roley is a Highlight, so both of its logos must have been checked.
+    // Roley is a Highlight, so its /projects card must have been checked too.
     assert(
       imgClass(list, "/img/projects/roley/logo.svg")?.includes("bg-parchment"),
     );
