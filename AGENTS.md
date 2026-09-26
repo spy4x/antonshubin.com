@@ -503,6 +503,17 @@ Playwright's version must match exactly across `deno.json`'s import map,
 nine call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
+Two rules keep them stable on a busy machine (#219). Open a page with
+`test/browser.ts`'s `newPage(browser, options)`, never `browser.newPage()`: it
+blocks service workers, because the site's worker takes control on the first
+page and `islands/SWUpdater.tsx` then reloads it, which lands mid-test and fails
+the next `page.evaluate` with "Execution context was destroyed". Only
+`test/sw-cache.browser.test.ts`, which is about the worker, opens a context
+without it. And when a click or a submit navigates, wait for that navigation
+itself (`Promise.all([page.waitForNavigation(), click])` or `page.waitForURL`)
+instead of a bare `waitForLoadState` after it, which can resolve on the old
+page. Never retry a test on this error.
+
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
   page, and that the form/success panels swap `inert`. The success heading needs
