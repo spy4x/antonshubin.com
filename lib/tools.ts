@@ -234,9 +234,9 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "preact-components will publish under the same @spy4x scope on JSR, as @spy4x/preact-*.",
+          "preact-components publishes under the same @spy4x scope on JSR, as @spy4x/preact-*.",
         href: "/tools/preact-components",
-        planned: true,
+        planned: false,
       },
       {
         text: "This site runs its env-file encryption on @spy4x/server.",
@@ -264,9 +264,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "0.1.0",
-      published: false,
-      install: "deno add jsr:@spy4x/preact-ui@0.1.0",
+      version: "0.1.1",
+      published: true,
+      install: "deno add jsr:@spy4x/preact-ui@0.1.1",
     },
     licence: "MIT",
     runtime:
@@ -315,14 +315,15 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "Will publish under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
+          "Publishes under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
         href: "/tools/ts-libs",
-        planned: true,
+        planned: false,
       },
       {
-        text: "My SaaS template will import it once it is published.",
-        href: "https://github.com/spy4x/template",
-        planned: true,
+        text:
+          "My SaaS template builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
+        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+        planned: false,
       },
       {
         text: "This site will replace its own components with it.",
