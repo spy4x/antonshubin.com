@@ -44,7 +44,7 @@ export interface AddSubscriberOutcome {
  * address whose unsubscribe link would never work. The list is saved for both
  * too, so an unwritable file answers 500 to a known address as to a new one.
  * The remaining difference is the mails a new address triggers after the
- * answer, and a few tenths of a millisecond; a probe with an unknown address
+ * answer, and about 0.1 ms of time; a probe with an unknown address
  * subscribes and mails it, so it cannot go unnoticed.
  */
 export async function addSubscriber(
