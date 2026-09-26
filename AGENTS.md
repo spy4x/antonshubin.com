@@ -460,16 +460,19 @@ names, from server-rendered HTML only — it doesn't cover the two lightboxes'
 buttons, which only exist after client JS opens them (see "Browser-driven
 tests"). `components/Nav.tsx` sets no `aria-current` on a destination link:
 Fresh's renderer marks it from the request URL, and `test/a11y.test.ts` pins
-that. Two exceptions use `lib/nav.ts`'s `navCurrent()` instead. Links to `/` get
-it because Fresh marks every link to `/` as the current section on every page.
-The links inside `islands/NavMore.tsx` get it because hydration strips Fresh's
-marker from an island (Preact drops attributes the island's own vnode lacks).
-`lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
-needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
-`UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
-preconnect links while browsers do. `routes/_app.tsx` makes that decision at
-render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is
-rendered.
+that. Three exceptions set it by hand. Links to `/` (the rail's portrait and the
+phone header) use `lib/nav.ts`'s `navCurrent()`, because Fresh marks every link
+to `/` as the current section on every page; `test/a11y.test.ts` checks them.
+The links inside `islands/NavMore.tsx` use `navCurrent()` too, because hydration
+strips Fresh's marker from an island (Preact drops attributes the island's own
+vnode lacks). Book carries a fixed `aria-current="false"`: it is an action,
+never the current page, and its "Write" fallback (`/#audit-form`) would
+otherwise be marked by Fresh. `lib/markdown.test.ts` (#160) tests
+`lib/markdown.ts` directly, no server needed. `test/bot-filter.test.ts` (#179)
+boots the site with placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known
+crawlers get no Umami script or preconnect links while browsers do.
+`routes/_app.tsx` makes that decision at render time with `lib/bots.ts`'s
+`isBot()`; nothing rewrites HTML after it is rendered.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds
@@ -509,13 +512,16 @@ the narrow `deno task test`.
   naming, button names and focus-return to the trigger; the nav (#185): the
   phone More dialog's Escape handling (closes it, returns focus to More, and
   does nothing when already closed), the desktop rail's top-to-bottom Tab order
-  with no rotated ancestor, and the 390px tab bar (five tabs, Book centred, the
-  current page and section styled after hydration). The explicit
-  `triggerRef.current?.focus()` calls in both lightboxes are kept on purpose,
-  even though native `<dialog>` already restores focus. Since #246 it also
-  checks the project gallery's "n / N" counter and its named Previous/Next
-  buttons, and runs every axe-core WCAG 2 A/AA rule plus a horizontal-scroll
-  check on six sample project pages at 390 and 1440px.
+  with no rotated ancestor, horizontal labels and an icon on every stop, the
+  Links popover listing its groups when opened, and the 390px tab bar (five
+  tabs, Book centred, the current page and section styled after hydration, More
+  outlined on a page listed under it, its dialog marking that page, and a tap on
+  the backdrop closing it). The explicit `triggerRef.current?.focus()` calls in
+  both lightboxes are kept on purpose, even though native `<dialog>` already
+  restores focus. Since #246 it also checks the project gallery's "n / N"
+  counter and its named Previous/Next buttons, and runs every axe-core WCAG 2
+  A/AA rule plus a horizontal-scroll check on six sample project pages at 390
+  and 1440px.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the

@@ -49,8 +49,8 @@ siteTest(
         /data-current="true"/.test(blogLink),
       `the /blog nav link is missing Fresh's exact-match markers: ${blogLink}`,
     );
-    // Counted over the rail's destination links only: the rail's home
-    // portrait links `/`, which Fresh marks `aria-current="true"` everywhere.
+    // Counted over the rail's destination links only, so the home links
+    // (checked in their own test below) and Book don't count.
     const exactList = exactLinks.join("");
     assertEquals(count(exactList, /aria-current="page"/g), 1);
     assertEquals(count(exactList, /aria-current="true"/g), 0);
@@ -75,6 +75,33 @@ siteTest(
     const nestedList = nestedLinks.join("");
     assertEquals(count(nestedList, /aria-current="true"/g), 1);
     assertEquals(count(nestedList, /aria-current="page"/g), 0);
+  },
+);
+
+/**
+ * Fresh's renderer would mark every link to `/` as the current section
+ * (`aria-current="true"`) on every page, so components/Nav.tsx (the rail's
+ * portrait) and components/Layout.tsx (the phone header) set the value
+ * themselves through `navCurrent()`: "page" on the home page, "false"
+ * everywhere else.
+ */
+siteTest(
+  "the two home links are the current page only on the home page",
+  async (site) => {
+    const homeLinks = (html: string) =>
+      [...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g)]
+        .map((m) => m[0]);
+    for (const [path, expected] of [["/", "page"], ["/blog", "false"]]) {
+      const links = homeLinks(await site.html(path));
+      assertEquals(links.length, 2, `${path}: rail and phone header`);
+      for (const link of links) {
+        assert(link.includes(`href="/"`), link);
+        assert(
+          link.includes(`aria-current="${expected}"`),
+          `${path}: expected aria-current="${expected}" on ${link}`,
+        );
+      }
+    }
   },
 );
 

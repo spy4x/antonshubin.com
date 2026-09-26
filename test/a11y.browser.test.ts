@@ -423,7 +423,13 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
       // Tab from the top of the page until focus leaves the rail, recording
       // each rail stop's top edge and whether anything above it is
       // transformed (the old rail was the phone bar rotated -90deg).
-      const stops: { label: string; y: number; transformed: boolean }[] = [];
+      const stops: {
+        label: string;
+        y: number;
+        transformed: boolean;
+        writingMode: string;
+        hasIcon: boolean;
+      }[] = [];
       for (let i = 0; i < 20; i++) {
         await page.keyboard.press("Tab");
         const stop = await page.evaluate(() => {
@@ -433,10 +439,13 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
           for (let n: Element | null = el; n; n = n.parentElement) {
             if (getComputedStyle(n).transform !== "none") transformed = true;
           }
+          const label = el.querySelector("span");
           return {
             label: (el.textContent || "").replace(/\s+/g, " ").trim(),
             y: el.getBoundingClientRect().top,
             transformed,
+            writingMode: label ? getComputedStyle(label).writingMode : "",
+            hasIcon: el.querySelector("svg.nav-icon") !== null,
           };
         });
         if (!stop) {
@@ -470,6 +479,15 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
       }
       for (const stop of stops) {
         assert(!stop.transformed, `"${stop.label}" is inside a transform`);
+        assertEquals(
+          stop.writingMode,
+          "horizontal-tb",
+          `"${stop.label}" must read horizontally`,
+        );
+        // The portrait is Anton's icon; every other stop draws a nav icon.
+        if (stop.label !== "Anton") {
+          assert(stop.hasIcon, `"${stop.label}" has no icon`);
+        }
       }
     } finally {
       await page.close();
@@ -580,6 +598,38 @@ Deno.test("a 390px phone shows five tabs with Book in the centre and the current
         await services.evaluate((el) => getComputedStyle(el).borderTopColor),
         await tokenColour(page, "border-rule-strong", "borderTopColor"),
         "the current section's tab must be an outlined pill",
+      );
+
+      // A page listed under More: More itself is outlined, and inside the
+      // dialog the page's own link is marked current.
+      await load("/blog");
+      const more = tabs.nth(4);
+      assertEquals(
+        await more.getAttribute("data-section-current"),
+        "true",
+        "More must be marked when the current page is one of its items",
+      );
+      assertEquals(
+        await more.evaluate((el) => getComputedStyle(el).borderTopColor),
+        await tokenColour(page, "border-rule-strong", "borderTopColor"),
+        "More must be an outlined pill on a page listed under it",
+      );
+      await more.click();
+      const menu = page.locator("#mobile-menu");
+      await menu.waitFor({ state: "visible" });
+      assertEquals(
+        await menu.getByRole("link", { name: "Writing", exact: true })
+          .getAttribute("aria-current"),
+        "page",
+        "the More dialog must mark the current page's link",
+      );
+
+      // A tap on the backdrop, above the sheet, closes it and returns focus.
+      await page.mouse.click(MOBILE_VIEWPORT.width / 2, 10);
+      await menu.waitFor({ state: "hidden" });
+      assert(
+        await more.evaluate((el) => el === document.activeElement),
+        "focus must return to More after a tap outside the dialog",
       );
     } finally {
       await page.close();
