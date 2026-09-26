@@ -14,11 +14,40 @@
 // widening that task's permissions. Chromium launch/version handling is
 // shared with that file via test/browser.ts.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
+import axeCore from "axe-core";
 import type { Browser, Locator, Page } from "playwright";
 import { startSite } from "./harness.ts";
 import { launchChromium } from "./browser.ts";
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
+const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
+
+/** The six project pages #246 was designed and reviewed against. */
+const SAMPLE_PROJECTS = [
+  "smartlite",
+  "foodrazor",
+  "corecircle",
+  "roley",
+  "microwork",
+  "code-review",
+];
+
+/** Rule ids and offending markup of every axe-core WCAG 2 A/AA violation on the loaded page. */
+async function axeViolations(page: Page): Promise<string[]> {
+  // Injected through page.evaluate, not a <script> tag, so the site's CSP
+  // does not block it (see test/contrast.browser.test.ts).
+  await page.evaluate(axeCore.source);
+  const results = await page.evaluate(async () => {
+    // deno-lint-ignore no-explicit-any
+    const axe = (globalThis as any).axe;
+    return await axe.run(document, {
+      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
+    });
+  }) as { violations: { id: string; nodes: { html: string }[] }[] };
+  return results.violations.flatMap((v) =>
+    v.nodes.map((n) => `${v.id}: ${n.html.slice(0, 160)}`)
+  );
+}
 
 /** True if `locator`'s element is the page's current `document.activeElement`. */
 function isFocused(locator: Locator): Promise<boolean> {
@@ -37,10 +66,10 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
       });
 
       const firstThumb = page.locator(
-        'button:has(img[alt="CallTrack screenshot 1"])',
+        'button:has(img[alt="Screenshot 1 of 7"])',
       );
       const secondThumb = page.locator(
-        'button:has(img[alt="CallTrack screenshot 2"])',
+        'button:has(img[alt="Screenshot 2 of 7"])',
       );
 
       // Open, check the dialog's accessible name, and that Close, Previous
@@ -48,7 +77,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
       // icon inside them).
       await firstThumb.click();
       const dialog = page.getByRole("dialog", {
-        name: "CallTrack screenshot 1",
+        name: "Screenshot 1 of 7",
       });
       await dialog.waitFor({ state: "visible" });
 
@@ -63,7 +92,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
 
       // Next moves to the next image and renames the dialog.
       await nextButton.click();
-      await page.getByRole("dialog", { name: "CallTrack screenshot 2" })
+      await page.getByRole("dialog", { name: "Screenshot 2 of 7" })
         .waitFor({ state: "visible" });
 
       // Escape closes the dialog and returns focus to the thumbnail that
@@ -79,7 +108,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
       // Close button does the same, from a different trigger.
       await secondThumb.click();
       const dialog2 = page.getByRole("dialog", {
-        name: "CallTrack screenshot 2",
+        name: "Screenshot 2 of 7",
       });
       await dialog2.waitFor({ state: "visible" });
       await dialog2.getByRole("button", { name: "Close" }).click();
@@ -94,6 +123,84 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
   } finally {
     await browser?.close();
     await site.stop();
+  }
+});
+
+Deno.test("the project gallery counts its screenshots and its named Next and Previous buttons move the strip", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({ viewport: DESKTOP_VIEWPORT });
+    try {
+      await page.goto(`${site.origin}/projects/smartlite`, {
+        waitUntil: "networkidle",
+      });
+      const counter = page.locator("[data-gallery-counter]");
+      assertEquals((await counter.innerText()).trim(), "1 / 12");
+      const next = page.getByRole("button", { name: "Next screenshot" });
+      const prev = page.getByRole("button", { name: "Previous screenshot" });
+      await next.waitFor({ state: "visible" });
+      await prev.waitFor({ state: "visible" });
+
+      await next.click();
+      await page.waitForFunction(() =>
+        document.querySelector("[data-gallery-counter]")?.textContent
+          ?.trim() === "2 / 12"
+      );
+      const scrolled = await page.locator("[data-gallery-strip]").evaluate(
+        (el) => el.scrollLeft,
+      );
+      assert(scrolled > 0, "Next did not scroll the strip");
+
+      await prev.click();
+      await page.waitForFunction(() =>
+        document.querySelector("[data-gallery-counter]")?.textContent
+          ?.trim() === "1 / 12"
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the six sample project pages have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  // The Book buttons render only with a booking URL; RFC 2606 host.
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+      const page: Page = await browser.newPage({ viewport });
+      try {
+        for (const slug of SAMPLE_PROJECTS) {
+          const where = `/projects/${slug} at ${viewport.width}px`;
+          await page.goto(`${site.origin}/projects/${slug}`, {
+            waitUntil: "networkidle",
+          });
+          const scrollWidth = await page.evaluate(() =>
+            document.documentElement.scrollWidth
+          );
+          assert(
+            scrollWidth <= viewport.width,
+            `${where} scrolls sideways: ${scrollWidth}px wide`,
+          );
+          assertEquals(await axeViolations(page), [], where);
+        }
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+    else Deno.env.set("SCHEDULE_URL", previous);
   }
 });
 
