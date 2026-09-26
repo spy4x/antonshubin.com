@@ -3,6 +3,7 @@
 # Age encryption key (never commit!)
 anton-tasks.md
 data/subscribers.json
+data/subscribers.json.*
 data/newsletter-log.json
 .env
 # Environment files

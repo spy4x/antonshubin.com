@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
 import { addSubscriber, type AddSubscriberDeps } from "./subscribe.ts";
-import type { Subscriber } from "./subscribers.ts";
+import { createSubscriberStore, type Subscriber } from "./subscribers.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
 const BASE = "https://example.com";
@@ -14,8 +14,12 @@ function setup(link: (email: string) => Promise<string>) {
   const saved: Subscriber[][] = [];
   const log = recordingLog();
   const deps: AddSubscriberDeps = {
-    load: () => [{ ...EXISTING }],
-    save: (list) => saved.push(structuredClone(list)),
+    // An in-memory list that starts with EXISTING and records every write.
+    update: async (change) => {
+      const outcome = await change([{ ...EXISTING }]);
+      if (outcome.list) saved.push(structuredClone(outcome.list));
+      return outcome.result;
+    },
     unsubscribeLink: link,
     mail: {
       sender: fakeSender(relay),
@@ -65,9 +69,7 @@ Deno.test("answers a stored address exactly as a new one when the list cannot be
   const outcomes = [];
   for (const email of ["old@example.com", "new@example.com"]) {
     const { relay, deps } = setup(linkFor);
-    deps.save = () => {
-      throw new Error("read-only file system");
-    };
+    deps.update = () => Promise.reject(new Error("read-only file system"));
     const outcome = await addSubscriber(email, deps);
     await outcome.mails;
     assertEquals(relay.mails.length, 0, email);
@@ -126,5 +128,24 @@ Deno.test("answers 500 and saves nothing when the unsubscribe link cannot be bui
       log.errors[0],
       "[SUBSCRIBE] cannot build unsubscribe link:",
     );
+  }
+});
+
+Deno.test("stores every one of ten concurrent new sign-ups", async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    const store = createSubscriberStore({ path: `${dir}/subscribers.json` });
+    const { deps } = setup(linkFor);
+    deps.update = store.update;
+    const emails = Array.from({ length: 10 }, (_, i) => `n${i}@example.com`);
+    const outcomes = await Promise.all(
+      emails.map((email) => addSubscriber(email, deps)),
+    );
+    await Promise.all(outcomes.map((o) => o.mails));
+    assertEquals(outcomes.map((o) => o.status), emails.map(() => 200));
+    const stored = (await store.load()).map((s) => s.email).sort();
+    assertEquals(stored, emails);
+  } finally {
+    await Deno.remove(dir, { recursive: true });
   }
 });

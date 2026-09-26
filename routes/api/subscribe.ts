@@ -12,7 +12,7 @@ import {
   SMTP_PORT,
   SMTP_USERNAME,
 } from "../../lib/config.ts";
-import { loadSubscribers, saveSubscribers } from "../../lib/subscribers.ts";
+import { updateSubscribers } from "../../lib/subscribers.ts";
 import { unsubscribeLink } from "../../lib/unsubscribe.ts";
 import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
 import { addSubscriber } from "../../lib/subscribe.ts";
@@ -45,8 +45,7 @@ export const handler = define.handlers({
 
     // Mails go out after the answer; addSubscriber logs their failures.
     const outcome = await addSubscriber(body?.email, {
-      load: loadSubscribers,
-      save: saveSubscribers,
+      update: updateSubscribers,
       unsubscribeLink,
       mail: { sender: SENDER, contactEmail: CONTACT_EMAIL, baseUrl: BASE_URL },
     });
