@@ -58,4 +58,12 @@ Deno.test("a card shows the review's star rating, named for screen readers", () 
     html.replace(/<[^>]+>/g, "").includes("Rated 5.0 out of 5"),
     `rating has no accessible text:\n${html}`,
   );
+  assert(
+    /<span class="sr-only">Rated 5\.0 out of 5<\/span>/.test(html),
+    `the rating's label is not hidden from view:\n${html}`,
+  );
+  assert(
+    /<span aria-hidden="true">5\.0<\/span>/.test(html),
+    `the visible 5.0 is not hidden from screen readers:\n${html}`,
+  );
 });
