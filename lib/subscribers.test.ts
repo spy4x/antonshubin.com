@@ -92,9 +92,29 @@ Deno.test("refuses to write over a file that is not a subscriber list, keeps it 
       await assertRejects(() => store.load(), SubscriberFileError);
       assertEquals(await Deno.readTextFile(path), raw);
       assertStringIncludes(log.errors[0], "[SUBSCRIBERS]");
+      assertStringIncludes(
+        log.errors[0],
+        `its text is kept in ${path}.invalid`,
+      );
       assertEquals(await Deno.readTextFile(`${path}.invalid`), raw);
     });
   }
+});
+
+Deno.test("keeps an earlier .invalid copy instead of writing over it, and says so", async () => {
+  await withFile(async (path) => {
+    await Deno.writeTextFile(`${path}.invalid`, "the first bad text");
+    await Deno.writeTextFile(path, "[{");
+    const log = recordingLog();
+    const store = createSubscriberStore({ path, log });
+    await assertRejects(() => store.load(), SubscriberFileError);
+    assertEquals(
+      await Deno.readTextFile(`${path}.invalid`),
+      "the first bad text",
+    );
+    assertStringIncludes(log.errors[0], "an earlier copy is already kept");
+    assertEquals(log.errors[0].includes("its text is kept"), false);
+  });
 });
 
 Deno.test("a write that fails on a full disk leaves the old list whole and no temp file", async () => {

@@ -109,23 +109,31 @@ export function createSubscriberStore(
       return read.value as Subscriber[];
     }
     const raw = read.kind === "invalid" ? read.raw : JSON.stringify(read.value);
-    await setAside(raw);
+    const aside = await setAside(raw);
     const error = new SubscriberFileError(
-      `${path} is not a subscriber list (${reason}); its text is kept in ` +
-        `${path}.invalid and nothing is written until it is repaired`,
+      `${path} is not a subscriber list (${reason}); ${aside}; nothing is ` +
+        `written until it is repaired`,
     );
     log.error("[SUBSCRIBERS]", error.message);
     throw error;
   }
 
-  /** Keeps the first unparseable copy; a later one would only repeat it. */
-  async function setAside(raw: string): Promise<void> {
+  /**
+   * Keeps the first unparseable copy in `<file>.invalid`; a later one is not
+   * written over it. Returns what happened, for the error message.
+   */
+  async function setAside(raw: string): Promise<string> {
+    const invalid = `${path}.invalid`;
     try {
-      if (!(await fs.exists(`${path}.invalid`))) {
-        await fs.writeText(`${path}.invalid`, raw);
+      if (await fs.exists(invalid)) {
+        return `an earlier copy is already kept in ${invalid}, so this text ` +
+          `was not kept`;
       }
+      await fs.writeText(invalid, raw);
+      return `its text is kept in ${invalid}`;
     } catch (err) {
       log.error("[SUBSCRIBERS] could not keep the unparseable file:", err);
+      return `its text could not be kept in ${invalid}`;
     }
   }
 
