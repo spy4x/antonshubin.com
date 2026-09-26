@@ -495,14 +495,12 @@ pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 
 ## Tagged links
 
-Never hand-write a tagged (UTM) URL.
-`deno task links <path> [--campaign …]
-[--content …]` prints a page's tagged URL
-for every channel, and `launch-kit`, `video-kit` and `publish:blog`'s Dev.to
-draft build theirs from the same channel table in `scripts/utm.ts`. The
-convention, the campaign names and the log of campaigns already used are in
-`docs/utm.md`; its channel table must match the code's (`scripts/utm.test.ts`
-checks it).
+Never hand-write a tagged (UTM) URL. `deno task links <path> [--campaign …]`
+(optionally `--content …`) prints a page's tagged URL for every channel, and
+`launch-kit`, `video-kit` and `publish:blog`'s Dev.to draft build theirs from
+the same channel table in `scripts/utm.ts`. The convention, the campaign names
+and the log of campaigns already used are in `docs/utm.md`; its channel table
+must match the code's (`scripts/utm.test.ts` checks it).
 
 ## AI crawler optimization (SEO)
 
