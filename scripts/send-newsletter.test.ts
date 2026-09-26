@@ -70,7 +70,7 @@ async function runSend(
   };
 }
 
-Deno.test("the container send refuses a slug already in the log, exits 1 and leaves the log unchanged", async () => {
+Deno.test("the container send refuses a slug already in the log, exits 1, prints no Sending line and leaves the log unchanged", async () => {
   const dir = await Deno.makeTempDir();
   try {
     const log = JSON.stringify([EARLIER]);
