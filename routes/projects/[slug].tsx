@@ -266,8 +266,9 @@ export default define.page(function ProjectDetail(ctx) {
                   <img
                     src={project.logoImageURL}
                     alt={`${project.title} logo`}
-                    class="max-h-full max-w-[260px] object-contain p-4"
-                    style={project.logoImageStyle}
+                    class={`max-h-full max-w-[260px] object-contain p-4${
+                      project.logoPlate ? " logo-plate" : ""
+                    }`}
                     loading="lazy"
                   />
                 )

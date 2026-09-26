@@ -199,3 +199,30 @@ siteTest(
     }
   },
 );
+
+/** The `class` of the first `<img>` whose `src` starts with `src`; throws when none does. */
+function imgClass(html: string, src: string): string {
+  const tag = html.match(new RegExp(`<img[^>]*src="${src}[?"][^>]*>`))?.[0];
+  assert(tag, `no <img> with src ${src}`);
+  return tag.match(/class="([^"]*)"/)?.[1] ?? "";
+}
+
+siteTest(
+  "a logo drawn for a light background sits on the light plate, and no other logo does",
+  async (site) => {
+    const plated = projects.freelance.filter((p) => p.logoPlate);
+    assertEquals(plated.map((p) => p.slug).sort(), ["roley", "sogroya"]);
+    const list = await site.html("/projects");
+    for (const p of projects.freelance) {
+      if (!p.slug || !p.logoImageURL) continue;
+      const pages = [await site.html(`/projects/${p.slug}`)];
+      if (highlightSlugs.includes(p.slug)) pages.push(list);
+      for (const html of pages) {
+        const onPlate = imgClass(html, p.logoImageURL).split(" ").includes(
+          "logo-plate",
+        );
+        assertEquals(onPlate, !!p.logoPlate, `${p.slug} logo plate`);
+      }
+    }
+  },
+);

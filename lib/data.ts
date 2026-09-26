@@ -7,7 +7,11 @@ export interface Project {
   externalURLDead?: boolean;
   description: string;
   logoImageURL?: string;
-  logoImageStyle?: string;
+  /**
+   * The logo was drawn for a light background and nearly disappears on the
+   * dark cards: render it on the `.logo-plate` backing (assets/styles.css).
+   */
+  logoPlate?: boolean;
   logoText?: string;
   logoTextStyle?: string;
   role?: string;
@@ -449,6 +453,7 @@ export const projects = {
         "Fresh",
       ],
       logoImageURL: "/img/projects/roley/logo.svg",
+      logoPlate: true,
       logoText: "Roley",
       screenshotURLs: [
         "01-home-mobile.png",
@@ -471,7 +476,7 @@ export const projects = {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
       logoImageURL: "/img/projects/sogroya/logo.svg",
-      logoImageStyle: "background: white; border-radius: 0.5rem;",
+      logoPlate: true,
       externalURL: "https://sogroyadosereminder.com",
       externalURLNote: "sogroya-live",
       description:

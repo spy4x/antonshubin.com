@@ -250,6 +250,18 @@ h4,
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * A light backing plate for a project logo drawn for a light background
+ * (a near-black wordmark or a navy mark), so it stays legible on the dark
+ * cards. Set by `logoPlate: true` on the project in lib/data.ts. Padding is
+ * left to each call site's utilities: this rule is unlayered, so a padding
+ * here would silently beat the `p-*` utility already on the <img>.
+ */
+.logo-plate {
+  background-color: var(--color-parchment);
+  border-radius: 0.5rem;
+}
+
 code,
 pre,
 kbd {
