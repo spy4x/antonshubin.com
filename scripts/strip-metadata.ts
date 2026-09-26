@@ -106,13 +106,17 @@ export function stripWebp(webp: Uint8Array): Uint8Array {
   return out;
 }
 
-/** Editor comments ("Generator: Adobe Illustrator …") and `<metadata>` blocks. */
+/**
+ * Editor stamps: generator comments ("Generator: Adobe Illustrator …"),
+ * `<desc>Created with Sketch.</desc>` and `<metadata>` blocks.
+ */
 export const SVG_METADATA = [
   /<!--\s*Generator:[\s\S]*?-->\s*/g,
+  /<desc>\s*Created with [^<]*<\/desc>\s*/g,
   /<metadata[\s\S]*?<\/metadata>\s*/g,
 ];
 
-/** The SVG without editor generator comments and `<metadata>` blocks. */
+/** The SVG without its editor stamps (see `SVG_METADATA`). */
 export function stripSvg(svg: string): string {
   return SVG_METADATA.reduce((text, re) => text.replace(re, ""), svg);
 }

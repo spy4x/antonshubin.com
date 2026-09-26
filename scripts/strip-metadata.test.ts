@@ -82,10 +82,11 @@ Deno.test("stripWebp drops EXIF and XMP, clears their VP8X flags and fixes the R
   assertEquals(chunks[2].bytes, body[2]);
 });
 
-Deno.test("stripSvg drops a generator comment and <metadata> but keeps other comments", () => {
+Deno.test("stripSvg drops editor stamps but keeps other comments", () => {
   const svg =
     `<?xml version="1.0"?>\n<!-- Generator: Adobe Illustrator 16.0.0 -->\n` +
-    `<svg><metadata><rdf:RDF/></metadata><!-- clapper mark --><path d="M0 0"/></svg>`;
+    `<svg><desc>Created with Sketch.</desc><metadata><rdf:RDF/></metadata>` +
+    `<!-- clapper mark --><path d="M0 0"/></svg>`;
   assertEquals(
     stripSvg(svg),
     `<?xml version="1.0"?>\n<svg><!-- clapper mark --><path d="M0 0"/></svg>`,
