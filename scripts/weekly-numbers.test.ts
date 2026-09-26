@@ -2,6 +2,7 @@ import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
 import {
   buildNtfySummary,
   fetchGithubStarsSection,
+  fetchUmamiCampaignsSection,
   fetchUmamiStatsSection,
   fetchUmamiTopPagesSection,
   fetchYoutubeSection,
@@ -199,6 +200,24 @@ async function withUmamiStub<T>(
     }
   }
 }
+
+Deno.test("fetchUmamiCampaignsSection asks Umami for utmCampaign metrics and keeps its visitor ranking", async () => {
+  const { result, urls } = await withUmamiStub(
+    [{ x: "opus55-vs-sonnet5", y: 42 }, { x: "mig-launch", y: 7 }],
+    fetchUmamiCampaignsSection,
+  );
+  assertEquals(urls.length, 1);
+  assertEquals(urls[0].pathname, "/umami/api/websites/site-id/metrics");
+  assertEquals(urls[0].searchParams.get("type"), "utmCampaign");
+  assertEquals(result.warning, undefined);
+  assertEquals(result.headers, ["campaign", "visitors"]);
+  assertEquals(result.rows, [["opus55-vs-sonnet5", "42"], ["mig-launch", "7"]]);
+  assertStringIncludes(
+    formatReport([result]),
+    "## Umami — top campaigns (7 days)\n\n| campaign | visitors |\n| --- | --- |\n" +
+      "| opus55-vs-sonnet5 | 42 |\n| mig-launch | 7 |",
+  );
+});
 
 Deno.test("fetchUmamiTopPagesSection asks for the path metric, the type Umami v3 accepts", async () => {
   const { result, urls } = await withUmamiStub(

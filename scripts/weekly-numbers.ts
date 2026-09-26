@@ -136,8 +136,9 @@ async function umamiMetricSection(
   title: string,
   type: string,
   columnLabel: string,
+  countLabel = "count",
 ): Promise<Section> {
-  const headers = [columnLabel, "count"];
+  const headers = [columnLabel, countLabel];
   const apiUrl = Deno.env.get("UMAMI_API_URL");
   const token = Deno.env.get("UMAMI_API_TOKEN");
   const siteId = Deno.env.get("UMAMI_ID");
@@ -187,6 +188,17 @@ export const fetchUmamiCtaEventsSection = () =>
     "Umami — CTA / outbound events (7 days)",
     "event",
     "event",
+  );
+
+// `utmCampaign` is a metrics type since Umami v3 (the instance runs 3.4.0).
+// Its count is distinct sessions per campaign, which Umami's UI calls
+// visitors, so the column says so.
+export const fetchUmamiCampaignsSection = () =>
+  umamiMetricSection(
+    "Umami — top campaigns (7 days)",
+    "utmCampaign",
+    "campaign",
+    "visitors",
   );
 
 /** Stargazer counts for each `owner/repo` in `GITHUB_REPOS`. */
@@ -288,6 +300,7 @@ async function main() {
     fetchUmamiTopPagesSection(),
     fetchUmamiReferrersSection(),
     fetchUmamiCtaEventsSection(),
+    fetchUmamiCampaignsSection(),
     fetchGithubStarsSection(),
     fetchYoutubeSection(),
   ]);
