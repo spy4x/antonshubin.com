@@ -43,34 +43,24 @@ ssh cloudlab 'docker exec -i antonshubincom-web sh -c "cat > /tmp/newsletter.htm
 ssh cloudlab 'docker exec antonshubincom-web deno run -A scripts/send-newsletter.ts "Newsletter Title" /tmp/newsletter.html'
 ```
 
-## Publishing a new blog post with newsletter notification
+## Announcing a new blog post
+
+Do not hand-write a post announcement. After the post is merged, deployed and
+live, `deno task publish:blog <slug>` prints the announcement's subject and body
+with the tagged `email` link, and sends nothing. Only after Anton says yes in
+chat to that post, `deno task publish:blog <slug> --send-newsletter` sends it
+from the production container, at most once per slug. The whole flow is in
+[publishing.md](publishing.md).
+
+The once-per-slug guard is a sent log, `data/newsletter-log.json`, next to
+`subscribers.json` in the same bind-mounted directory, so it survives deploys
+and is backed up with the list. `scripts/send-newsletter.ts --stdin-json` writes
+the slug there before the first mail goes out and refuses a slug that is already
+listed. A run that crashed partway is listed too. To resend a post on purpose,
+remove its entry from the file by hand. To read the log:
 
 ```bash
-deno task publish:blog ./path/to/content.md
-```
-
-This will:
-
-1. Parse the markdown file (front matter for metadata)
-2. Copy to `content/blog/{slug}.md`
-3. Update `lib/data.ts` with the new article entry
-4. Send newsletter to all subscribers notifying about the new post
-5. Stage the changes for commit
-
-Step 4 runs on your machine, which has no subscriber list, so it currently
-emails nobody (#180). Send the announcement from the server as above.
-
-## Markdown format
-
-```markdown
----
-title: "Your Article Title"
-description: "Short meta description for search engines"
-category: "dev-tips" # or "startups" or "personal"
-publishedAt: "2026-07-02"
----
-
-Article content here...
+ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/newsletter-log.json'
 ```
 
 ## Viewing subscribers

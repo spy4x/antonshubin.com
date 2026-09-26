@@ -22,7 +22,8 @@ deno task env:decrypt
 The newsletter list is one file, `data/subscribers.json`. It lives on the host,
 not in the container: `compose.yml` bind-mounts the app directory's `data/` at
 `/app/data`, so the container that every deploy recreates never holds the only
-copy.
+copy. The newsletter's per-post sent log, `data/newsletter-log.json`, sits in
+the same directory and is kept and backed up the same way (docs/newsletter.md).
 
 | Target     | File on cloudlab                                             |
 | ---------- | ------------------------------------------------------------ |

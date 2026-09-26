@@ -34,6 +34,12 @@ table (source and medium) shared with `scripts/utm.ts`, how campaigns are named,
 the campaign log, and `deno task links`, which prints a page's tagged URL for
 every channel.
 
+### [Publishing a blog post](publishing.md)
+
+The end-to-end flow for a new post: draft, pull request, deploy,
+`deno task publish:blog <slug>`, channel texts and the newsletter on Anton's
+yes. The voice to write in is in [voice.md](voice.md).
+
 ### [Video kit](video-kit.md)
 
 `deno task video-kit`: YouTube titles, description, chapters and a blog draft

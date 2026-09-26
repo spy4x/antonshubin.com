@@ -35,7 +35,7 @@ deno task deploy:stag           # staging   → website-stag.antonshubin.com
 deno task env:encrypt           # every .env* → its .env*.age (age64)
 deno task env:decrypt           # every .env*.age → its plaintext (age64)
 deno task env:status            # key presence + which env/age files exist
-deno task publish:blog          # publish a blog post + a Dev.to draft
+deno task publish:blog          # after deploy: live check, Dev.to draft, links; --send-newsletter only on Anton's yes
 deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
 deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
@@ -71,8 +71,9 @@ Nothing is written back to a tracked file, so a deploy leaves `git status` clean
 
 The newsletter subscriber list (`data/subscribers.json`) lives on the host:
 `compose.yml` bind-mounts the app directory's `data/`, and the deploy's
-`rsync --delete` excludes `/data/`. Keep both, or a deploy empties the list.
-Backup and restore are in `docs/deploy.md` "Subscriber data".
+`rsync --delete` excludes `/data/`. Keep both, or a deploy empties the list and
+the newsletter's sent log (`data/newsletter-log.json`) next to it. Backup and
+restore are in `docs/deploy.md` "Subscriber data".
 
 ## Code style
 
@@ -534,6 +535,24 @@ with `lib/subscribe-mail.ts` (`/api/subscribe`) and `lib/newsletter.ts`
 (`scripts/send-newsletter.ts`) build the messages and log a failed send instead
 of throwing; a send counts as done only when the relay accepted it. Their tests
 pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
+
+## Publishing a blog post
+
+`docs/publishing.md` is the whole flow, from "I want a blog post about X" to a
+live post: draft in Anton's voice (`docs/voice.md`, learned from the five oldest
+posts), a pull request with the post file and its `lib/data.ts` entry, review,
+merge, deploy, then `deno task publish:blog <slug>`. That script writes no file:
+it checks the post answers 200 live, creates the Dev.to draft and prints every
+channel's tagged link and the newsletter preview. Three hard rules:
+
+- **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
+  text per channel with its tagged link and show it in chat; Anton pastes it.
+- **The newsletter is sent only after the post is live and only when Anton says
+  yes in chat to that post** —
+  `deno task publish:blog <slug>
+  --send-newsletter`. The production container
+  refuses a slug already in its sent log, `data/newsletter-log.json`.
+- **Dev.to gets an unpublished draft only.** Anton publishes it himself.
 
 ## Tagged links
 
