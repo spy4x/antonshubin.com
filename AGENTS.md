@@ -25,6 +25,62 @@ In short, as of September 2026:
   build the reputation he sells on, so the posts add up to one recognisable body
   of work instead of scattered pieces.
 
+## Designing a page: four expert reviews first
+
+Every new page, and every redesign of a page a visitor uses to decide (home,
+work, services, booking, tools, writing, how I work), goes through this flow
+before any code. Anton asked for it on 26 September 2026 after #246 used it to
+rebuild the project page. #246 and PR #258 are the worked example: the four
+reviews and the merged spec are comments on the issue. Small fixes, such as a
+bug, a wording change or one element, skip it.
+
+1. **An issue per page.** It holds the page's job (what a visitor must believe
+   and then do), the sample URLs to review, and the order against any feature
+   issue that touches the same route. The feature issue keeps its content
+   bullets. Its layout bullets become input for the experts, not decisions.
+2. **Four expert reviews, no code, in parallel.** A UI/UX designer (the `claude`
+   agent, briefed as a senior product designer of modern developer portfolios
+   and SaaS case-study pages), SEO and marketing (both `marketing-seo`, one with
+   a search lens and one with a conversion lens) and a psychologist
+   (`psychologist`: trust, cognitive load, ethical persuasion only, no invented
+   urgency or scarcity). One shared brief: the issue, the constraints below, and
+   how to serve the site. That means `deno task build` in a throwaway worktree,
+   then a throwaway script that uses `test/harness.ts`'s `startSite()` and
+   `test/browser.ts`'s `launchChromium()` to capture the sample pages at 390px
+   and 1440px, closing the browser and server in a `finally`. A page that
+   doesn't exist yet is reviewed as the nearest existing page plus the issue's
+   plan. Each expert posts at most ten recommendations on the issue, most
+   important first, each with its reason and what a visitor notices.
+3. **One merged spec, by the lead.** A wireframe at 390px and 1440px, the
+   component list, and a table of what each recommendation became or why it was
+   dropped. Where the experts disagree, the lead decides and says why. It is
+   posted on the issue before any code. A sensible default wins; the spec
+   doesn't wait for Anton's approval. Facts only Anton can supply go into a
+   separate content issue, and the page ships with today's wording meanwhile.
+4. **One implementer, one PR.** The PR traces every adopted recommendation to
+   its review (UX 3, SEO 1, …) and lists what was dropped. It reuses existing
+   components (`ProjectFactCard`, `ImageGallery`, `ProjectReviews`,
+   `StatusMark`, `Button`) rather than making a second copy. Tests guard the
+   structure: the H1, the first-screen elements, the JSON-LD, and axe plus no
+   horizontal scroll at 390px and 1440px in a browser test.
+5. **Review, merge, deploy** as usual. The reviewer also does a browser pass on
+   every page the change touches, not only the samples.
+
+Constraints every review and spec keeps:
+
+- **Visual system** (below): the `@theme` tokens only, the accent fill only on
+  Book, `Button`/`buttonClass`, and `font-semibold`.
+- **Content rule** (below): no new claim, number, quote or name. Wording comes
+  from the `lib/*.ts` data files or from facts Anton supplied. When a
+  recommendation needs data that doesn't exist, the spec says what the page
+  shows without it.
+- **Speed and access:** home LCP is no worse (`deno task lcp --ab`, plus
+  `--path` for the page itself), and a hero image is the only eager,
+  high-priority image. There are 0 axe violations and no horizontal scroll.
+- **Search:** one real `<h1>`. No `Review` or `AggregateRating` JSON-LD for
+  Anton's own reviews, because Google treats that as self-serving. The crawler
+  files follow any change to headings or structure.
+
 ## Project structure
 
 ```
