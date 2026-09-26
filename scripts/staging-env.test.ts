@@ -59,3 +59,26 @@ Deno.test("refuses a DOMAIN reference it cannot rewrite", () => {
     "SMTP_HOST",
   );
 });
+
+Deno.test("refuses every other DOMAIN spelling compose expands", () => {
+  for (
+    const line of [
+      "SMTP_HOST=mail.${DOMAIN:-example.com}",
+      "export SMTP_HOST=mail.$DOMAIN",
+    ]
+  ) {
+    assertThrows(
+      () => stagingEnv(`DOMAIN=example.com\n${line}\n`, "stag.example.com"),
+      Error,
+      "SMTP_HOST",
+    );
+  }
+});
+
+Deno.test("refuses a DOMAIN that is not a bare host name", () => {
+  assertThrows(
+    () => stagingEnv(`DOMAIN="example.com"\n`, "stag.example.com"),
+    Error,
+    "bare host name",
+  );
+});

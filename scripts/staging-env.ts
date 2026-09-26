@@ -20,7 +20,7 @@ export function stagingEnv(prodEnv: string, stagingHost: string): string {
   const resolved = prodEnv.replaceAll("${DOMAIN}", prodDomain);
   // Compose also expands `$DOMAIN` and `${DOMAIN:-…}`; this helper does not,
   // so refuse them rather than let staging silently point at the staging host.
-  const other = resolved.match(/^(\w+)=.*\$\{?DOMAIN\b/m);
+  const other = resolved.match(/^(?:export\s+)?(\w+)=.*\$\{?DOMAIN\b/m);
   if (other) {
     throw new Error(
       `${other[1]} refers to DOMAIN in a form other than \${DOMAIN}`,
