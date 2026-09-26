@@ -102,7 +102,7 @@ Constraints every review and spec keeps:
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes, meet-embed and blog-overflow tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -496,13 +496,13 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-nine files below and fails loudly, naming the install command, if none is found.
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all ten
+files below and fails loudly, naming the install command, if none is found.
 Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All
-nine call `startSite()` and run under `deno task test:browser` with `-A`, not
-the narrow `deno task test`.
+— a mismatch downloads a different Chromium build than the one launched. All ten
+call `startSite()` and run under `deno task test:browser` with `-A`, not the
+narrow `deno task test`.
 
 Two rules keep them stable on a busy machine (#219). Open a page with
 `test/browser.ts`'s `newPage(browser, options)`, never `browser.newPage()`: it
@@ -593,6 +593,13 @@ page. Never retry a test on this error.
   The cards used to be clipped by an ancestor, so the page's own `scrollWidth`
   never showed the overflow. It blocks service workers: the worker takes control
   on the first page and `islands/SWUpdater.tsx` reloads it mid-measurement.
+- `test/safe-area.browser.test.ts`: at 390px the phone tab bar clears an
+  iPhone's home indicator. iOS Safari reports a zero
+  `env(safe-area-inset-bottom)` unless `routes/_app.tsx`'s viewport meta tag
+  carries `viewport-fit=cover`, but Chromium applies an emulated inset either
+  way, so the test checks the tag's content and, separately, that the tab bar's
+  padding follows a 34px inset set through CDP's
+  `Emulation.setSafeAreaInsetsOverride`.
 
 ## Content-Security-Policy
 
