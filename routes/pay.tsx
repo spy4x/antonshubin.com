@@ -58,6 +58,7 @@ export default define.page(function Pay() {
                     {...{ "client:idle": true }}
                     elementId="evm-addr"
                     class="mt-2 inline-flex items-center gap-1"
+                    title="Copy EVM address"
                   />
                 </div>
 
@@ -76,6 +77,7 @@ export default define.page(function Pay() {
                     {...{ "client:idle": true }}
                     elementId="btc-addr"
                     class="mt-2 inline-flex items-center gap-1"
+                    title="Copy Bitcoin address"
                   />
                 </div>
 
@@ -94,6 +96,7 @@ export default define.page(function Pay() {
                     {...{ "client:idle": true }}
                     elementId="sol-addr"
                     class="mt-2 inline-flex items-center gap-1"
+                    title="Copy Solana address"
                   />
                 </div>
               </div>
