@@ -72,8 +72,9 @@ function ProjectCard({
               <img
                 src={project.logoImageURL}
                 alt={`${project.title} logo`}
-                style={project.logoImageStyle}
-                class="max-h-full max-w-[160px] object-contain"
+                class={`max-h-full max-w-[160px] object-contain${
+                  project.logoPlate ? " bg-parchment rounded-lg px-2 py-1" : ""
+                }`}
                 loading="lazy"
               />
             )

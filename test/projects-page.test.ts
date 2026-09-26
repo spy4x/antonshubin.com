@@ -199,3 +199,49 @@ siteTest(
     }
   },
 );
+
+/** The `class` of the first `<img>` whose `src` starts with `src`, or undefined when none does. */
+function imgClass(html: string, src: string): string | undefined {
+  const at = html.indexOf(`src="${src}`);
+  if (at < 0) return undefined;
+  const tag = html.slice(html.lastIndexOf("<img", at), html.indexOf(">", at));
+  return tag.match(/class="([^"]*)"/)?.[1] ?? "";
+}
+
+siteTest(
+  "a logo drawn for a light background sits on the light plate, and no other logo does",
+  async (site) => {
+    const all = [...projects.my, ...projects.freelance];
+    assertEquals(
+      all.filter((p) => p.logoPlate).map((p) => p.slug).sort(),
+      ["roley", "sogroya"],
+    );
+    const list = await site.html("/projects");
+    for (const p of all) {
+      if (!p.logoImageURL) continue;
+      const pages = [["/projects", list]];
+      if (p.slug) {
+        pages.push([
+          `/projects/${p.slug}`,
+          await site.html(`/projects/${p.slug}`),
+        ]);
+      }
+      for (const [path, html] of pages) {
+        const cls = imgClass(html, p.logoImageURL);
+        // Archive rows on /projects show no logo; a project page always does.
+        if (cls === undefined && path === "/projects") continue;
+        assert(cls !== undefined, `${p.slug} page renders no logo`);
+        const onPlate = cls.split(" ").includes("bg-parchment");
+        assertEquals(
+          onPlate,
+          !!p.logoPlate,
+          `${p.slug ?? p.title} logo on ${path}`,
+        );
+      }
+    }
+    // Roley is a Highlight, so its /projects card must have been checked too.
+    assert(
+      imgClass(list, "/img/projects/roley/logo.svg")?.includes("bg-parchment"),
+    );
+  },
+);
