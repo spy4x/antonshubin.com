@@ -57,7 +57,9 @@ siteTest(
       );
       if (project.madeForName) {
         assert(
-          text.includes(`${project.madeForName} reviewed on Upwork`),
+          text.replace(/\s*\(opens in a new tab\)/g, "").includes(
+            `${project.madeForName} reviewed on Upwork`,
+          ),
           `/projects/${project.slug} does not say "${project.madeForName} reviewed on Upwork"`,
         );
         assert(
