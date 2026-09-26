@@ -33,6 +33,19 @@ export interface Project {
   /** Margin note id (`lib/notes.ts`) that sources the live `externalURL`. */
   externalURLNote?: string;
   /**
+   * The live link's text in the project page's fact card, when the link is
+   * not the product itself (the code review's `externalURL` is the published
+   * report). Without it the card shows the bare host.
+   */
+  externalURLLabel?: string;
+  /**
+   * The `lib/catalog.ts` item closest to this work today, by its role and
+   * scope: the project page links it as "Similar work today". A typo throws
+   * in `catalogItem()` when the page renders (`lib/data.test.ts` checks
+   * every client project).
+   */
+  catalogSlug?: string;
+  /**
    * When the work happened, in whole years. Every client project carries
    * one (`lib/data.test.ts`); `formatPeriod()` renders it.
    */
@@ -292,6 +305,7 @@ export const projects = {
     {
       title: "SmartLite",
       slug: "smartlite",
+      catalogSlug: "zero-to-production-saas-mvp",
       role: "Full-stack (web app + backend + infrastructure)",
       logoImageURL: "/img/projects/smartlite/logo.svg",
       description:
@@ -311,18 +325,18 @@ export const projects = {
         "PWA",
       ],
       screenshotURLs: [
-        "01-dashboard.png",
-        "02-lampboxes.png",
-        "03-alerts.png",
-        "04-schedules.png",
-        "05-zones.png",
-        "06-users.png",
-        "07-gateways.png",
-        "08-sensors.png",
-        "09-regions.png",
-        "10-lamp-profiles.png",
-        "11-admin-settings.png",
-        "12-profile.png",
+        "01-dashboard.webp",
+        "02-lampboxes.webp",
+        "03-alerts.webp",
+        "04-schedules.webp",
+        "05-zones.webp",
+        "06-users.webp",
+        "07-gateways.webp",
+        "08-sensors.webp",
+        "09-regions.webp",
+        "10-lamp-profiles.webp",
+        "11-admin-settings.webp",
+        "12-profile.webp",
       ],
       screenshotSize: { width: 1440, height: 1000 },
       period: { from: 2024, ongoing: true },
@@ -334,6 +348,7 @@ export const projects = {
     {
       title: "Truth or Dare (DareChat)",
       slug: "truth-or-dare",
+      catalogSlug: "cto-advisory-retainer",
       externalURL: "https://darechat.me",
       role: "Tech Lead & Architect",
       description:
@@ -374,6 +389,7 @@ export const projects = {
     {
       title: "FoodRazor",
       slug: "foodrazor",
+      catalogSlug: "cto-advisory-retainer",
       externalURL: "https://foodrazor.com",
       description:
         "Digitize paper invoices, automating orders to suppliers, and tracking price fluctuations.",
@@ -412,6 +428,7 @@ export const projects = {
     {
       title: "Corecircle",
       slug: "corecircle",
+      catalogSlug: "cto-advisory-retainer",
       role: "Tech Lead",
       tags: [
         "Node.js",
@@ -424,6 +441,7 @@ export const projects = {
       ],
       logoImageURL: "/img/projects/corecircle/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp"],
+      screenshotSize: { width: 460, height: 996 },
       description:
         "Fitness-focused social network with exercise tracking features and ML for recommendation system.",
       externalURL: "https://corecircle.com",
@@ -436,6 +454,7 @@ export const projects = {
     {
       title: "Roley — Make a Movie!",
       slug: "roley",
+      catalogSlug: "zero-to-production-saas-mvp",
       externalURL: "https://makearoley.com",
       description:
         "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Postgres, AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The visuals below are a portfolio re-imagination I built later — the original client's branding wasn't mine to share.",
@@ -456,16 +475,17 @@ export const projects = {
       logoPlate: true,
       logoText: "Roley",
       screenshotURLs: [
-        "01-home-mobile.png",
-        "02-scripts-mobile.png",
-        "03-script-detail-mobile.png",
-        "04-my-movies-mobile.png",
-        "05-editor-mobile.png",
-        "06-recorder-mobile.png",
-        "07-processing-mobile.png",
-        "08-watch-mobile.png",
-        "09-auth-mobile.png",
+        "01-home-mobile.webp",
+        "02-scripts-mobile.webp",
+        "03-script-detail-mobile.webp",
+        "04-my-movies-mobile.webp",
+        "05-editor-mobile.webp",
+        "06-recorder-mobile.webp",
+        "07-processing-mobile.webp",
+        "08-watch-mobile.webp",
+        "09-auth-mobile.webp",
       ],
+      screenshotSize: { width: 780, height: 1688 },
       period: { from: 2023, to: 2025 },
       madeForName: "Lila King",
       madeForURL: "https://www.linkedin.com/in/lila-king-66b94b",
@@ -475,6 +495,7 @@ export const projects = {
     {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
+      catalogSlug: "zero-to-production-saas-mvp",
       logoImageURL: "/img/projects/sogroya/logo.svg",
       logoPlate: true,
       externalURL: "https://sogroyadosereminder.com",
@@ -496,6 +517,7 @@ export const projects = {
         "03-schedule.png",
         "04-download.png",
       ],
+      screenshotSize: { width: 780, height: 1688 },
       period: { from: 2023 },
       madeForName: "Novo Nordisk",
       madeForURL: "https://www.novonordisk.com/",
@@ -504,6 +526,7 @@ export const projects = {
     {
       title: "Connectful",
       slug: "connectful",
+      catalogSlug: "cto-advisory-retainer",
       role: "Tech Lead",
       tags: [
         "Node.js",
@@ -515,6 +538,7 @@ export const projects = {
       ],
       logoImageURL: "/img/projects/connectful/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],
+      screenshotSize: { width: 460, height: 996 },
       description:
         "Networking app with Tinder-like UI and Machine Learning algorithm to match like-minded people.",
       externalURL: "https://connectful.com",
@@ -527,6 +551,7 @@ export const projects = {
     {
       title: "GoPingu",
       slug: "gopingu",
+      catalogSlug: "cto-advisory-retainer",
       role: "Team lead & tech lead (full-stack)",
       tags: ["Angular", "Node.js", "Firebase", "Firestore"],
       logoImageURL: "/img/projects/gopingu/logo.svg",
@@ -544,6 +569,7 @@ export const projects = {
     {
       title: "Microwork",
       slug: "microwork",
+      catalogSlug: "cto-advisory-retainer",
       externalURL: "https://microwork.io",
       externalURLDead: true,
       description:
@@ -567,6 +593,7 @@ export const projects = {
     {
       title: "CallTrack",
       slug: "calltrack",
+      catalogSlug: "cto-advisory-retainer",
       externalURL: "https://ctrk.net",
       externalURLDead: true,
       description:
@@ -590,6 +617,7 @@ export const projects = {
     {
       title: "Sajari",
       slug: "sajari",
+      catalogSlug: "cto-advisory-retainer",
       role: "Frontend",
       externalURL: "https://sajari.com",
       externalURLDead: true,
@@ -610,7 +638,9 @@ export const projects = {
     {
       title: "Code Review & Architecture Audit",
       slug: "code-review",
+      catalogSlug: "codebase-health-audit",
       externalURL: "https://spy4x.github.io/pb-code-review",
+      externalURLLabel: "Read the audit report",
       description:
         "Code review report for a Node.js REST API codebase. Callback hell, code inconsistency and fun. After the report I interviewed seven Node.js developers in two weeks and hired the one who took the code forward.",
       role: "Audit and hiring",
@@ -882,19 +912,61 @@ export function prettyDate(dateString: string): string {
 }
 
 /**
+ * A screenshot's caption, from its file name when the name says what it
+ * shows ("01-dashboard.png" → "Dashboard", "05-editor-mobile.webp" →
+ * "Editor (mobile)"), otherwise "Screenshot 3 of 12". Captions are never
+ * written by hand: a hand-written caption would be new copy.
+ */
+export function screenshotCaption(
+  file: string,
+  index: number,
+  total: number,
+): string {
+  const words = file
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/^\d+[-_]?/, "")
+    .replace(/[-_]mobile$/i, " (mobile)")
+    .replace(/[-_]+/g, " ")
+    .trim();
+  if (!/[a-z]/i.test(words)) return `Screenshot ${index + 1} of ${total}`;
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
  * Build the gallery image list for a project: one entry per screenshot, with
  * `width`/`height` carried over from `screenshotSize` when the project has
  * one. Used by the project detail page to feed `<ImageGallery>` without
- * repeating the src/alt convention inline.
+ * repeating the src/alt convention inline. The caption doubles as the `alt`
+ * text (`screenshotCaption()`).
  */
 export function projectScreenshots(
   project: Project,
 ): { src: string; alt: string; width?: number; height?: number }[] {
   if (!project.screenshotURLs) return [];
+  const total = project.screenshotURLs.length;
   return project.screenshotURLs.map((file, index) => ({
     src: `/img/projects/${project.slug}/${file}`,
-    alt: `${project.title} screenshot ${index + 1}`,
+    alt: screenshotCaption(file, index, total),
     width: project.screenshotSize?.width,
     height: project.screenshotSize?.height,
   }));
+}
+
+/**
+ * Other client projects to show under "More work" on a project page: ranked
+ * by how many `tags` they share with `project`, with the /projects order
+ * (the highlights, then the archive) breaking ties. `project` itself is
+ * never in the list.
+ */
+export function relatedProjects(project: Project, count = 3): Project[] {
+  const order = [...highlightProjects(), ...archiveProjects()];
+  const tags = new Set(project.tags ?? []);
+  const shared = (p: Project) =>
+    (p.tags ?? []).filter((t) => tags.has(t)).length;
+  return order
+    .filter((p) => p.slug !== project.slug)
+    .map((p, i) => ({ p, i, score: shared(p) }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .slice(0, count)
+    .map(({ p }) => p);
 }
