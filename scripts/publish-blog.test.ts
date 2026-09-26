@@ -10,7 +10,6 @@ import {
   publishBlog,
   type PublishDeps,
   readPost,
-  REMOTE_SEND_COMMAND,
 } from "./publish-blog.ts";
 import { parsePostAnnouncement } from "./send-newsletter.ts";
 import { CHANNELS } from "./utm.ts";
@@ -35,6 +34,7 @@ const POST: Post = {
 interface Recorder {
   deps: PublishDeps;
   fetched: string[];
+  inits: (RequestInit | undefined)[];
   drafts: { title: string; slug: string; body: string; campaign: string }[];
   remote: { command: string; stdin: string }[];
   out: string[];
@@ -54,6 +54,7 @@ function fakes(
 ): Recorder {
   const r: Recorder = {
     fetched: [],
+    inits: [],
     drafts: [],
     remote: [],
     out: [],
@@ -61,8 +62,9 @@ function fakes(
     deps: {} as PublishDeps,
   };
   r.deps = {
-    fetch: ((url: string) => {
+    fetch: ((url: string, init?: RequestInit) => {
       r.fetched.push(url);
+      r.inits.push(init);
       if (status === "network-error") {
         return Promise.reject(new Error("dns failed"));
       }
@@ -86,15 +88,24 @@ function fakes(
 const DEFAULT_RUN = { slug: "a-test-post", sendNewsletter: false };
 const SEND_RUN = { slug: "a-test-post", sendNewsletter: true };
 
-Deno.test("a post that is not live yet exits 1 with no Dev.to draft and no send", async () => {
-  for (const args of [DEFAULT_RUN, SEND_RUN]) {
-    const r = fakes({ status: 404 });
-    assertEquals(await publishBlog(args, r.deps), 1);
-    assertEquals(r.fetched, ["https://antonshubin.com/blog/a-test-post"]);
-    assertEquals(r.drafts.length, 0);
-    assertEquals(r.remote.length, 0);
-    assertStringIncludes(r.err.join("\n"), "answered 404");
+Deno.test("a post that answers anything but 200 exits 1 with no Dev.to draft and no send", async () => {
+  for (const status of [301, 404, 503]) {
+    for (const args of [DEFAULT_RUN, SEND_RUN]) {
+      const r = fakes({ status });
+      assertEquals(await publishBlog(args, r.deps), 1);
+      assertEquals(r.fetched, ["https://antonshubin.com/blog/a-test-post"]);
+      assertEquals(r.drafts.length, 0);
+      assertEquals(r.remote.length, 0);
+      assertStringIncludes(r.err.join("\n"), `answered ${status}`);
+    }
   }
+});
+
+Deno.test("the live check does not follow redirects and gives fetch an abort signal", async () => {
+  const r = fakes();
+  await publishBlog(DEFAULT_RUN, r.deps);
+  assertEquals(r.inits[0]?.redirect, "manual");
+  assertEquals(r.inits[0]?.signal instanceof AbortSignal, true);
 });
 
 Deno.test("a live check that fails to connect counts as not live", async () => {
@@ -165,7 +176,10 @@ Deno.test("--send-newsletter pipes the tagged announcement to the container's se
   assertEquals(await publishBlog(SEND_RUN, r.deps), 0);
   assertEquals(r.drafts.length, 0);
   assertEquals(r.remote.length, 1);
-  assertEquals(r.remote[0].command, REMOTE_SEND_COMMAND);
+  assertEquals(
+    r.remote[0].command,
+    "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json",
+  );
   const sent = parsePostAnnouncement(r.remote[0].stdin);
   assertEquals(sent.slug, "a-test-post");
   assertEquals(sent.subject, "New article: A <test> post");
@@ -279,11 +293,19 @@ Deno.test("parsePublishArgs takes a slug and the --send-newsletter flag, and rej
   );
 });
 
-Deno.test("parsePostAnnouncement rejects a missing body and a slug that is not kebab-case", () => {
+Deno.test("parsePostAnnouncement rejects a missing body, an empty subject and a slug that is not kebab-case", () => {
   assertThrows(
     () => parsePostAnnouncement(JSON.stringify({ slug: "a", subject: "s" })),
     Error,
     `"body"`,
+  );
+  assertThrows(
+    () =>
+      parsePostAnnouncement(
+        JSON.stringify({ slug: "a", subject: "", body: "b" }),
+      ),
+    Error,
+    `"subject"`,
   );
   assertThrows(
     () =>

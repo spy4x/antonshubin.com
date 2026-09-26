@@ -31,6 +31,9 @@ export const SITE = "https://antonshubin.com";
 export const REMOTE_SEND_COMMAND =
   "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json";
 
+/** How long the live check waits for production before counting it as not live. */
+export const LIVE_CHECK_TIMEOUT_MS = 10_000;
+
 const USAGE = "Usage: deno task publish:blog <slug> [--send-newsletter]";
 
 export interface PublishArgs {
@@ -138,10 +141,16 @@ export interface PublishDeps {
   error: (line: string) => void;
 }
 
-/** Resolves to the live URL's status; a network error counts as not live. */
+/**
+ * Resolves to the live URL's status; a network error or no answer within
+ * {@linkcode LIVE_CHECK_TIMEOUT_MS} counts as not live.
+ */
 async function liveStatus(deps: PublishDeps, url: string): Promise<string> {
   try {
-    const res = await deps.fetch(url, { redirect: "manual" });
+    const res = await deps.fetch(url, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(LIVE_CHECK_TIMEOUT_MS),
+    });
     await res.body?.cancel();
     return String(res.status);
   } catch (err) {
