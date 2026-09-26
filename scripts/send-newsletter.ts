@@ -23,6 +23,7 @@ import { createSiteSender, smtpSettings } from "@/lib/mail.ts";
 import { type NewsletterIssue, sendNewsletter } from "@/lib/newsletter.ts";
 import {
   NEWSLETTER_LOG_FILE,
+  sendExitCode,
   sendNewsletterOnce,
 } from "@/lib/newsletter-log.ts";
 import { assertKebab } from "./utm.ts";
@@ -121,13 +122,14 @@ async function main() {
   }
 
   const logFile = Deno.env.get("NEWSLETTER_LOG_FILE") || NEWSLETTER_LOG_FILE;
-  console.log(
-    `Sending "${announcement.slug}" to ${subs.length} subscribers...`,
-  );
   const result = await sendNewsletterOnce({
     slug: announcement.slug,
     logFile,
     issue,
+    onStart: () =>
+      console.log(
+        `Sending "${announcement.slug}" to ${subs.length} subscribers...`,
+      ),
   });
   if (result.status === "already-sent") {
     fail(
@@ -135,7 +137,15 @@ async function main() {
         `(started ${result.entry.startedAt}, ${logFile}). Nothing was sent.`,
     );
   }
+  if (result.status === "no-subscribers") {
+    fail(
+      `Refused: no subscribers loaded (is ${
+        Deno.env.get("SUBSCRIBERS_FILE") || "data/subscribers.json"
+      } missing or unreadable?). Nothing was sent or recorded.`,
+    );
+  }
   console.log(`\nDone. Sent: ${result.sent}, Failed: ${result.failed}`);
+  Deno.exit(sendExitCode(result));
 }
 
 if (import.meta.main) {

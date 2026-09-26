@@ -1,5 +1,9 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@^1.0.0";
-import { loadNewsletterLog, sendNewsletterOnce } from "./newsletter-log.ts";
+import {
+  loadNewsletterLog,
+  sendExitCode,
+  sendNewsletterOnce,
+} from "./newsletter-log.ts";
 import type { NewsletterIssue } from "./newsletter.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
@@ -155,4 +159,29 @@ Deno.test("a log file that is not valid JSON stops the send instead of allowing 
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
+});
+
+Deno.test("sendNewsletterOnce refuses an empty subscriber list before recording the slug", async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    const logFile = `${dir}/newsletter-log.json`;
+    const relay = fakeRelay();
+    const result = await sendNewsletterOnce({
+      slug: "a-post",
+      logFile,
+      issue: { ...issue(relay), subscribers: [] },
+      now: NOW,
+    });
+    assertEquals(result, { status: "no-subscribers" });
+    assertEquals(loadNewsletterLog(logFile), []);
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test("sendExitCode is 0 only when a mail went out and none failed", () => {
+  assertEquals(sendExitCode({ sent: 2, failed: 0 }), 0);
+  assertEquals(sendExitCode({ sent: 2, failed: 1 }), 1);
+  assertEquals(sendExitCode({ sent: 0, failed: 2 }), 1);
+  assertEquals(sendExitCode({ sent: 0, failed: 0 }), 1);
 });
