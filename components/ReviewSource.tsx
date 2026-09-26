@@ -30,7 +30,7 @@ export function ReviewSource(
         href={project.madeForURL}
         target="_blank"
         rel="noopener noreferrer"
-        class={LINK}
+        class={`${LINK} whitespace-nowrap`}
       >
         {project.madeForName}
         <NewTabHint />

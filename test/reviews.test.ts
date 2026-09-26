@@ -63,7 +63,9 @@ siteTest(
           `/projects/${project.slug} does not say "${project.madeForName} reviewed on Upwork"`,
         );
         assert(
-          html.includes(`href="${project.madeForURL}"`),
+          new RegExp(
+            `data-review-source[^>]*>\\s*<a href="${project.madeForURL}"`,
+          ).test(html),
           `/projects/${project.slug} does not link ${project.madeForName}'s profile`,
         );
       }
