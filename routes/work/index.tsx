@@ -217,7 +217,7 @@ export default define.page(function Work(ctx) {
     title: "Work — Anton Shubin",
     pageName: "Work",
     description:
-      "Client work by Anton Shubin: highlights first, then the archive, with each client's review.",
+      "Client work by Anton Shubin: highlights first, then the archive.",
     canonical: `https://antonshubin.com${WORK_PATH}`,
     ogType: "website",
   };
