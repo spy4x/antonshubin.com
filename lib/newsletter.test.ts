@@ -52,12 +52,48 @@ Deno.test("counts a send the relay refuses as failed, not sent", async () => {
   assertStringIncludes(log.errors[0], "  ✗ two@example.com:");
 });
 
-Deno.test("a stored address the unsubscribe codec cannot sign costs one mail, not the run", async () => {
-  // A lone UTF-16 surrogate: the codec refuses to sign it, so building this
-  // subscriber's link throws.
+Deno.test("a subscriber whose unsubscribe link cannot be built costs one mail, not the run", async () => {
   const subscribers = [
     SUBSCRIBERS[0],
-    { email: "\ud800x@example.com", subscribedAt: "2026-01-03T00:00:00.000Z" },
+    { email: "three@example.com", subscribedAt: "2026-01-03T00:00:00.000Z" },
+    SUBSCRIBERS[1],
+  ];
+  const relay = fakeRelay();
+  const log = recordingLog();
+  const result = await sendNewsletter({
+    subscribers,
+    subject: "Issue 1",
+    body: "<p>Hello</p>",
+    baseUrl: "https://example.com",
+    unsubscribeLink: (email) =>
+      email === "three@example.com"
+        ? Promise.reject(new Error("cannot sign"))
+        : createUnsubscribeToken(email, "s".repeat(32)),
+    sender: fakeSender(relay),
+    log,
+  });
+  assertEquals(result, { sent: 2, failed: 1 });
+  assertEquals(relay.mails.map((m) => m.to), [["one@example.com"], [
+    "two@example.com",
+  ]]);
+  assertEquals(log.errors.length, 1);
+  assertStringIncludes(log.errors[0], "  ✗ three@example.com: cannot sign");
+});
+
+Deno.test("skips a stored row that is not a bare address, counts it as failed and never logs it", async () => {
+  // Rows stored before #255: a display name the caller chose, and values the
+  // unsubscribe codec or a mail header cannot carry.
+  const bad = [
+    `"Your-account-is-locked,verify-at-https://evil.example/x"<victim@example.com>`,
+    "a<victim@example.com>",
+    "\ud800x@example.com",
+  ];
+  const subscribers = [
+    SUBSCRIBERS[0],
+    ...bad.map((email) => ({
+      email,
+      subscribedAt: "2026-01-03T00:00:00.000Z",
+    })),
     SUBSCRIBERS[1],
   ];
   const relay = fakeRelay();
@@ -71,10 +107,13 @@ Deno.test("a stored address the unsubscribe codec cannot sign costs one mail, no
     sender: fakeSender(relay),
     log,
   });
-  assertEquals(result, { sent: 2, failed: 1 });
+  assertEquals(result, { sent: 2, failed: 3 });
   assertEquals(relay.mails.map((m) => m.to), [["one@example.com"], [
     "two@example.com",
   ]]);
-  assertEquals(log.errors.length, 1);
-  assertStringIncludes(log.errors[0], "  ✗ \ud800x@example.com:");
+  assertEquals(log.errors, [
+    "  ✗ row 2: not a bare address, skipped",
+    "  ✗ row 3: not a bare address, skipped",
+    "  ✗ row 4: not a bare address, skipped",
+  ]);
 });

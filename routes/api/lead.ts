@@ -9,15 +9,7 @@ import {
   SMTP_USERNAME,
 } from "../../lib/config.ts";
 import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
-import { notifyOwner } from "../../lib/lead-mail.ts";
-
-interface LeadPayload {
-  name: string;
-  email: string;
-  techStack: string;
-  _t?: number;
-  _website?: string;
-}
+import { acceptLead } from "../../lib/lead.ts";
 
 // ── In-memory rate limiter (per IP, 3 submissions per hour) ──────────
 const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>();
@@ -36,55 +28,6 @@ function checkRateLimit(ip: string): string | null {
   }
   entry.count++;
   return null;
-}
-
-// ── Validation ───────────────────────────────────────────────────────
-function validate(payload: unknown): {
-  ok: false;
-  error: string;
-} | { ok: true; data: LeadPayload } {
-  if (!payload || typeof payload !== "object") {
-    return { ok: false, error: "Invalid request body" };
-  }
-  const body = payload as Record<string, unknown>;
-
-  // Honeypot: _website must be empty (bots fill it)
-  if (
-    body._website && typeof body._website === "string" &&
-    body._website.trim() !== ""
-  ) {
-    return { ok: false, error: "Invalid request" };
-  }
-
-  // Time gate: if _t is present and valid, reject <3s (bots submit instantly)
-  // Missing/invalid _t is tolerated — some Preact hydration paths lose it.
-  if (typeof body._t === "number" && body._t > 1e12) {
-    const elapsed = Date.now() - body._t;
-    if (elapsed < 3000) {
-      return { ok: false, error: "Please wait a moment before submitting" };
-    }
-  }
-
-  if (typeof body.name !== "string" || !body.name.trim()) {
-    return { ok: false, error: "Name is required" };
-  }
-  if (
-    typeof body.email !== "string" ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)
-  ) {
-    return { ok: false, error: "Valid email is required" };
-  }
-  if (typeof body.techStack !== "string" || !body.techStack.trim()) {
-    return { ok: false, error: "Tech stack description is required" };
-  }
-  return {
-    ok: true,
-    data: {
-      name: body.name.trim(),
-      email: body.email.trim(),
-      techStack: body.techStack.trim(),
-    },
-  };
 }
 
 // ── Mail ─────────────────────────────────────────────────────────────
@@ -116,19 +59,12 @@ export const handler = define.handlers({
       return Response.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
-    const result = validate(payload);
-    if (!result.ok) {
-      return Response.json({ error: result.error }, { status: 400 });
-    }
-
-    notifyOwner(result.data, {
+    // The mail goes out after the answer; acceptLead logs its failure.
+    const outcome = acceptLead(payload, {
       sender: SENDER,
       contactEmail: CONTACT_EMAIL,
       relay: SMTP_HOST + ":" + SMTP_PORT,
-    }).catch((err) => {
-      console.error("[LEAD] failed:", err);
     });
-
-    return Response.json({ ok: true });
+    return Response.json(outcome.body, { status: outcome.status });
   },
 });

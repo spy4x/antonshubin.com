@@ -51,29 +51,15 @@ export const handler = define.handlers({
       return Response.json({ error: rateError }, { status: 429 });
     }
 
-    let body: { email?: string };
+    let body: { email?: unknown } | null;
     try {
       body = await ctx.req.json();
     } catch {
       return Response.json({ error: "Invalid JSON" }, { status: 400 });
     }
 
-    if (
-      !body.email || typeof body.email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email) ||
-      // A control character or a lone UTF-16 surrogate: no mail can reach
-      // it, and the unsubscribe codec refuses to sign it, so it would sit in
-      // the list and fail every send.
-      /[\p{Cc}\p{Cs}]/u.test(body.email)
-    ) {
-      return Response.json({ error: "Valid email is required" }, {
-        status: 400,
-      });
-    }
-
-    const email = body.email.trim().toLowerCase();
     // Mails go out after the answer; addSubscriber logs their failures.
-    const outcome = await addSubscriber(email, {
+    const outcome = await addSubscriber(body?.email, {
       load: loadSubscribers,
       save: saveSubscribers,
       unsubscribeLink,
