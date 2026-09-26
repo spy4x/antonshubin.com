@@ -285,7 +285,10 @@ export default define.page(function BlogArticle(ctx) {
 
           {/* Previous / Next article navigation */}
           {(prev || next) && (
-            <div class="grid gap-4 sm:grid-cols-2 p-4 bg-paper border-t border-rule">
+            <div
+              data-post-nav
+              class="grid grid-cols-1 gap-4 sm:grid-cols-2 p-4 bg-paper border-t border-rule"
+            >
               {prev
                 ? (
                   <a

@@ -3,14 +3,14 @@ import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
 
 interface CopyButtonProps {
   elementId: string;
+  /** Visible text. Defaults to `title`, so what a visitor reads is what a screen reader announces (#236). */
   label?: string;
   class?: string;
   title?: string;
 }
 
 export default function CopyButton(
-  { elementId, label = "Copy address", class: className, title }:
-    CopyButtonProps,
+  { elementId, label, class: className, title }: CopyButtonProps,
 ) {
   const copied = useSignal(false);
 
@@ -52,7 +52,7 @@ export default function CopyButton(
         )
         : (
           <>
-            <CopyIcon class="w-3.5 h-3.5" /> {label}
+            <CopyIcon class="w-3.5 h-3.5" /> {label ?? title ?? "Copy address"}
           </>
         )}
     </button>
