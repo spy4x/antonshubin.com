@@ -1,5 +1,5 @@
 import type { ComponentChildren } from "preact";
-import Nav from "../islands/Nav.tsx";
+import { Nav } from "./Nav.tsx";
 import { SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts";
 import { navCurrent } from "../lib/nav.ts";
 
@@ -13,7 +13,7 @@ export function Layout({ children, currentPath }: LayoutProps) {
     <>
       {
         /* Phone header (#185): scrolls away with the page; the desktop rail
-          in islands/Nav.tsx carries the portrait from 640px up. */
+          in components/Nav.tsx carries the portrait from 640px up. */
       }
       <header class="sm:hidden flex items-center gap-2 h-13 px-4 border-b border-rule">
         <a
@@ -33,11 +33,7 @@ export function Layout({ children, currentPath }: LayoutProps) {
         </a>
         <span class="ml-auto text-sm text-graphite">{TIMEZONE_LABEL}</span>
       </header>
-      <Nav
-        {...{ "client:idle": true }}
-        currentPath={currentPath}
-        scheduleUrl={SCHEDULE_URL}
-      />
+      <Nav currentPath={currentPath} scheduleUrl={SCHEDULE_URL} />
       <main
         id="main-content"
         class="p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:ml-18 sm:pb-4 lg:ml-22 md:p-12"

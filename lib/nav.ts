@@ -1,11 +1,12 @@
 /**
  * The site's navigation destinations (#185): the one place a nav label, href
- * or Links entry is written. `islands/Nav.tsx` renders the desktop rail, the
- * phone tab bar and the phone "More" sheet from these lists, so changing a
+ * or Links entry is written. `components/Nav.tsx` renders the desktop rail and
+ * the phone tab bar, `islands/NavMore.tsx` the phone "More" sheet and
+ * `islands/NavLinks.tsx` the Links popover, from these lists, so changing a
  * destination (#188 moves Work to `/work`) is one edit here.
  */
 
-/** Names of the icons `islands/Nav.tsx` maps onto `components/Icons.tsx`. */
+/** The item icons; each names a glyph in `components/Icons.tsx`'s `NavGlyph`. */
 export type NavIcon =
   | "work"
   | "services"
@@ -109,7 +110,8 @@ export const linkGroups: NavLinkGroup[] = [
  * on the page itself, `"true"` anywhere under it, `"false"` otherwise. The
  * same matching Fresh's renderer applies on the server, except that `/` is
  * only ever the page itself: Fresh marks every link to `/` as the current
- * section on every page. See `islands/Nav.tsx` for where each one applies.
+ * section on every page. Used for links to `/` in `components/Nav.tsx` and
+ * `components/Layout.tsx`, and for every link in `islands/NavMore.tsx`.
  */
 export function navCurrent(
   currentPath: string,

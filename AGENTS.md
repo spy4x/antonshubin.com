@@ -264,12 +264,19 @@ Each tool page's 1200×630 preview comes from `deno task og`, like a post's.
 
 `lib/nav.ts` is the only list of navigation destinations (#185): the desktop
 rail, the phone tab bar, the phone More dialog and the Links groups all read it,
-so changing a destination is one entry there. `islands/Nav.tsx` renders them;
-the phone header (photo, name, `TIMEZONE_LABEL` from `lib/config.ts`) is plain
-markup in `components/Layout.tsx`. Book goes to `SCHEDULE_URL` and carries
-`data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes to the
-home page's brief form (`/#audit-form`). `test/nav.test.ts` checks both on every
-page.
+so changing a destination is one entry there. `components/Nav.tsx` renders the
+rail and the tab bar on the server; only More (`islands/NavMore.tsx`, its
+dialog's contents rendered when it opens) and the rail's Links popover
+(`islands/NavLinks.tsx`, its groups rendered the first time it opens) ship JS.
+The nav's icons are `components/Icons.tsx`'s `NavGlyph` (one short path each,
+styled by `.nav-icon`) and its states are the `.nav-*` classes in
+`assets/styles.css`: keep its markup small, because under `scripts/lcp.ts`'s
+network profile every extra KB on every page measurably delays the home page's
+LCP image. The phone header (photo, name, `TIMEZONE_LABEL` from `lib/config.ts`)
+is plain markup in `components/Layout.tsx`. Book goes to `SCHEDULE_URL` and
+carries `data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes
+to the home page's brief form (`/#audit-form`). `test/nav.test.ts` checks both
+on every page.
 
 ## Visual system
 
@@ -451,13 +458,13 @@ sitemap page plus `/pay`, and pins that each `/pay` copy button names its field.
 `test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only accessible
 names, from server-rendered HTML only — it doesn't cover the two lightboxes'
 buttons, which only exist after client JS opens them (see "Browser-driven
-tests"). On the server, `islands/Nav.tsx` leaves a
-destination link's `aria-current` to Fresh's renderer, which marks it from the
-request URL, and `test/a11y.test.ts` pins that. Hydration strips that marker
-(Preact drops attributes the island's own vnode lacks), so in the browser the
-island sets it from `location.pathname` through `lib/nav.ts`'s `navCurrent()`,
-which also never marks `/` as a section — Fresh marks every link to `/` on every
-page. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
+tests"). `components/Nav.tsx` sets no `aria-current` on a destination link:
+Fresh's renderer marks it from the request URL, and `test/a11y.test.ts` pins
+that. Two exceptions use `lib/nav.ts`'s `navCurrent()` instead. Links to `/` get
+it because Fresh marks every link to `/` as the current section on every page.
+The links inside `islands/NavMore.tsx` get it because hydration strips Fresh's
+marker from an island (Preact drops attributes the island's own vnode lacks).
+`lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
 needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
 `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
 preconnect links while browsers do. `routes/_app.tsx` makes that decision at

@@ -1,5 +1,5 @@
 // Browser-driven guards for issue #165: the mobile menu's Escape handling
-// (islands/Nav.tsx; #185 made it the More dialog and added the rail's tab
+// (islands/NavMore.tsx; #185 made it the More dialog and added the rail's tab
 // order and the phone tab bar) and the two photo lightboxes' names and focus return
 // (islands/ImageGallery.tsx on a project page, islands/BlogImageEnhancer.tsx
 // on a blog post). None of this is visible in the server-rendered HTML the
@@ -480,6 +480,33 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
   }
 });
 
+Deno.test("the rail's Links popover lists the Links groups when opened", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await page.getByRole("button", { name: "Links", exact: true }).click();
+      const popover = page.locator("#nav-links");
+      for (const name of ["GitHub", "RSS", "meet.antonshubin.com"]) {
+        await popover.getByRole("link", { name, exact: false }).first()
+          .waitFor({ state: "visible", timeout: 5000 });
+      }
+      await page.keyboard.press("Escape");
+      await popover.waitFor({ state: "hidden" });
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
 /** The computed colour a probe element gets from `className`, e.g. `bg-lamp`. */
 function tokenColour(
   page: Page,
@@ -505,9 +532,9 @@ Deno.test("a 390px phone shows five tabs with Book in the centre and the current
     try {
       const tabs = page.locator("#tab-bar li > :is(a, button)");
 
-      /** Loads `path` and waits until the nav island has hydrated: More only
-       * opens its dialog once client JS runs, and hydration is what used to
-       * strip the current-page marker. */
+      /** Loads `path` and waits until the More island has hydrated (More
+       * only opens its dialog once client JS runs), so the state checks
+       * below see the page after hydration, not only the server HTML. */
       const load = async (path: string) => {
         await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
         await tabs.nth(4).click();

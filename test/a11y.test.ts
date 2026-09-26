@@ -1,6 +1,6 @@
-// Guards for issue #160: the nav's active-page marker (which islands/Nav.tsx
-// leaves entirely to Fresh's own framework behavior — see the first test's
-// docs for why) and icon-only controls keeping an accessible name. Reads the
+// Guards for issue #160: the nav's active-page marker (which
+// components/Nav.tsx leaves to Fresh's own framework behavior — see the first
+// test's docs) and icon-only controls keeping an accessible name. Reads the
 // built site through test/harness.ts — see AGENTS.md "Rendered-page tests".
 // Assert on structure only, never on prose (same rule as
 // test/structure.test.ts and test/rendered.test.ts).
@@ -21,14 +21,12 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 }
 
 /**
- * On the server, islands/Nav.tsx leaves each destination link's
- * `aria-current` to Fresh 2's renderer, which marks any `<a href>` matching
- * the request URL: an exact match gets `aria-current="page"` and
- * `data-current="true"`, a section ancestor gets `aria-current="true"` and
- * `data-ancestor="true"` (Fresh's `setActiveUrl` in its built server bundle).
- * In the browser the island sets the value itself after hydration — see its
- * `current()` helper and test/a11y.browser.test.ts's phone tab bar test.
- * What this test guards is the nav links' own `href`s in the server HTML:
+ * components/Nav.tsx leaves each destination link's `aria-current` to Fresh
+ * 2's renderer, which marks any `<a href>` matching the request URL: an exact
+ * match gets `aria-current="page"` and `data-current="true"`, a section
+ * ancestor gets `aria-current="true"` and `data-ancestor="true"` (Fresh's
+ * `setActiveUrl` in its built server bundle). The nav is server-rendered, so
+ * no hydration strips the marker again. What this test guards is the nav links' own `href`s in the server HTML:
  * pin both of Fresh's cases (exact match on `/blog`, section-ancestor match
  * on `/catalog` from a nested catalog item) so a typo'd or hardcoded `href`
  * — which would make Fresh's own matching miss — shows up here.
