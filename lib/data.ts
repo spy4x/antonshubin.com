@@ -9,7 +9,7 @@ export interface Project {
   logoImageURL?: string;
   /**
    * The logo was drawn for a light background and nearly disappears on the
-   * dark cards: render it on the `.logo-plate` backing (assets/styles.css).
+   * dark cards: render it on a light Parchment plate (`bg-parchment`).
    */
   logoPlate?: boolean;
   logoText?: string;

@@ -213,9 +213,9 @@ never colour alone; used today on `routes/projects/index.tsx` and
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
 gets `logoPlate: true` in `lib/data.ts`: the /projects card and the project page
-then render it on `.logo-plate` (Parchment backing, `assets/styles.css`). Today
-that is Roley and Sogroya; `test/projects-page.test.ts` pins the list. No
-per-project inline logo styles.
+then render it on a light plate (`bg-parchment rounded-lg`). Today that is Roley
+and Sogroya; `test/projects-page.test.ts` pins that list across client projects
+and tools. No per-project inline logo styles.
 
 ### Type
 
