@@ -133,14 +133,16 @@ in TypeScript — no `sops` binary, no `.sops.yaml`. It reads `.age/key.txt`,
 which lives only in the main checkout: Syncthing replicates it as part of
 `~/sync/code`; keep an offline copy as well. A linked git worktree needs no copy
 of its own: the module finds the MAIN checkout's key itself by reading the
-worktree's `.git` file. Run `deno task env:decrypt` to turn `.env.prod.age` into
-`.env.prod`. Agents never copy an env file (`.env`, `.env.prod`, or the key
-itself) between checkouts or worktrees — decrypt it fresh in each one.
+worktree's `.git` file, so skip the global `env-key-copy.ts` step here. Run
+`deno task env:decrypt` to turn `.env.prod.age` into `.env.prod`. Agents never
+copy an env file (`.env`, `.env.prod`, or the key itself) between checkouts or
+worktrees — decrypt it fresh in each one.
 
 ## Deploy
 
 Order: review the pull request, merge it, then deploy from the default branch
-(`deno task deploy`). Never deploy unreviewed or unmerged code.
+(`deno task deploy`) right after the merge, without asking. Never deploy
+unreviewed or unmerged code.
 
 The deploy script passes the local commit hash to the remote build as
 `BUILD_ID`, which becomes the service worker's cache name (`routes/sw.js.ts`).
@@ -156,7 +158,9 @@ restore are in `docs/deploy.md` "Subscriber data".
 ## Code style
 
 Double quotes, no semicolons, 2-space indent, 100 columns — this is what
-`deno fmt` enforces, so run it instead of hand-formatting.
+`deno fmt` enforces, so run it instead of hand-formatting. Double quotes
+override the global "backticks for strings" rule; backticks only for
+interpolation.
 
 ## Catalog and prices
 
