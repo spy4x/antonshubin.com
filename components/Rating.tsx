@@ -24,6 +24,7 @@ export function Rating(
         ),
       )}
       <span class="ml-1 text-parchment font-semibold text-sm">
+        <span class="sr-only">Rated {label} out of 5</span>
         <span aria-hidden="true">{label}</span>
       </span>
     </span>
