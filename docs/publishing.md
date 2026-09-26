@@ -10,6 +10,52 @@ hold throughout:
    says yes in chat to that post.** A newsletter cannot be unsent.
 3. **Dev.to gets an unpublished draft only.** Anton publishes it with one click.
 
+## 0. Brief: four lenses
+
+Before writing a word, read AGENTS.md "Anton's goals and this site's role" and
+the two ai-memory files it names. Then judge the idea through four lenses and
+write the result as a short brief. Each lens asks what this post does for
+Anton's goals, not whether it is interesting.
+
+- **SEO specialist.** What would the reader type into a search engine or ask an
+  AI assistant to find this post? Pick one search intent and one main phrase,
+  and put it in the title, the description, the slug and the first paragraph,
+  naturally. Check that no existing post already answers it (`content/blog/`);
+  if one does, update or link that post instead. Plan two or three internal
+  links: to a related post, a project, a tool or the catalog.
+- **Marketer.** Who exactly is the reader: a founder or CTO who might hire
+  Anton, a developer who might use one of his tools, or both? What should that
+  reader do after the last paragraph: book a call, open the catalog, star or try
+  a tool, subscribe? Name the one next step and end the post with it. Name the
+  channels that fit this reader, which decides which channel texts in step 4 are
+  worth writing.
+- **Psychologist.** What makes this reader start, keep reading and trust the
+  author? Open with the reader's problem or a concrete result, not with
+  background, then say what the post is and who it is for, as
+  [voice.md](voice.md) "How a post opens" describes. Show proof through
+  specifics: code, screenshots, what went wrong, and numbers under AGENTS.md
+  "Content rule" only. Answer the reader's likely doubt before they raise it. No
+  fake urgency, invented scarcity, flattery or other manipulation: trust is the
+  point, and one trick costs it.
+- **Personal-brand adviser.** Does the post make Anton look like what he sells:
+  a senior full-stack engineer and tech lead who ships, owns outcomes and
+  explains plainly? Does it add to a theme he wants to be known for, so posts
+  build on each other instead of scattering? Would he be glad to have it found
+  under his name in three years? Show expertise through the work, never through
+  bragging.
+
+The brief ends with a verdict. If the post serves no goal, or a different angle
+serves them clearly better, say so in chat and propose that angle before
+drafting; Anton decides. Otherwise the brief goes, in full, into the pull
+request body, and the reviewer checks the draft against it. The repository is
+public, and so is everything a post produces. The ai-memory files are for
+understanding the goals, never a source to quote: the brief, the post, the
+channel texts and the newsletter never copy a number or a private detail from
+them. A figure comes from Anton in the session (AGENTS.md "Content rule") or,
+for Upwork figures, from `lib/proof.ts` through `proof(id)`. Where the harness
+has them, the `marketing-seo` and `psychologist` agents can read the finished
+draft against the brief before the pull request opens.
+
 ## 1. Draft
 
 1. Read [voice.md](voice.md) first, and AGENTS.md "Content rule": no client,
@@ -71,6 +117,12 @@ The agent writes one text per channel in Anton's voice ([voice.md](voice.md)
 - a Reddit title and body, with two or three suggested subreddits, each with its
   own link from `deno task links /blog/<slug> --content r-<subreddit>`;
 - a Hacker News title (`hn` link).
+
+The brief from step 0 picks the reader and the one result each text carries;
+[voice.md](voice.md) "Channel texts" decides each channel's shape and how it
+opens. Reddit and Hacker News punish anything that reads as self-promotion, so
+the result there is what the reader learns, not what Anton did. Skip a channel
+the brief ruled out, and say which and why.
 
 It shows them in chat and stops there. The texts are not saved to a file: the
 links can be printed again any time with `deno task links`.
