@@ -60,4 +60,10 @@ export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
 export const SAME_AS_URLS = [
   "https://www.upwork.com/freelancers/ashubin",
   "https://github.com/spy4x",
+  "https://www.linkedin.com/in/anton-shubin",
+  "https://www.youtube.com/@anton-shubin",
+  "https://x.com/spy4x",
 ] as const;
+
+/** Anton's X handle, confirmed on 27 Sep 2026 (#193). */
+export const X_HANDLE = "@spy4x";

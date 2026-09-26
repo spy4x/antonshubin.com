@@ -81,8 +81,9 @@ Four entities in a `@graph` array:
 - No `aggregateRating` anywhere on the site (#193): 80 is Upwork's job count,
   not a review count, and schema.org's review-snippet rules require an on-page
   review to back a rating
-- `twitter:site` is omitted, not set to a guessed handle: `@antonshubin` is
-  unverified (#193)
+- `twitter:site` and `twitter:creator` are `@spy4x`, the handle Anton confirmed
+  on 27 Sep 2026 (#193); the Person `sameAs` lists Upwork, GitHub, LinkedIn,
+  YouTube and X (`lib/config.ts`'s `SAME_AS_URLS`)
 
 ### 6. FAQ Schema (routes/how-i-work.tsx)
 
@@ -121,8 +122,8 @@ Four entities in a `@graph` array:
 
 ### 8. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
 
-- `summary_large_image` card type; no `twitter:site` (the handle is unverified,
-  #193)
+- `summary_large_image` card type; `twitter:site` and `twitter:creator` are
+  `@spy4x` (#193)
 - Full OG tags (type, title, description, url, image, image:width, image:height,
   site_name, locale)
 - `og:image`/`twitter:image` point at a 1200×630 PNG for every post, project

@@ -3,8 +3,14 @@ interface Crumb {
   href?: string;
 }
 
+/**
+ * The visible trail, shown only on pages two levels deep (Home / Work /
+ * SmartLite). On a top-level page it would only repeat the H1 under "Home",
+ * so it renders nothing there; every page keeps its `BreadcrumbList`
+ * JSON-LD for search (`lib/head.ts`).
+ */
 export function Breadcrumb({ items }: { items: Crumb[] }) {
-  if (items.length <= 1) return null;
+  if (items.length <= 2) return null;
 
   return (
     <nav aria-label="Breadcrumb" class="mb-6 text-sm">

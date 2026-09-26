@@ -6,7 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
-import { groupedTools, tool, tools } from "../lib/tools.ts";
+import { ciUrl, groupedTools, tool, tools } from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
 
 /** The word components/StatusMark.tsx prints for each tool status. */
@@ -96,6 +96,29 @@ siteTest(
         ? tools.map((t) => `CI ${ciReading(repoSnapshot(t.repo).ci).word}`)
         : [`CI ${ciReading(repoSnapshot(tool(path.slice(7)).repo).ci).word}`];
       assertEquals(pills, expected, path);
+    }
+  },
+);
+
+siteTest(
+  "every CI pill links the tool's repository on Woodpecker, not one pipeline",
+  async (site) => {
+    for (const t of tools) {
+      for (const path of ["/tools", `/tools/${t.slug}`]) {
+        const html = await site.html(path);
+        const hrefs = [
+          ...html.matchAll(/<a[^>]*href="([^"]*)"[^>]*data-ci-status=/g),
+        ]
+          .map((m) => m[1]);
+        assert(
+          hrefs.includes(ciUrl(t)),
+          `${path}: no CI pill links ${ciUrl(t)}`,
+        );
+        assert(
+          !hrefs.some((h) => h.includes("/pipeline/")),
+          `${path}: a CI pill links one pipeline`,
+        );
+      }
     }
   },
 );

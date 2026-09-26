@@ -4,7 +4,9 @@ import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
 /**
  * A tool's CI status from the committed snapshot (#189): a shape plus a word
  * ("Passing", "Failing", "Running", "Unknown"), never colour alone, linked to
- * the Woodpecker pipeline it was read from. `data-ci-status` carries the word
+ * the tool's repository on Woodpecker, not
+ * the one pipeline the snapshot was read from: that run goes stale with the
+ * next push. `data-ci-status` carries the word
  * for tests. Rendered from `lib/github-snapshot.json`, not from Woodpecker's
  * live badge image, so the page is the same on every request.
  */
@@ -19,7 +21,7 @@ export function CiPill(
   const { word, mark } = ciReading(ci);
   return (
     <a
-      href={ci?.url ?? pipelinesUrl}
+      href={pipelinesUrl}
       data-ci-status={word}
       class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-lamp rounded-full hover:underline underline-offset-4"
     >

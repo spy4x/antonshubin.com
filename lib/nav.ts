@@ -87,10 +87,6 @@ export function linkGroups(upworkUrl: string): NavLinkGroup[] {
       links: [
         { href: "https://meet.antonshubin.com", label: "meet.antonshubin.com" },
         { href: "https://dash.antonshubin.com", label: "dash.antonshubin.com" },
-        {
-          href: "https://probe-home.antonshubin.com",
-          label: "probe-home.antonshubin.com",
-        },
       ],
     },
     {
