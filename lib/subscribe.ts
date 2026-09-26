@@ -1,6 +1,7 @@
 // What `/api/subscribe` does with the posted email field: check it is a bare
-// address, store it once, then welcome the subscriber and notify the owner. Kept out of the route so a test
-// can run it against fake storage and a fake mail relay.
+// address, store it once, then welcome the subscriber and notify the owner.
+// Kept out of the route so a test can run it against fake storage and a fake
+// mail relay.
 import type { Subscriber } from "./subscribers.ts";
 import { bareAddress } from "./email-field.ts";
 import {
@@ -40,7 +41,11 @@ export interface AddSubscriberOutcome {
  * used to test whether an address is on the list. For the same reason the
  * unsubscribe link is built first, for both: a missing or unusable
  * UNSUBSCRIBE_SECRET fails every request the same way, instead of saving an
- * address whose unsubscribe link would never work.
+ * address whose unsubscribe link would never work. The list is saved for both
+ * too, so an unwritable file answers 500 to a known address as to a new one.
+ * The remaining difference is the mails a new address triggers after the
+ * answer, and a few tenths of a millisecond; a probe with an unknown address
+ * subscribes and mails it, so it cannot go unnoticed.
  */
 export async function addSubscriber(
   field: unknown,
@@ -71,14 +76,13 @@ export async function addSubscriber(
   }
 
   const subs = deps.load();
-  if (subs.some((s) => s.email === email)) {
-    return { status: 200, body: { ok: true }, mails: none };
+  const known = subs.some((s) => s.email === email);
+  if (!known) {
+    subs.push({
+      email,
+      subscribedAt: (deps.now?.() ?? new Date()).toISOString(),
+    });
   }
-
-  subs.push({
-    email,
-    subscribedAt: (deps.now?.() ?? new Date()).toISOString(),
-  });
   try {
     deps.save(subs);
   } catch (err) {
@@ -89,6 +93,7 @@ export async function addSubscriber(
       mails: none,
     };
   }
+  if (known) return { status: 200, body: { ok: true }, mails: none };
 
   // Welcome the subscriber and notify the owner.
   const mails = sendSubscribeMails(
