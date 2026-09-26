@@ -320,7 +320,7 @@ export const tools: Tool[] = [
         planned: false,
       },
       {
-        text: "My SaaS template will import it once it is published.",
+        text: "My SaaS template will import it.",
         href: "https://github.com/spy4x/template",
         planned: true,
       },
