@@ -578,15 +578,26 @@ siteTest(
       html.includes('<meta name="twitter:site" content="@spy4x"/>'),
       "twitter:site should be @spy4x",
     );
+    assert(
+      html.includes('<meta name="twitter:creator" content="@spy4x"/>'),
+      "twitter:creator should be @spy4x",
+    );
     const person = jsonLd(html)
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
       .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
         | { sameAs?: string[] }
         | undefined;
-    assert(
-      person?.sameAs?.includes("https://x.com/spy4x"),
-      "Person sameAs lacks the X profile",
-    );
+    for (
+      const url of [
+        "https://www.upwork.com/freelancers/ashubin",
+        "https://github.com/spy4x",
+        "https://www.linkedin.com/in/anton-shubin",
+        "https://www.youtube.com/@anton-shubin",
+        "https://x.com/spy4x",
+      ]
+    ) {
+      assert(person?.sameAs?.includes(url), `Person sameAs lacks ${url}`);
+    }
   },
 );
 

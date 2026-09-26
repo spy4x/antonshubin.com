@@ -287,14 +287,14 @@ on every page.
 
 `assets/styles.css`'s `@theme` block is the only place a colour is defined
 (#184): Ink, Desk, Paper and Lamp are the four dark surfaces (page; rail, bar
-and footer; cards; active nav item and sheet), Rule and Rule strong are hairline
-and control borders, Parchment and Graphite are primary and secondary text,
-Accent (`#f97316`, Ink text on it, hover `#fb923c`) is the one filled-button
-colour, and Sage, Mist and Brick are status colours (ready/live, beta/info,
-risk/error). Every class in `routes/`, `components/` and `islands/` uses these
-tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind palette colour
-(`slate-*`, `gray-*`, `orange-*`) showing up again is a regression, not a style
-choice.
+and closing bands; cards; active nav item and sheet), Rule and Rule strong are
+hairline and control borders, Parchment and Graphite are primary and secondary
+text, Accent (`#f97316`, Ink text on it, hover `#fb923c`) is the one
+filled-button colour, and Sage, Mist and Brick are status colours (ready/live,
+beta/info, risk/error). Every class in `routes/`, `components/` and `islands/`
+uses these tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind
+palette colour (`slate-*`, `gray-*`, `orange-*`) showing up again is a
+regression, not a style choice.
 
 `components/Button.tsx` is the one button component. `variant` defaults to
 `secondary` (an outline button); `variant="primary"` (`bg-accent text-ink`) is
@@ -330,7 +330,10 @@ own projects keep their pages at `/work/<slug>` (the same route serves both,
 those pages are reached from the sitemap, both llms files and the pages that
 link them (rostok from `/infrastructure`, the guide and a post). `lib/work.ts`
 is derived from `lib/data.ts` and `lib/testimonials.ts` and writes no copy of
-its own. The breadcrumb reads "Home / Work", the page name and not the full
+its own. The visible breadcrumb shows only on pages two levels deep
+(`components/Breadcrumb.tsx` renders nothing for a trail of two items), so a
+case page reads "Home / Work / <title>" and `/work` shows none; every page keeps
+its `BreadcrumbList` JSON-LD, whose last item is the page name, not the full
 `<title>`.
 
 ### Project page
