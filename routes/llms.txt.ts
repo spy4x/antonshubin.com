@@ -35,7 +35,7 @@ export const handler = define.handlers({
     // server, a revival, a production URL) a bare description often doesn't.
     const openSourceList = openSourceProjects()
       .map((p) =>
-        `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
+        `- [${p.title}](${BASE_URL}/work/${p.slug}) — ${
           withOutcome(firstSentence(p.description), p.outcome)
         }`
       )
@@ -48,7 +48,7 @@ export const handler = define.handlers({
       .slice(0, 2)
       .map((slug) => {
         const p = clientProject(slug);
-        return `- [${p.title}](${BASE_URL}/projects/${p.slug}) — ${
+        return `- [${p.title}](${BASE_URL}/work/${p.slug}) — ${
           clientSummary(p)
         }`;
       })
@@ -106,7 +106,7 @@ ${promisesList}
 - [Production Infrastructure](${BASE_URL}/infrastructure) — Operational proof of deployable, observable, recoverable, and transferable systems
 - [Contact](${BASE_URL}/contact-me)
 - [Blog](${BASE_URL}/blog)
-- [Work](${BASE_URL}/projects)
+- [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install${hackathonsLink}
 
 ## Open Source Projects

@@ -109,7 +109,7 @@ export default define.page(function SaasArchGuide() {
             {allProj.map((p) => (
               <li>
                 <a
-                  href={`/projects/${p.slug}`}
+                  href={`/work/${p.slug}`}
                   class="text-accent hover:text-accent hover:underline transition-colors font-medium"
                 >
                   → {p.title}
@@ -193,7 +193,7 @@ export default define.page(function SaasArchGuide() {
             </li>
             <li>
               <a
-                href="/projects/rostok"
+                href="/work/rostok"
                 data-e2e="architecture-guide-rostok-proof"
                 class="inline-flex min-h-11 items-center text-accent hover:text-accent hover:underline transition-colors font-medium"
               >

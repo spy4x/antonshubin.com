@@ -16,7 +16,7 @@ already, and use it to keep Coverage and Core Web Vitals errors down.
    - Value: `google-site-verification=...` (provided by GSC)
 4. After verification, submit sitemap:
    - URL: `https://antonshubin.com/sitemap.xml`
-5. Request manual indexing: homepage, /how-i-work, /blog, /projects
+5. Request manual indexing: homepage, /how-i-work, /blog, /work
 6. Check Coverage report weekly for errors
 
 ## Also

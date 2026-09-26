@@ -1,5 +1,5 @@
 // #246: the project page as a case study. Checked on the built pages, since
-// the wiring lives in routes/projects/[slug].tsx and its components: a real
+// the wiring lives in routes/work/[slug].tsx and its components: a real
 // <h1>, the lead line, the fact card, one Book in the card and one in the
 // closing band, the catalog link, the meta description, the JSON-LD fields
 // and the one high-priority hero image.
@@ -47,9 +47,9 @@ siteTest(
   async (site) => {
     assert(clients.length > 0);
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)];
-      assertEquals(h1s.length, 1, `/projects/${p.slug} has ${h1s.length} <h1>`);
+      assertEquals(h1s.length, 1, `/work/${p.slug} has ${h1s.length} <h1>`);
       assertEquals(visibleText(h1s[0][1]), p.title, p.slug);
       assert(!/role="heading"/.test(html), `${p.slug} fakes a heading`);
     }
@@ -61,7 +61,7 @@ siteTest(
   async (site) => {
     let fallback = 0;
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       const lead = visibleText(region(html, "data-project-lead", "p"));
       const expected = p.outcome ??
         firstSentence(p.description.replace(/\s+/g, " "));
@@ -76,7 +76,7 @@ siteTest(
   "the fact card shows client, role, period, status and stack",
   async (site) => {
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       const card = region(html, "data-project-facts", "aside");
       const text = visibleText(card);
       assert(/data-project-period/.test(card), `${p.slug}: no period marker`);
@@ -113,7 +113,7 @@ siteTest(
 siteTest(
   "the code review's live link reads as the audit report",
   async (site) => {
-    const html = await site.html("/projects/code-review");
+    const html = await site.html("/work/code-review");
     const card = visibleText(region(html, "data-project-facts", "aside"));
     assert(card.includes("Read the audit report"), card);
   },
@@ -123,7 +123,7 @@ siteTest(
   "Book shows once in the fact card and once in the closing band",
   async (site) => {
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       // The page body only: the nav's own Book (#185) sits before <main>.
       const main = html.slice(html.indexOf(`id="main-content"`));
       assertEquals(count(main, /data-primary-book/), 2, p.slug);
@@ -149,7 +149,7 @@ siteTest(
     const slugs = new Set(catalogItems.map((i) => i.slug));
     let absent = 0;
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       if (!p.catalogSlug) {
         absent++;
         assert(
@@ -185,7 +185,7 @@ siteTest(
   "a project page's meta description is one line of at most 160 characters",
   async (site) => {
     for (const p of [...projects.my, ...clients].filter((x) => x.slug)) {
-      const raw = metaDescription(await site.html(`/projects/${p.slug}`));
+      const raw = metaDescription(await site.html(`/work/${p.slug}`));
       assert(!/[\n\r]/.test(raw), `${p.slug}: a newline`);
       const description = visibleText(raw);
       assert(description.length > 0, `${p.slug}: empty description`);
@@ -206,7 +206,7 @@ siteTest(
       corecircle: "2021",
     };
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       const node = jsonLd(html).find((d) =>
         (d as { "@id"?: string })["@id"]?.endsWith("#project")
       ) as Record<string, unknown> | undefined;
@@ -237,7 +237,7 @@ siteTest(
   "only the hero screenshot loads eagerly with high priority",
   async (site) => {
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       assertEquals(count(html, /fetchpriority="high"/), 1, p.slug);
       const tag = html.match(/<img\b[^>]*fetchpriority="high"[^>]*>/)![0];
       assert(tag.includes(`/${p.slug}/${p.screenshotURLs![0]}`), tag);
@@ -263,7 +263,7 @@ siteTest(
   "More work shows three other client projects with their periods",
   async (site) => {
     for (const p of clients) {
-      const html = await site.html(`/projects/${p.slug}`);
+      const html = await site.html(`/work/${p.slug}`);
       const cards = [...html.matchAll(/data-more-work="([^"]+)"/g)].map((m) =>
         m[1]
       );

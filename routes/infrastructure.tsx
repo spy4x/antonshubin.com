@@ -206,7 +206,7 @@ export default define.page(function Infrastructure() {
 
           <div class="grid gap-4 sm:grid-cols-2 mb-6">
             <a
-              href="/projects/smartlite"
+              href="/work/smartlite"
               data-e2e="infrastructure-view-smartlite"
               class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
@@ -223,7 +223,7 @@ export default define.page(function Infrastructure() {
               </p>
             </a>
             <a
-              href="/projects/rostok"
+              href="/work/rostok"
               data-e2e="infrastructure-view-rostok"
               class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >

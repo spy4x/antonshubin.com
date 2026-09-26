@@ -33,22 +33,22 @@ siteTest(
   async (site) => {
     let reviewsSeen = 0;
     for (const project of projects.freelance) {
-      const html = await site.html(`/projects/${project.slug}`);
+      const html = await site.html(`/work/${project.slug}`);
       const text = visibleText(html);
       const period = formatPeriod(project.period!);
       assert(
         /data-project-period/.test(html) && text.includes(`Period ${period}`),
-        `/projects/${project.slug} does not show its period ${period}`,
+        `/work/${project.slug} does not show its period ${period}`,
       );
       const reviews = projectTestimonials(project.slug!);
       if (reviews.length === 0) continue;
       assert(
         html.includes("data-project-reviews"),
-        `/projects/${project.slug} has reviews but no review section`,
+        `/work/${project.slug} has reviews but no review section`,
       );
       assert(
         html.includes(`href="${UPWORK_URL}"`),
-        `/projects/${project.slug} does not link the Upwork profile`,
+        `/work/${project.slug} does not link the Upwork profile`,
       );
       const start = html.indexOf("data-project-reviews");
       const section = html.slice(start, html.indexOf("</section>", start));
@@ -57,36 +57,36 @@ siteTest(
       const sources = section.match(/data-review-source/g)?.length ?? 0;
       assert(
         sources === 1,
-        `/projects/${project.slug} names the reviewer ${sources} times in its review section`,
+        `/work/${project.slug} names the reviewer ${sources} times in its review section`,
       );
       if (project.madeForName) {
         assert(
           text.replace(/\s*\(opens in a new tab\)/g, "").includes(
             `${project.madeForName} reviewed on Upwork`,
           ),
-          `/projects/${project.slug} does not say "${project.madeForName} reviewed on Upwork"`,
+          `/work/${project.slug} does not say "${project.madeForName} reviewed on Upwork"`,
         );
         assert(
           new RegExp(
             `data-review-source[^>]*>\\s*<a href="${project.madeForURL}"`,
           ).test(section),
-          `/projects/${project.slug} does not link ${project.madeForName}'s profile`,
+          `/work/${project.slug} does not link ${project.madeForName}'s profile`,
         );
       }
       const ratings = section.match(/data-rating="5\.0"/g)?.length ?? 0;
       assert(
         ratings === reviews.length,
-        `/projects/${project.slug} shows ${ratings} ratings for ${reviews.length} reviews`,
+        `/work/${project.slug} shows ${ratings} ratings for ${reviews.length} reviews`,
       );
       assert(
         !visibleText(section).includes(period),
-        `/projects/${project.slug} repeats the period ${period} under its reviews`,
+        `/work/${project.slug} repeats the period ${period} under its reviews`,
       );
       for (const t of reviews) {
         reviewsSeen++;
         assert(
           text.includes(squash(t.quote)),
-          `/projects/${project.slug} does not show review ${t.id} in full`,
+          `/work/${project.slug} does not show review ${t.id} in full`,
         );
       }
     }
@@ -115,8 +115,8 @@ siteTest(
         `excerpt ${id} missing from the home page`,
       );
       assert(
-        section.includes(`href="/projects/${project.slug}"`),
-        `excerpt ${id} does not link /projects/${project.slug}`,
+        section.includes(`href="/work/${project.slug}"`),
+        `excerpt ${id} does not link /work/${project.slug}`,
       );
       assert(
         text.includes(`${project.title} · ${formatPeriod(project.period!)}`),

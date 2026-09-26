@@ -9,7 +9,7 @@
 //
 // Coverage:
 // - Every static page, plus one representative page per dynamic route
-//   pattern (/blog/[slug], /projects/[slug], /catalog/[slug],
+//   pattern (/blog/[slug], /work/[slug], /catalog/[slug],
 //   /hackathons/[slug] if any exist) — see representativePaths()'s docs for
 //   why this isn't a full ~48-page sitemap crawl.
 // - An unmatched URL (/no-such-page, see #177 R-001): zero violations, same
@@ -105,7 +105,7 @@ async function sitemapPaths(site: Site): Promise<string[]> {
  * hold on, not just one instance of each.
  */
 function representativePaths(paths: string[]): string[] {
-  const dynamicPrefixes = ["/blog/", "/projects/", "/catalog/", "/hackathons/"];
+  const dynamicPrefixes = ["/blog/", "/work/", "/catalog/", "/hackathons/"];
   const isDynamic = (p: string) =>
     dynamicPrefixes.some((prefix) => p.startsWith(prefix));
   const chosen = paths.filter((p) => !isDynamic(p));

@@ -7,7 +7,7 @@
 // component, or a call site reverting to a plain `<a href={SCHEDULE_URL}>`,
 // could break, and fails on any `<a>` with a missing or empty `href`.
 //
-// The page set mirrors test/projects-claims.test.ts: the union of every path
+// The page set mirrors test/work-claims.test.ts: the union of every path
 // in the built `/sitemap.xml`, `/pay` (a real page left out of the sitemap
 // because it is noindex), and every project and blog slug from lib/data.ts,
 // so a page that drops out of the sitemap by accident is still fetched.
@@ -28,7 +28,7 @@ const EXTRA_PATHS = ["/pay"];
 
 const projectPaths = [...projects.my, ...projects.freelance]
   .filter((p) => p.slug)
-  .map((p) => `/projects/${p.slug}`);
+  .map((p) => `/work/${p.slug}`);
 
 const blogPaths = blogArticles.map((a) => `/blog/${a.slug}`);
 

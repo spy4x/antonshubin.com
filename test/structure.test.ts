@@ -12,6 +12,7 @@ import {
 } from "../lib/catalog.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
+import { redirectTable, redirectTarget } from "../lib/redirects.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -57,7 +58,7 @@ siteTest("the navigation has the five agreed links", async (site) => {
     .map((m) => m[0].match(/href="([^"]*)"/)?.[1]);
   assertEquals(
     [...links].sort(),
-    ["/blog", "/catalog", "/how-i-work", "/projects", "/tools"],
+    ["/blog", "/catalog", "/how-i-work", "/tools", "/work"],
   );
 });
 
@@ -152,7 +153,7 @@ const PRICE_PAGES: Record<string, string[]> = {
   ...Object.fromEntries(
     projects.freelance
       .filter((p) => p.catalogSlug)
-      .map((p) => [`/projects/${p.slug}`, []]),
+      .map((p) => [`/work/${p.slug}`, []]),
   ),
   // "a $10 VPS" in a blog post summary.
   "/saas-architecture-guide": ["$10"],
@@ -237,7 +238,7 @@ siteTest(
         "/",
         "/how-i-work",
         "/contact-me",
-        "/projects",
+        "/work",
         "/blog",
         "/infrastructure",
       ]
@@ -357,6 +358,7 @@ siteTest(
     assert(queue.length > 10, "sitemap looks empty");
     const seen = new Set<string>();
     const bad: string[] = [];
+    const redirected = new Set<string>();
     while (queue.length > 0) {
       const path = queue.pop()!;
       if (seen.has(path)) continue;
@@ -376,9 +378,18 @@ siteTest(
       }
       const html = await res.text();
       for (const m of html.matchAll(/<a\s[^>]*href="(\/[^"#?]*)[^"]*"/g)) {
-        if (!m[1].startsWith("//") && !seen.has(m[1])) queue.push(m[1]);
+        if (m[1].startsWith("//")) continue;
+        // Read the redirect table itself, so a link to an old URL is named
+        // as such instead of as a bare 301.
+        const target = redirectTarget(m[1]);
+        if (target) {
+          redirected.add(`${path} links ${m[1]}, which redirects to ${target}`);
+          continue;
+        }
+        if (!seen.has(m[1])) queue.push(m[1]);
       }
     }
+    assertEquals([...redirected], [], "internal links that hit a redirect");
     assertEquals(bad, [], "internal links that do not answer 200");
   },
 );
@@ -405,7 +416,7 @@ siteTest("no page emits an aggregateRating", async (site) => {
     const path of [
       "/",
       ...catalogItems.map((i) => `/catalog/${i.slug}`),
-      `/projects/${projects.freelance[0].slug}`,
+      `/work/${projects.freelance[0].slug}`,
       `/blog/${blogArticles[0].slug}`,
     ]
   ) {
@@ -439,15 +450,49 @@ siteTest(
     );
 
     const project = projects.freelance[0].slug;
-    const res2 = await site.get(`/projects/${project}/`);
+    const res2 = await site.get(`/work/${project}/`);
     await res2.body?.cancel();
     assertEquals(res2.status, 301);
     assertEquals(
       (res2.headers.get("location") ?? "").replace(site.origin, ""),
-      `/projects/${project}`,
+      `/work/${project}`,
     );
   },
 );
+
+siteTest(
+  "every old /projects URL answers one 301 to its /work twin, query string kept",
+  async (site) => {
+    const old = [...redirectTable].filter(([from]) =>
+      from.startsWith("/projects")
+    );
+    // 23 paths (the index, 21 project pages, homelab), each with and without
+    // a trailing slash; lib/redirects.test.ts lists them one by one.
+    assertEquals(old.length, 46);
+    for (const [from, to] of old) {
+      const res = await site.get(`${from}?utm_source=x&utm_campaign=y`);
+      await res.body?.cancel();
+      assertEquals(res.status, 301, from);
+      const location = (res.headers.get("location") ?? "").replace(
+        site.origin,
+        "",
+      );
+      assertEquals(location, `${to}?utm_source=x&utm_campaign=y`, from);
+      // One hop: the target answers 200 itself, not another redirect.
+      const landed = await site.get(location);
+      await landed.body?.cancel();
+      assertEquals(landed.status, 200, `${from} -> ${location}`);
+    }
+  },
+);
+
+siteTest("an old /projects URL with no new home answers 404", async (site) => {
+  for (const path of ["/projects/no-such-project", "/projects/no-such/"]) {
+    const res = await site.get(path);
+    await res.body?.cancel();
+    assertEquals(res.status, 404, path);
+  }
+});
 
 siteTest(
   "the retired CalDAV slug redirects to the post that absorbed it",
@@ -495,12 +540,12 @@ siteTest(
     }
     for (const project of [...projects.my, ...projects.freelance]) {
       if (!project.slug) continue;
-      const html = await site.html(`/projects/${project.slug}`);
+      const html = await site.html(`/work/${project.slug}`);
       assert(
         html.includes(
           `property="og:image" content="https://antonshubin.com/img/og/projects/${project.slug}.png"`,
         ),
-        `/projects/${project.slug}: og:image is not its PNG`,
+        `/work/${project.slug}: og:image is not its PNG`,
       );
     }
   },
@@ -558,8 +603,31 @@ siteTest(
 
     const project = projects.freelance[0];
     assertEquals(
-      await lastBreadcrumbName(`/projects/${project.slug}`),
+      await lastBreadcrumbName(`/work/${project.slug}`),
       project.title,
+    );
+
+    assertEquals(await lastBreadcrumbName("/work"), "Work");
+  },
+);
+
+siteTest(
+  "the visible breadcrumb reads Home / Work on the work pages",
+  async (site) => {
+    async function crumbs(path: string): Promise<string> {
+      const html = await site.html(path);
+      const start = html.indexOf('aria-label="Breadcrumb"');
+      assert(start > 0, `${path}: no breadcrumb`);
+      const nav = html.slice(start, html.indexOf("</nav>", start));
+      return nav.split("<li").slice(1)
+        .map((li) => visibleText(`<li${li}`).replace(/[\s/]+$/, "").trim())
+        .join(" / ");
+    }
+    assertEquals(await crumbs("/work"), "Home / Work");
+    const project = projects.freelance[0];
+    assertEquals(
+      await crumbs(`/work/${project.slug}`),
+      `Home / Work / ${project.title}`,
     );
   },
 );
@@ -601,7 +669,7 @@ siteTest(
   "/saas-architecture-guide's 'Building the MVP' section lists real case studies, not tools",
   async (site) => {
     const html = await site.html("/saas-architecture-guide");
-    // Scoped to the "Building the MVP" section: /projects/rostok is also
+    // Scoped to the "Building the MVP" section: /work/rostok is also
     // linked, on purpose, from the unrelated "Infrastructure & Cost
     // Optimization" section further down as infra proof, not a case study.
     const start = html.indexOf("Building the MVP");
@@ -611,14 +679,14 @@ siteTest(
     for (const project of projects.freelance) {
       if (!project.slug || project.archived) continue;
       assert(
-        section.includes(`href="/projects/${project.slug}"`),
+        section.includes(`href="/work/${project.slug}"`),
         `the MVP section does not link case study ${project.slug}`,
       );
     }
     for (const project of projects.my) {
       if (!project.slug) continue;
       assert(
-        !section.includes(`href="/projects/${project.slug}"`),
+        !section.includes(`href="/work/${project.slug}"`),
         `the MVP section links tool ${project.slug}, expected only client work`,
       );
     }

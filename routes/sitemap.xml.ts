@@ -1,6 +1,6 @@
 import { define } from "../lib/utils.ts";
 import { blogArticles, hackathons } from "../lib/data.ts";
-import { projects } from "../lib/data.ts";
+import { WORK_PATH, workHref, workProjects } from "../lib/work.ts";
 import { BASE_URL } from "../lib/config.ts";
 import { catalogItems } from "../lib/catalog.ts";
 import { tools } from "../lib/tools.ts";
@@ -37,7 +37,7 @@ export const handler = define.handlers({
         lastmod: undefined,
       },
       {
-        loc: "/projects",
+        loc: WORK_PATH,
         priority: "0.8",
         changefreq: "monthly",
         lastmod: undefined,
@@ -83,11 +83,9 @@ export const handler = define.handlers({
       lastmod: a.updatedAt ?? a.publishedAt,
     }));
 
-    const allProjects = [...projects.my, ...projects.freelance];
-    const projectUrls = allProjects
-      .filter((p) => p.slug)
+    const projectUrls = workProjects()
       .map((p) => ({
-        loc: `/projects/${p.slug}`,
+        loc: workHref(p.slug!),
         priority: "0.6",
         changefreq: "monthly" as const,
         lastmod: undefined as string | undefined,

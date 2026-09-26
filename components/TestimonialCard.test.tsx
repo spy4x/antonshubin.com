@@ -75,7 +75,7 @@ Deno.test("a card shows the excerpt, not the full quote, and names its project, 
   assert(html.includes("Great work."), `no excerpt:\n${html}`);
   assert(!html.includes("Would hire again."), `full quote shown:\n${html}`);
   assert(
-    html.includes(`href="/projects/example"`),
+    html.includes(`href="/work/example"`),
     `no project link:\n${html}`,
   );
   assert(html.includes("Example App"), `no project title:\n${html}`);

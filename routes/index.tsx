@@ -194,7 +194,7 @@ export default define.page(function Home(ctx) {
             {caseStudies.map((p) => (
               <a
                 key={p.slug}
-                href={`/projects/${p.slug}`}
+                href={`/work/${p.slug}`}
                 data-e2e={`home-view-${p.slug}`}
                 class="p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-colors group flex flex-col"
               >
@@ -221,7 +221,7 @@ export default define.page(function Home(ctx) {
           </div>
           <div class="mt-6 text-right">
             <a
-              href="/projects"
+              href="/work"
               class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
             >
               See all work

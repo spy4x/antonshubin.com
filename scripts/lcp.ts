@@ -34,7 +34,7 @@
  *   deno task lcp --n 21                    # more samples
  *   deno task lcp --mode cpu                # one mode only
  *   deno task lcp --ab ../main ../branch     # compare two built directories
- *   deno task lcp --path /projects/smartlite # measure another page
+ *   deno task lcp --path /work/smartlite # measure another page
  */
 import { type Site, startSite } from "../test/harness.ts";
 import { launchChromium } from "../test/browser.ts";

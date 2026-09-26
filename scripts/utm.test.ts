@@ -13,8 +13,8 @@ const OPUS_POST = "/blog/opus-5-5-vs-sonnet-5-agent-costs";
 
 Deno.test("drops a trailing slash from a non-root path", () => {
   assertEquals(
-    stripTrailingSlash("/projects/rostok/"),
-    "/projects/rostok",
+    stripTrailingSlash("/work/rostok/"),
+    "/work/rostok",
   );
 });
 

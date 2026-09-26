@@ -25,7 +25,7 @@ export function TestimonialCard(
       </blockquote>
       <figcaption class="text-sm">
         <a
-          href={`/projects/${project.slug}`}
+          href={`/work/${project.slug}`}
           class="font-semibold text-parchment hover:text-accent underline underline-offset-4"
         >
           {project.title}
