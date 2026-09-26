@@ -9,7 +9,7 @@ import { FOCUS, LinkGroups, STACKED, STATES } from "../components/NavParts.tsx";
  * with the home page's LCP image on a slow connection (see
  * components/Nav.tsx).
  */
-export default function NavLinks() {
+export default function NavLinks({ upworkUrl }: { upworkUrl: string }) {
   const shown = useSignal(false);
   return (
     <>
@@ -30,7 +30,9 @@ export default function NavLinks() {
         }}
         class="m-0 top-auto right-auto bottom-3 left-20 lg:left-24 w-64 max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-xl border border-rule bg-lamp p-2 text-parchment shadow-lg"
       >
-        {shown.value && <LinkGroups idPrefix="rail-links" />}
+        {shown.value && (
+          <LinkGroups idPrefix="rail-links" upworkUrl={upworkUrl} />
+        )}
       </div>
     </>
   );

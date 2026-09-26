@@ -15,7 +15,9 @@ import { moreItems, navCurrent } from "../lib/nav.ts";
  * work, Writing, Infrastructure and the Links groups. Escape, the Close
  * button or a tap on the backdrop closes it, and focus returns to More.
  */
-export default function NavMore({ currentPath }: { currentPath: string }) {
+export default function NavMore(
+  { currentPath, upworkUrl }: { currentPath: string; upworkUrl: string },
+) {
   const isMoreOpen = useSignal(false);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -106,7 +108,7 @@ export default function NavMore({ currentPath }: { currentPath: string }) {
                   </li>
                 ))}
               </ul>
-              <LinkGroups idPrefix="more-links" />
+              <LinkGroups idPrefix="more-links" upworkUrl={upworkUrl} />
             </>
           )}
         </div>

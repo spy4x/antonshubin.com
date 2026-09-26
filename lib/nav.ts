@@ -74,36 +74,43 @@ export const moreItems: NavItem[] = [
  */
 export const WRITE_FALLBACK_HREF = "/#audit-form";
 
-/** The Links popover (desktop) and the Links part of the More sheet (phone). */
-export const linkGroups: NavLinkGroup[] = [
-  {
-    label: "Running",
-    links: [
-      { href: "https://meet.antonshubin.com", label: "meet.antonshubin.com" },
-      { href: "https://dash.antonshubin.com", label: "dash.antonshubin.com" },
-      {
-        href: "https://probe-home.antonshubin.com",
-        label: "probe-home.antonshubin.com",
-      },
-    ],
-  },
-  {
-    label: "Profiles",
-    links: [
-      { href: "https://github.com/spy4x", label: "GitHub" },
-      { href: "https://www.linkedin.com/in/anton-shubin", label: "LinkedIn" },
-      { href: "https://www.youtube.com/@anton-shubin", label: "YouTube" },
-      { href: "https://www.upwork.com/freelancers/ashubin", label: "Upwork" },
-    ],
-  },
-  {
-    label: "Feeds",
-    links: [
-      { href: "/rss.xml", label: "RSS" },
-      { href: "/llms.txt", label: "llms.txt" },
-    ],
-  },
-];
+/**
+ * The Links popover (desktop) and the Links part of the More sheet (phone).
+ * `upworkUrl` is `lib/config.ts`'s `UPWORK_URL`, passed in rather than
+ * imported: the two nav islands import this file, and `config.ts` reads
+ * `Deno.env` when it loads, which does not exist in the browser.
+ */
+export function linkGroups(upworkUrl: string): NavLinkGroup[] {
+  return [
+    {
+      label: "Running",
+      links: [
+        { href: "https://meet.antonshubin.com", label: "meet.antonshubin.com" },
+        { href: "https://dash.antonshubin.com", label: "dash.antonshubin.com" },
+        {
+          href: "https://probe-home.antonshubin.com",
+          label: "probe-home.antonshubin.com",
+        },
+      ],
+    },
+    {
+      label: "Profiles",
+      links: [
+        { href: "https://github.com/spy4x", label: "GitHub" },
+        { href: "https://www.linkedin.com/in/anton-shubin", label: "LinkedIn" },
+        { href: "https://www.youtube.com/@anton-shubin", label: "YouTube" },
+        { href: upworkUrl, label: "Upwork" },
+      ],
+    },
+    {
+      label: "Feeds",
+      links: [
+        { href: "/rss.xml", label: "RSS" },
+        { href: "/llms.txt", label: "llms.txt" },
+      ],
+    },
+  ];
+}
 
 /**
  * The `aria-current` value for a nav link to `href` on `currentPath`: `"page"`

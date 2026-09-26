@@ -1,6 +1,7 @@
 import { NavGlyph } from "./Icons.tsx";
 import { NewTabHint } from "./NewTabHint.tsx";
 import { BOOK, FOCUS, navIcon, STACKED, STATES } from "./NavParts.tsx";
+import { UPWORK_URL } from "../lib/config.ts";
 import NavLinks from "../islands/NavLinks.tsx";
 import NavMore from "../islands/NavMore.tsx";
 import {
@@ -99,6 +100,7 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             <NavMore
               {...{ "client:idle": true }}
               currentPath={currentPath}
+              upworkUrl={UPWORK_URL}
             />
           </li>
         </ul>
@@ -152,7 +154,7 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             </li>
           ))}
         </ul>
-        <NavLinks />
+        <NavLinks upworkUrl={UPWORK_URL} />
       </div>
     </nav>
   );

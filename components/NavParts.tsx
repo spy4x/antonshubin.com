@@ -23,10 +23,12 @@ function isExternal(href: string): boolean {
 }
 
 /** The Links groups, shared by the desktop popover and the phone sheet. */
-export function LinkGroups({ idPrefix }: { idPrefix: string }) {
+export function LinkGroups(
+  { idPrefix, upworkUrl }: { idPrefix: string; upworkUrl: string },
+) {
   return (
     <div class="space-y-3">
-      {linkGroups.map((group) => {
+      {linkGroups(upworkUrl).map((group) => {
         const id = `${idPrefix}-${group.label.toLowerCase()}`;
         return (
           <div key={group.label}>
