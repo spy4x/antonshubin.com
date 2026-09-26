@@ -829,18 +829,18 @@ offline, no browser needed to run the check itself.
 ## Image metadata
 
 Every image committed under `static/` or `assets/` ships without metadata: no
-EXIF or XMP in a WebP, no text, time or EXIF chunk in a PNG, no editor generator
-comment or `<metadata>` block in an SVG. The tools that made them left camera
-and software names, dates, a local file path and app build ids, which every
-visitor downloaded (20 KB on the hero photo alone). Run
-`deno task strip-metadata` after adding or replacing any image, or
-`deno task strip-metadata <file>...` for just those files, and commit the
-result. It removes whole metadata chunks only; pixel data and colour information
-(ICC profiles, gamma, sRGB) are copied byte for byte, so the image looks the
-same. `test/asset-metadata.test.ts` fails on any image that still carries
-metadata. `deno task og` and `deno task optimize:screenshots` re-encode from
-pixels and add none, so only hand-added files need the step. Fonts keep their
-name table: it holds the OFL licence.
+EXIF or XMP in a WebP, no text, time or EXIF chunk in a PNG, no editor stamp in
+an SVG (a generator comment, `<desc>Created with …</desc>` or a `<metadata>`
+block). The tools that made them left camera and software names, dates, a local
+file path and app build ids, which every visitor downloaded (20 KB on the hero
+photo alone). Run `deno task strip-metadata` after adding or replacing any
+image, or `deno task strip-metadata <file>...` for just those files, and commit
+the result. It removes whole metadata chunks only; pixel data and colour
+information (ICC profiles, gamma, sRGB) are copied byte for byte, so the image
+looks the same. `test/asset-metadata.test.ts` fails on any image that still
+carries metadata. `deno task og` and `deno task optimize:screenshots` re-encode
+from pixels and add none, so only hand-added files need the step. Fonts keep
+their name table: it holds the OFL licence.
 
 ## Redirect table
 
