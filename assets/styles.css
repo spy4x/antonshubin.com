@@ -189,12 +189,69 @@ body {
   font-family: var(--font-sans);
 }
 
-/* islands/Menu.tsx rotates #menu -90deg into a vertical desktop rail; the
-   rail's on-screen height is this rule's width before rotation. */
-@media (min-width: 640px) {
-  #menu {
-    width: 100vh;
-  }
+/*
+ * Navigation items (#185, components/Nav.tsx and islands/NavMore.tsx).
+ * Classes rather than utility strings: the same long string on every rail
+ * item, tab and sheet row made every page's HTML several KB larger, and under
+ * scripts/lcp.ts's slow-network profile each KB measurably delays the home
+ * page's LCP image. States follow the link's
+ * aria-current: the page itself is a Lamp pill with a Parchment 600 label, a
+ * parent section is an outlined pill, the rest are Graphite with Paper on
+ * hover. Focus is a 2px Parchment ring with a 2px gap; the accent is only
+ * ever Book's background, never a state.
+ */
+.nav-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  text-align: center;
+}
+.nav-state {
+  border: 1px solid transparent;
+  color: var(--color-graphite);
+}
+.nav-state:hover {
+  color: var(--color-parchment);
+}
+.nav-state:not([aria-current="page"]):hover {
+  background-color: var(--color-paper);
+}
+.nav-state[aria-current="page"] {
+  background-color: var(--color-lamp);
+  color: var(--color-parchment);
+  font-weight: 600;
+}
+.nav-state[aria-current="true"],
+.nav-state[data-section-current] {
+  border-color: var(--color-rule-strong);
+  color: var(--color-parchment);
+}
+.nav-book {
+  border: 1px solid transparent;
+  background-color: var(--color-accent);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.nav-book:hover {
+  background-color: var(--color-accent-hover);
+}
+.nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.nav-focus:focus-visible {
+  outline: 2px solid var(--color-parchment);
+  outline-offset: 2px;
 }
 
 h1,

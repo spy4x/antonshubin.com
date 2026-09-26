@@ -4,6 +4,8 @@ export const BASE_URL = DOMAIN.startsWith("https://")
   ? DOMAIN
   : `https://${DOMAIN}`;
 export const SCHEDULE_URL = Deno.env.get("SCHEDULE_URL") || "";
+/** Shown next to the name in the phone header (#185); Da Nang is ICT. */
+export const TIMEZONE_LABEL = "UTC+7";
 export const UPWORK_URL = Deno.env.get("UPWORK_URL") ||
   "https://www.upwork.com/freelancers/ashubin";
 export const UMAMI_URL = Deno.env.get("UMAMI_URL") || "";

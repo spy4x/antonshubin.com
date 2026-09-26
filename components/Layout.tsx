@@ -1,6 +1,7 @@
 import type { ComponentChildren } from "preact";
-import Menu from "../islands/Menu.tsx";
-import { SCHEDULE_URL } from "../lib/config.ts";
+import { Nav } from "./Nav.tsx";
+import { SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts";
+import { navCurrent } from "../lib/nav.ts";
 
 interface LayoutProps {
   children: ComponentChildren;
@@ -10,12 +11,33 @@ interface LayoutProps {
 export function Layout({ children, currentPath }: LayoutProps) {
   return (
     <>
-      <Menu
-        {...{ "client:idle": true }}
-        currentPath={currentPath}
-        scheduleUrl={SCHEDULE_URL}
-      />
-      <main id="main-content" class="p-4 pb-24 sm:ml-16 md:p-12">
+      {
+        /* Phone header (#185): scrolls away with the page; the desktop rail
+          in components/Nav.tsx carries the portrait from 640px up. */
+      }
+      <header class="sm:hidden flex items-center gap-2 h-13 px-4 border-b border-rule">
+        <a
+          href="/"
+          aria-label="Anton Shubin, home"
+          aria-current={navCurrent(currentPath, "/")}
+          class="flex items-center gap-2 rounded-lg text-parchment font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-parchment"
+        >
+          <img
+            class="h-8 w-8 rounded-full border border-rule-strong"
+            src="/img/photo-64.webp"
+            alt="Photo of Anton Shubin"
+            width="32"
+            height="32"
+          />
+          <span>Anton Shubin</span>
+        </a>
+        <span class="ml-auto text-sm text-graphite">{TIMEZONE_LABEL}</span>
+      </header>
+      <Nav currentPath={currentPath} scheduleUrl={SCHEDULE_URL} />
+      <main
+        id="main-content"
+        class="p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:ml-18 sm:pb-4 lg:ml-22 md:p-12"
+      >
         {children}
         <footer class="max-w-4xl mx-auto mt-16 pt-6 border-t border-rule text-center text-graphite text-sm">
           <p>

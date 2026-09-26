@@ -50,14 +50,14 @@ siteTest(
   },
 );
 
-siteTest("the navigation has the six agreed links", async (site) => {
+siteTest("the navigation has the five agreed links", async (site) => {
   const html = await site.html("/");
   const menu = html.slice(html.indexOf('id="desktop-menu"'));
   const links = [...menu.matchAll(/<a[^>]*data-nav-link[^>]*>/g)]
     .map((m) => m[0].match(/href="([^"]*)"/)?.[1]);
   assertEquals(
     [...links].sort(),
-    ["/blog", "/catalog", "/contact-me", "/how-i-work", "/projects", "/tools"],
+    ["/blog", "/catalog", "/how-i-work", "/projects", "/tools"],
   );
 });
 
