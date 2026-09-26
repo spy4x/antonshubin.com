@@ -19,9 +19,11 @@ const LEAD = { name: "Jane Doe", techStack: "Deno" };
 
 Deno.test("answers 400 to an email field with a display name, and mails nothing", async () => {
   const refused = [
+    `"Your-account-is-locked,verify-at-https://evil.example/x"<victim@example.com>`,
     "a<victim@example.com>",
     `"Verify at https://evil.example"<victim@example.com>`,
     "Jane <jane@example.com>",
+    ["jane@example.com"],
   ];
   for (const email of refused) {
     const { relay, deps } = setup();
@@ -29,8 +31,8 @@ Deno.test("answers 400 to an email field with a display name, and mails nothing"
     await outcome.mail;
     assertEquals([outcome.status, outcome.body], [400, {
       error: "Valid email is required",
-    }], email);
-    assertEquals(relay.mails.length, 0, email);
+    }], JSON.stringify(email));
+    assertEquals(relay.mails.length, 0, JSON.stringify(email));
   }
 });
 
