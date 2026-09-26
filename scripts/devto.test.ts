@@ -3,7 +3,23 @@ import {
   absolutizeImageUrls,
   buildDevToPayload,
   createDevToDraft,
+  type DevToArticlePayload,
 } from "./devto.ts";
+
+const FOOTER_START = "\n\n---\n\n_First published on ";
+
+/** The post body as sent, without the "First published" footer. */
+function bodyOf(payload: DevToArticlePayload): string {
+  const md = payload.article.body_markdown;
+  const at = md.lastIndexOf(FOOTER_START);
+  if (at === -1) throw new Error(`no "First published" footer in: ${md}`);
+  return md.slice(0, at);
+}
+
+/** The last non-empty line of the body sent to Dev.to. */
+function lastLine(payload: DevToArticlePayload): string {
+  return payload.article.body_markdown.trimEnd().split("\n").at(-1) ?? "";
+}
 
 Deno.test("buildDevToPayload creates a draft with a clean, untagged canonical url", () => {
   const payload = buildDevToPayload(
@@ -12,13 +28,36 @@ Deno.test("buildDevToPayload creates a draft with a clean, untagged canonical ur
     "body text",
   );
   assertEquals(payload.article.title, "rostok launch post");
-  assertEquals(payload.article.body_markdown, "body text");
+  assertEquals(bodyOf(payload), "body text");
   assertEquals(payload.article.published, false);
   assertEquals(
     payload.article.canonical_url,
     "https://antonshubin.com/blog/rostok-self-hosted-scaffolder",
   );
   assertEquals(payload.article.canonical_url.includes("utm_"), false);
+});
+
+Deno.test("the draft ends with a First published line linking back with the devto tags and the campaign", () => {
+  const payload = buildDevToPayload(
+    "Opus 5.5 vs Sonnet 5",
+    "opus-5-5-vs-sonnet-5-agent-costs",
+    "body text",
+    "opus55-vs-sonnet5",
+  );
+  assertEquals(
+    lastLine(payload),
+    "_First published on [antonshubin.com](https://antonshubin.com/blog/opus-5-5-vs-sonnet-5-agent-costs" +
+      "?utm_source=devto&utm_medium=blog&utm_campaign=opus55-vs-sonnet5)._",
+  );
+});
+
+Deno.test("the First published line's campaign defaults to the post's slug", () => {
+  const payload = buildDevToPayload("title", "ship-it-today", "body text");
+  assertEquals(
+    lastLine(payload).includes("utm_campaign=ship-it-today)"),
+    true,
+    lastLine(payload),
+  );
 });
 
 Deno.test("buildDevToPayload rewrites a site-relative image path to an absolute url", () => {
@@ -28,7 +67,7 @@ Deno.test("buildDevToPayload rewrites a site-relative image path to an absolute 
     "before ![alt text](/img/blog/x.png) after",
   );
   assertEquals(
-    payload.article.body_markdown,
+    bodyOf(payload),
     "before ![alt text](https://antonshubin.com/img/blog/x.png) after",
   );
 });
@@ -36,13 +75,13 @@ Deno.test("buildDevToPayload rewrites a site-relative image path to an absolute 
 Deno.test("buildDevToPayload leaves a body with no images unchanged", () => {
   const body = "just text, and a [link](/blog/other-post) with no image";
   const payload = buildDevToPayload("post title", "post-slug", body);
-  assertEquals(payload.article.body_markdown, body);
+  assertEquals(bodyOf(payload), body);
 });
 
 Deno.test("buildDevToPayload leaves an already-absolute image url alone", () => {
   const body = "![alt](https://cdn.example.com/img/x.png)";
   const payload = buildDevToPayload("post title", "post-slug", body);
-  assertEquals(payload.article.body_markdown, body);
+  assertEquals(bodyOf(payload), body);
 });
 
 Deno.test("buildDevToPayload rewrites images to the same origin as canonical_url", () => {
@@ -275,6 +314,31 @@ Deno.test("createDevToDraft warns instead of throwing when the request fails", a
   try {
     // Must resolve, not reject — a failed Dev.to draft never blocks a publish.
     await createDevToDraft("title", "slug", "body");
+  } finally {
+    globalThis.fetch = originalFetch;
+    Deno.env.delete("DEVTO_API_KEY");
+  }
+});
+
+Deno.test("createDevToDraft sends the article's campaign in the First published link", async () => {
+  Deno.env.set("DEVTO_API_KEY", "test-key");
+  const originalFetch = globalThis.fetch;
+  let sent: DevToArticlePayload | undefined;
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+    sent = JSON.parse(String(init?.body));
+    return Promise.resolve(new Response("{}", { status: 201 }));
+  }) as typeof fetch;
+  try {
+    await createDevToDraft("title", "some-post", "body", "some-campaign");
+    assertEquals(
+      sent !== undefined &&
+        lastLine(sent).includes("utm_campaign=some-campaign)"),
+      true,
+    );
+    assertEquals(
+      sent?.article.canonical_url,
+      "https://antonshubin.com/blog/some-post",
+    );
   } finally {
     globalThis.fetch = originalFetch;
     Deno.env.delete("DEVTO_API_KEY");

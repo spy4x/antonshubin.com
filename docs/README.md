@@ -27,9 +27,14 @@ Post-implementation report of all SEO fixes shipped 2026-06-29. Covers 5 feature
 PRs + 2 production hotfixes, architecture decisions, live verification results,
 and ongoing maintenance procedures.
 
-### [UTM convention](utm.md)
+### [Tagged links](utm.md)
 
-The 3-parameter taxonomy every external link back to antonshubin.com must use,
-with worked URL examples for GitHub READMEs, Upwork proposals, YouTube
-descriptions, LinkedIn posts, HN/Reddit submissions, business cards, and email
-signatures. Build the URL with UTMs first, paste it second.
+How every link posted elsewhere back to antonshubin.com is tagged: the channel
+table (source and medium) shared with `scripts/utm.ts`, how campaigns are named,
+the campaign log, and `deno task links`, which prints a page's tagged URL for
+every channel.
+
+### [Video kit](video-kit.md)
+
+`deno task video-kit`: YouTube titles, description, chapters and a blog draft
+from a transcript.

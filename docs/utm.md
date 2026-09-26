@@ -1,124 +1,151 @@
-# UTM convention
+# Tagged links
 
-Every external link that points back to `antonshubin.com` should carry UTMs. The
-site gets 91% direct traffic, but **0% of inbound channels are tagged**. Without
-UTMs, we cannot tell whether a click came from a YouTube video, a Reddit thread,
-a Hacker News comment, an Upwork chat, or a business card. That makes every
-distribution decision blind.
-
-The convention below is intentionally small. Three parameters, kebab-case,
-always lowercase, never invented on the fly. Build the URL once, paste it
-everywhere.
-
-## The taxonomy
-
-| Param          | Values                                                                                               | Rule                                                    |
-| -------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `utm_source`   | the platform: `github`, `linkedin`, `youtube`, `reddit`, `hn`, `devto`, `upwork`, `email`, `qr-card` | Specific platform, never `social`                       |
-| `utm_medium`   | the touch category: `oss`, `blog`, `video`, `social`, `profile`, `dm`, `qr`, `email`                 | Lets you attribute social vs content vs profile traffic |
-| `utm_campaign` | the initiative: `template-launch`, `rostok-launch`, `mcp-yt`, `audit-q3`, `client-acme-audit`        | A discrete launch. Archived when done.                  |
-
-### Hard rules
-
-- Exactly these 3 params. Never add `utm_term` or `utm_content` (we don't have
-  paid-search traffic and don't need A/B term splits inside a launch).
-- Always lowercase, kebab-case. Never `Q3_Audit`.
-- Always link to a page on `antonshubin.com`, never to a third-party domain (so
-  Umami captures the visit).
-- Campaign names = initiative + version if iterative (`rostok-launch-v2`).
-- For business card QR: source `qr-card`, medium `profile`, no campaign.
-
-## Worked examples — the actual URL to paste
-
-These are real links Anton is shipping this week. Copy the pattern.
-
-A `[slug]` route on this site 404s when the path ends in a trailing slash
-(`/projects/smartlite/` 404s, `/projects/smartlite` is 200 — see the comment at
-`lib/head.ts:43`). None of the examples below end in one, except the root `/`,
-which is the one path where a trailing slash is correct.
-
-**1. GitHub repo README link to a case study**
+Every link posted elsewhere that points back to `antonshubin.com` carries UTM
+parameters, so Umami can tell which post, video or message a visit came from.
+Never write a tagged URL by hand: print it with `deno task links`, or let the
+kits (`launch-kit`, `video-kit`, `publish:blog`) build it.
 
 ```
-https://antonshubin.com/projects/smartlite?utm_source=github&utm_medium=oss&utm_campaign=template-launch
+deno task links <path> [--campaign <name>] [--content <name>]
 ```
 
-**2. Upwork proposal chat (client outreach)**
+It prints one tagged URL per channel in the table below, for the page at
+`<path>`.
+
+## Three questions
+
+A tagged link answers three questions, plus an optional fourth.
+
+| Parameter      | Question                          | Rule                                                              |
+| -------------- | --------------------------------- | ----------------------------------------------------------------- |
+| `utm_source`   | Which platform is the link on?    | One row of the channel table.                                     |
+| `utm_medium`   | What kind of placement is it?     | Comes with the source from the channel table. Never chosen apart. |
+| `utm_campaign` | What does the link promote?       | See "Campaigns" below. Required on every link.                    |
+| `utm_content`  | Which specific place, if several? | Optional: a subreddit, a thread reply, one of several posts.      |
+
+Rules:
+
+- Campaign and content are lowercase kebab-case (`opus55-vs-sonnet5`,
+  `r-claudeai`). The builder throws on anything else, because a typo splits one
+  campaign into two in Umami.
+- `utm_content` is left out when there is nothing to tell apart. The builder
+  omits it when it is unset.
+- `utm_term` is never used: the site buys no search ads.
+- Parameters always appear in the same order: source, medium, campaign, content.
+- The link points at a page on `antonshubin.com`, never at a third-party site,
+  so the visit lands in Umami. The path carries no trailing slash; the builder
+  strips one.
+
+## Channels
+
+The medium describes where the link sits, not the platform: `social` for any
+post or comment on a social or community site (Show HN included), `blog` for a
+cross-post on another blog, `video` for a video description, `oss` only for a
+link inside a repository, `dm` for a private message, `email` for an email, and
+`profile` for a standing link that is not part of any post.
+
+This table must match `CHANNELS` in `scripts/utm.ts` row for row;
+`scripts/utm.test.ts` fails when they disagree. To add a channel, add it to
+both.
+
+| Source     | Medium    | Where the link goes         |
+| ---------- | --------- | --------------------------- |
+| `x`        | `social`  | X post or reply             |
+| `linkedin` | `social`  | LinkedIn post or comment    |
+| `reddit`   | `social`  | Reddit post or comment      |
+| `hn`       | `social`  | Hacker News post or comment |
+| `devto`    | `blog`    | Dev.to cross-post           |
+| `youtube`  | `video`   | YouTube video description   |
+| `github`   | `oss`     | README or release notes     |
+| `upwork`   | `dm`      | Upwork proposal or chat     |
+| `email`    | `email`   | Email signature or message  |
+| `qr-card`  | `profile` | Business card QR code       |
+
+## Campaigns
+
+The campaign names the thing the link promotes.
+
+| What is promoted    | Campaign                                                               |
+| ------------------- | ---------------------------------------------------------------------- |
+| A repository launch | `<repo>-launch`, set by `deno task launch-kit`                         |
+| An article          | its blog slug, or the post's `utmCampaign` front-matter field when set |
+| A video             | `<topic>-yt`, set by `deno task video-kit` (default `<slug>-yt`)       |
+| A standing link     | `evergreen`: a business card, an email signature, a profile            |
+
+`deno task links` picks the campaign by itself only for an article: for a
+`/blog/<slug>` path with no `--campaign`, it reads `utmCampaign` from
+`content/blog/<slug>.md`, and falls back to the slug. Any other path needs
+`--campaign`, and the task exits with an error without one, because only an
+article has a name the task can know.
+
+## Examples
+
+An article shared on X, with its campaign set by hand:
 
 ```
-https://antonshubin.com/how-i-work?utm_source=upwork&utm_medium=dm&utm_campaign=client-acme-audit
+deno task links /blog/opus-5-5-vs-sonnet-5-agent-costs --campaign opus55-vs-sonnet5
 ```
 
-**3. YouTube video description (companion blog post)**
+prints, among the other channels:
 
 ```
-https://antonshubin.com/blog/building-mcp-servers-with-deno?utm_source=youtube&utm_medium=blog&utm_campaign=mcp-yt
+https://antonshubin.com/blog/opus-5-5-vs-sonnet-5-agent-costs?utm_source=x&utm_medium=social&utm_campaign=opus55-vs-sonnet5
 ```
 
-**4. LinkedIn post CTA link**
+The same article in two subreddits, told apart by `--content`:
 
 ```
-https://antonshubin.com/?utm_source=linkedin&utm_medium=social&utm_campaign=founder-pitch
+https://antonshubin.com/blog/opus-5-5-vs-sonnet-5-agent-costs?utm_source=reddit&utm_medium=social&utm_campaign=opus55-vs-sonnet5&utm_content=r-claudeai
+https://antonshubin.com/blog/opus-5-5-vs-sonnet-5-agent-costs?utm_source=reddit&utm_medium=social&utm_campaign=opus55-vs-sonnet5&utm_content=r-claudecode
 ```
 
-**5. Hacker News Show post (rostok launch)**
+A link in the rostok README to its launch post:
 
 ```
-https://antonshubin.com/infrastructure?utm_source=hn&utm_medium=oss&utm_campaign=rostok-launch
+https://antonshubin.com/blog/rostok-self-hosted-scaffolder?utm_source=github&utm_medium=oss&utm_campaign=rostok-launch
 ```
 
-**6. Business card QR code**
+A standing link in an Upwork message:
 
 ```
-https://antonshubin.com/?utm_source=qr-card&utm_medium=profile
+https://antonshubin.com/how-i-work?utm_source=upwork&utm_medium=dm&utm_campaign=evergreen
 ```
 
-**7. Reddit r/selfhosted post body link**
+## The Dev.to cross-post
+
+`deno task publish:blog` creates a Dev.to draft whose `canonical_url` is the
+clean post URL, with no parameters, because it tells search engines which copy
+is the original. The draft body ends with a "First published on antonshubin.com"
+line whose link carries the `devto` channel's tags and the article's campaign,
+so readers who click through are counted.
+
+## Campaign log
+
+Campaigns already used by hand. Keep them valid: reuse the same name when
+sharing the same thing again.
+
+### `opus55-vs-sonnet5` — 26 Sep 2026
+
+Post: `/blog/opus-5-5-vs-sonnet-5-agent-costs`. The campaign differs from the
+slug, so pass `--campaign opus55-vs-sonnet5` to `deno task links` for this post.
+Links shared that day:
 
 ```
-https://antonshubin.com/blog/rostok-self-hosted-scaffolder?utm_source=reddit&utm_medium=social&utm_campaign=rostok-launch
+?utm_source=x&utm_medium=social&utm_campaign=opus55-vs-sonnet5
+?utm_source=linkedin&utm_medium=social&utm_campaign=opus55-vs-sonnet5
+?utm_source=hn&utm_medium=social&utm_campaign=opus55-vs-sonnet5
+?utm_source=reddit&utm_medium=social&utm_campaign=opus55-vs-sonnet5&utm_content=r-claudeai
+?utm_source=reddit&utm_medium=social&utm_campaign=opus55-vs-sonnet5&utm_content=r-claudecode
+?utm_source=devto&utm_medium=blog&utm_campaign=opus55-vs-sonnet5
 ```
 
-**8. Dev.to canonical cross-post**
-
-```
-https://antonshubin.com/blog/mig-tiny-self-hosted-scheduler?utm_source=devto&utm_medium=blog&utm_campaign=mig-launch
-```
-
-**9. Email signature / cold outreach**
-
-```
-https://antonshubin.com/?utm_source=email&utm_medium=profile&utm_campaign=audit-q3#audit-form
-```
-
-## Build the link first, paste it second
-
-Whenever drafting a post, draft the URL with UTMs _first_, paste it everywhere.
-Never post a bare `antonshubin.com/blog/x` link — there is no going back to add
-tags retroactively.
-
-## Tracking setup
-
-Umami's free tier already has campaign tracking. Tagged external links appear in
-the Campaigns report automatically. Review monthly:
-
-- Top 5 campaigns by visits
-- Top 5 by visit → audit-form conversion
-- Cut campaigns that drive traffic without conversions
-
-## Naming campaigns
-
-| Initiative                  | Campaign slug                                                                     |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| Open-source repo launch     | `<repo>-launch` (`template-launch`, `rostok-launch`, `mig-launch`, `zond-launch`) |
-| YouTube companion blog      | `<topic>-yt` (`mcp-yt`, `caldav-yt`)                                              |
-| Per-client audit outreach   | `client-<name>-audit`                                                             |
-| Quarterly audit funnel push | `audit-q<N>` (`audit-q3`)                                                         |
-| LinkedIn credibility post   | `founder-pitch` (re-use across posts)                                             |
+Exception: a Dev.to variant with `utm_medium=crosspost` was also drafted that
+day and may have been posted. It is not the rule; if it shows up in Umami, count
+it with the `devto` / `blog` row.
 
 ## Review cadence
 
-Every Friday at 09:00 (10-min analytics ritual), open Umami → Campaigns. Note
-the top 3 campaigns by visits and the top 3 by audit-form conversions.
-End-of-quarter: cut campaigns with traffic but no conversions. Double down on
-the ones that work.
+Campaign results are reviewed weekly in the Sunday `deno task weekly-numbers`
+report. Its "Umami — top campaigns (7 days)" section ranks the week's
+`utm_campaign` values by visitors (see
+[`docs/weekly-numbers.md`](./weekly-numbers.md)).

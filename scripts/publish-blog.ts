@@ -11,10 +11,13 @@
  *   description: "Meta description for SEO"
  *   category: "dev-tips"  # dev-tips | startups | personal
  *   publishedAt: "2026-07-02"
+ *   utmCampaign: "some-campaign"  # optional; the tagged links' campaign,
+ *                                 # defaults to the slug (docs/utm.md)
  *   ---
  */
 
 import { createDevToDraft } from "./devto.ts";
+import { articleCampaign } from "./utm.ts";
 
 const DATA_FILE = "lib/data.ts";
 const CONTENT_DIR = "content/blog";
@@ -24,6 +27,7 @@ interface FrontMatter {
   description: string;
   category: "dev-tips" | "startups" | "personal";
   publishedAt: string;
+  utmCampaign?: string;
 }
 
 function slugify(title: string): string {
@@ -186,7 +190,7 @@ sendNewsletter(slug, front.title);
 
 // Create a Dev.to draft (never published directly, and never blocks a
 // publish — see scripts/devto.ts)
-await createDevToDraft(front.title, slug, body);
+await createDevToDraft(front.title, slug, body, articleCampaign(slug, front));
 
 console.log(`\n  ✅ Published: /blog/${slug}\n`);
 console.log("  Next steps:");

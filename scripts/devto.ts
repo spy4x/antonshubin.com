@@ -7,10 +7,20 @@
  * on its own.
  */
 
+import { channelUrl } from "./utm.ts";
+
 // Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
 // must point at production, since it tells search engines which copy is the
 // original. Pointing it at a staging host would misattribute the source.
 const DEVTO_BASE_URL = "https://antonshubin.com";
+
+/**
+ * The line a Dev.to cross-post ends with: a link back to the original,
+ * tagged as the `devto` channel so a reader who clicks through is counted.
+ */
+export function firstPublishedLine(taggedUrl: string): string {
+  return `_First published on [antonshubin.com](${taggedUrl})._`;
+}
 
 export interface DevToArticlePayload {
   article: {
@@ -164,17 +174,23 @@ export function absolutizeImageUrls(markdown: string): string {
  * Builds the Dev.to API payload for a draft cross-post. `canonical_url` is
  * the clean blog URL, with no UTM params — it is Dev.to's canonicalization
  * field, not a tracked link, so tagging it would point the canonical at a
- * URL that isn't the one search engines should treat as the source.
+ * URL that isn't the one search engines should treat as the source. The
+ * body ends with {@linkcode firstPublishedLine}, whose link does carry the
+ * `devto` channel's tags and `campaign` (the article's, see `docs/utm.md`).
  */
 export function buildDevToPayload(
   title: string,
   slug: string,
   bodyMarkdown: string,
+  campaign: string = slug,
 ): DevToArticlePayload {
+  const tagged = channelUrl(DEVTO_BASE_URL, `/blog/${slug}`, "devto", campaign);
   return {
     article: {
       title,
-      body_markdown: absolutizeImageUrls(bodyMarkdown),
+      body_markdown: `${absolutizeImageUrls(bodyMarkdown)}\n\n---\n\n${
+        firstPublishedLine(tagged)
+      }\n`,
       published: false,
       canonical_url: `${DEVTO_BASE_URL}/blog/${slug}`,
     },
@@ -189,6 +205,7 @@ export async function createDevToDraft(
   title: string,
   slug: string,
   bodyMarkdown: string,
+  campaign: string = slug,
 ): Promise<void> {
   const apiKey = Deno.env.get("DEVTO_API_KEY");
   if (!apiKey) {
@@ -202,7 +219,9 @@ export async function createDevToDraft(
         "api-key": apiKey,
         "content-type": "application/json",
       },
-      body: JSON.stringify(buildDevToPayload(title, slug, bodyMarkdown)),
+      body: JSON.stringify(
+        buildDevToPayload(title, slug, bodyMarkdown, campaign),
+      ),
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     console.log("  ✓ Dev.to draft created");

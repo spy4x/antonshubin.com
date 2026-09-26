@@ -30,7 +30,7 @@
  */
 
 import { BASE_URL } from "@/lib/config.ts";
-import { buildTaggedUrl } from "./utm.ts";
+import { channelUrl } from "./utm.ts";
 
 const OUT_DIR = "videos";
 const CHAPTER_INTERVAL_SECONDS = 60;
@@ -211,11 +211,7 @@ export function buildContext(
       ? buildChaptersFromSegments(segments)
       : [{ startSeconds: 0, label: "Intro" }],
     summary: buildSummary(fullText),
-    taggedBlogUrl: buildTaggedUrl(BASE_URL, `/blog/${slug}`, {
-      source: "youtube",
-      medium: "blog",
-      campaign,
-    }),
+    taggedBlogUrl: channelUrl(BASE_URL, `/blog/${slug}`, "youtube", campaign),
   };
 }
 

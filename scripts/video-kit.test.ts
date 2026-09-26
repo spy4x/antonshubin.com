@@ -134,12 +134,12 @@ Deno.test("deriveCampaign uses the explicit override when given one", () => {
   );
 });
 
-Deno.test("buildContext's tagged blog link carries exactly the three UTM params from docs/utm.md", () => {
+Deno.test("buildContext's tagged blog link is the youtube channel: medium video, no utm_content", () => {
   const ctx = buildContext("some-post", "some-post-yt", PLAIN_SAMPLE, []);
   const url = new URL(ctx.taggedBlogUrl);
   const params = url.searchParams;
   assertEquals(params.get("utm_source"), "youtube");
-  assertEquals(params.get("utm_medium"), "blog");
+  assertEquals(params.get("utm_medium"), "video");
   assertEquals(params.get("utm_campaign"), "some-post-yt");
   assertEquals([...params.keys()].length, 3);
 });
@@ -216,7 +216,7 @@ Deno.test("runVideoKit writes titles, description, chapters and a blog draft fro
 
     const description = await Deno.readTextFile(`${outDir}/description.md`);
     const linkUrl =
-      "https://antonshubin.com/blog/some-post?utm_source=youtube&utm_medium=blog&utm_campaign=some-post-yt";
+      "https://antonshubin.com/blog/some-post?utm_source=youtube&utm_medium=video&utm_campaign=some-post-yt";
     const summaryFirstWords = "Welcome back to the channel";
     const summaryIndex = description.indexOf(summaryFirstWords);
     const linkIndex = description.indexOf(linkUrl);
