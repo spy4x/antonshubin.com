@@ -8,7 +8,9 @@
  * Reads the repo's README and the matching post in `content/blog/`, then
  * writes one draft per channel into `launches/<repo>/`: `reddit.md`,
  * `hn.md`, `linkedin.md`, `devto.md`, `youtube.md`. Every link back to
- * antonshubin.com in a draft carries the UTM parameters from `docs/utm.md`.
+ * antonshubin.com in a draft is tagged for that draft's channel, with the
+ * medium from the shared table in `scripts/utm.ts` and the campaign
+ * `<repo>-launch` (`docs/utm.md`).
  * Nothing is posted anywhere — posting stays manual, on purpose (issue #106,
  * #124): Reddit and Hacker News penalise automated posting, and a launch
  * needs its author in the comments.
@@ -28,7 +30,8 @@
 
 import { extract as extractYaml } from "@std/front-matter/yaml";
 import { BASE_URL } from "@/lib/config.ts";
-import { buildTaggedUrl, type UtmParams } from "./utm.ts";
+import { firstPublishedLine } from "./devto.ts";
+import { channelUrl } from "./utm.ts";
 
 const CONTENT_DIR = "content/blog";
 const OUT_DIR = "launches";
@@ -245,12 +248,14 @@ export interface DraftContext {
   taggedBlogUrl: string;
 }
 
-function context(
+/** Builds one draft's context; the tagged link is `source`'s row of the channel table. */
+export function context(
   repo: string,
   readme: ReadmeSummary,
   blog: BlogSummary,
   slug: string,
-  utm: UtmParams,
+  source: string,
+  campaign: string,
 ): DraftContext {
   return {
     repo,
@@ -258,7 +263,7 @@ function context(
     blog,
     githubUrl: `https://github.com/spy4x/${repo}`,
     canonicalBlogUrl: `${BASE_URL}/blog/${slug}`,
-    taggedBlogUrl: buildTaggedUrl(BASE_URL, `/blog/${slug}`, utm),
+    taggedBlogUrl: channelUrl(BASE_URL, `/blog/${slug}`, source, campaign),
   };
 }
 
@@ -319,8 +324,9 @@ ${ctx.blog.description}
 
 ${ctx.readme.description}
 
-Original post: ${ctx.taggedBlogUrl}
 Repo: ${ctx.githubUrl}
+
+${firstPublishedLine(ctx.taggedBlogUrl)}
 `;
 }
 
@@ -336,32 +342,17 @@ Repo: ${ctx.githubUrl}
 `;
 }
 
-const CHANNELS: {
+/** One file per channel; each draft's link is tagged with its `source`'s table row. */
+export const DRAFTS: {
   file: string;
-  utm: Omit<UtmParams, "campaign">;
+  source: string;
   draft: (c: DraftContext) => string;
 }[] = [
-  {
-    file: "reddit.md",
-    utm: { source: "reddit", medium: "social" },
-    draft: redditDraft,
-  },
-  { file: "hn.md", utm: { source: "hn", medium: "oss" }, draft: hnDraft },
-  {
-    file: "linkedin.md",
-    utm: { source: "linkedin", medium: "social" },
-    draft: linkedinDraft,
-  },
-  {
-    file: "devto.md",
-    utm: { source: "devto", medium: "blog" },
-    draft: devtoDraft,
-  },
-  {
-    file: "youtube.md",
-    utm: { source: "youtube", medium: "video" },
-    draft: youtubeDraft,
-  },
+  { file: "reddit.md", source: "reddit", draft: redditDraft },
+  { file: "hn.md", source: "hn", draft: hnDraft },
+  { file: "linkedin.md", source: "linkedin", draft: linkedinDraft },
+  { file: "devto.md", source: "devto", draft: devtoDraft },
+  { file: "youtube.md", source: "youtube", draft: youtubeDraft },
 ];
 
 async function main() {
@@ -391,10 +382,10 @@ async function main() {
   const outDir = `${OUT_DIR}/${repo}`;
   await Deno.mkdir(outDir, { recursive: true });
 
-  for (const channel of CHANNELS) {
-    const ctx = context(repo, readme, blog, slug, { ...channel.utm, campaign });
-    const path = `${outDir}/${channel.file}`;
-    await Deno.writeTextFile(path, channel.draft(ctx));
+  for (const draft of DRAFTS) {
+    const ctx = context(repo, readme, blog, slug, draft.source, campaign);
+    const path = `${outDir}/${draft.file}`;
+    await Deno.writeTextFile(path, draft.draft(ctx));
     console.log(`  ✓ ${path}`);
   }
 

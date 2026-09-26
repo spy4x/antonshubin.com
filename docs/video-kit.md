@@ -14,7 +14,7 @@ fully testable without a network connection.
   characters, numbered, in the order they occur — candidate titles, not finished
   ones, for a human to pick from and clean up
 - `description.md` — those same first sentences (up to three) as a summary
-  paragraph, followed by the UTM-tagged link to the companion blog post
+  paragraph, followed by the tagged link to the companion blog post
 - `chapters.md` — timestamped chapter lines in YouTube's format (`0:00 Intro`)
 - `blog-draft.md` — a draft for `content/blog/`, with YAML front matter carrying
   a `title` and a `description`. It is not ready for `deno task publish:blog` as
@@ -47,12 +47,13 @@ as `<slug>-yt`, following the `<topic>-yt` pattern in [`docs/utm.md`](./utm.md)
 — the topic is the blog slug itself, the only stable, deterministic name this
 script has for the video's subject.
 
-## The UTM rule
+## The tagged link
 
-Every link the script writes back to antonshubin.com is built with
-`buildTaggedUrl` from `scripts/utm.ts`, carrying exactly the three parameters
-`docs/utm.md` requires (`utm_source=youtube`, `utm_medium=blog`,
-`utm_campaign=<slug>-yt` or the override), with no trailing slash on the path.
+Every link the script writes back to antonshubin.com is the `youtube` row of the
+channel table in `scripts/utm.ts` (see [`docs/utm.md`](./utm.md)):
+`utm_source=youtube`, `utm_medium=video`, `utm_campaign=<slug>-yt` or the
+override, with no trailing slash on the path. The campaign must be lowercase
+kebab-case, or the script fails.
 
 ## The blog draft is not publishable as-is
 

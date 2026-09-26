@@ -6,8 +6,10 @@ import {
 } from "jsr:@std/assert@^1.0.0";
 import { extract as extractYaml } from "@std/front-matter/yaml";
 import {
+  context,
   devtoDraft,
   type DraftContext,
+  DRAFTS,
   findBlogSlug,
   findReadmePath,
   hnDraft,
@@ -308,8 +310,38 @@ Deno.test("devtoDraft's canonical_url is clean, with no utm params", () => {
   assertEquals(canonicalLine?.includes("utm_"), false);
 });
 
-Deno.test("devtoDraft's body still carries the utm-tagged link, for the human posting it", () => {
-  assertStringIncludes(devtoDraft(ctx), ctx.taggedBlogUrl);
+Deno.test("devtoDraft ends with the First published line carrying the tagged link", () => {
+  const lines = devtoDraft(ctx).trimEnd().split("\n");
+  assertEquals(
+    lines.at(-1),
+    `_First published on [antonshubin.com](${ctx.taggedBlogUrl})._`,
+  );
+});
+
+Deno.test("every launch draft's link is tagged with its channel's medium from the shared table", () => {
+  const mediums = Object.fromEntries(
+    DRAFTS.map((d) => {
+      const c = context(
+        "rostok",
+        ctx.readme,
+        ctx.blog,
+        "rostok-self-hosted-scaffolder",
+        d.source,
+        "rostok-launch",
+      );
+      const params = new URL(c.taggedBlogUrl).searchParams;
+      assertEquals(params.get("utm_source"), d.source);
+      assertEquals(params.get("utm_campaign"), "rostok-launch");
+      return [d.source, params.get("utm_medium")];
+    }),
+  );
+  assertEquals(mediums, {
+    reddit: "social",
+    hn: "social",
+    linkedin: "social",
+    devto: "blog",
+    youtube: "video",
+  });
 });
 
 Deno.test("devtoDraft's front matter is valid YAML and the title round-trips, even with a colon in it", () => {
