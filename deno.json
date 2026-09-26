@@ -20,7 +20,8 @@
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
     "lcp": "deno run -A scripts/lcp.ts",
-    "og": "deno run -A scripts/og-images.ts"
+    "og": "deno run -A scripts/og-images.ts",
+    "strip-metadata": "deno run --allow-read --allow-write --allow-run=git scripts/strip-metadata.ts"
   },
   "lint": {
     "rules": {
