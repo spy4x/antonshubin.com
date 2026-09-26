@@ -188,7 +188,7 @@ function ArchiveRow({ project }: { project: Project }) {
             “{review.excerpt}”
           </blockquote>
           <figcaption class="inline text-graphite">
-            {" — "}
+            {" —\u00a0"}
             <ReviewSource project={project} href={review.sourceHref} />
           </figcaption>
         </figure>
