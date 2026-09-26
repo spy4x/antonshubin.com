@@ -124,7 +124,9 @@ siteTest(
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/projects/${p.slug}`);
-      assertEquals(count(html, /data-primary-book/), 2, p.slug);
+      // The page body only: the nav's own Book (#185) sits before <main>.
+      const main = html.slice(html.indexOf(`id="main-content"`));
+      assertEquals(count(main, /data-primary-book/), 2, p.slug);
       const card = region(html, "data-project-facts", "aside");
       const band = region(html, "data-closing-band", "section");
       assertEquals(count(card, /data-primary-book/), 1, `${p.slug} card`);
