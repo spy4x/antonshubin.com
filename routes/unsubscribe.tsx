@@ -6,6 +6,7 @@ import { SEOHead } from "../components/SEOHead.tsx";
 import { loadSubscribers, saveSubscribers } from "../lib/subscribers.ts";
 import { findSubscriberByToken } from "../lib/unsubscribe.ts";
 import { getUnsubscribeSecret } from "../lib/config.ts";
+import { readFormBody, SMALL_FORM_MAX_BYTES } from "../lib/request-body.ts";
 
 // Never cached: the confirm state renders one visitor's address, and a
 // stale POST response must never be replayed from a cache.
@@ -66,8 +67,16 @@ export const handler = define.handlers({
   async POST(ctx) {
     let token = ctx.url.searchParams.get("token");
     if (!token) {
-      const form = await ctx.req.formData().catch(() => null);
-      token = form?.get("token")?.toString() || null;
+      // Read under a byte cap (#251); a body that does not parse as a form
+      // simply carries no token.
+      const read = await readFormBody(ctx.req, SMALL_FORM_MAX_BYTES);
+      if (!read.ok && read.status !== 400) {
+        return page<PageData>({ state: "not-recognised" }, {
+          status: read.status,
+          headers: NO_STORE,
+        });
+      }
+      token = (read.ok && read.value.get("token")?.toString()) || null;
     }
     if (!token) {
       return page<PageData>({ state: "not-recognised" }, {

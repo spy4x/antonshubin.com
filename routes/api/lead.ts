@@ -10,6 +10,7 @@ import {
 } from "../../lib/config.ts";
 import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
 import { acceptLead } from "../../lib/lead.ts";
+import { LEAD_MAX_BYTES, readJsonBody } from "../../lib/request-body.ts";
 
 // ── In-memory rate limiter (per IP, 3 submissions per hour) ──────────
 const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>();
@@ -52,12 +53,15 @@ export const handler = define.handlers({
       return Response.json({ error: rateError }, { status: 429 });
     }
 
-    let payload: unknown;
-    try {
-      payload = await ctx.req.json();
-    } catch {
-      return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+    const read = await readJsonBody(
+      ctx.req,
+      LEAD_MAX_BYTES,
+      "Invalid JSON body",
+    );
+    if (!read.ok) {
+      return Response.json({ error: read.error }, { status: read.status });
     }
+    const payload = read.value;
 
     // The mail goes out after the answer; acceptLead logs its failure.
     const outcome = acceptLead(payload, {
