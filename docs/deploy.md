@@ -71,8 +71,11 @@ export RESTIC_PASSWORD="$(grep '^BACKUPS_PASSWORD=' ~spy4x/cloudlab/apps/.env.ro
 REPO=~spy4x/cloudlab/sync/cloud-light-backups/antonshubin
 restic -r "$REPO" snapshots
 restic -r "$REPO" restore latest --target /tmp/antonshubin-restore
-cp /tmp/antonshubin-restore/home/spy4x/cloudlab/apps/antonshubin.com/data/subscribers.json \
-  ~spy4x/cloudlab/apps/antonshubin.com/data/subscribers.json
+# newsletter-log.json exists only once a post was announced; skip it if missing
+for f in subscribers.json newsletter-log.json; do
+  cp /tmp/antonshubin-restore/home/spy4x/cloudlab/apps/antonshubin.com/data/$f \
+    ~spy4x/cloudlab/apps/antonshubin.com/data/$f
+done
 rm -rf /tmp/antonshubin-restore
 ```
 

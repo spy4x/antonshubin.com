@@ -91,4 +91,9 @@ only place with the subscriber list and the SMTP settings
 `data/newsletter-log.json` before the first mail goes out and refuses a slug
 that is already there, so a second run cannot mail everyone twice. A run that
 crashed partway also refuses; to resend on purpose, remove that entry from the
-log on the server by hand.
+log on the server by hand. An empty subscriber list is refused before anything
+is recorded, and the command exits non-zero when any mail failed or none went
+out.
+
+Report the result to Anton in chat: the `Sent` and `Failed` counts the command
+printed, or its refusal. A non-zero exit is not a success, whatever it printed.

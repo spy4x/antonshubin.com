@@ -26,6 +26,11 @@ app directory, so the file survives deploys, and it is backed up nightly — see
 
 ## Sending a newsletter
 
+This section is for a general newsletter, such as a note to subscribers that is
+not about one post. A new post is never announced this way: its announcement
+goes only through `deno task publish:blog`, which tags the link and sends at
+most once per slug (see "Announcing a new blog post" below).
+
 Send from the production container on cloudlab. It has the subscriber list
 mounted and the SMTP settings in its environment. Your machine has neither, so
 running the script locally reaches nobody.
@@ -33,15 +38,17 @@ running the script locally reaches nobody.
 ```bash
 # Write your content as HTML (unsubscribe link auto-appended)
 cat > /tmp/newsletter.html << 'EOF'
-<h2>New article: Title Here</h2>
+<h2>A short update</h2>
 <p>Content...</p>
-<a href="https://antonshubin.com/blog/slug">Read full article →</a>
 EOF
 
 # Copy it into the container, then send to all subscribers
 ssh cloudlab 'docker exec -i antonshubincom-web sh -c "cat > /tmp/newsletter.html"' < /tmp/newsletter.html
 ssh cloudlab 'docker exec antonshubincom-web deno run -A scripts/send-newsletter.ts "Newsletter Title" /tmp/newsletter.html'
 ```
+
+Any link to the site in it is a tagged `email` link from
+`deno task links <path>` (docs/utm.md), never typed by hand.
 
 ## Announcing a new blog post
 
@@ -57,7 +64,9 @@ The once-per-slug guard is a sent log, `data/newsletter-log.json`, next to
 and is backed up with the list. `scripts/send-newsletter.ts --stdin-json` writes
 the slug there before the first mail goes out and refuses a slug that is already
 listed. A run that crashed partway is listed too. To resend a post on purpose,
-remove its entry from the file by hand. To read the log:
+remove its entry from the file by hand. It also refuses an empty subscriber list
+(a missing or unreadable `subscribers.json`) before recording anything, and
+exits non-zero when any mail failed or none went out. To read the log:
 
 ```bash
 ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/newsletter-log.json'

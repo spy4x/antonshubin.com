@@ -16,13 +16,24 @@ guide describes a style; it is not a source of facts. AGENTS.md "Content rule"
 applies to every draft: no client, number, prize, testimonial or guarantee
 unless Anton gave it as fact in the session.
 
-## The two registers in these posts
+## Two kinds of post
 
-The first two posts, `ship-it-today` and `from-office-job-to-freelance-...`, are
-the voice to copy. They are personal, specific and a little playful. The later
-three drift into generic prose that could be anyone's: long bullet lists of
-"tips", "It's important to", "In conclusion", and marketing questions ("Are you
-tired of..."). Treat those three as the edge to stay away from, not as a model.
+All five are written by the same person for the same reader: someone building
+software, often alone, who wants a practical next step. They fall into two
+kinds, and a new post takes the shape of the kind it is:
+
+- **Story posts** (`ship-it-today`, `from-office-job-to-freelance-...`, and the
+  opening of the mental-health post) tell Anton's own experience, with real
+  detail and some self-irony, and draw a lesson from it.
+- **How-to posts** (the Prettier and Drone CI posts, and the numbered techniques
+  of the mental-health post) name a problem, walk through the fix in numbered
+  steps, show the real config, compare it with the usual alternative
+  ("Comparison with GitHub CI"), mention the cost angle ("Allocating a single
+  server for multiple projects") and end with a bonus from his own setup
+  ("Bonus - My Prettier Config").
+
+Both kinds talk to the reader directly and casually: "Hey there!", "But let's be
+real", "Why Drone CI is cool".
 
 ## How a post opens
 
@@ -37,8 +48,10 @@ tired of..."). Treat those three as the edge to stay away from, not as a model.
 ## Sentences
 
 - Short and direct. Many paragraphs are one to three sentences.
-- First person singular throughout. "I" did it, "you" can do it; "we" appears
-  only in the "we'll discuss" framing of the weaker posts.
+- "I" for what Anton did, "you" for the reader. "We" means real people who were
+  there ("we were on a Skype call for 9 hours every day"), and also opens some
+  articles ("we'll explore what Drone CI is"); in a new draft, prefer "I'll
+  show" to that article "we".
 - Fragments are allowed for rhythm: "Where it makes sense. When it makes sense."
   and "You'll change it later. Maybe. Or maybe never."
 - Conversational openers: "Ok, so what's next?", "By the way,".
@@ -48,7 +61,7 @@ tired of..."). Treat those three as the edge to stay away from, not as a model.
 
 ## Personal experience and mistakes
 
-The strongest passages are Anton's own story, told with real detail and some
+The story passages tell Anton's own experience with real detail and some
 self-irony:
 
 - A mistake owned up front: "It was the first time I had made a big mistake."
@@ -56,8 +69,9 @@ self-irony:
   afford :D"
 - Lessons drawn from what clients did, without naming them: "Many of my clients
   spent years developing a fully functioning app".
-- Numbers he actually had, laid out plainly (income per year, hourly rate). Only
-  use numbers Anton gives you for the new post.
+- Numbers he actually had, laid out plainly, one line per year: hourly rate,
+  hours worked and monthly income. Only use numbers Anton gives you for the new
+  post.
 
 ## Structure
 
@@ -78,10 +92,13 @@ self-irony:
   single-feature MVP, and just" ship it.
 - An invitation: a question to the reader, or a pointer to subscribe for the
   next part.
-- Avoid "In conclusion," and a paragraph that repeats the post; the two weakest
-  posts end that way.
+- Skip "In conclusion," and a paragraph that repeats the post; the reader has
+  just read it.
 
-## Words and habits to avoid
+## Phrases to keep out of new drafts
+
+Some stock phrases turn up in the posts. They are not what makes the voice
+recognisable, and today they read as generated text, so leave them out:
 
 - "In conclusion", "It's important to", "crucial", "essential for success",
   "vast library", "powerful, flexible, and easy-to-use".
