@@ -12,6 +12,18 @@ import type { Note as NoteData } from "../lib/notes.ts";
  * that label) — plain "Source" would otherwise sit right next to a claim's
  * own inline link to the same URL with no way to tell them apart by ear.
  */
+/** "2026-09-26" → "26 Sep 2026" (en-GB would print "Sept"). */
+export function formatCheckedOn(iso: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).formatToParts(new Date(`${iso}T00:00:00Z`));
+  const part = (type: string) => parts.find((p) => p.type === type)?.value;
+  return `${part("day")} ${part("month")} ${part("year")}`;
+}
+
 export function Note({ note }: { note: NoteData }) {
   return (
     <p class="note-aside margin-note text-graphite text-xs leading-relaxed">
@@ -32,7 +44,7 @@ export function Note({ note }: { note: NoteData }) {
           </a>
         </>
       )}
-      {note.checkedOn && <>{" "}(checked on {note.checkedOn})</>}
+      {note.checkedOn && <>{" "}(checked {formatCheckedOn(note.checkedOn)})</>}
     </p>
   );
 }

@@ -22,8 +22,8 @@ export const notes: Note[] = [
     id: "upwork-profile",
     text: "From my Upwork profile.",
     href: UPWORK_URL,
-    // No checkedOn: the date these figures were last read is a fact Anton
-    // hasn't supplied yet (see the needs-decision comment on issue #186).
+    // The date Anton read the public profile's figures (#186).
+    checkedOn: "2026-09-26",
   },
   {
     id: "foodrazor-acquired",

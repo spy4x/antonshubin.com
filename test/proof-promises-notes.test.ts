@@ -11,7 +11,7 @@ import { proof, proofFigures } from "../lib/proof.ts";
 import { promises } from "../lib/promises.ts";
 import { testimonials, visibleTestimonials } from "../lib/testimonials.ts";
 import { startSite } from "./harness.ts";
-import { jsonLd } from "./html.ts";
+import { jsonLd, visibleText } from "./html.ts";
 import { note } from "../lib/notes.ts";
 
 const SCAN_DIRS = ["routes", "components", "islands", "lib"];
@@ -46,7 +46,7 @@ async function sourceFiles(exclude: string[]): Promise<string[]> {
 const FIGURE_NEEDLES: Record<string, string> = {
   "jobs": "80+",
   "job-success": "100% Job Success",
-  "earned": "395K",
+  "earned": "300K",
   "hours": "6,600",
   "expert-vetted": "Expert-Vetted",
   "top-percent": "Top 1%",
@@ -246,4 +246,42 @@ Deno.test("lib/testimonials.ts holds only sourced reviews and no dollar figure",
   assertEquals(visibleTestimonials(testimonials), testimonials);
   const text = await Deno.readTextFile("lib/testimonials.ts");
   assert(!/\$\s?\d/.test(text), "lib/testimonials.ts states a dollar figure");
+});
+
+Deno.test("the home page shows the public Upwork earnings with the date they were read", async () => {
+  const site = await startSite();
+  try {
+    const text = visibleText(await site.html("/"));
+    assert(text.includes("$300K"), "home page does not show $300K");
+    assert(
+      text.includes("checked 26 Sep 2026"),
+      "home page does not show the checked date",
+    );
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("no page or llms file shows the private earnings figure or the old email", async () => {
+  const site = await startSite();
+  try {
+    const sitemap = await site.html("/sitemap.xml");
+    const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) =>
+      new URL(m[1]).pathname
+    );
+    assert(paths.length > 0, "sitemap.xml is empty");
+    for (const path of [...paths, "/llms.txt", "/llms-full.txt"]) {
+      const body = await site.html(path);
+      assert(!body.includes("$395K"), `${path} contains $395K`);
+      // The mig post's HOST_EMAIL is sample config, not a contact address.
+      if (path !== "/blog/mig-tiny-self-hosted-scheduler") {
+        assert(
+          !body.includes("anton@antonshubin.com"),
+          `${path} contains anton@antonshubin.com`,
+        );
+      }
+    }
+  } finally {
+    await site.stop();
+  }
 });

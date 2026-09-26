@@ -46,7 +46,7 @@ const contacts = [
     icon: <MailIcon class="w-6 h-6" />,
     title: "Email",
     desc: "Prefer writing? Email me anytime.",
-    href: "mailto:anton@antonshubin.com",
+    href: "mailto:hello@antonshubin.com",
     color:
       "bg-rule-strong/20 text-graphite border-rule-strong/30 hover:border-rule-strong",
     btnClass: buttonClass("secondary", "px-4 py-2 text-sm inline-block"),
