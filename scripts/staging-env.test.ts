@@ -2,8 +2,8 @@ import { assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import { stagingEnv } from "./staging-env.ts";
 
 const PROD = [
-  "DOMAIN=example.com",
   "WWW_DOMAIN=www.example.com",
+  "DOMAIN=example.com",
   "SCHEDULE_URL=https://meet.${DOMAIN}",
   "CONTACT_EMAIL=owner@${DOMAIN}",
   "SMTP_HOST=mail.${DOMAIN}",
@@ -45,5 +45,17 @@ Deno.test("serves staging on the staging host, without a www name", () => {
 Deno.test("refuses a production env without DOMAIN", () => {
   assertThrows(() =>
     stagingEnv("SMTP_HOST=mail.${DOMAIN}\n", "stag.example.com")
+  );
+});
+
+Deno.test("refuses a DOMAIN reference it cannot rewrite", () => {
+  assertThrows(
+    () =>
+      stagingEnv(
+        "DOMAIN=example.com\nSMTP_HOST=mail.$DOMAIN\n",
+        "stag.example.com",
+      ),
+    Error,
+    "SMTP_HOST",
   );
 });

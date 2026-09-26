@@ -14,10 +14,21 @@
 export function stagingEnv(prodEnv: string, stagingHost: string): string {
   const prodDomain = prodEnv.match(/^DOMAIN=(.*)$/m)?.[1]?.trim();
   if (!prodDomain) throw new Error("DOMAIN is missing from the production env");
+  if (!/^[a-z0-9.-]+$/i.test(prodDomain)) {
+    throw new Error("DOMAIN in the production env is not a bare host name");
+  }
+  const resolved = prodEnv.replaceAll("${DOMAIN}", prodDomain);
+  // Compose also expands `$DOMAIN` and `${DOMAIN:-…}`; this helper does not,
+  // so refuse them rather than let staging silently point at the staging host.
+  const other = resolved.match(/^(\w+)=.*\$\{?DOMAIN\b/m);
+  if (other) {
+    throw new Error(
+      `${other[1]} refers to DOMAIN in a form other than \${DOMAIN}`,
+    );
+  }
   // Anchor both replacements: an unanchored /DOMAIN=.*/ also matches the tail
   // of WWW_DOMAIN=.
-  return prodEnv
-    .replaceAll("${DOMAIN}", prodDomain)
+  return resolved
     .replace(/^DOMAIN=.*$/m, `DOMAIN=${stagingHost}`)
     .replace(/^WWW_DOMAIN=.*$/m, `WWW_DOMAIN=${stagingHost}`);
 }
