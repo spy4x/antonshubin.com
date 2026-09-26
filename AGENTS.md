@@ -662,6 +662,15 @@ that stalls for 10 s gets 408. `/unsubscribe` reads no body at all when the
 token is in the query, so a one-click unsubscribe (RFC 8058) works with any
 body.
 
+`/api/subscribe` and `/api/lead` allow three posts per client per hour through
+`lib/rate-limit.ts` (#252), which uses `@spy4x/platform`'s `clientIp` and
+sweeping `createMemoryRateLimiter`. Production is Cloudflare → Traefik (empty
+`forwardedHeaders.trustedIPs`) → app, so the client is `X-Real-IP` (Traefik
+writes it), or `CF-Connecting-IP` when `X-Real-IP` is a Cloudflare edge;
+`X-Forwarded-For` is never read. If Traefik's `trustedIPs` or the Cloudflare
+setup changes, revisit that module. A rendered-site test that posts to either
+form sends its own `X-Real-IP`, or every test shares one bucket.
+
 ## Outgoing mail
 
 Every mail the site sends goes through `@spy4x/email` (`jsr:@spy4x/email`,
