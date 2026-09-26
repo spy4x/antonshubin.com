@@ -260,6 +260,17 @@ reaches production. Rerun the script and commit the JSON when a CI status
 matters; `test/tools.test.ts` checks each page shows what the snapshot holds.
 Each tool page's 1200×630 preview comes from `deno task og`, like a post's.
 
+## Navigation
+
+`lib/nav.ts` is the only list of navigation destinations (#185): the desktop
+rail, the phone tab bar, the phone More dialog and the Links groups all read it,
+so changing a destination is one entry there. `islands/Nav.tsx` renders them;
+the phone header (photo, name, `TIMEZONE_LABEL` from `lib/config.ts`) is plain
+markup in `components/Layout.tsx`. Book goes to `SCHEDULE_URL` and carries
+`data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes to the
+home page's brief form (`/#audit-form`). `test/nav.test.ts` checks both on every
+page.
+
 ## Visual system
 
 `assets/styles.css`'s `@theme` block is the only place a colour is defined
@@ -440,9 +451,13 @@ sitemap page plus `/pay`, and pins that each `/pay` copy button names its field.
 `test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only accessible
 names, from server-rendered HTML only — it doesn't cover the two lightboxes'
 buttons, which only exist after client JS opens them (see "Browser-driven
-tests"). `islands/Menu.tsx` sets no `aria-current` itself; Fresh's renderer adds
-it, and `test/a11y.test.ts` pins that — don't add it by hand.
-`lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
+tests"). On the server, `islands/Nav.tsx` leaves a
+destination link's `aria-current` to Fresh's renderer, which marks it from the
+request URL, and `test/a11y.test.ts` pins that. Hydration strips that marker
+(Preact drops attributes the island's own vnode lacks), so in the browser the
+island sets it from `location.pathname` through `lib/nav.ts`'s `navCurrent()`,
+which also never marks `/` as a section — Fresh marks every link to `/` on every
+page. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
 needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
 `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
 preconnect links while browsers do. `routes/_app.tsx` makes that decision at
@@ -484,13 +499,16 @@ the narrow `deno task test`.
   `focus({ preventScroll: true })`; the test only reproduces the scroll jump
   with the submit button pinned to the bottom of the viewport.
 - `test/a11y.browser.test.ts` (#165): the project and blog lightboxes' dialog
-  naming, button names and focus-return to the trigger, and the mobile menu's
-  Escape handling (closes it, returns focus, and does nothing when already
-  closed). The explicit `triggerRef.current?.focus()` calls in both lightboxes
-  are kept on purpose, even though native `<dialog>` already restores focus.
-  Since #246 it also checks the project gallery's "n / N" counter and its named
-  Previous/Next buttons, and runs every axe-core WCAG 2 A/AA rule plus a
-  horizontal-scroll check on six sample project pages at 390 and 1440px.
+  naming, button names and focus-return to the trigger; the nav (#185): the
+  phone More dialog's Escape handling (closes it, returns focus to More, and
+  does nothing when already closed), the desktop rail's top-to-bottom Tab order
+  with no rotated ancestor, and the 390px tab bar (five tabs, Book centred, the
+  current page and section styled after hydration). The explicit
+  `triggerRef.current?.focus()` calls in both lightboxes are kept on purpose,
+  even though native `<dialog>` already restores focus. Since #246 it also
+  checks the project gallery's "n / N" counter and its named Previous/Next
+  buttons, and runs every axe-core WCAG 2 A/AA rule plus a horizontal-scroll
+  check on six sample project pages at 390 and 1440px.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the
