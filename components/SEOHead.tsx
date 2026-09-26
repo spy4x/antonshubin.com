@@ -5,7 +5,7 @@ import {
   ROLE,
   SITE_DESCRIPTION,
 } from "../lib/head.ts";
-import { SAME_AS_URLS } from "../lib/config.ts";
+import { SAME_AS_URLS, X_HANDLE } from "../lib/config.ts";
 import { proof } from "../lib/proof.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
 
@@ -24,11 +24,12 @@ export function SEOHead() {
       />
 
       {
-        /* Twitter Card — large summary with image. No twitter:site: the
-          @antonshubin handle is unverified (#193) — Anton hasn't confirmed
-          it, and the Content rule forbids shipping an unverified fact. */
+        /* Twitter Card — large summary with image. The handle is the one
+          Anton confirmed on 27 Sep 2026 (#193). */
       }
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content={X_HANDLE} />
+      <meta name="twitter:creator" content={X_HANDLE} />
       <meta name="twitter:title" content={h.title} />
       <meta name="twitter:description" content={h.description} />
       <meta name="twitter:image" content={h.ogImage} />

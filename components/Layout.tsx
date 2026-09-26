@@ -39,12 +39,6 @@ export function Layout({ children, currentPath }: LayoutProps) {
         class="p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:ml-[calc(4.5rem+env(safe-area-inset-left))] sm:pb-4 lg:ml-[calc(5.5rem+env(safe-area-inset-left))] md:p-12 md:pr-[max(3rem,env(safe-area-inset-right))]"
       >
         {children}
-        <footer class="max-w-4xl mx-auto mt-16 pt-6 border-t border-rule text-center text-graphite text-sm">
-          <p>
-            Outside work I ride enduro, ski and scuba dive. Based in Da Nang,
-            Vietnam.
-          </p>
-        </footer>
       </main>
     </>
   );

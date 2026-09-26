@@ -571,12 +571,21 @@ siteTest(
 );
 
 siteTest(
-  "twitter:site is not set (the handle is unverified, #193)",
+  "twitter:site names Anton's confirmed X handle, and the Person sameAs lists his X profile (#193)",
   async (site) => {
     const html = await site.html("/");
     assert(
-      !html.includes('name="twitter:site"'),
-      "twitter:site should be removed until the handle is verified",
+      html.includes('<meta name="twitter:site" content="@spy4x"/>'),
+      "twitter:site should be @spy4x",
+    );
+    const person = jsonLd(html)
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
+      .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
+        | { sameAs?: string[] }
+        | undefined;
+    assert(
+      person?.sameAs?.includes("https://x.com/spy4x"),
+      "Person sameAs lacks the X profile",
     );
   },
 );
@@ -612,7 +621,7 @@ siteTest(
 );
 
 siteTest(
-  "the visible breadcrumb reads Home / Work on the work pages",
+  "the visible breadcrumb on a case page reads Home / Work / <title>",
   async (site) => {
     async function crumbs(path: string): Promise<string> {
       const html = await site.html(path);
@@ -623,7 +632,6 @@ siteTest(
         .map((li) => visibleText(`<li${li}`).replace(/[\s/]+$/, "").trim())
         .join(" / ");
     }
-    assertEquals(await crumbs("/work"), "Home / Work");
     const project = projects.freelance[0];
     assertEquals(
       await crumbs(`/work/${project.slug}`),
@@ -711,6 +719,37 @@ siteTest(
           `${path} renders the catalog icon name "${name}" as visible text`,
         );
       }
+    }
+  },
+);
+
+siteTest(
+  "the visible breadcrumb shows only on pages two levels deep, and every page keeps its BreadcrumbList",
+  async (site) => {
+    const shallow = [
+      "/work",
+      "/blog",
+      "/catalog",
+      "/tools",
+      "/how-i-work",
+      "/infrastructure",
+    ];
+    const deep = [
+      "/work/smartlite",
+      "/tools/ts-libs",
+      `/blog/${blogArticles[0].slug}`,
+    ];
+    for (const path of [...shallow, ...deep]) {
+      const html = await site.html(path);
+      assertEquals(
+        count(html, /aria-label="Breadcrumb"/g),
+        deep.includes(path) ? 1 : 0,
+        `${path}: visible breadcrumb`,
+      );
+      assert(
+        html.includes('"BreadcrumbList"'),
+        `${path}: no BreadcrumbList JSON-LD`,
+      );
     }
   },
 );
