@@ -54,6 +54,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - Dynamic page, project, catalog, and blog URLs with priorities; `/pay` excluded
 - AI-friendly XML comments describing the site and its purpose
 - All blog posts, projects, catalog items included
+- Project pages live at `/work/<slug>` since #188; every old `/projects` URL
+  answers one 301 there (`lib/redirects.ts`), so the sitemap and both llms files
+  list only the new URLs
 
 ### 5. JSON-LD Structured Data (components/SEOHead.tsx)
 
@@ -87,7 +90,7 @@ Four entities in a `@graph` array:
 - Provides Google Rich Results for the /how-i-work page
 - AI crawlers parse this as canonical Q&A about engagement terms
 
-### 7. Project JSON-LD (routes/projects/[slug].tsx)
+### 7. Project JSON-LD (routes/work/[slug].tsx)
 
 - One `SoftwareSourceCode` node when the project links a repo (`ghRepo`),
   otherwise `CreativeWork`, built only from fields already on the `Project`
@@ -160,7 +163,7 @@ Four entities in a `@graph` array:
   security, cost control, and change ownership in founder-readable terms
 - Managed cloud and dedicated infrastructure are presented as workload-fit
   decisions, not ideology
-- `/projects/rostok` (the old `/projects/homelab` answers 301 there) is the
+- `/work/rostok` (the old `/projects/homelab` answers 301 there) is the
   open-source scaffolder Anton deploys his own servers with
 - Private endpoints, IP addresses, sensitive topology, personal service
   inventory, secrets, and unsupported cost or reliability claims stay out of

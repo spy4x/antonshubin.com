@@ -313,35 +313,46 @@ via `extra` instead of fighting a default.
 
 `components/StatusMark.tsx` renders a shape plus a word for a project or tool
 status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`,
-`live`, `offline`) — never colour alone; used today on
-`routes/projects/index.tsx` and in the project page's fact card
-(`components/ProjectFactCard.tsx`: live, offline or archived).
+`live`, `offline`) — never colour alone; used today on `routes/work/index.tsx`
+and in the project page's fact card (`components/ProjectFactCard.tsx`: live,
+offline or archived).
+
+### Work section
+
+`/work` (#188, `routes/work/index.tsx`) lists client work only: the Highlights
+and Archive sections from #232, read through `lib/work.ts`'s `clientWork()`. My
+own projects keep their pages at `/work/<slug>` (the same route serves both,
+`findWorkProject()`), but the index never lists a tool or the YouTube channel;
+those pages are reached from the sitemap, both llms files and the pages that
+link them (rostok from `/infrastructure`, the guide and a post). `lib/work.ts`
+is derived from `lib/data.ts` and `lib/testimonials.ts` and writes no copy of
+its own. The breadcrumb reads "Home / Work", the page name and not the full
+`<title>`.
 
 ### Project page
 
-`routes/projects/[slug].tsx` (#246) is a two-column case study from 1024px: a
-real Literata `<h1>` with a small logo mark, the lead line under it
-(`projectLead()` in `lib/llms.ts`: the `outcome`, or the description's first
-sentence, with its `outcomeNote`), then the fact card
-(`components/ProjectFactCard.tsx`, sticky in the right column, first at 390px)
-beside the main column: the screenshot gallery as the hero, the pull quote,
-"What I built", "Client reviews", "Video" and "More work" (`relatedProjects()`
-in `lib/data.ts`: three client projects ranked by shared tags). A closing band
-on Desk ends the page with two promises through `promise()`, Book, the catalog
-link and How I work. Book appears twice, once in the card and once in the band,
-and nowhere else on the page. `islands/ImageGallery.tsx` renders the strip:
-slides sized by width with centre snap, captions from the file names
-(`screenshotCaption()`, the same text as the `alt`), a "n / N" counter,
-Previous/Next buttons from 1024px, and only the first image eager with
-`fetchpriority="high"`. A margin note inside the narrow fact card uses
-`WithNote`'s `note-stack` class, which keeps the note under its claim at every
-width. `test/project-page.test.ts` checks the built pages.
+`routes/work/[slug].tsx` (#246) is a two-column case study from 1024px: a real
+Literata `<h1>` with a small logo mark, the lead line under it (`projectLead()`
+in `lib/llms.ts`: the `outcome`, or the description's first sentence, with its
+`outcomeNote`), then the fact card (`components/ProjectFactCard.tsx`, sticky in
+the right column, first at 390px) beside the main column: the screenshot gallery
+as the hero, the pull quote, "What I built", "Client reviews", "Video" and "More
+work" (`relatedProjects()` in `lib/data.ts`: three client projects ranked by
+shared tags). A closing band on Desk ends the page with two promises through
+`promise()`, Book, the catalog link and How I work. Book appears twice, once in
+the card and once in the band, and nowhere else on the page.
+`islands/ImageGallery.tsx` renders the strip: slides sized by width with centre
+snap, captions from the file names (`screenshotCaption()`, the same text as the
+`alt`), a "n / N" counter, Previous/Next buttons from 1024px, and only the first
+image eager with `fetchpriority="high"`. A margin note inside the narrow fact
+card uses `WithNote`'s `note-stack` class, which keeps the note under its claim
+at every width. `test/work-page.test.ts` checks the built pages.
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
-gets `logoPlate: true` in `lib/data.ts`: the /projects card and the project page
+gets `logoPlate: true` in `lib/data.ts`: the /work card and the project page
 then render it on a light plate (`bg-parchment rounded-lg`). Today that is Roley
-and Sogroya; `test/projects-page.test.ts` pins that list across client projects
-and tools. No per-project inline logo styles.
+and Sogroya; `test/work-index.test.ts` pins that list across client projects and
+tools. No per-project inline logo styles.
 
 ### Type
 
@@ -397,8 +408,8 @@ self-hosting needed no CSP change.
 
 `deno task lcp` (not part of `deno task check` — it needs a production build and
 several seconds per sample) measures the home page's Largest Contentful Paint
-(or the page `--path /projects/smartlite` names), mobile viewport (390×844), in
-two modes: `cpu` (4x CPU throttling only) and `network` (CDP
+(or the page `--path /work/smartlite` names), mobile viewport (390×844), in two
+modes: `cpu` (4x CPU throttling only) and `network` (CDP
 `Network.emulateNetworkConditions`, 150ms latency, 200 KB/s down/up, service
 worker blocked so every sample is a genuine first load) — both by default, since
 a regression can show up in only one of them. Reports every sample plus the
@@ -765,7 +776,7 @@ const CORE_PAGES = new Set([
   "/infrastructure",
   "/contact-me",
   "/blog",
-  "/projects",
+  "/work",
   "/tools",
   "/catalog",
   "/pay",
@@ -851,13 +862,23 @@ their name table: it holds the OFL licence.
 
 ## Redirect table
 
-`lib/redirects.ts`'s `redirectTarget()` is the 301 table for URLs that no longer
-exist as written: a trailing slash on a `/blog/<slug>` or `/projects/<slug>`
-URL, and blog slugs retired by a rename (today: the CalDAV post). It's a pure
-function, unit-tested in `lib/redirects.test.ts` without a server — the same
-pattern as `lib/csp.ts` and `lib/cache-control.ts`. `main.ts` wires it as its
-own middleware, placed after the CSP and cache middlewares but before
-`staticFiles()`/`app.fsRoutes()`: a redirect response still needs the CSP and
-cache headers every other response gets, and it gets them because those two
-middlewares set headers on whatever `ctx.next()` resolves to, which is this
-middleware's response when it doesn't call `ctx.next()` itself.
+`lib/redirects.ts` holds the one 301 table (#188) for URLs that no longer exist
+as written: the old `/projects` section (`/projects` goes to `/work`, and each
+`/projects/<slug>` goes to `/tools/<slug>` when a tool page has that slug,
+otherwise to `/work/<slug>`), the retired `/projects/homelab` (to
+`/work/rostok`) and blog slugs retired by a rename (today: the CalDAV post).
+Every old path is listed with and without a trailing slash, so both land in one
+hop, and no entry points at another redirect. A `/projects/<x>` with no new home
+is not in the table and answers 404. Besides the table, a trailing slash on any
+`/blog/<slug>` or `/work/<slug>` URL redirects to the slash-free form.
+`redirectTarget()` is a pure function, unit-tested in `lib/redirects.test.ts`
+without a server — the same pattern as `lib/csp.ts` and `lib/cache-control.ts`;
+`test/structure.test.ts` checks every old URL on the built site (one 301, query
+string kept, a 200 behind it), and its internal-link crawl fails on any link
+that the table would redirect. `main.ts` wires it as its own middleware, placed
+after the CSP and cache middlewares but before `staticFiles()`/`app.fsRoutes()`:
+a redirect response still needs the CSP and cache headers every other response
+gets, and it gets them because those two middlewares set headers on whatever
+`ctx.next()` resolves to, which is this middleware's response when it doesn't
+call `ctx.next()` itself. It appends the request's query string to the target,
+so launch links keep their UTM tags.
