@@ -2,7 +2,9 @@ import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
 import {
   buildNtfySummary,
   fetchGithubStarsSection,
+  fetchUmamiCampaignsSection,
   fetchUmamiStatsSection,
+  fetchUmamiTopPagesSection,
   fetchYoutubeSection,
   formatMarkdownTable,
   formatReport,
@@ -161,4 +163,67 @@ Deno.test("sendNtfy skips without a network call when NTFY_URL or NTFY_TOPIC is 
     withEnvCleared(["NTFY_URL", "NTFY_TOPIC"], () => sendNtfy("test message"))
   );
   assertEquals(calls, 0);
+});
+
+// --- Umami metrics requests, against a stubbed fetch ---
+// Each of these sets placeholder Umami env vars (restoring the previous
+// values afterwards), answers every fetch with a fixed metrics payload and
+// records the requested URL, so the test sees which metrics `type` was asked
+// for and how the answer is rendered. No network call leaves the process.
+
+async function withUmamiStub<T>(
+  payload: { x: string; y: number }[],
+  fn: () => Promise<T>,
+): Promise<{ result: T; urls: URL[] }> {
+  const env: Record<string, string> = {
+    UMAMI_API_URL: "https://umami.example.com/umami/",
+    UMAMI_API_TOKEN: "placeholder-token",
+    UMAMI_ID: "site-id",
+  };
+  const previous = new Map(
+    Object.keys(env).map((n) => [n, Deno.env.get(n)]),
+  );
+  for (const [n, v] of Object.entries(env)) Deno.env.set(n, v);
+  const original = globalThis.fetch;
+  const urls: URL[] = [];
+  globalThis.fetch = ((input: string | URL | Request) => {
+    urls.push(new URL(input instanceof Request ? input.url : String(input)));
+    return Promise.resolve(Response.json(payload));
+  }) as typeof fetch;
+  try {
+    return { result: await fn(), urls };
+  } finally {
+    globalThis.fetch = original;
+    for (const [n, v] of previous) {
+      if (v === undefined) Deno.env.delete(n);
+      else Deno.env.set(n, v);
+    }
+  }
+}
+
+Deno.test("fetchUmamiCampaignsSection asks Umami for utmCampaign metrics and keeps its visitor ranking", async () => {
+  const { result, urls } = await withUmamiStub(
+    [{ x: "opus55-vs-sonnet5", y: 42 }, { x: "mig-launch", y: 7 }],
+    fetchUmamiCampaignsSection,
+  );
+  assertEquals(urls.length, 1);
+  assertEquals(urls[0].pathname, "/umami/api/websites/site-id/metrics");
+  assertEquals(urls[0].searchParams.get("type"), "utmCampaign");
+  assertEquals(result.warning, undefined);
+  assertEquals(result.headers, ["campaign", "visitors"]);
+  assertEquals(result.rows, [["opus55-vs-sonnet5", "42"], ["mig-launch", "7"]]);
+  assertStringIncludes(
+    formatReport([result]),
+    "## Umami — top campaigns (7 days)\n\n| campaign | visitors |\n| --- | --- |\n" +
+      "| opus55-vs-sonnet5 | 42 |\n| mig-launch | 7 |",
+  );
+});
+
+Deno.test("fetchUmamiTopPagesSection asks for the path metric, the type Umami v3 accepts", async () => {
+  const { result, urls } = await withUmamiStub(
+    [{ x: "/", y: 10 }],
+    fetchUmamiTopPagesSection,
+  );
+  assertEquals(urls[0].searchParams.get("type"), "path");
+  assertEquals(result.rows, [["/", "10"]]);
 });
