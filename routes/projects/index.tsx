@@ -16,6 +16,7 @@ import {
   repeatClientsLine,
 } from "../../lib/testimonials.ts";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
+import { ReviewSource } from "../../components/ReviewSource.tsx";
 import {
   ArchiveIcon,
   BriefcaseIcon,
@@ -186,20 +187,10 @@ function ArchiveRow({ project }: { project: Project }) {
           <blockquote class="inline text-parchment italic">
             “{review.excerpt}”
           </blockquote>
-          {review.sourceHref && (
-            <figcaption class="inline text-graphite">
-              {" · "}
-              <a
-                href={review.sourceHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 text-accent hover:text-accent underline underline-offset-4"
-              >
-                Review on Upwork
-                <NewTabHint />
-              </a>
-            </figcaption>
-          )}
+          <figcaption class="inline text-graphite">
+            {" — "}
+            <ReviewSource project={project} href={review.sourceHref} />
+          </figcaption>
         </figure>
       )}
       {project.companyOutcome && (

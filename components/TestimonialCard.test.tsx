@@ -20,6 +20,8 @@ const project: Project = {
   slug: "example",
   description: "An example.",
   period: { from: 2018, to: 2019 },
+  madeForName: "Jane Example",
+  madeForURL: "https://example.com/in/jane",
 };
 
 Deno.test("a testimonial with a sourceHref renders a link to it", () => {
@@ -34,8 +36,37 @@ Deno.test("a testimonial with no sourceHref renders no source link", () => {
   const { sourceHref: _drop, ...rest } = withSource;
   const html = render(<TestimonialCard t={rest} project={project} />);
   assert(
-    !html.includes("Review on Upwork"),
-    `rendered card shows a source link it shouldn't:\n${html}`,
+    !/<a [^>]*>Upwork/.test(html),
+    `rendered card links Upwork with no source:\n${html}`,
+  );
+});
+
+Deno.test("a card names the client, linked to their profile, as the reviewer", () => {
+  const html = render(<TestimonialCard t={withSource} project={project} />);
+  const text = html.replace(/<[^>]+>/g, "").replace(
+    /\u00a0\(opens in a new tab\)/g,
+    "",
+  );
+  assert(
+    text.includes("Jane Example reviewed on Upwork"),
+    `no "Jane Example reviewed on Upwork":\n${html}`,
+  );
+  assert(
+    html.includes(`href="https://example.com/in/jane"`),
+    `the client's name is not linked:\n${html}`,
+  );
+});
+
+Deno.test("a card for a project with no named client says Reviewed on Upwork", () => {
+  const { madeForName: _n, madeForURL: _u, ...anonymous } = project;
+  const html = render(<TestimonialCard t={withSource} project={anonymous} />);
+  const text = html.replace(/<[^>]+>/g, "").replace(
+    /\u00a0\(opens in a new tab\)/g,
+    "",
+  );
+  assert(
+    text.includes("Reviewed on Upwork"),
+    `no "Reviewed on Upwork":\n${html}`,
   );
 });
 
