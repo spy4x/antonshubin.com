@@ -32,6 +32,7 @@
   "imports": {
     "@/": "./",
     "@spy4x/email": "jsr:@spy4x/email@1.4.0",
+    "@spy4x/net": "jsr:@spy4x/net@1.4.0",
     "@spy4x/platform": "jsr:@spy4x/platform@1.4.0",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
     "@std/net": "jsr:@std/net@^1.0.6",

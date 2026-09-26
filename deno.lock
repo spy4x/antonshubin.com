@@ -12,6 +12,7 @@
     "jsr:@fresh/plugin-vite@^1.0.8": "1.0.8",
     "jsr:@hono/hono@4.13.8": "4.13.8",
     "jsr:@spy4x/email@1.4.0": "1.4.0",
+    "jsr:@spy4x/net@1.4.0": "1.4.0",
     "jsr:@spy4x/platform@1.4.0": "1.4.0",
     "jsr:@spy4x/server@1.2.0": "1.2.0",
     "jsr:@spy4x/time@^1.4.0": "1.4.0",
@@ -155,6 +156,9 @@
         "jsr:@std/encoding@1.0.11",
         "npm:nodemailer"
       ]
+    },
+    "@spy4x/net@1.4.0": {
+      "integrity": "d75d2decba582f6f330cf94b80dee81f0902559376c3a3730475eb8cc125183e"
     },
     "@spy4x/platform@1.4.0": {
       "integrity": "c843c560b0d8ea0c2f9ccc7092cf9e15ccacecbec7691cfce42a35c0d4acef6d",
@@ -1627,6 +1631,7 @@
       "jsr:@fresh/core@^2.3.3",
       "jsr:@fresh/plugin-vite@^1.0.8",
       "jsr:@spy4x/email@1.4.0",
+      "jsr:@spy4x/net@1.4.0",
       "jsr:@spy4x/platform@1.4.0",
       "jsr:@std/front-matter@^1.0.9",
       "jsr:@std/net@^1.0.6",
