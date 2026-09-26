@@ -321,7 +321,7 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "My SaaS template imports @spy4x/preact-icons and @spy4x/preact-signals.",
+          "My SaaS template pins four @spy4x/preact-* packages and takes its useUrlFilters hook from @spy4x/preact-signals.",
         href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
         planned: false,
       },
