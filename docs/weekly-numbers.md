@@ -17,11 +17,11 @@ GitHub numbers from going out.
 
 The "top campaigns" section lists the week's `utm_campaign` values by visitors,
 from Umami's metrics endpoint with `type=utmCampaign`. The self-hosted instance
-runs Umami 3.4.0, where that type exists; its count is distinct sessions, which
-Umami's own UI labels visitors. The same Umami 3 release renamed the page metric
-from `url` to `path` and answers `url` with a 400, so the top-pages section asks
-for `path`. How links get tagged, and how often the campaign numbers are
-reviewed, is in `docs/utm.md`.
+runs Umami 3 or newer (its image pins `:latest`), where that type exists; its
+count is distinct sessions, which Umami's own UI labels visitors. Umami 3
+renamed the page metric from `url` to `path` and answers `url` with a 400, so
+the top-pages section asks for `path`. How links get tagged, and how often the
+campaign numbers are reviewed, is in `docs/utm.md`.
 
 ## Env vars
 

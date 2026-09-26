@@ -190,7 +190,7 @@ export const fetchUmamiCtaEventsSection = () =>
     "event",
   );
 
-// `utmCampaign` is a metrics type since Umami v3 (the instance runs 3.4.0).
+// `utmCampaign` is a metrics type since Umami v3 (the instance pins `:latest`).
 // Its count is distinct sessions per campaign, which Umami's UI calls
 // visitors, so the column says so.
 export const fetchUmamiCampaignsSection = () =>
