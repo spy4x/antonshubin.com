@@ -244,8 +244,13 @@ Deno.test("a signed unsubscribe link loads and its form submits without a CSP vi
         );
         await assertNoViolations(page, "on the unsubscribe confirm page");
 
-        await page.getByRole("button", { name: "Unsubscribe" }).click();
-        await page.waitForLoadState("networkidle");
+        // The submit navigates (a POST back to /unsubscribe, same URL), so
+        // wait for that navigation itself: a bare waitForLoadState right
+        // after the click can resolve on the old page before it starts.
+        await Promise.all([
+          page.waitForNavigation({ waitUntil: "networkidle" }),
+          page.getByRole("button", { name: "Unsubscribe" }).click(),
+        ]);
         await page.getByRole("heading", { name: "You're unsubscribed" })
           .waitFor({ state: "visible" });
         await assertNoViolations(page, "after submitting the unsubscribe form");
