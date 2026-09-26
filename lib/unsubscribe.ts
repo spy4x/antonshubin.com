@@ -27,9 +27,9 @@ import { BASE_URL, getUnsubscribeSecret } from "./config.ts";
 
 const ENC = new TextEncoder();
 
-/** Same normalization `routes/api/subscribe.ts` applies before storing an
- * address, so a token is verifiable regardless of how the caller cased or
- * padded the email it started from. */
+/** Same normalization `lib/subscribe.ts` applies before storing an address
+ * (trim, then lowercase), so a token is verifiable regardless of how the
+ * caller cased or padded the email it started from. */
 function normalize(email: string): string {
   return email.trim().toLowerCase();
 }
