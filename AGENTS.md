@@ -558,7 +558,9 @@ page. Never retry a test on this error.
   never serves one from it — a signed unsubscribe link opened, submitted and
   reopened answers "Link not recognised", not the cached form. It opens the
   pages under test in a second tab once `navigator.serviceWorker.ready`
-  resolves, because the tab that registers the worker is not controlled by it.
+  resolves, because the tab that registers the worker is not controlled by it. A
+  third test pins `newPage()`: no worker activates on its page and the page
+  loads only once (#219).
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`

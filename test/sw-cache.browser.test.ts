@@ -17,7 +17,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, BrowserContext, Page } from "playwright";
 import { type Site, startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
 
 const TEST_SECRET = "t".repeat(32);
@@ -144,4 +144,30 @@ Deno.test("a no-store response already in the cache is never served from it", as
     await page.getByRole("button", { name: "Unsubscribe" })
       .waitFor({ state: "visible", timeout: 5_000 });
   });
+});
+
+Deno.test("a page from newPage() never gets a service worker, so SWUpdater can't reload it mid-test", async () => {
+  // Every other browser test opens its pages through newPage(). With the
+  // worker allowed, it activates within a second on the first page, claims
+  // it, and islands/SWUpdater.tsx reloads the page (#219).
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    let loads = 0;
+    page.on("load", () => loads++);
+    await page.goto(`${site.origin}/`, { waitUntil: "load" });
+    const worker = await page.evaluate(() =>
+      Promise.race([
+        navigator.serviceWorker.ready.then(() => "activated"),
+        new Promise((resolve) => setTimeout(() => resolve("none"), 3_000)),
+      ])
+    );
+    assertEquals(worker, "none", "a service worker activated on the page");
+    assertEquals(loads, 1, "the page was reloaded after it first loaded");
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
 });
