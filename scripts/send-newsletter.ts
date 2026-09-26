@@ -104,7 +104,12 @@ async function main() {
     fail(err instanceof Error ? err.message : String(err));
   }
 
-  const subs = loadSubscribers();
+  let subs;
+  try {
+    subs = await loadSubscribers();
+  } catch (err) {
+    fail(err instanceof Error ? err.message : String(err));
+  }
   const issue: NewsletterIssue = {
     subscribers: subs,
     subject,

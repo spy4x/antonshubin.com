@@ -2,7 +2,7 @@
 // address, store it once, then welcome the subscriber and notify the owner.
 // Kept out of the route so a test can run it against fake storage and a fake
 // mail relay.
-import type { Subscriber } from "./subscribers.ts";
+import type { SubscriberStore } from "./subscribers.ts";
 import { bareAddress } from "./email-field.ts";
 import {
   sendSubscribeMails,
@@ -11,9 +11,9 @@ import {
 
 /** Storage, link signing and mail for {@link addSubscriber}. */
 export interface AddSubscriberDeps {
-  load(): Subscriber[];
-  /** Throws when the write fails. */
-  save(list: Subscriber[]): void;
+  /** The subscriber list's read-change-write; throws when the file cannot
+   * be parsed or written. */
+  update: SubscriberStore["update"];
   /** Throws when the link cannot be signed, e.g. without UNSUBSCRIBE_SECRET. */
   unsubscribeLink(email: string): Promise<string>;
   mail: SubscribeMailDeps;
@@ -75,16 +75,21 @@ export async function addSubscriber(
     };
   }
 
-  const subs = deps.load();
-  const known = subs.some((s) => s.email === email);
-  if (!known) {
-    subs.push({
-      email,
-      subscribedAt: (deps.now?.() ?? new Date()).toISOString(),
-    });
-  }
+  let known: boolean;
+  let total: number;
   try {
-    deps.save(subs);
+    // The list is read inside the update, under the lock, after the link
+    // is built: a read taken earlier would be stale by the time it is written.
+    ({ known, total } = await deps.update((subs) => {
+      const known = subs.some((s) => s.email === email);
+      const list = known ? subs : [...subs, {
+        email,
+        subscribedAt: (deps.now?.() ?? new Date()).toISOString(),
+      }];
+      // Written for a known address too, so a failing write answers both the
+      // same way (#278).
+      return { list, result: { known, total: list.length } };
+    }));
   } catch (err) {
     log.error("[SUBSCRIBE] failed to save:", err);
     return {
@@ -97,7 +102,7 @@ export async function addSubscriber(
 
   // Welcome the subscriber and notify the owner.
   const mails = sendSubscribeMails(
-    { email, total: subs.length, unsubscribeLink: link },
+    { email, total, unsubscribeLink: link },
     deps.mail,
   ).catch((err) => log.error("[SUBSCRIBE] mail failed:", err));
 

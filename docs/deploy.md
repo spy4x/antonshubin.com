@@ -30,6 +30,12 @@ the same directory and is kept and backed up the same way (docs/newsletter.md).
 | production | `~/cloudlab/apps/antonshubin.com/data/subscribers.json`      |
 | staging    | `~/cloudlab/apps/antonshubin.com-stag/data/subscribers.json` |
 
+Next to it the site keeps `subscribers.json.lock` (the write lock; harmless,
+leave it) and, only after it found the list unparseable,
+`subscribers.json.invalid`: a copy of the text it refused. While the list does
+not parse, subscribing and unsubscribing answer 500 and the log says why; repair
+`subscribers.json` (or restore it, below), then delete the `.invalid` copy.
+
 Three things keep it there:
 
 - `scripts/deploy.ts` excludes `/data/` from its `rsync --delete`, and rsync
@@ -73,7 +79,11 @@ restic -r "$REPO" snapshots
 restic -r "$REPO" restore latest --target /tmp/antonshubin-restore
 SRC=/tmp/antonshubin-restore/home/spy4x/cloudlab/apps/antonshubin.com/data
 DST=~spy4x/cloudlab/apps/antonshubin.com/data
-cp "$SRC/subscribers.json" "$DST/subscribers.json"
+# Copy next to the list first, then swap it in under the site's own write lock,
+# so no sign-up can write an older list over the restored one.
+cp "$SRC/subscribers.json" "$DST/subscribers.json.restore"
+flock "$DST/subscribers.json.lock" \
+  mv "$DST/subscribers.json.restore" "$DST/subscribers.json"
 # The sent log only if it was lost too: last night's copy would forget a post
 # announced since then, and a later --send-newsletter would mail it again.
 [ -f "$SRC/newsletter-log.json" ] && [ ! -f "$DST/newsletter-log.json" ] &&

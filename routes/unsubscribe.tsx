@@ -3,7 +3,7 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
-import { loadSubscribers, saveSubscribers } from "../lib/subscribers.ts";
+import { loadSubscribers, updateSubscribers } from "../lib/subscribers.ts";
 import { findSubscriberByToken } from "../lib/unsubscribe.ts";
 import { getUnsubscribeSecret } from "../lib/config.ts";
 import { readFormBody, SMALL_FORM_MAX_BYTES } from "../lib/request-body.ts";
@@ -19,21 +19,17 @@ type PageData =
   | { state: "outdated" }
   | { state: "error" };
 
-/**
- * Looks up the subscriber a token was issued for. Returns `undefined` for a
- * missing `UNSUBSCRIBE_SECRET` the same as for a bad token — a
- * misconfiguration must not leak as a different response than "not
- * recognised" (see lib/unsubscribe.ts's `findSubscriberByToken`).
- */
-async function subscriberForToken(token: string) {
-  let secret: string;
+/** `UNSUBSCRIBE_SECRET`, or `undefined` when it is missing or unusable: that
+ * answers "not recognised" the same as a bad token, so a misconfiguration
+ * does not leak as a different response (see lib/unsubscribe.ts's
+ * `findSubscriberByToken`). */
+function unsubscribeSecret(): string | undefined {
   try {
-    secret = getUnsubscribeSecret();
+    return getUnsubscribeSecret();
   } catch (err) {
     console.error("[UNSUBSCRIBE]", err);
     return undefined;
   }
-  return await findSubscriberByToken(loadSubscribers(), token, secret);
 }
 
 // GET shows the confirm/not-recognised/outdated states; POST is the only
@@ -49,7 +45,18 @@ export const handler = define.handlers({
         headers: NO_STORE,
       });
     }
-    const match = await subscriberForToken(token);
+    const secret = unsubscribeSecret();
+    let match;
+    try {
+      match = secret &&
+        await findSubscriberByToken(await loadSubscribers(), token, secret);
+    } catch (err) {
+      console.error("[UNSUBSCRIBE] cannot read the list:", err);
+      return page<PageData>({ state: "error" }, {
+        status: 500,
+        headers: NO_STORE,
+      });
+    }
     if (!match) {
       return page<PageData>({ state: "not-recognised" }, {
         status: 400,
@@ -84,21 +91,32 @@ export const handler = define.handlers({
         headers: NO_STORE,
       });
     }
-    const match = await subscriberForToken(token);
-    if (!match) {
-      return page<PageData>({ state: "not-recognised" }, {
-        status: 400,
-        headers: NO_STORE,
-      });
-    }
+    const secret = unsubscribeSecret();
+    let match;
     try {
-      saveSubscribers(
-        loadSubscribers().filter((s) => s.email !== match.email),
-      );
+      // The token is checked against a plain read, outside the lock, so a
+      // flood of bad tokens never holds the lock (#254). Only the removal of
+      // the matched address runs under it, as one change, so a subscribe
+      // landing in between cannot write the address back.
+      match = secret &&
+        await findSubscriberByToken(await loadSubscribers(), token, secret);
+      if (match) {
+        const email = match.email;
+        await updateSubscribers((list) => ({
+          list: list.filter((s) => s.email !== email),
+          result: null,
+        }));
+      }
     } catch (err) {
       console.error("[UNSUBSCRIBE] failed to save:", err);
       return page<PageData>({ state: "error" }, {
         status: 500,
+        headers: NO_STORE,
+      });
+    }
+    if (!match) {
+      return page<PageData>({ state: "not-recognised" }, {
+        status: 400,
         headers: NO_STORE,
       });
     }

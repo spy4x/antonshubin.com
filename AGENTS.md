@@ -628,8 +628,14 @@ just present and internally consistent.
 `lib/subscribers.ts` owns the subscriber list (`SUBSCRIBERS_FILE`, default
 `data/subscribers.json`) — `routes/api/subscribe.ts`, `routes/unsubscribe.tsx`
 and `scripts/send-newsletter.ts` all read and write through it, never the file
-directly. `lib/unsubscribe.ts` signs and verifies unsubscribe tokens with the
-ts-libs signed payload codec (`jsr:@spy4x/platform/signed-payload`: purpose
+directly. Every change is `updateSubscribers(change)`: one read-change-write
+under an in-process queue and the lock file `subscribers.json.lock`, written by
+temp file and `rename` (#254), so a full disk or a crash never leaves a torn
+list. A file that does not parse as a list is an error, never an empty list: its
+text is copied to `subscribers.json.invalid`, every read and write fails with
+500, and nothing overwrites it until a person repairs the file.
+`lib/unsubscribe.ts` signs and verifies unsubscribe tokens with the ts-libs
+signed payload codec (`jsr:@spy4x/platform/signed-payload`: purpose
 `unsubscribe`, version 1, empty payload, the normalized address as bound
 context, so the token holds no address) and still accepts the pre-#233
 bare-signature tokens until #237 removes that path. The key is
