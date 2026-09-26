@@ -16,6 +16,7 @@ const base: Omit<Testimonial, "sourceHref" | "permission"> = {
   id: "example-1",
   projectSlug: "roley",
   contract: 1,
+  rating: 5,
   quote: "Great work.",
   excerpt: "Great work.",
 };
@@ -106,6 +107,10 @@ Deno.test("each review is one contract, and ids follow the project and contract"
   for (const t of testimonials) {
     assertEquals(t.id, `${t.projectSlug}-${t.contract}`);
   }
+});
+
+Deno.test("every review is rated 5.0, as Anton confirmed for all his reviews since 2013", () => {
+  for (const t of testimonials) assertEquals(t.rating, 5, t.id);
 });
 
 Deno.test("every real testimonial links its source and is cleared for the site", () => {

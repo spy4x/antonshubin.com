@@ -17,6 +17,7 @@ import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import GhStars from "../../islands/GhStars.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
+import { Rating } from "../../components/Rating.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
 import StatusMark from "../../components/StatusMark.tsx";
 
@@ -411,6 +412,7 @@ export default define.page(function ProjectDetail(ctx) {
               <div class="space-y-6">
                 {reviews.map((t) => (
                   <figure key={t.id}>
+                    <Rating value={t.rating} class="mb-2 pl-4" />
                     <blockquote class="space-y-3 text-graphite italic leading-relaxed border-l-2 border-rule-strong pl-4">
                       {t.quote.split(/\n+/).map((para, i) => (
                         <p key={i}>{para}</p>
