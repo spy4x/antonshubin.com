@@ -9,8 +9,7 @@ import { NewTabHint } from "./NewTabHint.tsx";
 import StatusMark from "./StatusMark.tsx";
 import { WithNote } from "./WithNote.tsx";
 
-const LINK =
-  "text-parchment underline underline-offset-4 decoration-rule-strong hover:decoration-accent";
+const LINK = "text-parchment underline underline-offset-4 hover:text-accent";
 
 /** One `<dt>`/`<dd>` pair of the fact card, wrapped in a `<div>` as `<dl>` allows. */
 function Fact(
@@ -61,7 +60,7 @@ export function SimilarWorkLink(
     >
       Similar work today: {item.shortTitle} ·{" "}
       <span class="price">{priceLabel(item)}</span>
-      <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1 align-[-2px]" />
+      <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
     </a>
   );
 }
@@ -85,7 +84,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
       class={`${LINK} break-words`}
     >
       {project.externalURLLabel ?? live.replace(/^https?:\/\//, "")}
-      <ExternalLinkIcon class="inline w-3.5 h-3.5 ml-1 align-[-2px]" />
+      <ExternalLinkIcon class="inline w-3.5 h-3.5 ml-1" />
       <NewTabHint />
     </a>
   );
@@ -103,7 +102,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
               ? (
                 <a href={project.madeForURL} target="_blank" class={LINK}>
                   {project.madeForName}
-                  <ExternalLinkIcon class="inline w-3.5 h-3.5 ml-1 align-[-2px]" />
+                  <ExternalLinkIcon class="inline w-3.5 h-3.5 ml-1" />
                   <NewTabHint />
                 </a>
               )

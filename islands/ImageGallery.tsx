@@ -74,7 +74,7 @@ function Arrow({ d, class: className }: { d: string; class: string }) {
 }
 
 /** Round icon button in the site's secondary style. */
-const ROUND = buttonClass("secondary", "justify-center w-11 h-11 bg-ink");
+const ROUND = buttonClass("secondary", "justify-center w-10 h-10 bg-ink");
 
 /**
  * A project's screenshots as a horizontal strip: each slide is sized by the
@@ -194,7 +194,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
         ref={stripRef}
         onScroll={updateCurrent}
         data-gallery-strip
-        class="relative flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory [scrollbar-width:thin] [scrollbar-color:var(--color-rule-strong)_transparent]"
+        class="relative flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-color:var(--color-rule-strong)_transparent]"
       >
         {images.map((image, index) => (
           <figure
@@ -232,7 +232,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
             aria-label="Previous screenshot"
             onClick={() => scrollToSlide(Math.max(0, current.value - 1))}
             disabled={current.value === 0}
-            class={`${ROUND} max-lg:hidden disabled:opacity-40`}
+            class={`${ROUND} max-lg:hidden disabled:opacity-50`}
           >
             <Arrow d={ARROW_LEFT} class="w-5 h-5" />
           </button>
@@ -248,7 +248,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
             onClick={() =>
               scrollToSlide(Math.min(images.length - 1, current.value + 1))}
             disabled={current.value === images.length - 1}
-            class={`${ROUND} max-lg:hidden disabled:opacity-40`}
+            class={`${ROUND} max-lg:hidden disabled:opacity-50`}
           >
             <Arrow d={ARROW_RIGHT} class="w-5 h-5" />
           </button>
@@ -268,7 +268,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
       >
         {activeIndex.value !== null && (
           <div class="w-full h-full flex flex-col">
-            <div class="flex justify-end p-3">
+            <div class="p-3 text-right">
               <button
                 type="button"
                 onClick={closeLightbox}
@@ -312,7 +312,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
             >
               <GalleryImage
                 {...images[activeIndex.value]}
-                class="max-w-full max-h-full object-contain select-none"
+                class="max-h-full object-contain"
               />
             </div>
 

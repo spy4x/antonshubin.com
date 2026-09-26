@@ -144,7 +144,7 @@ function LogoMark({ project }: { project: Project }) {
       width={48}
       height={48}
       class={`w-12 h-12 shrink-0 object-contain${
-        project.logoPlate ? " bg-parchment rounded-lg p-1" : ""
+        project.logoPlate ? " bg-parchment rounded-lg p-2" : ""
       }`}
     />
   );
@@ -220,7 +220,7 @@ export default define.page(function ProjectDetail(ctx) {
   const leadLine = (
     <p
       data-project-lead
-      class="font-heading text-xl sm:text-2xl text-parchment leading-snug text-balance"
+      class="font-heading text-xl text-parchment leading-snug text-balance"
     >
       {lead}
     </p>
@@ -235,7 +235,7 @@ export default define.page(function ProjectDetail(ctx) {
           __html: toJsonLd(projectJsonLd(project, head.value.canonical)),
         }}
       />
-      <div class="max-w-6xl mx-auto sm:py-4">
+      <div class="max-w-6xl mx-auto">
         <Breadcrumb
           items={getBreadcrumb(head.value.canonical, project.title)}
         />
@@ -244,7 +244,7 @@ export default define.page(function ProjectDetail(ctx) {
         <header class="mb-8">
           <div class="flex items-center gap-4">
             <LogoMark project={project} />
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl text-parchment text-balance">
+            <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
               {project.title}
             </h1>
           </div>
@@ -277,7 +277,7 @@ export default define.page(function ProjectDetail(ctx) {
               <h2 id="project-built" class="text-2xl text-parchment mb-4">
                 What I built
               </h2>
-              <div class="space-y-4 max-w-[65ch] leading-relaxed">
+              <div class="space-y-4 max-w-2xl leading-relaxed">
                 {paragraphs.map((p, i) => (
                   <p
                     key={i}
@@ -345,7 +345,7 @@ export default define.page(function ProjectDetail(ctx) {
               </li>
             ))}
           </ul>
-          <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+          <div class="flex flex-wrap items-center gap-4">
             <BookCallLink
               url={SCHEDULE_URL}
               target="_blank"
@@ -358,7 +358,7 @@ export default define.page(function ProjectDetail(ctx) {
             <a
               href="/how-i-work"
               data-umami-event={`project-cta-${project.slug}-how-i-work`}
-              class="inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 decoration-rule-strong hover:decoration-accent"
+              class="inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
             >
               How I work
               <ArrowRightIcon class="w-3.5 h-3.5" />

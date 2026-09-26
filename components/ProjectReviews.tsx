@@ -35,7 +35,7 @@ export function ProjectReviews(
             </figcaption>
             <blockquote
               cite={t.sourceHref}
-              class="space-y-3 text-parchment leading-relaxed max-w-[65ch]"
+              class="space-y-3 text-parchment leading-relaxed max-w-2xl"
             >
               {t.quote.split(/\n+/).map((para, i) => <p key={i}>{para}</p>)}
             </blockquote>
@@ -59,7 +59,7 @@ export function PullQuote(
     <figure data-pull-quote class="border-l-2 border-rule-strong pl-5">
       <blockquote
         cite={review.sourceHref}
-        class="font-heading text-xl sm:text-2xl text-parchment leading-snug max-w-[40ch]"
+        class="font-heading text-xl text-parchment leading-snug max-w-2xl"
       >
         <p>“{review.excerpt}”</p>
       </blockquote>
