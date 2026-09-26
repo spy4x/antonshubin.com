@@ -320,9 +320,10 @@ export const tools: Tool[] = [
         planned: false,
       },
       {
-        text: "My SaaS template will import it.",
-        href: "https://github.com/spy4x/template",
-        planned: true,
+        text:
+          "My SaaS template imports @spy4x/preact-icons and @spy4x/preact-signals.",
+        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+        planned: false,
       },
       {
         text: "This site will replace its own components with it.",
