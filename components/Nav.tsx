@@ -109,7 +109,7 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
       {/* Desktop rail */}
       <div
         id="desktop-menu"
-        class="hidden sm:flex fixed inset-y-0 left-0 z-30 w-18 lg:w-22 flex-col gap-2 bg-desk border-r border-rule px-1.5 py-3"
+        class="hidden sm:flex fixed inset-y-0 left-0 z-30 w-[calc(4.5rem+env(safe-area-inset-left))] lg:w-[calc(5.5rem+env(safe-area-inset-left))] flex-col gap-2 bg-desk border-r border-rule pl-[calc(0.375rem+env(safe-area-inset-left))] pr-1.5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
       >
         <a
           href="/"

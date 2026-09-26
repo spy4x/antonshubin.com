@@ -36,7 +36,7 @@ export function Layout({ children, currentPath }: LayoutProps) {
       <Nav currentPath={currentPath} scheduleUrl={SCHEDULE_URL} />
       <main
         id="main-content"
-        class="p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:ml-18 sm:pb-4 lg:ml-22 md:p-12"
+        class="p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:ml-[calc(4.5rem+env(safe-area-inset-left))] sm:pb-4 lg:ml-[calc(5.5rem+env(safe-area-inset-left))] md:p-12 md:pr-[max(3rem,env(safe-area-inset-right))]"
       >
         {children}
         <footer class="max-w-4xl mx-auto mt-16 pt-6 border-t border-rule text-center text-graphite text-sm">
