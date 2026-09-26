@@ -41,7 +41,7 @@ deno task video-kit             # transcript → titles, description, chapters, 
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
-deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B)
+deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B, --path for another page)
 ```
 
 `deno task check` fails on a failing test, same as a lint or type error — a red
@@ -87,9 +87,12 @@ page and the `Offer` JSON-LD read from it. `lib/catalog.test.ts` pins the four
 prices and the six redirects; `test/structure.test.ts` fails when a dollar
 amount that is not in the catalog shows up on a page listed in its `PRICE_PAGES`
 or in an llms file — add a page to that list when it starts showing a price.
-Retired slugs live in `catalogRedirects` there and answer 301 — never link to
-one. The same price list is used on Upwork and neatsoft.dev, so a price change
-is followed by a manual edit in both places.
+Every client project page is on that list: its fact card and closing band link
+"Similar work today" to the item named by the project's `catalogSlug`
+(`lib/data.ts`, checked through `catalogItem()` by `lib/data.test.ts`). Retired
+slugs live in `catalogRedirects` there and answer 301 — never link to one. The
+same price list is used on Upwork and neatsoft.dev, so a price change is
+followed by a manual edit in both places.
 
 The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
 Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
@@ -136,16 +139,18 @@ reference.
   for the name on 26 Sep 2026). An `excerpt` is only exact pieces of its `quote`
   joined by " … " — cut around a misspelling, never fix it.
   `lib/testimonials.test.ts` checks the slugs, the excerpts and the pinned
-  misspellings. A project page shows its visible reviews in full;
-  `routes/index.tsx` shows the three excerpts in `homeTestimonialIds` through
-  `components/TestimonialCard.tsx`, and `test/reviews.test.ts` checks both on
-  the built pages. `visibleTestimonials()` still filters on `sourceHref` and
-  `permission: true`.
+  misspellings. A project page shows its first review's excerpt as a pull quote
+  under the hero, then every visible review in full
+  (`components/ProjectReviews.tsx`), with the attribution printed once above the
+  group and no period under each review; `routes/index.tsx` shows the three
+  excerpts in `homeTestimonialIds` through `components/TestimonialCard.tsx`, and
+  `test/reviews.test.ts` checks both on the built pages. `visibleTestimonials()`
+  still filters on `sourceHref` and `permission: true`.
 - Every client project in `lib/data.ts` carries a `period` (`lib/data.test.ts`
   fails without one), rendered by `formatPeriod()` ("2021", "2018–2019",
-  "2024–now") on the cards, the project page eyebrow and the JSON-LD
-  `dateCreated`. `outcomeNote`/`externalURLNote` attach a margin note to a
-  project's outcome or live link.
+  "2024–now") on the cards, the project page fact card and the JSON-LD
+  `dateCreated` and `temporalCoverage`. `outcomeNote`/`externalURLNote` attach a
+  margin note to a project's outcome or live link.
 - `lib/notes.ts` holds every margin note (`{ id, text, href?, checkedOn? }`) —
   the source or checked date behind a claim wrapped in
   `components/WithNote.tsx`, which stamps the claim with `data-note-ref="<id>"`.
@@ -210,9 +215,30 @@ emit them in the compiled stylesheet, so every call site supplies its own sizing
 via `extra` instead of fighting a default.
 
 `components/StatusMark.tsx` renders a shape plus a word for a project or tool
-status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`) —
-never colour alone; used today on `routes/projects/index.tsx` and
-`routes/projects/[slug].tsx`'s archived/outcome badges.
+status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`,
+`live`, `offline`) — never colour alone; used today on
+`routes/projects/index.tsx` and in the project page's fact card
+(`components/ProjectFactCard.tsx`: live, offline or archived).
+
+### Project page
+
+`routes/projects/[slug].tsx` (#246) is a two-column case study from 1024px: a
+real Literata `<h1>` with a small logo mark, the lead line under it
+(`projectLead()` in `lib/llms.ts`: the `outcome`, or the description's first
+sentence, with its `outcomeNote`), then the fact card
+(`components/ProjectFactCard.tsx`, sticky in the right column, first at 390px)
+beside the main column: the screenshot gallery as the hero, the pull quote,
+"What I built", "Client reviews", "Video" and "More work" (`relatedProjects()`
+in `lib/data.ts`: three client projects ranked by shared tags). A closing band
+on Desk ends the page with two promises through `promise()`, Book, the catalog
+link and How I work. Book appears twice, once in the card and once in the band,
+and nowhere else on the page. `islands/ImageGallery.tsx` renders the strip:
+slides sized by width with centre snap, captions from the file names
+(`screenshotCaption()`, the same text as the `alt`), a "n / N" counter,
+Previous/Next buttons from 1024px, and only the first image eager with
+`fetchpriority="high"`. A margin note inside the narrow fact card uses
+`WithNote`'s `note-stack` class, which keeps the note under its claim at every
+width. `test/project-page.test.ts` checks the built pages.
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
 gets `logoPlate: true` in `lib/data.ts`: the /projects card and the project page
@@ -273,12 +299,13 @@ self-hosting needed no CSP change.
 ### `scripts/lcp.ts`
 
 `deno task lcp` (not part of `deno task check` — it needs a production build and
-several seconds per sample) measures the home page's Largest Contentful Paint,
-mobile viewport (390×844), in two modes: `cpu` (4x CPU throttling only) and
-`network` (CDP `Network.emulateNetworkConditions`, 150ms latency, 200 KB/s
-down/up, service worker blocked so every sample is a genuine first load) — both
-by default, since a regression can show up in only one of them. Reports every
-sample plus the median, min and max.
+several seconds per sample) measures the home page's Largest Contentful Paint
+(or the page `--path /projects/smartlite` names), mobile viewport (390×844), in
+two modes: `cpu` (4x CPU throttling only) and `network` (CDP
+`Network.emulateNetworkConditions`, 150ms latency, 200 KB/s down/up, service
+worker blocked so every sample is a genuine first load) — both by default, since
+a regression can show up in only one of them. Reports every sample plus the
+median, min and max.
 
 `--ab <dirA> <dirB>` compares two already-built site directories (each needs its
 own `deno task build` first) instead of only the current worktree — alternating
@@ -288,8 +315,8 @@ doesn't make whichever build was measured second look artificially better or
 worse (confirmed necessary: measuring the same commit twice in separate batches
 gave different medians before this mode existed). This is the reliable way to
 compare a branch against `origin/main`: clone or `git worktree add` a copy of
-`main`, build it, then
-`deno task lcp -- --ab <main copy> <this worktree> --n 15`.
+`main`, build it, then `deno task lcp --ab <main copy> <this worktree> --n 15`,
+adding `--path <page>` for a page other than `/`.
 
 ## Content rule
 
@@ -380,6 +407,9 @@ the narrow `deno task test`.
   Escape handling (closes it, returns focus, and does nothing when already
   closed). The explicit `triggerRef.current?.focus()` calls in both lightboxes
   are kept on purpose, even though native `<dialog>` already restores focus.
+  Since #246 it also checks the project gallery's "n / N" counter and its named
+  Previous/Next buttons, and runs every axe-core WCAG 2 A/AA rule plus a
+  horizontal-scroll check on six sample project pages at 390 and 1440px.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the

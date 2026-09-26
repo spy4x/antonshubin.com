@@ -243,6 +243,16 @@ h4,
   .note-aside {
     margin-top: 0;
   }
+
+  /* A note inside a narrow box (the project fact card, #246) stays under
+     its claim at every width: a 240px column would not fit beside it. */
+  .note-wrap.note-stack {
+    display: block;
+  }
+
+  .note-stack .note-aside {
+    margin-top: 0.25rem;
+  }
 }
 
 /* Tabular figures for prices (#184). */

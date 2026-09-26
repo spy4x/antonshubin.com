@@ -6,7 +6,9 @@ import {
   highlightProjects,
   highlightSlugs,
   projects,
+  relatedProjects,
 } from "./data.ts";
+import { catalogItem } from "./catalog.ts";
 
 Deno.test("the highlights are the six projects #232 names, in its order", () => {
   assertEquals(highlightProjects().map((p) => p.slug), [
@@ -87,4 +89,37 @@ Deno.test("a period renders as one year, a range with an en dash, or a year to n
   assertEquals(formatPeriod({ from: 2021, to: 2021 }), "2021");
   assertEquals(formatPeriod({ from: 2018, to: 2019 }), "2018\u20132019");
   assertEquals(formatPeriod({ from: 2024, ongoing: true }), "2024\u2013now");
+});
+
+/**
+ * CallTrack and Sajari were frontend roles on someone else's product: no
+ * catalog item describes that work, so their pages show no catalog link.
+ */
+const NO_CATALOG_MATCH = ["calltrack", "sajari"];
+
+Deno.test("every client project maps to a real catalog item, except the two frontend roles", () => {
+  for (const p of projects.freelance) {
+    if (NO_CATALOG_MATCH.includes(p.slug!)) {
+      assertEquals(p.catalogSlug, undefined, p.slug);
+      continue;
+    }
+    assert(p.catalogSlug, `${p.slug} has no catalogSlug`);
+    catalogItem(p.catalogSlug);
+  }
+});
+
+Deno.test("More work ranks by shared tags, then by the /projects order, and never lists the page itself", () => {
+  const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!;
+  // Roley and DareChat share four tags each; Roley is the earlier highlight.
+  // Corecircle and Sogroya share one each; Corecircle is a highlight.
+  assertEquals(relatedProjects(smartlite).map((p) => p.slug), [
+    "roley",
+    "truth-or-dare",
+    "corecircle",
+  ]);
+  for (const p of projects.freelance) {
+    const related = relatedProjects(p);
+    assertEquals(related.length, 3, `${p.slug} gets ${related.length}`);
+    assert(!related.includes(p), `${p.slug} lists itself`);
+  }
 });

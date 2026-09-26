@@ -1,5 +1,6 @@
 /**
- * Measures the home page's Largest Contentful Paint on one or two production
+ * Measures a page's Largest Contentful Paint (the home page unless `--path`
+ * names another) on one or two production
  * builds. Not part of `deno task check` — it needs a built site, a real
  * Chromium and several seconds per sample, so it's a standalone `deno task
  * lcp` instead (see AGENTS.md "Visual system"). Used to prove the
@@ -30,9 +31,10 @@
  *
  * Usage:
  *   deno task lcp                              # current build, both modes, n=15
- *   deno task lcp -- --n 21                    # more samples
- *   deno task lcp -- --mode cpu                # one mode only
- *   deno task lcp -- --ab ../main ../branch     # compare two built directories
+ *   deno task lcp --n 21                    # more samples
+ *   deno task lcp --mode cpu                # one mode only
+ *   deno task lcp --ab ../main ../branch     # compare two built directories
+ *   deno task lcp --path /projects/smartlite # measure another page
  */
 import { type Site, startSite } from "../test/harness.ts";
 import { launchChromium } from "../test/browser.ts";
@@ -44,12 +46,15 @@ interface Args {
   n: number;
   modes: Mode[];
   ab?: [string, string];
+  /** The page to measure, from the site root; "/" by default. */
+  path: string;
 }
 
 function parseArgs(argv: string[]): Args {
   let n = 15;
   let modes: Mode[] = ["cpu", "network"];
   let ab: [string, string] | undefined;
+  let path = "/";
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--n") n = Number(argv[++i]);
@@ -59,13 +64,18 @@ function parseArgs(argv: string[]): Args {
         throw new Error(`--mode must be "cpu" or "network", got "${m}"`);
       }
       modes = [m];
+    } else if (arg === "--path") {
+      path = argv[++i];
+      if (!path?.startsWith("/")) {
+        throw new Error(`--path must start with "/", got "${path}"`);
+      }
     } else if (arg === "--ab") {
       ab = [argv[++i], argv[++i]];
     } else {
       throw new Error(`unknown argument: ${arg}`);
     }
   }
-  return { n, modes, ab };
+  return { n, modes, ab, path };
 }
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
@@ -125,7 +135,11 @@ async function startSiteAt(dir: string): Promise<Site> {
 
 /** One LCP sample: a fresh Chromium instance, a fresh page, navigate, read
  * the largest-contentful-paint entry's startTime. */
-async function sampleOnce(origin: string, mode: Mode): Promise<number> {
+async function sampleOnce(
+  origin: string,
+  mode: Mode,
+  path = "/",
+): Promise<number> {
   const browser: Browser = await launchChromium();
   try {
     const context = await browser.newContext({
@@ -161,7 +175,7 @@ async function sampleOnce(origin: string, mode: Mode): Promise<number> {
         }
       }).observe({ type: "largest-contentful-paint", buffered: true });
     });
-    await page.goto(`${origin}/`, { waitUntil: "load", timeout: 30_000 });
+    await page.goto(`${origin}${path}`, { waitUntil: "load", timeout: 30_000 });
     // Let the LCP settle after load (images/fonts can still shift it briefly).
     await page.waitForTimeout(500);
     return await page.evaluate(() =>
@@ -196,7 +210,9 @@ const args = parseArgs(Deno.args);
 
 if (args.ab) {
   const [dirA, dirB] = args.ab;
-  console.log(`A/B: A=${dirA}  B=${dirB}  n=${args.n} per build per mode`);
+  console.log(
+    `A/B: A=${dirA}  B=${dirB}  path=${args.path}  n=${args.n} per build per mode`,
+  );
   const siteA = await startSiteAt(dirA);
   const siteB = await startSiteAt(dirB);
   try {
@@ -206,8 +222,8 @@ if (args.ab) {
       for (let i = 0; i < args.n; i++) {
         // Alternate A, B, A, B, ... so neither build is consistently
         // measured earlier or later in the run.
-        const lcpA = await sampleOnce(siteA.origin, mode);
-        const lcpB = await sampleOnce(siteB.origin, mode);
+        const lcpA = await sampleOnce(siteA.origin, mode, args.path);
+        const lcpB = await sampleOnce(siteB.origin, mode, args.path);
         samplesA.push(lcpA);
         samplesB.push(lcpB);
         console.log(
@@ -229,7 +245,7 @@ if (args.ab) {
     for (const mode of args.modes) {
       const samples: number[] = [];
       for (let i = 0; i < args.n; i++) {
-        const lcp = await sampleOnce(site.origin, mode);
+        const lcp = await sampleOnce(site.origin, mode, args.path);
         samples.push(lcp);
         console.log(`[${mode}] sample ${i + 1}/${args.n}: ${lcp.toFixed(1)}ms`);
       }

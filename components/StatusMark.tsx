@@ -5,7 +5,9 @@ export type Status =
   | "paused"
   | "archived"
   | "outcome"
-  | "issue";
+  | "issue"
+  | "live"
+  | "offline";
 
 interface StatusConfig {
   label: string;
@@ -20,6 +22,8 @@ const CONFIG: Record<Status, StatusConfig> = {
   archived: { label: "Archived", colorClass: "text-graphite" },
   outcome: { label: "Outcome", colorClass: "text-parchment" },
   issue: { label: "Known issue", colorClass: "text-brick" },
+  live: { label: "Live", colorClass: "text-sage" },
+  offline: { label: "Offline", colorClass: "text-graphite" },
 };
 
 /** 16x16 shape for a status, one per `Status` — never colour alone. */
@@ -90,6 +94,38 @@ function Shape(
             height="9"
             fill="currentColor"
             transform="rotate(45 8 8)"
+          />
+        </svg>
+      );
+    case "live":
+      return (
+        <svg {...common} aria-hidden="true">
+          <circle cx="8" cy="8" r="3" fill="currentColor" />
+          <circle
+            cx="8"
+            cy="8"
+            r="6.25"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+        </svg>
+      );
+    case "offline":
+      return (
+        <svg {...common} aria-hidden="true">
+          <circle
+            cx="8"
+            cy="8"
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <path
+            d="M3.5 12.5 12.5 3.5"
+            stroke="currentColor"
+            stroke-width="1.5"
           />
         </svg>
       );

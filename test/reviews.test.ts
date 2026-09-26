@@ -29,7 +29,7 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 const squash = (s: string) => s.replace(/\s+/g, " ").trim();
 
 siteTest(
-  "every client project page shows its period and each of its reviews in full",
+  "every client project page shows its period and each of its reviews in full, attributed once",
   async (site) => {
     let reviewsSeen = 0;
     for (const project of projects.freelance) {
@@ -50,10 +50,14 @@ siteTest(
         html.includes(`href="${UPWORK_URL}"`),
         `/projects/${project.slug} does not link the Upwork profile`,
       );
-      const sources = html.match(/data-review-source/g)?.length ?? 0;
+      const start = html.indexOf("data-project-reviews");
+      const section = html.slice(start, html.indexOf("</section>", start));
+      // One client per project page, so the attribution is printed once
+      // above the group, not under every review (#246).
+      const sources = section.match(/data-review-source/g)?.length ?? 0;
       assert(
-        sources === reviews.length,
-        `/projects/${project.slug} names the reviewer ${sources} times for ${reviews.length} reviews`,
+        sources === 1,
+        `/projects/${project.slug} names the reviewer ${sources} times in its review section`,
       );
       if (project.madeForName) {
         assert(
@@ -65,14 +69,18 @@ siteTest(
         assert(
           new RegExp(
             `data-review-source[^>]*>\\s*<a href="${project.madeForURL}"`,
-          ).test(html),
+          ).test(section),
           `/projects/${project.slug} does not link ${project.madeForName}'s profile`,
         );
       }
-      const ratings = html.match(/data-rating="5\.0"/g)?.length ?? 0;
+      const ratings = section.match(/data-rating="5\.0"/g)?.length ?? 0;
       assert(
         ratings === reviews.length,
         `/projects/${project.slug} shows ${ratings} ratings for ${reviews.length} reviews`,
+      );
+      assert(
+        !visibleText(section).includes(period),
+        `/projects/${project.slug} repeats the period ${period} under its reviews`,
       );
       for (const t of reviews) {
         reviewsSeen++;
