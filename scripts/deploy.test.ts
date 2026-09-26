@@ -47,3 +47,10 @@ Deno.test("the image never carries a local data/ directory", () => {
     ".dockerignore must list /data/",
   );
 });
+
+Deno.test("the staging deploy builds its env with stagingEnv", () => {
+  assert(
+    read("scripts/deploy.ts").includes("stagingEnv("),
+    "scripts/deploy.ts must build .env.staging.local with stagingEnv",
+  );
+});

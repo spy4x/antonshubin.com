@@ -21,6 +21,8 @@
  * (Docker creates a missing bind-mount source as root). See docs/deploy.md.
  */
 
+import { stagingEnv } from "./staging-env.ts";
+
 // Cloud server (23.88.101.28). antonshubin.com used to run on the home server
 // as well; it was consolidated onto cloud, where Umami also lives — which is
 // what lets the first-party /umami/ proxy work from Traefik labels alone.
@@ -53,15 +55,10 @@ if (isStaging) {
   // --env-file). The .local suffix keeps it matched by the .gitignore rule
   // .env.*.local, so a deploy that fails midway leaves no untracked,
   // un-ignored copy of the environment values behind.
-  const prodEnv = Deno.readTextFileSync(".env.prod");
-  // Anchor both replacements: an unanchored /DOMAIN=.*/ also matches the tail
-  // of WWW_DOMAIN=. WWW_DOMAIN is pinned to the staging host (not
-  // `www.<staging host>`) because that name has no DNS record — Traefik would
-  // request a cert for it and Let's Encrypt would fail the whole order,
-  // leaving staging with no certificate at all.
-  const stagEnv = prodEnv
-    .replace(/^DOMAIN=.*$/m, `DOMAIN=${TARGET.domain}`)
-    .replace(/^WWW_DOMAIN=.*$/m, `WWW_DOMAIN=${TARGET.domain}`);
+  const stagEnv = stagingEnv(
+    Deno.readTextFileSync(".env.prod"),
+    TARGET.domain,
+  );
   Deno.writeTextFileSync(TARGET.envFile, stagEnv);
 }
 
