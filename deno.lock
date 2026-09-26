@@ -10,10 +10,18 @@
     "jsr:@fresh/core@^2.2.0": "2.3.3",
     "jsr:@fresh/core@^2.3.3": "2.3.3",
     "jsr:@fresh/plugin-vite@^1.0.8": "1.0.8",
+    "jsr:@hectorm/otpauth@9.5.2": "9.5.2",
     "jsr:@hono/hono@4.13.8": "4.13.8",
+    "jsr:@iuioiua/redis@1.1.10": "1.1.10",
+    "jsr:@libs/qrcode@3.1.0": "3.1.0",
     "jsr:@spy4x/email@1.4.0": "1.4.0",
+    "jsr:@spy4x/email@^1.4.0": "1.4.0",
+    "jsr:@spy4x/net@1.4.0": "1.4.0",
+    "jsr:@spy4x/net@^1.4.0": "1.4.0",
     "jsr:@spy4x/platform@1.4.0": "1.4.0",
+    "jsr:@spy4x/platform@^1.4.0": "1.4.0",
     "jsr:@spy4x/server@1.2.0": "1.2.0",
+    "jsr:@spy4x/server@1.4.0": "1.4.0",
     "jsr:@spy4x/time@^1.4.0": "1.4.0",
     "jsr:@spy4x/validation@^1.4.0": "1.4.0",
     "jsr:@std/assert@1": "1.0.17",
@@ -67,6 +75,7 @@
     "npm:marked@^17.0.1": "17.0.1",
     "npm:nodemailer@10.0.10": "10.0.10",
     "npm:playwright@1.63.0": "1.63.0",
+    "npm:postgres@3.4.7": "3.4.7",
     "npm:preact-render-to-string@^6.6.3": "6.7.0_preact@10.29.3",
     "npm:preact@^10.28.2": "10.29.3",
     "npm:preact@^10.29.1": "10.29.3",
@@ -145,8 +154,17 @@
         "npm:vite@^7.1.4"
       ]
     },
+    "@hectorm/otpauth@9.5.2": {
+      "integrity": "efe9d019825c3262b32c144dd2316fa4c3b4537ce025e9d009948e78a28fb55e"
+    },
     "@hono/hono@4.13.8": {
       "integrity": "bbb566d9ebb81e74c0d7eeff1f9221ba9f3fda6f1832e5ca66cbddcecb2f7fec"
+    },
+    "@iuioiua/redis@1.1.10": {
+      "integrity": "b743e861a77a874fb7b310e0e4e3f5077300f5c8a13c398c31844ef4fc5353bf"
+    },
+    "@libs/qrcode@3.1.0": {
+      "integrity": "1d65698d3cbaf1d5e2e0b025f7d8572e8b2c485dcfa81d485e0bf0ce607e9c2b"
     },
     "@spy4x/email@1.4.0": {
       "integrity": "3f854a192e5f7e77b6fa754f2acb18a91ae73599dc24556e1198a6ed5cf0a1c1",
@@ -155,6 +173,9 @@
         "jsr:@std/encoding@1.0.11",
         "npm:nodemailer"
       ]
+    },
+    "@spy4x/net@1.4.0": {
+      "integrity": "d75d2decba582f6f330cf94b80dee81f0902559376c3a3730475eb8cc125183e"
     },
     "@spy4x/platform@1.4.0": {
       "integrity": "c843c560b0d8ea0c2f9ccc7092cf9e15ccacecbec7691cfce42a35c0d4acef6d",
@@ -175,6 +196,24 @@
         "jsr:@age/age-encryption",
         "jsr:@std/encoding@1.0.11",
         "jsr:@std/path@1.1.6"
+      ]
+    },
+    "@spy4x/server@1.4.0": {
+      "integrity": "3b7b3fb62352c2d0a8bcdcc65cafc5f83d6be1bcbfc61374cc3314cd962319f8",
+      "dependencies": [
+        "jsr:@age/age-encryption",
+        "jsr:@hectorm/otpauth",
+        "jsr:@hono/hono",
+        "jsr:@iuioiua/redis",
+        "jsr:@libs/qrcode",
+        "jsr:@spy4x/email@^1.4.0",
+        "jsr:@spy4x/net@^1.4.0",
+        "jsr:@spy4x/platform@^1.4.0",
+        "jsr:@spy4x/validation",
+        "jsr:@std/encoding@1.0.11",
+        "jsr:@std/path@1.1.6",
+        "npm:arktype",
+        "npm:postgres"
       ]
     },
     "@spy4x/time@1.4.0": {
@@ -1515,6 +1554,9 @@
         "source-map-js"
       ]
     },
+    "postgres@3.4.7": {
+      "integrity": "sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw=="
+    },
     "preact-render-to-string@6.7.0_preact@10.29.3": {
       "integrity": "sha512-Z4WR8fmLMRpdYqJ9i7vrlXSsSrxVJydwrkEXHapexfARbWfGb7vGcnvNQnIzN0cXciMVOlz/XLoiMCi9gUsy9Q==",
       "dependencies": [
@@ -1627,7 +1669,9 @@
       "jsr:@fresh/core@^2.3.3",
       "jsr:@fresh/plugin-vite@^1.0.8",
       "jsr:@spy4x/email@1.4.0",
+      "jsr:@spy4x/net@1.4.0",
       "jsr:@spy4x/platform@1.4.0",
+      "jsr:@spy4x/server@1.4.0",
       "jsr:@std/front-matter@^1.0.9",
       "jsr:@std/net@^1.0.6",
       "jsr:@std/path@^1.1.2",

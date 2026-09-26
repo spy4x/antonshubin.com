@@ -171,6 +171,55 @@ Deno.test("a valid POST removes only the matching subscriber", async () => {
   });
 });
 
+Deno.test("a one-click unsubscribe (RFC 8058) with the token in the query still works, with or without a body", async () => {
+  const bodies = [undefined, "", "List-Unsubscribe=One-Click"];
+  for (const body of bodies) {
+    const subs: Subscriber[] = [
+      { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+      { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
+    ];
+    await withSubscribers(subs, async (site, file) => {
+      const token = await createUnsubscribeToken(
+        "leave@example.com",
+        TEST_SECRET,
+      );
+      const res = await site.get(
+        `/unsubscribe?token=${encodeURIComponent(token)}`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          body,
+        },
+      );
+      assertEquals(res.status, 200, JSON.stringify(body));
+      await res.body?.cancel();
+      const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
+      assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
+    });
+  }
+});
+
+Deno.test("a POST with the token in a body that has no Content-Type answers 400 and removes nobody", async () => {
+  const subs: Subscriber[] = [
+    { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
+  ];
+  await withSubscribers(subs, async (site, file) => {
+    const token = await createUnsubscribeToken(
+      "leave@example.com",
+      TEST_SECRET,
+    );
+    // A byte body, so fetch adds no Content-Type of its own.
+    const res = await site.get("/unsubscribe", {
+      method: "POST",
+      body: new TextEncoder().encode(`token=${encodeURIComponent(token)}`),
+    });
+    assertEquals(res.status, 400);
+    await res.body?.cancel();
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
+    assertEquals(stored.map((s) => s.email), ["leave@example.com"]);
+  });
+});
+
 Deno.test("a link sent before #233, in the old token format, still unsubscribes", async () => {
   const subs: Subscriber[] = [
     { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },

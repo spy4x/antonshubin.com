@@ -653,6 +653,15 @@ skipped, counted as failed and logged by row number only. `/api/subscribe`
 answers a known address exactly as a new one, so it cannot test who is on the
 list.
 
+Every POST route reads its body through `lib/request-body.ts` (#251), which
+wraps `@spy4x/net/bounded-body` (forms: `@spy4x/server/http/bounded-body`'s
+`parseBoundedFormData`): never call `req.json()` or `req.formData()` directly,
+since they buffer the whole body. The caps are 4 KiB for `/api/subscribe` and
+`/unsubscribe` and 64 KiB for `/api/lead`; a larger body gets 413 and a body
+that stalls for 10 s gets 408. `/unsubscribe` reads no body at all when the
+token is in the query, so a one-click unsubscribe (RFC 8058) works with any
+body.
+
 ## Outgoing mail
 
 Every mail the site sends goes through `@spy4x/email` (`jsr:@spy4x/email`,

@@ -12,6 +12,7 @@ import { loadSubscribers, saveSubscribers } from "../../lib/subscribers.ts";
 import { unsubscribeLink } from "../../lib/unsubscribe.ts";
 import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
 import { addSubscriber } from "../../lib/subscribe.ts";
+import { readJsonBody, SMALL_FORM_MAX_BYTES } from "../../lib/request-body.ts";
 
 const SMTP = smtpSettings({
   host: SMTP_HOST,
@@ -51,12 +52,11 @@ export const handler = define.handlers({
       return Response.json({ error: rateError }, { status: 429 });
     }
 
-    let body: { email?: unknown } | null;
-    try {
-      body = await ctx.req.json();
-    } catch {
-      return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    const read = await readJsonBody(ctx.req, SMALL_FORM_MAX_BYTES);
+    if (!read.ok) {
+      return Response.json({ error: read.error }, { status: read.status });
     }
+    const body = read.value as { email?: unknown } | null;
 
     // Mails go out after the answer; addSubscriber logs their failures.
     const outcome = await addSubscriber(body?.email, {
