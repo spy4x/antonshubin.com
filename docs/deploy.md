@@ -30,6 +30,12 @@ the same directory and is kept and backed up the same way (docs/newsletter.md).
 | production | `~/cloudlab/apps/antonshubin.com/data/subscribers.json`      |
 | staging    | `~/cloudlab/apps/antonshubin.com-stag/data/subscribers.json` |
 
+Next to it the site keeps `subscribers.json.lock` (the write lock; harmless,
+leave it) and, only after it found the list unparseable,
+`subscribers.json.invalid`: a copy of the text it refused. While the list does
+not parse, subscribing and unsubscribing answer 500 and the log says why; repair
+`subscribers.json` (or restore it, below), then delete the `.invalid` copy.
+
 Three things keep it there:
 
 - `scripts/deploy.ts` excludes `/data/` from its `rsync --delete`, and rsync
