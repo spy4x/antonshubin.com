@@ -1,200 +1,258 @@
 #!/usr/bin/env -S deno run -A
 /**
- * Publish a new blog post from markdown.
+ * The after-deploy step for a blog post (#260). The post file and its
+ * `lib/data.ts` entry arrive through a reviewed pull request first; this
+ * script writes no file. See `docs/publishing.md` for the whole flow.
  *
  * Usage:
- *   deno run -A scripts/publish-blog.ts ./path/to/content.md
+ *   deno task publish:blog <slug>                     # Dev.to draft + links + newsletter preview
+ *   deno task publish:blog <slug> --send-newsletter   # only after Anton says yes in chat
  *
- * Front matter format in the markdown file:
- *   ---
- *   title: "Your Title"
- *   description: "Meta description for SEO"
- *   category: "dev-tips"  # dev-tips | startups | personal
- *   publishedAt: "2026-07-02"
- *   utmCampaign: "some-campaign"  # optional; the tagged links' campaign,
- *                                 # defaults to the slug (docs/utm.md)
- *   ---
+ * Both runs first check that `https://antonshubin.com/blog/<slug>` answers
+ * 200 and stop otherwise. The default run creates the Dev.to draft, prints
+ * every channel's tagged link and the newsletter's subject and body, and sends
+ * nothing. `--send-newsletter` sends the announcement from the production
+ * container over SSH, where `scripts/send-newsletter.ts --stdin-json` refuses
+ * a slug it already sent.
  */
 
+import { extract as extractYaml } from "@std/front-matter/yaml";
+import { test as hasFrontMatter } from "@std/front-matter/test";
+import { type BlogArticle, blogArticles } from "@/lib/data.ts";
 import { createDevToDraft } from "./devto.ts";
-import { articleCampaign } from "./utm.ts";
+import { linkLines } from "./links.ts";
+import { articleCampaign, channelUrl } from "./utm.ts";
+import type { PostAnnouncement } from "./send-newsletter.ts";
 
-const DATA_FILE = "lib/data.ts";
-const CONTENT_DIR = "content/blog";
+/** Production, hardcoded like `scripts/devto.ts`: the live check and every link point here. */
+export const SITE = "https://antonshubin.com";
 
-interface FrontMatter {
-  title: string;
-  description: string;
-  category: "dev-tips" | "startups" | "personal";
-  publishedAt: string;
-  utmCampaign?: string;
+/** Runs on cloudlab: the send inside the production container, fed by stdin. */
+export const REMOTE_SEND_COMMAND =
+  "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json";
+
+/** How long the live check waits for production before counting it as not live. */
+export const LIVE_CHECK_TIMEOUT_MS = 10_000;
+
+const USAGE = "Usage: deno task publish:blog <slug> [--send-newsletter]";
+
+export interface PublishArgs {
+  slug: string;
+  sendNewsletter: boolean;
 }
 
-function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+/** Parses `<slug> [--send-newsletter]`. */
+export function parsePublishArgs(args: string[]): PublishArgs {
+  let slug: string | undefined;
+  let sendNewsletter = false;
+  for (const arg of args) {
+    if (arg === "--send-newsletter") sendNewsletter = true;
+    else if (arg.startsWith("-")) {
+      throw new Error(`Unknown option ${arg}. ${USAGE}`);
+    } else if (slug === undefined) slug = arg;
+    else throw new Error(`Unexpected argument ${arg}. ${USAGE}`);
+  }
+  if (!slug) throw new Error(USAGE);
+  return { slug, sendNewsletter };
 }
 
-function estimateReadTime(markdown: string): number {
-  const words = markdown.split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
+/** A post as both the repo and the live site should have it. */
+export interface Post {
+  article: BlogArticle;
+  /** Markdown body without front matter. */
+  body: string;
+  campaign: string;
 }
 
-function parseMarkdown(filePath: string): { front: FrontMatter; body: string } {
-  const raw = Deno.readTextFileSync(filePath);
-  const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-  if (!match) {
-    console.error("No YAML front matter found. Must start with ---");
-    Deno.exit(1);
+/**
+ * Reads `content/blog/<slug>.md` and the `blogArticles` entry; throws naming
+ * whichever is missing.
+ */
+export async function readPost(
+  slug: string,
+  articles: readonly BlogArticle[] = blogArticles,
+  contentDir = "content/blog",
+): Promise<Post> {
+  const article = articles.find((a) => a.slug === slug);
+  if (!article) {
+    throw new Error(`No blogArticles entry for "${slug}" in lib/data.ts`);
   }
-
-  const yaml = match[1];
-  const body = match[2].trim();
-
-  // Manual YAML parse (no deps)
-  const fields: Record<string, string> = {};
-  for (const line of yaml.split("\n")) {
-    const m = line.match(/^(\w+):\s*(.+)$/);
-    if (m) fields[m[1]] = m[2].replace(/^"|"$/g, "").trim();
+  const file = `${contentDir}/${slug}.md`;
+  let raw: string;
+  try {
+    raw = await Deno.readTextFile(file);
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      throw new Error(`No post at ${file}`);
+    }
+    throw err;
   }
-
-  if (
-    !fields.title || !fields.description || !fields.category ||
-    !fields.publishedAt
-  ) {
-    console.error(
-      "Missing required front matter: title, description, category, publishedAt",
-    );
-    Deno.exit(1);
+  if (!hasFrontMatter(raw, ["yaml"])) {
+    return { article, body: raw.trim(), campaign: articleCampaign(slug) };
   }
+  const { attrs, body } = extractYaml<Record<string, unknown>>(raw);
+  return { article, body: body.trim(), campaign: articleCampaign(slug, attrs) };
+}
 
-  if (!["dev-tips", "startups", "personal"].includes(fields.category)) {
-    console.error(
-      `Invalid category: ${fields.category}. Use dev-tips, startups, or personal.`,
-    );
-    Deno.exit(1);
-  }
+function escapeHtml(text: string): string {
+  return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(
+    ">",
+    "&gt;",
+  )
+    .replaceAll('"', "&quot;");
+}
 
+/**
+ * The announcement mail. Its only link to the post is the `email` channel's
+ * tagged URL (docs/utm.md), so Umami counts the visits it brings.
+ */
+export function newsletterFor(post: Post): PostAnnouncement {
+  const { article } = post;
+  const link = channelUrl(
+    SITE,
+    `/blog/${article.slug}`,
+    "email",
+    post.campaign,
+  );
   return {
-    front: fields as unknown as FrontMatter,
-    body,
+    slug: article.slug,
+    subject: `New article: ${article.title}`,
+    body: [
+      `<h2>${escapeHtml(article.title)}</h2>`,
+      `<p>${escapeHtml(article.description)}</p>`,
+      `<p><a href="${link}">Read the article</a></p>`,
+    ].join("\n"),
   };
 }
 
-function updateDataTS(
-  slug: string,
-  front: FrontMatter,
-  readTime: number,
-): number {
-  const data = Deno.readTextFileSync(DATA_FILE);
+/** Everything the script touches outside its own process, so a test can fake it. */
+export interface PublishDeps {
+  fetch: typeof fetch;
+  createDraft: (
+    title: string,
+    slug: string,
+    body: string,
+    campaign: string,
+  ) => Promise<void>;
+  /** Runs `command` on the server with `stdin`; resolves to its exit code. */
+  runRemote: (command: string, stdin: string) => Promise<number>;
+  readPost: (slug: string) => Promise<Post>;
+  log: (line: string) => void;
+  error: (line: string) => void;
+}
 
-  // Find the blogArticles array and insert at the right position
-  // Find the last article's index
-  const articleMatch = data.match(/index:\s*(\d+)/g);
-  const indices =
-    articleMatch?.map((m) => parseInt(m.match(/\d+/)?.[0] || "0")) || [0];
-  const maxIndex = Math.max(...indices);
-  const newIndex = maxIndex + 1;
+/**
+ * Resolves to the live URL's status; a network error or no answer within
+ * {@linkcode LIVE_CHECK_TIMEOUT_MS} counts as not live.
+ */
+async function liveStatus(deps: PublishDeps, url: string): Promise<string> {
+  try {
+    const res = await deps.fetch(url, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(LIVE_CHECK_TIMEOUT_MS),
+    });
+    await res.body?.cancel();
+    return String(res.status);
+  } catch (err) {
+    return `a failed request (${(err as Error).message})`;
+  }
+}
 
-  // Find insertion point: the last '];' that closes blogArticles
-  const blogEnd = data.match(/\n];\n\nexport interface/);
-  if (!blogEnd) {
-    console.error("Could not find blogArticles end in data.ts");
-    Deno.exit(1);
+/**
+ * Runs one `publish:blog` invocation and resolves to its exit code. Nothing
+ * past the live check runs unless the post answers 200.
+ */
+export async function publishBlog(
+  args: PublishArgs,
+  deps: PublishDeps,
+): Promise<number> {
+  let post: Post;
+  try {
+    post = await deps.readPost(args.slug);
+  } catch (err) {
+    deps.error((err as Error).message);
+    return 1;
   }
 
-  const insertPos = data.indexOf("];", blogEnd.index!) + 2;
+  const url = `${SITE}/blog/${args.slug}`;
+  const status = await liveStatus(deps, url);
+  if (status !== "200") {
+    deps.error(
+      `${url} answered ${status}, not 200. Deploy the merged post first ` +
+        `(docs/publishing.md); nothing was created or sent.`,
+    );
+    return 1;
+  }
+  deps.log(`Live: ${url}`);
 
-  const newEntry = `,\n  {
-    index: ${newIndex},
-    title: "${front.title}",
-    slug: "${slug}",
-    description:
-      "${front.description.replace(/"/g, '\\"')}",
-    readTime: ${readTime},
-    publishedAt: "${front.publishedAt}",
-    previewImageURL: "cover.svg",
-    category: "${front.category}",
-  }`;
+  const newsletter = newsletterFor(post);
 
-  const updated = data.slice(0, insertPos) + newEntry + data.slice(insertPos);
-  Deno.writeTextFileSync(DATA_FILE, updated);
-  console.log(`  ✓ data.ts updated (index ${newIndex})`);
+  if (args.sendNewsletter) {
+    deps.log(
+      `Sending the newsletter for "${args.slug}" from the production container...`,
+    );
+    const code = await deps.runRemote(
+      REMOTE_SEND_COMMAND,
+      JSON.stringify(newsletter),
+    );
+    if (code !== 0) deps.error(`The remote send exited with ${code}.`);
+    return code;
+  }
 
-  return newIndex;
-}
-
-function sendNewsletter(slug: string, title: string) {
-  const BASE_URL = "https://antonshubin.com";
-  const body = `<h2>New article: ${title}</h2>
-<p>Just published. Read the full article here:</p>
-<p><a href="${BASE_URL}/blog/${slug}">${BASE_URL}/blog/${slug}</a></p>`;
-
-  const cmd = new Deno.Command("deno", {
-    args: [
-      "run",
-      "-A",
-      "scripts/send-newsletter.ts",
-      `New: ${title}`,
-      body,
-    ],
-  });
-  cmd.output().then((o) => {
-    if (o.code === 0) {
-      console.log("  ✓ Newsletter sent to subscribers");
-    } else {
-      console.error("  ✗ Newsletter send failed");
-    }
-  });
-}
-
-// ── Main ──────────────────────────────────────────────
-const filePath = Deno.args[0];
-if (!filePath) {
-  console.error(
-    "Usage: deno run -A scripts/publish-blog.ts ./path/to/content.md",
+  await deps.createDraft(
+    post.article.title,
+    args.slug,
+    post.body,
+    post.campaign,
   );
-  Deno.exit(1);
+
+  deps.log(`\nTagged links (campaign ${post.campaign}):`);
+  for (const line of linkLines(SITE, `/blog/${args.slug}`, post.campaign)) {
+    deps.log(line);
+  }
+  deps.log(
+    `\nPer subreddit: deno task links /blog/${args.slug} --content r-<subreddit>`,
+  );
+
+  deps.log(`\nNewsletter subject: ${newsletter.subject}`);
+  deps.log(`Newsletter body:\n${newsletter.body}`);
+  deps.log(
+    `\nNothing was sent. Only after Anton says yes in chat for this post:\n` +
+      `  deno task publish:blog ${args.slug} --send-newsletter`,
+  );
+  return 0;
 }
 
-console.log(`\n  📝 Publishing blog post...`);
-
-const { front, body } = parseMarkdown(filePath);
-const slug = slugify(front.title);
-const readTime = estimateReadTime(body);
-
-console.log(`  Title: ${front.title}`);
-console.log(`  Slug: ${slug}`);
-console.log(`  Read time: ${readTime} min`);
-
-// Copy markdown
-const destDir = `${CONTENT_DIR}/${slug}`;
-Deno.mkdirSync(destDir, { recursive: true });
-const destFile = `${destDir}.md`;
-let rawFile = Deno.readTextFileSync(filePath);
-// If it already has front matter, keep it; otherwise add it
-if (!rawFile.startsWith("---")) {
-  rawFile =
-    `---\ntitle: "${front.title}"\ndescription: "${front.description}"\ncategory: "${front.category}"\npublishedAt: "${front.publishedAt}"\n---\n\n${body}`;
+/** Pipes `stdin` into `ssh cloudlab <command>`, showing the remote output as it runs. */
+async function sshRun(command: string, stdin: string): Promise<number> {
+  const child = new Deno.Command("ssh", {
+    args: ["cloudlab", command],
+    stdin: "piped",
+    stdout: "inherit",
+    stderr: "inherit",
+  }).spawn();
+  const writer = child.stdin.getWriter();
+  await writer.write(new TextEncoder().encode(stdin));
+  await writer.close();
+  return (await child.status).code;
 }
-Deno.writeTextFileSync(destFile, rawFile);
-console.log(`  ✓ Copied to ${destFile}`);
 
-// Update data.ts
-updateDataTS(slug, front, readTime);
-
-// Send newsletter
-sendNewsletter(slug, front.title);
-
-// Create a Dev.to draft (never published directly, and never blocks a
-// publish — see scripts/devto.ts)
-await createDevToDraft(front.title, slug, body, articleCampaign(slug, front));
-
-console.log(`\n  ✅ Published: /blog/${slug}\n`);
-console.log("  Next steps:");
-console.log("  1. Add a preview image to /static/img/blog/<slug>/");
-console.log("  2. git add . && git commit -m 'feat(blog): add <title>'");
-console.log("  3. git push origin main");
-console.log("  4. deno task deploy");
+if (import.meta.main) {
+  let args: PublishArgs;
+  try {
+    args = parsePublishArgs(Deno.args);
+  } catch (err) {
+    console.error((err as Error).message);
+    Deno.exit(1);
+  }
+  Deno.exit(
+    await publishBlog(args, {
+      fetch,
+      createDraft: createDevToDraft,
+      runRemote: sshRun,
+      readPost: (slug) => readPost(slug),
+      log: console.log,
+      error: console.error,
+    }),
+  );
+}

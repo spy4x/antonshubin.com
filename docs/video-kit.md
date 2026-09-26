@@ -17,8 +17,8 @@ fully testable without a network connection.
   paragraph, followed by the tagged link to the companion blog post
 - `chapters.md` — timestamped chapter lines in YouTube's format (`0:00 Intro`)
 - `blog-draft.md` — a draft for `content/blog/`, with YAML front matter carrying
-  a `title` and a `description`. It is not ready for `deno task publish:blog` as
-  written — see below.
+  a `title` and a `description`. It is not a finished post as written — see
+  below.
 
 `videos/` is gitignored and excluded from `deno fmt`/`deno lint` in `deno.json`,
 the same way `launches/` is for `launch-kit.ts` — generated drafts aren't source
@@ -57,10 +57,9 @@ kebab-case, or the script fails.
 
 ## The blog draft is not publishable as-is
 
-`blog-draft.md` only carries `title` and `description` in its front matter.
-`deno task publish:blog` also requires `category` and `publishedAt`, and exits 1
-with "Missing required front matter" without them. This is deliberate:
-`category` (`dev-tips` | `startups` | `personal`) and `publishedAt` are
-editorial decisions this script has no way to make, and a guessed placeholder
-risks being copy-pasted straight through `publish:blog` unnoticed. Fill in both
-by hand before publishing.
+`blog-draft.md` only carries `title` and `description` in its front matter. A
+post also needs `publishedAt`, `readTime` and `previewImageURL`, a `lib/data.ts`
+entry with a `category`, and a cover — editorial decisions this script has no
+way to make. Finish it by hand and publish it through the flow in
+[publishing.md](publishing.md); `deno task publish:blog` runs only after the
+post is merged and deployed.

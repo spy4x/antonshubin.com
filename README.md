@@ -30,25 +30,25 @@ The dev server starts at `http://localhost:5173` with hot module replacement.
 
 All tasks are defined in `deno.json`; this list mirrors it.
 
-| Command                          | Description                                                        |
-| -------------------------------- | ------------------------------------------------------------------ |
-| `deno task check`                | fmt --check + lint + type check + test + test:browser              |
-| `deno task test`                 | Build, then run `deno test`                                        |
-| `deno task test:browser`         | Playwright lead-form, a11y, contrast, CSP and service-worker tests |
-| `deno task dev`                  | Dev server (Vite, HMR)                                             |
-| `deno task build`                | Production build (Vite)                                            |
-| `deno task start`                | Run the production server                                          |
-| `deno task update`               | Update Fresh                                                       |
-| `deno task deploy`               | Deploy production → antonshubin.com                                |
-| `deno task deploy:stag`          | Deploy staging → website-stag.antonshubin.com                      |
-| `deno task env:encrypt`          | Every `.env*` → its `.env*.age` (age64)                            |
-| `deno task env:decrypt`          | Every `.env*.age` → its plaintext (age64)                          |
-| `deno task env:status`           | Key presence + which env/age files exist                           |
-| `deno task publish:blog`         | Publish a blog post + a Dev.to draft                               |
-| `deno task launch-kit`           | Draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts      |
-| `deno task video-kit`            | Transcript → titles, description, chapters, blog draft             |
-| `deno task weekly-numbers`       | Umami/GitHub/YouTube numbers → markdown + NTFY                     |
-| `deno task optimize:screenshots` | Compress portfolio screenshots                                     |
+| Command                          | Description                                                               |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `deno task check`                | fmt --check + lint + type check + test + test:browser                     |
+| `deno task test`                 | Build, then run `deno test`                                               |
+| `deno task test:browser`         | Playwright lead-form, a11y, contrast, CSP and service-worker tests        |
+| `deno task dev`                  | Dev server (Vite, HMR)                                                    |
+| `deno task build`                | Production build (Vite)                                                   |
+| `deno task start`                | Run the production server                                                 |
+| `deno task update`               | Update Fresh                                                              |
+| `deno task deploy`               | Deploy production → antonshubin.com                                       |
+| `deno task deploy:stag`          | Deploy staging → website-stag.antonshubin.com                             |
+| `deno task env:encrypt`          | Every `.env*` → its `.env*.age` (age64)                                   |
+| `deno task env:decrypt`          | Every `.env*.age` → its plaintext (age64)                                 |
+| `deno task env:status`           | Key presence + which env/age files exist                                  |
+| `deno task publish:blog`         | After deploy: live check, Dev.to draft, tagged links (docs/publishing.md) |
+| `deno task launch-kit`           | Draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts             |
+| `deno task video-kit`            | Transcript → titles, description, chapters, blog draft                    |
+| `deno task weekly-numbers`       | Umami/GitHub/YouTube numbers → markdown + NTFY                            |
+| `deno task optimize:screenshots` | Compress portfolio screenshots                                            |
 
 ## Documentation
 
