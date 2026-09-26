@@ -79,7 +79,12 @@ restic -r "$REPO" snapshots
 restic -r "$REPO" restore latest --target /tmp/antonshubin-restore
 SRC=/tmp/antonshubin-restore/home/spy4x/cloudlab/apps/antonshubin.com/data
 DST=~spy4x/cloudlab/apps/antonshubin.com/data
-cp "$SRC/subscribers.json" "$DST/subscribers.json"
+# Copy next to the list first, then swap it in under the site's own write lock,
+# so a sign-up running at that moment is neither lost nor written over it.
+cp "$SRC/subscribers.json" "$DST/subscribers.json.restore"
+chown --reference="$DST" "$DST/subscribers.json.restore"
+flock "$DST/subscribers.json.lock" \
+  mv "$DST/subscribers.json.restore" "$DST/subscribers.json"
 # The sent log only if it was lost too: last night's copy would forget a post
 # announced since then, and a later --send-newsletter would mail it again.
 [ -f "$SRC/newsletter-log.json" ] && [ ! -f "$DST/newsletter-log.json" ] &&
