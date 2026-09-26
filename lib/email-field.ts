@@ -11,8 +11,9 @@ const MAX_LOCAL_PART_LENGTH = 64;
  * it holds anything else. `isAddress()` from `@spy4x/email` accepts only an
  * ASCII addr-spec such as `jane@example.com`: no display name, no `<`, `>` or
  * `"`, no control character and no lone surrogate. A value like
- * `"Verify at https://evil.example"<victim@example.com>` would otherwise reach
- * the welcome mail's `To:` line with the caller's words as its display name.
+ * `"Your-account-is-locked,verify-at-https://evil.example/x"<victim@example.com>`
+ * would otherwise reach the welcome mail's `To:` line with the caller's words
+ * as its display name.
  * An address over 254 characters, or with a local part over 64, is refused
  * too: no relay delivers it, and it would only grow the subscriber file.
  */
