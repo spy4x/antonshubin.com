@@ -50,6 +50,25 @@ siteTest(
         html.includes(`href="${UPWORK_URL}"`),
         `/projects/${project.slug} does not link the Upwork profile`,
       );
+      const sources = html.match(/data-review-source/g)?.length ?? 0;
+      assert(
+        sources === reviews.length,
+        `/projects/${project.slug} names the reviewer ${sources} times for ${reviews.length} reviews`,
+      );
+      if (project.madeForName) {
+        assert(
+          text.replace(/\s*\(opens in a new tab\)/g, "").includes(
+            `${project.madeForName} reviewed on Upwork`,
+          ),
+          `/projects/${project.slug} does not say "${project.madeForName} reviewed on Upwork"`,
+        );
+        assert(
+          new RegExp(
+            `data-review-source[^>]*>\\s*<a href="${project.madeForURL}"`,
+          ).test(html),
+          `/projects/${project.slug} does not link ${project.madeForName}'s profile`,
+        );
+      }
       const ratings = html.match(/data-rating="5\.0"/g)?.length ?? 0;
       assert(
         ratings === reviews.length,

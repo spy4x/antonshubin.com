@@ -597,7 +597,7 @@ export const projects = {
         "Dashboard single-page application for search and recommendations engine as a service.",
       tags: ["AngularJS"],
       logoImageURL: "/img/projects/sajari/logo.svg",
-      screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp"],
+      screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
       period: { from: 2014 },
       companyOutcome: {
         text: "Later renamed Search.io and acquired by Algolia in 2022",

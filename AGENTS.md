@@ -130,14 +130,17 @@ reference.
 - `lib/testimonials.ts` holds every client review (#231): public Upwork reviews
   copied verbatim from the portfolio archive, the client's spelling included,
   each tied to a client project by `projectSlug` (`testimonialProject()` throws
-  on a typo) and cited by project and period, never by the client's personal
-  name. An `excerpt` is only exact pieces of its `quote` joined by " … " — cut
-  around a misspelling, never fix it. `lib/testimonials.test.ts` checks the
-  slugs, the excerpts and the pinned misspellings. A project page shows its
-  visible reviews in full; `routes/index.tsx` shows the three excerpts in
-  `homeTestimonialIds` through `components/TestimonialCard.tsx`, and
-  `test/reviews.test.ts` checks both on the built pages. `visibleTestimonials()`
-  still filters on `sourceHref` and `permission: true`.
+  on a typo) and cited by project, period and the client's name, linked to their
+  profile (the project's `madeForName`/`madeForURL`, rendered by
+  `components/ReviewSource.tsx` as "<client> reviewed on Upwork"; Anton asked
+  for the name on 26 Sep 2026). An `excerpt` is only exact pieces of its `quote`
+  joined by " … " — cut around a misspelling, never fix it.
+  `lib/testimonials.test.ts` checks the slugs, the excerpts and the pinned
+  misspellings. A project page shows its visible reviews in full;
+  `routes/index.tsx` shows the three excerpts in `homeTestimonialIds` through
+  `components/TestimonialCard.tsx`, and `test/reviews.test.ts` checks both on
+  the built pages. `visibleTestimonials()` still filters on `sourceHref` and
+  `permission: true`.
 - Every client project in `lib/data.ts` carries a `period` (`lib/data.test.ts`
   fails without one), rendered by `formatPeriod()` ("2021", "2018–2019",
   "2024–now") on the cards, the project page eyebrow and the JSON-LD

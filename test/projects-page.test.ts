@@ -118,6 +118,10 @@ siteTest(
         review.sourceHref && row.includes(`href="${review.sourceHref}"`),
         `${p.slug}'s row does not link the source of ${review.id}`,
       );
+      assert(
+        !p.madeForName || row.includes(`${p.madeForName}`),
+        `${p.slug}'s row does not name its reviewer ${p.madeForName}`,
+      );
     }
     assert(excerpts > 0, "no archive row has a review — checked nothing");
   },

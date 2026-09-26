@@ -8,9 +8,11 @@ import { type Project, projects } from "./data.ts";
  * archive, including the client's own spelling (#231). Never correct a
  * quote: an `excerpt` cuts around a misspelling instead.
  *
- * Decision recorded on #186: these are public reviews, so they are cited by
- * project and period with a link to the profile (`sourceHref`), and no
- * client's personal name is attached to a quote.
+ * These are public reviews, so each is cited with its project, its period
+ * and a link to the profile (`sourceHref`). Anton asked on 26 Sep 2026 for
+ * the client's name on every review, linked to their profile; it comes from
+ * the project's `madeForName`/`madeForURL` (`components/ReviewSource.tsx`),
+ * replacing the no-name rule recorded on #186.
  *
  * A project page (`routes/projects/[slug].tsx`) shows every visible review
  * of its project in full; the home page shows the excerpts listed in
