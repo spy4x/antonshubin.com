@@ -21,8 +21,8 @@ Deno.test("a typo'd note id throws instead of returning undefined", () => {
   assertThrows(() => note("upwork-profil"), Error, 'no note "upwork-profil"');
 });
 
-Deno.test("the Upwork profile note links the profile with no guessed checked date", () => {
+Deno.test("the Upwork profile note links the profile, checked 26 Sep 2026", () => {
   const n = note("upwork-profile");
   assertEquals(n.href, "https://www.upwork.com/freelancers/ashubin");
-  assertEquals(n.checkedOn, undefined);
+  assertEquals(n.checkedOn, "2026-09-26");
 });

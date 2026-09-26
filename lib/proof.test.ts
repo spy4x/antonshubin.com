@@ -8,5 +8,5 @@ Deno.test("every proof figure resolves by id", () => {
 });
 
 Deno.test("a typo'd proof figure id throws instead of returning undefined", () => {
-  assertThrows(() => proof("395k"), Error, 'no proof figure "395k"');
+  assertThrows(() => proof("300k"), Error, 'no proof figure "300k"');
 });

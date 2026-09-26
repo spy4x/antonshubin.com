@@ -1,5 +1,17 @@
 import type { Note as NoteData } from "../lib/notes.ts";
 
+/** "2026-09-26" → "26 Sep 2026" (en-GB would print "Sept"). */
+export function formatCheckedOn(iso: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).formatToParts(new Date(`${iso}T00:00:00Z`));
+  const part = (type: string) => parts.find((p) => p.type === type)?.value;
+  return `${part("day")} ${part("month")} ${part("year")}`;
+}
+
 /**
  * One margin note (#184, #186): a short first-person sentence with a source
  * link or a checked date. No colour beyond the tokens' text colours, no
@@ -32,7 +44,7 @@ export function Note({ note }: { note: NoteData }) {
           </a>
         </>
       )}
-      {note.checkedOn && <>{" "}(checked on {note.checkedOn})</>}
+      {note.checkedOn && <>{" "}(checked {formatCheckedOn(note.checkedOn)})</>}
     </p>
   );
 }

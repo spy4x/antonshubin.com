@@ -14,14 +14,14 @@
 
 export interface ProofFigure {
   id: string;
-  /** The value exactly as it is rendered, e.g. "80", "100%", "$395K". */
+  /** The value exactly as it is rendered, e.g. "80", "100%", "$300K". */
   value: string;
 }
 
 export const proofFigures: ProofFigure[] = [
   { id: "jobs", value: "80" },
   { id: "job-success", value: "100%" },
-  { id: "earned", value: "$395K" },
+  { id: "earned", value: "$300K" },
   { id: "hours", value: "6,600" },
   { id: "expert-vetted", value: "Expert-Vetted" },
   { id: "top-percent", value: "Top 1%" },

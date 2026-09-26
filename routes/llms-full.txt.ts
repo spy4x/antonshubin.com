@@ -128,7 +128,7 @@ export const handler = define.handlers({
 - **Name:** Anton Shubin
 - **Title:** ${ROLE}
 - **Company:** NeatSoft PTE LTD, Singapore (UEN 202300222R) — Anton is co-founder and CEO
-- **Email:** anton@antonshubin.com
+- **Email:** hello@antonshubin.com
 - **GitHub:** https://github.com/spy4x
 - **LinkedIn:** https://www.linkedin.com/in/anton-shubin
 - **YouTube:** https://www.youtube.com/@anton-shubin

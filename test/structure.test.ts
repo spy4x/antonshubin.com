@@ -26,7 +26,7 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 }
 
 /** Dollar figures that are not prices: Upwork earnings, a quote inside a sample question. */
-const NOT_A_PRICE = new Set(["$395K", "$50K"]);
+const NOT_A_PRICE = new Set(["$300K", "$50K"]);
 
 /** Every "$1,500"-style token in a text, with its "K" suffix when it has one. */
 function dollarAmounts(text: string): string[] {
@@ -143,7 +143,7 @@ siteTest(
  */
 const PRICE_PAGES: Record<string, string[]> = {
   // Upwork earnings. Testimonials carry no dollar figure (#231).
-  "/": ["$395K"],
+  "/": ["$300K"],
   "/catalog": [],
   ...Object.fromEntries(catalogItems.map((i) => [`/catalog/${i.slug}`, []])),
   "/how-i-work": [],
