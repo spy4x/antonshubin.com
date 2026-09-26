@@ -22,6 +22,9 @@ Deno.test("no blog post or its Previous/Next cards run past the screen at 390px"
     browser = await launchChromium();
     const page = await browser.newPage({
       viewport: { width: 390, height: 844 },
+      // The service worker takes control on the first page and
+      // islands/SWUpdater.tsx then reloads it mid-measurement.
+      serviceWorkers: "block",
     });
     const wide: string[] = [];
     for (const path of posts) {
@@ -44,8 +47,12 @@ Deno.test("no blog post or its Previous/Next cards run past the screen at 390px"
       }
     }
     assert(
+      cardsSeen > 0,
+      "no [data-post-nav] card found; the selector is stale",
+    );
+    assert(
       wide.length === 0,
-      `these posts scroll sideways at 390px: ${wide.join(", ")}`,
+      `these posts run past a 390px screen: ${wide.join(", ")}`,
     );
   } finally {
     await browser?.close();

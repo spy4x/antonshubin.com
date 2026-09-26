@@ -3,7 +3,10 @@ import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
 
 interface CopyButtonProps {
   elementId: string;
-  /** Visible text. Defaults to `title`, so what a visitor reads is what a screen reader announces (#236). */
+  /**
+   * Visible text. Defaults to `title`, so what a visitor reads is what a
+   * screen reader announces (#236).
+   */
   label?: string;
   class?: string;
   title?: string;

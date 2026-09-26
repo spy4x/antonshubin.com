@@ -25,7 +25,7 @@ specific to this repository.
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes and meet-embed tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes, meet-embed and blog-overflow tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -329,12 +329,15 @@ server on a free port and returns `{ get, html, stop }` — `get` uses
 `jsonLd()` and `count()` for asserting on structure and short phrases, never
 prose — the copy changes often, and a test that pins a paragraph breaks for the
 wrong reason. `test/structure.test.ts` guards site structure (catalog, nav,
-redirects, prices, labels). `test/a11y.test.ts` (#160) guards nav `aria-current`
-and icon-only accessible names, from server-rendered HTML only — it doesn't
-cover the two lightboxes' buttons, which only exist after client JS opens them
-(see "Browser-driven tests"). `islands/Menu.tsx` sets no `aria-current` itself;
-Fresh's renderer adds it, and `test/a11y.test.ts` pins that — don't add it by
-hand. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
+redirects, prices, labels). `test/label-in-name.test.ts` (#236) fails when an
+`aria-label`led button or link's visible text is not part of its name, on every
+sitemap page plus `/pay`, and pins that each `/pay` copy button names its field.
+`test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only accessible
+names, from server-rendered HTML only — it doesn't cover the two lightboxes'
+buttons, which only exist after client JS opens them (see "Browser-driven
+tests"). `islands/Menu.tsx` sets no `aria-current` itself; Fresh's renderer adds
+it, and `test/a11y.test.ts` pins that — don't add it by hand.
+`lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
 needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
 `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
 preconnect links while browsers do. `routes/_app.tsx` makes that decision at
@@ -363,11 +366,11 @@ own before a build.
 
 Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-eight files below and fails loudly, naming the install command, if none is
-found. Playwright's version must match exactly across `deno.json`'s import map,
+nine files below and fails loudly, naming the install command, if none is found.
+Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
 — a mismatch downloads a different Chromium build than the one launched. All
-eight call `startSite()` and run under `deno task test:browser` with `-A`, not
+nine call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
@@ -431,6 +434,12 @@ the narrow `deno task test`.
   the "same origin, wrong window" guard: a same-origin sibling iframe posting a
   spoofed `mig:height` message never resizes the booking iframe, because
   `event.source` isn't that iframe's own `contentWindow`.
+- `test/blog-overflow.browser.test.ts` (#222): at 390px, no blog post in the
+  sitemap is wider than the screen, and no Previous/Next card
+  (`[data-post-nav] a` in `routes/blog/[slug].tsx`) ends past its right edge.
+  The cards used to be clipped by an ancestor, so the page's own `scrollWidth`
+  never showed the overflow. It blocks service workers: the worker takes control
+  on the first page and `islands/SWUpdater.tsx` reloads it mid-measurement.
 
 ## Content-Security-Policy
 

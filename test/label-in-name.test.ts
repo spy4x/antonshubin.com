@@ -48,3 +48,27 @@ Deno.test("every aria-labelled button and link contains its visible text in its 
     await site.stop();
   }
 });
+
+Deno.test("each copy button on /pay names the field it copies", async () => {
+  const site = await startSite();
+  try {
+    const html = await site.html("/pay");
+    const labels = [...html.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)]
+      .map((m) => visibleText(m[1]))
+      .filter((t) => t.startsWith("Copy"));
+    assert(
+      labels.length === 7,
+      `expected 7 copy buttons, found ${labels.length}`,
+    );
+    assert(
+      !labels.includes("Copy address"),
+      `a button still reads "Copy address"`,
+    );
+    assert(
+      new Set(labels).size === labels.length,
+      `two buttons share a label: ${labels.join(", ")}`,
+    );
+  } finally {
+    await site.stop();
+  }
+});
