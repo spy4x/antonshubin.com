@@ -667,9 +667,10 @@ body.
 sweeping `createMemoryRateLimiter`. Production is Cloudflare → Traefik (empty
 `forwardedHeaders.trustedIPs`) → app, so the client is `X-Real-IP` (Traefik
 writes it), or `CF-Connecting-IP` when `X-Real-IP` is a Cloudflare edge;
-`X-Forwarded-For` is never read. If Traefik's `trustedIPs` or the Cloudflare
-setup changes, revisit that module. A rendered-site test that posts to either
-form sends its own `X-Real-IP`, or every test shares one bucket.
+`X-Forwarded-For` is never read. An IPv6 client is keyed on its /64. If
+Traefik's `trustedIPs` or the Cloudflare setup changes, revisit that module. A
+rendered-site test that posts to either form sends its own `X-Real-IP`, or every
+test shares one bucket.
 
 ## Outgoing mail
 

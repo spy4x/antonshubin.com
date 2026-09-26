@@ -92,17 +92,38 @@ export function isCloudflareAddress(address: string): boolean {
 }
 
 /**
- * The address to rate-limit a request by: X-Real-IP (written by Traefik),
- * or, when that is a Cloudflare edge, the visitor Cloudflare names in
- * CF-Connecting-IP. X-Forwarded-For is never read. Without X-Real-IP (only
- * when the app runs without Traefik, as in a test) it falls back to the socket
- * address.
+ * The key for one client's address. An IPv4 address is its own key. An IPv6
+ * address is keyed on its /64 (the first four groups): one household or
+ * server usually holds a whole /64 and can pick any address in it, so a
+ * per-address key would give it an unlimited budget. An IPv4-mapped IPv6
+ * address (`::ffff:192.0.2.1`) is keyed as the IPv4 address it carries. A
+ * value that is neither is kept as it is, so equal values still share a key.
+ */
+export function clientKey(address: string): string {
+  if (!address.includes(":")) return address;
+  const groups = parseIpv6Groups(address);
+  if (!groups) return address;
+  const mapped = groups.slice(0, 5).every((g) => g === 0) &&
+    groups[5] === 0xffff;
+  if (mapped) {
+    return [groups[6] >> 8, groups[6] & 255, groups[7] >> 8, groups[7] & 255]
+      .join(".");
+  }
+  return `${groups.slice(0, 4).map((g) => g.toString(16)).join(":")}::/64`;
+}
+
+/**
+ * The key to rate-limit a request by ({@link clientKey}): X-Real-IP (written
+ * by Traefik), or, when that is a Cloudflare edge, the visitor Cloudflare
+ * names in CF-Connecting-IP. X-Forwarded-For is never read. Without X-Real-IP
+ * (only when the app runs without Traefik, as in a test) it falls back to the
+ * socket address.
  */
 export function requestClientIp(req: Request, socketAddress?: string): string {
   const peer = clientIp(req, socketAddress, "x-real-ip");
-  return isCloudflareAddress(peer)
-    ? clientIp(req, peer, "cf-connecting-ip")
-    : peer;
+  return clientKey(
+    isCloudflareAddress(peer) ? clientIp(req, peer, "cf-connecting-ip") : peer,
+  );
 }
 
 /** The socket address from Deno's serve info, when the transport has one. */
