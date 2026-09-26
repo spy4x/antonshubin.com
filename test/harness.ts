@@ -55,6 +55,12 @@ export interface StartSiteOptions {
    * env untouched.
    */
   env?: Record<string, string>;
+  /**
+   * Port to listen on. Omit for a free one. A test that restarts the site
+   * passes the stopped one's port, so the browser sees the same origin
+   * (test/sw-updater.browser.test.ts deploys a new service worker that way).
+   */
+  port?: number;
 }
 
 /**
@@ -74,7 +80,7 @@ export interface StartSiteOptions {
 export async function startSite(options: StartSiteOptions = {}): Promise<Site> {
   await assertBuilt();
 
-  const port = getAvailablePort();
+  const port = options.port ?? getAvailablePort();
   const origin = `http://127.0.0.1:${port}`;
 
   const get = (path: string, init?: RequestInit): Promise<Response> =>

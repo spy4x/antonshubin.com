@@ -507,20 +507,22 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all ten
-files below and fails loudly, naming the install command, if none is found.
-Playwright's version must match exactly across `deno.json`'s import map,
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
+eleven files below and fails loudly, naming the install command, if none is
+found. Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All ten
-call `startSite()` and run under `deno task test:browser` with `-A`, not the
-narrow `deno task test`.
+— a mismatch downloads a different Chromium build than the one launched. All
+eleven call `startSite()` and run under `deno task test:browser` with `-A`, not
+the narrow `deno task test`.
 
 Two rules keep them stable on a busy machine (#219). Open a page with
 `test/browser.ts`'s `newPage(browser, options)`, never `browser.newPage()`: it
-blocks service workers, because the site's worker takes control on the first
-page and `islands/SWUpdater.tsx` then reloads it, which lands mid-test and fails
-the next `page.evaluate` with "Execution context was destroyed". Only
-`test/sw-cache.browser.test.ts`, which is about the worker, opens a context
+blocks service workers. `islands/SWUpdater.tsx` used to reload the first page
+once the site's worker took control, which landed mid-test and failed the next
+`page.evaluate` with "Execution context was destroyed". It no longer does
+(#259), but a blocked worker also keeps its cache and its fetch handler out of
+tests that are not about it. Only `test/sw-cache.browser.test.ts` and
+`test/sw-updater.browser.test.ts`, which are about the worker, open a context
 without it. And when a click or a submit navigates, wait for that navigation
 itself (`Promise.all([page.waitForNavigation(), click])` or `page.waitForURL`)
 instead of a bare `waitForLoadState` after it, which can resolve on the old
@@ -573,6 +575,14 @@ page. Never retry a test on this error.
   resolves, because the tab that registers the worker is not controlled by it. A
   third test pins `newPage()`: no worker activates on its page and the page
   loads only once (#219).
+- `test/sw-updater.browser.test.ts` (#259): a first visit to `/contact-me` with
+  service workers allowed loads once and keeps a value set on `window` after the
+  worker takes control, because `islands/SWUpdater.tsx` reloads only when a
+  worker replaces one that already controlled the page. A second test deploys a
+  new worker by restarting the site on the same port with a new `BUILD_ID`
+  (`startSite()`'s `port` option), and checks the "Reload" button still reloads
+  the page onto it. A third does the same for a returning visitor, whose page a
+  worker already controls when the island mounts.
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`
@@ -602,8 +612,8 @@ page. Never retry a test on this error.
   sitemap is wider than the screen, and no Previous/Next card
   (`[data-post-nav] a` in `routes/blog/[slug].tsx`) ends past its right edge.
   The cards used to be clipped by an ancestor, so the page's own `scrollWidth`
-  never showed the overflow. It blocks service workers: the worker takes control
-  on the first page and `islands/SWUpdater.tsx` reloads it mid-measurement.
+  never showed the overflow. It blocks service workers, like every test that
+  opens pages through `newPage()`.
 - `test/safe-area.browser.test.ts`: at 390px the phone tab bar clears an
   iPhone's home indicator. iOS Safari reports a zero
   `env(safe-area-inset-bottom)` unless `routes/_app.tsx`'s viewport meta tag
