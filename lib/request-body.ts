@@ -1,14 +1,15 @@
 // Capped request-body reading for every POST route (#251). `req.json()` and
 // `req.formData()` buffer the whole body, so one large unauthenticated request
 // could push the container past its memory limit. These read through
-// `@spy4x/net/bounded-body` instead, which checks a declared Content-Length
+// `@spy4x/net/bounded-body` (and, for forms, `@spy4x/server/http/bounded-body`,
+// which reuses it) instead, which checks a declared Content-Length
 // before reading and the running total while streaming.
 import {
   BodyReadTimeoutError,
   PayloadTooLargeError,
-  readBoundedBody,
   readBoundedJson,
 } from "@spy4x/net/bounded-body";
+import { parseBoundedFormData } from "@spy4x/server/http/bounded-body";
 
 /** `/api/subscribe` and `/unsubscribe`: an address or a token is a few hundred
  * bytes, so 4 KiB leaves room for any real form and nothing more. */
@@ -52,31 +53,19 @@ export async function readJsonBody(
 }
 
 /**
- * Reads a form body (url-encoded or multipart) of at most `maxBytes` bytes. The
- * bytes are read under the cap first, then parsed by the platform's own form
- * parser with the request's content type, so no parsing is reimplemented here.
- * An empty body, as a one-click unsubscribe (RFC 8058) may send, parses as an
- * empty form.
+ * Reads a form body (url-encoded or multipart) of at most `maxBytes` bytes
+ * through `parseBoundedFormData` from `@spy4x/server`, which reads the bytes
+ * under the cap before the platform's form parser sees them. A body with no
+ * Content-Type, or one that does not parse as a form, is a 400, as
+ * `req.formData()` answered before (#251).
  */
 export async function readFormBody(
   req: Request,
   maxBytes: number,
 ): Promise<{ ok: true; value: FormData } | BodyError> {
-  let bytes: Uint8Array;
   try {
-    bytes = await readBoundedBody(req, { maxBytes });
+    return { ok: true, value: await parseBoundedFormData(req, { maxBytes }) };
   } catch (err) {
     return bodyError(err, "Invalid form body");
-  }
-  const type = req.headers.get("content-type") ??
-    "application/x-www-form-urlencoded";
-  if (bytes.length === 0) return { ok: true, value: new FormData() };
-  try {
-    const form = await new Response(new Uint8Array(bytes), {
-      headers: { "content-type": type },
-    }).formData();
-    return { ok: true, value: form };
-  } catch {
-    return { ok: false, status: 400, error: "Invalid form body" };
   }
 }

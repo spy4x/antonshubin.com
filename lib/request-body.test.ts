@@ -67,17 +67,32 @@ Deno.test("reads a url-encoded form under the cap", async () => {
   assertEquals(read.ok && read.value.get("token"), "abc");
 });
 
-Deno.test("reads an empty body as an empty form, as a one-click unsubscribe may send", async () => {
-  const requests = [
-    new Request(URL_, { method: "POST" }),
+Deno.test("reads an empty url-encoded body as an empty form", async () => {
+  const read = await readFormBody(
     post("", "application/x-www-form-urlencoded"),
+    64,
+  );
+  assertEquals(read.ok && [...read.value.keys()], []);
+});
+
+Deno.test("answers 400 to a form body with no Content-Type or one that does not parse", async () => {
+  const invalid: BodyError = {
+    ok: false,
+    status: 400,
+    error: "Invalid form body",
+  };
+  const requests = [
+    new Request(URL_, {
+      method: "POST",
+      body: new TextEncoder().encode("token=abc"),
+    }),
+    post("token=abc", "text/plain"),
     post("", "multipart/form-data; boundary=x"),
   ];
   for (const req of requests) {
-    const read = await readFormBody(req, 64);
     assertEquals(
-      read.ok && [...read.value.keys()],
-      [],
+      await readFormBody(req, 64),
+      invalid,
       req.headers.get("content-type") ?? "no content type",
     );
   }
