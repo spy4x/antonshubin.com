@@ -189,14 +189,6 @@ body {
   font-family: var(--font-sans);
 }
 
-/* islands/Menu.tsx rotates #menu -90deg into a vertical desktop rail; the
-   rail's on-screen height is this rule's width before rotation. */
-@media (min-width: 640px) {
-  #menu {
-    width: 100vh;
-  }
-}
-
 h1,
 h2,
 h3,

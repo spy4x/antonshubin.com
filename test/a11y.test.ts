@@ -1,4 +1,4 @@
-// Guards for issue #160: the nav's active-page marker (which islands/Menu.tsx
+// Guards for issue #160: the nav's active-page marker (which islands/Nav.tsx
 // leaves entirely to Fresh's own framework behavior — see the first test's
 // docs for why) and icon-only controls keeping an accessible name. Reads the
 // built site through test/harness.ts — see AGENTS.md "Rendered-page tests".
@@ -21,23 +21,17 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 }
 
 /**
- * islands/Menu.tsx sets no `aria-current` of its own — Fresh 2's own
- * renderer auto-marks any `<a href>` matching the current URL: an exact
- * match gets `aria-current="page"` and `data-current="true"`, a section
- * ancestor gets `aria-current="true"` and `data-ancestor="true"` (Fresh's
- * `setActiveUrl` in its built server bundle; confirmed by adding and then
- * removing an explicit `aria-current` prop in islands/Menu.tsx and
- * rebuilding both times).
- * That means a mutation that only deletes an `aria-current` prop from
- * Menu.tsx cannot turn this test red, because there is no such prop to
- * delete — Fresh fills the attribute unconditionally. What this test
- * actually guards is the nav links' own `href`s: pin both of Fresh's cases
- * (exact match on `/blog`, section-ancestor match on `/catalog` from a
- * nested catalog item) so a typo'd or hardcoded `href` — which would make
- * Fresh's own matching miss — still shows up here. Confirmed by mutating
- * the Services link's `href` from `/catalog` to `/catalog-x` in
- * islands/Menu.tsx: aria-current disappears from that link and this test
- * goes red; restored afterward.
+ * On the server, islands/Nav.tsx leaves each destination link's
+ * `aria-current` to Fresh 2's renderer, which marks any `<a href>` matching
+ * the request URL: an exact match gets `aria-current="page"` and
+ * `data-current="true"`, a section ancestor gets `aria-current="true"` and
+ * `data-ancestor="true"` (Fresh's `setActiveUrl` in its built server bundle).
+ * In the browser the island sets the value itself after hydration — see its
+ * `current()` helper and test/a11y.browser.test.ts's phone tab bar test.
+ * What this test guards is the nav links' own `href`s in the server HTML:
+ * pin both of Fresh's cases (exact match on `/blog`, section-ancestor match
+ * on `/catalog` from a nested catalog item) so a typo'd or hardcoded `href`
+ * — which would make Fresh's own matching miss — shows up here.
  */
 siteTest(
   "the nav marks an exact page 'page' and its section 'true'",
@@ -49,7 +43,7 @@ siteTest(
     );
     const exactLinks = [...exactMenu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g)]
       .map((m) => m[0]);
-    assertEquals(exactLinks.length, 6, "expected the six agreed nav links");
+    assertEquals(exactLinks.length, 5, "expected the five agreed nav links");
     const blogLink = exactLinks.find((a) => /href="\/blog"/.test(a));
     assert(blogLink, "no nav link points at /blog");
     assert(
@@ -57,8 +51,11 @@ siteTest(
         /data-current="true"/.test(blogLink),
       `the /blog nav link is missing Fresh's exact-match markers: ${blogLink}`,
     );
-    assertEquals(count(exactMenu, /aria-current="page"/g), 1);
-    assertEquals(count(exactMenu, /aria-current="true"/g), 0);
+    // Counted over the rail's destination links only: the rail's home
+    // portrait links `/`, which Fresh marks `aria-current="true"` everywhere.
+    const exactList = exactLinks.join("");
+    assertEquals(count(exactList, /aria-current="page"/g), 1);
+    assertEquals(count(exactList, /aria-current="true"/g), 0);
 
     const nestedHtml = await site.html(
       "/catalog/zero-to-production-saas-mvp",
@@ -77,8 +74,9 @@ siteTest(
         /data-ancestor="true"/.test(servicesLink),
       `the Services nav link is missing Fresh's ancestor-match markers: ${servicesLink}`,
     );
-    assertEquals(count(nestedMenu, /aria-current="true"/g), 1);
-    assertEquals(count(nestedMenu, /aria-current="page"/g), 0);
+    const nestedList = nestedLinks.join("");
+    assertEquals(count(nestedList, /aria-current="true"/g), 1);
+    assertEquals(count(nestedList, /aria-current="page"/g), 0);
   },
 );
 

@@ -1,5 +1,6 @@
 // Browser-driven guards for issue #165: the mobile menu's Escape handling
-// (islands/Menu.tsx) and the two photo lightboxes' names and focus return
+// (islands/Nav.tsx; #185 made it the More dialog and added the rail's tab
+// order and the phone tab bar) and the two photo lightboxes' names and focus return
 // (islands/ImageGallery.tsx on a project page, islands/BlogImageEnhancer.tsx
 // on a blog post). None of this is visible in the server-rendered HTML the
 // other rendered-page tests read — the lightbox only gets its aria-label
@@ -354,7 +355,7 @@ Deno.test("blog image lightbox is named, its Close button is named, and focus re
   }
 });
 
-Deno.test("Escape closes the mobile menu and returns focus to the toggle button", async () => {
+Deno.test("More opens the menu dialog, Escape closes it and focus returns to More", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -363,41 +364,195 @@ Deno.test("Escape closes the mobile menu and returns focus to the toggle button"
     try {
       await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
 
-      const toggle = page.getByRole("button", { name: "Open main menu" });
-      await toggle.click();
+      const more = page.getByRole("button", { name: "More", exact: true });
+      await more.click();
 
       const menu = page.locator("#mobile-menu");
-      await menu.waitFor({ state: "visible" });
-      await toggle.waitFor({ state: "hidden" }); // renamed to "Close main menu"
-      const closeToggle = page.getByRole("button", {
-        name: "Close main menu",
+      await page.getByRole("dialog", { name: "More" }).waitFor({
+        state: "visible",
       });
-      await closeToggle.waitFor({ state: "visible" });
       assertEquals(
-        await closeToggle.getAttribute("aria-expanded"),
+        await more.getAttribute("aria-expanded"),
         "true",
-        "the toggle button must report the menu as expanded while it is open",
+        "More must report the menu as expanded while it is open",
       );
 
       // Move focus into the menu before closing it, so the focus assertion
-      // below actually proves Escape moves focus back to the toggle button
-      // rather than merely leaving it where the earlier click put it.
-      await menu.getByRole("link", { name: "Work", exact: true }).focus();
+      // below actually proves Escape moves focus back to More rather than
+      // merely leaving it where the earlier click put it.
+      const writing = menu.getByRole("link", { name: "Writing", exact: true });
+      await writing.focus();
+      assert(await isFocused(writing), "focus must be inside the open menu");
       await page.keyboard.press("Escape");
       await menu.waitFor({ state: "hidden" });
+      // The dialog's `close` event, which resets More, is dispatched as a
+      // separate task after the dialog hides.
+      await page.locator('#tab-bar button[aria-expanded="false"]').waitFor({
+        timeout: 2000,
+      }).catch(() => {});
 
-      const reopenToggle = page.getByRole("button", {
-        name: "Open main menu",
-      });
-      await reopenToggle.waitFor({ state: "visible" });
       assertEquals(
-        await reopenToggle.getAttribute("aria-expanded"),
+        await more.getAttribute("aria-expanded"),
         "false",
-        "the toggle button must report the menu as collapsed after Escape",
+        "More must report the menu as collapsed after Escape",
       );
       assert(
-        await isFocused(reopenToggle),
-        "focus must land on the menu toggle button after Escape closes the menu",
+        await isFocused(more),
+        "focus must land on More after Escape closes the menu",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("Tabbing through the desktop rail goes top to bottom with upright labels", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL: "" } });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      await page.goto(`${site.origin}/blog`, { waitUntil: "networkidle" });
+
+      // Tab from the top of the page until focus leaves the rail, recording
+      // each rail stop's top edge and whether anything above it is
+      // transformed (the old rail was the phone bar rotated -90deg).
+      const stops: { label: string; y: number; transformed: boolean }[] = [];
+      for (let i = 0; i < 20; i++) {
+        await page.keyboard.press("Tab");
+        const stop = await page.evaluate(() => {
+          const el = document.activeElement as HTMLElement | null;
+          if (!el?.closest("#desktop-menu")) return null;
+          let transformed = false;
+          for (let n: Element | null = el; n; n = n.parentElement) {
+            if (getComputedStyle(n).transform !== "none") transformed = true;
+          }
+          return {
+            label: (el.textContent || "").replace(/\s+/g, " ").trim(),
+            y: el.getBoundingClientRect().top,
+            transformed,
+          };
+        });
+        if (!stop) {
+          if (stops.length > 0) break;
+          continue;
+        }
+        stops.push(stop);
+      }
+
+      assertEquals(
+        stops.map((s) => s.label),
+        [
+          "Anton",
+          "Write",
+          "Work",
+          "Services",
+          "How I work",
+          "Tools",
+          "Writing",
+          "Links",
+        ],
+        "the rail must be tabbed through in its visual order",
+      );
+      for (let i = 1; i < stops.length; i++) {
+        assert(
+          stops[i].y > stops[i - 1].y,
+          `"${stops[i].label}" (y=${stops[i].y}) must sit below "${
+            stops[i - 1].label
+          }" (y=${stops[i - 1].y})`,
+        );
+      }
+      for (const stop of stops) {
+        assert(!stop.transformed, `"${stop.label}" is inside a transform`);
+      }
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+/** The computed colour a probe element gets from `className`, e.g. `bg-lamp`. */
+function tokenColour(
+  page: Page,
+  className: string,
+  property: "backgroundColor" | "borderTopColor",
+): Promise<string> {
+  return page.evaluate(([cls, prop]) => {
+    const probe = document.createElement("div");
+    probe.className = `${cls} border`;
+    document.body.append(probe);
+    const value = getComputedStyle(probe)[prop as "backgroundColor"];
+    probe.remove();
+    return value;
+  }, [className, property]);
+}
+
+Deno.test("a 390px phone shows five tabs with Book in the centre and the current section marked", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL: "" } });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    try {
+      const tabs = page.locator("#tab-bar li > :is(a, button)");
+
+      /** Loads `path` and waits until the nav island has hydrated: More only
+       * opens its dialog once client JS runs, and hydration is what used to
+       * strip the current-page marker. */
+      const load = async (path: string) => {
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        await tabs.nth(4).click();
+        await page.locator("#mobile-menu").waitFor({ state: "visible" });
+        await page.keyboard.press("Escape");
+        await page.locator("#mobile-menu").waitFor({ state: "hidden" });
+      };
+
+      await load("/catalog");
+      assertEquals(
+        (await tabs.allInnerTexts()).map((t) => t.trim()),
+        ["Work", "Services", "Write", "Tools", "More"],
+      );
+      for (let i = 0; i < 5; i++) {
+        const box = await tabs.nth(i).boundingBox();
+        assert(box, `tab ${i} has no box`);
+        assert(
+          box.x >= 0 && box.x + box.width <= MOBILE_VIEWPORT.width &&
+            box.y >= 0 && box.y + box.height <= MOBILE_VIEWPORT.height,
+          `tab ${i} must sit inside the 390px viewport: ${JSON.stringify(box)}`,
+        );
+      }
+      const book = await tabs.nth(2).boundingBox();
+      assert(book);
+      assert(
+        Math.abs(book.x + book.width / 2 - MOBILE_VIEWPORT.width / 2) < 2,
+        `Book must be centred: ${JSON.stringify(book)}`,
+      );
+
+      // The current page: a Lamp pill.
+      const services = tabs.nth(1);
+      assertEquals(await services.getAttribute("aria-current"), "page");
+      assertEquals(
+        await services.evaluate((el) => getComputedStyle(el).backgroundColor),
+        await tokenColour(page, "bg-lamp", "backgroundColor"),
+        "the current page's tab must be a Lamp pill",
+      );
+
+      // A page inside the section: an outlined pill.
+      await load("/catalog/zero-to-production-saas-mvp");
+      assertEquals(await services.getAttribute("aria-current"), "true");
+      assertEquals(
+        await services.evaluate((el) => getComputedStyle(el).borderTopColor),
+        await tokenColour(page, "border-rule-strong", "borderTopColor"),
+        "the current section's tab must be an outlined pill",
       );
     } finally {
       await page.close();
@@ -419,8 +574,8 @@ Deno.test("Escape leaves focus alone when the mobile menu is already closed", as
 
       // The menu is closed from the start — focus a link outside it, in
       // <main>, and press Escape. A menu handler that closes on every
-      // Escape, not just while open, would steal focus to the toggle button
-      // even though there is nothing open to close.
+      // Escape, not just while open, would steal focus to More even though
+      // there is nothing open to close.
       const mainLink = page.locator("#main-content").getByRole("link", {
         name: "See all work",
       });

@@ -169,7 +169,7 @@ Deno.test("the mobile menu still hydrates on an unmatched URL", async () => {
       });
       await assertNoViolations(page, "on /no-such-page");
 
-      const toggle = page.getByRole("button", { name: "Open main menu" });
+      const toggle = page.getByRole("button", { name: "More", exact: true });
       await toggle.click();
       await page.locator("#mobile-menu").waitFor({ state: "visible" });
 
