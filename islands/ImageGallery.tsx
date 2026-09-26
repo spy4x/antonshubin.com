@@ -86,6 +86,11 @@ const ROUND = buttonClass("secondary", "justify-center w-10 h-10 bg-ink");
 export default function ImageGallery({ images, hero }: ImageGalleryProps) {
   const activeIndex = useSignal<number | null>(null);
   const current = useSignal(0);
+  const atStart = useSignal(true);
+  const atEnd = useSignal(false);
+  // False until the island measures the strip: with nothing to scroll,
+  // Previous and Next are not rendered at all.
+  const overflows = useSignal(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   // The slide button that opened the lightbox, so closing it can put
@@ -125,45 +130,59 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
     }
   };
 
-  /** The slide whose centre is nearest the strip's centre; the ends win at the scroll limits. */
+  /** One slide's width plus the gap after it: how far Next and Previous scroll. */
+  const step = (strip: HTMLElement): number => {
+    const [first, second] = Array.from(strip.children) as HTMLElement[];
+    if (!first) return strip.clientWidth;
+    return second ? second.offsetLeft - first.offsetLeft : first.offsetWidth;
+  };
+
+  /**
+   * Syncs the counter and the button states with the strip's scroll
+   * position. The counter is the slide at the strip's left edge, and the
+   * last slide once the strip is scrolled to its end, so Next always walks
+   * to "N / N" even when several slides fit at once.
+   */
   const updateCurrent = () => {
     const strip = stripRef.current;
     if (!strip) return;
     const max = strip.scrollWidth - strip.clientWidth;
-    if (strip.scrollLeft <= 1) {
-      current.value = 0;
-      return;
+    overflows.value = max > 1;
+    atStart.value = strip.scrollLeft <= 1;
+    atEnd.value = strip.scrollLeft >= max - 1;
+    if (atStart.value) current.value = 0;
+    else if (atEnd.value) current.value = images.length - 1;
+    else {
+      current.value = Math.min(
+        images.length - 2,
+        Math.max(1, Math.round(strip.scrollLeft / step(strip))),
+      );
     }
-    if (strip.scrollLeft >= max - 1) {
-      current.value = images.length - 1;
-      return;
-    }
-    const centre = strip.scrollLeft + strip.clientWidth / 2;
-    let best = 0;
-    let bestDistance = Infinity;
-    Array.from(strip.children).forEach((child, i) => {
-      const el = child as HTMLElement;
-      const distance = Math.abs(el.offsetLeft + el.offsetWidth / 2 - centre);
-      if (distance < bestDistance) {
-        best = i;
-        bestDistance = distance;
-      }
-    });
-    current.value = best;
   };
 
-  /** Scrolls the strip so slide `index` sits in the centre. */
-  const scrollToSlide = (index: number) => {
+  /** Scrolls the strip by one slide, clamped to its start and end. */
+  const scrollByOne = (direction: 1 | -1) => {
     const strip = stripRef.current;
-    const slide = strip?.children[index] as HTMLElement | undefined;
-    if (!strip || !slide) return;
+    if (!strip) return;
+    const max = strip.scrollWidth - strip.clientWidth;
     const reduce = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")
       .matches;
     strip.scrollTo({
-      left: slide.offsetLeft - (strip.clientWidth - slide.offsetWidth) / 2,
+      left: Math.min(
+        max,
+        Math.max(0, strip.scrollLeft + direction * step(strip)),
+      ),
       behavior: reduce ? "auto" : "smooth",
     });
   };
+
+  // Whether the strip overflows changes with the viewport, so the buttons
+  // re-check on resize, not only on scroll.
+  useEffect(() => {
+    updateCurrent();
+    globalThis.addEventListener("resize", updateCurrent);
+    return () => globalThis.removeEventListener("resize", updateCurrent);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -199,7 +218,9 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
         {images.map((image, index) => (
           <figure
             key={index}
-            class={`shrink-0 snap-center ${many ? slideWidth : "w-full"}`}
+            class={`shrink-0 ${portrait ? "snap-start" : "snap-center"} ${
+              many ? slideWidth : "w-full"
+            }`}
           >
             <button
               type="button"
@@ -230,8 +251,9 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
           <button
             type="button"
             aria-label="Previous screenshot"
-            onClick={() => scrollToSlide(Math.max(0, current.value - 1))}
-            disabled={current.value === 0}
+            onClick={() => scrollByOne(-1)}
+            disabled={atStart.value}
+            hidden={!overflows.value}
             class={`${ROUND} max-lg:hidden disabled:opacity-50`}
           >
             <Arrow d={ARROW_LEFT} class="w-5 h-5" />
@@ -245,9 +267,9 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
           <button
             type="button"
             aria-label="Next screenshot"
-            onClick={() =>
-              scrollToSlide(Math.min(images.length - 1, current.value + 1))}
-            disabled={current.value === images.length - 1}
+            onClick={() => scrollByOne(1)}
+            disabled={atEnd.value}
+            hidden={!overflows.value}
             class={`${ROUND} max-lg:hidden disabled:opacity-50`}
           >
             <Arrow d={ARROW_RIGHT} class="w-5 h-5" />
@@ -337,7 +359,8 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
                   images[activeIndex.value].alt,
                 ) && (
                   <span class="text-graphite">
-                    · {images[activeIndex.value].alt}
+                    {" · "}
+                    {images[activeIndex.value].alt}
                   </span>
                 )}
               </p>

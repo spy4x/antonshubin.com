@@ -147,9 +147,12 @@ const PRICE_PAGES: Record<string, string[]> = {
   "/catalog": [],
   ...Object.fromEntries(catalogItems.map((i) => [`/catalog/${i.slug}`, []])),
   "/how-i-work": [],
-  // Every client project page links its "Similar work today" item (#246).
+  // Every client project page with a catalogSlug links its "Similar work
+  // today" item (#246).
   ...Object.fromEntries(
-    projects.freelance.map((p) => [`/projects/${p.slug}`, []]),
+    projects.freelance
+      .filter((p) => p.catalogSlug)
+      .map((p) => [`/projects/${p.slug}`, []]),
   ),
   // "a $10 VPS" in a blog post summary.
   "/saas-architecture-guide": ["$10"],

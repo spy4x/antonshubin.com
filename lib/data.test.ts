@@ -91,8 +91,18 @@ Deno.test("a period renders as one year, a range with an en dash, or a year to n
   assertEquals(formatPeriod({ from: 2024, ongoing: true }), "2024\u2013now");
 });
 
-Deno.test("every client project maps to a real catalog item", () => {
+/**
+ * CallTrack and Sajari were frontend roles on someone else's product: no
+ * catalog item describes that work, so their pages show no catalog link.
+ */
+const NO_CATALOG_MATCH = ["calltrack", "sajari"];
+
+Deno.test("every client project maps to a real catalog item, except the two frontend roles", () => {
   for (const p of projects.freelance) {
+    if (NO_CATALOG_MATCH.includes(p.slug!)) {
+      assertEquals(p.catalogSlug, undefined, p.slug);
+      continue;
+    }
     assert(p.catalogSlug, `${p.slug} has no catalogSlug`);
     catalogItem(p.catalogSlug);
   }

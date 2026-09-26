@@ -167,6 +167,98 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
   }
 });
 
+/** The gallery counter's text, e.g. "3 / 9". */
+async function counterText(page: Page): Promise<string> {
+  return (await page.locator("[data-gallery-counter]").innerText()).trim();
+}
+
+/**
+ * Clicks `button` until it is disabled (at most `limit` clicks), waiting
+ * after each click for the strip's smooth scroll to end, and returns every
+ * counter value seen, starting with the one before the first click. Fails
+ * when a click does not scroll the strip at all.
+ */
+async function walk(page: Page, button: Locator, limit: number) {
+  const strip = page.locator("[data-gallery-strip]");
+  const seen = [await counterText(page)];
+  for (let i = 0; i < limit && await button.isEnabled(); i++) {
+    const scrolled = strip.evaluate((el) =>
+      new Promise<boolean>((resolve) => {
+        el.addEventListener("scrollend", () => resolve(true), { once: true });
+        setTimeout(() => resolve(false), 5000);
+      })
+    );
+    await button.click();
+    assert(await scrolled, `click ${i + 1} did not scroll the strip`);
+    seen.push(await counterText(page));
+  }
+  return seen;
+}
+
+Deno.test("a portrait gallery's Next walks to the last screenshot and Previous walks back", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({ viewport: DESKTOP_VIEWPORT });
+    try {
+      // Roley: nine phone screenshots, several in view at once at 1440px.
+      await page.goto(`${site.origin}/projects/roley`, {
+        waitUntil: "networkidle",
+      });
+      const next = page.getByRole("button", { name: "Next screenshot" });
+      const prev = page.getByRole("button", { name: "Previous screenshot" });
+      await next.waitFor({ state: "visible" });
+      assert(await prev.isDisabled(), "Previous is enabled at the start");
+
+      const forward = await walk(page, next, 9);
+      assertEquals(forward[0], "1 / 9");
+      assertEquals(forward[forward.length - 1], "9 / 9", forward.join(", "));
+      assert(await next.isDisabled(), "Next is still enabled at the end");
+
+      const back = await walk(page, prev, 9);
+      assertEquals(back[back.length - 1], "1 / 9", back.join(", "));
+      assert(await prev.isDisabled(), "Previous is still enabled at the start");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("a gallery that fits without scrolling offers no Next or Previous", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await browser.newPage({ viewport: DESKTOP_VIEWPORT });
+    try {
+      // Connectful: three phone screenshots, all in view at 1440px.
+      await page.goto(`${site.origin}/projects/connectful`, {
+        waitUntil: "networkidle",
+      });
+      const overflow = await page.locator("[data-gallery-strip]").evaluate(
+        (el) => el.scrollWidth - el.clientWidth,
+      );
+      assert(overflow <= 1, `the strip still scrolls by ${overflow}px`);
+      for (const name of ["Next screenshot", "Previous screenshot"]) {
+        assertEquals(
+          await page.getByRole("button", { name }).count(),
+          0,
+          `${name} is offered with nothing to scroll`,
+        );
+      }
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
 Deno.test("the six sample project pages have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   // The Book buttons render only with a booking URL; RFC 2606 host.

@@ -91,7 +91,9 @@ siteTest(
         );
       }
       assert(text.includes(`Role ${p.role}`), `${p.slug}: no role`);
-      if (p.externalURL) {
+      if (p.externalURLLabel) {
+        assert(!text.includes("Status"), `${p.slug}: a document has a status`);
+      } else if (p.externalURL) {
         const word = p.externalURLDead ? "Offline" : "Live";
         assert(text.includes(`Status ${word}`), `${p.slug}: not ${word}`);
       }
@@ -140,11 +142,20 @@ siteTest(
 );
 
 siteTest(
-  "the catalog link names a real catalog item in the card and the band",
+  "the catalog link names a real catalog item in the card and the band, and is absent without a catalogSlug",
   async (site) => {
     const slugs = new Set(catalogItems.map((i) => i.slug));
+    let absent = 0;
     for (const p of clients) {
       const html = await site.html(`/projects/${p.slug}`);
+      if (!p.catalogSlug) {
+        absent++;
+        assert(
+          !html.includes("data-catalog-link"),
+          `${p.slug}: a catalog link`,
+        );
+        continue;
+      }
       for (
         const [where, tag, place] of [
           ["data-project-facts", "aside", "card"],
@@ -164,6 +175,7 @@ siteTest(
         assertEquals(res.status, 200, `/catalog/${m[1]}`);
       }
     }
+    assert(absent > 0, "no project without a catalogSlug was checked");
   },
 );
 

@@ -315,9 +315,8 @@ doesn't make whichever build was measured second look artificially better or
 worse (confirmed necessary: measuring the same commit twice in separate batches
 gave different medians before this mode existed). This is the reliable way to
 compare a branch against `origin/main`: clone or `git worktree add` a copy of
-`main`, build it, then
-`deno task lcp -- --ab <main copy> <this worktree> --n 15`, adding
-`--path <page>` for a page other than `/`.
+`main`, build it, then `deno task lcp --ab <main copy> <this worktree> --n 15`,
+adding `--path <page>` for a page other than `/`.
 
 ## Content rule
 

@@ -593,7 +593,6 @@ export const projects = {
     {
       title: "CallTrack",
       slug: "calltrack",
-      catalogSlug: "cto-advisory-retainer",
       externalURL: "https://ctrk.net",
       externalURLDead: true,
       description:
@@ -617,7 +616,6 @@ export const projects = {
     {
       title: "Sajari",
       slug: "sajari",
-      catalogSlug: "cto-advisory-retainer",
       role: "Frontend",
       externalURL: "https://sajari.com",
       externalURLDead: true,
