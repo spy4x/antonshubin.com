@@ -8,7 +8,7 @@
 import { assert } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 // The three widths #186's review measured overflow at: 1100px (the note's
 // own breakpoint), 1280px (a common laptop width) and 1440px (this repo's
@@ -23,7 +23,7 @@ Deno.test("the Upwork note fits beside its claim with no horizontal scroll at 11
     browser = await launchChromium();
 
     for (const width of DESKTOP_WIDTHS) {
-      const page: Page = await browser.newPage({
+      const page: Page = await newPage(browser, {
         viewport: { width, height: 900 },
       });
       try {
@@ -69,7 +69,7 @@ Deno.test("the Upwork note fits beside its claim with no horizontal scroll at 11
       }
     }
 
-    const mobile: Page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    const mobile: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
       await mobile.goto(`${site.origin}/`, { waitUntil: "networkidle" });
       const wrap = '[data-note-ref="upwork-profile"]';

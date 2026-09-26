@@ -7,7 +7,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 /** Booking buttons only render when SCHEDULE_URL is set (#175) — same
  * placeholder test/contrast.browser.test.ts uses. */
@@ -33,7 +33,7 @@ Deno.test("no monospace font renders in a heading, nav item or button (#184)", a
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage();
+    const page: Page = await newPage(browser);
     try {
       for (const path of PAGES) {
         await page.goto(`${site.origin}${path}`, {
@@ -84,7 +84,7 @@ Deno.test("the accent colour is a background only on the primary button and the 
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage();
+    const page: Page = await newPage(browser);
     try {
       for (const path of PAGES) {
         await page.goto(`${site.origin}${path}`, {
@@ -160,7 +160,7 @@ Deno.test("Literata and IBM Plex Sans load from self with no CSP violation (#184
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage();
+    const page: Page = await newPage(browser);
     const violations: string[] = [];
     page.on("console", (msg) => {
       if (msg.type() === "error" && msg.text().includes("Content Security")) {

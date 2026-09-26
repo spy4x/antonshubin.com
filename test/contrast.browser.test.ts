@@ -98,7 +98,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import axeCore from "axe-core";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 interface AxeNode {
   target: string[];
@@ -266,7 +266,7 @@ Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch p
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       // white text on bg-sky-600 (Tailwind v4's oklch(58.8% .158 241.966),
       // #0084d1 once painted) is a known quantity: axe itself reports this
@@ -314,7 +314,7 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       for (
         const path of [
@@ -511,7 +511,7 @@ Deno.test("every visual-system token pairing passes WCAG AA (#184)", async () =>
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page = await browser.newPage();
+    const page = await newPage(browser);
     try {
       // Any built page carries the stylesheet with the tokens — home is as
       // good as any, and it's already covered above for the pre-existing set.

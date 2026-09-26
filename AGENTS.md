@@ -503,6 +503,17 @@ Playwright's version must match exactly across `deno.json`'s import map,
 nine call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
+Two rules keep them stable on a busy machine (#219). Open a page with
+`test/browser.ts`'s `newPage(browser, options)`, never `browser.newPage()`: it
+blocks service workers, because the site's worker takes control on the first
+page and `islands/SWUpdater.tsx` then reloads it, which lands mid-test and fails
+the next `page.evaluate` with "Execution context was destroyed". Only
+`test/sw-cache.browser.test.ts`, which is about the worker, opens a context
+without it. And when a click or a submit navigates, wait for that navigation
+itself (`Promise.all([page.waitForNavigation(), click])` or `page.waitForURL`)
+instead of a bare `waitForLoadState` after it, which can resolve on the old
+page. Never retry a test on this error.
+
 - `test/lead-form.browser.test.ts` (#157): submits the lead form (stubbing
   `/api/lead`), asserts focus lands on the success heading without scrolling the
   page, and that the form/success panels swap `inert`. The success heading needs
@@ -547,7 +558,9 @@ the narrow `deno task test`.
   never serves one from it — a signed unsubscribe link opened, submitted and
   reopened answers "Link not recognised", not the cached form. It opens the
   pages under test in a second tab once `navigator.serviceWorker.ready`
-  resolves, because the tab that registers the worker is not controlled by it.
+  resolves, because the tab that registers the worker is not controlled by it. A
+  third test pins `newPage()`: no worker activates on its page and the page
+  loads only once (#219).
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`

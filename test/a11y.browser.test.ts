@@ -18,7 +18,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import axeCore from "axe-core";
 import type { Browser, Locator, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
 const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
@@ -60,7 +60,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage();
+    const page: Page = await newPage(browser);
     try {
       await page.goto(`${site.origin}/projects/calltrack`, {
         waitUntil: "networkidle",
@@ -132,7 +132,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({ viewport: DESKTOP_VIEWPORT });
+    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
       await page.goto(`${site.origin}/projects/smartlite`, {
         waitUntil: "networkidle",
@@ -201,7 +201,7 @@ Deno.test("a portrait gallery's Next walks to the last screenshot and Previous w
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({ viewport: DESKTOP_VIEWPORT });
+    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
       // Roley: nine phone screenshots, several in view at once at 1440px.
       await page.goto(`${site.origin}/projects/roley`, {
@@ -234,7 +234,7 @@ Deno.test("a gallery that fits without scrolling offers no Next or Previous", as
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({ viewport: DESKTOP_VIEWPORT });
+    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
       // Connectful: three phone screenshots, all in view at 1440px.
       await page.goto(`${site.origin}/projects/connectful`, {
@@ -269,7 +269,7 @@ Deno.test("the six sample project pages have no horizontal scroll and no axe vio
   try {
     browser = await launchChromium();
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-      const page: Page = await browser.newPage({ viewport });
+      const page: Page = await newPage(browser, { viewport });
       try {
         for (const slug of SAMPLE_PROJECTS) {
           const where = `/projects/${slug} at ${viewport.width}px`;
@@ -302,7 +302,7 @@ Deno.test("blog image lightbox is named, its Close button is named, and focus re
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage();
+    const page: Page = await newPage(browser);
     try {
       await page.goto(
         `${site.origin}/blog/from-office-job-to-freelance-to-my-startups`,
@@ -360,7 +360,7 @@ Deno.test("More opens the menu dialog, Escape closes it and focus returns to Mor
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
       await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
 
@@ -414,7 +414,7 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({
+    const page: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
     });
     try {
@@ -503,7 +503,7 @@ Deno.test("the rail's Links popover lists the Links groups when opened", async (
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({
+    const page: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
     });
     try {
@@ -546,7 +546,7 @@ Deno.test("a 390px phone shows five tabs with Book in the centre and the current
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
       const tabs = page.locator("#tab-bar li > :is(a, button)");
 
@@ -645,7 +645,7 @@ Deno.test("Escape leaves focus alone when the mobile menu is already closed", as
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await browser.newPage({ viewport: MOBILE_VIEWPORT });
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
       await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
 

@@ -6,7 +6,7 @@
 import { assert } from "jsr:@std/assert@^1.0.0";
 import type { Browser } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium } from "./browser.ts";
+import { launchChromium, newPage } from "./browser.ts";
 
 Deno.test("no blog post or its Previous/Next cards run past the screen at 390px", async () => {
   const site = await startSite();
@@ -20,11 +20,8 @@ Deno.test("no blog post or its Previous/Next cards run past the screen at 390px"
     let cardsSeen = 0;
 
     browser = await launchChromium();
-    const page = await browser.newPage({
+    const page = await newPage(browser, {
       viewport: { width: 390, height: 844 },
-      // The service worker takes control on the first page and
-      // islands/SWUpdater.tsx then reloads it mid-measurement.
-      serviceWorkers: "block",
     });
     const wide: string[] = [];
     for (const path of posts) {
