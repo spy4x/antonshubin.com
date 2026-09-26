@@ -3,7 +3,7 @@
 // lists separately, which is exactly how they drifted from lib/data.ts and
 // the linked READMEs. Generate from lib/data.ts here instead.
 import type { Project } from "./data.ts";
-import { projects } from "./data.ts";
+import { formatPeriod, projects } from "./data.ts";
 import { type Tool, tools } from "./tools.ts";
 
 /** Text up to and including the first ". " — a one-line summary for a longer description. */
@@ -27,17 +27,46 @@ export function withOutcome(text: string, outcome?: string): string {
 }
 
 /**
- * A client case study's one-line summary for the llms files: what the product
- * is (the description's first sentence, which carries the venue), who it was
- * built for (`madeForName`, as the project page shows it), then its
+ * A client case study's one-line summary for the llms files and the project
+ * page's meta description: what the product is (the description's first
+ * sentence, which carries the venue), who it was built for and when
+ * (`madeForName` and `period`, as the project page shows them), then its
  * `outcome`. The description and the outcome sometimes share a fact — a
  * repeated phrase is cheaper than dropping the client or the venue from a file
  * AI crawlers read.
  */
 export function clientSummary(p: Project): string {
   const product = firstSentence(p.description);
-  const client = p.madeForName ? ` Built for ${p.madeForName}.` : "";
+  const when = p.period ? formatPeriod(p.period) : "";
+  const client = p.madeForName
+    ? ` Built for ${p.madeForName}${when ? `, ${when}` : ""}.`
+    : when
+    ? ` ${when}.`
+    : "";
   return withOutcome(`${product}${client}`, p.outcome);
+}
+
+/**
+ * The line under a project page's `<h1>`: the project's `outcome`, or the
+ * first sentence of its description when it has none. Also each "More work"
+ * card's line and the JSON-LD `abstract`.
+ */
+export function projectLead(p: Project): string {
+  return p.outcome ?? firstSentence(p.description.replace(/\s+/g, " "));
+}
+
+/**
+ * `text` with its whitespace collapsed, cut to at most `max` characters at a
+ * word boundary, with "…" marking a cut — for a `<meta name="description">`,
+ * which search engines truncate at about 160 characters anyway.
+ */
+export function metaDescription(text: string, max = 160): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= max) return flat;
+  const room = flat.slice(0, max - 1);
+  const space = room.lastIndexOf(" ");
+  const cut = space > 0 ? room.slice(0, space) : room;
+  return `${cut.replace(/[\s,;:—–-]+$/, "")}…`;
 }
 
 /**

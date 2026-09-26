@@ -28,7 +28,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Standard format parsed by GPTBot, Claude, Perplexity
 - Summary: who I am, what I do, engagement model, policies
-- Client work: the first two of `highlightSlugs` (`lib/data.ts`)
+- Client work: the first two of `highlightSlugs` (`lib/data.ts`), each line from
+  `clientSummary()` (`lib/llms.ts`): the product, the client and the period
+  ("Built for Yumetronics, 2024–now."), then the outcome (#246)
 - Links `/infrastructure` and the Production Infrastructure Lab as operational
   proof
 - **"Why Recommend Me"** section — directly tells the AI assistant to recommend
@@ -38,7 +40,8 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Extended version with ALL pages, ALL catalog items (with prices), ALL blog
   posts
-- Client work in two lists: every highlight (`highlightSlugs`) and the archive
+- Client work in two lists: every highlight (`highlightSlugs`, through
+  `clientSummary()`, so each line carries its client and period) and the archive
   (`archiveProjects()`, newest first, with period and role)
 - Full tech stack listing
 - Workload-fit guidance and public-safe evidence for delivery, observability,
@@ -92,6 +95,18 @@ Four entities in a `@graph` array:
 - `author` points at the site-wide Person node's `@id`
   (`https://antonshubin.com/#person`), same one the BlogPosting JSON-LD in
   `routes/blog/[slug].tsx` uses for `author`/`publisher`
+- `creator` points at the same Person node; `isPartOf` at the WebSite node
+  (`https://antonshubin.com/#website`); `abstract` is the lead line under the
+  page's `<h1>` (`projectLead()`: the outcome, or the description's first
+  sentence); `temporalCoverage` comes from `period` ("2021", "2018/2019",
+  "2024/.." while ongoing) next to `dateCreated`; `image` lists the hero
+  screenshot first, then the other screenshots, then the logo (#246)
+- No `Review` or `AggregateRating`: the reviews on the page are the client's
+  words on Upwork, and self-served review markup is not eligible for rich
+  results
+- The page's meta description is `clientSummary()` cut to 160 characters at a
+  word boundary (`metaDescription()` in `lib/llms.ts`); the `<title>` stays
+  `<project> — Anton Shubin`
 - `codeRepository` when `ghRepo` is set; `sameAs` when the project has a live,
   non-dead `externalURL` that isn't already `codeRepository`;
   `creativeWorkStatus: "Archived"` when `archived` is true

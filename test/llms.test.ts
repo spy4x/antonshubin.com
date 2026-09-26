@@ -3,8 +3,9 @@
 // by every request in the process, sorting it in place in either route used
 // to reorder "Read next" on every blog post page after the first fetch of
 // that route. See AGENTS.md "Rendered-page tests".
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
+import { formatPeriod, projects } from "../lib/data.ts";
 
 /** Extracts the `/blog/<slug>` hrefs inside the "Read next" section, in order. */
 function readNextSlugs(html: string): string[] {
@@ -42,10 +43,34 @@ Deno.test("both llms files say what the strongest client case study is, not only
         `${llmsPath} dropped SmartLite's venue from its client line`,
       );
       assertEquals(
-        text.includes("Built for Yumetronics."),
+        text.includes("Built for Yumetronics, 2024\u2013now."),
         true,
         `${llmsPath} dropped SmartLite's client from its client line`,
       );
+    }
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("every client project line in both llms files carries its period", async () => {
+  const site = await startSite();
+  try {
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const lines = (await site.html(llmsPath)).split("\n");
+      let checked = 0;
+      for (const p of projects.freelance) {
+        const line = lines.find((l) =>
+          l.startsWith("- ") && l.includes(`/projects/${p.slug})`)
+        );
+        if (!line) continue;
+        checked++;
+        assert(
+          line.includes(formatPeriod(p.period!)),
+          `${llmsPath}: the ${p.slug} line lacks ${formatPeriod(p.period!)}`,
+        );
+      }
+      assert(checked >= 2, `${llmsPath}: only ${checked} client lines found`);
     }
   } finally {
     await site.stop();
