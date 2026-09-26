@@ -1,12 +1,13 @@
 import { formatPeriod, type Project } from "../lib/data.ts";
 import type { Testimonial } from "../lib/testimonials.ts";
 import { NewTabHint } from "./NewTabHint.tsx";
+import { Rating } from "./Rating.tsx";
 
 /**
  * One review excerpt for the home page (#231): the excerpt, the project it
- * is about with its period, linked to that project's page, and — when the
- * entry carries one — a link to `sourceHref`. No client's personal name and
- * no star rating: neither is in the sources. The caller resolves `project`
+ * is about with its period, linked to that project's page, its star rating,
+ * and — when the entry carries one — a link to `sourceHref`. No client's
+ * personal name: the sources don't attach one to a quote. The caller resolves `project`
  * (`testimonialProject()` in `lib/testimonials.ts`), so
  * `components/TestimonialCard.test.tsx` can render a synthetic card.
  */
@@ -15,6 +16,7 @@ export function TestimonialCard(
 ) {
   return (
     <figure class="p-4 bg-paper rounded-xl border border-rule flex flex-col">
+      <Rating value={t.rating} class="mb-3" />
       <blockquote class="text-sm italic text-graphite mb-4 leading-relaxed flex-1">
         <p>"{t.excerpt}"</p>
       </blockquote>

@@ -50,6 +50,11 @@ siteTest(
         html.includes(`href="${UPWORK_URL}"`),
         `/projects/${project.slug} does not link the Upwork profile`,
       );
+      const ratings = html.match(/data-rating="5\.0"/g)?.length ?? 0;
+      assert(
+        ratings === reviews.length,
+        `/projects/${project.slug} shows ${ratings} ratings for ${reviews.length} reviews`,
+      );
       for (const t of reviews) {
         reviewsSeen++;
         assert(
@@ -71,6 +76,10 @@ siteTest(
     const section = html.slice(start, html.indexOf("</section>", start));
     const text = visibleText(section);
     assert(homeTestimonialIds.length === 3, "not three home excerpts");
+    assert(
+      (section.match(/data-rating="5\.0"/g)?.length ?? 0) === 3,
+      "the home excerpts do not each show a 5.0 rating",
+    );
     for (const id of homeTestimonialIds) {
       const t = testimonial(id);
       const project = testimonialProject(t);

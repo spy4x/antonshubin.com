@@ -8,6 +8,7 @@ const withSource: Testimonial = {
   id: "example-1",
   projectSlug: "example",
   contract: 1,
+  rating: 5,
   quote: "Great work. Would hire again.",
   excerpt: "Great work.",
   sourceHref: "https://example.com/review",
@@ -48,4 +49,13 @@ Deno.test("a card shows the excerpt, not the full quote, and names its project, 
   );
   assert(html.includes("Example App"), `no project title:\n${html}`);
   assert(html.includes("2018–2019"), `no period:\n${html}`);
+});
+
+Deno.test("a card shows the review's star rating, named for screen readers", () => {
+  const html = render(<TestimonialCard t={withSource} project={project} />);
+  assert(html.includes(`data-rating="5.0"`), `no rating:\n${html}`);
+  assert(
+    html.replace(/<[^>]+>/g, "").includes("Rated 5.0 out of 5"),
+    `rating has no accessible text:\n${html}`,
+  );
 });
