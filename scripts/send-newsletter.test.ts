@@ -99,3 +99,19 @@ Deno.test("the container send refuses an empty subscriber list, exits 1 and reco
     await Deno.remove(dir, { recursive: true });
   }
 });
+
+Deno.test("the container send exits 1 when the relay refuses the only mail, and keeps the slug logged", async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    const subscribers = JSON.stringify([
+      { email: "one@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+    ]);
+    const r = await runSend(dir, subscribers, undefined);
+    assertEquals(r.code, 1);
+    assertStringIncludes(r.stdout, "Sent: 0, Failed: 1");
+    const [entry] = JSON.parse(r.log ?? "[]");
+    assertEquals([entry?.slug, entry?.sent, entry?.failed], ["a-post", 0, 1]);
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
