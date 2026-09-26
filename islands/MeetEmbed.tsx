@@ -136,19 +136,24 @@ export default function MeetEmbed({ url }: MeetEmbedProps) {
 
   // Listens for mig's `mig:height` message (README "Embedding") so the frame
   // can grow or shrink to its actual content height instead of sitting at a
-  // fixed height that either scrolls internally or leaves blank space. Only
-  // attached once the iframe exists (after the click-to-load swap) and torn
-  // down on unmount.
+  // fixed height that either scrolls internally or leaves blank space.
+  // Attached on mount, before the click-to-load swap renders the iframe, and
+  // torn down on unmount. mig posts its height on load and from its first
+  // resize callback only, so a listener attached after the iframe renders
+  // (an effect keyed on `loaded`, which Preact runs after the next paint) can
+  // miss both and leave the frame at its fallback height (issue #227). The
+  // iframe's window is read when each message arrives, so every message
+  // before the swap is rejected by the `source` check.
   useEffect(() => {
-    if (!loaded.value) return;
-    const iframeWindow = iframeRef.current?.contentWindow;
+    if (!embedOrigin) return;
     const onMessage = (event: MessageEvent) => {
+      const iframeWindow = iframeRef.current?.contentWindow;
       const next = isEmbedHeightMessage(event, embedOrigin, iframeWindow);
       if (next !== null) height.value = next;
     };
     globalThis.addEventListener("message", onMessage);
     return () => globalThis.removeEventListener("message", onMessage);
-  }, [loaded.value, embedOrigin]);
+  }, [embedOrigin]);
 
   /**
    * Fires on the iframe element's native `load` event, which fires the same

@@ -68,6 +68,19 @@ function startStubMig(): { origin: string; stop: () => void } {
           { headers: { "content-type": "text/html" } },
         );
       }
+      if (pathname === "/once/embed") {
+        // Posts a single height while the page is still parsing and never
+        // again — like mig on a step whose content never resizes after load.
+        // A listener attached late misses it, and nothing corrects the frame.
+        return new Response(
+          `<!doctype html><html><body>mig stub, one message
+            <script>
+              window.parent.postMessage({ type: "mig:height", height: 654 }, "*");
+            </script>
+          </body></html>`,
+          { headers: { "content-type": "text/html" } },
+        );
+      }
       if (pathname === "/spoof.html") {
         return new Response(
           `<!doctype html><html><body>spoofed source
@@ -133,6 +146,65 @@ Deno.test("the booking iframe resizes to the height mig's stub reports", async (
           ) as HTMLIFrameElement | null;
           return el?.style.height === "950px";
         },
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    stub.stop();
+  }
+});
+
+// Issue https://github.com/spy4x/antonshubin.com/issues/227: mig posts its
+// height on load and from its first resize callback, and on a step that never
+// resizes afterwards that is all it ever sends. MeetEmbed used to attach its
+// listener in a `useEffect` that Preact runs after the next paint, so a frame
+// that loaded first had its only message dropped and stayed at the 760px
+// fallback. The stub here posts exactly one message, as early as it can.
+// `requestAnimationFrame` is held back on this page so a paint-deferred effect
+// runs on Preact's 100ms fallback timer instead, well after a frame served from
+// 127.0.0.1 has loaded: that makes a late listener lose the race every time,
+// not only in a slow engine.
+Deno.test("the booking iframe takes the height from mig's first and only message", async () => {
+  const stub = startStubMig();
+  const site = await startSite({
+    env: { SCHEDULE_URL: `${stub.origin}/once` },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await browser.newPage();
+    try {
+      await page.goto(`${site.origin}/contact-me`, {
+        waitUntil: "networkidle",
+      });
+      await page.evaluate(() => {
+        globalThis.requestAnimationFrame = () => 0;
+      });
+      await page.getByRole("button", { name: "Book a free 30-min intro call" })
+        .click();
+
+      const frame = page.locator(
+        'iframe[title="Schedule a call with Anton Shubin"]',
+      );
+      await frame.waitFor({ state: "visible" });
+      // The stub's single message is posted during its parse, so it is on its
+      // way by the frame's `load`; one more second lets it land before we look.
+      await page.frameLocator(
+        'iframe[title="Schedule a call with Anton Shubin"]',
+      )
+        .locator("body").waitFor();
+      await page.waitForTimeout(1000);
+
+      const height = await frame.evaluate((el) =>
+        parseInt(getComputedStyle(el).height, 10)
+      );
+      assertEquals(
+        height,
+        654,
+        "the frame missed mig's first height message and kept its fallback height",
       );
     } finally {
       await page.close();
