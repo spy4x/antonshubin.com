@@ -58,6 +58,33 @@ Deno.test("answers 'Already subscribed' for a stored address, and neither saves 
   assertEquals([saved.length, relay.mails.length], [0, 0]);
 });
 
+Deno.test("answers 400 to an email field that is not a bare address, and neither saves nor mails", async () => {
+  const refused = [
+    "a<victim@example.com>",
+    `"Verify at https://evil.example"<victim@example.com>`,
+    "Jane <jane@example.com>",
+    undefined,
+  ];
+  for (const field of refused) {
+    const { relay, saved, deps } = setup(linkFor);
+    const outcome = await addSubscriber(field, deps);
+    await outcome.mails;
+    assertEquals([outcome.status, outcome.body], [400, {
+      error: "Valid email is required",
+    }], String(field));
+    assertEquals([saved.length, relay.mails.length], [0, 0], String(field));
+  }
+});
+
+Deno.test("stores a bare address trimmed and lowercased", async () => {
+  const { saved, deps } = setup(linkFor);
+  await (await addSubscriber("  New@Example.COM ", deps)).mails;
+  assertEquals(saved[0].map((s) => s.email), [
+    "old@example.com",
+    "new@example.com",
+  ]);
+});
+
 Deno.test("answers 500 and saves nothing when the unsubscribe link cannot be built", async () => {
   const { relay, saved, log, deps } = setup(() =>
     Promise.reject(new Error("UNSUBSCRIBE_SECRET is not set"))

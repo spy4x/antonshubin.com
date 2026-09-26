@@ -1,7 +1,8 @@
-// What `/api/subscribe` does with a validated address: store it once, then
-// welcome the subscriber and notify the owner. Kept out of the route so a test
+// What `/api/subscribe` does with the posted email field: check it is a bare
+// address, store it once, then welcome the subscriber and notify the owner. Kept out of the route so a test
 // can run it against fake storage and a fake mail relay.
 import type { Subscriber } from "./subscribers.ts";
+import { bareAddress } from "./email-field.ts";
 import {
   sendSubscribeMails,
   type SubscribeMailDeps,
@@ -28,19 +29,34 @@ export interface AddSubscriberOutcome {
 }
 
 /**
- * Stores `email` (already validated and normalized) unless it is already on
- * the list. The unsubscribe link is built before anything is saved: a missing
- * or unusable UNSUBSCRIBE_SECRET fails the whole request instead of saving an
+ * Stores the address in `field` (the request's raw email field) unless it is
+ * already on the list.
+ *
+ * Only a bare address is accepted (#255): anything else answers 400 before the
+ * list is read, so nothing is stored and nothing is mailed. The address is
+ * stored lowercased.
+ *
+ * The unsubscribe link is built before anything is saved: a missing or
+ * unusable UNSUBSCRIBE_SECRET fails the whole request instead of saving an
  * address whose unsubscribe link would never work.
  */
 export async function addSubscriber(
-  email: string,
+  field: unknown,
   deps: AddSubscriberDeps,
 ): Promise<AddSubscriberOutcome> {
   const log = deps.log ?? console;
   const none = Promise.resolve();
-  const subs = deps.load();
 
+  const email = bareAddress(field)?.toLowerCase();
+  if (!email) {
+    return {
+      status: 400,
+      body: { error: "Valid email is required" },
+      mails: none,
+    };
+  }
+
+  const subs = deps.load();
   if (subs.some((s) => s.email === email)) {
     return {
       status: 200,

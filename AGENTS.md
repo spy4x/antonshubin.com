@@ -543,6 +543,11 @@ address; opening a link never removes anyone — only a `POST` to `/unsubscribe`
 with a verified token does. See docs/newsletter.md for the full data format and
 endpoint list.
 
+The email field of `/api/subscribe` and `/api/lead` goes through
+`lib/email-field.ts`'s `bareAddress()` (`@spy4x/email`'s `isAddress()`, #255):
+only a bare address passes, so a display name, `<`, `>` or `"` answers 400, and
+only the bare address is stored or mailed.
+
 ## Outgoing mail
 
 Every mail the site sends goes through `@spy4x/email` (`jsr:@spy4x/email`,
