@@ -1,46 +1,59 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 
+/**
+ * The post body's two interactive parts, wired to markup `lib/markdown.ts`
+ * renders on the server (#274):
+ *
+ * - Each post image is already a `<button data-lightbox>` in the HTML, so a
+ *   keyboard reaches it without JS; this opens it in a full-screen
+ *   `<dialog>` (UX 8). The close button clears the notch and home bar
+ *   (`env(safe-area-inset-*)`, the site sets `viewport-fit=cover`), and a
+ *   tap anywhere but the image closes it.
+ * - Each code block's Copy button (`[data-copy-code]`) is `hidden` in the
+ *   HTML, since it does nothing without JS; this shows it and copies the
+ *   block's text. `islands/CopyButton.tsx` can't be used here: an island
+ *   can't hydrate inside the post's `dangerouslySetInnerHTML` markup.
+ */
 export default function BlogImageEnhancer() {
   const activeImage = useSignal<{ src: string; alt: string } | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  // The blog-content <img> that opened the lightbox, so closing it returns
-  // keyboard focus there instead of dropping it to <body>.
-  const triggerRef = useRef<HTMLImageElement | null>(null);
+  // The button that opened the lightbox, so closing it returns keyboard
+  // focus there instead of dropping it to <body>.
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    // Find all images in blog-content and make them clickable
     const blogContent = document.querySelector(".blog-content");
     if (!blogContent) return;
 
-    const images = blogContent.querySelectorAll("img");
-    images.forEach((img) => {
-      img.style.cursor = "zoom-in";
-      // These images are plain markdown <img> tags with a click handler
-      // bolted on below — without tabindex/role/a keydown handler a
-      // keyboard or screen-reader user could never open the lightbox.
-      img.tabIndex = 0;
-      img.setAttribute("role", "button");
-      img.setAttribute(
-        "aria-label",
-        `View larger image: ${img.alt || "blog image"}`,
-      );
-      const open = () => {
-        triggerRef.current = img;
-        activeImage.value = {
-          src: img.src,
-          alt: img.alt || "Blog image",
-        };
-        dialogRef.current?.showModal();
-      };
-      img.addEventListener("click", open);
-      img.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          open();
-        }
+    blogContent.querySelectorAll<HTMLButtonElement>("[data-lightbox]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const img = button.querySelector("img");
+          if (!img) return;
+          triggerRef.current = button;
+          activeImage.value = { src: img.src, alt: img.alt || "Blog image" };
+          dialogRef.current?.showModal();
+        });
       });
-    });
+
+    blogContent.querySelectorAll<HTMLButtonElement>("[data-copy-code]")
+      .forEach((button) => {
+        button.hidden = false;
+        button.addEventListener("click", async () => {
+          const code = button.closest(".code-block")?.querySelector("pre");
+          const text = code?.textContent ?? "";
+          try {
+            await navigator.clipboard.writeText(text.replace(/\n$/, ""));
+            button.textContent = "Copied!";
+          } catch {
+            button.textContent = "Copy failed";
+          }
+          setTimeout(() => {
+            button.textContent = "Copy";
+          }, 3000);
+        });
+      });
   }, []);
 
   const closeLightbox = () => {
@@ -53,6 +66,7 @@ export default function BlogImageEnhancer() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeImage.value === null) return;
       if (e.key === "Escape") {
+        e.preventDefault();
         closeLightbox();
       }
     };
@@ -65,18 +79,23 @@ export default function BlogImageEnhancer() {
     <dialog
       ref={dialogRef}
       aria-label={activeImage.value?.alt}
-      class="fixed inset-0 w-full h-full max-w-none max-h-none m-0 p-0 bg-black/95 backdrop:bg-black/80"
+      class="lightbox fixed inset-0 w-full h-full max-w-none max-h-none m-0 p-0 bg-ink"
       onClick={(e) => {
-        if (e.target === dialogRef.current) closeLightbox();
+        // Anything but the image itself (or the close button, which closes
+        // on its own) closes the lightbox: the backdrop, the frame around
+        // the image and the caption alike.
+        if ((e.target as HTMLElement).tagName !== "IMG") closeLightbox();
       }}
     >
       {activeImage.value && (
-        <div class="relative w-full h-full flex items-center justify-center">
-          {/* Close button */}
+        <figure class="lightbox-frame">
           <button
             type="button"
-            onClick={closeLightbox}
-            class="absolute top-4 right-4 z-10 p-2 text-parchment/70 hover:text-parchment bg-black/50 rounded-full transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              closeLightbox();
+            }}
+            class="lightbox-close z-10 p-2 text-parchment bg-desk border border-rule-strong rounded-full hover:bg-lamp transition-colors"
             aria-label="Close"
           >
             <svg
@@ -95,14 +114,15 @@ export default function BlogImageEnhancer() {
               />
             </svg>
           </button>
-
-          {/* Image */}
           <img
             src={activeImage.value.src}
             alt={activeImage.value.alt}
-            class="max-w-[90vw] max-h-[90vh] object-contain"
+            class="lightbox-image object-contain"
           />
-        </div>
+          <figcaption class="mt-3 text-center text-sm text-graphite">
+            {activeImage.value.alt}
+          </figcaption>
+        </figure>
       )}
     </dialog>
   );

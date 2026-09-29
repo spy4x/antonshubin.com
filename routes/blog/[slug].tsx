@@ -1,17 +1,35 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { type BlogArticle, blogArticles, prettyDate } from "../../lib/data.ts";
+import { type BlogArticle, blogArticles } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
-import { renderBlogMarkdown } from "../../lib/markdown.ts";
+import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
-import NewsletterForm from "../../islands/NewsletterForm.tsx";
-import { getBreadcrumb, head } from "../../lib/head.ts";
+import PostToc from "../../islands/PostToc.tsx";
+import { NewsletterBlock } from "../../components/NewsletterBlock.tsx";
+import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
+import Button from "../../components/Button.tsx";
+import { ArrowRightIcon } from "../../components/Icons.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
-import { toolsForPost } from "../../lib/tools.ts";
+import {
+  archiveNoteText,
+  AUTHOR_LINE,
+  postDate,
+  postHref,
+  postTitleTag,
+  readNext,
+  relatedService,
+  relatedToolLink,
+  serviceHref,
+  serviceLabel,
+  TOC_MIN_MINUTES,
+  topic,
+} from "../../lib/blog.ts";
+
+const SITE = "https://antonshubin.com";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -19,8 +37,7 @@ function getArticleBySlug(slug: string): BlogArticle | undefined {
 
 async function getArticleContent(slug: string): Promise<string | null> {
   try {
-    const content = await Deno.readTextFile(`content/blog/${slug}.md`);
-    return content;
+    return await Deno.readTextFile(`content/blog/${slug}.md`);
   } catch {
     return null;
   }
@@ -29,9 +46,8 @@ async function getArticleContent(slug: string): Promise<string | null> {
 interface PageData {
   article: BlogArticle | null;
   content: string | null;
-  prev: BlogArticle | null;
-  next: BlogArticle | null;
-  related?: BlogArticle[];
+  headings: PostHeading[];
+  related: BlogArticle[];
 }
 
 // Unknown slugs keep the friendly "Not Found" view below, but must answer with
@@ -46,8 +62,7 @@ export const handler = define.handlers({
       return page<PageData>({
         article: null,
         content: null,
-        prev: null,
-        next: null,
+        headings: [],
         related: [],
       }, {
         status: 404,
@@ -55,62 +70,181 @@ export const handler = define.handlers({
       });
     }
 
-    const sorted = [...blogArticles].sort((a, b) => b.index - a.index);
-    const idx = sorted.findIndex((a) => a.slug === slug);
-    const prev = idx < sorted.length - 1 ? sorted[idx + 1] : null;
-    const next = idx > 0 ? sorted[idx - 1] : null;
-
     const markdown = await getArticleContent(slug);
     // Strip YAML front matter (between first pair of --- delimiters)
     const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null;
-    const content = body ? await renderBlogMarkdown(body) : null;
+    const rendered = body ? await renderBlogPost(body) : null;
 
-    // Related posts: same category, exclude self, max 3
-    const related = article
-      ? blogArticles
-        .filter((a) =>
-          a.category && a.category === article.category && a.slug !== slug
-        )
-        .slice(0, 3)
-      : [];
-
-    return page<PageData>({ article, content, prev, next, related });
+    return page<PageData>({
+      article,
+      content: rendered?.html ?? null,
+      headings: rendered?.headings ?? [],
+      related: readNext(article),
+    });
   },
 });
 
-export default define.page(function BlogArticle(ctx) {
-  const { article, content, prev, next, related = [] } = ctx.data as PageData;
+/** "15 June 2026" in a `<time>` element. */
+function PostTime({ iso }: { iso: string }) {
+  return <time datetime={iso}>{postDate(iso)}</time>;
+}
+
+/**
+ * The secondary link of the author box and the side card: the post's service
+ * ("The same work for you: …"), else its tool ("The code: …"), else the
+ * catalog (#274, Mkt 1 and 3).
+ */
+function SecondaryLink(
+  { article, place, class: extra }: {
+    article: BlogArticle;
+    place: "side" | "end";
+    class: string;
+  },
+) {
+  const service = relatedService(article);
+  if (service) {
+    return (
+      <Button
+        href={serviceHref(service)}
+        data-umami-event={`blog-cta-${article.slug}-service-${place}`}
+        class={extra}
+      >
+        <span class="price">{serviceLabel(service)}</span>
+      </Button>
+    );
+  }
+  const tool = relatedToolLink(article);
+  if (tool) {
+    return (
+      <Button
+        href={tool.href}
+        data-umami-event={`blog-cta-${article.slug}-tool-${place}`}
+        class={extra}
+      >
+        The code: {tool.name}
+      </Button>
+    );
+  }
+  return (
+    <Button
+      href="/catalog"
+      data-umami-event={`blog-cta-${article.slug}-services-${place}`}
+      class={extra}
+    >
+      Services
+    </Button>
+  );
+}
+
+/**
+ * The author box at the end of every post (#191, #274: Mkt 1, Psych 6,
+ * UX 9): who wrote it, the #249 positioning line, Book and one secondary
+ * link. A stub on Desk until #270's `components/ClosingBand.tsx` lands.
+ */
+function AuthorBox({ article }: { article: BlogArticle }) {
+  const tool = relatedToolLink(article);
+  const service = relatedService(article);
+  return (
+    <section
+      data-author-box
+      aria-labelledby="author-box-heading"
+      class="mt-16 bg-desk border border-rule rounded-xl p-6 sm:p-8"
+    >
+      <div class="flex items-center gap-4">
+        <img
+          src="/img/photo-64.webp"
+          aria-hidden="true"
+          alt=""
+          width="56"
+          height="56"
+          loading="lazy"
+          class="h-14 w-14 rounded-full border border-rule-strong"
+        />
+        <div>
+          <p class="font-semibold text-parchment">Anton Shubin</p>
+          <p class="text-sm text-graphite">{ROLE}</p>
+        </div>
+      </div>
+      <p class="mt-4 text-graphite">{AUTHOR_LINE}</p>
+      <h2 id="author-box-heading" class="mt-6 text-2xl text-parchment">
+        Need this for your product?
+      </h2>
+      <div class="mt-4 flex flex-wrap items-center gap-4">
+        <BookCallLink
+          url={SCHEDULE_URL}
+          target="_blank"
+          data-umami-event={`blog-cta-${article.slug}-book-end`}
+          class="justify-center px-6 py-3"
+        >
+          Book a free intro call
+        </BookCallLink>
+        <SecondaryLink article={article} place="end" class="px-5 py-3" />
+      </div>
+      <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        {service && tool && (
+          <a
+            href={tool.href}
+            data-umami-event={`blog-cta-${article.slug}-tool-end`}
+            class="text-parchment underline underline-offset-4 hover:text-graphite"
+          >
+            The code: {tool.name}
+          </a>
+        )}
+        <a
+          href="/how-i-work"
+          class="inline-flex items-center gap-1 text-parchment underline underline-offset-4 hover:text-graphite"
+        >
+          How I work
+          <ArrowRightIcon class="w-3.5 h-3.5" />
+        </a>
+      </div>
+    </section>
+  );
+}
+
+export default define.page(function BlogPost(ctx) {
+  const { article, content, headings, related } = ctx.data as PageData;
 
   if (!article) {
     return (
       <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-bold text-parchment mb-4">Not Found</h1>
+        <div class="max-w-3xl mx-auto py-8 sm:py-12 text-center">
+          <h1 class="text-3xl text-parchment mb-4">Not Found</h1>
           <p class="text-graphite mb-6">
             The article you're looking for does not exist.
           </p>
           <a
             href="/blog"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
+            class="text-parchment underline underline-offset-4 hover:text-graphite"
           >
-            ← Back to blog
+            ← All writing
           </a>
         </div>
       </Layout>
     );
   }
 
+  const canonical = `${SITE}${postHref(article.slug)}`;
+  const tool = relatedToolLink(article);
+  const postTopic = topic(article.topic);
+  const tocItems = article.readTime >= TOC_MIN_MINUTES
+    ? headings.filter((h) => h.depth === 2).map(({ id, text }) => ({
+      id,
+      text,
+    }))
+    : [];
+  const hasToc = tocItems.length > 0;
+
   head.value = {
     ...head.value,
-    title: `${article.title} — Anton Shubin`,
+    title: postTitleTag(article),
     pageName: article.title,
     description: article.description,
-    canonical: `https://antonshubin.com/blog/${article.slug}`,
+    canonical,
     ogType: "article",
-    // 1200x630 PNG (#193), generated by `deno task og` — the SVG/WebP cover
-    // above stays as the JSON-LD "image" and the in-page preview; LinkedIn,
-    // X, Facebook and Slack don't render SVG link previews.
-    ogImage: `https://antonshubin.com/img/og/blog/${article.slug}.png`,
+    // 1200x630 PNG (#193), generated by `deno task og`: the link preview and
+    // the JSON-LD image. LinkedIn, X, Facebook and Slack don't render SVG.
+    ogImage: `${SITE}/img/og/blog/${article.slug}.png`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
   };
@@ -124,353 +258,248 @@ export default define.page(function BlogArticle(ctx) {
           __html: toJsonLd({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "@id": `https://antonshubin.com/blog/${article.slug}#article`,
+            "@id": `${canonical}#article`,
             "headline": article.title,
             "description": article.description,
-            "image":
-              `https://antonshubin.com/img/blog/${article.slug}/${article.previewImageURL}`,
+            "image": {
+              "@type": "ImageObject",
+              "url": `${SITE}/img/og/blog/${article.slug}.png`,
+              "width": 1200,
+              "height": 630,
+            },
             "datePublished": article.publishedAt,
             "dateModified": article.updatedAt ?? article.publishedAt,
             "timeRequired": `PT${article.readTime}M`,
+            "articleSection": postTopic.title,
             "inLanguage": "en-US",
+            "isPartOf": { "@id": `${SITE}/blog#blog` },
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `https://antonshubin.com/blog/${article.slug}`,
+              "@id": canonical,
             },
             "author": {
               "@type": "Person",
-              "@id": "https://antonshubin.com/#person",
+              "@id": `${SITE}/#person`,
               "name": "Anton Shubin",
-              "url": "https://antonshubin.com",
+              "url": SITE,
             },
-            "publisher": { "@id": "https://antonshubin.com/#person" },
+            "publisher": { "@id": `${SITE}/#person` },
           }),
         }}
       />
-      <article class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <Breadcrumb
-          items={getBreadcrumb(head.value.canonical, article.title)}
-        />
-
-        <div class="bg-paper rounded-xl border border-rule overflow-hidden">
-          {/* Preview image */}
-          <div class="aspect-video overflow-hidden bg-lamp">
-            <img
-              src={`/img/blog/${article.slug}/${article.previewImageURL}`}
-              alt={article.title}
-              class="w-full h-full object-cover"
-              fetchpriority="high"
-            />
-          </div>
-
-          <div class="p-4">
-            {/* Tag */}
-            {article.category && (() => {
-              const colors: Record<string, string> = {
-                "startups": "bg-lamp text-accent",
-                "dev-tips": "bg-mist/15 text-mist",
-                "personal": "bg-rule-strong/15 text-graphite",
-              };
-              const labels: Record<string, string> = {
-                "startups": "Startups",
-                "dev-tips": "Dev Tips",
-                "personal": "Personal",
-              };
-              return (
-                <span
-                  class={`inline-block px-2.5 py-0.5 rounded text-xs font-medium mb-4 ${
-                    colors[article.category] || ""
-                  }`}
-                >
-                  {labels[article.category] || article.category}
-                </span>
-              );
-            })()}
-
-            {/* Article meta */}
-            {/* Article meta */}
-            <div class="flex flex-wrap items-center gap-3 text-sm text-graphite mb-4">
-              <span>{prettyDate(article.publishedAt)}</span>
-              <span>·</span>
-              <span class="inline-flex items-center gap-1">
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  class="w-4 h-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                {article.readTime} min read
-              </span>
-            </div>
-
-            <h1 class="text-2xl sm:text-3xl font-bold text-parchment mb-4">
-              {article.title}
-            </h1>
-            <p class="text-graphite text-base sm:text-lg leading-relaxed mb-8">
-              {article.description}
-            </p>
-            {toolsForPost(article.slug).map((t) => (
-              <p
-                key={t.slug}
-                data-post-tool={t.slug}
-                class="text-graphite mb-8 -mt-4"
+      <div
+        class={`post-layout py-4 sm:py-8 ${hasToc ? "post-layout--aside" : ""}`}
+      >
+        <article class="post-column">
+          <Breadcrumb
+            items={getBreadcrumb(head.value.canonical, article.title)}
+          />
+          <header>
+            <p class="text-sm text-graphite">
+              <a
+                href={`/blog#${postTopic.id}`}
+                class="hover:text-parchment underline-offset-4 hover:underline"
               >
-                The tool behind this post:{" "}
-                <a
-                  href={`/tools/${t.slug}`}
-                  data-umami-event={`post-tool-${t.slug}`}
-                  class="text-accent underline underline-offset-4"
-                >
-                  {t.name}
-                </a>
+                {postTopic.title}
+              </a>
+            </p>
+            <h1 class="post-title mt-2 text-parchment">{article.title}</h1>
+            <p class="mt-4 text-graphite post-lead">{article.description}</p>
+            <p
+              data-byline
+              class="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-graphite"
+            >
+              <img
+                src="/img/photo-64.webp"
+                aria-hidden="true"
+                alt=""
+                width="24"
+                height="24"
+                class="h-6 w-6 rounded-full border border-rule-strong"
+              />
+              <a
+                href="/"
+                class="text-parchment font-semibold hover:underline underline-offset-4"
+              >
+                Anton Shubin
+              </a>
+              <span aria-hidden="true">·</span>
+              <PostTime iso={article.publishedAt} />
+              {article.updatedAt && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>
+                    Updated <PostTime iso={article.updatedAt} />
+                  </span>
+                </>
+              )}
+              <span aria-hidden="true">·</span>
+              <span>{article.readTime} min read</span>
+            </p>
+            {article.archived && (
+              <p
+                data-archive-note
+                class="mt-4 margin-note text-graphite border-l-2 border-rule-strong pl-3"
+              >
+                {archiveNoteText(article)}
               </p>
-            ))}
+            )}
+            {tool && (
+              <p data-code-link class="mt-3 text-sm text-graphite">
+                The tool:{" "}
+                <a
+                  href={tool.href}
+                  data-umami-event={`post-tool-${tool.href.split("/").pop()}`}
+                  class="text-parchment underline underline-offset-4 hover:text-graphite"
+                >
+                  {tool.name}
+                </a>
+                {tool.repoUrl && (
+                  <>
+                    <span aria-hidden="true">{" · "}</span>
+                    Code:{" "}
+                    <a
+                      href={tool.repoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-parchment underline underline-offset-4 hover:text-graphite"
+                    >
+                      {tool.repoUrl.replace(/^https:\/\//, "")}
+                      <span class="sr-only">&nbsp;(opens in a new tab)</span>
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
+          </header>
 
-            {/* YouTube Video */}
-            {article.youtubeVideoId && (
-              <div class="mb-8">
-                <div class="aspect-video rounded-lg overflow-hidden">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${article.youtubeVideoId}`}
-                    title={`Video: ${article.title}`}
-                    class="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+          {hasToc && (
+            <details data-toc class="post-toc-details mt-6">
+              <summary>Contents</summary>
+              <nav aria-label="Contents">
+                <ol class="post-toc">
+                  {tocItems.map((item) => (
+                    <li key={item.id}>
+                      <a href={`#${item.id}`}>{item.text}</a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            </details>
+          )}
+
+          {article.youtubeVideoId && (
+            <div class="mt-8 aspect-video rounded-lg overflow-hidden">
+              <iframe
+                src={`https://www.youtube.com/embed/${article.youtubeVideoId}`}
+                title={`Video: ${article.title}`}
+                class="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          {content
+            ? (
+              <>
+                <div
+                  class="blog-content mt-10 text-parchment"
+                  dangerouslySetInnerHTML={{ __html: content }}
+                />
+                <BlogImageEnhancer />
+              </>
+            )
+            : (
+              <p class="mt-10 text-graphite">
+                Content not available. Please check back later.
+              </p>
+            )}
+
+          <AuthorBox article={article} />
+          <NewsletterBlock event={`blog-newsletter-${article.slug}`} />
+
+          {related.length > 0 && (
+            <section
+              data-read-next
+              aria-labelledby="read-next-heading"
+              class="mt-12"
+            >
+              <h2 id="read-next-heading" class="text-xl text-parchment">
+                Read next
+              </h2>
+              <ul class="mt-4 border-t border-rule">
+                {related.map((r) => (
+                  <li
+                    key={r.slug}
+                    class="relative py-4 border-b border-rule"
+                  >
+                    <p class="text-sm text-graphite">
+                      <PostTime iso={r.publishedAt} /> · {r.readTime} min read
+                    </p>
+                    <p class="mt-1 font-heading text-lg text-parchment">
+                      <a
+                        href={postHref(r.slug)}
+                        class="post-row-link hover:underline underline-offset-4"
+                      >
+                        {r.title}
+                      </a>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </article>
+
+        {hasToc && (
+          <aside class="post-aside" aria-label="About this post">
+            <div class="post-aside-inner">
+              <nav aria-label="On this page">
+                <p class="text-sm font-semibold text-parchment">
+                  On this page
+                </p>
+                <PostToc items={tocItems} />
+              </nav>
+              <div class="mt-8 border-t border-rule pt-6">
+                <div class="flex items-center gap-3">
+                  <img
+                    src="/img/photo-64.webp"
+                    aria-hidden="true"
+                    alt=""
+                    width="40"
+                    height="40"
                     loading="lazy"
+                    class="h-10 w-10 rounded-full border border-rule-strong"
+                  />
+                  <div>
+                    <p class="text-sm font-semibold text-parchment">
+                      Anton Shubin
+                    </p>
+                    <p class="text-xs text-graphite">{ROLE}</p>
+                  </div>
+                </div>
+                <div class="mt-4 flex flex-col gap-3">
+                  <BookCallLink
+                    url={SCHEDULE_URL}
+                    target="_blank"
+                    data-umami-event={`blog-cta-${article.slug}-book-side`}
+                    class="justify-center px-4 py-2 text-sm"
+                  >
+                    Book a free intro call
+                  </BookCallLink>
+                  <SecondaryLink
+                    article={article}
+                    place="side"
+                    class="justify-center px-4 py-2 text-sm text-center"
                   />
                 </div>
               </div>
-            )}
-
-            {/* Divider */}
-            <div class="h-px bg-lamp mb-8" />
-
-            {/* Article content */}
-            {content
-              ? (
-                <>
-                  <div
-                    class="blog-content text-parchment leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                  />
-                  <BlogImageEnhancer />
-                </>
-              )
-              : (
-                <p class="text-graphite">
-                  Content not available. Please check back later.
-                </p>
-              )}
-          </div>
-
-          {/* Related posts — same category interlinking */}
-          {related && related.length > 0 && (
-            <div class="px-4 pt-6 pb-4 bg-paper border-t border-rule">
-              <h3 class="text-base font-semibold text-graphite mb-4">
-                Read next
-              </h3>
-              <div class="grid gap-3 sm:grid-cols-2">
-                {related.map((r) => (
-                  <a
-                    href={`/blog/${r.slug}`}
-                    class="block p-4 bg-ink/50 rounded-lg hover:bg-ink transition-colors group"
-                  >
-                    <p class="text-parchment text-sm font-medium group-hover:text-accent transition-colors leading-snug mb-1">
-                      {r.title}
-                    </p>
-                    <p class="text-graphite text-xs line-clamp-2">
-                      {r.description}
-                    </p>
-                    <p class="text-graphite text-xs mt-1.5">
-                      {r.readTime} min read
-                    </p>
-                  </a>
-                ))}
-              </div>
             </div>
-          )}
-
-          {/* Previous / Next article navigation */}
-          {(prev || next) && (
-            <div
-              data-post-nav
-              class="grid grid-cols-1 gap-4 sm:grid-cols-2 p-4 bg-paper border-t border-rule"
-            >
-              {prev
-                ? (
-                  <a
-                    href={`/blog/${prev.slug}`}
-                    class="flex items-center gap-4 p-4 bg-ink/50 rounded-lg hover:bg-ink transition-colors group"
-                  >
-                    <div class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-lamp">
-                      <img
-                        src={`/img/blog/${prev.slug}/${prev.previewImageURL}`}
-                        alt={prev.title}
-                        class="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-graphite text-sm mb-1">← Previous</p>
-                      <p class="text-parchment text-base font-medium group-hover:text-accent transition-colors">
-                        {prev.title}
-                      </p>
-                    </div>
-                  </a>
-                )
-                : <div />}
-              {next
-                ? (
-                  <a
-                    href={`/blog/${next.slug}`}
-                    class="flex items-center gap-4 p-4 bg-ink/50 rounded-lg hover:bg-ink transition-colors group sm:text-right sm:flex-row-reverse"
-                  >
-                    <div class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-lamp">
-                      <img
-                        src={`/img/blog/${next.slug}/${next.previewImageURL}`}
-                        alt={next.title}
-                        class="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-graphite text-xs mb-1">Next →</p>
-                      <p class="text-parchment text-sm font-medium truncate group-hover:text-accent transition-colors">
-                        {next.title}
-                      </p>
-                    </div>
-                  </a>
-                )
-                : <div />}
-            </div>
-          )}
-
-          {/* Share buttons */}
-          <div class="px-8 py-4 bg-paper border-t border-rule">
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="text-graphite text-sm font-medium">Share:</span>
-              <a
-                href={`https://twitter.com/intent/tweet?text=${
-                  encodeURIComponent(`"${article.title}" by @antonshubin`)
-                }&url=${
-                  encodeURIComponent(
-                    `https://antonshubin.com/blog/${article.slug}?utm_source=twitter&utm_medium=social&utm_campaign=blog-share`,
-                  )
-                }`}
-                target="_blank"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-rule-strong hover:bg-lamp text-graphite text-sm rounded-lg transition-colors"
-                aria-label="Share on Twitter (opens in a new tab)"
-              >
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  class="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-                Twitter
-              </a>
-              <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${
-                  encodeURIComponent(
-                    `https://antonshubin.com/blog/${article.slug}?utm_source=linkedin&utm_medium=social&utm_campaign=blog-share`,
-                  )
-                }`}
-                target="_blank"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-rule-strong hover:bg-lamp text-graphite text-sm rounded-lg transition-colors"
-                aria-label="Share on LinkedIn (opens in a new tab)"
-              >
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  class="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                </svg>
-                LinkedIn
-              </a>
-              <a
-                href={`mailto:?subject=${
-                  encodeURIComponent(article.title)
-                }&body=${
-                  encodeURIComponent(
-                    `I thought you'd find this interesting:\n\n${article.title}\n\nhttps://antonshubin.com/blog/${article.slug}?utm_source=email&utm_medium=social&utm_campaign=blog-share`,
-                  )
-                }`}
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-rule-strong hover:bg-lamp text-graphite text-sm rounded-lg transition-colors"
-                aria-label="Share via email"
-              >
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  class="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Email
-              </a>
-            </div>
-          </div>
-
-          {/* Newsletter signup */}
-          <div class="px-8 py-5 bg-paper border-t border-rule">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <span class="text-graphite text-sm font-medium shrink-0">
-                Get new posts via email:
-              </span>
-              <NewsletterForm />
-            </div>
-            <p class="text-graphite text-xs mt-2">
-              No spam. Unsubscribe anytime.
-            </p>
-          </div>
-
-          {/* Footer CTA */}
-          <div class="px-8 py-6 bg-ink/50 border-t border-rule">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-              <a
-                href="/blog"
-                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
-              >
-                ← All articles
-              </a>
-              <div class="flex flex-wrap items-stretch gap-4">
-                <BookCallLink
-                  url={SCHEDULE_URL}
-                  target="_blank"
-                  class="justify-center gap-1 px-5 py-2.5 text-sm"
-                >
-                  Book a free intro call
-                </BookCallLink>
-                <a
-                  href="/catalog"
-                  class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-transparent border border-rule-strong hover:bg-lamp text-parchment text-sm font-semibold rounded-lg transition-colors"
-                >
-                  View services
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
+          </aside>
+        )}
+      </div>
     </Layout>
   );
 });
