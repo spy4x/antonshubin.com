@@ -91,9 +91,9 @@ token and an address that's already been removed both answer "link not
 recognised" — the same response either way, on purpose. Requires
 `UNSUBSCRIBE_SECRET` (see `.env.example`).
 
-Tokens use the ts-libs signed payload codec (#233). Links mailed before that
-carry the older bare-signature token, which still works until #237 removes it
-two newsletters after the change shipped.
+Tokens use the ts-libs signed payload codec (#233). The older bare-signature
+token is no longer accepted (#237); a link carrying one answers "link not
+recognised".
 
 ## Backup
 

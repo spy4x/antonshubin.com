@@ -6,7 +6,6 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, visibleText } from "./html.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
-import { oldCodeToken } from "./old-unsubscribe-token.ts";
 import type { Subscriber } from "../lib/subscribers.ts";
 
 const TEST_SECRET = "t".repeat(32);
@@ -220,27 +219,45 @@ Deno.test("a POST with the token in a body that has no Content-Type answers 400 
   });
 });
 
-Deno.test("a link sent before #233, in the old token format, still unsubscribes", async () => {
+Deno.test("a bare-signature token from the pre-#233 format is refused, changes nothing and answers 'not recognised'", async () => {
   const subs: Subscriber[] = [
-    { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
     { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
   ];
   await withSubscribers(subs, async (site, file) => {
-    const token = await oldCodeToken("leave@example.com", TEST_SECRET);
-    const confirm = await site.html(
+    // The old format, valid under the site's own secret: base64url(HMAC-SHA256
+    // of "unsubscribe:<email>"), 43 characters, no dot.
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(TEST_SECRET),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+    const mac = new Uint8Array(
+      await crypto.subtle.sign(
+        "HMAC",
+        key,
+        new TextEncoder().encode("unsubscribe:leave@example.com"),
+      ),
+    );
+    const token = btoa(String.fromCharCode(...mac))
+      .replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+    assertEquals(token.length, 43);
+    assert(!token.includes("."));
+
+    const confirm = await site.get(
       `/unsubscribe?token=${encodeURIComponent(token)}`,
     );
-    assert(visibleText(confirm).includes("leave@example.com"));
+    assert(visibleText(await confirm.text()).includes("not recognised"));
 
     const res = await site.get("/unsubscribe", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: `token=${encodeURIComponent(token)}`,
     });
-    assertEquals(res.status, 200);
-    assert(visibleText(await res.text()).includes("You're unsubscribed"));
+    assert(visibleText(await res.text()).includes("not recognised"));
     const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
+    assertEquals(stored.map((s) => s.email), ["leave@example.com"]);
   });
 });
 
