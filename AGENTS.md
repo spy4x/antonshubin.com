@@ -436,8 +436,8 @@ its verb) and live links; the page, `llms-full.txt` and the `TechArticle`
 missing box. Add an arrow only when it is true today; never link probe-home (503
 whenever a home-lab service is down). The CI link is mig's public pipeline list
 because the root of ci. asks for a GitHub sign-in. The colophon's "this build"
-reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the live links and bump
-`LIVE_CHECKED_ON` and the note's `checkedOn` together.
+reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the live links and bump the
+`infra-live-checked` note's `checkedOn`.
 
 ### Project page
 

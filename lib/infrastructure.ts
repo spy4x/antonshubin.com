@@ -17,9 +17,6 @@ import { ciUrl, findTool, tool, toolRows } from "./tools.ts";
 
 const BASE = "https://antonshubin.com";
 
-/** The date every live link below last answered 200 (`curl`, 30 Sep 2026). */
-export const LIVE_CHECKED_ON = "2026-09-30";
-
 export type InfraGroupId = "open" | "runs" | "deployed" | "know";
 
 export interface InfraGroup {
@@ -80,7 +77,7 @@ export interface LiveLink {
 
 /**
  * The three services a visitor can open, all answering 200 on
- * `LIVE_CHECKED_ON`. The CI link is the pipeline list of mig, a public
+ * 2026-09-30 (the date in the `infra-live-checked` note). The CI link is the pipeline list of mig, a public
  * repository: the root of ci.antonshubin.com asks for a GitHub sign-in.
  */
 export const liveLinks: LiveLink[] = [
@@ -157,7 +154,7 @@ export const infraNodes: InfraNode[] = [
     id: "woodpecker",
     label: "Woodpecker",
     group: "runs",
-    job: "Pipeline-based CI/CD for Docker stacks",
+    job: "CI server and Docker agent, with GitHub sign-in",
     href: "https://woodpecker-ci.org",
     external: true,
   },
@@ -179,7 +176,7 @@ export const infraNodes: InfraNode[] = [
   },
   {
     id: "repos",
-    label: "The repositories",
+    label: "GitHub repositories",
     group: "deployed",
     job: "The code, on GitHub",
     href: "https://github.com/spy4x",
@@ -197,7 +194,7 @@ export const infraNodes: InfraNode[] = [
     id: "gatus",
     label: "Gatus",
     group: "know",
-    job: "Health checks of every service",
+    job: "Gatus checks service health",
     href: "https://github.com/TwiN/gatus",
     external: true,
   },

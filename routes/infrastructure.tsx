@@ -119,7 +119,7 @@ const workload = [
   },
 ];
 
-/** The four posts that cover a layer, each linked in the section it belongs to. */
+/** The three posts that cover a layer, each linked in the section it belongs to. */
 const posts = [
   {
     href: "/blog/rostok-self-hosted-scaffolder",
