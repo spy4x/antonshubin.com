@@ -29,6 +29,7 @@
  */
 
 import { extract as extractYaml } from "@std/front-matter/yaml";
+import { fillProof } from "@/lib/blog-posts.ts";
 import { BASE_URL } from "@/lib/config.ts";
 import { firstPublishedLine } from "./devto.ts";
 import { channelUrl } from "./utm.ts";
@@ -235,7 +236,11 @@ export function parseBlogFrontMatter(
   if (!attrs.title || !attrs.description) {
     throw new Error(`${name} front matter is missing title or description`);
   }
-  return { title: attrs.title, description: attrs.description };
+  // A title may cite an Upwork figure as `{proof:<id>}` (lib/blog-posts.ts).
+  return {
+    title: fillProof(attrs.title),
+    description: fillProof(attrs.description),
+  };
 }
 
 export interface DraftContext {

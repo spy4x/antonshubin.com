@@ -15,14 +15,12 @@ import { parsePostAnnouncement } from "./send-newsletter.ts";
 import { CHANNELS } from "./utm.ts";
 
 const ARTICLE: BlogArticle = {
-  index: 99,
   title: "A <test> post",
   slug: "a-test-post",
   description: "What the post is about",
   readTime: 3,
   publishedAt: "2026-09-26",
-  previewImageURL: "cover.svg",
-  category: "dev-tips",
+  topic: "ai-mcp",
 };
 
 const POST: Post = {

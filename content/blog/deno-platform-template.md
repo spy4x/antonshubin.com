@@ -1,9 +1,11 @@
 ---
-title: "Deno Platform Template: distilling 80+ client projects into one repo"
+title: "Deno Platform Template: distilling {proof:jobs}+ client projects into one repo"
 description: "What I learned shipping the same SaaS skeleton over and over for paying clients. Group core, personal groups, REST + CQRS, offline sync, an outbox processor — and a deliberate decision to ship it as a template, not a framework."
 publishedAt: "2026-08-26"
 readTime: 11
-previewImageURL: "cover.svg"
+topic: "founders"
+relatedTool: "template"
+catalogSlug: "zero-to-production-saas-mvp"
 ---
 
 I have shipped — by my own count — about 80 production projects on Upwork over

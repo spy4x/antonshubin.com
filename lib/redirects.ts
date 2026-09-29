@@ -90,3 +90,19 @@ export function redirectTarget(
   if (target) return target;
   return pathname.match(/^(\/(?:blog|work|tools)\/[^/]+)\/$/)?.[1];
 }
+
+/**
+ * `/blog?tab=<topic>` was the old list's filter (#274, SEO 4): the topics
+ * are sections of one page now, so any `tab` answers a 301 to `/blog`,
+ * keeping every other query parameter (launch links carry UTM tags).
+ * Returns undefined for any other URL. `routes/blog/index.tsx` calls it.
+ */
+export function blogTabRedirect(url: URL): string | undefined {
+  if (url.pathname !== "/blog" || !url.searchParams.has("tab")) {
+    return undefined;
+  }
+  const params = new URLSearchParams(url.search);
+  params.delete("tab");
+  const rest = params.toString();
+  return rest ? `/blog?${rest}` : "/blog";
+}

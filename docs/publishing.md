@@ -61,28 +61,50 @@ draft against the brief before the pull request opens.
 1. Read [voice.md](voice.md) first, and AGENTS.md "Content rule": no client,
    number, prize, testimonial or guarantee unless Anton gave it as fact in the
    session.
-2. Write `content/blog/<slug>.md` with the front matter real posts use:
+2. Write `content/blog/<slug>.md`. Its front matter is the only place the post's
+   metadata is written (#191): `lib/blog-posts.ts` reads every file in
+   `content/blog/` and `lib/data.ts` re-exports the list as `blogArticles`, so
+   there is no second entry to add by hand.
 
    ```markdown
    ---
    title: "The post's title"
-   description: "One or two sentences for search results and link previews"
+   description: "One or two sentences; the first 150 characters carry the point"
    publishedAt: "2026-09-26"
+   updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
-   previewImageURL: "cover.svg"
+   topic: "ai-mcp" # founders, ai-mcp or self-hosting
+   relatedTool: "mig" # optional; a lib/tools.ts slug
+   catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
+   seoTitle: "Short title" # optional; <title> only, for a title over 55 characters
+   youtubeVideoId: "abc123" # optional
    utmCampaign: "short-campaign" # optional; defaults to the slug (docs/utm.md)
    ---
    ```
 
-3. Add the post's entry to `blogArticles` in `lib/data.ts` by hand: the next
-   free `index`, the same `title`, `slug`, `description`, `readTime`,
-   `publishedAt` and `previewImageURL`, and a `category` (`dev-tips`, `startups`
-   or `personal`).
-4. Add `static/img/blog/<slug>/cover.svg` and any figures the post uses, then
-   run `deno task og` for the 1200×630 preview and commit the PNG.
+   A missing, mistyped or unknown field fails the tests, naming the file. An
+   Upwork figure in a title or description is written `{proof:jobs}`, never the
+   number itself. Link the post's tool with `relatedTool` and the service it
+   sells with `catalogSlug` (#191's writing standard): the post shows the
+   repository under the byline and both links in the author box. A post with a
+   `catalogSlug` shows a price, so `test/structure.test.ts` adds it to
+   `PRICE_PAGES` on its own.
+3. Posts of 8 minutes or more get a contents list of their `##` headings, so
+   give a long post real section headings. Every `##` and `###` gets an id from
+   its text.
+4. Add any figures the post uses under `static/img/blog/<slug>/`, run
+   `deno task strip-metadata` on them, then run `deno task og` for the 1200×630
+   preview and commit the PNG. No cover image: the post opens with its title,
+   and the preview PNG is the link and search image.
 5. Check the "AI crawler optimization" table in AGENTS.md. The sitemap, the RSS
    feed and both llms files read `blogArticles`, so they update themselves; the
    doc rows may still need a line.
+
+**Archiving a post.** Set `archived: true`. The post moves under Archive on
+`/blog`, leaves "Read next" and the RSS feed, drops to sitemap priority 0.3 and
+opens with "Written in <Month Year>. Kept as written." An optional `archiveNote`
+adds one line on what changed since, in Anton's words. It stays on its URL and
+in search; don't change its `updatedAt` for the note.
 
 ## 2. Ship
 
@@ -97,7 +119,7 @@ deno task publish:blog <slug>
 
 It writes no file. It:
 
-1. Reads `content/blog/<slug>.md` and the `lib/data.ts` entry, and stops if
+1. Reads `content/blog/<slug>.md` and its `blogArticles` entry, and stops if
    either is missing.
 2. Fetches `https://antonshubin.com/blog/<slug>` and stops unless it answers
    200. Nothing below runs for a post that is not live.

@@ -1,3 +1,12 @@
+---
+title: "Setting Up Your Own CI/CD Server with Drone CI"
+description: "Running your own CI/CD with Drone CI on a $10 VPS. Docker Compose setup, pipeline config, GitHub integration — skip vendor lock-in, keep your builds private."
+publishedAt: "2023-02-12"
+readTime: 5
+topic: "self-hosting"
+archived: true
+---
+
 Drone CI is an open-source Continuous Integration and Continuous Deployment
 (CI/CD) tool that helps organizations automate their software development
 pipeline. With Drone CI, you can automate tasks such as building, testing, and

@@ -66,7 +66,7 @@ export default define.page(function App({ Component, req }) {
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="Anton Shubin — Blog"
+          title="Anton Shubin — Writing"
           href="https://antonshubin.com/rss.xml"
         />
 

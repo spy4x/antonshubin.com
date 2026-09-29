@@ -42,7 +42,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
 ### 3. `/llms-full.txt` (routes/llms-full.txt.ts)
 
 - Extended version with ALL pages, ALL catalog items (with prices), ALL blog
-  posts
+  posts, grouped under the three Writing topics with each post's tool link, and
+  the Archive last (#274); `lib/blog.ts`'s `llmsBlogSections()` builds the list
+  for both llms files
 - Client work in two lists: every highlight (`highlightSlugs`, through
   `clientSummary()`, so each line carries its client and period) and the archive
   (`archiveProjects()`, newest first, with period and role), in the same order
@@ -62,7 +64,8 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Dynamic page, project, catalog, and blog URLs with priorities; `/pay` excluded
 - AI-friendly XML comments describing the site and its purpose
-- All blog posts, projects, catalog items included
+- All blog posts, projects, catalog items included; `/blog`'s `lastmod` is the
+  newest current post's date, and an archived post has priority 0.3 (#274)
 - Project pages live at `/work/<slug>` since #188; every old `/projects` URL
   answers one 301 there (`lib/redirects.ts`), so the sitemap and both llms files
   list only the new URLs
@@ -157,6 +160,27 @@ Five entities in a `@graph` array (six on `/about`):
 - `test/work-index.test.ts` checks that the `ItemList` URLs equal the page's
   title links in order
 
+### 7c. Writing JSON-LD and feed (`routes/blog/**`, `routes/rss.xml.ts`)
+
+- `/blog` carries one `Blog` node (`https://antonshubin.com/blog#blog`, author
+  and publisher the `#person` node) whose `blogPost` lists every post's `@id`;
+  each post's `BlogPosting` points back with `isPartOf` (#274, SEO 5)
+- `BlogPosting.image` is an `ImageObject` of the post's 1200×630 PNG from
+  `deno task og`, never an SVG cover; `articleSection` is the post's topic;
+  `dateModified` is `updatedAt`, which the byline also shows as "Updated"
+- `/blog`'s title names the three topics; a post's `<title>` is its `seoTitle`,
+  or its title with " — Anton Shubin" only when that fits in 55 characters
+  (`postTitleTag()` in `lib/blog.ts`)
+- Every `h2` and `h3` in a post has a stable id from its text, so a section can
+  be linked; posts of 8 minutes or more list their `h2`s under "Contents"
+- The old `/blog?tab=<topic>` filters answer one 301 to `/blog`
+  (`blogTabRedirect()` in `lib/redirects.ts`); the topics are sections of the
+  one page
+- Archived posts stay indexed and in the sitemap with a dated note at the top;
+  they leave "Read next" and the RSS feed (title "Anton Shubin — Writing", with
+  a `lastBuildDate`). When a replacement post ships, 301 the old URL to it in
+  `lib/redirects.ts` and delete its file in the same pull request
+
 ### 8. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
 
 - `summary_large_image` card type; `twitter:site` and `twitter:creator` are
@@ -238,7 +262,7 @@ Whenever any of these change, update the corresponding AI crawler files:
 | Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                                                  |
 | Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                                                                              |
 | Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                                        |
-| Blog post added           | sitemap.xml.ts, llms-full.txt.ts, `deno task og` (new post PNG)                                                                                |
+| Blog post added           | `content/blog/<slug>.md` only: sitemap, RSS, both llms files and `/blog` read its front matter; then `deno task og` (new post PNG)             |
 | Blog/project title change | `deno task og` (regenerate that post's or project's PNG)                                                                                       |
 | Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD), `deno task og` (new project PNG)                        |
 | Tool added                | `lib/tools.ts` only: sitemap, both llms files and the `/tools` pages read it; then `deno run -A scripts/github-snapshot.ts` and `deno task og` |

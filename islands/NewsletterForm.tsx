@@ -1,6 +1,16 @@
 import { useState } from "preact/hooks";
 
-export default function NewsletterForm() {
+interface NewsletterFormProps {
+  /** Umami event sent once a signup succeeds (#274, Mkt 10). */
+  umamiEvent?: string;
+}
+
+/** Umami's tracker, when the page loaded it (never for bots or without config). */
+interface UmamiWindow {
+  umami?: { track?: (event: string) => void };
+}
+
+export default function NewsletterForm({ umamiEvent }: NewsletterFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     "idle",
@@ -20,6 +30,13 @@ export default function NewsletterForm() {
       if (res.ok) {
         setStatus("done");
         setMsg("Subscribed!");
+        if (umamiEvent) {
+          try {
+            (globalThis as UmamiWindow).umami?.track?.(umamiEvent);
+          } catch {
+            // Analytics is fail-open: a tracker error never breaks the form.
+          }
+        }
       } else {
         const err = await res.json();
         setStatus("error");

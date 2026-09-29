@@ -1,3 +1,12 @@
+---
+title: "How to Keep Sane When Developing a SaaS Startup Solo? Part 1: Mindset and Mental Health"
+description: "Take care of yourself first and work hard then"
+publishedAt: "2022-12-15"
+readTime: 7
+topic: "founders"
+archived: true
+---
+
 ## What is it about?
 
 In one of my <a href="ship-it-today" target="_blank">previous blog posts</a>, I

@@ -3,7 +3,8 @@ title: "mig: a lightweight meeting scheduler because Calendly alternatives are o
 description: "One owner, one URL, one feature: book a time slot. A single Deno binary, JSON-file storage, SMTP confirmations with ICS attachments, cancellable links signed with SHA-256 HMAC. Built because I needed a static meeting link, not a database."
 publishedAt: "2026-08-26"
 readTime: 7
-previewImageURL: "cover.svg"
+topic: "self-hosting"
+relatedTool: "mig"
 ---
 
 Most "Calendly alternatives" are heavyweight. Cal.com is Next.js + Postgres

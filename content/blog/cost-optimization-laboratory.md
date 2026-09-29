@@ -4,7 +4,8 @@ description: "A founder-readable framework for choosing managed cloud, dedicated
 publishedAt: "2026-06-15"
 updatedAt: "2026-08-20"
 readTime: 9
-previewImageURL: "cover.svg"
+topic: "founders"
+catalogSlug: "strategy-call"
 ---
 
 Infrastructure should follow the business. It should not follow fashion, a

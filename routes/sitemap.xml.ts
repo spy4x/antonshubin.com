@@ -7,6 +7,7 @@ import { tools } from "../lib/tools.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
 import { ABOUT_PATH } from "../lib/about.ts";
+import { latestPostDate } from "../lib/blog.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -59,7 +60,8 @@ export const handler = define.handlers({
         loc: "/blog",
         priority: "0.8",
         changefreq: "weekly",
-        lastmod: undefined,
+        // The newest current post's date (#274, SEO 10).
+        lastmod: latestPostDate() as string | undefined,
       },
       {
         loc: "/infrastructure",
@@ -83,9 +85,10 @@ export const handler = define.handlers({
         : []),
     ];
 
+    // Archived posts stay indexed, one step down (#274, SEO 7).
     const blogUrls = blogArticles.map((a) => ({
       loc: `/blog/${a.slug}`,
-      priority: "0.7",
+      priority: a.archived ? "0.3" : "0.7",
       changefreq: "monthly" as const,
       lastmod: a.updatedAt ?? a.publishedAt,
     }));

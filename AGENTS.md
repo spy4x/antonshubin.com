@@ -202,9 +202,11 @@ reference.
 - `lib/proof.ts` is the only place an Upwork number or label (jobs, job success
   rate, amount earned, hours, Expert-Vetted, Top 1%) is written. The home page,
   `components/SEOHead.tsx`'s JSON-LD, the sitemap comment, both llms files,
-  `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
-  `routes/saas-architecture-guide.tsx`, `lib/subscribe-mail.ts`'s welcome email
-  and `lib/data.ts`'s template project all read a value through `proof(id)`.
+  `islands/LeadForm.tsx`, `routes/saas-architecture-guide.tsx`,
+  `lib/subscribe-mail.ts`'s welcome email and `lib/tools.ts`'s template entry
+  all read a value through `proof(id)`. A post's front matter writes a figure as
+  a `{proof:<id>}` placeholder (the template post's title uses `{proof:jobs}`),
+  which `lib/blog-posts.ts`'s `fillProof()` replaces.
   `test/proof-promises-notes.test.ts`'s proof guard scans `routes/`,
   `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and every
   `*.test.ts`) for each figure's exact rendered text — including the
@@ -298,7 +300,7 @@ say when the CI status was checked and whether it is the committed file
 (`checkedLabel()`; a repository counts as live only when its GitHub and
 Woodpecker calls both succeeded). `/tools` and `/tools/*` are cached for an hour
 so a refresh reaches visitors (`lib/cache-control.ts`). A tool's `posts` link
-each post to its page (the post shows "The tool behind this post"); its
+each post to its page (the post header shows "The tool: <name>"); its
 `catalogSlug` picks the catalog item the "hire me" door names; `deployable` adds
 `SoftwareApplication` JSON-LD, whose `url` is only ever its running `live`
 instance. The hub carries `CollectionPage` and `ItemList` JSON-LD. Umami events
@@ -721,12 +723,16 @@ page. Never retry a test on this error.
   the "same origin, wrong window" guard: a same-origin sibling iframe posting a
   spoofed `mig:height` message never resizes the booking iframe, because
   `event.source` isn't that iframe's own `contentWindow`.
-- `test/blog-overflow.browser.test.ts` (#222): at 390px, no blog post in the
-  sitemap is wider than the screen, and no Previous/Next card
-  (`[data-post-nav] a` in `routes/blog/[slug].tsx`) ends past its right edge.
-  The cards used to be clipped by an ancestor, so the page's own `scrollWidth`
-  never showed the overflow. It blocks service workers, like every test that
-  opens pages through `newPage()`.
+- `test/blog-overflow.browser.test.ts` (#222, #274): at 390px, no blog post in
+  the sitemap is wider than the screen, and no "Read next" row
+  (`[data-read-next] li` in `routes/blog/[slug].tsx`) ends past its right edge;
+  the old Previous/Next cards were clipped by an ancestor, so only each row's
+  own box shows such an overflow. It also runs every axe-core WCAG 2 A/AA rule
+  plus a horizontal-scroll check on `/blog` and three sample posts at 390 and
+  1440px, and checks that the post image lightbox, on a phone turned sideways,
+  keeps its close button clear of a 47px safe-area inset, closes on a tap beside
+  the image and returns focus to the image button. It blocks service workers,
+  like every test that opens pages through `newPage()`.
 - `test/safe-area.browser.test.ts`: at 390px the phone tab bar clears an
   iPhone's home indicator. iOS Safari reports a zero
   `env(safe-area-inset-bottom)` unless `routes/_app.tsx`'s viewport meta tag
@@ -839,10 +845,11 @@ pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 live post: a brief that judges the post as an SEO specialist, a marketer, a
 psychologist and a personal-brand adviser against the goals above, a draft in
 Anton's voice (`docs/voice.md`, learned from the five oldest posts), a pull
-request with the post file and its `lib/data.ts` entry, review, merge, deploy,
-then `deno task publish:blog <slug>`. That script writes no file: it checks the
-post answers 200 live, creates the Dev.to draft and prints every channel's
-tagged link and the newsletter preview. Three hard rules:
+request with the post file and its front matter (no `lib/data.ts` entry: the
+metadata is read from the file), review, merge, deploy, then
+`deno task publish:blog <slug>`. That script writes no file: it checks the post
+answers 200 live, creates the Dev.to draft and prints every channel's tagged
+link and the newsletter preview. Three hard rules:
 
 - **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
   text per channel with its tagged link and show it in chat; Anton pastes it.
@@ -997,17 +1004,21 @@ listed with and without a trailing slash, so both land in one hop, and no entry
 points at another redirect. A `/projects/<x>` with no new home is not in the
 table and answers 404. Besides the table, a trailing slash on any
 `/blog/<slug>`, `/work/<slug>` or `/tools/<slug>` URL redirects to the
-slash-free form. `redirectTarget()` is a pure function, unit-tested in
-`lib/redirects.test.ts` without a server — the same pattern as `lib/csp.ts` and
-`lib/cache-control.ts`; `test/structure.test.ts` checks every old URL on the
-built site (one 301, query string kept, a 200 behind it), and its internal-link
-crawl fails on any link that the table would redirect. `main.ts` wires it as its
-own middleware, placed after the CSP and cache middlewares but before
-`staticFiles()`/`app.fsRoutes()`: a redirect response still needs the CSP and
-cache headers every other response gets, and it gets them because those two
-middlewares set headers on whatever `ctx.next()` resolves to, which is this
-middleware's response when it doesn't call `ctx.next()` itself. It appends the
-request's query string to the target, so launch links keep their UTM tags.
+slash-free form. An old `/blog?tab=<x>` link (the retired tab filter) answers
+one 301 to `/blog`, keeping any other parameters: `lib/redirects.ts`'s
+`blogTabRedirect()`, called from `routes/blog/index.tsx`'s handler, since it
+depends on the query rather than the path. `redirectTarget()` is a pure
+function, unit-tested in `lib/redirects.test.ts` without a server — the same
+pattern as `lib/csp.ts` and `lib/cache-control.ts`; `test/structure.test.ts`
+checks every old URL on the built site (one 301, query string kept, a 200 behind
+it), and its internal-link crawl fails on any link that the table would
+redirect. `main.ts` wires it as its own middleware, placed after the CSP and
+cache middlewares but before `staticFiles()`/`app.fsRoutes()`: a redirect
+response still needs the CSP and cache headers every other response gets, and it
+gets them because those two middlewares set headers on whatever `ctx.next()`
+resolves to, which is this middleware's response when it doesn't call
+`ctx.next()` itself. It appends the request's query string to the target, so
+launch links keep their UTM tags.
 
 ## Shared libraries
 

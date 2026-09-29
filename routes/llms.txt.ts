@@ -1,7 +1,8 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL, LOCATION } from "../lib/config.ts";
 import { ABOUT_PATH } from "../lib/about.ts";
-import { blogArticles, hackathons, highlightSlugs } from "../lib/data.ts";
+import { hackathons, highlightSlugs } from "../lib/data.ts";
+import { llmsBlogSections } from "../lib/blog.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { decapitalize, promise, promises } from "../lib/promises.ts";
 import { proof } from "../lib/proof.ts";
@@ -38,13 +39,9 @@ export const handler = define.handlers({
       })
       .join("\n");
 
-    // Five most recent posts, newest first, without mutating the shared
-    // blogArticles array (see routes/llms-full.txt.ts for why that matters).
-    const recentPosts = [...blogArticles]
-      .sort((a, b) => b.index - a.index)
-      .slice(0, 5)
-      .map((a) => `- [${a.title}](${BASE_URL}/blog/${a.slug})`)
-      .join("\n");
+    // Every post grouped by its topic with its tool link, then the Archive
+    // (#274, SEO 10), from lib/blog.ts; nothing sorts the shared array.
+    const writing = llmsBlogSections(BASE_URL, false);
 
     // Titles and descriptions come from lib/promises.ts; nothing here
     // restates a promise's title or wording by hand.
@@ -90,7 +87,7 @@ ${promisesList}
 - [How I Work](${BASE_URL}/how-i-work)
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect, and how deploys, backups, monitoring and sign-in are handled
 - [Contact](${BASE_URL}/contact-me)
-- [Blog](${BASE_URL}/blog)
+- [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting
 - [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install${hackathonsLink}
 
@@ -98,9 +95,9 @@ ${promisesList}
 
 ${toolLines(BASE_URL)}
 
-## Recent Blog Posts
+## Writing
 
-${recentPosts}
+${writing}
 
 ## Client Work Highlights
 

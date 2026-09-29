@@ -3,7 +3,6 @@ import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
 import { ABOUT_PATH, aboutSteps } from "../lib/about.ts";
 import {
   archiveProjects,
-  blogArticles,
   formatPeriod,
   hackathons,
   highlightSlugs,
@@ -19,6 +18,7 @@ import { infrastructureLines } from "../lib/infrastructure.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
 import { workDescription } from "../lib/work.ts";
+import { llmsBlogSections } from "../lib/blog.ts";
 import {
   clientProject,
   clientSummary,
@@ -28,17 +28,10 @@ import {
 
 export const handler = define.handlers({
   GET() {
-    // Sorts a copy — blogArticles is a module-level array shared by every
-    // request in this process, so sorting it in place here used to reorder
-    // "Read next" on every blog post page after the first fetch of this
-    // route. test/llms.test.ts guards this.
-    const blogList = [...blogArticles]
-      .sort((a, b) => b.index - a.index)
-      .map(
-        (a) =>
-          `- [${a.title}](${BASE_URL}/blog/${a.slug}) — ${a.description} (${a.readTime} min read, ${a.publishedAt})`,
-      )
-      .join("\n");
+    // Every post grouped by its topic, with its tool link, the Archive last
+    // (#274, SEO 7 and 10). lib/blog.ts filters copies of the shared
+    // blogArticles array and never sorts it in place (test/llms.test.ts).
+    const blogList = llmsBlogSections(BASE_URL, true, 4);
 
     // Built from lib/data.ts so the section exists only while there are real
     // entries, and never restates results by hand.
@@ -184,9 +177,9 @@ ${catalogList}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how each layer is run: handover, backups, monitoring, deploys, sign-in. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 ${infrastructureLines(BASE_URL)}
-- **Blog:** ${BASE_URL}/blog — Technical articles
+- **Writing:** ${BASE_URL}/blog — Posts on decisions for founders, AI and MCP, and self-hosting, grouped by topic, with an Archive of older posts kept as written
 ${hackathonsSection}
-### Blog Posts
+### Writing
 ${blogList}
 
 ### Tools
