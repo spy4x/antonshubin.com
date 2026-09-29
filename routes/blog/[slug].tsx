@@ -12,7 +12,7 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import Button from "../../components/Button.tsx";
-import { ArrowRightIcon } from "../../components/Icons.tsx";
+import { type BandLink, ClosingBand } from "../../components/ClosingBand.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
 import {
   archiveNoteText,
@@ -138,67 +138,56 @@ function SecondaryLink(
 
 /**
  * The author box at the end of every post (#191, #274: Mkt 1, Psych 6,
- * UX 9): who wrote it, the #249 positioning line, Book and one secondary
- * link. A stub on Desk until #270's `components/ClosingBand.tsx` lands.
+ * UX 9), built on the shared closing band (#270): the band's heading, then
+ * who wrote the post and the #249 positioning line in its `children` slot,
+ * then Book, the post's own next step and quiet links. No promise line.
  */
 function AuthorBox({ article }: { article: BlogArticle }) {
   const tool = relatedToolLink(article);
   const service = relatedService(article);
+  const links: BandLink[] = [
+    ...(service && tool
+      ? [{
+        href: tool.href,
+        label: `The code: ${tool.name}`,
+        event: `blog-cta-${article.slug}-tool-end`,
+      }]
+      : []),
+    {
+      href: "/how-i-work",
+      label: "How I work",
+      event: `blog-cta-${article.slug}-how-i-work`,
+    },
+  ];
   return (
-    <section
-      data-author-box
-      aria-labelledby="author-box-heading"
-      class="mt-16 bg-desk border border-rule rounded-xl p-6 sm:p-8"
-    >
-      <div class="flex items-center gap-4">
-        <img
-          src="/img/photo-64.webp"
-          aria-hidden="true"
-          alt=""
-          width="56"
-          height="56"
-          loading="lazy"
-          class="h-14 w-14 rounded-full border border-rule-strong"
-        />
-        <div>
-          <p class="font-semibold text-parchment">Anton Shubin</p>
-          <p class="text-sm text-graphite">{ROLE}</p>
-        </div>
-      </div>
-      <p class="mt-4 text-graphite">{AUTHOR_LINE}</p>
-      <h2 id="author-box-heading" class="mt-6 text-2xl text-parchment">
-        Need this for your product?
-      </h2>
-      <div class="mt-4 flex flex-wrap items-center gap-4">
-        <BookCallLink
-          url={SCHEDULE_URL}
-          target="_blank"
-          data-umami-event={`blog-cta-${article.slug}-book-end`}
-          class="justify-center px-6 py-3"
-        >
-          Book a free intro call
-        </BookCallLink>
+    <ClosingBand
+      heading="Need this for your product?"
+      promiseIds={[]}
+      bookEvent={`blog-cta-${article.slug}-book-end`}
+      catalogLink={
         <SecondaryLink article={article} place="end" class="px-5 py-3" />
+      }
+      links={links}
+    >
+      <div data-author-box class="mb-6">
+        <div class="flex items-center gap-4">
+          <img
+            src="/img/photo-64.webp"
+            aria-hidden="true"
+            alt=""
+            width="56"
+            height="56"
+            loading="lazy"
+            class="h-14 w-14 rounded-full border border-rule-strong"
+          />
+          <div>
+            <p class="font-semibold text-parchment">Anton Shubin</p>
+            <p class="text-sm text-graphite">{ROLE}</p>
+          </div>
+        </div>
+        <p class="mt-4 text-graphite">{AUTHOR_LINE}</p>
       </div>
-      <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-        {service && tool && (
-          <a
-            href={tool.href}
-            data-umami-event={`blog-cta-${article.slug}-tool-end`}
-            class="text-parchment underline underline-offset-4 hover:text-graphite"
-          >
-            The code: {tool.name}
-          </a>
-        )}
-        <a
-          href="/how-i-work"
-          class="inline-flex items-center gap-1 text-parchment underline underline-offset-4 hover:text-graphite"
-        >
-          How I work
-          <ArrowRightIcon class="w-3.5 h-3.5" />
-        </a>
-      </div>
-    </section>
+    </ClosingBand>
   );
 }
 

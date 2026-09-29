@@ -97,7 +97,7 @@ siteTest(
       const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
       assertEquals(dupes, [], `${article.slug} repeats ids`);
       const bare = count(
-        content.slice(0, content.indexOf("data-author-box")),
+        content.slice(0, content.indexOf("data-closing-band")),
         /<h[23]>/,
       );
       assertEquals(bare, 0, `${article.slug} has a heading without an id`);
@@ -174,15 +174,26 @@ siteTest(
 );
 
 siteTest(
-  "every post ends with the author box: Book and the post's own next step",
+  "every post ends with the author box in the closing band: author, Book and the post's own next step",
   async (site) => {
     for (const article of blogArticles) {
       const html = await site.html(`/blog/${article.slug}`);
-      const box = section(html, "data-author-box");
-      assert(box, `${article.slug} has no author box`);
+      // The shared band (#270), with the author in its children slot.
+      const box = section(html, "data-closing-band");
+      assert(box, `${article.slug} has no closing band`);
+      const author = block(box, "data-author-box", "div");
+      assert(
+        visibleText(author).includes("Anton Shubin"),
+        `${article.slug}: the band's children slot holds no author`,
+      );
       assertEquals(count(box, /data-primary-book/), 1, article.slug);
+      assert(
+        box.indexOf("data-author-box") < box.indexOf("data-primary-book"),
+        `${article.slug}: the author must come before Book`,
+      );
       const text = visibleText(box);
       assert(text.includes("Need this for your product?"), text);
+      assert(text.includes("I build greenfield SaaS"), text);
       if (article.catalogSlug) {
         assert(
           box.includes(`href="/catalog/${article.catalogSlug}"`),
