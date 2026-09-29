@@ -54,9 +54,7 @@ function sourceCodeJsonLd(tool: Tool, url: string) {
     ...(tool.programmingLanguage
       ? { "programmingLanguage": tool.programmingLanguage }
       : {}),
-    ...(licence
-      ? { "license": `https://spdx.org/licenses/${licence}` }
-      : {}),
+    ...(licence ? { "license": `https://spdx.org/licenses/${licence}` } : {}),
     ...(tool.registry?.published ? { "version": tool.registry.version } : {}),
     "author": { "@id": `${SITE}/#person` },
     "mainEntityOfPage": { "@type": "WebPage", "@id": url },
@@ -272,9 +270,7 @@ export default define.page(async function ToolPage(ctx) {
                 )}
               </Fact>
             )}
-            {licence && (
-              <Fact term="Licence">{licence}</Fact>
-            )}
+            {licence && <Fact term="Licence">{licence}</Fact>}
             {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
             {tool.live && (
               <Fact term="Live">

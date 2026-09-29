@@ -296,10 +296,10 @@ CI status was checked and whether it is the committed file (`checkedLabel()`).
 (`lib/cache-control.ts`). A tool's `posts` link each post to its page (the post
 shows "The tool behind this post"); its `catalogSlug` picks the catalog item the
 "hire me" door names; `deployable` adds `SoftwareApplication` JSON-LD, whose
-`url` is only ever its running `live` instance. The hub carries
-`CollectionPage` and `ItemList` JSON-LD. Umami events are
-`tool-<slug>-<install-copy|github|issue|live|catalog|post>`,
-`tools-hub-<slug>` and `post-tool-<slug>`.
+`url` is only ever its running `live` instance. The hub carries `CollectionPage`
+and `ItemList` JSON-LD. Umami events are
+`tool-<slug>-<install-copy|github|issue|live|catalog|post>`, `tools-hub-<slug>`
+and `post-tool-<slug>`.
 
 ## Navigation
 
@@ -353,9 +353,9 @@ via `extra` instead of fighting a default.
 
 `components/StatusMark.tsx` renders a shape plus a word for a project or tool
 status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`, `outcome`,
-`issue`, `live`, `offline`) — never colour alone; used today on `routes/work/index.tsx`
-and in the project page's fact card (`components/ProjectFactCard.tsx`: live,
-offline or archived).
+`issue`, `live`, `offline`) — never colour alone; used today on
+`routes/work/index.tsx` and in the project page's fact card
+(`components/ProjectFactCard.tsx`: live, offline or archived).
 
 ### Work section
 

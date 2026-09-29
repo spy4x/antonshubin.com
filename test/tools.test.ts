@@ -611,7 +611,10 @@ siteTest(
       );
       const page = visibleText(await site.html(`/tools/${t.slug}`));
       if (licence) {
-        assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
+        // The archive group is one line per project, without a licence.
+        if (t.group !== "archive") {
+          assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
+        }
         assert(page.includes(licence), `${t.slug}: page has no ${licence}`);
       }
     }

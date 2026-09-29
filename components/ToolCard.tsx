@@ -1,6 +1,6 @@
 import { firstSentence } from "../lib/llms.ts";
 import { liveRepo, type ToolsLive } from "../lib/tools-live.ts";
-import { ciUrl, type Tool, type ToolRow } from "../lib/tools.ts";
+import { ciUrl, type Tool, toolLicence, type ToolRow } from "../lib/tools.ts";
 import { CiPill } from "./CiPill.tsx";
 import StatusMark from "./StatusMark.tsx";
 
@@ -93,6 +93,9 @@ export function ToolCard(
       <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-graphite">
         <StatusMark status={tool.status} />
         {version && <span data-version>{version}</span>}
+        {variant !== "more" && toolLicence(tool) && (
+          <span>{toolLicence(tool)}</span>
+        )}
         {variant !== "more" && tool.ci && snap && (
           <CiPill ci={snap.ci} pipelinesUrl={ciUrl(tool)!} />
         )}
