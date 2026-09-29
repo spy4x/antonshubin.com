@@ -54,3 +54,24 @@ Deno.test("the staging deploy builds its env with stagingEnv", () => {
     "scripts/deploy.ts must build .env.staging.local with stagingEnv",
   );
 });
+
+// .env.deploy holds the Cloudflare token (#268). It stays on the deploying
+// machine: git ignores it, and neither rsync step may carry it to the server.
+Deno.test("the Cloudflare token file is never committed or uploaded", () => {
+  assert(
+    lines(".gitignore").includes(".env.deploy"),
+    ".gitignore must list .env.deploy",
+  );
+  assert(
+    lines(".dockerignore").includes(".env.*"),
+    ".dockerignore must list .env.*, which keeps .env.deploy out of the source rsync",
+  );
+  const envRsync = read("scripts/deploy.ts").split("\n").find((line) =>
+    line.includes("rsync -avz .env")
+  );
+  assert(envRsync, "scripts/deploy.ts no longer has the env-file rsync step");
+  assert(
+    !envRsync.includes(".env.deploy"),
+    "the env-file rsync must not upload .env.deploy",
+  );
+});
