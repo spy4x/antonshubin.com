@@ -1,3 +1,12 @@
+---
+title: "Why you have to ship your idea today and with shittiest code possible"
+description: "Or why so many developers abandon their attempts to release a product"
+publishedAt: "2022-04-27"
+readTime: 5
+topic: "founders"
+archived: true
+---
+
 ## What is it about?
 
 Today I'll share my approach to shipping an app idea. It's a compilation of my

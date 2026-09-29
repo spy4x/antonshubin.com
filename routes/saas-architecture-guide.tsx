@@ -26,7 +26,10 @@ export default define.page(function SaasArchGuide() {
   };
 
   // Organize content by topic
-  const startupPosts = blogArticles.filter((a) => a.category === "startups");
+  // The "For founders" topic (#274), without the Archive's older posts.
+  const startupPosts = blogArticles.filter((a) =>
+    a.topic === "founders" && !a.archived
+  );
   // "Real case studies" (#193): client work (projects.freelance), not the
   // tools Anton builds and runs for himself (projects.my) — a founder
   // reading this guide wants proof he has shipped for other people's

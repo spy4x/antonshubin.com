@@ -3,7 +3,8 @@ title: "zond: a 10 MB probe bridge so Gatus can see through your SSO proxy"
 description: "Health checks behind Authelia fail because Gatus cannot follow SSO redirects. Zond sits beside your services on the Docker network and answers 200 or 503 — no auth bypass, no internal URLs leaked, one config file."
 publishedAt: "2026-08-26"
 readTime: 6
-previewImageURL: "cover.svg"
+topic: "self-hosting"
+relatedTool: "zond"
 ---
 
 Every self-hosted homelab eventually hits the same monitoring problem: you want

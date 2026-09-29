@@ -1,4 +1,7 @@
 import { proof } from "./proof.ts";
+import { type BlogArticle, loadBlogArticles } from "./blog-posts.ts";
+
+export type { BlogArticle };
 
 export interface Project {
   title: string;
@@ -80,19 +83,6 @@ export function formatPeriod(period: Period): string {
     return `${period.from}–${period.to}`;
   }
   return `${period.from}`;
-}
-
-export interface BlogArticle {
-  index: number;
-  title: string;
-  slug: string;
-  description: string;
-  readTime: number;
-  publishedAt: string;
-  updatedAt?: string;
-  previewImageURL: string;
-  youtubeVideoId?: string;
-  category?: "startups" | "dev-tips" | "personal";
 }
 
 export const projects = {
@@ -532,174 +522,12 @@ export function archiveProjects(): Project[] {
     .sort((a, b) => (b.period?.from ?? 0) - (a.period?.from ?? 0));
 }
 
-export const blogArticles: BlogArticle[] = [
-  {
-    index: 0,
-    title:
-      "Why you have to ship your idea today and with shittiest code possible",
-    slug: "ship-it-today",
-    description:
-      "Or why so many developers abandon their attempts to release a product",
-    readTime: 5,
-    publishedAt: "2022-04-27",
-    previewImageURL: "preview.webp",
-    category: "startups",
-  },
-  {
-    index: 1,
-    title: "My journey from an office job to freelance to my startups",
-    slug: "from-office-job-to-freelance-to-my-startups",
-    description: "While traveling and enjoying life",
-    readTime: 15,
-    publishedAt: "2022-06-07",
-    previewImageURL: "preview2.webp",
-    category: "personal",
-  },
-  {
-    index: 2,
-    title:
-      "How to Keep Sane When Developing a SaaS Startup Solo? Part 1: Mindset and Mental Health",
-    slug: "how-to-keep-sane-while-developing-saas-alone-part-1-mental-health",
-    description: "Take care of yourself first and work hard then",
-    readTime: 7,
-    publishedAt: "2022-12-15",
-    previewImageURL: "preview.webp",
-    category: "personal",
-  },
-  {
-    index: 3,
-    title:
-      "Dev tricks, Part 1: The Importance of Code Formatting with Prettier",
-    slug: "the-importance-of-code-formatting-with-prettier",
-    description:
-      "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day!",
-    readTime: 7,
-    publishedAt: "2022-12-21",
-    previewImageURL: "preview.webp",
-    youtubeVideoId: "uaqFYlfOZeE",
-    category: "dev-tips",
-  },
-  {
-    index: 5,
-    title: "Setting Up Your Own CI/CD Server with Drone CI",
-    slug: "setting-up-your-own-ci-cd-server-with-drone-ci",
-    description:
-      "Running your own CI/CD with Drone CI on a $10 VPS. Docker Compose setup, pipeline config, GitHub integration — skip vendor lock-in, keep your builds private.",
-    readTime: 5,
-    publishedAt: "2023-02-12",
-    previewImageURL: "preview.webp",
-    category: "dev-tips",
-  },
-  {
-    index: 6,
-    title:
-      "How ChatGPT Can Help You Design System Architecture for Your Applications",
-    slug: "how-chatgpt-can-help-you-design-system-architecture",
-    description:
-      "ChatGPT as your architecture copilot: generate system diagrams, compare databases, spot security gaps before they ship. Real prompts that work.",
-    readTime: 5,
-    publishedAt: "2023-04-18",
-    previewImageURL: "preview.webp",
-    youtubeVideoId: "Ri3TLTKvSYQ",
-    category: "dev-tips",
-  },
-  {
-    index: 7,
-    title:
-      "Cost-Disciplined SaaS Infrastructure: Managed Cloud, Dedicated, or Hybrid?",
-    slug: "cost-optimization-laboratory",
-    description:
-      "A founder-readable framework for choosing managed cloud, dedicated, or hybrid SaaS infrastructure based on workload, team, compliance, recovery, and total cost.",
-    readTime: 9,
-    publishedAt: "2026-06-15",
-    updatedAt: "2026-08-20",
-    previewImageURL: "cover.svg",
-    category: "startups",
-  },
-  {
-    index: 8,
-    title: "Building MCP Servers with Deno: A Practical Guide",
-    slug: "building-mcp-servers-with-deno",
-    description:
-      "Why Deno is the right runtime for Model Context Protocol servers, the architecture I use, a working CalDAV example, and what I learned shipping four MCP servers in production.",
-    readTime: 15,
-    publishedAt: "2026-06-23",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 9,
-    title:
-      "The missing piece in a self-hosted CalDAV stack: a web UI for Tasks.org",
-    slug: "self-hosted-caldav-web-ui-tasks-org",
-    description:
-      "Tasks.org syncs Android tasks to CalDAV. There is no web UI for that data. The fix is a stateless PWA on top of the CalDAV server you already run — and the architecture that made it boring to ship.",
-    readTime: 9,
-    publishedAt: "2026-07-22",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 10,
-    title:
-      "rostok: scaffold a self-hosted homelab from a curated service catalog",
-    slug: "rostok-self-hosted-scaffolder",
-    description:
-      "The CLI I built to remove 80% of the friction between 'I want to self-host X' and 'X is running, secrets are committed, deploy is one command'. One wizard, a few prompts, and the same IaC structure I use for my own infrastructure.",
-    readTime: 8,
-    publishedAt: "2026-08-26",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 11,
-    title: `Deno Platform Template: distilling ${
-      proof("jobs")
-    }+ client projects into one repo`,
-    slug: "deno-platform-template",
-    description:
-      "What I learned shipping the same SaaS skeleton over and over for paying clients. Group core, personal groups, REST + CQRS, offline sync, an outbox processor — and a deliberate decision to ship it as a template, not a framework.",
-    readTime: 11,
-    publishedAt: "2026-08-26",
-    previewImageURL: "cover.svg",
-    category: "startups",
-  },
-  {
-    index: 12,
-    title: "zond: a 10 MB probe bridge so Gatus can see through your SSO proxy",
-    slug: "zond-sso-probe-bridge",
-    description:
-      "Health checks behind Authelia fail because Gatus cannot follow SSO redirects. Zond sits beside your services on the Docker network and answers 200 or 503 — no auth bypass, no internal URLs leaked, one config file.",
-    readTime: 6,
-    publishedAt: "2026-08-26",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 13,
-    title:
-      "mig: a lightweight meeting scheduler because Calendly alternatives are overkill",
-    slug: "mig-tiny-self-hosted-scheduler",
-    description:
-      "One owner, one URL, one feature: book a time slot. A single Deno binary, JSON-file storage, SMTP confirmations with ICS attachments, cancellable links signed with SHA-256 HMAC. Built because I needed a static meeting link, not a database.",
-    readTime: 7,
-    publishedAt: "2026-08-26",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-  {
-    index: 14,
-    title:
-      "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost",
-    slug: "opus-5-5-vs-sonnet-5-agent-costs",
-    description:
-      "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed.",
-    readTime: 8,
-    publishedAt: "2026-09-26",
-    previewImageURL: "cover.svg",
-    category: "dev-tips",
-  },
-];
+/**
+ * Every blog post, newest first, read from each post's front matter by
+ * `lib/blog-posts.ts` (#191): `content/blog/<slug>.md` is the one place a
+ * post's metadata is written.
+ */
+export const blogArticles: BlogArticle[] = loadBlogArticles();
 
 export interface Hackathon {
   slug: string;

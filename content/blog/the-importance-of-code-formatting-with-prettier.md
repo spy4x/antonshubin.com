@@ -1,3 +1,13 @@
+---
+title: "Dev tricks, Part 1: The Importance of Code Formatting with Prettier"
+description: "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day!"
+publishedAt: "2022-12-21"
+readTime: 7
+topic: "founders"
+archived: true
+youtubeVideoId: "uaqFYlfOZeE"
+---
+
 Are you tired of your developers spending valuable time and energy debating code
 style preferences? Does messy, poorly formatted code hinder their productivity
 and efficiency? Are you frustrated with constantly having to review pull

@@ -1,4 +1,13 @@
-_Written in 2022. Who I am and what I do today: [About me](/about)._
+---
+title: "My journey from an office job to freelance to my startups"
+description: "While traveling and enjoying life"
+publishedAt: "2022-06-07"
+readTime: 15
+topic: "founders"
+archived: true
+---
+
+_Who I am and what I do today: [About me](/about)._
 
 ## What is it about?
 

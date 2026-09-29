@@ -3,7 +3,7 @@ title: "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the
 description: "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
 publishedAt: "2026-09-26"
 readTime: 8
-previewImageURL: "cover.svg"
+topic: "ai-mcp"
 ---
 
 Opus 5.5 lists at twice the price of Sonnet 5. In my coding agents it cost about

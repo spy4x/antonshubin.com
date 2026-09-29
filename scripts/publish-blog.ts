@@ -75,7 +75,9 @@ export async function readPost(
 ): Promise<Post> {
   const article = articles.find((a) => a.slug === slug);
   if (!article) {
-    throw new Error(`No blogArticles entry for "${slug}" in lib/data.ts`);
+    throw new Error(
+      `No blogArticles entry for "${slug}": add content/blog/${slug}.md with its front matter`,
+    );
   }
   const file = `${contentDir}/${slug}.md`;
   let raw: string;

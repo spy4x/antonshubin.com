@@ -3,7 +3,8 @@ title: "rostok: scaffold a self-hosted homelab from a curated service catalog"
 description: "The CLI I built to remove 80% of the friction between 'I want to self-host X' and 'X is running, secrets are committed, deploy is one command'. One wizard, a few prompts, and the same IaC structure I use for my own infrastructure."
 publishedAt: "2026-08-26"
 readTime: 8
-previewImageURL: "cover.svg"
+topic: "self-hosting"
+relatedTool: "rostok"
 ---
 
 Every homelab I have ever stood up started the same way: a folder, a README, a

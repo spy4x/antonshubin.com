@@ -1,3 +1,12 @@
+---
+title: "How ChatGPT Can Help You Design System Architecture for Your Applications"
+description: "ChatGPT as your architecture copilot: generate system diagrams, compare databases, spot security gaps before they ship. Real prompts that work."
+publishedAt: "2023-04-18"
+readTime: 5
+topic: "ai-mcp"
+youtubeVideoId: "Ri3TLTKvSYQ"
+---
+
 Designing system architecture for your applications can be a daunting task,
 especially if you are new to software development or if you are not sure if the
 approach you are taking is the right one. Fortunately, with the help of ChatGPT,
