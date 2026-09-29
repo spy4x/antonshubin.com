@@ -11,8 +11,8 @@ import {
 import { moreItems, navCurrent } from "../lib/nav.ts";
 
 /**
- * The phone tab bar's More button and its `<dialog>` (#185): Home, How I
- * work, Writing, Infrastructure and the Links groups. Escape, the Close
+ * The phone tab bar's More button and its `<dialog>` (#185): Home, About
+ * (#294), How I work, Writing, Infrastructure and the Links groups. Escape, the Close
  * button or a tap on the backdrop closes it, and focus returns to More.
  */
 export default function NavMore(

@@ -665,6 +665,7 @@ const NAV_GLYPHS = {
   writing: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",
   home:
     "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  about: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01",
   infrastructure: "M2 4h20v6H2zM2 14h20v6H2zM6 7h.01M6 17h.01",
   book: "M3 5h18v16H3zM16 3v4M8 3v4M3 10h18",
   write: "M2 5h20v14H2zM2 6l10 7 10-7",

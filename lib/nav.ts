@@ -14,6 +14,7 @@ export type NavIcon =
   | "tools"
   | "writing"
   | "home"
+  | "about"
   | "infrastructure";
 
 export interface NavItem {
@@ -41,6 +42,7 @@ const HOW_I_WORK: NavItem = {
 const TOOLS: NavItem = { href: "/tools", label: "Tools", icon: "tools" };
 const WRITING: NavItem = { href: "/blog", label: "Writing", icon: "writing" };
 const HOME: NavItem = { href: "/", label: "Home", icon: "home" };
+const ABOUT: NavItem = { href: "/about", label: "About", icon: "about" };
 const INFRASTRUCTURE: NavItem = {
   href: "/infrastructure",
   label: "Infrastructure",
@@ -63,6 +65,7 @@ export const tabItemsAfterBook: NavItem[] = [TOOLS];
 /** What the phone "More" sheet lists above the Links groups. */
 export const moreItems: NavItem[] = [
   HOME,
+  ABOUT,
   HOW_I_WORK,
   WRITING,
   INFRASTRUCTURE,
