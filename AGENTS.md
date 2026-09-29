@@ -439,6 +439,7 @@ whenever a home-lab service is down). The CI link is mig's public pipeline list
 because the root of ci. asks for a GitHub sign-in. The colophon's "this build"
 reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the live links and bump the
 `infra-live-checked` note's `checkedOn`.
+
 ### Services pages
 
 `/catalog` ("Services" in the rail, H1 and breadcrumb) and `/catalog/<slug>`
