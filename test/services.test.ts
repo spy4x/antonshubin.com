@@ -303,3 +303,20 @@ siteTest(
     assertFalse(other.includes("data-service-versus"));
   },
 );
+
+siteTest(
+  "the next-step link reads its price in lower case after the dot",
+  async (site) => {
+    for (const item of catalogItems.filter((i) => i.next)) {
+      const html = await site.html(`/catalog/${item.slug}`);
+      const next = visibleText(
+        html.match(/data-service-next[\s\S]*?<\/p>/)![0],
+      );
+      assertFalse(/· From/.test(next), `${item.slug}: "${next}"`);
+      assert(
+        /^Next step: .+ · (\$|from )/.test(next),
+        `${item.slug}: "${next}"`,
+      );
+    }
+  },
+);
