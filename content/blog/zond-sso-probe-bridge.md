@@ -18,6 +18,9 @@ Docker network as your services, gets probed by Gatus over the public URL, and
 forwards the probe to the internal service over the Docker DNS name. No auth
 bypass, no exposed internal URLs.
 
+It feeds the Gatus checks behind my status page;
+[how I run production](/infrastructure) shows where it sits.
+
 ## Why TCP checks are not enough
 
 The first instinct is to use a TCP check in Gatus: `tcp://hl-metube:8081`. That

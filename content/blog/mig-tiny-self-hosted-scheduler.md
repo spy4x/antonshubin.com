@@ -19,6 +19,9 @@ one URL, and zero interest in running a database to send an email.
 binary, stores bookings in a JSON file, sends confirmations over SMTP, and signs
 cancellable links with SHA-256 HMAC. No DB, no admin UI, no Tailwind cluster.
 
+It runs my own booking page; [how I run production](/infrastructure) shows how
+it fits in.
+
 ## What mig actually does
 
 ```
