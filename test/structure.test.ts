@@ -581,21 +581,47 @@ siteTest(
 );
 
 siteTest(
-  "the visible breadcrumb on a case page reads Home / Work / <title>",
+  "a nested page's back link says the nav's word for its section, and its JSON-LD trail is unchanged",
   async (site) => {
-    async function crumbs(path: string): Promise<string> {
+    async function back(path: string): Promise<{ href: string; text: string }> {
       const html = await site.html(path);
       const start = html.indexOf('aria-label="Breadcrumb"');
-      assert(start > 0, `${path}: no breadcrumb`);
-      const nav = html.slice(start, html.indexOf("</nav>", start));
-      return nav.split("<li").slice(1)
-        .map((li) => visibleText(`<li${li}`).replace(/[\s/]+$/, "").trim())
-        .join(" / ");
+      assert(start > 0, `${path}: no back link`);
+      const nav = html.slice(
+        html.lastIndexOf("<nav", start),
+        html.indexOf("</nav>", start),
+      );
+      assertEquals(count(nav, /<a\b/g), 1, `${path}: more than one link`);
+      return {
+        href: nav.match(/href="([^"]+)"/)![1],
+        text: visibleText(nav).replace(/^‹\s*/, ""),
+      };
     }
     const project = projects.freelance[0];
+    assertEquals(await back(`/work/${project.slug}`), {
+      href: "/work",
+      text: "Work",
+    });
+    assertEquals(await back(`/blog/${blogArticles[0].slug}`), {
+      href: "/blog",
+      text: "Writing",
+    });
+    assertEquals(await back(`/catalog/${catalogItems[0].slug}`), {
+      href: "/catalog",
+      text: "Services",
+    });
+    assertEquals(await back(`/tools/${tools[0].slug}`), {
+      href: "/tools",
+      text: "Tools",
+    });
+    const trail = jsonLd(await site.html(`/work/${project.slug}`))
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
+      .find((n) => (n as { "@type"?: string })["@type"] === "BreadcrumbList") as
+        | { itemListElement: { name: string }[] }
+        | undefined;
     assertEquals(
-      await crumbs(`/work/${project.slug}`),
-      `Home / Work / ${project.title}`,
+      trail?.itemListElement.map((i) => i.name),
+      ["Home", "Work", project.title],
     );
   },
 );

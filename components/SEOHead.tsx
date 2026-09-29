@@ -5,7 +5,8 @@ import {
   ROLE,
   SITE_DESCRIPTION,
 } from "../lib/head.ts";
-import { LOCATION, SAME_AS_URLS, X_HANDLE } from "../lib/config.ts";
+import { LOCATION, X_HANDLE } from "../lib/config.ts";
+import { sameAsUrls } from "../lib/profiles.ts";
 import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts";
 import { proof } from "../lib/proof.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
@@ -164,7 +165,7 @@ export function SEOHead() {
                 // tell apart similarly-named items, not to state earnings),
                 // and the figure is already visible on the page (#186) —
                 // left out of structured data entirely rather than misused.
-                "sameAs": [...SAME_AS_URLS],
+                "sameAs": sameAsUrls,
                 // schema.org's n-ary-relation pattern: a plain "worksFor":
                 // {"@id": "...#org"} has no room for a role, so the value is
                 // a Role node that itself points at the org (#193 — Anton is

@@ -673,7 +673,6 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
           "How I work",
           "Tools",
           "Writing",
-          "Links",
         ],
         "the rail must be tabbed through in its visual order",
       );
@@ -706,26 +705,43 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
   }
 });
 
-Deno.test("the rail's Links popover lists the Links groups when opened", async () => {
+Deno.test("neither the rail nor the More dialog has a Links control, and More lists pages only", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    const page: Page = await newPage(browser, {
+    const desktop: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
     });
     try {
-      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
-      await page.getByRole("button", { name: "Links", exact: true }).click();
-      const popover = page.locator("#nav-links");
-      for (const name of ["GitHub", "RSS", "meet.antonshubin.com"]) {
-        await popover.getByRole("link", { name, exact: false }).first()
-          .waitFor({ state: "visible", timeout: 5000 });
-      }
-      await page.keyboard.press("Escape");
-      await popover.waitFor({ state: "hidden" });
+      await desktop.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      assertEquals(
+        await desktop.getByRole("button", { name: "Links" }).count(),
+        0,
+        "the rail still has a Links button",
+      );
+      assertEquals(await desktop.locator("#nav-links").count(), 0);
     } finally {
-      await page.close();
+      await desktop.close();
+    }
+    const phone: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    try {
+      await phone.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await phone.getByRole("button", { name: "More", exact: true }).click();
+      const dialog = phone.locator("#mobile-menu");
+      await dialog.getByRole("link").first().waitFor({ state: "visible" });
+      const names = await dialog.getByRole("link").allTextContents();
+      assertEquals(
+        names.map((n) => n.trim()),
+        ["Home", "About", "How I work", "Writing", "Infrastructure"],
+      );
+      assertEquals(
+        await dialog.locator('a[href^="http"]').count(),
+        0,
+        "More lists an outside link",
+      );
+    } finally {
+      await phone.close();
     }
   } finally {
     await browser?.close();

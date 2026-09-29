@@ -191,6 +191,7 @@ ${catalogList}
 - **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how each layer is run: handover, backups, monitoring, deploys, sign-in. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 ${infrastructureLines(BASE_URL)}
 - **Writing:** ${BASE_URL}/blog — Posts on decisions for founders, AI and MCP, and self-hosting, grouped by topic, with an Archive of older posts kept as written
+- **Privacy:** ${BASE_URL}/privacy — What the brief form, the newsletter and analytics collect, where it is stored, and how to unsubscribe
 ${hackathonsSection}
 ### Writing
 ${blogList}

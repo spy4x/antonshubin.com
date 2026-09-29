@@ -254,6 +254,26 @@ body {
   outline-offset: 2px;
 }
 
+/* The footer's links (#293). One rule instead of a class string on each of
+   its ~25 links: the footer is on every page, and its bytes compete with the
+   home page's LCP image on a slow connection. */
+.site-footer {
+  /* Below the fold on almost every page: skip its layout and paint until it
+     scrolls near, so it costs the first paint nothing. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 32rem;
+}
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  color: var(--color-parchment);
+  text-underline-offset: 4px;
+}
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
 h1,
 h2,
 h3,

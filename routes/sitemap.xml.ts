@@ -1,89 +1,31 @@
 import { define } from "../lib/utils.ts";
 import { blogArticles, hackathons } from "../lib/data.ts";
-import { WORK_PATH, workHref, workProjects } from "../lib/work.ts";
+import { workHref, workProjects } from "../lib/work.ts";
 import { BASE_URL } from "../lib/config.ts";
 import { catalogItems } from "../lib/catalog.ts";
 import { tools } from "../lib/tools.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
-import { ABOUT_PATH } from "../lib/about.ts";
+import { pagesFor } from "../lib/pages.ts";
 import { latestPostDate } from "../lib/blog.ts";
 
 export const handler = define.handlers({
   GET() {
     const domain = BASE_URL;
 
-    const staticPages = [
-      {
-        loc: "/",
-        priority: "1.0",
-        changefreq: "weekly",
-        lastmod: undefined as string | undefined,
-      },
-      {
-        loc: "/catalog",
-        priority: "0.9",
-        changefreq: "weekly",
-        lastmod: undefined,
-      },
-      {
-        loc: "/how-i-work",
-        priority: "0.8",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      {
-        loc: ABOUT_PATH,
-        priority: "0.8",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      {
-        loc: "/contact-me",
-        priority: "0.7",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      {
-        loc: WORK_PATH,
-        priority: "0.8",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      {
-        loc: "/tools",
-        priority: "0.8",
-        changefreq: "weekly",
-        lastmod: undefined,
-      },
-      {
-        loc: "/blog",
-        priority: "0.8",
-        changefreq: "weekly",
+    // `lib/pages.ts`'s core pages. /hackathons answers 404 until there is a
+    // hackathon, so it stays out until then.
+    const staticPages = pagesFor("sitemap")
+      .filter((p) => p.path !== "/hackathons" || hackathons.length > 0)
+      .map((p) => ({
+        loc: p.path,
+        priority: p.priority,
+        changefreq: p.changefreq,
         // The newest current post's date (#274, SEO 10).
-        lastmod: latestPostDate() as string | undefined,
-      },
-      {
-        loc: "/infrastructure",
-        priority: "0.7",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      {
-        loc: "/saas-architecture-guide",
-        priority: "0.9",
-        changefreq: "monthly",
-        lastmod: undefined,
-      },
-      ...(hackathons.length > 0
-        ? [{
-          loc: "/hackathons",
-          priority: "0.7",
-          changefreq: "monthly",
-          lastmod: undefined,
-        }]
-        : []),
-    ];
+        lastmod: (p.path === "/blog" ? latestPostDate() : undefined) as
+          | string
+          | undefined,
+      }));
 
     // Archived posts stay indexed, one step down (#274, SEO 7).
     const blogUrls = blogArticles.map((a) => ({

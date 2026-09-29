@@ -1,6 +1,7 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
+import { NotFound } from "../../components/NotFound.tsx";
 import {
   type Period,
   type Project,
@@ -115,7 +116,7 @@ function projectJsonLd(project: Project, canonical: string) {
   };
 }
 
-// Unknown slugs keep the friendly "Not Found" view below, but must answer with
+// Unknown slugs show the shared not-found page (components/NotFound.tsx), but must answer with
 // a real 404 so search engines drop removed project pages instead of indexing
 // an empty 200.
 export const handler = define.handlers({
@@ -149,22 +150,7 @@ export default define.page(function ProjectDetail(ctx) {
   const project = findWorkProject(slug);
 
   if (!project) {
-    return (
-      <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-semibold text-parchment mb-4">Not Found</h1>
-          <p class="text-graphite mb-6">
-            The project you're looking for does not exist.
-          </p>
-          <a
-            href={WORK_PATH}
-            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors"
-          >
-            ← Back to work
-          </a>
-        </div>
-      </Layout>
-    );
+    return <NotFound pathname={ctx.url.pathname} />;
   }
 
   const isClientProject = isClientWork(slug);

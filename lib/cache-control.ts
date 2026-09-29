@@ -3,20 +3,11 @@
 // and whether the request came in on the staging host, so a unit test can
 // cover the staging branch: a test's fetch cannot set a Host header.
 
-// Core static page routes that change infrequently (cached 3 days at edge).
-export const CORE_PAGES = new Set([
-  "/",
-  "/how-i-work",
-  "/about",
-  "/infrastructure",
-  "/contact-me",
-  "/blog",
-  "/work",
-  "/catalog",
-  "/pay",
-  "/saas-architecture-guide",
-  "/hackathons",
-]);
+import { pagesFor } from "./pages.ts";
+
+// Core static page routes that change infrequently (cached 3 days at edge):
+// `lib/pages.ts`'s list, minus the pages it marks as kept off the edge tier.
+export const CORE_PAGES = new Set(pagesFor("edge").map((p) => p.path));
 
 const isAsset = (pathname: string) =>
   pathname.startsWith("/assets/") || pathname.startsWith("/_fresh/");

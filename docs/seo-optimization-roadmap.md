@@ -68,7 +68,7 @@ can build on it.
 - `award` (Expert-Vetted, 100% Job Success — the earnings figure was moved out
   of `award` in #186: it isn't an award, and no other schema.org property fit it
   without overclaiming, so it's left out of structured data entirely)
-- `sameAs` spread from `lib/config.ts` (`SAME_AS_URLS`)
+- `sameAs` from `lib/profiles.ts`
 - `worksFor` now references `@id: "https://neatsoft.dev/#org"`
 
 Added standalone `Organization` block for NeatSoft with `founder` link back to
@@ -79,8 +79,7 @@ reference and added `publisher` field.
 
 New config:
 
-- `lib/config.ts` — `SAME_AS_URLS` (Upwork, GitHub). Add LinkedIn / X / YouTube
-  URLs here.
+- `lib/profiles.ts` (Upwork, GitHub). Add LinkedIn / X / YouTube URLs here.
 
 ### T4 — Enriched BlogPosting + catalog Service (#30)
 
@@ -211,7 +210,7 @@ roadmap for detailed steps.
 | New blog post              | `routes/sitemap.xml.ts`, `routes/llms-full.txt.ts`                         |
 | New catalog item           | `routes/sitemap.xml.ts`, `routes/llms-full.txt.ts`                         |
 | New project                | `routes/sitemap.xml.ts` (automatic), `routes/llms-full.txt.ts`             |
-| Add LinkedIn/X/YouTube URL | `lib/config.ts` (`SAME_AS_URLS`)                                           |
+| Add LinkedIn/X/YouTube URL | `lib/profiles.ts`                                                          |
 | Change pricing/policies    | `routes/llms.txt.ts`, `routes/llms-full.txt.ts`                            |
 | Change crawler rules       | `routes/robots.txt.ts`                                                     |
 | Add new route              | `routes/sitemap.xml.ts`, `routes/llms-full.txt.ts`, wire head in new route |

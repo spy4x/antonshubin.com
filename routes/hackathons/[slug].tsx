@@ -1,6 +1,7 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
+import { NotFound } from "../../components/NotFound.tsx";
 import { type Hackathon, hackathons } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
@@ -13,7 +14,7 @@ function getHackathonBySlug(slug: string): Hackathon | undefined {
   return hackathons.find((h) => h.slug === slug);
 }
 
-// Unknown slugs answer with a real 404, not a 200 "Not Found" page.
+// Unknown slugs answer with a real 404.
 export const handler = define.handlers({
   GET(ctx) {
     return getHackathonBySlug(ctx.params.slug) ? page() : page(null, {
@@ -28,22 +29,7 @@ export default define.page(function HackathonDetail(ctx) {
   const h = getHackathonBySlug(slug);
 
   if (!h) {
-    return (
-      <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-bold text-parchment mb-4">Not Found</h1>
-          <p class="text-graphite mb-6">
-            That hackathon does not exist.
-          </p>
-          <a
-            href="/hackathons"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
-          >
-            &larr; Back to hackathons
-          </a>
-        </div>
-      </Layout>
-    );
+    return <NotFound pathname={ctx.url.pathname} />;
   }
 
   head.value = {

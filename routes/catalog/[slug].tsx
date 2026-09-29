@@ -1,6 +1,7 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
+import { NotFound } from "../../components/NotFound.tsx";
 import { BASE_URL } from "../../lib/config.ts";
 import {
   briefPath,
@@ -44,7 +45,7 @@ function getItemBySlug(slug: string): CatalogItem | undefined {
 }
 
 // Retired slugs answer 301 to the item that absorbed them (lib/catalog.ts).
-// Unknown slugs keep the friendly "Not Found" view below, but must answer with
+// Unknown slugs show the shared not-found page (components/NotFound.tsx), but must answer with
 // a real 404 so search engines drop removed catalog items instead of indexing
 // an empty 200.
 export const handler = define.handlers({
@@ -71,20 +72,7 @@ export default define.page(function CatalogDetail(ctx) {
   const item = getItemBySlug(slug);
 
   if (!item) {
-    return (
-      <Layout currentPath="/catalog">
-        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-semibold text-parchment mb-4">Not Found</h1>
-          <p class="text-graphite mb-6">This service does not exist.</p>
-          <a
-            href="/catalog"
-            class="text-accent hover:text-accent hover:underline transition-colors"
-          >
-            ← Back to services
-          </a>
-        </div>
-      </Layout>
-    );
+    return <NotFound pathname={ctx.url.pathname} />;
   }
 
   const canonical = `https://antonshubin.com/catalog/${item.slug}`;

@@ -669,8 +669,6 @@ const NAV_GLYPHS = {
   infrastructure: "M2 4h20v6H2zM2 14h20v6H2zM6 7h.01M6 17h.01",
   book: "M3 5h18v16H3zM16 3v4M8 3v4M3 10h18",
   write: "M2 5h20v14H2zM2 6l10 7 10-7",
-  links:
-    "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
   more: "M4 6h16M4 12h16M4 18h16",
   close: "M18 6 6 18M6 6l12 12",
 } as const;

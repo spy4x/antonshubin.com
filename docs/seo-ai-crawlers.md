@@ -65,7 +65,10 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 ### 4. `/sitemap.xml` (routes/sitemap.xml.ts)
 
-- Dynamic page, project, catalog, and blog URLs with priorities; `/pay` excluded
+- Dynamic page, project, catalog, and blog URLs with priorities; `/pay`
+  excluded. The static pages come from `lib/pages.ts` (#293), the same list that
+  feeds the edge-cache `CORE_PAGES` and the service worker's precache;
+  `/privacy` is in it
 - AI-friendly XML comments describing the site and its purpose
 - All blog posts, projects, catalog items included; `/blog`'s `lastmod` is the
   newest current post's date, and an archived post has priority 0.3 (#274)
@@ -124,7 +127,7 @@ Five entities in a `@graph` array (six on `/about`):
 - `twitter:site` and `twitter:creator` are `@spy4x`, the handle Anton confirmed
   on 27 Sep 2026 (#193); the Person `sameAs` lists Upwork, GitHub, LinkedIn,
   both YouTube channels (work and the `@anton-shubin-live` vlog, #294) and X
-  (`lib/config.ts`'s `SAME_AS_URLS`)
+  (`lib/profiles.ts`, the list the footer and `/contact-me` read too, #293)
 
 ### 6. FAQ Schema (routes/how-i-work.tsx, lib/faqs.ts)
 
@@ -282,7 +285,7 @@ Whenever any of these change, update the corresponding AI crawler files:
 
 | What changed              | Files to update                                                                                                                                |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| New page added            | sitemap.xml.ts, llms-full.txt.ts                                                                                                               |
+| New page added            | `lib/pages.ts` (sitemap, edge cache and precache), llms-full.txt.ts                                                                            |
 | Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                                                  |
 | Policies/terms change     | `lib/faqs.ts` (page, JSON-LD and llms-full read it), `lib/promises.ts`, llms.txt.ts                                                            |
 | Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                                        |

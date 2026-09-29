@@ -30,12 +30,11 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   });
 }
 
-/** The visible breadcrumb trail (`<nav aria-label="Breadcrumb">`) as text items. */
-function crumbs(html: string): string[] {
+/** The back link's text (`<nav aria-label="Breadcrumb">`), without its "‹". */
+function backLink(html: string): string {
   const nav = html.match(/<nav[^>]*aria-label="Breadcrumb"[\s\S]*?<\/nav>/);
-  assert(nav, "no breadcrumb");
-  return [...nav[0].matchAll(/<(?:a|span)\b[^>]*>([^<]+)<\/(?:a|span)>/g)]
-    .map((m) => m[1].trim()).filter(Boolean);
+  assert(nav, "no back link");
+  return visibleText(nav[0]).replace(/^‹\s*/, "");
 }
 
 siteTest(
@@ -54,7 +53,7 @@ siteTest(
 );
 
 siteTest(
-  "the breadcrumb says Home / Services / <short title>, in the trail and in JSON-LD",
+  "the back link says Services, and the JSON-LD trail is Home / Services / <short title>",
   async (site) => {
     for (const item of catalogItems) {
       const html = await site.html(`/catalog/${item.slug}`);
@@ -71,12 +70,7 @@ siteTest(
         ["Home", "Services", item.shortTitle],
         item.slug,
       );
-      const trail = crumbs(html);
-      assert(trail.includes("Services"), `${item.slug}: trail ${trail}`);
-      assertFalse(
-        trail.includes("Catalog"),
-        `${item.slug}: trail says Catalog`,
-      );
+      assertEquals(backLink(html), "Services", item.slug);
     }
     const index = await site.html("/catalog");
     const graph = jsonLd(index).flatMap((d) =>

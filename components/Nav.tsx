@@ -1,10 +1,8 @@
 import { NavGlyph } from "./Icons.tsx";
-import { NewTabHint } from "./NewTabHint.tsx";
 import { BOOK, FOCUS, navIcon, STACKED, STATES } from "./NavParts.tsx";
-import { UPWORK_URL } from "../lib/config.ts";
-import NavLinks from "../islands/NavLinks.tsx";
 import NavMore from "../islands/NavMore.tsx";
 import {
+  BOOK_HREF,
   navCurrent,
   type NavItem,
   railItems,
@@ -15,25 +13,17 @@ import {
 
 interface NavProps {
   currentPath: string;
-  /** `SCHEDULE_URL`: Book's target. Empty → Book reads "Write" and goes to the brief form. */
+  /** `SCHEDULE_URL`: set → Book; empty → "Write". Both go to `/contact-me`. */
   scheduleUrl: string;
 }
 
-/** The Book action's props: the booking link, or "Write" to the brief form. */
+/** The Book action: "Book" on the booking page, or "Write" on its brief. */
 function bookLink(scheduleUrl: string) {
   return scheduleUrl
-    ? {
-      href: scheduleUrl,
-      label: "Book",
-      target: "_blank" as const,
-      rel: "noopener noreferrer",
-      icon: <NavGlyph name="book" />,
-    }
+    ? { href: BOOK_HREF, label: "Book", icon: <NavGlyph name="book" /> }
     : {
       href: WRITE_FALLBACK_HREF,
       label: "Write",
-      target: undefined,
-      rel: undefined,
       icon: <NavGlyph name="write" />,
     };
 }
@@ -41,11 +31,11 @@ function bookLink(scheduleUrl: string) {
 /**
  * The site navigation (#185). Desktop (640px up): a fixed left rail read top
  * to bottom — home portrait, Book, the five destinations in `lib/nav.ts`'s
- * `railItems` (the only part that scrolls on a short screen), then a Links
- * popover (`islands/NavLinks.tsx`). Phone: a fixed bottom tab bar — Work,
+ * `railItems` (the only part that scrolls on a short screen); the profiles
+ * and feeds are in the footer (#293). Phone: a fixed bottom tab bar — Work,
  * Services, Book in the centre, Tools, More — where More
  * (`islands/NavMore.tsx`) opens a `<dialog>`
- * with the remaining pages and the Links groups.
+ * with the remaining pages.
  *
  * Server-rendered on purpose. Fresh's renderer marks each destination link's
  * `aria-current` from the real request URL, and nothing hydrates here to strip
@@ -82,8 +72,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
           <li>
             <a
               href={book.href}
-              target={book.target}
-              rel={book.rel}
               aria-current="false"
               data-primary-book
               data-nav-book
@@ -92,7 +80,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             >
               {book.icon}
               <span>{book.label}</span>
-              {book.target && <NewTabHint />}
             </a>
           </li>
           {tabItemsAfterBook.map(tab)}
@@ -100,7 +87,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             <NavMore
               {...{ "client:idle": true }}
               currentPath={currentPath}
-              upworkUrl={UPWORK_URL}
             />
           </li>
         </ul>
@@ -128,8 +114,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
         </a>
         <a
           href={book.href}
-          target={book.target}
-          rel={book.rel}
           aria-current="false"
           data-primary-book
           data-nav-book
@@ -138,7 +122,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
         >
           {book.icon}
           <span>{book.label}</span>
-          {book.target && <NewTabHint />}
         </a>
         <ul class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 p-1 -mx-1">
           {railItems.map((item) => (
@@ -154,7 +137,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             </li>
           ))}
         </ul>
-        <NavLinks upworkUrl={UPWORK_URL} />
       </div>
     </nav>
   );
