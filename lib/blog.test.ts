@@ -2,6 +2,7 @@ import { assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
   archiveNoteText,
   latestPostDate,
+  postDate,
   postTitleTag,
   readNext,
   relatedService,
@@ -149,4 +150,9 @@ Deno.test("a post's relatedTool is the tool whose posts list names it, and only 
     );
     assertEquals(toolsForPost(article.slug).length <= 1, true, article.slug);
   }
+});
+
+Deno.test("a post date reads as day, month name and year, whatever the server's time zone", () => {
+  assertEquals(postDate("2026-06-15"), "15 June 2026");
+  assertEquals(postDate("2026-01-01"), "1 January 2026");
 });

@@ -4,6 +4,7 @@
  * llms-file lines. Metadata itself is read by `lib/blog-posts.ts`; this file
  * writes no claim of its own beyond the fixed labels below.
  */
+import { dayLabel, monthLabel } from "@spy4x/time/locale";
 import { blogArticles } from "./data.ts";
 import { type BlogArticle, byNewest, topic, topics } from "./blog-posts.ts";
 import {
@@ -94,20 +95,12 @@ export function readNext(
     .slice(0, count);
 }
 
-const MONTH_YEAR = new Intl.DateTimeFormat("en-US", {
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
 /**
  * The note at the top of an archived post: "Written in April 2022. Kept as
  * written." plus the post's own `archiveNote` when Anton writes one (#301).
  */
 export function archiveNoteText(article: BlogArticle): string {
-  const written = MONTH_YEAR.format(
-    new Date(`${article.publishedAt}T00:00:00Z`),
-  );
+  const written = monthLabel(article.publishedAt, "en-US");
   const base = `Written in ${written}. Kept as written.`;
   return article.archiveNote ? `${base} ${article.archiveNote}` : base;
 }
@@ -184,19 +177,12 @@ export function llmsBlogSections(
   return sections.join("\n\n");
 }
 
-const DAY_MONTH_YEAR = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
 /**
  * "15 June 2026", as every Writing page prints a date. Formatted in UTC, so
  * the day never shifts with the server's time zone.
  */
 export function postDate(iso: string): string {
-  return DAY_MONTH_YEAR.format(new Date(`${iso}T00:00:00Z`));
+  return dayLabel(iso, "en-GB");
 }
 
 /**
