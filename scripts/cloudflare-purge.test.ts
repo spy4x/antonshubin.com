@@ -154,6 +154,24 @@ Deno.test("purgeCloudflare reports an API error without throwing or echoing the 
   assert(!JSON.stringify(result).includes(TOKEN));
 });
 
+Deno.test("purgeCloudflare treats an HTTP 200 answer marked unsuccessful as a failure", async () => {
+  const { fetch } = stubFetch((_, i) =>
+    i === 0
+      ? zoneFound()
+      : json({ success: false, errors: [{ code: 1134, message: "Busy" }] })
+  );
+  const result = await purgeCloudflare({
+    token: TOKEN,
+    urls: ["https://antonshubin.com/sw.js"],
+    fetch,
+  });
+  assertEquals(result.success, false);
+  assertEquals(
+    result.error,
+    "purge failed after 0 of 1 URL(s) (HTTP 200: 1134 Busy)",
+  );
+});
+
 Deno.test("purgeCloudflare reports a missing zone and a network failure as errors", async () => {
   const missing = stubFetch(() => json({ success: true, result: [] }));
   const noZone = await purgeCloudflare({
