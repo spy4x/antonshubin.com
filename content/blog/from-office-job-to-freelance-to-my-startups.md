@@ -1,3 +1,5 @@
+_Written in 2022. Who I am and what I do today: [About me](/about)._
+
 ## What is it about?
 
 In my <a href="ship-it-today" target="_blank">previous blog post</a>, I shared
