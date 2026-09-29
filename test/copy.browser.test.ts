@@ -74,13 +74,12 @@ Deno.test("the /pay copy button still copies through the textarea fallback when 
   });
 });
 
-Deno.test("the /pay copy button never says Copied! when nothing could be copied", async () => {
+Deno.test("the /pay copy button says Copy failed, not Copied!, when nothing could be copied", async () => {
   await withPage("fails", "/pay", async (page) => {
-    const button = page.getByRole("button", { name: "Copy EVM address" });
+    const button = page.getByRole("button").filter({ hasText: /Copy/ }).first();
     await button.click();
-    await page.waitForTimeout(500);
+    await page.getByText("Copy failed").first().waitFor({ timeout: 5000 });
     assertEquals(await page.getByText("Copied!").count(), 0);
-    assertEquals(await button.count(), 1);
   });
 });
 
@@ -103,4 +102,20 @@ Deno.test("a post's code Copy button reads Copied! on success and Copy failed wh
       document.querySelector("[data-copy-code]")?.textContent === "Copy failed"
     );
   });
+});
+
+Deno.test("a post's code Copy button reads Copied! when the clipboard API rejects and the textarea fallback works", async () => {
+  await withPage(
+    "legacy-ok",
+    "/blog/building-mcp-servers-with-deno",
+    async (page) => {
+      const button = page.locator("[data-copy-code]").first();
+      await button.waitFor({ state: "visible" });
+      await button.click();
+      await page.waitForFunction(() =>
+        document.querySelector("[data-copy-code]")?.textContent === "Copied!"
+      );
+      assertEquals((await copied(page)).length, 1);
+    },
+  );
 });

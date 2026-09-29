@@ -19,12 +19,19 @@ export default function CopyButton(
   { elementId, label, class: className, title, umamiEvent }: CopyButtonProps,
 ) {
   const copied = useSignal(false);
+  const failed = useSignal(false);
 
   const handleCopy = async () => {
     const el = document.getElementById(elementId);
     if (!el) return;
     const txt = el.textContent?.trim() || "";
-    if (!(await copyToClipboard(txt))) return;
+    if (!(await copyToClipboard(txt))) {
+      failed.value = true;
+      setTimeout(() => {
+        failed.value = false;
+      }, 3000);
+      return;
+    }
     copied.value = true;
     setTimeout(() => {
       copied.value = false;
@@ -40,7 +47,9 @@ export default function CopyButton(
       class={`${className || ""} ${baseClass}`.trim()}
       aria-live="polite"
       data-umami-event={umamiEvent}
-      {...(title && !copied.value ? { title, "aria-label": title } : {})}
+      {...(title && !copied.value && !failed.value
+        ? { title, "aria-label": title }
+        : {})}
     >
       {copied.value
         ? (
@@ -48,6 +57,8 @@ export default function CopyButton(
             <CheckIcon class="w-3.5 h-3.5" /> Copied!
           </>
         )
+        : failed.value
+        ? <>Copy failed</>
         : (
           <>
             <CopyIcon class="w-3.5 h-3.5" /> {label ?? title ?? "Copy address"}
