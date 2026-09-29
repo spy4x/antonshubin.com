@@ -300,7 +300,7 @@ say when the CI status was checked and whether it is the committed file
 (`checkedLabel()`; a repository counts as live only when its GitHub and
 Woodpecker calls both succeeded). `/tools` and `/tools/*` are cached for an hour
 so a refresh reaches visitors (`lib/cache-control.ts`). A tool's `posts` link
-each post to its page (the post shows "The tool behind this post"); its
+each post to its page (the post header shows "The tool: <name>"); its
 `catalogSlug` picks the catalog item the "hire me" door names; `deployable` adds
 `SoftwareApplication` JSON-LD, whose `url` is only ever its running `live`
 instance. The hub carries `CollectionPage` and `ItemList` JSON-LD. Umami events
