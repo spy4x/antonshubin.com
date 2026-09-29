@@ -11,6 +11,7 @@ import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
 import { ROLE } from "../lib/head.ts";
 import { projectLead } from "../lib/llms.ts";
+import { promise } from "../lib/promises.ts";
 import {
   archiveProjects,
   formatPeriod,
@@ -529,7 +530,7 @@ Deno.test("/work shows Book once in its body, in the closing band, beside the ca
 });
 
 siteTest(
-  "only the first /work card image loads eagerly, none is high priority, and every image is sized",
+  "only the first /work card's picture loads eagerly, none is high priority, and every image is sized",
   async (site) => {
     const body = main(await site.html("/work"));
     const imgs = [...body.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]);
@@ -546,12 +547,10 @@ siteTest(
     }
     const first = highlightProjects()[0];
     const eager = imgs.filter((t) => !/loading="lazy"/.test(t));
+    assertEquals(eager.length, 1, `eager images: ${eager.join("\n")}`);
     assert(
-      eager.length > 0 &&
-        eager.every((t) =>
-          t.includes(first.cardImage!.src) || t.includes(first.logoImageURL!)
-        ),
-      `an image outside the first card is eager: ${eager.join("\n")}`,
+      eager[0].includes(`src="${first.cardImage!.src}`),
+      `the eager image is not the first card's picture: ${eager[0]}`,
     );
     for (const p of highlightProjects()) {
       assert(p.cardImage, `${p.slug} has no card image`);
@@ -608,5 +607,32 @@ siteTest(
       /\nAll client work: \S+\/work\n/.test(short),
       "llms.txt does not point to /work",
     );
+  },
+);
+
+siteTest(
+  "the closing band on /work and on a project page shows the refund and first-milestone promises",
+  async (site) => {
+    const expected = [promise("refund"), promise("first-milestone")];
+    for (const path of ["/work", "/work/smartlite"]) {
+      const html = await site.html(path);
+      const start = html.indexOf("<section data-closing-band");
+      assert(start > 0, `${path} has no closing band`);
+      const band = html.slice(start, html.indexOf("</section>", start));
+      const list = band.slice(band.indexOf("<ul"), band.indexOf("</ul>"));
+      assertEquals(
+        count(list, /<li[\s>]/g),
+        expected.length,
+        `${path} promises`,
+      );
+      const text = visibleText(list);
+      for (const p of expected) {
+        assert(text.includes(p.title), `${path}'s band lacks "${p.title}"`);
+        assert(
+          text.includes(p.desc),
+          `${path}'s band lacks the ${p.id} promise's text`,
+        );
+      }
+    }
   },
 );

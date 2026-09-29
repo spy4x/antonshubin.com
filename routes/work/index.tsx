@@ -208,7 +208,7 @@ function HighlightCard(
               aria-hidden="true"
               width={28}
               height={28}
-              loading={eager ? "eager" : "lazy"}
+              loading="lazy"
               class={`w-7 h-7 shrink-0 object-contain${
                 project.logoPlate ? " bg-parchment rounded p-0.5" : ""
               }`}
