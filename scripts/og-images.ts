@@ -2,8 +2,8 @@
 /**
  * Generates the 1200×630 link-preview PNGs this site commits under
  * `static/img/og/`: one per blog post, one per project page, one per tool
- * page plus the `/tools` hub (#189), and one landscape default for the site
- * (#193).
+ * page plus the `/tools` hub (#189), one for `/work` (#270), and one
+ * landscape default for the site (#193).
  *
  * Run with:
  *   deno task og
@@ -25,6 +25,8 @@ import { launchChromium } from "../test/browser.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { ROLE } from "../lib/head.ts";
 import { tools } from "../lib/tools.ts";
+import { metaDescription } from "../lib/llms.ts";
+import { workDescription } from "../lib/work.ts";
 import type { Browser } from "playwright";
 import { fromFileUrl } from "@std/path";
 
@@ -156,6 +158,18 @@ async function main() {
       new URL("tools.png", OG_DIR),
     );
     console.log(`tools.png  ${fmtBytes(toolsHubBytes)}`);
+    count++;
+
+    // /work (#270): the page's own title and meta description.
+    const workBytes = await render(
+      browser,
+      cardHtml(
+        "Client work and case studies",
+        metaDescription(workDescription(ROLE)),
+      ),
+      new URL("work.png", OG_DIR),
+    );
+    console.log(`work.png  ${fmtBytes(workBytes)}`);
     count++;
 
     const defaultHtml = cardHtml("Anton Shubin", ROLE);
