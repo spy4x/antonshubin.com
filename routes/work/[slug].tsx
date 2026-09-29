@@ -2,7 +2,6 @@ import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import {
-  formatPeriod,
   type Period,
   type Project,
   projectScreenshots,
@@ -22,6 +21,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
+import { MoreWorkCard } from "../../components/MoreWorkCard.tsx";
 import {
   ProjectFactCard,
   SimilarWorkLink,
@@ -141,27 +141,6 @@ function LogoMark({ project }: { project: Project }) {
         project.logoPlate ? " bg-parchment rounded-lg p-2" : ""
       }`}
     />
-  );
-}
-
-/** A "More work" card: title, lead line and period, linking the project's page. */
-function MoreWorkCard({ project }: { project: Project }) {
-  return (
-    <li>
-      <a
-        href={workHref(project.slug ?? "")}
-        data-more-work={project.slug}
-        class="block h-full bg-paper border border-rule rounded-xl p-5 hover:border-rule-strong transition-colors"
-      >
-        <h3 class="text-lg text-parchment">{project.title}</h3>
-        <p class="mt-2 text-sm text-graphite">{projectLead(project)}</p>
-        {project.period && (
-          <p class="mt-3 text-sm text-graphite" data-project-period>
-            {formatPeriod(project.period)}
-          </p>
-        )}
-      </a>
-    </li>
   );
 }
 

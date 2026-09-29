@@ -5,6 +5,7 @@ import {
   archiveFrame,
   clientWork,
   formatYearSpan,
+  projectsForCatalog,
   projectStatus,
   repeatClientsSegments,
   workDescription,
@@ -94,4 +95,28 @@ Deno.test("the repeat-clients segments join back into the line and mark each nam
       ["Corecircle", "corecircle"],
     ],
   );
+});
+
+Deno.test("projectsForCatalog lists the client projects sold under an item, highlights first", () => {
+  assertEquals(
+    projectsForCatalog("zero-to-production-saas-mvp").map((p) => p.slug),
+    ["smartlite", "roley", "sogroya"],
+  );
+  assertEquals(
+    projectsForCatalog("codebase-health-audit").map((p) => p.slug),
+    ["code-review"],
+  );
+  assertEquals(projectsForCatalog("cto-advisory-retainer").length, 3);
+  assertEquals(projectsForCatalog("cto-advisory-retainer", 2).length, 2);
+});
+
+Deno.test("projectsForCatalog gives no project for the strategy session and throws on a typo", () => {
+  assertEquals(projectsForCatalog("strategy-call"), []);
+  let threw = false;
+  try {
+    projectsForCatalog("strategy-cal");
+  } catch {
+    threw = true;
+  }
+  assert(threw, "a mistyped slug must fail, not return an empty list");
 });

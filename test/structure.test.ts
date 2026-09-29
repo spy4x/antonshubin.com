@@ -70,10 +70,12 @@ siteTest("the navigation has the five agreed links", async (site) => {
  * produces the redirects: a deleted or repointed entry would then pass.
  */
 const EXPECTED_REDIRECTS: Record<string, string> = {
-  "technical-discovery-sprint": "/catalog/zero-to-production-saas-mvp",
-  "bulletproof-backend-api": "/catalog/zero-to-production-saas-mvp",
-  "surgical-ai-integration": "/catalog/zero-to-production-saas-mvp",
-  "mcp-server-development": "/catalog/zero-to-production-saas-mvp",
+  "technical-discovery-sprint":
+    "/catalog/zero-to-production-saas-mvp#how-it-starts",
+  "bulletproof-backend-api": "/catalog/zero-to-production-saas-mvp#backend-api",
+  "surgical-ai-integration":
+    "/catalog/zero-to-production-saas-mvp#ai-integration",
+  "mcp-server-development": "/catalog/zero-to-production-saas-mvp#mcp-servers",
   "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
   "free-architecture-audit": "/#audit-form",
 };

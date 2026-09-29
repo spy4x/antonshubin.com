@@ -10,6 +10,7 @@ import {
 import {
   catalogItem,
   catalogItems,
+  catalogPromises,
   INTRO_CALL,
   priceLabel,
 } from "../lib/catalog.ts";
@@ -53,12 +54,19 @@ export const handler = define.handlers({
       .map((i) => {
         const covers = i.alsoCovers
           ? ` Also built under this item: ${
-            i.alsoCovers.map((c) => c.title).join(", ")
+            i.alsoCovers.map((c) => `${c.title} (/catalog/${i.slug}#${c.id})`)
+              .join(", ")
+          }.`
+          : "";
+        const ids = catalogPromises(i.slug);
+        const kept = ids.length > 0
+          ? ` Promises shown with the price: ${
+            ids.map((id) => promise(id).title).join("; ")
           }.`
           : "";
         return `  - /catalog/${i.slug} — ${i.title} (${
           priceLabel(i)
-        }, ${i.delivery.toLowerCase()}). ${i.summary}${covers}`;
+        }, ${i.delivery.toLowerCase()}). ${i.summary}${covers}${kept}`;
       })
       .join("\n");
     const build = catalogItem("zero-to-production-saas-mvp");
