@@ -2,6 +2,7 @@ import type { ComponentChildren } from "preact";
 import { formatPeriod, type Project } from "../lib/data.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
+import { projectStatus } from "../lib/work.ts";
 import GhStars from "../islands/GhStars.tsx";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { ArrowRightIcon, ExternalLinkIcon } from "./Icons.tsx";
@@ -25,18 +26,6 @@ function Fact(
       <dd class="text-parchment min-w-0">{children}</dd>
     </div>
   );
-}
-
-/** The status a project page shows: live, offline or archived — never colour alone. */
-function projectStatus(
-  project: Project,
-): "live" | "offline" | "archived" | null {
-  if (project.archived) return "archived";
-  if (project.externalURL && project.externalURLDead) return "offline";
-  // A link with its own label is a document (the code review's published
-  // report), not a product that can be live.
-  if (project.externalURL && !project.externalURLLabel) return "live";
-  return null;
 }
 
 /**
