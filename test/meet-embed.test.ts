@@ -1,26 +1,24 @@
-// Guards for issue #111, its review round (#111 follow-up), and #152: the
-// inline scheduler facade on `/`, `/how-i-work` and `/contact-me`. Four
-// things are guarded per page:
-//  1. The facade button and the standalone fallback link both exist, and the
-//     fallback's `href` really is the scheduler's URL — this must run before
-//     the "nothing fetches the origin" check below, otherwise that check
-//     passes vacuously when `SCHEDULE_URL` never reached the server (the
-//     origin then never appears anywhere, so there is nothing to find).
-//  2. Nothing that makes a browser fetch eagerly (`src`, `srcset`,
-//     `<link href>`, a protocol-relative reference, or a CSS `url(...)`
-//     inside a `style` attribute or a `<style>` block) points at the
-//     scheduler's origin before a click. A plain `<a href>` fallback link is
-//     expected and allowed, and so is the URL turning up inside Fresh's
-//     serialized island-hydration props — confirmed present in the built
-//     HTML for `/how-i-work` and `/contact-me`; it never renders as a
-//     fetchable attribute.
-//  3. On `/`, the collapsed success panel (and, once success shows, the
-//     collapsed form panel) carries `inert`, so a Tab press can't reach a
-//     control that is invisible at `max-height: 0`.
-//  4. With `SCHEDULE_URL` unset, every booking block (facade, fallback link,
-//     and — on `/contact-me` — the `#book` section and its card) is absent
-//     rather than rendering a dead end: an empty-`href` link or a heading
-//     with nothing under it.
+// Guards for issue #111, #152 and #272: the booking calendar on `/`,
+// `/how-i-work` and `/contact-me`. Since #272 there is no click-to-load
+// button: the server renders a reserved placeholder (`data-meet-embed`) and
+// the island inserts the iframe after hydration. Four things are guarded per
+// page:
+//  1. The placeholder (where the page shows one) and the new-tab link both
+//     exist, and the link's `href` really is the scheduler's URL — this must
+//     run before the "nothing fetches the origin" check below, otherwise that
+//     check passes vacuously when `SCHEDULE_URL` never reached the server.
+//  2. The server HTML holds no `<iframe>`, and nothing that makes a browser
+//     fetch eagerly (`src`, `srcset`, `<link href>`, a protocol-relative
+//     reference, or a CSS `url(...)`) points at the scheduler's origin. A
+//     plain `<a href>` is allowed, so is the URL inside Fresh's serialized
+//     island props, and on `/contact-me` only, one `<link rel="preconnect">`.
+//  3. On `/`, the collapsed success panel carries `inert` and holds no
+//     calendar: the calendar mounts only after a successful submit, so a home
+//     page view never loads the scheduler.
+//  4. With `SCHEDULE_URL` unset, every booking block (placeholder, new-tab
+//     link, and on `/contact-me` the `#book` section) is absent rather than
+//     rendering a dead end: an empty-`href` link or a heading with nothing
+//     under it.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 import { count } from "./html.ts";
@@ -32,7 +30,8 @@ import {
 
 const SCHEDULER_ORIGIN = "https://meet.example.com";
 const SCHEDULER_HOST = "meet.example.com";
-const FACADE_EVENT = 'data-umami-event="meet-embed-click-to-load"';
+/** The calendar's wrapper, `data-meet-embed="<state>"`; not the `-placeholder` child. */
+const EMBED_MARKER = /data-meet-embed="/g;
 const FALLBACK_EVENT = "meet-embed-fallback-click";
 
 /** Escapes regex metacharacters so a literal string can go inside a `RegExp`. */
@@ -123,17 +122,17 @@ function assertFallbackLink(html: string, path: string, expectedHref: string) {
   );
 }
 
-/** Runs the full facade + fallback + no-eager-fetch guard set for one page. */
-function assertBookingFacade(
+/** Runs the full placeholder + new-tab link + no-eager-fetch guard set for one page. */
+function assertBookingPlaceholder(
   html: string,
   path: string,
   embeds: number,
   expectedScheduleUrl: string,
 ) {
   assertEquals(
-    count(html, new RegExp(escapeRegExp(FACADE_EVENT), "g")),
+    count(html, EMBED_MARKER),
     embeds,
-    `${path}: expected ${embeds} facade button(s)`,
+    `${path}: expected ${embeds} calendar placeholder(s)`,
   );
   assertEquals(count(html, /<iframe\b/gi), 0, `${path}: rendered an <iframe>`);
 
@@ -143,7 +142,7 @@ function assertBookingFacade(
 
   assert(
     !fetchesFromOrigin(html, SCHEDULER_ORIGIN),
-    `${path}: found a src/srcset/link-href/CSS-url reference to the scheduler origin before a click`,
+    `${path}: found a src/srcset/link-href/CSS-url reference to the scheduler origin in the server HTML`,
   );
 }
 
@@ -204,7 +203,7 @@ function hasEmptyHrefAnchor(html: string): boolean {
 }
 
 /**
- * Asserts the booking facade, its fallback link, and any empty-href anchor
+ * Asserts the calendar placeholder, its new-tab link, and any empty-href anchor
  * are all absent — the guard for a misconfigured environment where
  * `SCHEDULE_URL` is unset. Each absence checked here has a matching
  * presence assertion in a set-case test above, so this can't pass
@@ -212,9 +211,9 @@ function hasEmptyHrefAnchor(html: string): boolean {
  */
 function assertNoBookingBlock(html: string, path: string) {
   assertEquals(
-    count(html, new RegExp(escapeRegExp(FACADE_EVENT), "g")),
+    count(html, EMBED_MARKER),
     0,
-    `${path}: rendered the booking facade button with SCHEDULE_URL unset`,
+    `${path}: rendered the calendar placeholder with SCHEDULE_URL unset`,
   );
   assertEquals(
     count(html, /<iframe\b/gi),
@@ -224,7 +223,7 @@ function assertNoBookingBlock(html: string, path: string) {
   assertEquals(
     count(html, new RegExp(escapeRegExp(FALLBACK_EVENT), "g")),
     0,
-    `${path}: rendered the "open standalone" fallback link with SCHEDULE_URL unset`,
+    `${path}: rendered the new-tab link with SCHEDULE_URL unset`,
   );
   assert(
     !hasEmptyHrefAnchor(html),
@@ -234,7 +233,7 @@ function assertNoBookingBlock(html: string, path: string) {
 
 // A schemeless SCHEDULE_URL (a plausible config typo — "meet.example.com"
 // instead of "https://meet.example.com") must not 500 the pages that render
-// the booking facade. `embedUrl()` still builds a URL from it (schemeless,
+// the booking calendar. `embedUrl()` still builds a URL from it (schemeless,
 // so browser-side it resolves wrong — a separate, pre-existing concern, not
 // this test's point); MeetEmbed must not *throw* rendering it, server-side
 // or client-side.
@@ -255,13 +254,13 @@ Deno.test("/ renders 200, not 500, when SCHEDULE_URL has no scheme", async () =>
   }
 });
 
-Deno.test("home page ships the booking facade and no iframe before a click", async () => {
+Deno.test("home page ships no calendar, no iframe and no scheduler request before a submit", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
   const site = await startSite();
   try {
     const body = await site.html("/");
-    assertBookingFacade(body, "/", 1, SCHEDULER_ORIGIN);
+    assertBookingPlaceholder(body, "/", 0, SCHEDULER_ORIGIN);
   } finally {
     await site.stop();
     if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
@@ -284,8 +283,8 @@ Deno.test("home page keeps the collapsed success panel out of the tab order", as
         "so its controls stay Tab-reachable while invisible",
     );
     assert(
-      wrapperHtml.includes(FACADE_EVENT),
-      "/: the facade button was not found inside the success wrapper — " +
+      wrapperHtml.includes(FALLBACK_EVENT),
+      "/: the new-tab link was not found inside the success wrapper — " +
         "the inert check above would be guarding the wrong element",
     );
   } finally {
@@ -295,21 +294,21 @@ Deno.test("home page keeps the collapsed success panel out of the tab order", as
   }
 });
 
-Deno.test("how-i-work ships the booking facade after the FAQ, no iframe before a click", async () => {
+Deno.test("how-i-work ships the calendar placeholder after the FAQ, no iframe in the HTML", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
   const site = await startSite();
   try {
     const body = await site.html("/how-i-work");
-    assertBookingFacade(body, "/how-i-work", 1, SCHEDULER_ORIGIN);
+    assertBookingPlaceholder(body, "/how-i-work", 1, SCHEDULER_ORIGIN);
 
     const faqIndex = body.indexOf("Frequently Asked Questions");
-    const facadeIndex = body.indexOf(FACADE_EVENT);
+    const embedIndex = body.search(EMBED_MARKER);
     assert(faqIndex >= 0, "/how-i-work: FAQ heading not found");
-    assert(facadeIndex >= 0, "/how-i-work: facade button not found");
+    assert(embedIndex >= 0, "/how-i-work: calendar placeholder not found");
     assert(
-      facadeIndex > faqIndex,
-      "/how-i-work: booking facade must come after the FAQ section, so objections are cleared before the ask",
+      embedIndex > faqIndex,
+      "/how-i-work: the calendar must come after the FAQ section, so objections are cleared before the ask",
     );
   } finally {
     await site.stop();
@@ -318,25 +317,32 @@ Deno.test("how-i-work ships the booking facade after the FAQ, no iframe before a
   }
 });
 
-Deno.test("contact-me ships the booking facade behind #book, no iframe before a click", async () => {
+Deno.test("contact-me ships the calendar placeholder in #book, a preconnect and no iframe", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
   const site = await startSite();
   try {
     const body = await site.html("/contact-me");
-    assertBookingFacade(body, "/contact-me", 1, SCHEDULER_ORIGIN);
+    // The one allowed reference: a preconnect, which opens a connection but
+    // fetches nothing. Checked, then removed before the eager-fetch guard.
+    const preconnect = `<link rel="preconnect" href="${SCHEDULER_ORIGIN}"/>`;
+    assertEquals(
+      count(body, new RegExp(escapeRegExp(preconnect), "g")),
+      1,
+      "/contact-me: expected one preconnect to the scheduler's origin",
+    );
+    assertBookingPlaceholder(
+      body.replace(preconnect, ""),
+      "/contact-me",
+      1,
+      SCHEDULER_ORIGIN,
+    );
 
+    const book = /<section\b[^>]*\bid="book"[^>]*>/.exec(body);
+    assert(book, '/contact-me: no section with id="book" found');
     assert(
-      /<a\b[^>]*href="#book"/.test(body),
-      "/contact-me: first contact card does not link to #book",
-    );
-    assert(
-      /\bid="book"/.test(body),
-      '/contact-me: no element with id="book" found',
-    );
-    assert(
-      body.includes("Book a free 30-min intro call"),
-      "/contact-me: booking heading not found",
+      body.search(EMBED_MARKER) > book.index,
+      "/contact-me: the calendar placeholder is not inside #book",
     );
   } finally {
     await site.stop();
@@ -377,7 +383,7 @@ Deno.test("how-i-work renders no booking block when SCHEDULE_URL is unset", asyn
   }
 });
 
-Deno.test("contact-me renders no #book section or link when SCHEDULE_URL is unset", async () => {
+Deno.test("contact-me renders no #book section, link or preconnect when SCHEDULE_URL is unset", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.delete("SCHEDULE_URL");
   const site = await startSite();
@@ -390,11 +396,11 @@ Deno.test("contact-me renders no #book section or link when SCHEDULE_URL is unse
     );
     assert(
       !/href="#book"/.test(body),
-      "/contact-me: a card still links to #book with SCHEDULE_URL unset",
+      "/contact-me: a link still points at #book with SCHEDULE_URL unset",
     );
     assert(
-      !body.includes("Book a free 30-min intro call"),
-      "/contact-me: booking heading still rendered with SCHEDULE_URL unset",
+      !/rel="preconnect"/.test(body),
+      "/contact-me: still preconnects to a scheduler with SCHEDULE_URL unset",
     );
   } finally {
     await site.stop();
@@ -605,7 +611,7 @@ Deno.test("isEmbedHeightMessage returns a height exactly at the cap unchanged", 
 Deno.test("meet-embed guard allows the plain fallback link and serialized island props", () => {
   const html =
     `<a href="https://${SCHEDULER_HOST}" target="_blank" rel="noopener noreferrer" ` +
-    `data-umami-event="${FALLBACK_EVENT}">open standalone</a>` +
+    `data-umami-event="${FALLBACK_EVENT}">Open the calendar in a new tab</a>` +
     `<script>boot({},"[[1],{\\"url\\":0},\\"https://${SCHEDULER_HOST}/embed\\"]")</script>`;
   assert(
     !fetchesFromOrigin(html, SCHEDULER_ORIGIN),

@@ -14,6 +14,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page, Route } from "playwright";
 import { startSite } from "./harness.ts";
 import { launchChromium, newPage } from "./browser.ts";
+import { catalogItem } from "../lib/catalog.ts";
 
 const FOCUS_TIMEOUT_MS = 5000;
 // Longer than the panels' 500ms CSS transition, so the scroll sampler below
@@ -204,6 +205,110 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
         ),
         "the focused heading must carry the success text a screen reader announces",
       );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+/** RFC 2606 host: the calendar's frame never loads, which these tests don't need. */
+const PLACEHOLDER_SCHEDULE_URL = "https://meet.example.com";
+
+/** Fills the three fields (keeping any prefilled brief), submits, and waits for the success heading. */
+async function submitBrief(page: Page): Promise<void> {
+  await page.fill("#lead-name", "Ada Lovelace");
+  await page.fill("#lead-email", "ada@example.com");
+  await page.locator("#lead-stack").pressSequentially("Deno + Fresh");
+  await clickSubmitButtonWithoutScrolling(page);
+  await page.waitForFunction(
+    () => document.activeElement?.id === "lead-success-heading",
+    undefined,
+    { timeout: FOCUS_TIMEOUT_MS },
+  );
+}
+
+Deno.test("on the booking page a brief carries its ?service= slug and its success points up to the one calendar", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      const posted: unknown[] = [];
+      await page.route("**/api/lead", (route: Route) => {
+        posted.push(route.request().postDataJSON());
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ok: true }),
+        });
+      });
+      const slug = "codebase-health-audit";
+      await page.goto(`${site.origin}/contact-me?service=${slug}`, {
+        waitUntil: "networkidle",
+      });
+      const about = `About: ${catalogItem(slug).shortTitle}`;
+      assert(
+        (await page.inputValue("#lead-stack")).startsWith(about),
+        `the brief is not prefilled with "${about}"`,
+      );
+
+      await submitBrief(page);
+      assertEquals(posted.length, 1);
+      const body = posted[0] as Record<string, unknown>;
+      assertEquals(body.service, slug);
+      assert(String(body.techStack).startsWith(about));
+
+      assertEquals(
+        await page.locator("[data-meet-embed]").count(),
+        1,
+        "a second calendar appeared after the brief was sent",
+      );
+      assertEquals(
+        await page.locator("[data-lead-success] a[href='#book']").count(),
+        1,
+        "the success panel does not point up to the calendar",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the home page mounts the calendar only after a successful brief", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await page.route(
+        "**/api/lead",
+        (route: Route) =>
+          route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ ok: true }),
+          }),
+      );
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      assertEquals(await page.locator("iframe").count(), 0);
+      assertEquals(await page.locator("[data-meet-embed]").count(), 0);
+
+      await submitBrief(page);
+      await page.locator("[data-lead-success] [data-meet-embed]").waitFor({
+        state: "attached",
+      });
     } finally {
       await page.close();
     }

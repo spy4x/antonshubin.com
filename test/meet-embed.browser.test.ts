@@ -1,6 +1,9 @@
 // Browser-driven guard for mig#44's parent-side half: islands/MeetEmbed.tsx's
 // `message` listener actually resizes the iframe to the height mig reports,
-// and ignores a spoofed message from a different window on the page. A plain
+// and ignores a spoofed message from a different window on the page. Since
+// #272 it also covers the placeholder: the frame shows on the first valid
+// message, a frame allowed by `frame-ancestors` shows despite
+// `X-Frame-Options: DENY`, and a refused frame ends in the failure message. A plain
 // rendered-page test (test/meet-embed.test.ts) can't reach this — it's
 // client-JS runtime behaviour, exactly like the CSP enforcement and focus
 // tests in the other *.browser.test.ts files (see AGENTS.md "Browser-driven
@@ -19,9 +22,9 @@
 // (`removeEventListener`) actually fires on unmount. Every route that
 // renders MeetEmbed (routes/contact-me.tsx, routes/how-i-work.tsx,
 // islands/LeadForm.tsx's success panel) keeps it mounted for the page's
-// whole life — LeadForm's success panel only CSS-collapses it
-// (`max-height`/`inert`), it never unmounts — so there's no reachable UI
-// interaction that tears MeetEmbed down while staying on the page. A full
+// whole life once it appears — LeadForm mounts it on a successful submit and
+// never unmounts it — so there's no reachable UI interaction that tears
+// MeetEmbed down while staying on the page. A full
 // page navigation does destroy it, but a hard navigation doesn't reliably
 // run Preact's effect-cleanup functions before the document is torn down,
 // so a test built on that signal wouldn't actually prove the cleanup ran.
@@ -34,10 +37,11 @@
 // `addEventListener` two lines above it) — low-risk enough to leave
 // covered by code review rather than a test that would need new
 // infrastructure to write honestly.
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser } from "playwright";
 import { startSite } from "./harness.ts";
 import { launchChromium, newPage } from "./browser.ts";
+import { EMBED_TIMEOUT_MS } from "../islands/MeetEmbed.tsx";
 
 /** Starts a stub "mig" server whose `/embed` page posts `mig:height`
  * messages to `window.parent`, and whose `/spoof.html` page posts one that
@@ -81,6 +85,28 @@ function startStubMig(): { origin: string; stop: () => void } {
           { headers: { "content-type": "text/html" } },
         );
       }
+      if (pathname === "/xfo/embed" || pathname === "/refused/embed") {
+        // mig's /embed today (checked 30 Sep 2026) sends X-Frame-Options:
+        // DENY beside a frame-ancestors policy that allows the site. /xfo
+        // sends both, as mig does; /refused sends only the DENY, so the
+        // browser refuses the frame and its message never runs.
+        const headers: Record<string, string> = {
+          "content-type": "text/html",
+          "x-frame-options": "DENY",
+        };
+        if (pathname === "/xfo/embed") {
+          headers["content-security-policy"] =
+            "frame-ancestors http://127.0.0.1:*";
+        }
+        return new Response(
+          `<!doctype html><html><body>mig stub, framing headers
+            <script>
+              window.parent.postMessage({ type: "mig:height", height: 700 }, "*");
+            </script>
+          </body></html>`,
+          { headers },
+        );
+      }
       if (pathname === "/spoof.html") {
         return new Response(
           `<!doctype html><html><body>spoofed source
@@ -109,43 +135,48 @@ Deno.test("the booking iframe resizes to the height mig's stub reports", async (
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
+      // Records every height the frame takes, from before hydration: the
+      // frame now loads by itself, so both of the stub's messages can land
+      // before the page is idle.
+      await page.addInitScript(() => {
+        const seen: string[] = [];
+        (globalThis as unknown as { heights: string[] }).heights = seen;
+        new MutationObserver(() => {
+          const el = document.querySelector(
+            'iframe[title="Schedule a call with Anton Shubin"]',
+          ) as HTMLIFrameElement | null;
+          const h = el?.style.height;
+          if (h && seen.at(-1) !== h) seen.push(h);
+        }).observe(document, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+        });
+      });
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
       });
-      await page.getByRole("button", { name: "Book a free 30-min intro call" })
-        .click();
 
-      const frame = page.locator(
-        'iframe[title="Schedule a call with Anton Shubin"]',
+      // The hidden frame starts at the placeholder's height, takes the first
+      // message, and keeps applying later ones, not just the first.
+      await page.waitForFunction(() =>
+        (globalThis as unknown as { heights: string[] }).heights.at(-1) ===
+          "950px"
       );
-      await frame.waitFor({ state: "visible" });
-
-      // Before any message arrives: the pre-mig#44 fallback height, not 0
-      // and not the final reported height — this is also what an older mig
-      // build that never sends mig:height leaves the frame at forever.
-      const initialHeight = await frame.evaluate((el) =>
-        parseInt(getComputedStyle(el).height, 10)
+      assertEquals(
+        await page.evaluate(() =>
+          (globalThis as unknown as { heights: string[] }).heights
+        ),
+        ["760px", "650px", "950px"],
       );
-      assertEquals(initialHeight, 760);
-
-      await page.waitForFunction(
-        () => {
-          const el = document.querySelector(
-            'iframe[title="Schedule a call with Anton Shubin"]',
-          ) as HTMLIFrameElement | null;
-          return el?.style.height === "650px";
-        },
+      // The first valid message replaced the placeholder with the frame.
+      assertEquals(
+        await page.locator("[data-meet-embed]").getAttribute("data-meet-embed"),
+        "ready",
       );
-
-      // The stub sends a second, larger height shortly after — the listener
-      // must keep applying later messages, not just the first one.
-      await page.waitForFunction(
-        () => {
-          const el = document.querySelector(
-            'iframe[title="Schedule a call with Anton Shubin"]',
-          ) as HTMLIFrameElement | null;
-          return el?.style.height === "950px";
-        },
+      assertEquals(
+        await page.locator("[data-meet-embed-placeholder]").count(),
+        0,
       );
     } finally {
       await page.close();
@@ -162,7 +193,9 @@ Deno.test("the booking iframe resizes to the height mig's stub reports", async (
 // resizes afterwards that is all it ever sends. MeetEmbed used to attach its
 // listener in a `useEffect` that Preact runs after the next paint, so a frame
 // that loaded first had its only message dropped and stayed at the 760px
-// fallback. The stub here posts exactly one message, as early as it can.
+// fallback. Since #272 the island inserts the frame itself, from the same
+// effect that attaches the listener, and shows it only on the first valid
+// message. The stub here posts exactly one message, as early as it can.
 // `requestAnimationFrame` is held back on this page so a paint-deferred effect
 // runs on Preact's 35ms fallback timer instead. On an idle machine the stub's
 // message arrives 16-20ms after the frame is inserted, so a late listener loses
@@ -178,19 +211,19 @@ Deno.test("the booking iframe takes the height from mig's first and only message
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
+      // Held back before any page script runs, so the island's effects run on
+      // Preact's fallback timer, as on a busy phone.
+      await page.addInitScript(() => {
+        globalThis.requestAnimationFrame = () => 0;
+      });
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
       });
-      await page.evaluate(() => {
-        globalThis.requestAnimationFrame = () => 0;
-      });
-      await page.getByRole("button", { name: "Book a free 30-min intro call" })
-        .click();
 
       const frame = page.locator(
         'iframe[title="Schedule a call with Anton Shubin"]',
       );
-      await frame.waitFor({ state: "visible" });
+      await frame.waitFor({ state: "attached" });
       // The stub's single message is posted during its parse, so it is on its
       // way by the frame's `load`; one more second lets it land before we look.
       await page.frameLocator(
@@ -206,6 +239,11 @@ Deno.test("the booking iframe takes the height from mig's first and only message
         height,
         654,
         "the frame missed mig's first height message and kept its fallback height",
+      );
+      assertEquals(
+        await page.locator("[data-meet-embed]").getAttribute("data-meet-embed"),
+        "ready",
+        "the frame missed mig's first height message and stayed hidden",
       );
     } finally {
       await page.close();
@@ -246,8 +284,6 @@ Deno.test("the listener ignores a message whose origin is spoofed but whose sour
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
       });
-      await page.getByRole("button", { name: "Book a free 30-min intro call" })
-        .click();
 
       const frame = page.locator(
         'iframe[title="Schedule a call with Anton Shubin"]',
@@ -308,8 +344,6 @@ Deno.test("a same-origin message from a different window never resizes the ifram
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
       });
-      await page.getByRole("button", { name: "Book a free 30-min intro call" })
-        .click();
 
       const frame = page.locator(
         'iframe[title="Schedule a call with Anton Shubin"]',
@@ -352,6 +386,87 @@ Deno.test("a same-origin message from a different window never resizes the ifram
         currentHeight,
         950,
         "a message from a different window's contentWindow resized the iframe",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    stub.stop();
+  }
+});
+
+Deno.test("a frame allowed by frame-ancestors shows even though it also sends X-Frame-Options: DENY", async () => {
+  const stub = startStubMig();
+  const site = await startSite({ env: { SCHEDULE_URL: `${stub.origin}/xfo` } });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await page.goto(`${site.origin}/contact-me`, {
+        waitUntil: "networkidle",
+      });
+      await page.waitForSelector('[data-meet-embed="ready"]');
+      const frame = page.locator(
+        'iframe[title="Schedule a call with Anton Shubin"]',
+      );
+      assertEquals(
+        await frame.evaluate((el) => parseInt(getComputedStyle(el).height, 10)),
+        700,
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    stub.stop();
+  }
+});
+
+Deno.test("a refused frame turns the placeholder into a message with the new-tab link and the brief", async () => {
+  const stub = startStubMig();
+  const scheduleUrl = `${stub.origin}/refused`;
+  const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await page.goto(`${site.origin}/contact-me`, {
+        waitUntil: "networkidle",
+      });
+      // Still loading until the timeout; the frame stays hidden behind it.
+      assertEquals(
+        await page.locator("[data-meet-embed]").getAttribute("data-meet-embed"),
+        "loading",
+      );
+      await page.waitForSelector('[data-meet-embed="failed"]', {
+        timeout: EMBED_TIMEOUT_MS + 5000,
+      });
+      const box = page.locator("[data-meet-embed-placeholder]");
+      assert(
+        (await box.innerText()).includes("The calendar didn't load here."),
+        "the failure message is missing",
+      );
+      assertEquals(
+        await box.getByRole("link", { name: /Open the calendar in a new tab/ })
+          .getAttribute("href"),
+        scheduleUrl,
+      );
+      assertEquals(
+        await box.getByRole("link", { name: "send a written brief" })
+          .getAttribute("href"),
+        "#brief",
+      );
+      assertEquals(
+        await page.locator(
+          'iframe[title="Schedule a call with Anton Shubin"]',
+        ).isVisible(),
+        false,
+        "the refused frame is shown instead of the message",
       );
     } finally {
       await page.close();

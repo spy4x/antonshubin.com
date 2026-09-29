@@ -334,7 +334,7 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       }
 
       // Every page in the loop above except /pay carries a booking button
-      // (the home CTA, the contact page's facade and link, the blog post
+      // (the home CTA, the contact page's new-tab link, the blog post
       // footer). Without this, a server that never received the placeholder
       // would pass the loop above vacuously.
       for (const path of ["/", "/contact-me", "/blog/ship-it-today"]) {
