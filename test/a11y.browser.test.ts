@@ -297,6 +297,39 @@ Deno.test("the six sample project pages have no horizontal scroll and no axe vio
   }
 });
 
+Deno.test("/work has no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  // The closing band's Book renders only with a booking URL; RFC 2606 host.
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+      const page: Page = await newPage(browser, { viewport });
+      try {
+        const where = `/work at ${viewport.width}px`;
+        await page.goto(`${site.origin}/work`, { waitUntil: "networkidle" });
+        const scrollWidth = await page.evaluate(() =>
+          document.documentElement.scrollWidth
+        );
+        assert(
+          scrollWidth <= viewport.width,
+          `${where} scrolls sideways: ${scrollWidth}px wide`,
+        );
+        assertEquals(await axeViolations(page), [], where);
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+    else Deno.env.set("SCHEDULE_URL", previous);
+  }
+});
+
 Deno.test("blog image lightbox is named, its Close button is named, and focus returns", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
