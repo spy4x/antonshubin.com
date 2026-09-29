@@ -4,7 +4,7 @@ description: "Tasks.org syncs Android tasks to CalDAV. There is no web UI for th
 publishedAt: "2026-07-22"
 readTime: 9
 topic: "self-hosting"
-relatedTool: "todoapp-caldav"
+relatedTool: "caldav-tasks-web"
 ---
 
 > **Update, September 2026:** The tool works well with Radicale. Stalwart

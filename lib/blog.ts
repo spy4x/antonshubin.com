@@ -4,7 +4,7 @@
  * llms-file lines. Metadata itself is read by `lib/blog-posts.ts`; this file
  * writes no claim of its own beyond the fixed labels below.
  */
-import { blogArticles, projects } from "./data.ts";
+import { blogArticles } from "./data.ts";
 import { type BlogArticle, byNewest, topic, topics } from "./blog-posts.ts";
 import {
   type CatalogItem,
@@ -12,8 +12,7 @@ import {
   catalogPath,
   priceLabel,
 } from "./catalog.ts";
-import { findTool } from "./tools.ts";
-import { workHref } from "./work.ts";
+import { findTool, repoUrl } from "./tools.ts";
 
 export { topic, topics };
 
@@ -34,35 +33,25 @@ export interface ToolLink {
 }
 
 /**
- * Resolves a post's `relatedTool` to a link, or undefined when it has none.
- * A slug in `lib/tools.ts` links its `/tools/<slug>` page; otherwise it must
- * be one of my own projects in `lib/data.ts`, linked through `workHref()`.
- * Anything else throws, so a typo fails the test run instead of shipping a
+ * Resolves a post's `relatedTool` to a link, or undefined when it has none:
+ * the tool's own `/tools/<slug>` page (one hop, never an old `/work` path)
+ * and its public repository. A slug that is not in `lib/tools.ts` throws,
+ * naming the post, so a typo fails the test run instead of shipping a
  * broken link.
  */
 export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
   const slug = article.relatedTool;
   if (!slug) return undefined;
-  const tool = findTool(slug);
-  if (tool) {
-    return {
-      name: tool.name,
-      href: `/tools/${tool.slug}`,
-      repoUrl: `https://github.com/${tool.repo}`,
-    };
-  }
-  const project = projects.my.find((p) => p.slug === slug);
-  if (!project) {
+  const found = findTool(slug);
+  if (!found) {
     throw new Error(
-      `content/blog/${article.slug}.md: relatedTool "${slug}" is neither a tool in lib/tools.ts nor one of my projects in lib/data.ts`,
+      `content/blog/${article.slug}.md: relatedTool "${slug}" is not a tool in lib/tools.ts`,
     );
   }
   return {
-    name: project.title,
-    href: workHref(slug),
-    repoUrl: project.ghRepo
-      ? `https://github.com/${project.ghRepo}`
-      : undefined,
+    name: found.name,
+    href: `/tools/${found.slug}`,
+    repoUrl: repoUrl(found),
   };
 }
 

@@ -43,15 +43,12 @@ Deno.test("an unknown relatedTool or catalogSlug throws", () => {
   );
 });
 
-Deno.test("a relatedTool from lib/data.ts links its work page and its repository", () => {
+Deno.test("a relatedTool links its /tools page in one hop and its repository", () => {
   assertEquals(relatedToolLink(post("x", { relatedTool: "mig" })), {
     name: "mig",
-    href: "/work/mig",
+    href: "/tools/mig",
     repoUrl: "https://github.com/spy4x/mig",
   });
-});
-
-Deno.test("a relatedTool from lib/tools.ts links its tool page", () => {
   assertEquals(
     relatedToolLink(post("x", { relatedTool: "ts-libs" }))?.href,
     "/tools/ts-libs",

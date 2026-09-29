@@ -56,8 +56,8 @@ export interface BlogArticle {
   /** What changed since, added after the archive note's date line. */
   archiveNote?: string;
   /**
-   * The tool the post is about: a slug in `lib/tools.ts` or an own project in
-   * `lib/data.ts`. `lib/blog.ts`'s `relatedToolLink()` throws on a typo.
+   * The tool the post is about, a slug in `lib/tools.ts`.
+   * `lib/blog.ts`'s `relatedToolLink()` throws on a typo.
    */
   relatedTool?: string;
   /** A `lib/catalog.ts` slug, checked through `catalogItem()`. */

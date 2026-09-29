@@ -74,7 +74,7 @@ draft against the brief before the pull request opens.
    updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
    topic: "ai-mcp" # founders, ai-mcp or self-hosting
-   relatedTool: "mig" # optional; a lib/tools.ts slug or one of my projects
+   relatedTool: "mig" # optional; a lib/tools.ts slug
    catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
    seoTitle: "Short title" # optional; <title> only, for a title over 55 characters
    youtubeVideoId: "abc123" # optional
