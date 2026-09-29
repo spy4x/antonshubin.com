@@ -322,8 +322,9 @@ styled by `.nav-icon`) and its states are the `.nav-*` classes in
 network profile every extra KB on every page measurably delays the home page's
 LCP image. The phone header (photo, name, and `ROLE` on the right) is plain
 markup in `components/Layout.tsx`; the time zone is in the footer. Book goes to
-`SCHEDULE_URL` and carries `data-primary-book`; with `SCHEDULE_URL` unset it
-reads "Write" and goes to the home page's brief form (`/#audit-form`).
+`/contact-me` in the same tab and carries `data-primary-book`; with
+`SCHEDULE_URL` unset it reads "Write" and goes to that page's written brief
+(`/contact-me#brief`). The footer's Contact group links the same page.
 `test/nav.test.ts` checks both on every page.
 
 ## Site frame
@@ -336,9 +337,9 @@ server markup on Desk with five parts: identity (name, `ROLE`, `LOCATION` and
 At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
 
 - `lib/profiles.ts` is the only list of profile URLs. The footer's Elsewhere
-  group (`footerProfiles`), the `/contact-me` icon row (`contactProfiles`) and
-  the Person JSON-LD's `sameAs` (`sameAsUrls`) read it; `profile(id)` throws on
-  a typo. A new profile is one entry there.
+  group (`footerProfiles`), the `/contact-me` side panel's email, Telegram and
+  Upwork links and the Person JSON-LD's `sameAs` (`sameAsUrls`) read it;
+  `profile(id)` throws on a typo. A new profile is one entry there.
 - `lib/pages.ts` is the only list of core pages: `CORE_PAGES`
   (`lib/cache-control.ts`), the service worker's precache (`routes/sw.js.ts`)
   and the sitemap's static entries read it through `pagesFor(surface)`. An entry
@@ -700,7 +701,7 @@ to `/` as the current section on every page; `test/a11y.test.ts` checks them.
 The links inside `islands/NavMore.tsx` use `navCurrent()` too, because hydration
 strips Fresh's marker from an island (Preact drops attributes the island's own
 vnode lacks). Book carries a fixed `aria-current="false"`: it is an action,
-never the current page, and its "Write" fallback (`/#audit-form`) would
+never the current page, and its "Write" fallback (`/contact-me#brief`) would
 otherwise be marked by Fresh. `lib/markdown.test.ts` (#160) tests
 `lib/markdown.ts` directly, no server needed. `test/bot-filter.test.ts` (#179)
 boots the site with placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known

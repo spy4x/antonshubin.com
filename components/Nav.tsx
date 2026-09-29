@@ -1,8 +1,8 @@
 import { NavGlyph } from "./Icons.tsx";
-import { NewTabHint } from "./NewTabHint.tsx";
 import { BOOK, FOCUS, navIcon, STACKED, STATES } from "./NavParts.tsx";
 import NavMore from "../islands/NavMore.tsx";
 import {
+  BOOK_HREF,
   navCurrent,
   type NavItem,
   railItems,
@@ -13,25 +13,17 @@ import {
 
 interface NavProps {
   currentPath: string;
-  /** `SCHEDULE_URL`: Book's target. Empty → Book reads "Write" and goes to the brief form. */
+  /** `SCHEDULE_URL`: set → Book; empty → "Write". Both go to `/contact-me`. */
   scheduleUrl: string;
 }
 
-/** The Book action's props: the booking link, or "Write" to the brief form. */
+/** The Book action: "Book" on the booking page, or "Write" on its brief. */
 function bookLink(scheduleUrl: string) {
   return scheduleUrl
-    ? {
-      href: scheduleUrl,
-      label: "Book",
-      target: "_blank" as const,
-      rel: "noopener noreferrer",
-      icon: <NavGlyph name="book" />,
-    }
+    ? { href: BOOK_HREF, label: "Book", icon: <NavGlyph name="book" /> }
     : {
       href: WRITE_FALLBACK_HREF,
       label: "Write",
-      target: undefined,
-      rel: undefined,
       icon: <NavGlyph name="write" />,
     };
 }
@@ -80,8 +72,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
           <li>
             <a
               href={book.href}
-              target={book.target}
-              rel={book.rel}
               aria-current="false"
               data-primary-book
               data-nav-book
@@ -90,7 +80,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             >
               {book.icon}
               <span>{book.label}</span>
-              {book.target && <NewTabHint />}
             </a>
           </li>
           {tabItemsAfterBook.map(tab)}
@@ -125,8 +114,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
         </a>
         <a
           href={book.href}
-          target={book.target}
-          rel={book.rel}
           aria-current="false"
           data-primary-book
           data-nav-book
@@ -135,7 +122,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
         >
           {book.icon}
           <span>{book.label}</span>
-          {book.target && <NewTabHint />}
         </a>
         <ul class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 p-1 -mx-1">
           {railItems.map((item) => (

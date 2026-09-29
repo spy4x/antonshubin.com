@@ -23,7 +23,7 @@ function bookLinks(html: string): { tag: string; text: string }[] {
     .map((m) => ({ tag: m[1], text: visibleText(m[2]) }));
 }
 
-Deno.test("Book links the booking page from the rail and the tab bar on every page", async () => {
+Deno.test("Book goes to /contact-me from the rail and the tab bar on every page, in the same tab", async () => {
   const site = await startSite({ env: { SCHEDULE_URL } });
   try {
     for (const path of await allPaths(site)) {
@@ -35,9 +35,10 @@ Deno.test("Book links the booking page from the rail and the tab bar on every pa
       );
       for (const link of links) {
         assert(
-          link.tag.includes(`href="${SCHEDULE_URL}"`),
+          link.tag.includes(`href="/contact-me"`),
           `${path}: ${link.tag}`,
         );
+        assert(!link.tag.includes("target="), `${path}: ${link.tag}`);
         assert(link.tag.includes("data-primary-book"), `${path}: ${link.tag}`);
         assert(link.text.startsWith("Book"), `${path}: reads "${link.text}"`);
       }
@@ -47,7 +48,7 @@ Deno.test("Book links the booking page from the rail and the tab bar on every pa
   }
 });
 
-Deno.test("Book reads Write and links the brief form when SCHEDULE_URL is unset", async () => {
+Deno.test("Book reads Write and goes to the brief on /contact-me when SCHEDULE_URL is unset", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } });
   try {
     for (const path of await allPaths(site)) {
@@ -59,16 +60,16 @@ Deno.test("Book reads Write and links the brief form when SCHEDULE_URL is unset"
       );
       for (const link of links) {
         assert(
-          link.tag.includes(`href="/#audit-form"`),
+          link.tag.includes(`href="/contact-me#brief"`),
           `${path}: ${link.tag}`,
         );
         assertEquals(link.text, "Write", `${path}: reads "${link.text}"`);
       }
     }
-    const home = await site.html("/");
+    const contact = await site.html("/contact-me");
     assert(
-      home.includes(`id="audit-form"`),
-      "the home page lost its brief form anchor",
+      contact.includes(`id="brief"`),
+      "/contact-me lost its brief anchor",
     );
   } finally {
     await site.stop();
