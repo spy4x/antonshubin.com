@@ -207,7 +207,10 @@ blogMarked.use({
      * `h2` and `h3` get an `id` from their text (kebab-case, `-2`, `-3` on a
      * repeat) and a "#" link to themselves, shown on hover and focus, so a
      * reader can link to a section and the contents list has targets (#274,
-     * UX 2, SEO 6). Other levels keep marked's own output.
+     * UX 2, SEO 6). The link sits beside the heading, not inside it, so a
+     * screen reader's list of headings reads only the heading text; the link
+     * itself is named "Link to section: <heading>". Other levels keep
+     * marked's own output.
      */
     heading({ tokens, depth }) {
       if (depth !== 2 && depth !== 3) return false;
@@ -217,7 +220,9 @@ blogMarked.use({
       ).replace(/\s+/g, " ").trim();
       const id = uniqueId(slugify(text) || "section");
       headings.push({ depth, id, text });
-      return `<h${depth} id="${id}">${html}<a class="heading-anchor" href="#${id}"><span aria-hidden="true">#</span><span class="sr-only">Link to this section</span></a></h${depth}>\n`;
+      return `<div class="heading-row heading-row--${depth}"><h${depth} id="${id}">${html}</h${depth}><a class="heading-anchor" href="#${id}"><span aria-hidden="true">#</span><span class="sr-only">Link to section: ${
+        escapeEncode(text)
+      }</span></a></div>\n`;
     },
     /**
      * A fenced code block (#274, UX 4): a header row with the language and a

@@ -479,43 +479,53 @@ kbd {
   @apply decoration-parchment;
 }
 
-.blog-content h2,
-.blog-content h3 {
-  color: var(--color-parchment);
+/* A post's h2 and h3 sit in a row with their "#" link beside them. The row
+   carries the heading's size and spacing, so its margins collapse with the
+   paragraphs around it as a bare heading's would. */
+.blog-content .heading-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
   line-height: 1.3;
   margin-top: 2em;
   margin-bottom: 0.5em;
-  scroll-margin-top: 1.5rem;
 }
 
-.blog-content h2 {
+.blog-content .heading-row--2 {
   font-size: 1.5rem;
 }
 
-.blog-content h3 {
+.blog-content .heading-row--3 {
   font-size: 1.25rem;
 }
 
 @media (min-width: 1024px) {
-  .blog-content h2 {
+  .blog-content .heading-row--2 {
     font-size: 1.75rem;
   }
 
-  .blog-content h3 {
+  .blog-content .heading-row--3 {
     font-size: 1.375rem;
   }
 }
 
-/* The "#" link after a heading: shown on hover and on keyboard focus. */
+.blog-content .heading-row > h2,
+.blog-content .heading-row > h3 {
+  color: var(--color-parchment);
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  scroll-margin-top: 1.5rem;
+}
+
+/* The "#" link beside a heading: shown on hover and on keyboard focus. */
 .blog-content .heading-anchor {
-  margin-left: 0.4em;
   color: var(--color-graphite);
   text-decoration: none;
   opacity: 0;
 }
 
-.blog-content h2:hover .heading-anchor,
-.blog-content h3:hover .heading-anchor,
+.blog-content .heading-row:hover .heading-anchor,
 .blog-content .heading-anchor:focus-visible {
   opacity: 1;
 }

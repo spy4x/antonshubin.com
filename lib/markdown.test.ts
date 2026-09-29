@@ -321,7 +321,7 @@ Deno.test("a real <pre> gets tabindex; an escaped <pre> inside code does not", a
   assertMatch(html, /&lt;pre&gt;literal text&lt;\/pre&gt;/);
 });
 
-Deno.test("h2 and h3 headings get unique ids and a link to themselves", async () => {
+Deno.test("h2 and h3 headings get unique ids and a named link beside them, outside the heading", async () => {
   const md =
     "## Why `Deno`? & more\n\ntext\n\n## Why `Deno`? & more\n\n### Setup\n\n#### Deep\n";
   const { html, headings } = await renderBlogPost(md);
@@ -332,7 +332,7 @@ Deno.test("h2 and h3 headings get unique ids and a link to themselves", async ()
   ]);
   assertMatch(
     html,
-    /<h2 id="why-deno-more">Why <code>Deno<\/code>\? &amp; more<a class="heading-anchor" href="#why-deno-more">/,
+    /<div class="heading-row heading-row--2"><h2 id="why-deno-more">Why <code>Deno<\/code>\? &amp; more<\/h2><a class="heading-anchor" href="#why-deno-more"><span aria-hidden="true">#<\/span><span class="sr-only">Link to section: Why Deno\? &amp; more<\/span><\/a><\/div>/,
   );
   assertMatch(html, /<h2 id="why-deno-more-2">/);
   // Other levels keep marked's own output.
