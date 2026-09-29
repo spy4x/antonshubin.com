@@ -64,19 +64,26 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 ### 5. JSON-LD Structured Data (components/SEOHead.tsx)
 
-Four entities in a `@graph` array:
+Four entities in a `@graph` array (five on `/`):
 
 - **Person** — Name, job title, description, knowsAbout (skills), `worksFor` a
   `Role` node (`roleName: "Co-Founder and CEO"`) pointing at NeatSoft, so the
   role — not just the org — is machine-readable (#193)
 - **Organization** — NeatSoft entity linked to Anton as founder, with its UEN
   (202300222R) as a `PropertyValue` identifier
-- **WebSite** — Site name, a fixed `description` (`lib/head.ts`'s
-  `SITE_DESCRIPTION`, the same on every page — it describes the site, not the
-  current page, per #193), language, publisher reference
-- **BreadcrumbList** — built from `head.value.pageName` (falls back to `title`
-  when a page hasn't set it), so the trail reads "Ship It Today", not "Ship It
-  Today — Anton Shubin"
+- **WebSite** — Short site name "Anton Shubin" (with `alternateName`
+  `antonshubin.com`), what Google shows above a result (#269); a fixed
+  `description` (`lib/head.ts`'s `SITE_DESCRIPTION`, the same on every page — it
+  describes the site, not the current page, per #193), language, publisher
+  reference
+- **ProfilePage** — on `/` only (#269): `mainEntity` is the Person's `@id`,
+  `isPartOf` the WebSite. The Person also carries `alternateName: "spy4x"`. `/`
+  has no BreadcrumbList (its one "Home" item says nothing), and no `Review` or
+  `AggregateRating` for the three review cards. The home meta description comes
+  from `lib/home.ts`.
+- **BreadcrumbList** — on every other page, built from `head.value.pageName`
+  (falls back to `title` when a page hasn't set it), so the trail reads "Ship It
+  Today", not "Ship It Today — Anton Shubin"
 - Person description states end-to-end SaaS architecture, delivery, and
   production outcome ownership for non-technical founders
 - `knowsAbout` includes Platform Engineering, Infrastructure as Code,

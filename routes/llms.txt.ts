@@ -87,7 +87,7 @@ export const handler = define.handlers({
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written audit (${BASE_URL}/#audit-form).
+Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written brief (${BASE_URL}/#audit-form).
 
 ${services}
 
@@ -99,7 +99,7 @@ ${promisesList}
 
 ## Key Pages
 
-- [Home](${BASE_URL}/)
+- [Home](${BASE_URL}/) — Who I am, the Upwork figures, prices, client work, reviews and how to book
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide)
 - [Services and prices](${BASE_URL}/catalog)
 - [How I Work](${BASE_URL}/how-i-work)
