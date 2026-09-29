@@ -310,7 +310,7 @@ siteTest(
     for (const item of catalogItems.filter((i) => i.next)) {
       const html = await site.html(`/catalog/${item.slug}`);
       const next = visibleText(
-        html.match(/data-service-next[\s\S]*?<\/p>/)![0],
+        html.match(/<p data-service-next[\s\S]*?<\/p>/)![0],
       );
       assertFalse(/· From/.test(next), `${item.slug}: "${next}"`);
       assert(
