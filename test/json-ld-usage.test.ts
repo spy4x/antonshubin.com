@@ -79,8 +79,8 @@ Deno.test("every ld+json block under routes/, components/, islands/ uses toJsonL
   }
   assertEquals(
     totalBlocks,
-    7,
-    "expected exactly 7 ld+json blocks (#172, #189, #270)",
+    9,
+    "expected exactly 9 ld+json blocks (#172, #189, #270, #273)",
   );
 });
 
