@@ -268,11 +268,11 @@ siteTest(
 );
 
 siteTest(
-  "how-i-work has at most five FAQ entries and the JSON-LD comes from them",
+  "how-i-work has at most seven FAQ entries and the JSON-LD comes from them",
   async (site) => {
     const html = await site.html("/how-i-work");
-    const shown = count(html, /<details[^>]*data-faq/g);
-    assert(shown >= 1 && shown <= 5, `${shown} FAQ entries`);
+    const shown = count(html, /<div[^>]*\bdata-faq\b/g);
+    assert(shown >= 1 && shown <= 7, `${shown} FAQ entries`);
     const faq = jsonLd(html).find((d) =>
       (d as { "@type"?: string })["@type"] === "FAQPage"
     ) as { mainEntity: unknown[] } | undefined;

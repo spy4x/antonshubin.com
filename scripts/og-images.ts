@@ -3,7 +3,7 @@
  * Generates the 1200×630 link-preview PNGs this site commits under
  * `static/img/og/`: one per blog post, one per project page, one per tool
  * page plus the `/tools` hub (#189), one for `/work` (#270), one for
- * `/about` (#294), one for `/infrastructure` (#295), and one
+ * `/about` (#294), one for `/infrastructure` (#295), one for `/how-i-work` (#275), and one
  * landscape default for the site (#193).
  *
  * Run with:
@@ -29,6 +29,7 @@ import { tools } from "../lib/tools.ts";
 import { metaDescription } from "../lib/llms.ts";
 import { workDescription } from "../lib/work.ts";
 import { ABOUT_NAME, aboutDescription } from "../lib/about.ts";
+import { HOW_I_WORK_NAME, howIWorkDescription } from "../lib/how-i-work.ts";
 import { LOCATION } from "../lib/config.ts";
 import type { Browser } from "playwright";
 import { fromFileUrl } from "@std/path";
@@ -182,6 +183,15 @@ async function main() {
       new URL("about.png", OG_DIR),
     );
     console.log(`about.png  ${fmtBytes(aboutBytes)}`);
+    count++;
+
+    // /how-i-work (#275): the page's name and its description.
+    const howIWorkBytes = await render(
+      browser,
+      cardHtml(HOW_I_WORK_NAME, metaDescription(howIWorkDescription())),
+      new URL("how-i-work.png", OG_DIR),
+    );
+    console.log(`how-i-work.png  ${fmtBytes(howIWorkBytes)}`);
     count++;
 
     // /infrastructure (#295): the page's own title and description.

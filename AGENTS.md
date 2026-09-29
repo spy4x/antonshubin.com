@@ -516,6 +516,29 @@ prefill alone does not count as a description, in the form or in `/api/lead`
 and carries the `ContactPage` JSON-LD node. `test/booking.test.ts` checks the
 built page.
 
+### How I work page
+
+`routes/how-i-work.tsx` (#275) is the project page's frame: "How I work"
+(`<h1>`, `lib/how-i-work.ts`'s name, subtitle, title and description), a sticky
+card beside the main column (from 1024px; first at 390px) with the pricing rule
+(`PRICING_RULE`, said once on the page), the four catalog prices through
+`priceLabel()`, Book and "Send a written brief", then "Who this suits"
+(`GOOD_FIT`/`NOT_A_FIT`, in Anton's #249 words) with one proof line
+(`repeatClientsLine()` and the Job Success figure through `proof()`, with the
+`upwork-profile` note), "Five promises" (H2, promises as H3) as
+`PromiseTimeline variant="full" layout="stack"`, "My AI-agent setup" (one
+paragraph, links `spy4x/dotfiles`) and the questions, open, each at `#faq-<id>`.
+Book goes to `/contact-me` and the brief to `/contact-me#brief` (#272); the page
+has no calendar embed. `lib/faqs.ts` is the only copy of the questions (at most
+`MAX_FAQS`, seven): the page, the `FAQPage` JSON-LD (joined to the site graph)
+and `llms-full.txt`'s FAQ section read it, and answers splice promises through
+`promise()`. `PromiseTimeline` gained `layout` (`stack` keeps it vertical at
+every width) and `links` (a quiet link under a `full` promise); `ClosingBand`
+gained `bookHref` (an on-site Book target). `test/how-i-work.test.ts` checks the
+built page. Still open with Anton (#301): how a client asks for the refund, and
+what happens to client code with AI providers; the page says nothing about
+either.
+
 ### Type
 
 Literata 600 for headings — `h1`-`h3`, `.h1`, `.h2` in `assets/styles.css` set

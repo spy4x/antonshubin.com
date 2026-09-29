@@ -84,7 +84,7 @@ ${promisesList}
 - [About](${BASE_URL}${ABOUT_PATH}) — Who I am, since 2010: the career story, what I run myself and how to pay
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide)
 - [Services and prices](${BASE_URL}/catalog)
-- [How I Work](${BASE_URL}/how-i-work)
+- [How I work](${BASE_URL}/how-i-work) — The five promises in the order a project meets them, prices, who does the work, my AI-agent setup and the questions clients ask
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect, and how deploys, backups, monitoring and sign-in are handled
 - [Contact](${BASE_URL}/contact-me) — Book a ${INTRO_CALL} on the page, send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting

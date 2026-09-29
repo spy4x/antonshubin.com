@@ -129,6 +129,17 @@ Deno.test("every promise title, phrase (any case) and desc appears in source onl
   }
 });
 
+// #275: the FAQ answers splice promises through `promise()`; the guard above
+// must keep scanning the file that holds them, or a hand-written copy there
+// would go unseen.
+Deno.test("the promise guard scans lib/faqs.ts, where the FAQ answers splice promises", async () => {
+  const files = await sourceFiles(["lib/promises.ts"]);
+  assert(
+    files.includes("lib/faqs.ts"),
+    "lib/faqs.ts is not scanned by the promise guard",
+  );
+});
+
 // Key terms a paraphrase could restate without quoting a promise's full
 // `desc` word for word — the exact drift issue #186 exists to prevent
 // ("30 days" in one place, "60 days" in another). Each needle is a phrase

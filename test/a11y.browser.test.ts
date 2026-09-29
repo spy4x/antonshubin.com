@@ -332,7 +332,7 @@ async function assertPageSound(path: string) {
   }
 }
 
-for (const path of ["/work", "/infrastructure"]) {
+for (const path of ["/work", "/infrastructure", "/how-i-work"]) {
   Deno.test(`${path} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
     await assertPageSound(path);
   });

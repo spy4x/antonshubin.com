@@ -20,7 +20,7 @@
 //
 // Not covered here: that the `message` listener's cleanup
 // (`removeEventListener`) actually fires on unmount. Every route that
-// renders MeetEmbed (routes/contact-me.tsx, routes/how-i-work.tsx,
+// renders MeetEmbed (routes/contact-me.tsx,
 // islands/LeadForm.tsx's success panel) keeps it mounted for the page's
 // whole life once it appears — LeadForm mounts it on a successful submit and
 // never unmounts it — so there's no reachable UI interaction that tears

@@ -126,10 +126,18 @@ Five entities in a `@graph` array (six on `/about`):
   both YouTube channels (work and the `@anton-shubin-live` vlog, #294) and X
   (`lib/config.ts`'s `SAME_AS_URLS`)
 
-### 6. FAQ Schema (routes/how-i-work.tsx)
+### 6. FAQ Schema (routes/how-i-work.tsx, lib/faqs.ts)
 
-- FAQPage type with all 5 promises as Question/Answer pairs
-- Provides Google Rich Results for the /how-i-work page
+- One `FAQPage` node (`#faq`, `isPartOf` the site's `#website` node) with one
+  Question/Answer per entry of `lib/faqs.ts`, at most seven (#275). The page
+  shows the same strings, open, and `llms-full.txt` has a "Frequently Asked
+  Questions" section built from them, so a policy change is one edit there.
+  Answers splice the promises through `promise()`; none is hand-written.
+- Every question has a stable anchor, `/how-i-work#faq-<id>`; every promise has
+  `/how-i-work#<promise id>`.
+- Google shows FAQ rich results only for government and health sites (since
+  August 2023), so this node does not earn a rich result here; it stays as
+  structured, machine-readable Q&A
 - AI crawlers parse this as canonical Q&A about engagement terms
 
 ### 7. Project JSON-LD (routes/work/[slug].tsx)
@@ -276,7 +284,7 @@ Whenever any of these change, update the corresponding AI crawler files:
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | New page added            | sitemap.xml.ts, llms-full.txt.ts                                                                                                               |
 | Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                                                  |
-| Policies/terms change     | how-i-work.tsx (FAQ), llms.txt.ts                                                                                                              |
+| Policies/terms change     | `lib/faqs.ts` (page, JSON-LD and llms-full read it), `lib/promises.ts`, llms.txt.ts                                                            |
 | Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                                        |
 | Blog post added           | `content/blog/<slug>.md` only: sitemap, RSS, both llms files and `/blog` read its front matter; then `deno task og` (new post PNG)             |
 | Blog/project title change | `deno task og` (regenerate that post's or project's PNG)                                                                                       |

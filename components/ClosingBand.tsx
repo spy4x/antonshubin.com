@@ -40,6 +40,12 @@ export interface ClosingBandProps {
   children?: ComponentChildren;
   /** False hides Book; the band then shows only its links. */
   book?: boolean;
+  /**
+   * Where Book goes when it is an on-site page (`/contact-me`) instead of the
+   * calendar: it then opens in the same tab and shows even when
+   * `SCHEDULE_URL` is unset. Omitted, Book opens `SCHEDULE_URL` in a new tab.
+   */
+  bookHref?: string;
   /** Book's text. */
   bookLabel?: string;
   /** The catalog link, rendered after Book: a project's "Similar work today", or `/catalog`. */
@@ -66,6 +72,7 @@ export function ClosingBand(
     children,
     book = true,
     bookLabel = "Book a free intro call",
+    bookHref,
     catalogLink,
     links = [],
     primaryCta,
@@ -95,8 +102,8 @@ export function ClosingBand(
       <div class="flex flex-wrap items-center gap-4">
         {book && (
           <BookCallLink
-            url={SCHEDULE_URL}
-            target="_blank"
+            url={bookHref ?? SCHEDULE_URL}
+            target={bookHref ? undefined : "_blank"}
             data-umami-event={bookEvent}
             data-primary-cta={primaryCta}
             class="justify-center px-6 py-3"
