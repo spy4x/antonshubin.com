@@ -34,8 +34,6 @@ import { proof } from "../lib/proof.ts";
 import { repeatClientsLine } from "../lib/testimonials.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
 
-/** Where Book goes: the booking page (#272). The written brief is its `#brief` section. */
-
 /** The public repository the AI-agent setup's rules live in. */
 const DOTFILES_URL = "https://github.com/spy4x/dotfiles";
 
