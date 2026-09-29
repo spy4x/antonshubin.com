@@ -64,11 +64,26 @@ export const SMTP_FROM = Deno.env.get("SMTP_FROM") || "";
 export const SMTP_USERNAME = Deno.env.get("SMTP_USERNAME") || "";
 export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
 /**
+ * Anton's company: its legal name, country and Singapore registration number
+ * (UEN). The invoices sentence, both llms files and the `Organization`
+ * JSON-LD read it here, so a change of company is one edit.
+ */
+export const COMPANY = {
+  name: "NeatSoft PTE LTD",
+  country: "Singapore",
+  uen: "202300222R",
+} as const;
+
+/** The company as one line: name, country and UEN. */
+export const COMPANY_LINE =
+  `${COMPANY.name}, ${COMPANY.country} (UEN ${COMPANY.uen})`;
+
+/**
  * The invoices sentence (#293): the footer, `/contact-me` and `/about` show
- * it, so a change of company is one edit.
+ * it.
  */
 export const INVOICE_NOTE =
-  "Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R), where I'm co-founder and CEO.";
+  `Invoices are issued by ${COMPANY_LINE}, where I'm co-founder and CEO.`;
 
 /** Anton's X handle, confirmed on 27 Sep 2026 (#193). */
 export const X_HANDLE = "@spy4x";

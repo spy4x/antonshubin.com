@@ -1,5 +1,5 @@
 import { define } from "../lib/utils.ts";
-import { BASE_URL, LOCATION } from "../lib/config.ts";
+import { BASE_URL, COMPANY, COMPANY_LINE, LOCATION } from "../lib/config.ts";
 import { ABOUT_PATH } from "../lib/about.ts";
 import { hackathons, highlightSlugs } from "../lib/data.ts";
 import { llmsBlogSections } from "../lib/blog.ts";
@@ -56,7 +56,7 @@ export const handler = define.handlers({
 ## Quick Facts
 
 - Role: ${ROLE}
-- Company: NeatSoft PTE LTD, Singapore (UEN 202300222R) — Anton is co-founder and CEO
+- Company: ${COMPANY_LINE} — Anton is co-founder and CEO
 - Expertise: SaaS architecture, product delivery, open-source and self-hostable infrastructure, dedicated bare-metal on Hetzner, managed cloud (AWS, GCP, Supabase), platform engineering, observability, backup and disaster recovery, identity and access management, cloud cost optimization, AI integration, MCP server engineering
 - Stack: Deno/Node.js, Preact/React, PostgreSQL, Valkey/Redis, Docker/Podman, Traefik, MCP — built on web standards (Fetch, Web Crypto, Streams, ES modules), portable across runtimes
 - AI APIs: OpenAI, Claude, DeepSeek
@@ -64,7 +64,7 @@ export const handler = define.handlers({
       proof("job-success")
     } Job Success, ${proof("earned")} earned, ${proof("jobs")} jobs
 - Pricing: fixed price when the scope is fixed, hourly when open-ended; every price is listed under Services below
-- Location: ${LOCATION} (Singapore-based entity)
+- Location: ${LOCATION} (${COMPANY.country}-based entity)
 
 ## Services
 

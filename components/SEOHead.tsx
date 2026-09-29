@@ -5,7 +5,7 @@ import {
   ROLE,
   SITE_DESCRIPTION,
 } from "../lib/head.ts";
-import { LOCATION, X_HANDLE } from "../lib/config.ts";
+import { COMPANY, LOCATION, X_HANDLE } from "../lib/config.ts";
 import { sameAsUrls } from "../lib/profiles.ts";
 import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts";
 import { proof } from "../lib/proof.ts";
@@ -185,7 +185,7 @@ export function SEOHead() {
                 "identifier": {
                   "@type": "PropertyValue",
                   "propertyID": "UEN",
-                  "value": "202300222R",
+                  "value": COMPANY.uen,
                 },
               },
               {

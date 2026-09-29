@@ -1,5 +1,11 @@
 import { define } from "../lib/utils.ts";
-import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
+import {
+  BASE_URL,
+  COMPANY,
+  COMPANY_LINE,
+  LOCATION,
+  TIMEZONE_LABEL,
+} from "../lib/config.ts";
 import {
   ABOUT_HOBBIES,
   ABOUT_PATH,
@@ -126,7 +132,7 @@ export const handler = define.handlers({
 
 - **Name:** Anton Shubin
 - **Title:** ${ROLE}
-- **Company:** NeatSoft PTE LTD, Singapore (UEN 202300222R) — Anton is co-founder and CEO
+- **Company:** ${COMPANY_LINE} — Anton is co-founder and CEO
 - **Email:** hello@antonshubin.com
 - **GitHub:** https://github.com/spy4x
 - **LinkedIn:** https://www.linkedin.com/in/anton-shubin
@@ -142,7 +148,7 @@ The career story on ${BASE_URL}${ABOUT_PATH}, oldest first:
 
 ${aboutSteps.map((s) => `- **${s.when}:** ${s.text}`).join("\n")}
 
-${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from NeatSoft PTE LTD, Singapore; payment by ${paymentList()}: ${BASE_URL}/pay
+${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from ${COMPANY.name}, ${COMPANY.country}; payment by ${paymentList()}: ${BASE_URL}/pay
 
 ## Core Expertise
 
@@ -191,7 +197,7 @@ ${faqs.map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}
 ${catalogList}
 - **About:** ${BASE_URL}${ABOUT_PATH} — Who I am, since 2010: the career story, two client reviews about working with me, what I run myself and how to pay
 - **How I work:** ${BASE_URL}/how-i-work — The five promises in the order a project meets them, prices, who I build for, my AI-agent setup and ${faqs.length} answered questions
-- **Contact:** ${BASE_URL}/contact-me — Book a ${INTRO_CALL} in the calendar on the page, or send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x. Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R)
+- **Contact:** ${BASE_URL}/contact-me — Book a ${INTRO_CALL} in the calendar on the page, or send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x. Invoices are issued by ${COMPANY_LINE}
 - **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how each layer is run: handover, backups, monitoring, deploys, sign-in. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
