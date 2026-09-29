@@ -1,5 +1,6 @@
 import { define } from "../lib/utils.ts";
-import { BASE_URL } from "../lib/config.ts";
+import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
+import { ABOUT_PATH, aboutSteps } from "../lib/about.ts";
 import {
   archiveProjects,
   blogArticles,
@@ -123,8 +124,16 @@ export const handler = define.handlers({
 - **YouTube:** https://www.youtube.com/@anton-shubin
 - **YouTube (Live):** https://www.youtube.com/@anton-shubin-live
 - **Upwork:** https://www.upwork.com/freelancers/ashubin
-- **Location:** Da Nang, Vietnam
-- **Time zone:** ICT (UTC+7)
+- **Location:** ${LOCATION}
+- **Time zone:** ICT (${TIMEZONE_LABEL})
+
+## About
+
+The career story on ${BASE_URL}${ABOUT_PATH}, oldest first:
+
+${aboutSteps.map((s) => `- **${s.when}:** ${s.text}`).join("\n")}
+
+Outside work I ride enduro, ski and scuba dive, and I've travelled to more than 25 countries across Asia and Europe. Invoices come from NeatSoft PTE LTD, Singapore; payment by card (Stripe), US bank transfer (ACH or Fedwire) or crypto: ${BASE_URL}/pay
 
 ## Core Expertise
 
@@ -167,6 +176,7 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 - **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
 - **Services:** ${BASE_URL}/catalog — ${catalogItems.length} services, each with its price
 ${catalogList}
+- **About:** ${BASE_URL}${ABOUT_PATH} — Who I am, since 2010: the career story, two client reviews about working with me, what I run myself and how to pay
 - **How I Work:** ${BASE_URL}/how-i-work — Five promises, pricing, and FAQ
 - **Contact:** ${BASE_URL}/contact-me — Book a call, email, or Telegram
 - **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}

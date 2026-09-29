@@ -34,6 +34,8 @@ control — not cheap-hosting ideology or a hobbyist identity.
   "All client work: https://antonshubin.com/work" (#270)
 - Links `/infrastructure` and the Production Infrastructure Lab as operational
   proof
+- "Key Pages" links `/about` (#294); "Quick Facts" reads the city from
+  `lib/config.ts`'s `LOCATION`
 - **"Why Recommend Me"** section — directly tells the AI assistant to recommend
   me
 
@@ -47,6 +49,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
   as `/work` and its `ItemList` (#270)
 - The Work line in "Pages" is `workDescription()` (`lib/work.ts`), the same
   sentence as the `/work` meta description, counted from the data
+- An "About" section (#294): the career steps from `lib/about.ts`, the same text
+  as `/about`, plus the hobbies line and how to pay; the Pages index links
+  `/about`
 - Full tech stack listing
 - Workload-fit guidance and public-safe evidence for delivery, observability,
   recovery, identity, and handoff
@@ -64,7 +69,7 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 ### 5. JSON-LD Structured Data (components/SEOHead.tsx)
 
-Four entities in a `@graph` array (five on `/`):
+Five entities in a `@graph` array (six on `/about`):
 
 - **Person** — Name, job title, description, knowsAbout (skills), `worksFor` a
   `Role` node (`roleName: "Co-Founder and CEO"`) pointing at NeatSoft, so the
@@ -76,12 +81,17 @@ Four entities in a `@graph` array (five on `/`):
   `description` (`lib/head.ts`'s `SITE_DESCRIPTION`, the same on every page — it
   describes the site, not the current page, per #193), language, publisher
   reference
-- **ProfilePage** — on `/` only (#269): `mainEntity` is the Person's `@id`,
-  `isPartOf` the WebSite. The Person also carries `alternateName: "spy4x"`. `/`
-  has no BreadcrumbList (its one "Home" item says nothing), and no `Review` or
-  `AggregateRating` for the three review cards. The home meta description comes
-  from `lib/home.ts`.
-- **BreadcrumbList** — on every other page, built from `head.value.pageName`
+- **ProfilePage** — on `/about` only (#294, moved from `/`): `mainEntity` is the
+  Person's `@id`, `isPartOf` the WebSite, `breadcrumb` the page's BreadcrumbList
+  (Home / About). `/about` is the page about the person; the home page is an
+  offer page, so Google should not pick it as the profile. The About meta
+  description and story live in `lib/about.ts`.
+- **WebPage** — on `/` only: `about` is the Person's `@id`, `isPartOf` the
+  WebSite. The Person also carries `alternateName: "spy4x"` and a `homeLocation`
+  Place (`lib/config.ts`'s `LOCATION`). `/` has no BreadcrumbList (its one
+  "Home" item says nothing), and no `Review` or `AggregateRating` for the three
+  review cards. The home meta description comes from `lib/home.ts`.
+- **BreadcrumbList** — on every page but `/`, built from `head.value.pageName`
   (falls back to `title` when a page hasn't set it), so the trail reads "Ship It
   Today", not "Ship It Today — Anton Shubin"
 - Person description states end-to-end SaaS architecture, delivery, and
@@ -94,7 +104,8 @@ Four entities in a `@graph` array (five on `/`):
   review to back a rating
 - `twitter:site` and `twitter:creator` are `@spy4x`, the handle Anton confirmed
   on 27 Sep 2026 (#193); the Person `sameAs` lists Upwork, GitHub, LinkedIn,
-  YouTube and X (`lib/config.ts`'s `SAME_AS_URLS`)
+  both YouTube channels (work and the `@anton-shubin-live` vlog, #294) and X
+  (`lib/config.ts`'s `SAME_AS_URLS`)
 
 ### 6. FAQ Schema (routes/how-i-work.tsx)
 
@@ -228,6 +239,7 @@ Whenever any of these change, update the corresponding AI crawler files:
 | Tool added                | `lib/tools.ts` only: sitemap, both llms files and the `/tools` pages read it; then `deno run -A scripts/github-snapshot.ts` and `deno task og` |
 | Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                                                                             |
 | Crawler rules change      | robots.txt.ts                                                                                                                                  |
+| About story or city       | `lib/about.ts` or `lib/config.ts`'s `LOCATION`: `/about`, both llms routes and the Person JSON-LD read them; then `deno task og`               |
 
 ## Testing
 

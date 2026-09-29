@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { linkGroups, navCurrent } from "./nav.ts";
+import { linkGroups, moreItems, navCurrent } from "./nav.ts";
 
 Deno.test("navCurrent marks the page itself 'page'", () => {
   assertEquals(navCurrent("/catalog", "/catalog"), "page");
@@ -27,4 +27,11 @@ Deno.test("the Links groups never link probe-home, which answers 503 when a home
   const hrefs = linkGroups("https://www.upwork.com/freelancers/ashubin")
     .flatMap((g) => g.links.map((l) => l.href));
   assert(!hrefs.some((h) => h.includes("probe-home")), hrefs.join(", "));
+});
+
+Deno.test("the More sheet lists About right after Home", () => {
+  assertEquals(
+    moreItems.slice(0, 2).map((i) => i.href),
+    ["/", "/about"],
+  );
 });

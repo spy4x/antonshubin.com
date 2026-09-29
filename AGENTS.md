@@ -383,6 +383,25 @@ than making a copy:
 - `components/ClosingBand.tsx`: the band that ends a page (its `children` slot
   holds the home page's brief form).
 
+### About page
+
+`routes/about.tsx` (#294) uses the project page's frame: the `<h1>` "About Anton
+Shubin" and a lead line, then the portrait (the page's one eager,
+`fetchpriority="high"` image, cropped to 4:3) and a sticky `FactCard` with Book
+in the right column, first at 390px. The main column holds the career in four
+dated steps, two client reviews (`gopingu-1`, `connectful-2`, quoted nowhere
+else), what Anton runs himself, one paragraph about life outside work, and how
+to pay; `ClosingBand` ends the page. Book appears in the card and the band only.
+The story, the page name and the meta description live in `lib/about.ts`, which
+`/llms-full.txt` and `deno task og` read too; the city is `lib/config.ts`'s
+`LOCATION`. The story leaves out the 2022 post's income figures, the loan, the
+80/20 split and the "leave freelance" goal, and `lib/about.test.ts` fails if one
+comes back. `/about` carries the site's only `ProfilePage` JSON-LD
+(`components/SEOHead.tsx`); `/` carries a `WebPage` about the Person instead.
+`test/about.test.ts` checks the built page and that no other sitemap page has a
+`ProfilePage`. It is linked from the phone More sheet, the home fact card and a
+top line on the 2022 post.
+
 ### Project page
 
 `routes/work/[slug].tsx` (#246) is a two-column case study from 1024px: a real
@@ -839,6 +858,7 @@ cached at the edge:
 const CORE_PAGES = new Set([
   "/",
   "/how-i-work",
+  "/about",
   "/infrastructure",
   "/contact-me",
   "/blog",
@@ -893,13 +913,14 @@ production sends `noindex` for any status ≥ 400 and `noindex, nofollow` for
 `scripts/og-images.ts` generates the 1200×630 PNGs committed under
 `static/img/og/`: one per blog post (`blog/<slug>.png`), one per project page
 (`projects/<slug>.png`), one per tool page (`tools/<slug>.png`) plus the hub
-(`tools.png`), and one landscape default for the site (`default.png`,
-`lib/head.ts`'s `DEFAULTS.ogImage`) — replacing the SVG covers and the old
-1200×1800 portrait photo, none of which LinkedIn, X, Facebook or Slack render as
-a link preview. It renders each PNG from the post/project title and description
-already in `lib/data.ts`, never from the committed cover SVGs, through the
-Chromium already pinned for the browser-driven tests (`test/browser.ts`'s
-`launchChromium()`) instead of adding a new image-rendering dependency.
+(`tools.png`), one for `/about` (`about.png`), and one landscape default for the
+site (`default.png`, `lib/head.ts`'s `DEFAULTS.ogImage`) — replacing the SVG
+covers and the old 1200×1800 portrait photo, none of which LinkedIn, X, Facebook
+or Slack render as a link preview. It renders each PNG from the post/project
+title and description already in `lib/data.ts`, never from the committed cover
+SVGs, through the Chromium already pinned for the browser-driven tests
+(`test/browser.ts`'s `launchChromium()`) instead of adding a new image-rendering
+dependency.
 
 Regeneration is one command: `deno task og`. Run it whenever a post or project
 title or description changes, then commit the changed PNGs — for example after

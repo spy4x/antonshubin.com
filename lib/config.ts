@@ -6,6 +6,12 @@ export const BASE_URL = DOMAIN.startsWith("https://")
 export const SCHEDULE_URL = Deno.env.get("SCHEDULE_URL") || "";
 /** Shown next to the name in the phone header (#185); Da Nang is ICT. */
 export const TIMEZONE_LABEL = "UTC+7";
+/**
+ * Where Anton lives (#294): the About page, the Person JSON-LD's
+ * `homeLocation` and both llms files read it, so a move changes one line.
+ * Change `TIMEZONE_LABEL` with it.
+ */
+export const LOCATION = "Da Nang, Vietnam";
 export const UPWORK_URL = Deno.env.get("UPWORK_URL") ||
   "https://www.upwork.com/freelancers/ashubin";
 export const UMAMI_URL = Deno.env.get("UMAMI_URL") || "";
@@ -62,6 +68,9 @@ export const SAME_AS_URLS = [
   "https://github.com/spy4x",
   "https://www.linkedin.com/in/anton-shubin",
   "https://www.youtube.com/@anton-shubin",
+  // The vlog channel (#294), linked from /about. Checked on 30 Sep 2026: it
+  // answers 200, while an unknown handle answers 404.
+  "https://www.youtube.com/@anton-shubin-live",
   "https://x.com/spy4x",
 ] as const;
 

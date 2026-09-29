@@ -210,6 +210,18 @@ export default define.page(function Home(ctx) {
                   <NewTabHint />
                 </a>
               </p>
+              <p class="mt-2 text-sm text-graphite">
+                Who you'd be working with:{" "}
+                <a
+                  href="/about"
+                  data-home-about
+                  data-umami-event="home-about"
+                  class={LINK}
+                >
+                  About me
+                  <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+                </a>
+              </p>
             </FactCard>
           </div>
 

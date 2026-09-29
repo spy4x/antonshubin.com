@@ -5,16 +5,48 @@ import {
   ROLE,
   SITE_DESCRIPTION,
 } from "../lib/head.ts";
-import { SAME_AS_URLS, X_HANDLE } from "../lib/config.ts";
+import { LOCATION, SAME_AS_URLS, X_HANDLE } from "../lib/config.ts";
+import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts";
 import { proof } from "../lib/proof.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
 
 export function SEOHead() {
   const h = head.value;
-  // The home page is the one page that is Anton's profile (#269): it gets a
-  // ProfilePage node and no BreadcrumbList, whose single "Home" item says
-  // nothing.
-  const isHome = new URL(h.canonical).pathname === "/";
+  const path = new URL(h.canonical).pathname;
+  // `/about` is the one page that is Anton's profile (#294, SEO 1): it gets
+  // the site's only ProfilePage. The home page is an offer page, so it gets a
+  // plain WebPage about the Person and no BreadcrumbList, whose single "Home"
+  // item says nothing (#269).
+  const isHome = path === "/";
+  const isAbout = path === ABOUT_PATH;
+  const breadcrumb = {
+    "@type": "BreadcrumbList",
+    "@id": `${h.canonical}#breadcrumb`,
+    "itemListElement": breadcrumbFromCanonical(
+      h.canonical,
+      h.pageName ?? h.title,
+    ),
+  };
+  const pageNodes = isHome
+    ? [{
+      "@type": "WebPage",
+      "@id": "https://antonshubin.com/#webpage",
+      "url": "https://antonshubin.com/",
+      "name": h.title,
+      "about": { "@id": "https://antonshubin.com/#person" },
+      "isPartOf": { "@id": "https://antonshubin.com/#website" },
+    }]
+    : isAbout
+    ? [{
+      "@type": "ProfilePage",
+      "@id": `${h.canonical}#profile`,
+      "url": h.canonical,
+      "name": ABOUT_NAME,
+      "mainEntity": { "@id": "https://antonshubin.com/#person" },
+      "isPartOf": { "@id": "https://antonshubin.com/#website" },
+      "breadcrumb": { "@id": breadcrumb["@id"] },
+    }, breadcrumb]
+    : [breadcrumb];
 
   return (
     <Head>
@@ -116,6 +148,7 @@ export function SEOHead() {
                   `Upwork ${proof("expert-vetted")}`,
                   `Upwork ${proof("job-success")} Job Success`,
                 ],
+                "homeLocation": { "@type": "Place", "name": LOCATION },
                 // No schema.org property fits the Upwork earnings figure
                 // without overclaiming (disambiguatingDescription exists to
                 // tell apart similarly-named items, not to state earnings),
@@ -157,23 +190,7 @@ export function SEOHead() {
                 "inLanguage": "en-US",
                 "publisher": { "@id": "https://antonshubin.com/#person" },
               },
-              ...(isHome
-                ? [{
-                  "@type": "ProfilePage",
-                  "@id": "https://antonshubin.com/#profile",
-                  "url": "https://antonshubin.com/",
-                  "name": h.title,
-                  "mainEntity": { "@id": "https://antonshubin.com/#person" },
-                  "isPartOf": { "@id": "https://antonshubin.com/#website" },
-                }]
-                : [{
-                  "@type": "BreadcrumbList",
-                  "@id": `${h.canonical}#breadcrumb`,
-                  "itemListElement": breadcrumbFromCanonical(
-                    h.canonical,
-                    h.pageName ?? h.title,
-                  ),
-                }]),
+              ...pageNodes,
             ],
           }),
         }}

@@ -7,6 +7,7 @@
 export const CORE_PAGES = new Set([
   "/",
   "/how-i-work",
+  "/about",
   "/infrastructure",
   "/contact-me",
   "/blog",
