@@ -6,6 +6,8 @@ export interface Lead {
   name: string;
   email: string;
   techStack: string;
+  /** The catalog item the visitor came from (`/contact-me?service=<slug>`), when it is a real one. */
+  service?: { slug: string; shortTitle: string };
 }
 
 /** What {@link notifyOwner} sends with; `sender` is `null` when SMTP is not configured. */
@@ -36,8 +38,11 @@ export async function notifyOwner(
   const result = await deps.sender.send({
     to: deps.contactEmail,
     subject: `[Lead] Architecture audit request from ${subjectSafe(lead.name)}`,
-    text:
-      `New audit request from ${lead.name} (${lead.email}):\n\n${lead.techStack}`,
+    text: `New audit request from ${lead.name} (${lead.email}):\n\n` +
+      (lead.service
+        ? `Service: ${lead.service.shortTitle} (${lead.service.slug})\n\n`
+        : "") +
+      lead.techStack,
   });
   if (!result.ok) {
     log.error("[LEAD] failed:", result.error);
