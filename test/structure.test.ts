@@ -12,6 +12,7 @@ import {
 } from "../lib/catalog.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
+import { promises } from "../lib/promises.ts";
 import { redirectTable, redirectTarget } from "../lib/redirects.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
@@ -822,5 +823,25 @@ siteTest(
     assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source");
     const main = html.slice(html.indexOf('id="main-content"'));
     assertEquals(count(main, /fetchpriority="high"/g), 1);
+  },
+);
+
+siteTest(
+  "the home page shows the five promises as a timeline of steps linking how-i-work",
+  async (site) => {
+    const html = await site.html("/");
+    const start = html.indexOf('data-promise-timeline="compact"');
+    assert(start > 0, "no compact promise timeline on /");
+    const timeline = html.slice(start, html.indexOf("</ol>", start));
+    assertEquals(count(timeline, /<li /g), 5);
+    for (const p of promises) {
+      assert(timeline.includes(`id="${p.id}"`), `no step ${p.id}`);
+      assert(
+        timeline.includes(`href="/how-i-work#${p.id}"`),
+        `${p.id} does not link how-i-work`,
+      );
+      assert(visibleText(timeline).includes(p.when), `no "${p.when}" label`);
+    }
+    assert(!/accent/.test(timeline), "the timeline uses the accent colour");
   },
 );

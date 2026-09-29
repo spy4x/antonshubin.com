@@ -1,5 +1,5 @@
-// Browser-driven guard for margin notes (#186): the note next to the Upwork
-// proof line sits in the 240px margin column from 1100px without causing
+// Browser-driven guard for margin notes (#186): the note next to a project
+// page's outcome line (FoodRazor's acquisition) sits in the 240px margin column from 1100px without causing
 // horizontal scroll, and renders inline under its paragraph below that. Not
 // checkable from raw server-rendered HTML — it needs computed layout (an
 // element's position relative to its claim, and the page's own scroll
@@ -15,8 +15,12 @@ import { launchChromium, newPage } from "./browser.ts";
 // other desktop screenshots/tests).
 const DESKTOP_WIDTHS = [1100, 1280, 1440];
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
+// The project page's outcome line carries a side-by-side note (#246); the home
+// page's Upwork note sits in the narrow fact card and stays stacked (#269).
+const PROJECT_PATH = "/work/foodrazor";
+const PROJECT_NOTE = '[data-note-ref="foodrazor-acquired"]';
 
-Deno.test("the Upwork note fits beside its claim with no horizontal scroll at 1100/1280/1440px, and inline at 390px", async () => {
+Deno.test("a project page's outcome note fits beside its claim with no horizontal scroll at 1100/1280/1440px, and inline at 390px", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -27,9 +31,11 @@ Deno.test("the Upwork note fits beside its claim with no horizontal scroll at 11
         viewport: { width, height: 900 },
       });
       try {
-        await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+        await page.goto(`${site.origin}${PROJECT_PATH}`, {
+          waitUntil: "networkidle",
+        });
 
-        const wrap = '[data-note-ref="upwork-profile"]';
+        const wrap = PROJECT_NOTE;
         const claim = `${wrap} > p`;
         const note = `${wrap} .note-aside`;
 
@@ -71,8 +77,10 @@ Deno.test("the Upwork note fits beside its claim with no horizontal scroll at 11
 
     const mobile: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
-      await mobile.goto(`${site.origin}/`, { waitUntil: "networkidle" });
-      const wrap = '[data-note-ref="upwork-profile"]';
+      await mobile.goto(`${site.origin}${PROJECT_PATH}`, {
+        waitUntil: "networkidle",
+      });
+      const wrap = PROJECT_NOTE;
       const claim = `${wrap} > p`;
       const note = `${wrap} .note-aside`;
       const mobileBoxes = await mobile.evaluate(
@@ -89,6 +97,49 @@ Deno.test("the Upwork note fits beside its claim with no horizontal scroll at 11
       );
     } finally {
       await mobile.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the home page's Upwork note stays under its figures in the fact card, with no horizontal scroll", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (const width of [390, ...DESKTOP_WIDTHS]) {
+      const page: Page = await newPage(browser, {
+        viewport: { width, height: 900 },
+      });
+      try {
+        await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+        const wrap = '[data-note-ref="upwork-profile"]';
+        const boxes = await page.evaluate(
+          ([claimSel, noteSel]) => {
+            const rect = (sel: string) =>
+              document.querySelector(sel)!.getBoundingClientRect();
+            return {
+              claim: rect(claimSel),
+              note: rect(noteSel),
+              scrollWidth: document.documentElement.scrollWidth,
+              clientWidth: document.documentElement.clientWidth,
+            };
+          },
+          [`${wrap} > dl`, `${wrap} .note-aside`],
+        );
+        assert(
+          boxes.note.top >= boxes.claim.bottom,
+          `at ${width}px the note (top ${boxes.note.top}) is not below the figures (bottom ${boxes.claim.bottom})`,
+        );
+        assert(
+          boxes.scrollWidth <= boxes.clientWidth,
+          `at ${width}px the page scrolls sideways`,
+        );
+      } finally {
+        await page.close();
+      }
     }
   } finally {
     await browser?.close();

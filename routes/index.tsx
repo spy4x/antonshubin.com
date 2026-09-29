@@ -6,6 +6,7 @@ import { formatPeriod, highlightProjects } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
 import { promise } from "../lib/promises.ts";
+import { PromiseTimeline } from "../components/PromiseTimeline.tsx";
 import {
   homeTestimonialIds,
   testimonial,
@@ -57,19 +58,6 @@ const alsoWork = [
   { slug: "sogroya", label: "Novo Nordisk" },
   { slug: "truth-or-dare", label: "DareChat" },
 ].map((a) => ({ ...a, project: clientProject(a.slug) }));
-
-/**
- * The five promises as a timeline (#187): when each one bites, in the order a
- * project meets them. Titles and descriptions come from `lib/promises.ts`;
- * only the "when" labels are written here.
- */
-const timeline = [
-  { when: "Day one", id: "ownership" },
-  { when: "First 5 days", id: "refund" },
-  { when: "Weeks 1–2", id: "first-milestone" },
-  { when: "Every week", id: "weekly-software" },
-  { when: "30 days after", id: "free-bugfixes" },
-].map((s) => ({ ...s, promise: promise(s.id) }));
 
 /** The tools row: at most this many, so a growing registry never crowds the page. */
 const TOOLS_SHOWN = 4;
@@ -365,23 +353,11 @@ export default define.page(function Home(ctx) {
         {/* 4. How a project runs: the five promises, in the order a project meets them */}
         <section data-home-section="how-it-works" class="mb-16 md:mb-24">
           <h2 class="h2 mb-6">How a project runs</h2>
-          <ol class="grid gap-6 md:grid-cols-5 md:gap-4">
-            {timeline.map((s) => (
-              <li
-                key={s.id}
-                data-timeline-step={s.id}
-                class="border-l-2 border-rule-strong pl-4 md:border-l-0 md:border-t-2 md:pl-0 md:pt-4"
-              >
-                <p class="text-sm text-graphite">{s.when}</p>
-                <h3 class="mt-1 text-lg text-parchment leading-snug">
-                  {s.promise.title}
-                </h3>
-                <p class="mt-2 text-sm text-graphite leading-relaxed">
-                  {s.promise.desc}
-                </p>
-              </li>
-            ))}
-          </ol>
+          <PromiseTimeline
+            variant="compact"
+            headingLevel={3}
+            umamiPrefix="home-promise-"
+          />
           <p class="mt-6 text-sm">
             <a
               href="/how-i-work"

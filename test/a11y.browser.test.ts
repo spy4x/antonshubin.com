@@ -687,7 +687,7 @@ Deno.test("Escape leaves focus alone when the mobile menu is already closed", as
       // Escape, not just while open, would steal focus to More even though
       // there is nothing open to close.
       const mainLink = page.locator("#main-content").getByRole("link", {
-        name: "See all work",
+        name: "All client work",
       });
       await mainLink.focus();
       await page.keyboard.press("Escape");
