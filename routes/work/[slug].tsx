@@ -16,20 +16,17 @@ import {
   workHref,
 } from "../../lib/work.ts";
 import { clientSummary, metaDescription, projectLead } from "../../lib/llms.ts";
-import { promise } from "../../lib/promises.ts";
 import { WithNote } from "../../components/WithNote.tsx";
-import { SCHEDULE_URL } from "../../lib/config.ts";
 import ImageGallery from "../../islands/ImageGallery.tsx";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { BookCallLink } from "../../components/BookCallLink.tsx";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
 import {
   ProjectFactCard,
   SimilarWorkLink,
 } from "../../components/ProjectFactCard.tsx";
 import { ProjectReviews, PullQuote } from "../../components/ProjectReviews.tsx";
-import { ArrowRightIcon } from "../../components/Icons.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
 
 /**
@@ -197,7 +194,6 @@ export default define.page(function ProjectDetail(ctx) {
   const screenshots = projectScreenshots(project);
   const lead = projectLead(project);
   const related = isClientProject ? relatedProjects(project) : [];
-  const closingPromises = [promise("refund"), promise("first-milestone")];
 
   head.value = {
     ...head.value,
@@ -329,39 +325,15 @@ export default define.page(function ProjectDetail(ctx) {
         </div>
 
         {/* ── Closing band: one decision ────────────────────────────── */}
-        <section
-          data-closing-band
-          aria-label="Next step"
-          class="mt-16 bg-desk border border-rule rounded-xl p-6 sm:p-8"
-        >
-          <ul class="grid gap-4 sm:grid-cols-2 mb-6">
-            {closingPromises.map((p) => (
-              <li key={p.id}>
-                <p class="font-heading text-lg text-parchment">{p.title}</p>
-                <p class="mt-1 text-sm text-graphite">{p.desc}</p>
-              </li>
-            ))}
-          </ul>
-          <div class="flex flex-wrap items-center gap-4">
-            <BookCallLink
-              url={SCHEDULE_URL}
-              target="_blank"
-              data-umami-event={`project-cta-${project.slug}-schedule-bottom`}
-              class="justify-center px-6 py-3"
-            >
-              Book a free intro call
-            </BookCallLink>
-            <SimilarWorkLink project={project} place="bottom" />
-            <a
-              href="/how-i-work"
-              data-umami-event={`project-cta-${project.slug}-how-i-work`}
-              class="inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
-            >
-              How I work
-              <ArrowRightIcon class="w-3.5 h-3.5" />
-            </a>
-          </div>
-        </section>
+        <ClosingBand
+          bookEvent={`project-cta-${project.slug}-schedule-bottom`}
+          catalogLink={<SimilarWorkLink project={project} place="bottom" />}
+          links={[{
+            href: "/how-i-work",
+            label: "How I work",
+            event: `project-cta-${project.slug}-how-i-work`,
+          }]}
+        />
       </div>
     </Layout>
   );

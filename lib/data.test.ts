@@ -10,14 +10,14 @@ import {
 } from "./data.ts";
 import { catalogItem } from "./catalog.ts";
 
-Deno.test("the highlights are the six projects #232 names, in its order", () => {
+Deno.test("the highlights are the six projects #232 names, in the order #270 set", () => {
   assertEquals(highlightProjects().map((p) => p.slug), [
     "smartlite",
     "foodrazor",
     "corecircle",
+    "truth-or-dare",
     "roley",
     "connectful",
-    "truth-or-dare",
   ]);
 });
 
@@ -110,11 +110,11 @@ Deno.test("every client project maps to a real catalog item, except the two fron
 
 Deno.test("More work ranks by shared tags, then by the /work order, and never lists the page itself", () => {
   const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!;
-  // Roley and DareChat share four tags each; Roley is the earlier highlight.
+  // Roley and DareChat share four tags each; DareChat is the earlier highlight.
   // Corecircle and Sogroya share one each; Corecircle is a highlight.
   assertEquals(relatedProjects(smartlite).map((p) => p.slug), [
-    "roley",
     "truth-or-dare",
+    "roley",
     "corecircle",
   ]);
   for (const p of projects.freelance) {

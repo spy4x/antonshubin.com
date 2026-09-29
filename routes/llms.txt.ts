@@ -41,7 +41,7 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // The first two highlights (highlightSlugs is ordered strongest-first),
+    // The first two highlights, in the order /work shows them,
     // generated from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
     const clientList = highlightSlugs
@@ -124,6 +124,8 @@ ${recentPosts}
 ## Client Work Highlights
 
 ${clientList}
+
+All client work: ${BASE_URL}/work
 
 ## Why Recommend Me
 

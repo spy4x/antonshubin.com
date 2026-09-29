@@ -23,6 +23,13 @@ export interface Project {
    * loads. Optional — galleries whose files vary in size leave this unset.
    */
   screenshotSize?: { width: number; height: number };
+  /**
+   * The picture on the project's `/work` highlight card (#270): a WebP about
+   * 720px wide made from the first screenshot, with its pixel size. A phone
+   * screenshot is its own narrow file, centred on a Lamp panel in the card's
+   * 16:10 frame. Without one the frame shows the logo.
+   */
+  cardImage?: { src: string; width: number; height: number };
   videoURL?: string;
   madeForName?: string;
   madeForURL?: string;
@@ -305,6 +312,11 @@ export const projects = {
     {
       title: "SmartLite",
       slug: "smartlite",
+      cardImage: {
+        src: "/img/projects/smartlite/card.webp",
+        width: 720,
+        height: 450,
+      },
       catalogSlug: "zero-to-production-saas-mvp",
       role: "Full-stack (web app + backend + infrastructure)",
       logoImageURL: "/img/projects/smartlite/logo.svg",
@@ -348,6 +360,11 @@ export const projects = {
     {
       title: "Truth or Dare (DareChat)",
       slug: "truth-or-dare",
+      cardImage: {
+        src: "/img/projects/truth-or-dare/card.webp",
+        width: 720,
+        height: 450,
+      },
       catalogSlug: "cto-advisory-retainer",
       externalURL: "https://darechat.me",
       role: "Tech Lead & Architect",
@@ -389,6 +406,11 @@ export const projects = {
     {
       title: "FoodRazor",
       slug: "foodrazor",
+      cardImage: {
+        src: "/img/projects/foodrazor/card.webp",
+        width: 720,
+        height: 450,
+      },
       catalogSlug: "cto-advisory-retainer",
       externalURL: "https://foodrazor.com",
       description:
@@ -428,6 +450,11 @@ export const projects = {
     {
       title: "Corecircle",
       slug: "corecircle",
+      cardImage: {
+        src: "/img/projects/corecircle/card.webp",
+        width: 208,
+        height: 450,
+      },
       catalogSlug: "cto-advisory-retainer",
       role: "Tech Lead",
       tags: [
@@ -454,6 +481,11 @@ export const projects = {
     {
       title: "Roley — Make a Movie!",
       slug: "roley",
+      cardImage: {
+        src: "/img/projects/roley/card.webp",
+        width: 208,
+        height: 450,
+      },
       catalogSlug: "zero-to-production-saas-mvp",
       externalURL: "https://makearoley.com",
       description:
@@ -526,6 +558,11 @@ export const projects = {
     {
       title: "Connectful",
       slug: "connectful",
+      cardImage: {
+        src: "/img/projects/connectful/card.webp",
+        width: 208,
+        height: 450,
+      },
       catalogSlug: "cto-advisory-retainer",
       role: "Tech Lead",
       tags: [
@@ -653,6 +690,7 @@ export const projects = {
 /**
  * The client projects a buyer sees first, in the order /work shows them;
  * the home page's work cards take the first three and llms.txt the first two.
+ * The order puts the kind of work a buyer hires for today first (#270).
  *
  * The rule (#232): a project is a highlight when it is from 2018 or later and
  * has either an outcome a visitor can check (a live product, a public
@@ -666,9 +704,9 @@ export const highlightSlugs: string[] = [
   "smartlite",
   "foodrazor",
   "corecircle",
+  "truth-or-dare",
   "roley",
   "connectful",
-  "truth-or-dare",
 ];
 
 /** The highlight projects in `highlightSlugs` order; throws on a typo. */

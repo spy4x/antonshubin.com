@@ -106,3 +106,14 @@ Deno.test("every tool page and the tools hub have a 1200x630 OG preview PNG", as
     );
   }
 });
+
+Deno.test("the /work index has a 1200x630 OG preview PNG", async () => {
+  const relative = "work.png";
+  const { width, height, bytes } = await pngInfo(relative);
+  assertEquals(width, WIDTH, `${relative}: width`);
+  assertEquals(height, HEIGHT, `${relative}: height`);
+  assert(
+    bytes < MAX_BYTES,
+    `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
+  );
+});
