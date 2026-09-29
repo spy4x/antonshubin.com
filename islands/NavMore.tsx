@@ -1,23 +1,16 @@
 import { useSignal } from "@preact/signals";
 import { useRef } from "preact/hooks";
 import { NavGlyph } from "../components/Icons.tsx";
-import {
-  FOCUS,
-  LinkGroups,
-  navIcon,
-  STACKED,
-  STATES,
-} from "../components/NavParts.tsx";
+import { FOCUS, navIcon, STACKED, STATES } from "../components/NavParts.tsx";
 import { moreItems, navCurrent } from "../lib/nav.ts";
 
 /**
  * The phone tab bar's More button and its `<dialog>` (#185): Home, About
- * (#294), How I work, Writing, Infrastructure and the Links groups. Escape, the Close
- * button or a tap on the backdrop closes it, and focus returns to More.
+ * (#294), How I work, Writing and Infrastructure, pages only (#293: the
+ * profiles and feeds that used to sit below are in the footer). Escape, the
+ * Close button or a tap on the backdrop closes it, and focus returns to More.
  */
-export default function NavMore(
-  { currentPath, upworkUrl }: { currentPath: string; upworkUrl: string },
-) {
+export default function NavMore({ currentPath }: { currentPath: string }) {
   const isMoreOpen = useSignal(false);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -93,23 +86,20 @@ export default function NavMore(
               image (see components/Nav.tsx). */
           }
           {isMoreOpen.value && (
-            <>
-              <ul class="space-y-1 pb-4 mb-3 border-b border-rule">
-                {moreItems.map((item) => (
-                  <li key={item.href}>
-                    <a
-                      href={item.href}
-                      aria-current={navCurrent(path, item.href)}
-                      class={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${STATES} ${FOCUS}`}
-                    >
-                      {navIcon(item.icon)}
-                      <span>{item.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <LinkGroups idPrefix="more-links" upworkUrl={upworkUrl} />
-            </>
+            <ul class="space-y-1">
+              {moreItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    aria-current={navCurrent(path, item.href)}
+                    class={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${STATES} ${FOCUS}`}
+                  >
+                    {navIcon(item.icon)}
+                    <span>{item.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </dialog>

@@ -1,9 +1,10 @@
 /**
- * The site's navigation destinations (#185): the one place a nav label, href
- * or Links entry is written. `components/Nav.tsx` renders the desktop rail and
- * the phone tab bar, `islands/NavMore.tsx` the phone "More" sheet and
- * `islands/NavLinks.tsx` the Links popover, from these lists, so changing a
- * destination (#188 moves Work to `/work`) is one edit here.
+ * The site's navigation destinations (#185): the one place a nav label or
+ * href is written. `components/Nav.tsx` renders the desktop rail and the
+ * phone tab bar, `islands/NavMore.tsx` the phone "More" sheet and
+ * `components/Footer.tsx` its "Site" group, from these lists, so changing a
+ * destination (#188 moves Work to `/work`) is one edit here. Profiles and
+ * feeds are not destinations: they live in `lib/profiles.ts` and the footer.
  */
 
 /** The item icons; each names a glyph in `components/Icons.tsx`'s `NavGlyph`. */
@@ -21,11 +22,6 @@ export interface NavItem {
   href: string;
   label: string;
   icon: NavIcon;
-}
-
-export interface NavLinkGroup {
-  label: string;
-  links: { href: string; label: string }[];
 }
 
 const WORK: NavItem = { href: "/work", label: "Work", icon: "work" };
@@ -62,12 +58,23 @@ export const railItems: NavItem[] = [
 export const tabItemsBeforeBook: NavItem[] = [WORK, SERVICES];
 export const tabItemsAfterBook: NavItem[] = [TOOLS];
 
-/** What the phone "More" sheet lists above the Links groups. */
+/** What the phone "More" sheet lists: pages only. */
 export const moreItems: NavItem[] = [
   HOME,
   ABOUT,
   HOW_I_WORK,
   WRITING,
+  INFRASTRUCTURE,
+];
+
+const allItems: NavItem[] = [
+  HOME,
+  WORK,
+  SERVICES,
+  HOW_I_WORK,
+  TOOLS,
+  WRITING,
+  ABOUT,
   INFRASTRUCTURE,
 ];
 
@@ -78,38 +85,36 @@ export const moreItems: NavItem[] = [
 export const WRITE_FALLBACK_HREF = "/#audit-form";
 
 /**
- * The Links popover (desktop) and the Links part of the More sheet (phone).
- * `upworkUrl` is `lib/config.ts`'s `UPWORK_URL`, passed in rather than
- * imported: the two nav islands import this file, and `config.ts` reads
- * `Deno.env` when it loads, which does not exist in the browser.
+ * The nav's own word for a section, given the section's path: "Writing" for
+ * `/blog`, "Services" for `/catalog`. The back link on a nested page
+ * (`components/Breadcrumb.tsx`) uses it, so it never says "Blog" where the
+ * nav says "Writing". `undefined` for a path the nav doesn't list.
  */
-export function linkGroups(upworkUrl: string): NavLinkGroup[] {
-  return [
-    {
-      label: "Running",
-      links: [
-        { href: "https://meet.antonshubin.com", label: "meet.antonshubin.com" },
-        { href: "https://dash.antonshubin.com", label: "dash.antonshubin.com" },
-      ],
-    },
-    {
-      label: "Profiles",
-      links: [
-        { href: "https://github.com/spy4x", label: "GitHub" },
-        { href: "https://www.linkedin.com/in/anton-shubin", label: "LinkedIn" },
-        { href: "https://www.youtube.com/@anton-shubin", label: "YouTube" },
-        { href: upworkUrl, label: "Upwork" },
-      ],
-    },
-    {
-      label: "Feeds",
-      links: [
-        { href: "/rss.xml", label: "RSS" },
-        { href: "/llms.txt", label: "llms.txt" },
-      ],
-    },
-  ];
+export function navLabel(href: string): string | undefined {
+  return allItems.find((item) => item.href === href)?.label;
 }
+
+/**
+ * The nav item whose section `pathname` is inside (`/blog/x` and `/blog`
+ * both give Writing), or `undefined`. Home never matches: every path is
+ * under `/`. The 404 page uses it to put the section's button first.
+ */
+export function navItemFor(pathname: string): NavItem | undefined {
+  const trimmed = pathname.length > 1 && pathname.endsWith("/")
+    ? pathname.slice(0, -1)
+    : pathname;
+  return allItems.find((item) =>
+    item.href !== "/" &&
+    (trimmed === item.href || trimmed.startsWith(`${item.href}/`))
+  );
+}
+
+/** The footer's "Site" group: every page the nav lists except Home. */
+export const siteItems: NavItem[] = [
+  ...railItems,
+  INFRASTRUCTURE,
+  ABOUT,
+];
 
 /**
  * The `aria-current` value for a nav link to `href` on `currentPath`: `"page"`

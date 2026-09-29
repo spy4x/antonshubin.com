@@ -1,8 +1,6 @@
 import { NavGlyph } from "./Icons.tsx";
 import { NewTabHint } from "./NewTabHint.tsx";
 import { BOOK, FOCUS, navIcon, STACKED, STATES } from "./NavParts.tsx";
-import { UPWORK_URL } from "../lib/config.ts";
-import NavLinks from "../islands/NavLinks.tsx";
 import NavMore from "../islands/NavMore.tsx";
 import {
   navCurrent,
@@ -41,11 +39,11 @@ function bookLink(scheduleUrl: string) {
 /**
  * The site navigation (#185). Desktop (640px up): a fixed left rail read top
  * to bottom — home portrait, Book, the five destinations in `lib/nav.ts`'s
- * `railItems` (the only part that scrolls on a short screen), then a Links
- * popover (`islands/NavLinks.tsx`). Phone: a fixed bottom tab bar — Work,
+ * `railItems` (the only part that scrolls on a short screen); the profiles
+ * and feeds are in the footer (#293). Phone: a fixed bottom tab bar — Work,
  * Services, Book in the centre, Tools, More — where More
  * (`islands/NavMore.tsx`) opens a `<dialog>`
- * with the remaining pages and the Links groups.
+ * with the remaining pages.
  *
  * Server-rendered on purpose. Fresh's renderer marks each destination link's
  * `aria-current` from the real request URL, and nothing hydrates here to strip
@@ -100,7 +98,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             <NavMore
               {...{ "client:idle": true }}
               currentPath={currentPath}
-              upworkUrl={UPWORK_URL}
             />
           </li>
         </ul>
@@ -154,7 +151,6 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
             </li>
           ))}
         </ul>
-        <NavLinks upworkUrl={UPWORK_URL} />
       </div>
     </nav>
   );

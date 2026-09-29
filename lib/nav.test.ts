@@ -1,5 +1,12 @@
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { linkGroups, moreItems, navCurrent } from "./nav.ts";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import {
+  moreItems,
+  navCurrent,
+  navItemFor,
+  navLabel,
+  railItems,
+  siteItems,
+} from "./nav.ts";
 
 Deno.test("navCurrent marks the page itself 'page'", () => {
   assertEquals(navCurrent("/catalog", "/catalog"), "page");
@@ -23,10 +30,26 @@ Deno.test("navCurrent does not match a path that only shares a prefix", () => {
   assertEquals(navCurrent("/blog", "/catalog"), "false");
 });
 
-Deno.test("the Links groups never link probe-home, which answers 503 when a home-lab service is down", () => {
-  const hrefs = linkGroups("https://www.upwork.com/freelancers/ashubin")
-    .flatMap((g) => g.links.map((l) => l.href));
-  assert(!hrefs.some((h) => h.includes("probe-home")), hrefs.join(", "));
+Deno.test("navLabel gives the nav's own word for a section, not the URL's", () => {
+  assertEquals(navLabel("/blog"), "Writing");
+  assertEquals(navLabel("/catalog"), "Services");
+  assertEquals(navLabel("/work"), "Work");
+  assertEquals(navLabel("/hackathons"), undefined);
+});
+
+Deno.test("navItemFor finds the section a path is inside, and never Home", () => {
+  assertEquals(navItemFor("/blog/some-post")?.label, "Writing");
+  assertEquals(navItemFor("/blog/")?.label, "Writing");
+  assertEquals(navItemFor("/tools-extra"), undefined);
+  assertEquals(navItemFor("/no-such-page"), undefined);
+  assertEquals(navItemFor("/"), undefined);
+});
+
+Deno.test("the footer's Site group is the rail plus Infrastructure and About", () => {
+  assertEquals(
+    siteItems.map((i) => i.href),
+    [...railItems.map((i) => i.href), "/infrastructure", "/about"],
+  );
 });
 
 Deno.test("the More sheet lists About right after Home", () => {
