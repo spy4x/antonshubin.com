@@ -65,9 +65,7 @@ Deno.test("every blog post has a 1200x630 OG preview PNG", async () => {
 });
 
 Deno.test("every project page has a 1200x630 OG preview PNG", async () => {
-  const withSlug = [...projects.my, ...projects.freelance].filter((p) =>
-    p.slug
-  );
+  const withSlug = projects.freelance.filter((p) => p.slug);
   assert(withSlug.length > 0, "no projects with a slug to check");
   for (const project of withSlug) {
     const relative = `projects/${project.slug}.png`;

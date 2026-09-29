@@ -8,6 +8,7 @@ import {
   projects,
   relatedProjects,
 } from "./data.ts";
+import { tools } from "./tools.ts";
 import { catalogItem } from "./catalog.ts";
 
 Deno.test("the highlights are the six projects #232 names, in the order #270 set", () => {
@@ -32,8 +33,8 @@ Deno.test("every client project is a highlight or in the archive, never both", (
       `${p.slug}: highlight ${inHighlights}, archive ${inArchive}`,
     );
   }
-  for (const p of projects.my) {
-    assert(!archive.includes(p.slug), `tool ${p.slug} is in the archive`);
+  for (const t of tools) {
+    assert(!archive.includes(t.slug), `tool ${t.slug} is in the archive`);
   }
 });
 

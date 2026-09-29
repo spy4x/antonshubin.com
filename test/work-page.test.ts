@@ -184,7 +184,7 @@ siteTest(
 siteTest(
   "a project page's meta description is one line of at most 160 characters",
   async (site) => {
-    for (const p of [...projects.my, ...clients].filter((x) => x.slug)) {
+    for (const p of clients.filter((x) => x.slug)) {
       const raw = metaDescription(await site.html(`/work/${p.slug}`));
       assert(!/[\n\r]/.test(raw), `${p.slug}: a newline`);
       const description = visibleText(raw);

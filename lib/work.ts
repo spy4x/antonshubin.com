@@ -25,12 +25,12 @@ export function workHref(slug: string): string {
 }
 
 /**
- * Every project that has a page under `/work`: client projects and my own
- * tools alike, in `lib/data.ts` order. Only client work is listed on the
- * index (`clientWork()`); a tool's page stays in the sitemap.
+ * Every project that has a page under `/work`: client projects, in
+ * `lib/data.ts` order. My own projects have their pages under `/tools`
+ * (`lib/tools.ts`).
  */
 export function workProjects(): Project[] {
-  return [...projects.my, ...projects.freelance].filter((p) => p.slug);
+  return projects.freelance.filter((p) => p.slug);
 }
 
 /** The project whose page is `/work/<slug>`, or undefined for an unknown slug. */
@@ -38,7 +38,7 @@ export function findWorkProject(slug: string): Project | undefined {
   return workProjects().find((p) => p.slug === slug);
 }
 
-/** True when `slug` is a client project, not one of my own tools. */
+/** True when `slug` is a client project. */
 export function isClientWork(slug: string): boolean {
   return projects.freelance.some((p) => p.slug === slug);
 }

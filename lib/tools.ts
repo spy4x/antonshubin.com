@@ -3,19 +3,23 @@
  * site shows on `/tools` and `/tools/<slug>`, in the sitemap and in both llms
  * files. Nothing else in the repository lists a tool by hand.
  *
- * Only two entries exist today (ts-libs and preact-components, the first
- * slice of #189); the shape already takes the rest — services with a live
- * instance, CLIs, an agent setup, archived tools — so adding one is adding an
- * entry, not changing a page.
+ * Every project of mine that is not client work lives here (#273): libraries,
+ * services, a device, products still being built and archived apps. One page
+ * type serves them all and shows only the blocks an entry has data for, so a
+ * tool with no registry or no CI simply has no install line and no CI pill.
+ * The Seed and oko have no page yet: they are `toolRows`, a hub line with
+ * links, until their job line and summary exist in the data.
  *
  * Numbers that change on their own (stars, CI status, last push) do not live
  * here: `scripts/github-snapshot.ts` writes them to `lib/github-snapshot.json`,
  * read through `lib/github-snapshot.ts`, so pages render the same on every
  * request and tests stay deterministic.
  *
- * This module reads no environment variable and imports nothing, so tests and
- * scripts can load it without any permission.
+ * This module reads no environment variable and imports only `proof.ts` and
+ * the committed snapshot, so tests and scripts can load it without any
+ * permission.
  */
+import { proof } from "./proof.ts";
 
 /**
  * Where a tool stands, shown as a shape plus a word by
@@ -23,7 +27,13 @@
  * other two (`outcome`, `issue`) describe a client project or a problem, not a
  * tool.
  */
-export type ToolStatus = "ready" | "beta" | "wip" | "paused" | "archived";
+export type ToolStatus =
+  | "in-use"
+  | "ready"
+  | "beta"
+  | "wip"
+  | "paused"
+  | "archived";
 
 /** What kind of thing a tool is: decides nothing on the page yet but its label. */
 export type ToolKind =
@@ -31,14 +41,12 @@ export type ToolKind =
   | "component-library"
   | "service"
   | "cli"
-  | "app";
+  | "app"
+  | "device"
+  | "template";
 
 /** The `/tools` group a tool is listed under, in `toolGroups` order. */
-export type ToolGroupId =
-  | "running"
-  | "building-blocks"
-  | "agent-setup"
-  | "archive";
+export type ToolGroupId = "tools" | "products" | "archive";
 
 export interface ToolGroup {
   id: ToolGroupId;
@@ -48,35 +56,31 @@ export interface ToolGroup {
 }
 
 /**
- * The four groups #189 names, in page order. A group with no tool yet is not
- * rendered, so listing all four here does not put an empty heading on the
- * page.
+ * The three groups the merged spec of #273 sets, in page order: what I run
+ * and use first, then the products still being built, then what is paused or
+ * archived. A group with no entry is not rendered.
  */
 export const toolGroups: ToolGroup[] = [
   {
-    id: "running",
-    title: "Running on my servers",
-    intro: "Services I deploy and use every day.",
+    id: "tools",
+    title: "Tools",
+    intro: "Tools I run and use in my own work.",
   },
   {
-    id: "building-blocks",
-    title: "Building blocks",
-    intro: "Libraries I build my own apps and client projects from.",
-  },
-  {
-    id: "agent-setup",
-    title: "My AI-agent setup",
-    intro: "The rules and tools my coding agents run with.",
+    id: "products",
+    title: "Products",
+    intro: "Products I am building. Both are work in progress.",
   },
   {
     id: "archive",
-    title: "Archive",
-    intro: "Earlier tools I no longer maintain.",
+    title: "Paused or archived",
+    intro: "Projects I am not working on right now.",
   },
 ];
 
 /** What each status word means, for the status key on `/tools`. */
 export const statusMeanings: Record<ToolStatus, string> = {
+  "in-use": "Running in my own work today.",
   ready: "Published on its registry and used in my own projects.",
   beta: "Works and is in use, but the API may still change before 1.0.",
   wip: "Being built. Not ready for someone else to depend on.",
@@ -139,39 +143,128 @@ export interface Tool {
   name: string;
   /** The one-line job, the second half of the H1 ("name: job"). */
   job: string;
-  /** Two or three sentences under the H1: what it is, in web-standards terms. */
+  /** What it is, in the words the project already used. */
   summary: string;
   kind: ToolKind;
   status: ToolStatus;
   group: ToolGroupId;
-  /** `owner/name` on GitHub. */
-  repo: string;
-  registry: ToolRegistry;
-  licence: string;
-  /** Where the code runs, as true for this tool. */
-  runtime: string;
+  /** `owner/name` on GitHub. Absent when the code is not public. */
+  repo?: string;
+  /**
+   * Absent for a tool that is not on a registry: the page then has no install
+   * line, no version row and no registry row.
+   */
+  registry?: ToolRegistry;
+  /** Absent: the fact card shows the licence GitHub detected (the snapshot). */
+  licence?: string;
+  /** Where the code runs, as true for this tool. Absent: no "Runs on" row. */
+  runtime?: string;
+  /** schema.org `programmingLanguage`; absent when the language is not written down. */
+  programmingLanguage?: string;
   /** What I use it for myself: the live-proof sentence. */
-  usedFor: string;
+  usedFor?: string;
+  /** Where the tool stands today, when its status word is not enough. */
+  standing?: string;
   /** Links that prove `usedFor`, shown under it. */
-  proofLinks: ToolLink[];
+  proofLinks?: ToolLink[];
   /**
    * A running instance anyone can open (a demo, a live guide, a public
-   * service), shown as a hero button and on the hub. Absent for a library
-   * with nothing to open.
+   * service), shown as a hero button and on the hub. Absent for a tool with
+   * nothing to open.
    */
   live?: ToolLink;
-  ci: ToolCi;
+  /** Absent for a repository with no Woodpecker pipeline: no CI pill. */
+  ci?: ToolCi;
   /** The packages a multi-package tool publishes, in the order its README lists them. */
   packages?: string[];
-  useIf: string[];
-  dontUseIf: string[];
-  fits: ToolRelation[];
+  useIf?: string[];
+  dontUseIf?: string[];
+  fits?: ToolRelation[];
   screenshots?: ToolScreenshot[];
   /** Credit a tool must show visibly, such as the design a port is based on. */
   credit?: { text: string; links: ToolLink[] };
 }
 
+/**
+ * A hub line for a project with no page yet: a name, a status and links.
+ * It is not in the sitemap, the llms files or the redirect table.
+ */
+export interface ToolRow {
+  slug: string;
+  name: string;
+  status: ToolStatus;
+  group: ToolGroupId;
+  repo: string;
+  /** One sentence the project already used about itself. */
+  note?: string;
+  links: ToolLink[];
+}
+
 export const tools: Tool[] = [
+  {
+    slug: "mig",
+    name: "mig",
+    job: "tiny self-hosted meeting scheduler",
+    summary:
+      "миг (moment) — tiny self-hosted meeting scheduler, built on web standards. One owner, one URL, one feature: book a time slot. Runs as a single Deno binary, with JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a static meeting link without a Next.js + Postgres deployment.",
+    kind: "service",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/mig",
+    runtime: "Deno, as a single binary",
+    programmingLanguage: "TypeScript",
+    usedFor:
+      "Powers my own booking link at meet.antonshubin.com — dogfooded daily for client intros.",
+    proofLinks: [
+      { label: "The booking page on this site", href: "/contact-me" },
+    ],
+    live: { label: "Open the booking page", href: "/contact-me" },
+    ci: { provider: "woodpecker", repoId: 12 },
+  },
+  {
+    slug: "zond",
+    name: "Zond",
+    job: "internal health probe bridge for services behind SSO proxies",
+    summary:
+      "Internal health probe bridge for services behind SSO proxies. Originally Deno+TS, rewritten to Go as a single 10 MB distroless binary. Sits beside the containers on the same Docker network and probes them directly, so Gatus and other monitoring tools that lack SSO support can still check services behind Authelia.",
+    kind: "service",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/zond",
+    runtime: "Go, as a single distroless binary",
+    programmingLanguage: "Go",
+    ci: { provider: "woodpecker", repoId: 5 },
+  },
+  {
+    slug: "caldav-mcp",
+    name: "caldav-mcp",
+    job:
+      "MCP server that lets AI assistants read and write CalDAV events and tasks",
+    summary:
+      "MCP server that lets AI assistants read and write CalDAV events and tasks — Claude Desktop, OpenCode, Cursor, and Open WebUI all work with it. Built on web standards with zero npm dependencies, and runs as a single Deno binary.",
+    kind: "service",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/caldav-mcp",
+    runtime: "Deno, as a single binary",
+    programmingLanguage: "TypeScript",
+    ci: { provider: "woodpecker", repoId: 6 },
+  },
+  {
+    slug: "rostok",
+    name: "rostok",
+    job: "one-command scaffolder for a self-hosted homelab",
+    summary:
+      "росток (sprout) — one-command scaffolder for a self-hosted homelab from a curated service catalog. The CLI writes your servers/, config.json, and .env files; every secret mutation is auto-encrypted to .env.age via age64 so secrets stay safe to commit. Bridges my homelab IaC knowledge into a reusable tool others can run.",
+    kind: "cli",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/rostok",
+    programmingLanguage: "TypeScript",
+    usedFor:
+      "Deploys my own servers: four instances in different regions, each running a different set of services.",
+    ci: { provider: "woodpecker", repoId: 2 },
+  },
   {
     slug: "ts-libs",
     name: "ts-libs",
@@ -180,7 +273,7 @@ export const tools: Tool[] = [
       "Eight framework-agnostic packages built on web standards: ES modules, Fetch, Web Crypto and Streams. Sign-in, Postgres access, SMTP, safe outbound requests, time zones and validation, each with a one-line install. Every package is tested on Deno, the runtime I build with.",
     kind: "library",
     status: "ready",
-    group: "building-blocks",
+    group: "tools",
     repo: "spy4x/ts-libs",
     registry: {
       name: "JSR",
@@ -259,7 +352,7 @@ export const tools: Tool[] = [
       "A Preact port of Eirene's design system: components, design tokens, icons, charts and signals helpers in ten packages. Every module is a standard ES module that renders to HTML on the server and hydrates in the browser, with keyboard handling and focus written by hand. The tests and the build run on Deno.",
     kind: "component-library",
     status: "beta",
-    group: "building-blocks",
+    group: "tools",
     repo: "spy4x/preact-components",
     registry: {
       name: "JSR",
@@ -356,7 +449,174 @@ export const tools: Tool[] = [
       ],
     },
   },
+  {
+    slug: "air-quality-sensor",
+    name: "Air Quality Sensor",
+    job: "DIY ESP32-based air quality monitoring system",
+    summary:
+      "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
+    kind: "device",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/air-quality-sensor",
+    runtime: "An ESP32 microcontroller",
+    programmingLanguage: "C++",
+  },
+  {
+    slug: "financy",
+    name: "Financy",
+    job: "self-hosted finance tracker for a person or a family",
+    summary:
+      "Self-hosted finance tracker for a person or a family — open source, work in progress, not ready for everyday use. Targets multi-currency accounts and group or family collaboration with role-based access; transfers between accounts follow double-entry principles.",
+    kind: "app",
+    status: "wip",
+    group: "products",
+    repo: "spy4x/financy",
+    programmingLanguage: "TypeScript",
+    standing: "Being revived — work in progress, not ready for everyday use.",
+    ci: { provider: "woodpecker", repoId: 1 },
+  },
+  {
+    slug: "template",
+    name: "Deno Platform Template",
+    job: "reusable repository baseline for SaaS products",
+    summary:
+      `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
+        proof("jobs")
+      }+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.`,
+    kind: "template",
+    status: "wip",
+    group: "products",
+    repo: "spy4x/template",
+    runtime: "Deno",
+    programmingLanguage: "TypeScript",
+    usedFor:
+      "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
+    ci: { provider: "woodpecker", repoId: 11 },
+  },
+  {
+    slug: "caldav-tasks-web",
+    name: "caldav-tasks-web",
+    job: "touch-first PWA for editing CalDAV VTODO tasks",
+    summary:
+      "Touch-first PWA for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface with a Radicale and a Stalwart implementation), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos.",
+    kind: "app",
+    status: "paused",
+    group: "archive",
+    repo: "spy4x/caldav-tasks-web",
+    runtime: "Deno, with Hono and Preact",
+    programmingLanguage: "TypeScript",
+    standing:
+      "Tested in production against Radicale; Nextcloud and Baikal are expected to work but untested; Stalwart support is currently broken (README has the details).",
+    screenshots: [
+      {
+        src: "/img/tools/caldav-tasks-web/desktop-dashboard.webp",
+        alt: "Desktop dashboard",
+        width: 1440,
+        height: 900,
+      },
+      {
+        src: "/img/tools/caldav-tasks-web/desktop-kanban.webp",
+        alt: "Desktop kanban",
+        width: 1440,
+        height: 900,
+      },
+      {
+        src: "/img/tools/caldav-tasks-web/desktop-settings.webp",
+        alt: "Desktop settings",
+        width: 1440,
+        height: 900,
+      },
+      {
+        src: "/img/tools/caldav-tasks-web/mobile-dashboard.webp",
+        alt: "Mobile dashboard",
+        width: 780,
+        height: 1688,
+      },
+    ],
+  },
+  {
+    slug: "toread-today",
+    name: "Toread.Today",
+    job: "a cloud tool to organise things to read or watch later",
+    summary:
+      "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
+    kind: "app",
+    status: "archived",
+    group: "archive",
+    live: {
+      label: "Open it (still online, not maintained)",
+      href: "https://toread-today.web.app",
+    },
+    screenshots: [
+      {
+        src: "/img/tools/toread-today/1.webp",
+        alt: "Screenshot 1 of 3",
+        width: 2206,
+        height: 1800,
+      },
+      {
+        src: "/img/tools/toread-today/2.webp",
+        alt: "Screenshot 2 of 3",
+        width: 2204,
+        height: 1800,
+      },
+      {
+        src: "/img/tools/toread-today/3.webp",
+        alt: "Screenshot 3 of 3",
+        width: 2206,
+        height: 1800,
+      },
+    ],
+  },
 ];
+
+/**
+ * Projects with a hub line and no page. oko has no job line or summary in
+ * the data yet; the Seed's only home was a GitHub link, which #287 took off
+ * the site.
+ */
+export const toolRows: ToolRow[] = [
+  {
+    slug: "oko",
+    name: "oko",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/oko",
+    links: [
+      { label: "Open the dashboard", href: "https://dash.antonshubin.com" },
+      { label: "Repository", href: "https://github.com/spy4x/oko" },
+    ],
+  },
+  {
+    slug: "seed",
+    name: "The Seed",
+    status: "archived",
+    group: "archive",
+    repo: "spy4x/seed",
+    note:
+      "A one-person SaaS application codebase template. Ship your project idea in days instead of months. It is addictive.",
+    links: [{ label: "Repository", href: "https://github.com/spy4x/seed" }],
+  },
+];
+
+/**
+ * Every slug an own project answered under `/work` and `/projects` before #273
+ * moved it to `/tools`, mapped to the tool page it lives at now. Written out
+ * rather than derived, so dropping a tool cannot silently drop its 301
+ * (`lib/redirects.test.ts` checks every target is a page).
+ */
+export const movedSlugs: Readonly<Record<string, string>> = {
+  "mig": "mig",
+  "zond": "zond",
+  "caldav-mcp": "caldav-mcp",
+  "rostok": "rostok",
+  "air-quality-sensor": "air-quality-sensor",
+  "financy": "financy",
+  "template": "template",
+  "todoapp-caldav": "caldav-tasks-web",
+  "toread-today": "toread-today",
+};
 
 /** Looks a tool up by slug and throws on a typo, like `catalogItem()`. */
 export function tool(slug: string): Tool {
@@ -370,24 +630,41 @@ export function findTool(slug: string): Tool | undefined {
   return tools.find((t) => t.slug === slug);
 }
 
-/** Every group that has at least one tool, in `toolGroups` order, with its tools. */
+/** One `/tools` group: its page tools first, then its rows with no page. */
+export interface HubGroup {
+  group: ToolGroup;
+  tools: Tool[];
+  rows: ToolRow[];
+}
+
+/** Every group that has at least one entry, in `toolGroups` order. */
 export function groupedTools(
   list: Tool[] = tools,
-): { group: ToolGroup; tools: Tool[] }[] {
+  rows: ToolRow[] = toolRows,
+): HubGroup[] {
   return toolGroups
     .map((group) => ({
       group,
       tools: list.filter((t) => t.group === group.id),
+      rows: rows.filter((r) => r.group === group.id),
     }))
-    .filter((g) => g.tools.length > 0);
+    .filter((g) => g.tools.length + g.rows.length > 0);
 }
 
-/** The tool's GitHub URL. */
-export function repoUrl(t: Tool): string {
-  return `https://github.com/${t.repo}`;
+/** The tool's GitHub URL, or undefined when its code is not public. */
+export function repoUrl(t: Tool): string | undefined {
+  return t.repo ? `https://github.com/${t.repo}` : undefined;
 }
 
-/** The tool's Woodpecker pipeline list. */
-export function ciUrl(t: Tool): string {
-  return `https://ci.antonshubin.com/repos/${t.ci.repoId}`;
+/** The tool's Woodpecker pipeline list, or undefined when it has no pipeline. */
+export function ciUrl(t: Tool): string | undefined {
+  return t.ci ? `https://ci.antonshubin.com/repos/${t.ci.repoId}` : undefined;
+}
+
+/** Every tool page's repository, with its Woodpecker id when it has one, for the snapshot script. */
+export function snapshotRepos(): { repo: string; ciRepoId?: number }[] {
+  return tools.filter((t) => t.repo).map((t) => ({
+    repo: t.repo!,
+    ciRepoId: t.ci?.repoId,
+  }));
 }

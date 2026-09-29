@@ -11,6 +11,7 @@ import {
   formatPrice,
 } from "../lib/catalog.ts";
 import { blogArticles, projects } from "../lib/data.ts";
+import { tools } from "../lib/tools.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
 import { redirectTable, redirectTarget } from "../lib/redirects.ts";
 
@@ -538,7 +539,7 @@ siteTest(
       assert(html.includes('property="og:image:width" content="1200"'));
       assert(html.includes('property="og:image:height" content="630"'));
     }
-    for (const project of [...projects.my, ...projects.freelance]) {
+    for (const project of projects.freelance) {
       if (!project.slug) continue;
       const html = await site.html(`/work/${project.slug}`);
       assert(
@@ -688,7 +689,7 @@ siteTest(
   "/saas-architecture-guide's 'Building the MVP' section lists real case studies, not tools",
   async (site) => {
     const html = await site.html("/saas-architecture-guide");
-    // Scoped to the "Building the MVP" section: /work/rostok is also
+    // Scoped to the "Building the MVP" section: /tools/rostok is also
     // linked, on purpose, from the unrelated "Infrastructure & Cost
     // Optimization" section further down as infra proof, not a case study.
     const start = html.indexOf("Building the MVP");
@@ -702,11 +703,11 @@ siteTest(
         `the MVP section does not link case study ${project.slug}`,
       );
     }
-    for (const project of projects.my) {
-      if (!project.slug) continue;
+    for (const t of tools) {
       assert(
-        !section.includes(`href="/work/${project.slug}"`),
-        `the MVP section links tool ${project.slug}, expected only client work`,
+        !section.includes(`href="/work/${t.slug}"`) &&
+          !section.includes(`href="/tools/${t.slug}"`),
+        `the MVP section links tool ${t.slug}, expected only client work`,
       );
     }
   },

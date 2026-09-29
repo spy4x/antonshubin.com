@@ -1,11 +1,11 @@
 import { assert } from "jsr:@std/assert@^1.0.0";
 import { render } from "npm:preact-render-to-string@^6.6.3";
 import { InstallLine } from "./InstallLine.tsx";
-import { type Tool, tools } from "../lib/tools.ts";
+import { type Tool, tool } from "../lib/tools.ts";
 
 // Made-up tools, so these tests hold whatever the real registry says is published.
 const published: Tool = {
-  ...tools[0],
+  ...tool("ts-libs"),
   name: "Sample",
   slug: "sample",
   registry: {
@@ -18,7 +18,7 @@ const published: Tool = {
 };
 const unpublished: Tool = {
   ...published,
-  registry: { ...published.registry, published: false },
+  registry: { ...published.registry!, published: false },
 };
 
 Deno.test("a published tool's install line offers a copy button", () => {

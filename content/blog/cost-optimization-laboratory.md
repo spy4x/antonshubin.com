@@ -89,7 +89,7 @@ The system uses:
   restores;
 - Authelia for SSO and two-factor authentication on protected services.
 
-[rostok](/work/rostok), the scaffolder I deploy my own servers with, shows the
+[rostok](/tools/rostok), the scaffolder I deploy my own servers with, shows the
 implementation. Its value is not a claim that every SaaS needs this stack. It
 proves that I operate the controls I ask founders to fund: repeatable
 deployment, visible failures, documented recovery tooling, and explicit access

@@ -14,6 +14,7 @@
 import { assert } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { blogArticles, projects } from "../lib/data.ts";
+import { tools } from "../lib/tools.ts";
 
 /** Every `<loc>` path listed in the built `/sitemap.xml`. */
 async function sitemapPaths(site: Site): Promise<string[]> {
@@ -26,9 +27,10 @@ async function sitemapPaths(site: Site): Promise<string[]> {
 // A real page, deliberately left out of the sitemap because it is noindex.
 const EXTRA_PATHS = ["/pay"];
 
-const projectPaths = [...projects.my, ...projects.freelance]
-  .filter((p) => p.slug)
-  .map((p) => `/work/${p.slug}`);
+const projectPaths = [
+  ...projects.freelance.filter((p) => p.slug).map((p) => `/work/${p.slug}`),
+  ...tools.map((t) => `/tools/${t.slug}`),
+];
 
 const blogPaths = blogArticles.map((a) => `/blog/${a.slug}`);
 

@@ -193,7 +193,7 @@ export default define.page(function SaasArchGuide() {
             </li>
             <li>
               <a
-                href="/work/rostok"
+                href="/tools/rostok"
                 data-e2e="architecture-guide-rostok-proof"
                 class="inline-flex min-h-11 items-center text-accent hover:text-accent hover:underline transition-colors font-medium"
               >

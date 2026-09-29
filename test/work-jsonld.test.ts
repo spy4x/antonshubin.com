@@ -22,9 +22,7 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 
 // A project without a `slug` has no /work/<slug> route (e.g. an entry
 // only shown inline, like "YouTube Tech Channel" or "The Seed") — skip it.
-const allProjects = [...projects.my, ...projects.freelance].filter((p) =>
-  p.slug
-);
+const allProjects = projects.freelance.filter((p) => p.slug);
 
 function findProjectNode(blocks: unknown[]) {
   return blocks.find((d) => {

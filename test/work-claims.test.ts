@@ -15,6 +15,7 @@
 import { assert } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { blogArticles, projects } from "../lib/data.ts";
+import { tools } from "../lib/tools.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -47,9 +48,10 @@ const EXTRA_PATHS = [
   "/pay",
 ];
 
-const projectPaths = [...projects.my, ...projects.freelance]
-  .filter((p) => p.slug)
-  .map((p) => `/work/${p.slug}`);
+const projectPaths = [
+  ...projects.freelance.filter((p) => p.slug).map((p) => `/work/${p.slug}`),
+  ...tools.map((t) => `/tools/${t.slug}`),
+];
 
 const blogPaths = blogArticles.map((a) => `/blog/${a.slug}`);
 
@@ -79,7 +81,7 @@ siteTest(
       "no /catalog/<slug> page is in the guard's page set",
     );
     assert(
-      paths.includes("/work/todoapp-caldav"),
+      paths.includes("/tools/caldav-tasks-web"),
       "the caldav project page is missing from the guard's page set",
     );
   },

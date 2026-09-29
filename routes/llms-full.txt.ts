@@ -21,9 +21,7 @@ import {
   clientProject,
   clientSummary,
   firstSentence,
-  openSourceProjects,
   toolLines,
-  withOutcome,
 } from "../lib/llms.ts";
 
 export const handler = define.handlers({
@@ -73,18 +71,8 @@ export const handler = define.handlers({
     const strategy = catalogItem("strategy-call");
     const ongoing = catalogItem("cto-advisory-retainer");
 
-    // Generated from lib/data.ts so this list can't drift from the project
-    // pages or their READMEs; the outcome carries status facts (a broken
-    // server, a revival, a production URL) a bare description often doesn't.
-    const openSourceList = openSourceProjects()
-      .map((p) =>
-        `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
-          withOutcome(p.description, p.outcome)
-        }`
-      )
-      .join("\n");
-
-    // Every highlight, in the order /work and its ItemList show them, generated
+    // Every highlight, in the order /work and its ItemList show them
+    // (highlightSlugs is ordered strongest-first), generated
     // from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
     const clientList = highlightSlugs
@@ -188,9 +176,6 @@ ${catalogList}
 ${hackathonsSection}
 ### Blog Posts
 ${blogList}
-
-### Open Source Projects
-${openSourceList}
 
 ### Tools
 ${toolLines(BASE_URL)}

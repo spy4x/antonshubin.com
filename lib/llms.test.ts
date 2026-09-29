@@ -6,11 +6,11 @@ import {
   toolSummary,
 } from "./llms.ts";
 import type { Project } from "./data.ts";
-import { type Tool, tools } from "./tools.ts";
+import { type Tool, tool } from "./tools.ts";
 
 // Made-up tools, so these tests hold whatever the real registry says is published.
 const published: Tool = {
-  ...tools[0],
+  ...tool("ts-libs"),
   name: "Sample",
   slug: "sample",
   registry: {
@@ -23,7 +23,7 @@ const published: Tool = {
 };
 const unpublished: Tool = {
   ...published,
-  registry: { ...published.registry, published: false },
+  registry: { ...published.registry!, published: false },
 };
 
 Deno.test("toolSummary gives a published tool's install command", () => {

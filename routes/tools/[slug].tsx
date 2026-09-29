@@ -13,14 +13,18 @@ import { ciUrl, findTool, repoUrl, type Tool, tools } from "../../lib/tools.ts";
 import {
   githubSnapshot,
   MIN_STARS_SHOWN,
+  type RepoSnapshot,
   repoSnapshot,
 } from "../../lib/github-snapshot.ts";
 
 /**
  * The tool's `SoftwareSourceCode` JSON-LD node, from registry fields only.
- * `version` is left out until the version is really on its registry.
+ * A field the entry has no data for is left out, never guessed: `version`
+ * until the version is really on its registry, `codeRepository` for code that
+ * is not public, `license` when neither the entry nor GitHub names one.
  */
-function toolJsonLd(tool: Tool, canonical: string) {
+function toolJsonLd(tool: Tool, snap: RepoSnapshot | null, canonical: string) {
+  const licence = tool.licence ?? snap?.licence ?? null;
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
@@ -28,10 +32,14 @@ function toolJsonLd(tool: Tool, canonical: string) {
     "name": tool.name,
     "description": tool.summary,
     "url": canonical,
-    "codeRepository": repoUrl(tool),
-    "programmingLanguage": "TypeScript",
-    "license": `https://spdx.org/licenses/${tool.licence}`,
-    ...(tool.registry.published ? { "version": tool.registry.version } : {}),
+    ...(tool.repo ? { "codeRepository": repoUrl(tool) } : {}),
+    ...(tool.programmingLanguage
+      ? { "programmingLanguage": tool.programmingLanguage }
+      : {}),
+    ...(licence && licence !== "NOASSERTION"
+      ? { "license": `https://spdx.org/licenses/${licence}` }
+      : {}),
+    ...(tool.registry?.published ? { "version": tool.registry.version } : {}),
     "author": { "@id": "https://antonshubin.com/#person" },
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
   };
@@ -79,7 +87,9 @@ export default define.page(function ToolPage(ctx) {
     );
   }
 
-  const snap = repoSnapshot(tool.repo);
+  const snap = tool.repo ? repoSnapshot(tool.repo) : null;
+  const licence = tool.licence ?? snap?.licence ?? null;
+  const repo = repoUrl(tool);
   const others = tools.filter((t) => t.slug !== tool.slug);
 
   head.value = {
@@ -100,7 +110,7 @@ export default define.page(function ToolPage(ctx) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: toJsonLd(toolJsonLd(tool, head.value.canonical)),
+          __html: toJsonLd(toolJsonLd(tool, snap, head.value.canonical)),
         }}
       />
       <div class="max-w-5xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
@@ -125,12 +135,16 @@ export default define.page(function ToolPage(ctx) {
             </p>
           )}
           <div class="mt-6 flex flex-wrap gap-3">
-            <Button href="#install" class="px-4 py-2.5 text-sm">
-              Install
-            </Button>
-            <Button href={repoUrl(tool)} class="px-4 py-2.5 text-sm">
-              GitHub
-            </Button>
+            {tool.registry && (
+              <Button href="#install" class="px-4 py-2.5 text-sm">
+                Install
+              </Button>
+            )}
+            {repo && (
+              <Button href={repo} class="px-4 py-2.5 text-sm">
+                GitHub
+              </Button>
+            )}
             {tool.live && (
               <Button href={tool.live.href} class="px-4 py-2.5 text-sm">
                 {tool.live.label}
@@ -149,20 +163,26 @@ export default define.page(function ToolPage(ctx) {
               <Fact label="Status">
                 <StatusMark status={tool.status} />
               </Fact>
-              <Fact label="Version">
-                <span data-version>
-                  {tool.registry.published
-                    ? tool.registry.version
-                    : `${tool.registry.version}, publishing to ${tool.registry.name}`}
-                </span>
-              </Fact>
-              <Fact label="Licence">{tool.licence}</Fact>
-              <Fact label="Runs on">{tool.runtime}</Fact>
-              <Fact label="Registry">
-                <a href={tool.registry.url} class={linkClass}>
-                  {tool.registry.name}
-                </a>
-              </Fact>
+              {tool.registry && (
+                <Fact label="Version">
+                  <span data-version>
+                    {tool.registry.published
+                      ? tool.registry.version
+                      : `${tool.registry.version}, publishing to ${tool.registry.name}`}
+                  </span>
+                </Fact>
+              )}
+              {licence && licence !== "NOASSERTION" && (
+                <Fact label="Licence">{licence}</Fact>
+              )}
+              {tool.runtime && <Fact label="Runs on">{tool.runtime}</Fact>}
+              {tool.registry && (
+                <Fact label="Registry">
+                  <a href={tool.registry.url} class={linkClass}>
+                    {tool.registry.name}
+                  </a>
+                </Fact>
+              )}
               {tool.live && (
                 <Fact label="Live">
                   <a href={tool.live.href} class={linkClass}>
@@ -170,127 +190,179 @@ export default define.page(function ToolPage(ctx) {
                   </a>
                 </Fact>
               )}
-              <Fact label="Repository">
-                <a href={repoUrl(tool)} class={linkClass}>{tool.repo}</a>
-                {snap.stars >= MIN_STARS_SHOWN && (
-                  <span class="text-graphite">, {snap.stars} stars</span>
-                )}
-              </Fact>
-              <Fact label="CI">
-                <CiPill ci={snap.ci} pipelinesUrl={ciUrl(tool)} labelHidden />
-                <span class="block mt-1 text-sm text-graphite">
-                  Checked {githubSnapshot.checkedOn}
-                </span>
-              </Fact>
-              <Fact label="Install">
-                <InstallLine tool={tool} id={`fact-install-${tool.slug}`} />
-              </Fact>
+              {repo && snap && (
+                <Fact label="Repository">
+                  <a href={repo} class={linkClass}>{tool.repo}</a>
+                  {snap.stars >= MIN_STARS_SHOWN && (
+                    <span class="text-graphite">, {snap.stars} stars</span>
+                  )}
+                </Fact>
+              )}
+              {tool.ci && snap && (
+                <Fact label="CI">
+                  <CiPill
+                    ci={snap.ci}
+                    pipelinesUrl={ciUrl(tool)!}
+                    labelHidden
+                  />
+                  <span class="block mt-1 text-sm text-graphite">
+                    Checked {githubSnapshot.checkedOn}
+                  </span>
+                </Fact>
+              )}
+              {tool.registry && (
+                <Fact label="Install">
+                  <InstallLine tool={tool} id={`fact-install-${tool.slug}`} />
+                </Fact>
+              )}
             </dl>
           </aside>
 
           <div class="lg:order-1 min-w-0 space-y-12">
-            <section aria-labelledby="proof">
-              <h2 id="proof" class="text-2xl text-parchment">Live proof</h2>
-              <p class="mt-3 text-graphite leading-relaxed">{tool.usedFor}</p>
-              <ul class="mt-3 space-y-1">
-                {tool.proofLinks.map((l) => (
-                  <li key={l.href}>
-                    <a href={l.href} class={linkClass}>{l.label}</a>
-                  </li>
-                ))}
-              </ul>
-              {tool.screenshots?.map((s) => (
-                <figure
-                  key={s.src}
-                  class="mt-6 bg-paper border border-rule rounded-xl p-3"
-                >
-                  <img
-                    src={s.src}
-                    alt={s.alt}
-                    width={s.width}
-                    height={s.height}
-                    loading="lazy"
-                    class="w-full h-auto rounded-lg"
-                  />
-                </figure>
-              ))}
-            </section>
-
-            <section aria-labelledby="install">
-              <h2 id="install" class="text-2xl text-parchment">Install</h2>
-              <div class="mt-3">
-                <InstallLine tool={tool} id={`install-${tool.slug}`} />
-              </div>
-              {tool.packages && (
-                <>
-                  <p class="mt-4 text-graphite">
-                    {tool.packages.length} packages, each installed on its own:
+            {(tool.usedFor || tool.proofLinks) && (
+              <section aria-labelledby="proof">
+                <h2 id="proof" class="text-2xl text-parchment">Live proof</h2>
+                {tool.usedFor && (
+                  <p class="mt-3 text-graphite leading-relaxed">
+                    {tool.usedFor}
                   </p>
-                  <ul class="mt-2 flex flex-wrap gap-2">
-                    {tool.packages.map((p) => (
-                      <li key={p}>
-                        <code class="text-sm">{p}</code>
+                )}
+                {tool.proofLinks && (
+                  <ul class="mt-3 space-y-1">
+                    {tool.proofLinks.map((l) => (
+                      <li key={l.href}>
+                        <a href={l.href} class={linkClass}>{l.label}</a>
                       </li>
                     ))}
                   </ul>
-                </>
-              )}
-            </section>
+                )}
+              </section>
+            )}
 
-            <section aria-labelledby="fit" class="grid gap-8 sm:grid-cols-2">
-              <div>
-                <h2 id="fit" class="text-xl text-parchment">Use it if</h2>
-                <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                  {tool.useIf.map((line) => <li key={line}>{line}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h2 class="text-xl text-parchment">Don't use it if</h2>
-                <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                  {tool.dontUseIf.map((line) => <li key={line}>{line}</li>)}
-                </ul>
-              </div>
-            </section>
+            {tool.standing && (
+              <section aria-labelledby="standing">
+                <h2 id="standing" class="text-2xl text-parchment">
+                  Where it stands
+                </h2>
+                <p class="mt-3 text-graphite leading-relaxed">
+                  {tool.standing}
+                </p>
+              </section>
+            )}
 
-            <section aria-labelledby="fits">
-              <h2 id="fits" class="text-2xl text-parchment">
-                How it fits with my other repos
-              </h2>
-              <ul class="mt-4 space-y-3">
-                {tool.fits.map((f) => (
-                  <li
-                    key={f.text}
-                    data-relation={f.planned ? "planned" : "true"}
-                    class={`pl-4 border-l-2 ${
-                      f.planned
-                        ? "border-dashed border-rule-strong"
-                        : "border-solid border-sage"
-                    }`}
+            {tool.screenshots && (
+              <section aria-labelledby="screenshots">
+                <h2 id="screenshots" class="text-2xl text-parchment">
+                  Screenshots
+                </h2>
+                {tool.screenshots.map((s) => (
+                  <figure
+                    key={s.src}
+                    class="mt-6 bg-paper border border-rule rounded-xl p-3"
                   >
-                    <span class="text-xs uppercase tracking-wider text-graphite">
-                      {f.planned ? "Planned" : "Today"}
-                    </span>
-                    <p class="text-parchment">
-                      {f.href
-                        ? <a href={f.href} class={linkClass}>{f.text}</a>
-                        : f.text}
-                    </p>
-                  </li>
+                    <img
+                      src={s.src}
+                      alt={s.alt}
+                      width={s.width}
+                      height={s.height}
+                      loading="lazy"
+                      class="w-full h-auto rounded-lg"
+                    />
+                  </figure>
                 ))}
-              </ul>
-            </section>
+              </section>
+            )}
+
+            {tool.registry && (
+              <section aria-labelledby="install">
+                <h2 id="install" class="text-2xl text-parchment">Install</h2>
+                <div class="mt-3">
+                  <InstallLine tool={tool} id={`install-${tool.slug}`} />
+                </div>
+                {tool.packages && (
+                  <>
+                    <p class="mt-4 text-graphite">
+                      {tool.packages.length}{" "}
+                      packages, each installed on its own:
+                    </p>
+                    <ul class="mt-2 flex flex-wrap gap-2">
+                      {tool.packages.map((p) => (
+                        <li key={p}>
+                          <code class="text-sm">{p}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
+            )}
+
+            {((tool.useIf?.length ?? 0) + (tool.dontUseIf?.length ?? 0) > 0) &&
+              (
+                <section
+                  aria-labelledby="fit"
+                  class="grid gap-8 sm:grid-cols-2"
+                >
+                  <div>
+                    <h2 id="fit" class="text-xl text-parchment">Use it if</h2>
+                    <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
+                      {tool.useIf?.map((line) => <li key={line}>{line}</li>)}
+                    </ul>
+                  </div>
+                  <div>
+                    <h2 class="text-xl text-parchment">Don't use it if</h2>
+                    <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
+                      {tool.dontUseIf?.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </section>
+              )}
+
+            {(tool.fits?.length ?? 0) > 0 && (
+              <section aria-labelledby="fits">
+                <h2 id="fits" class="text-2xl text-parchment">
+                  How it fits with my other repos
+                </h2>
+                <ul class="mt-4 space-y-3">
+                  {tool.fits!.map((f) => (
+                    <li
+                      key={f.text}
+                      data-relation={f.planned ? "planned" : "true"}
+                      class={`pl-4 border-l-2 ${
+                        f.planned
+                          ? "border-dashed border-rule-strong"
+                          : "border-solid border-sage"
+                      }`}
+                    >
+                      <span class="text-xs uppercase tracking-wider text-graphite">
+                        {f.planned ? "Planned" : "Today"}
+                      </span>
+                      <p class="text-parchment">
+                        {f.href
+                          ? <a href={f.href} class={linkClass}>{f.text}</a>
+                          : f.text}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             <section
               aria-labelledby="next"
               class="border-t border-rule pt-8 grid gap-6 sm:grid-cols-2"
             >
               <h2 id="next" class="sr-only">What next</h2>
-              <div>
-                <p class="text-parchment">Star it or open an issue.</p>
-                <a href={`${repoUrl(tool)}/issues`} class={linkClass}>
-                  {tool.repo} on GitHub
-                </a>
-              </div>
+              {repo && (
+                <div>
+                  <p class="text-parchment">Star it or open an issue.</p>
+                  <a href={`${repo}/issues`} class={linkClass}>
+                    {tool.repo} on GitHub
+                  </a>
+                </div>
+              )}
               <div>
                 <p class="text-parchment">
                   Need something like this for your team? That's my day job.

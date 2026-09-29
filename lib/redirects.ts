@@ -5,22 +5,25 @@
 // lib/csp.ts uses — main.ts's middleware is the only caller, and it keeps the
 // query string (launch links carry UTM tags).
 import { WORK_PATH, workHref, workProjects } from "./work.ts";
-import { tools } from "./tools.ts";
+import { movedSlugs } from "./tools.ts";
+
+const TOOLS_PATH = "/tools";
 
 /** Old blog slug -> the post that absorbed it. */
 const RETIRED_BLOG_SLUGS: Record<string, string> = {
   "self-hosted-caldav-pwa-architecture": "self-hosted-caldav-web-ui-tasks-org",
 };
 
-/** Old project slug -> the project that replaced it (#231: homelab was reborn as rostok). */
+/** Old project slug -> the tool page that replaced it (#231: homelab was reborn as rostok). */
 const RETIRED_PROJECT_SLUGS: Record<string, string> = {
   "homelab": "rostok",
 };
 
-/** What the table is built from: every slug with a work page and every tool page. */
+/** What the table is built from: every slug with a work page and every own project that moved. */
 export interface RedirectSources {
   workSlugs: string[];
-  toolSlugs: string[];
+  /** Old `/work` and `/projects` slug -> its tool page's slug (`lib/tools.ts`'s `movedSlugs`). */
+  movedSlugs: Readonly<Record<string, string>>;
 }
 
 /**
@@ -28,9 +31,10 @@ export interface RedirectSources {
  * without a trailing slash, so both resolve in one hop:
  *
  * - `/projects` -> `/work`;
- * - `/projects/<slug>` -> `/tools/<slug>` when a tool page has that slug,
- *   otherwise `/work/<slug>`;
- * - `/projects/homelab` -> `/work/rostok` (retired slug);
+ * - `/projects/<slug>` -> `/work/<slug>` for a client project;
+ * - `/projects/<old>` and `/work/<old>` -> `/tools/<new>` for an own project
+ *   that moved to `/tools` (#273);
+ * - `/projects/homelab` -> `/tools/rostok` (retired slug);
  * - `/blog/<retired>` -> the post that absorbed it.
  *
  * A `/projects/<x>` with no new home is not in the table and answers 404: a
@@ -38,7 +42,7 @@ export interface RedirectSources {
  * engine.
  */
 export function buildRedirectTable(
-  { workSlugs, toolSlugs }: RedirectSources,
+  { workSlugs, movedSlugs }: RedirectSources,
 ): Map<string, string> {
   const table = new Map<string, string>();
   const add = (from: string, to: string) => {
@@ -46,14 +50,13 @@ export function buildRedirectTable(
     table.set(`${from}/`, to);
   };
   add("/projects", WORK_PATH);
-  for (const slug of workSlugs) {
-    add(
-      `/projects/${slug}`,
-      toolSlugs.includes(slug) ? `/tools/${slug}` : workHref(slug),
-    );
+  for (const slug of workSlugs) add(`/projects/${slug}`, workHref(slug));
+  for (const [old, now] of Object.entries(movedSlugs)) {
+    add(`/projects/${old}`, `${TOOLS_PATH}/${now}`);
+    add(workHref(old), `${TOOLS_PATH}/${now}`);
   }
   for (const [old, now] of Object.entries(RETIRED_PROJECT_SLUGS)) {
-    add(`/projects/${old}`, workHref(now));
+    add(`/projects/${old}`, `${TOOLS_PATH}/${now}`);
   }
   for (const [old, now] of Object.entries(RETIRED_BLOG_SLUGS)) {
     add(`/blog/${old}`, `/blog/${now}`);
@@ -64,7 +67,7 @@ export function buildRedirectTable(
 /** The site's redirect table, built from `lib/data.ts` and `lib/tools.ts`. */
 export const redirectTable: ReadonlyMap<string, string> = buildRedirectTable({
   workSlugs: workProjects().map((p) => p.slug!),
-  toolSlugs: tools.map((t) => t.slug),
+  movedSlugs,
 });
 
 /**
