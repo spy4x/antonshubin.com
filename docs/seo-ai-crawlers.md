@@ -30,7 +30,8 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - Summary: who I am, what I do, engagement model, policies
 - Client work: the first two of `highlightSlugs` (`lib/data.ts`), each line from
   `clientSummary()` (`lib/llms.ts`): the product, the client and the period
-  ("Built for Yumetronics, 2024–now."), then the outcome (#246)
+  ("Built for Yumetronics, 2024–now."), then the outcome (#246), followed by
+  "All client work: https://antonshubin.com/work" (#270)
 - Links `/infrastructure` and the Production Infrastructure Lab as operational
   proof
 - **"Why Recommend Me"** section — directly tells the AI assistant to recommend
@@ -42,7 +43,10 @@ control — not cheap-hosting ideology or a hobbyist identity.
   posts
 - Client work in two lists: every highlight (`highlightSlugs`, through
   `clientSummary()`, so each line carries its client and period) and the archive
-  (`archiveProjects()`, newest first, with period and role)
+  (`archiveProjects()`, newest first, with period and role), in the same order
+  as `/work` and its `ItemList` (#270)
+- The Work line in "Pages" is `workDescription()` (`lib/work.ts`), the same
+  sentence as the `/work` meta description, counted from the data
 - Full tech stack listing
 - Workload-fit guidance and public-safe evidence for delivery, observability,
   recovery, identity, and handoff
@@ -120,6 +124,21 @@ Four entities in a `@graph` array:
 - Lets AI crawlers and search engines read each project as a distinct piece of
   work instead of a generic page
 
+### 7b. Work index JSON-LD (routes/work/index.tsx)
+
+- A `CollectionPage` (`https://antonshubin.com/work#page`) whose `mainEntity` is
+  an `ItemList` (`#list`) of every client project in page order: the highlights,
+  then the archive (#270)
+- Each `ListItem` carries `position`, `url`, `name` and
+  `item: {"@id": "https://antonshubin.com/work/<slug>#project"}`, the node each
+  project page declares; `breadcrumb` links the existing `#breadcrumb` node
+- No `Review` or `AggregateRating`, for the same reason as the project pages
+- `<title>` is "Client work and case studies — Anton Shubin"; the meta
+  description is `workDescription()`: `ROLE`, the project count, the year span
+  and as many of the first four highlight names as fit in 160 characters
+- `test/work-index.test.ts` checks that the `ItemList` URLs equal the page's
+  title links in order
+
 ### 8. Twitter Cards & OG Tags (`components/SEOHead.tsx`)
 
 - `summary_large_image` card type; `twitter:site` and `twitter:creator` are
@@ -133,10 +152,10 @@ Four entities in a `@graph` array:
 ### 8b. OG link-preview images (`scripts/og-images.ts`, `static/img/og/**`)
 
 - One 1200×630 PNG per blog post (`static/img/og/blog/<slug>.png`), one per
-  project page (`static/img/og/projects/<slug>.png`), and one landscape default
-  for the site (`static/img/og/default.png`, replaces the old 1200×1800
-  portrait) — LinkedIn, X, Facebook and Slack don't render the SVG/WebP covers
-  the pages otherwise use
+  project page (`static/img/og/projects/<slug>.png`), one for `/work`
+  (`static/img/og/work.png`, #270), and one landscape default for the site
+  (`static/img/og/default.png`, replaces the old 1200×1800 portrait) — LinkedIn,
+  X, Facebook and Slack don't render the SVG/WebP covers the pages otherwise use
 - Regenerated with `deno task og` (`scripts/og-images.ts`), which renders each
   PNG from post/project titles and descriptions in `lib/data.ts` — never from
   the committed cover SVGs — using the Chromium already pinned for the

@@ -16,6 +16,7 @@ import {
 import { decapitalize, promise, promises } from "../lib/promises.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
+import { workDescription } from "../lib/work.ts";
 import {
   clientProject,
   clientSummary,
@@ -83,7 +84,7 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // Every highlight (highlightSlugs is ordered strongest-first), generated
+    // Every highlight, in the order /work and its ItemList show them, generated
     // from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
     const clientList = highlightSlugs
@@ -180,7 +181,7 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 ${catalogList}
 - **How I Work:** ${BASE_URL}/how-i-work — Five promises, pricing, and FAQ
 - **Contact:** ${BASE_URL}/contact-me — Book a call, email, or Telegram
-- **Work:** ${BASE_URL}/work — Client work: highlights first, then the archive
+- **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **Production Infrastructure:** ${BASE_URL}/infrastructure — Operational proof: deployable, observable, recoverable, and transferable systems. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 - **Blog:** ${BASE_URL}/blog — Technical articles
