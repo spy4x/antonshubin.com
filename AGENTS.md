@@ -1136,3 +1136,12 @@ Before writing a component, helper or library here, search
 The global rule
 ["Shared libs before local code"](https://github.com/spy4x/dotfiles/blob/main/ai-harnesses/AGENTS.md)
 says what belongs in each library; code only this repo needs stays here.
+
+The audit of what this repo still keeps locally is the table on issue #195 (a
+comment starting `<!-- agent -->`). Already imported from `@spy4x/platform`:
+`breadcrumbListJsonLd` (`components/SEOHead.tsx`, fed by `getBreadcrumb()`),
+`copyToClipboard` (`islands/CopyButton.tsx`, `islands/BlogImageEnhancer.tsx`),
+`sleep`, and the time constants; `lib/blog.ts` reads `@spy4x/time/locale`'s
+`dayLabel` and `monthLabel`. `toJsonLd` stays because `jsonLdText` escapes only
+`<`. The `@spy4x/preact-*` components are not adopted yet (part 2 of #195); do
+not add a second local copy of a component they hold.
