@@ -235,6 +235,12 @@ export const homeTestimonialIds: string[] = [
   "foodrazor-2",
 ];
 
+/**
+ * The two reviews on `/about` (#294): how Anton treats people and money
+ * (psychologist 2), from clients the home page and `/contact-me` don't quote.
+ */
+export const aboutTestimonialIds: string[] = ["gopingu-1", "connectful-2"];
+
 /** Looks a testimonial up by id and throws on a typo. */
 export function testimonial(id: string): Testimonial {
   const t = testimonials.find((x) => x.id === id);

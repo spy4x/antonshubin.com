@@ -18,6 +18,7 @@ import {
 import { proof } from "../lib/proof.ts";
 import { tool } from "../lib/tools.ts";
 import {
+  aboutTestimonialIds,
   testimonial,
   testimonialProject,
   visibleTestimonials,
@@ -38,12 +39,6 @@ const STORY_POST = "from-office-job-to-freelance-to-my-startups";
 
 /** Anton's vlog channel, from `lib/profiles.ts` next to the work channel. */
 const VLOG_URL = profile("youtube-vlog").href;
-
-/**
- * Two reviews about how Anton treats people and money (psychologist 2), from
- * clients the home page and `/contact-me` don't quote.
- */
-const aboutTestimonialIds = ["gopingu-1", "connectful-2"];
 
 const financy = tool("financy");
 

@@ -170,3 +170,11 @@ siteTest(
     );
   },
 );
+
+siteTest("/about shows two client review cards", async (site) => {
+  const html = await site.html("/about");
+  const start = html.indexOf('aria-labelledby="about-reviews"');
+  assert(start > -1, "/about has no reviews section");
+  const section = html.slice(start, html.indexOf("</section>", start));
+  assertEquals(count(section, /<figure[\s>]/g), 2);
+});
