@@ -15,6 +15,7 @@ import {
   priceLabel,
 } from "../lib/catalog.ts";
 import { decapitalize, promise, promises } from "../lib/promises.ts";
+import { infrastructureLines } from "../lib/infrastructure.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
 import { workDescription } from "../lib/work.ts";
@@ -181,7 +182,8 @@ ${catalogList}
 - **Contact:** ${BASE_URL}/contact-me — Book a call, email, or Telegram
 - **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
-- **Production Infrastructure:** ${BASE_URL}/infrastructure — Operational proof: deployable, observable, recoverable, and transferable systems. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
+- **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how each layer is run: handover, backups, monitoring, deploys, sign-in. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
+${infrastructureLines(BASE_URL)}
 - **Blog:** ${BASE_URL}/blog — Technical articles
 ${hackathonsSection}
 ### Blog Posts

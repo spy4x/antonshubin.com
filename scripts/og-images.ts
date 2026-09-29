@@ -3,7 +3,7 @@
  * Generates the 1200×630 link-preview PNGs this site commits under
  * `static/img/og/`: one per blog post, one per project page, one per tool
  * page plus the `/tools` hub (#189), one for `/work` (#270), one for
- * `/about` (#294), and one
+ * `/about` (#294), one for `/infrastructure` (#295), and one
  * landscape default for the site (#193).
  *
  * Run with:
@@ -182,6 +182,18 @@ async function main() {
       new URL("about.png", OG_DIR),
     );
     console.log(`about.png  ${fmtBytes(aboutBytes)}`);
+    count++;
+
+    // /infrastructure (#295): the page's own title and description.
+    const infraBytes = await render(
+      browser,
+      cardHtml(
+        "How I run production",
+        "Docker Compose behind Traefik, Authelia sign-in, restic backups, Gatus checks and self-hosted CI, with the live services linked.",
+      ),
+      new URL("infrastructure.png", OG_DIR),
+    );
+    console.log(`infrastructure.png  ${fmtBytes(infraBytes)}`);
     count++;
 
     const defaultHtml = cardHtml("Anton Shubin", ROLE);

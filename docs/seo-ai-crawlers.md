@@ -197,15 +197,20 @@ Five entities in a `@graph` array (six on `/about`):
 
 ### 10. `/infrastructure` and Production Infrastructure Lab
 
-- `/infrastructure` explains repeatable deploys, observability, recovery,
-  security, cost control, and change ownership in founder-readable terms
+- `/infrastructure` ("How I run production") links the live services, draws how
+  they connect and explains deploys, observability, recovery, sign-in and change
+  ownership in founder-readable terms
 - Managed cloud and dedicated infrastructure are presented as workload-fit
   decisions, not ideology
 - `/tools/rostok` (the old `/work/rostok` and `/projects/homelab` answer 301
   there) is the open-source scaffolder Anton deploys his own servers with
-- Private endpoints, IP addresses, sensitive topology, personal service
-  inventory, secrets, and unsupported cost or reliability claims stay out of
-  crawler copy
+- Public service names and URLs are shown, and `lib/infrastructure.ts` is their
+  one list: the `/infrastructure` map, the `llms-full.txt` lines and the
+  `TechArticle` `mentions` all read it. Private endpoints, IP addresses,
+  internal hostnames, ports, which server runs what, secrets, and unsupported
+  cost or reliability claims stay out of crawler copy
+- `/infrastructure` is a `TechArticle` (author `#person`, `mentions` the tool
+  pages' `SoftwareSourceCode` `@id`s) with its own 1200×630 OG image
 
 ## Analytics Configuration
 

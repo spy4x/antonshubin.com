@@ -126,3 +126,14 @@ Deno.test("the /about page has a 1200x630 OG preview PNG", async () => {
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
   );
 });
+
+Deno.test("the /infrastructure page has a 1200x630 OG preview PNG", async () => {
+  const relative = "infrastructure.png";
+  const { width, height, bytes } = await pngInfo(relative);
+  assertEquals(width, WIDTH, `${relative}: width`);
+  assertEquals(height, HEIGHT, `${relative}: height`);
+  assert(
+    bytes < MAX_BYTES,
+    `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
+  );
+});
