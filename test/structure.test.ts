@@ -161,6 +161,13 @@ const PRICE_PAGES: Record<string, string[]> = {
   ),
   // "a $10 VPS" in a blog post summary.
   "/saas-architecture-guide": ["$10"],
+  // A post with a catalogSlug names its service's price in the author box
+  // and the side card (#274). None of their texts states another amount.
+  ...Object.fromEntries(
+    blogArticles
+      .filter((a) => a.catalogSlug)
+      .map((a) => [`/blog/${a.slug}`, []]),
+  ),
 };
 
 siteTest(

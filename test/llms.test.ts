@@ -80,9 +80,9 @@ Deno.test("every client project line in both llms files carries its period", asy
 Deno.test("fetching /llms.txt or /llms-full.txt does not change blog 'Read next' order", async () => {
   const site = await startSite();
   try {
-    // A dev-tips post with several dev-tips siblings, so "Read next" has a
+    // A self-hosting post with several current self-hosting siblings, so "Read next" has a
     // real order to disturb.
-    const path = "/blog/the-importance-of-code-formatting-with-prettier";
+    const path = "/blog/zond-sso-probe-bridge";
 
     const before = readNextSlugs(await site.html(path));
     assertEquals(
