@@ -14,6 +14,10 @@
  *  1. Rsync source (excluding .git, .age, node_modules, _fresh, data, and .dockerignore patterns)
  *  2. Rsync env files separately (blocked by .dockerignore from step 1)
  *  3. SSH to the server: mkdir -p data, then BUILD_ID=<commit hash> docker compose up -d --build
+ *  4. Wait (about 60 s at most) until /sw.js serves the new BUILD_ID, then purge
+ *     Cloudflare: /sw.js plus every static/ file changed since the build that
+ *     was live before this deploy (#268). Fails open: a purge problem only
+ *     warns. The token comes from .env.deploy, which is never uploaded.
  *
  * `data/` on the server holds the newsletter subscriber list, bind-mounted into
  * the container by compose.yml. Step 1 never deletes or overwrites it, and step
@@ -21,6 +25,7 @@
  * (Docker creates a missing bind-mount source as root). See docs/deploy.md.
  */
 
+import { envValue, liveBuildId, purgeAfterDeploy } from "./cloudflare-purge.ts";
 import { stagingEnv } from "./staging-env.ts";
 
 // Cloud server (23.88.101.28). antonshubin.com used to run on the home server
@@ -80,6 +85,30 @@ async function run(
   };
 }
 
+/** Reads CLOUDFLARE_API_TOKEN from the environment or the local .env.deploy. */
+function cloudflareToken(): string | undefined {
+  const fromEnv = Deno.env.get("CLOUDFLARE_API_TOKEN");
+  if (fromEnv) return fromEnv;
+  try {
+    return envValue(
+      Deno.readTextFileSync(".env.deploy"),
+      "CLOUDFLARE_API_TOKEN",
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+/** Runs git in this checkout for step 4's static/ diff. */
+async function git(args: string[]): Promise<{ code: number; stdout: string }> {
+  const o = await new Deno.Command("git", {
+    args,
+    stdout: "piped",
+    stderr: "null",
+  }).output();
+  return { code: o.code, stdout: new TextDecoder().decode(o.stdout) };
+}
+
 // Runs every deploy step, wrapped so a failure at any point still lets the
 // caller clean up the temp env file below instead of exiting mid-deploy.
 let failed = false;
@@ -92,6 +121,10 @@ try {
     throw new Error(buildIdResult.stderr);
   }
   const BUILD_ID = buildIdResult.stdout.trim();
+
+  // The build live before this deploy, read from its /sw.js, so step 4 knows
+  // which static/ files changed. Unknown is fine: step 4 then purges /sw.js only.
+  const previousBuildId = await liveBuildId(TARGET.domain);
 
   // Step 1: source code (exclude env files via dockerignore filter).
   // `/data/` is excluded explicitly, not only through .dockerignore: rsync
@@ -128,6 +161,15 @@ try {
     throw new Error(r3.stderr);
   }
   console.log(r3.stdout);
+
+  // Step 4: Cloudflare purge. Never fails the deploy.
+  await purgeAfterDeploy({
+    domain: TARGET.domain,
+    buildId: BUILD_ID,
+    previousBuildId,
+    git,
+    token: cloudflareToken,
+  });
 
   console.log(`✅ Deploy to ${TARGET.name} complete`);
 } catch (error) {

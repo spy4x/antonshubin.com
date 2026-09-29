@@ -9,6 +9,7 @@ data/newsletter-log.json
 # Environment files
 .env.*.local
 .env.prod
+.env.deploy
 .env.age
 .env.*.local.age
 # dev .env's own encrypted form was never tracked before age64 either; only

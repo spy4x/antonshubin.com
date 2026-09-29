@@ -54,3 +54,46 @@ Deno.test("the staging deploy builds its env with stagingEnv", () => {
     "scripts/deploy.ts must build .env.staging.local with stagingEnv",
   );
 });
+
+// .env.deploy holds the Cloudflare token (#268). It stays on the deploying
+// machine: git ignores it, and neither rsync step may carry it to the server.
+Deno.test("the Cloudflare token file is never committed or uploaded", () => {
+  assert(
+    lines(".gitignore").includes(".env.deploy"),
+    ".gitignore must list .env.deploy",
+  );
+  assert(
+    lines(".dockerignore").includes(".env.*"),
+    ".dockerignore must list .env.*, which keeps .env.deploy out of the source rsync",
+  );
+  const envRsync = read("scripts/deploy.ts").split("\n").find((line) =>
+    line.includes("rsync -avz .env")
+  );
+  assert(envRsync, "scripts/deploy.ts no longer has the env-file rsync step");
+  assert(
+    !envRsync.includes(".env.deploy"),
+    "the env-file rsync must not upload .env.deploy",
+  );
+});
+
+// The purge needs the build that was live before anything is uploaded, and it
+// may only run once compose has started the new build (#268).
+Deno.test("the deploy reads the live build before the upload and purges after compose", () => {
+  const source = read("scripts/deploy.ts");
+  const liveRead = source.indexOf("await liveBuildId(TARGET.domain");
+  const upload = source.indexOf("rsync -avz --delete");
+  const compose = source.indexOf("docker compose -p");
+  const composeRun = source.indexOf("`ssh ${SERVER} '${composeCmd}'`");
+  const purge = source.indexOf("await purgeAfterDeploy(");
+  assert(
+    liveRead >= 0,
+    "scripts/deploy.ts must read the live build with liveBuildId",
+  );
+  assert(purge >= 0, "scripts/deploy.ts must call purgeAfterDeploy");
+  assert(
+    upload >= 0 && compose >= 0 && composeRun >= 0,
+    "deploy steps not found",
+  );
+  assert(liveRead < upload, "liveBuildId must run before the first rsync");
+  assert(purge > composeRun, "purgeAfterDeploy must run after docker compose");
+});
