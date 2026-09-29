@@ -4,7 +4,9 @@ import {
   assertThrows,
 } from "jsr:@std/assert@^1.0.0";
 import { BASE_URL } from "@/lib/config.ts";
+import { parseBlogArticle } from "@/lib/blog-posts.ts";
 import {
+  blogDraft,
   buildContext,
   chaptersDraft,
   deriveCampaign,
@@ -281,4 +283,24 @@ Deno.test("runVideoKit honors an explicit campaign override", async () => {
   } finally {
     await Deno.remove(tempDir, { recursive: true });
   }
+});
+
+Deno.test("the blog draft carries every required front matter field, as placeholders the post parser rejects until filled", () => {
+  const draft = blogDraft(
+    buildContext("some-post", "some-post-yt", PLAIN_SAMPLE, []),
+  );
+  assertThrows(
+    () => parseBlogArticle("some-post", draft),
+    Error,
+    "some-post.md",
+  );
+  const filled = draft
+    .replace(`publishedAt: "YYYY-MM-DD"`, `publishedAt: "2026-09-30"`)
+    .replace("readTime: 0", "readTime: 4")
+    .replace(`topic: "founders | ai-mcp | self-hosting"`, `topic: "founders"`);
+  const post = parseBlogArticle("some-post", filled);
+  assertEquals(
+    [post.publishedAt, post.readTime, post.topic],
+    ["2026-09-30", 4, "founders"],
+  );
 });

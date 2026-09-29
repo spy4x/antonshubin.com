@@ -231,11 +231,19 @@ export function chaptersDraft(ctx: VideoKitContext): string {
   return `${lines}\n`;
 }
 
-/** Front matter shape matches `content/blog/*.md` and `devtoDraft` in `launch-kit.ts`. */
+/**
+ * The companion post's first draft. Its front matter has every field
+ * `lib/blog-posts.ts` requires of a `content/blog/*.md` file; `publishedAt`,
+ * `readTime` and `topic` are placeholders that fail that parser, naming the
+ * file, until the author fills them in.
+ */
 export function blogDraft(ctx: VideoKitContext): string {
   return `---
 title: ${JSON.stringify(ctx.titleOptions[0])}
 description: ${JSON.stringify(ctx.summary)}
+publishedAt: "YYYY-MM-DD"
+readTime: 0
+topic: "founders | ai-mcp | self-hosting"
 ---
 
 ${ctx.summary}
