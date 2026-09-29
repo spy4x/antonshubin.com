@@ -330,6 +330,68 @@ Deno.test("/work has no horizontal scroll and no axe violations at 390 and 1440p
   }
 });
 
+Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+  // Book renders only with a booking URL; RFC 2606 host.
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+      const page: Page = await newPage(browser, { viewport });
+      try {
+        const where = `/about at ${viewport.width}px`;
+        await page.goto(`${site.origin}/about`, { waitUntil: "networkidle" });
+        const scrollWidth = await page.evaluate(() =>
+          document.documentElement.scrollWidth
+        );
+        assert(
+          scrollWidth <= viewport.width,
+          `${where} scrolls sideways: ${scrollWidth}px wide`,
+        );
+        assertEquals(await axeViolations(page), [], where);
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the phone More dialog links About and marks it current on /about", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    try {
+      await page.goto(`${site.origin}/about`, { waitUntil: "networkidle" });
+      const more = page.getByRole("button", { name: "More", exact: true });
+      assertEquals(
+        await more.getAttribute("data-section-current"),
+        "true",
+        "More must be marked on a page listed under it",
+      );
+      await more.click();
+      const menu = page.locator("#mobile-menu");
+      await menu.waitFor({ state: "visible" });
+      assertEquals(
+        await menu.getByRole("link", { name: "About", exact: true })
+          .getAttribute("aria-current"),
+        "page",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
 Deno.test("blog image lightbox is named, its Close button is named, and focus returns", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
