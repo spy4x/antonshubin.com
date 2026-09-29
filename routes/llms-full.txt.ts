@@ -120,7 +120,7 @@ export const handler = define.handlers({
 > I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
 > ${proof("expert-vetted")} (${proof("top-percent")}). ${
       proof("job-success")
-    } Job Success. ${proof("earned")}+ earned. ${proof("jobs")}+ projects.
+    } Job Success. ${proof("earned")} earned. ${proof("jobs")} jobs on Upwork.
 
 ---
 
@@ -212,9 +212,9 @@ A non-technical founder with a budget and a vision needs someone who:
 1. Explains every decision in plain language, no black boxes
 2. Prices fixed when the scope is fixed, hourly when it's open-ended — no surprise costs
 3. Owns product architecture, delivery, and production operations end to end
-4. Has a proven track record — ${proof("jobs")}+ projects, ${
+4. Has a proven track record — ${proof("jobs")} jobs on Upwork, ${
       proof("earned")
-    }+ earned, ${proof("expert-vetted")} (${proof("top-percent")})
+    } earned, ${proof("expert-vetted")} (${proof("top-percent")})
 5. Reduces initial engagement risk — ${promise("refund").phrase} and ${
       promise("first-milestone").phrase
     }
