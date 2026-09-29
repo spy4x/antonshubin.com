@@ -1,170 +1,179 @@
+import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
+import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
-import { blogArticles, prettyDate } from "../../lib/data.ts";
-import { proof } from "../../lib/proof.ts";
+import { NewsletterBlock } from "../../components/NewsletterBlock.tsx";
+import { type BlogArticle, blogArticles } from "../../lib/data.ts";
+import {
+  archivedPosts,
+  postDate,
+  postHref,
+  topicPosts,
+  topics,
+} from "../../lib/blog.ts";
+import { blogTabRedirect } from "../../lib/redirects.ts";
+import { toJsonLd } from "../../lib/json-ld.ts";
 
-const TABS = [
-  { key: "all", label: "All" },
-  { key: "startups", label: "Startups" },
-  { key: "dev-tips", label: "Dev Tips" },
-  { key: "personal", label: "Personal" },
-] as const;
+const SITE = "https://antonshubin.com";
 
-const TAG_LABELS: Record<string, string> = {
-  startups: "Startups",
-  "dev-tips": "Dev Tips",
-  personal: "Personal",
-};
+export const handler = define.handlers({
+  GET(ctx) {
+    // The old `?tab=` filters answer one 301 to the single list (SEO 4).
+    const target = blogTabRedirect(ctx.url);
+    if (target) {
+      return new Response(null, {
+        status: 301,
+        headers: { Location: target },
+      });
+    }
+    return page();
+  },
+});
 
-const TAG_COLORS: Record<string, string> = {
-  startups: "bg-lamp text-accent",
-  "dev-tips": "bg-mist/15 text-mist",
-  personal: "bg-rule-strong/15 text-graphite",
-};
+/** One post as a text row (#274, UX 6 and 7): date first, the title is the link. */
+function PostRow({ article }: { article: BlogArticle }) {
+  return (
+    <li class="relative py-5 border-b border-rule">
+      <p class="text-sm text-graphite">
+        <time datetime={article.publishedAt}>
+          {postDate(article.publishedAt)}
+        </time>{" "}
+        · {article.readTime} min read
+      </p>
+      <h3 class="mt-1 text-xl text-parchment">
+        <a
+          href={postHref(article.slug)}
+          class="post-row-link hover:underline underline-offset-4"
+        >
+          {article.title}
+        </a>
+      </h3>
+      <p class="mt-1 text-graphite line-clamp-2">{article.description}</p>
+    </li>
+  );
+}
 
 export default define.page(function Blog(ctx) {
-  const tab = (ctx.url.searchParams.get("tab") || "all") as string;
+  const topicSections = topics
+    .map((t) => ({ topic: t, posts: topicPosts(t.id) }))
+    .filter((s) => s.posts.length > 0);
+  const archive = archivedPosts();
+
   head.value = {
     ...head.value,
-    title: "Blog — Anton Shubin",
+    title:
+      "Writing on SaaS architecture, AI agents and self-hosting — Anton Shubin",
+    pageName: "Writing",
     description:
-      "Technical articles, architecture deep-dives, and dev tips from a senior full-stack engineer and tech lead.",
-    canonical: "https://antonshubin.com/blog",
+      `Anton Shubin, ${ROLE}, writes about decisions for founders, AI and MCP, and self-hosting, from the work and the tools he builds.`,
+    canonical: `${SITE}/blog`,
     ogType: "website",
   };
-  const filtered = tab === "all"
-    ? [...blogArticles].sort((a, b) => b.index - a.index)
-    : blogArticles.filter((a) => a.category === tab).sort((a, b) =>
-      b.index - a.index
-    );
 
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
-      <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: toJsonLd({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "@id": `${SITE}/blog#blog`,
+            "name": "Writing",
+            "url": `${SITE}/blog`,
+            "inLanguage": "en-US",
+            "author": { "@id": `${SITE}/#person` },
+            "publisher": { "@id": `${SITE}/#person` },
+            "blogPost": blogArticles.map((a) => ({
+              "@type": "BlogPosting",
+              "@id": `${SITE}${postHref(a.slug)}#article`,
+              "headline": a.title,
+              "url": `${SITE}${postHref(a.slug)}`,
+              "datePublished": a.publishedAt,
+            })),
+          }),
+        }}
       />
-      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <h1 class="text-3xl sm:text-4xl font-bold text-parchment mb-2">Blog</h1>
-        <p class="text-graphite mb-8 text-base sm:text-lg">
-          Architecture insights, SaaS lessons, and production patterns from{" "}
-          {proof("jobs")}+ shipped projects.
-        </p>
-
-        {/* Filter tabs */}
-        <div class="flex gap-2 mb-10">
-          {TABS.map((t) => {
-            const active = tab === t.key;
-            const href = t.key === "all" ? "/blog" : `/blog?tab=${t.key}`;
-            return active
-              ? (
-                <span class="px-4 py-1.5 rounded-full bg-lamp text-parchment text-sm font-medium transition-colors">
-                  {t.label}
-                </span>
-              )
-              : (
-                <a
-                  href={href}
-                  class="px-4 py-1.5 rounded-full bg-lamp text-graphite hover:bg-rule-strong text-sm transition-colors"
-                >
-                  {t.label}
-                </a>
-              );
-          })}
-        </div>
-
-        {/* Articles */}
-        <div class="space-y-6">
-          {filtered.map((article) => (
+      <Breadcrumb items={getBreadcrumb(head.value.canonical, "Writing")} />
+      <div class="max-w-3xl mx-auto py-4 sm:py-8">
+        <h1 class="post-title text-parchment">Writing</h1>
+        <div data-who-writes class="mt-4 flex items-start gap-3">
+          <img
+            src="/img/photo-64.webp"
+            aria-hidden="true"
+            alt=""
+            width="40"
+            height="40"
+            class="h-10 w-10 shrink-0 rounded-full border border-rule-strong"
+          />
+          <p class="text-graphite">
+            <span class="text-parchment font-semibold">Anton Shubin</span>,{" "}
+            {ROLE}. Notes from client work and the tools I build.{" "}
             <a
-              key={article.slug}
-              href={`/blog/${article.slug}`}
-              class="block p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-all group"
+              href="/how-i-work"
+              class="text-parchment underline underline-offset-4 hover:text-graphite"
             >
-              <div class="flex flex-col sm:flex-row gap-5">
-                <div class="w-full sm:w-48 h-32 shrink-0 rounded-lg overflow-hidden bg-lamp">
-                  <img
-                    src={`/img/blog/${article.slug}/${article.previewImageURL}`}
-                    alt={article.title}
-                    class="w-full h-full object-cover transition-transform duration-300"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 mb-2">
-                    {article.category && (
-                      <span
-                        class={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                          TAG_COLORS[article.category] || ""
-                        }`}
-                      >
-                        {TAG_LABELS[article.category] || article.category}
-                      </span>
-                    )}
-                  </div>
-                  <h2 class="text-lg sm:text-xl font-semibold text-parchment group-hover:text-accent transition-colors mb-2">
-                    {article.title}
-                  </h2>
-                  <p class="text-graphite text-sm leading-relaxed mb-3">
-                    {article.description}
-                  </p>
-                  <div class="flex items-center gap-3 text-xs text-graphite">
-                    <span class="inline-flex items-center gap-1">
-                      <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        class="w-3.5 h-3.5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      {article.readTime} min read
-                    </span>
-                    <span>·</span>
-                    <span>{prettyDate(article.publishedAt)}</span>
-                  </div>
-                </div>
-              </div>
+              How I work
             </a>
-          ))}
+          </p>
         </div>
 
-        {/* RSS link */}
-        <div class="mt-10 text-center">
-          <a
-            href="/rss.xml"
-            class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors text-sm font-medium"
+        <nav aria-label="Topics" class="mt-8">
+          <ul class="flex flex-wrap gap-2">
+            {[...topicSections.map((s) => s.topic), {
+              id: "archive",
+              title: "Archive",
+            }].map((t) => (
+              <li key={t.id}>
+                <a
+                  href={`#${t.id}`}
+                  class="inline-flex items-center min-h-10 px-4 rounded-full border border-rule-strong text-sm text-parchment hover:bg-lamp transition-colors"
+                >
+                  {t.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {topicSections.map(({ topic, posts }) => (
+          <section
+            key={topic.id}
+            data-topic={topic.id}
+            aria-labelledby={topic.id}
+            class="mt-12"
           >
-            <svg
-              aria-hidden="true"
-              focusable="false"
-              class="w-4 h-4"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 2a1 1 0 11-2 0 1 1 0 012 0z"
-              />
-            </svg>
-            Subscribe via RSS
-          </a>
-        </div>
+            <h2 id={topic.id} class="text-2xl text-parchment scroll-mt-6">
+              {topic.title}
+            </h2>
+            <ul class="mt-2 border-t border-rule">
+              {posts.map((a) => <PostRow key={a.slug} article={a} />)}
+            </ul>
+          </section>
+        ))}
+
+        {archive.length > 0 && (
+          <section
+            data-archive
+            aria-labelledby="archive"
+            class="mt-16 border-t-2 border-rule-strong pt-8"
+          >
+            <h2 id="archive" class="text-2xl text-parchment scroll-mt-6">
+              Archive
+            </h2>
+            <p class="mt-2 text-graphite">
+              Older posts, kept as written. Each one says when it was written.
+            </p>
+            <ul class="mt-2 border-t border-rule">
+              {archive.map((a) => <PostRow key={a.slug} article={a} />)}
+            </ul>
+          </section>
+        )}
+
+        <NewsletterBlock event="blog-newsletter-index" />
       </div>
     </Layout>
   );
