@@ -10,22 +10,11 @@
  * verifying one means checking it against each stored address in turn (see
  * `findSubscriberByToken`) — that keeps the email out of the URL and out of
  * server logs.
- *
- * LEGACY FORMAT — REMOVE LATER (#237). Links sent before #233 carry a bare
- * signature: base64url(HMAC-SHA256(secret, "unsubscribe:" + normalized
- * email)), 43 characters, no dot. `findSubscriberByToken` tries the current
- * format first and falls back to `verifyLegacyToken` only for a token in that
- * shape. It stays until two newsletters have gone out after this change is
- * deployed: every mail sent from then on carries a new-format link, so the
- * first newsletter gives every subscriber one, and the second is one full
- * cycle of grace for someone unsubscribing from an older mail.
  */
 import { type } from "arktype";
 import { createSignedPayloadCodec } from "@spy4x/platform/signed-payload";
 import type { Subscriber } from "./subscribers.ts";
 import { BASE_URL, getUnsubscribeSecret } from "./config.ts";
-
-const ENC = new TextEncoder();
 
 /** Same normalization `lib/subscribe.ts` applies before storing an address
  * (trim, then lowercase), so a token is verifiable regardless of how the
@@ -70,62 +59,22 @@ export function createUnsubscribeToken(
   return codecFor(secret).sign({}, { context: normalize(email) });
 }
 
-/** A legacy token: an unpadded base64url HMAC-SHA256 signature, no dot. */
-const LEGACY_TOKEN = /^[A-Za-z0-9_-]{43}$/;
-
-/** A key for the legacy verifier, or `null` when `token` is not in the
- * legacy shape — callers treat that as "no match", never as a crash. */
-async function legacyCheck(
-  token: string,
-  secret: string,
-): Promise<{ key: CryptoKey; signature: Uint8Array<ArrayBuffer> } | null> {
-  if (!LEGACY_TOKEN.test(token)) return null;
-  const padded = token.replaceAll("-", "+").replaceAll("_", "/") + "=";
-  const signature = Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
-  const key = await crypto.subtle.importKey(
-    "raw",
-    ENC.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["verify"],
-  );
-  return { key, signature };
-}
-
-/** LEGACY FORMAT — see the module comment for when this goes. Constant-time
- * via `crypto.subtle.verify`, not a string comparison. */
-function verifyLegacyToken(
-  check: { key: CryptoKey; signature: Uint8Array<ArrayBuffer> },
-  email: string,
-): Promise<boolean> {
-  return crypto.subtle.verify(
-    "HMAC",
-    check.key,
-    check.signature,
-    ENC.encode(`unsubscribe:${normalize(email)}`),
-  );
-}
-
 /** Checks that `token` was signed for `email` under `secret`, in the current
- * format or, for a link sent before #233, the legacy one. Never throws for a
- * malformed token. */
+ * format. Never throws for a malformed token. */
 export async function verifyUnsubscribeToken(
   email: string,
   token: string,
   secret: string,
 ): Promise<boolean> {
-  const current = await codecFor(secret).verify(token, {
+  const result = await codecFor(secret).verify(token, {
     context: normalize(email),
   });
-  if (current.ok) return true;
-  const legacy = await legacyCheck(token, secret);
-  return legacy !== null && await verifyLegacyToken(legacy, email);
+  return result.ok;
 }
 
 /**
  * Finds which subscriber, if any, `token` was issued for. A token carries no
- * email, so this checks it against every stored address — the current format
- * first, then, only for a token in the legacy shape, the legacy verifier. A
+ * email, so this checks it against every stored address. A
  * forged token and an address that was already removed both return
  * `undefined` — the caller can't tell them apart, and neither can whoever is
  * holding the link.
@@ -141,11 +90,6 @@ export async function findSubscriberByToken(
       context: normalize(subscriber.email),
     });
     if (result.ok) return subscriber;
-  }
-  const legacy = await legacyCheck(token, secret);
-  if (!legacy) return undefined;
-  for (const subscriber of subscribers) {
-    if (await verifyLegacyToken(legacy, subscriber.email)) return subscriber;
   }
   return undefined;
 }
