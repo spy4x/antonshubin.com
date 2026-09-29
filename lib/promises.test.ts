@@ -22,3 +22,16 @@ Deno.test("decapitalize lowercases only the first letter", () => {
   );
   assertEquals(decapitalize(""), "");
 });
+
+Deno.test("the promises are listed in the order a project meets them, each with its own label", () => {
+  assertEquals(
+    promises.map((p) => `${p.when}: ${p.id}`),
+    [
+      "Day one: ownership",
+      "First 5 days: refund",
+      "Weeks 1–2: first-milestone",
+      "Every week: weekly-software",
+      "30 days after: free-bugfixes",
+    ],
+  );
+});

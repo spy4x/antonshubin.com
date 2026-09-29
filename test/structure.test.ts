@@ -12,6 +12,7 @@ import {
 } from "../lib/catalog.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
+import { promises } from "../lib/promises.ts";
 import { redirectTable, redirectTarget } from "../lib/redirects.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
@@ -192,16 +193,15 @@ Deno.test(
     try {
       const html = await site.html("/");
       const main = html.slice(html.indexOf('id="main-content"'));
-      // "testimonials" only shows up once lib/testimonials.ts has an entry
-      // with a source and permission (#186) — the list ships empty, so the
-      // section is absent today.
+      // The prices sit inside the hero (#269); "testimonials" shows only
+      // while a review is cleared for the site.
       assertEquals(
         [...main.matchAll(/<section[^>]*data-home-section="([^"]*)"/g)].map((
           m,
         ) => m[1]),
         visibleTestimonials().length > 0
-          ? ["hero", "proof", "offers", "testimonials", "how-it-works", "cta"]
-          : ["hero", "proof", "offers", "how-it-works", "cta"],
+          ? ["hero", "work", "testimonials", "how-it-works", "tools", "cta"]
+          : ["hero", "work", "how-it-works", "tools", "cta"],
       );
       assert(
         count(main, /<section[\s>]/g) <= 6,
@@ -761,6 +761,116 @@ siteTest(
         html.includes('"BreadcrumbList"'),
         `${path}: no BreadcrumbList JSON-LD`,
       );
+    }
+  },
+);
+
+siteTest(
+  "the home page has one H1 that holds the name, and all four catalog prices in the hero",
+  async (site) => {
+    const html = await site.html("/");
+    assertEquals(count(html, /<h1[\s>]/g), 1);
+    const h1 = visibleText(
+      html.slice(html.indexOf("<h1"), html.indexOf("</h1>")),
+    );
+    assert(h1.includes("Anton Shubin") && h1.includes("Tech Lead"), h1);
+    const start = html.indexOf('data-home-section="hero"');
+    const hero = html.slice(start, html.indexOf("</section>", start));
+    for (const item of catalogItems) {
+      assert(
+        hero.includes(`href="/catalog/${item.slug}"`),
+        `no ${item.slug} row in the hero`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the home page JSON-LD is one ProfilePage about Anton, with no breadcrumb, review or rating",
+  async (site) => {
+    const nodes = jsonLd(await site.html("/"))
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d]) as {
+        "@type"?: string;
+        name?: string;
+        mainEntity?: { "@id": string };
+      }[];
+    const profiles = nodes.filter((n) => n["@type"] === "ProfilePage");
+    assertEquals(profiles.length, 1);
+    assertEquals(profiles[0].mainEntity, {
+      "@id": "https://antonshubin.com/#person",
+    });
+    assertEquals(
+      nodes.find((n) => n["@type"] === "WebSite")?.name,
+      "Anton Shubin",
+    );
+    for (const type of ["BreadcrumbList", "Review", "AggregateRating"]) {
+      assert(!nodes.some((n) => n["@type"] === type), `${type} on /`);
+    }
+  },
+);
+
+siteTest(
+  "the home page portrait is the one eager image and its <img> holds no photo URL",
+  async (site) => {
+    const html = await site.html("/");
+    const media = html.slice(html.indexOf("data-hero-media"));
+    const img = media.match(/<img[^>]*>/)![0];
+    assert(img.includes('fetchpriority="high"'), img);
+    assert(
+      !/photo-(big|mobile)/.test(img),
+      `a phone would fetch the photo: ${img}`,
+    );
+    assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source");
+    const main = html.slice(html.indexOf('id="main-content"'));
+    assertEquals(count(main, /fetchpriority="high"/g), 1);
+  },
+);
+
+siteTest(
+  "the home page shows the five promises as a timeline of steps linking how-i-work",
+  async (site) => {
+    const html = await site.html("/");
+    const start = html.indexOf('data-promise-timeline="compact"');
+    assert(start > 0, "no compact promise timeline on /");
+    const timeline = html.slice(start, html.indexOf("</ol>", start));
+    assertEquals(count(timeline, /<li /g), 5);
+    for (const p of promises) {
+      assert(timeline.includes(`id="${p.id}"`), `no step ${p.id}`);
+      assert(
+        timeline.includes(`href="/how-i-work#${p.id}"`),
+        `${p.id} does not link how-i-work`,
+      );
+      assert(visibleText(timeline).includes(p.when), `no "${p.when}" label`);
+    }
+    assert(!/accent/.test(timeline), "the timeline uses the accent colour");
+  },
+);
+
+Deno.test(
+  "the home closing band holds the brief form and the page's one primary Book",
+  async () => {
+    const previous = Deno.env.get("SCHEDULE_URL");
+    Deno.env.set("SCHEDULE_URL", "https://meet.example.com");
+    const site = await startSite();
+    try {
+      const html = await site.html("/");
+      const start = html.indexOf("<section data-closing-band");
+      assert(start > 0, "no closing band on /");
+      const band = html.slice(start, html.indexOf("</section>", start));
+      assert(
+        band.includes('data-home-section="cta"'),
+        "band is not the cta section",
+      );
+      assert(
+        band.includes('id="audit-form"'),
+        "the brief form is not in the band",
+      );
+      assertEquals(count(band, /data-primary-cta/g), 1);
+      assertEquals(count(html, /data-primary-cta/g), 1);
+    } finally {
+      await site.stop();
+      if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+      else Deno.env.set("SCHEDULE_URL", previous);
     }
   },
 );

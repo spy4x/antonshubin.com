@@ -59,10 +59,11 @@ bug, a wording change or one element, skip it.
    separate content issue, and the page ships with today's wording meanwhile.
 4. **One implementer, one PR.** The PR traces every adopted recommendation to
    its review (UX 3, SEO 1, …) and lists what was dropped. It reuses existing
-   components (`ProjectFactCard`, `ImageGallery`, `ProjectReviews`,
-   `StatusMark`, `Button`) rather than making a second copy. Tests guard the
-   structure: the H1, the first-screen elements, the JSON-LD, and axe plus no
-   horizontal scroll at 390px and 1440px in a browser test.
+   components (`FactCard`, `PromiseTimeline`, `ClosingBand`, `ProjectFactCard`,
+   `ImageGallery`, `ProjectReviews`, `StatusMark`, `Button`) rather than making
+   a second copy. Tests guard the structure: the H1, the first-screen elements,
+   the JSON-LD, and axe plus no horizontal scroll at 390px and 1440px in a
+   browser test.
 5. **Review, merge, deploy** as usual. The reviewer also does a browser pass on
    every page the change touches, not only the samples.
 
@@ -214,14 +215,15 @@ reference.
 - `lib/promises.ts` holds the five promises' title, description and "why this
   matters" text. `/how-i-work` is where this wording was written and reviewed,
   so its copy is canonical; `routes/how-i-work.tsx`'s FAQ answers, the home
-  page's "How it works" steps (two of the three — the first, "We talk", isn't a
-  promise), both llms files' Promises sections and `lib/catalog.ts`'s bug-fix
-  bullet all splice a promise's `title`/`desc` through `promise(id)` (and
-  `decapitalize()`/`firstSentence()` where a sentence needs to read as part of a
-  longer one) instead of restating it. The same guard test scans for each
-  promise's exact `title` and `desc` text, plus a short list of promise-specific
-  key terms ("one or two weeks of work", "fixed free for 30 days"), outside
-  `lib/promises.ts`.
+  page's "How a project runs" timeline (`components/PromiseTimeline.tsx`, shared
+  with the coming `/how-i-work` redesign: `lib/promises.ts` lists the five in
+  the order a project meets them, each with a `when` label), both llms files'
+  Promises sections and `lib/catalog.ts`'s bug-fix bullet all splice a promise's
+  `title`/`desc` through `promise(id)` (and `decapitalize()`/`firstSentence()`
+  where a sentence needs to read as part of a longer one) instead of restating
+  it. The same guard test scans for each promise's exact `title` and `desc`
+  text, plus a short list of promise-specific key terms ("one or two weeks of
+  work", "fixed free for 30 days"), outside `lib/promises.ts`.
 - `lib/testimonials.ts` holds every client review (#231): public Upwork reviews
   copied verbatim from the portfolio archive, the client's spelling included,
   each tied to a client project by `projectSlug` (`testimonialProject()` throws
@@ -356,6 +358,24 @@ one link is its title, and the status marks come from `lib/work.ts`'s
 `CollectionPage` whose `ItemList` names every client project in page order, each
 pointing at its page's `#project` node, with no review markup.
 `test/work-index.test.ts` checks the built page.
+
+### Home page and shared pieces
+
+`routes/index.tsx` (#269) uses the project page's frame: a two-line `<h1>` (name
+small, `ROLE` large), the lead, Book and "Send a written brief", a fact card
+with the Upwork figures beside the four prices, then Client work, Client
+reviews, "How a project runs", the tools and the closing band with the brief
+form. The portrait renders only from 1024px: its `<img>` holds a blank pixel
+until a `min-width: 1024px` `<source>` matches, so a phone requests no portrait,
+and it is the page's one eager, `fetchpriority="high"` image. Reuse these rather
+than making a copy:
+
+- `components/FactCard.tsx`: the fact card's box plus `Fact` rows, used by the
+  project page's card and the home card.
+- `components/PromiseTimeline.tsx`: the five promises as a timeline (`variant`
+  `compact` or `full`, `headingLevel` 2 or 3), no icons, no accent.
+- `components/ClosingBand.tsx`: the band that ends a page (its `children` slot
+  holds the home page's brief form).
 
 ### Project page
 
@@ -623,13 +643,14 @@ page. Never retry a test on this error.
   `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
   every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
   characters, excluding `©`/`®`/`™` and plain digits.
-- `test/notes.browser.test.ts` (#186): the margin note next to the home page's
-  Upwork proof line sits beside its claim with no horizontal scroll at 1100,
-  1280 and 1440px (the page's `scrollWidth` stays within the viewport and the
-  `.note-aside` element's right edge stays inside it) and below it at 390px —
-  the CSS breakpoint in `assets/styles.css`'s `.note-wrap`/`.note-aside` rules,
-  not checkable from server-rendered HTML alone since it depends on computed
-  layout.
+- `test/notes.browser.test.ts` (#186): the margin note next to a project page's
+  outcome line (`/work/foodrazor`) sits beside its claim with no horizontal
+  scroll at 1100, 1280 and 1440px (the page's `scrollWidth` stays within the
+  viewport and the `.note-aside` element's right edge stays inside it) and below
+  it at 390px; the home page's Upwork note sits stacked under its figures in the
+  fact card at every width (#269) — the CSS breakpoint in `assets/styles.css`'s
+  `.note-wrap`/`.note-aside` rules, not checkable from server-rendered HTML
+  alone since it depends on computed layout.
 - `test/meet-embed.browser.test.ts` (mig#44): `islands/MeetEmbed.tsx`'s
   `message` listener actually resizes the booking iframe to the height a
   `mig:height` message reports, and keeps applying later messages, not just the

@@ -2,279 +2,330 @@ import { define } from "../lib/utils.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts";
-import { formatPeriod, highlightProjects, type Project } from "../lib/data.ts";
+import { formatPeriod, highlightProjects } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
-import { decapitalize, promise } from "../lib/promises.ts";
-import { firstSentence } from "../lib/llms.ts";
+import { promise } from "../lib/promises.ts";
+import { ClosingBand } from "../components/ClosingBand.tsx";
+import { PromiseTimeline } from "../components/PromiseTimeline.tsx";
 import {
   homeTestimonialIds,
   testimonial,
   testimonialProject,
   visibleTestimonials,
 } from "../lib/testimonials.ts";
-import { ROLE } from "../lib/head.ts";
+import { head, ROLE } from "../lib/head.ts";
+import { homeDescription } from "../lib/home.ts";
+import { tools } from "../lib/tools.ts";
+import { clientProject } from "../lib/llms.ts";
 import { WithNote } from "../components/WithNote.tsx";
 import LeadForm from "../islands/LeadForm.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
+import Button from "../components/Button.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { TestimonialCard } from "../components/TestimonialCard.tsx";
-import {
-  ArrowRightIcon,
-  CalendarIcon,
-  CatalogIcon,
-  UpworkIcon,
-} from "../components/Icons.tsx";
+import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
+import StatusMark from "../components/StatusMark.tsx";
+import { ArrowRightIcon, CalendarIcon } from "../components/Icons.tsx";
 
-/** The three numbers of the proof strip. All three are on my Upwork profile. */
-const proofNumbers = [
+/** The section link style: Parchment, underlined, accent on hover. */
+const LINK = FACT_LINK;
+
+/** The four Upwork figures of the fact card, in reading order. */
+const figures = [
   { value: proof("jobs"), label: "jobs on Upwork" },
   { value: proof("job-success"), label: "Job Success" },
   { value: proof("earned"), label: "earned on Upwork" },
+  { value: proof("hours"), label: "hours on Upwork" },
 ];
 
 /**
- * The home page's work cards: the first three highlights (`highlightSlugs`
- * in lib/data.ts). Role, period and outcome are read from there, so a figure
+ * The three promises named next to Book (#269, psychologist 4): the risk
+ * reducers a buyer weighs first. Titles come from `lib/promises.ts`.
+ */
+const heroPromises = ["refund", "first-milestone", "ownership"].map(
+  (id) => promise(id).title,
+);
+
+/**
+ * The work rows: the first three highlights (`highlightSlugs` in
+ * lib/data.ts). Outcome, role and period are read from there, so a figure
  * lives in one place.
  */
-const caseStudies: Project[] = highlightProjects().slice(0, 3);
+const caseStudies = highlightProjects().slice(0, 3);
 
-/** Strips a single trailing period, for splicing a promise's `desc` mid-sentence. */
-function withoutPeriod(text: string): string {
-  return text.replace(/\.$/, "");
-}
+/** The "Also:" line under the rows: the project slug and the name a visitor knows it by. */
+const alsoWork = [
+  { slug: "sogroya", label: "Novo Nordisk" },
+  { slug: "truth-or-dare", label: "DareChat" },
+].map((a) => ({ ...a, project: clientProject(a.slug) }));
+
+/** The tools row: at most this many, so a growing registry never crowds the page. */
+const TOOLS_SHOWN = 4;
+const shownTools = tools.filter((t) => t.status !== "archived").slice(
+  0,
+  TOOLS_SHOWN,
+);
+
+/** A 1x1 transparent GIF: the portrait's `<img>` fallback, so a phone requests nothing. */
+const BLANK_PIXEL =
+  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 /**
- * Three steps, drawn from the five promises on /how-i-work and nothing else
- * — every sentence that states a promise is spliced from `lib/promises.ts`
- * (`promise(id).desc`), not hand-written, so a promise term can't drift
- * between /how-i-work and here. Step 1 ("We talk") isn't a promise, so it
- * stays hand-written. The first-milestone step's title and its first two
- * sentences come from lib/promises.ts verbatim; the previous copy
- * paraphrased them ("Either of us can stop..." instead of "If either of us
- * wants to stop..."), which /how-i-work's wording now wins per #186.
+ * The home page (#269, #187). The frame is the project page's: a two-line
+ * heading, the lead, Book and the brief link, then a fact card with the
+ * Upwork figures beside the four prices, all in the first screen at 1440px.
+ * At 390px the card has no portrait (the phone header already shows the
+ * photo) and follows Book directly. Below come the work rows, three reviews
+ * from three clients, the five promises as a timeline, the tools, and the
+ * closing band with the brief form.
  */
-const steps = [
-  {
-    title: "We talk",
-    desc:
-      "A free 30-minute call. Tell me what you need and I will tell you how I would go about it.",
-  },
-  {
-    title: promise("first-milestone").title,
-    desc: `${promise("first-milestone").desc} ${promise("refund").desc}`,
-  },
-  {
-    title: "Working software every week",
-    desc: `${firstSentence(promise("weekly-software").desc)} ${
-      withoutPeriod(promise("ownership").desc)
-    } from day one, and ${
-      decapitalize(withoutPeriod(promise("free-bugfixes").desc))
-    }.`,
-  },
-];
-
 export default define.page(function Home(ctx) {
+  head.value = { ...head.value, description: homeDescription() };
   const visible = visibleTestimonials(homeTestimonialIds.map(testimonial));
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
-      <div class="max-w-4xl mx-auto">
-        {/* 1. Hero */}
-        <section data-home-section="hero" class="mb-16 md:mb-24">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:gap-12">
-            <div class="flex-1 mb-8 lg:mb-0">
-              <h1 class="text-4xl font-bold text-parchment mb-6 sm:text-5xl">
-                Anton Shubin — {ROLE}
-              </h1>
-              <p class="text-base text-graphite sm:text-lg md:text-xl mb-4">
-                I build and run SaaS products{" "}
-                <span class="text-accent font-semibold whitespace-nowrap">
-                  end to end
-                </span>
-                {", and you own the code, the servers and the keys from day one."}
-              </p>
-              <p class="text-sm sm:text-base text-graphite leading-relaxed">
-                Fixed price when the scope is fixed, hourly when it's
-                open-ended. A change to the scope gets a quote before I start on
-                it.
-              </p>
-
-              <div class="mt-6">
-                <BookCallLink
-                  url={SCHEDULE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-umami-event="hero-book-call"
-                  data-e2e="hero-book-call"
-                  class="gap-2 px-6 py-3 text-base"
-                >
-                  <CalendarIcon class="w-5 h-5" />
-                  Book a {INTRO_CALL}
-                </BookCallLink>
-                <p class="mt-3 text-sm text-graphite">
-                  {SCHEDULE_URL && "Rather write? "}
-                  <a
-                    href="#audit-form"
-                    data-umami-event="hero-audit-link"
-                    class="text-accent hover:text-accent underline underline-offset-4"
-                  >
-                    Get a free written audit
-                  </a>
-                </p>
-              </div>
-            </div>
-            {
-              /* Hero media. The intro video (#118) replaces the <picture> inside
-                this box; the box keeps its width, so nothing else moves. */
-            }
-            <div data-hero-media class="lg:w-[400px] lg:flex-shrink-0">
-              <picture>
-                <source
-                  media="(max-width: 640px)"
-                  srcset="/img/photo-mobile.webp"
-                  type="image/webp"
-                />
-                <img
-                  class="w-full h-auto rounded-xl object-cover"
-                  src="/img/photo-big.webp"
-                  alt="Anton Shubin"
-                  width="800"
-                  height="600"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-                  fetchpriority="high"
-                  loading="eager"
-                  decoding="async"
-                />
-              </picture>
-            </div>
-          </div>
-        </section>
-
-        {/* 2. Proof strip: three numbers, three named case studies */}
-        <section data-home-section="proof" class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">The work is real</h2>
-          <a
-            href={UPWORK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="home-outbound-upwork"
-            class="grid grid-cols-3 gap-3 sm:gap-5 mb-3 group"
-          >
-            {proofNumbers.map((n) => (
-              <div
-                key={n.label}
-                class="p-3 sm:p-4 bg-paper rounded-xl border border-rule group-hover:border-accent transition-colors text-center"
-              >
-                <p class="text-2xl sm:text-4xl font-bold text-parchment">
-                  {n.value}
-                </p>
-                <p class="text-graphite text-xs sm:text-sm mt-1">{n.label}</p>
-              </div>
-            ))}
-            <NewTabHint />
-          </a>
-          <WithNote id="upwork-profile" class="mb-8">
-            <p class="text-graphite text-sm">
-              {proof("expert-vetted")} on Upwork ({proof("top-percent")
-                .toLowerCase()}), {proof("hours")}+ hours.{" "}
-              <a
-                href={UPWORK_URL}
+      <div class="max-w-6xl mx-auto">
+        {/* 1. Hero: heading, lead, actions, fact card, prices */}
+        <section
+          data-home-section="hero"
+          class="mb-16 md:mb-24 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start"
+        >
+          <div class="lg:col-start-1 lg:row-start-1">
+            <h1 class="text-parchment text-balance">
+              <span class="block text-base sm:text-lg text-graphite mb-2">
+                Anton Shubin
+              </span>
+              <span class="block text-3xl sm:text-4xl lg:text-5xl leading-tight">
+                {ROLE}
+              </span>
+            </h1>
+            <p class="mt-5 font-heading text-lg sm:text-xl text-parchment leading-snug text-balance">
+              I build and run SaaS products end to end, and you own the code,
+              the servers and the keys from day one. I build greenfield SaaS on
+              a modern, lightweight stack, solo or with senior developers from
+              my own pool: full-stack, DevOps and architecture.
+            </p>
+            <div class="mt-6 flex flex-wrap items-center gap-3">
+              <BookCallLink
+                url={SCHEDULE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-accent hover:text-accent underline underline-offset-4"
+                data-umami-event="hero-book-call"
+                data-e2e="hero-book-call"
+                class="gap-2 px-6 py-3 text-base"
               >
-                Check it on my Upwork profile
-                <NewTabHint />
+                <CalendarIcon class="w-5 h-5" />
+                Book a {INTRO_CALL}
+              </BookCallLink>
+              <Button
+                href="#audit-form"
+                data-umami-event="hero-brief-link"
+                class="px-6 py-3 text-base"
+              >
+                Send a written brief
+              </Button>
+            </div>
+            <p class="mt-4 text-sm text-graphite">
+              <a
+                href="/how-i-work"
+                data-umami-event="hero-promises-link"
+                class="hover:text-parchment"
+              >
+                {heroPromises.join(" · ")}
+                <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
               </a>
             </p>
-          </WithNote>
-          <div class="grid gap-5 md:grid-cols-3">
-            {caseStudies.map((p) => (
-              <a
-                key={p.slug}
-                href={`/work/${p.slug}`}
-                data-e2e={`home-view-${p.slug}`}
-                class="p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-colors group flex flex-col"
-              >
-                <h3 class="text-lg font-semibold text-parchment group-hover:text-accent transition-colors">
-                  {p.title}
-                </h3>
-                <p class="text-xs uppercase tracking-wide text-graphite mt-1 mb-3">
-                  {p.role}
-                  {p.period && (
-                    <span data-project-period class="normal-case">
-                      {` · ${formatPeriod(p.period)}`}
-                    </span>
-                  )}
-                </p>
-                <p class="text-graphite text-sm leading-relaxed flex-1">
-                  {p.outcome}
-                </p>
-                <span class="mt-3 inline-flex items-center gap-1 text-sm text-accent font-semibold">
-                  Read the case study
-                  <ArrowRightIcon class="w-4 h-4" />
-                </span>
-              </a>
-            ))}
           </div>
-          <div class="mt-6 text-right">
-            <a
-              href="/work"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
-            >
-              See all work
-              <ArrowRightIcon class="w-4 h-4" />
-            </a>
+
+          {
+            /* Fact card: no portrait below 1024px, so a phone requests no
+              image here. From 1024px the portrait is the page's one eager,
+              high-priority image (LCP); its `<img>` holds a blank pixel until
+              the `<source>` matches. */
+          }
+          <div class="lg:col-start-2 lg:row-start-1 lg:row-span-2">
+            <FactCard label="Upwork facts" data-home-facts>
+              <div data-hero-media class="hidden lg:block mb-5">
+                <picture>
+                  <source
+                    media="(min-width: 1024px)"
+                    srcset="/img/photo-mobile.webp 640w, /img/photo-big.webp 1200w"
+                    sizes="calc((min(100vw - 184px, 1152px) - 40px) / 3 - 40px)"
+                    type="image/webp"
+                  />
+                  <img
+                    class="w-full h-auto aspect-[4/3] object-cover object-top rounded-lg"
+                    src={BLANK_PIXEL}
+                    alt="Anton Shubin"
+                    width="640"
+                    height="480"
+                    fetchpriority="high"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </picture>
+              </div>
+              <WithNote id="upwork-profile" class="note-stack">
+                <dl
+                  data-proof-figures
+                  class="grid grid-cols-4 gap-2 lg:grid-cols-2 lg:gap-4"
+                >
+                  {figures.map((f) => (
+                    <div key={f.label} class="flex flex-col-reverse">
+                      <dt class="text-xs text-graphite">{f.label}</dt>
+                      <dd class="text-xl sm:text-2xl font-semibold text-parchment">
+                        {f.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </WithNote>
+              <dl class="mt-4 space-y-2 text-sm">
+                <Fact term="Upwork">
+                  <a
+                    href={UPWORK_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-umami-event="home-outbound-upwork"
+                    class={LINK}
+                  >
+                    {proof("expert-vetted")} · {proof("top-percent")}
+                    <NewTabHint />
+                  </a>
+                </Fact>
+              </dl>
+              <p class="mt-4 text-sm text-graphite">
+                Found me on Upwork?{" "}
+                <a
+                  href={UPWORK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-umami-event="home-hire-on-upwork"
+                  class={LINK}
+                >
+                  Hire me there
+                  <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+                  <NewTabHint />
+                </a>
+              </p>
+            </FactCard>
+          </div>
+
+          <div
+            data-home-offers
+            class="lg:col-start-1 lg:row-start-2"
+          >
+            <h2 class="text-sm uppercase tracking-wide text-graphite mb-2">
+              Services and prices
+            </h2>
+            <ul class="border-b border-rule">
+              {catalogItems.map((item) => (
+                <li key={item.slug} class="border-t border-rule">
+                  <a
+                    href={`/catalog/${item.slug}`}
+                    data-umami-event={`home-offer-${item.slug}`}
+                    class="group flex items-baseline justify-between gap-4 py-3"
+                  >
+                    <span class="min-w-0">
+                      <span class="block font-semibold text-parchment group-hover:text-accent">
+                        {item.shortTitle}
+                      </span>
+                      <span class="block text-sm text-graphite">
+                        {item.delivery}
+                      </span>
+                    </span>
+                    <span class="price text-parchment whitespace-nowrap">
+                      {priceLabel(item)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p class="mt-3 text-sm text-graphite">
+              Fixed price when the scope is fixed, hourly when it's open-ended.
+              A price that says "from" gets a quote for your scope before any
+              work starts.{" "}
+              <a
+                href="/catalog"
+                data-umami-event="home-catalog-all"
+                class={LINK}
+              >
+                All services and prices
+                <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+              </a>
+            </p>
           </div>
         </section>
 
-        {/* 3. The offers — titles and prices come from lib/catalog.ts */}
-        <section data-home-section="offers" class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">What it costs</h2>
-          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {catalogItems.map((item) => (
-              <a
-                key={item.slug}
-                href={`/catalog/${item.slug}`}
-                data-umami-event={`home-offer-${item.slug}`}
-                class="p-4 bg-paper rounded-xl border border-rule hover:border-accent transition-colors group flex flex-col"
-              >
-                <CatalogIcon
-                  name={item.icon}
-                  class="w-8 h-8 mb-3 text-accent"
-                />
-                <h3 class="text-lg font-semibold text-parchment group-hover:text-accent transition-colors mb-2">
-                  {item.shortTitle}
-                </h3>
-                <p class="text-graphite text-sm mb-3 flex-1 leading-relaxed">
-                  {item.summary}
-                </p>
-                <span class="inline-block px-2.5 py-0.5 bg-sage/15 text-sage text-xs font-medium rounded-full mt-auto self-start">
-                  {priceLabel(item)}
-                </span>
-                <span class="text-graphite text-xs mt-1.5">
-                  {item.delivery}
-                </span>
-              </a>
+        {/* 2. Client work: the outcome first, then who it was for */}
+        <section data-home-section="work" class="mb-16 md:mb-24">
+          <h2 class="h2 mb-6">Client work</h2>
+          <ul class="border-b border-rule">
+            {caseStudies.map((p) => (
+              <li key={p.slug} class="border-t border-rule">
+                <a
+                  href={`/work/${p.slug}`}
+                  data-e2e={`home-view-${p.slug}`}
+                  data-umami-event={`home-work-${p.slug}`}
+                  class="group block py-5"
+                >
+                  <span class="block font-heading text-xl text-parchment leading-snug text-balance">
+                    {p.outcome}
+                  </span>
+                  <span class="mt-2 block text-sm text-graphite">
+                    {p.title}
+                    {p.role && ` · ${p.role}`}
+                    {p.period && (
+                      <span data-project-period>
+                        {` · ${formatPeriod(p.period)}`}
+                      </span>
+                    )}
+                  </span>
+                  <span class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 group-hover:text-accent">
+                    Read the case study
+                    <ArrowRightIcon class="w-3.5 h-3.5" />
+                  </span>
+                </a>
+              </li>
             ))}
-          </div>
-          <p class="text-graphite text-sm mt-6">
-            A price that says "from" gets a quote for your scope before any work
-            starts.
+          </ul>
+          <p class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-graphite">
+            <span>
+              Also: {alsoWork.map((a, i) => (
+                <span key={a.slug}>
+                  {i > 0 && " · "}
+                  <a
+                    href={`/work/${a.slug}`}
+                    data-umami-event={`home-work-${a.slug}`}
+                    class={LINK}
+                  >
+                    {a.label}
+                  </a>
+                </span>
+              ))}
+            </span>
+            <a
+              href="/work"
+              data-umami-event="home-work-all"
+              class={LINK}
+            >
+              All client work
+              <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+            </a>
           </p>
         </section>
 
         {
-          /* Testimonial Section — three review excerpts picked in
+          /* 3. Client reviews: three excerpts from three clients, picked in
           lib/testimonials.ts's homeTestimonialIds (#231), each naming and
           linking its project. Renders only entries cleared for publishing (a
           source link and Anton's permission; see #186). */
         }
         {visible.length > 0 && (
           <section data-home-section="testimonials" class="mb-16 md:mb-24">
-            <h2 class="h1 mb-8">What clients say</h2>
+            <h2 class="h2 mb-6">Client reviews</h2>
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {visible.map((t) => (
                 <TestimonialCard
@@ -284,106 +335,92 @@ export default define.page(function Home(ctx) {
                 />
               ))}
             </div>
-
-            {/* Link to Upwork */}
-            <div class="mt-6 text-right">
+            <p class="mt-4 text-sm text-graphite">
               <a
                 href={UPWORK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-semibold"
+                data-umami-event="home-reviews-upwork"
+                class={LINK}
               >
-                View all reviews on{" "}
-                <UpworkIcon class="w-auto h-4 text-parchment" />
-                <span class="sr-only">Upwork</span>
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  class="w-4 h-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                  />
-                </svg>
+                All reviews on Upwork
+                <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
                 <NewTabHint />
               </a>
-            </div>
+            </p>
           </section>
         )}
 
-        {/* 5. How it works — three steps drawn from the five promises */}
+        {/* 4. How a project runs: the five promises, in the order a project meets them */}
         <section data-home-section="how-it-works" class="mb-16 md:mb-24">
-          <h2 class="h1 mb-8">How it works</h2>
-          <ol class="grid gap-5 md:grid-cols-3">
-            {steps.map((s, i) => (
-              <li
-                key={s.title}
-                class="p-4 bg-paper rounded-xl border border-rule"
-              >
-                <p class="text-accent font-bold text-lg mb-2">{i + 1}</p>
-                <h3 class="text-lg font-semibold text-parchment mb-2">
-                  {s.title}
-                </h3>
-                <p class="text-graphite text-sm leading-relaxed">{s.desc}</p>
-              </li>
-            ))}
-          </ol>
-          <div class="mt-6 text-right">
+          <h2 class="h2 mb-6">How a project runs</h2>
+          <PromiseTimeline
+            variant="compact"
+            headingLevel={3}
+            umamiPrefix="home-promise-"
+          />
+          <p class="mt-6 text-sm">
             <a
               href="/how-i-work"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium"
+              data-umami-event="home-how-i-work"
+              class={LINK}
             >
-              The five promises in full
-              <ArrowRightIcon class="w-4 h-4" />
-            </a>
-          </div>
-        </section>
-
-        {/* 6. One primary call to action; the written audit is the secondary path */}
-        <section
-          id="cta-bottom"
-          data-home-section="cta"
-          class="mb-16 md:mb-24 text-center"
-        >
-          <h2 class="h1 mb-4">Let's talk</h2>
-          {SCHEDULE_URL && (
-            <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6">
-              Thirty minutes, free, no pitch. We talk about what you are
-              building and whether I can help.
-            </p>
-          )}
-          <BookCallLink
-            url={SCHEDULE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="home-book-call"
-            data-primary-cta
-            class="gap-2.5 px-8 py-3.5 text-lg"
-          >
-            <CalendarIcon class="w-5 h-5" />
-            Book a {INTRO_CALL}
-          </BookCallLink>
-          <p class="mt-4 text-sm text-graphite">
-            {SCHEDULE_URL && "Rather write? "}
-            <a
-              href="#audit-form"
-              data-umami-event="cta-audit-link"
-              class="text-accent hover:text-accent underline underline-offset-4"
-            >
-              Send me your idea or your app for a free written audit
+              How I work, the five promises in full
+              <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
             </a>
           </p>
-          <div id="audit-form" class="mt-12 scroll-mt-4 text-left">
+        </section>
+
+        {/* 5. Tools: the open-source tools Anton builds and runs himself */}
+        <section data-home-section="tools" class="mb-16 md:mb-24">
+          <h2 class="h2 mb-6">Tools I build and run myself</h2>
+          <ul class="border-b border-rule">
+            {shownTools.map((t) => (
+              <li key={t.slug} class="border-t border-rule">
+                <a
+                  href={`/tools/${t.slug}`}
+                  data-umami-event={`home-tool-${t.slug}`}
+                  class="group flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3"
+                >
+                  <span class="min-w-0">
+                    <span class="font-semibold text-parchment group-hover:text-accent">
+                      {t.name}
+                    </span>
+                    <span class="block text-sm text-graphite">{t.job}</span>
+                  </span>
+                  <StatusMark status={t.status} />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            <a href="/tools" data-umami-event="home-tools-all" class={LINK}>
+              All tools
+              <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+            </a>
+            <a
+              href="/saas-architecture-guide"
+              data-umami-event="home-guide"
+              class={LINK}
+            >
+              SaaS Architecture Guide
+              <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+            </a>
+          </p>
+        </section>
+
+        {/* 6. Closing band: the brief form sits in its `children` slot */}
+        <ClosingBand
+          heading="Book a call or send a brief"
+          bookEvent="home-book-call"
+          bookLabel={`Book a ${INTRO_CALL}`}
+          primaryCta
+          sectionAttrs={{ id: "cta-bottom", "data-home-section": "cta" }}
+        >
+          <div id="audit-form" class="mb-6 scroll-mt-4">
             <LeadForm scheduleUrl={SCHEDULE_URL} />
           </div>
-        </section>
+        </ClosingBand>
       </div>
     </Layout>
   );

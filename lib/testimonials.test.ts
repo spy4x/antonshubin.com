@@ -117,9 +117,14 @@ Deno.test("every real testimonial links its source and is cleared for the site",
   assertEquals(visibleTestimonials(testimonials), testimonials);
 });
 
-Deno.test("the home page shows Roley contract 1, Corecircle and Connectful contract 1", () => {
-  assertEquals(homeTestimonialIds, ["roley-1", "corecircle-1", "connectful-1"]);
-  for (const id of homeTestimonialIds) testimonial(id);
+Deno.test("the home page shows Roley, Corecircle and FoodRazor, one review each", () => {
+  assertEquals(homeTestimonialIds, ["roley-1", "corecircle-1", "foodrazor-2"]);
+  const slugs = homeTestimonialIds.map((id) => testimonial(id).projectSlug);
+  assertEquals(
+    new Set(slugs).size,
+    slugs.length,
+    "two home reviews share a client",
+  );
 });
 
 Deno.test("microwork's four reviews come back first contract first", () => {

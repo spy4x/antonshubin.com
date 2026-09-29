@@ -46,6 +46,10 @@ export interface ClosingBandProps {
   catalogLink?: ComponentChildren;
   /** Quiet links after the catalog link. */
   links?: BandLink[];
+  /** Marks Book as the page's one primary call to action (`data-primary-cta`). */
+  primaryCta?: boolean;
+  /** Extra attributes for the `<section>`: an anchor `id`, or the home page's section marker. */
+  sectionAttrs?: { id?: string; "data-home-section"?: string };
 }
 
 /**
@@ -64,12 +68,15 @@ export function ClosingBand(
     bookLabel = "Book a free intro call",
     catalogLink,
     links = [],
+    primaryCta,
+    sectionAttrs,
   }: ClosingBandProps,
 ) {
   const shown = promiseIds.map(promise);
   return (
     <section
       data-closing-band
+      {...sectionAttrs}
       aria-label={heading ?? "Next step"}
       class="mt-16 bg-desk border border-rule rounded-xl p-6 sm:p-8"
     >
@@ -91,6 +98,7 @@ export function ClosingBand(
             url={SCHEDULE_URL}
             target="_blank"
             data-umami-event={bookEvent}
+            data-primary-cta={primaryCta}
             class="justify-center px-6 py-3"
           >
             {bookLabel}

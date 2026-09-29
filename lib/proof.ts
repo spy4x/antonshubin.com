@@ -14,15 +14,19 @@
 
 export interface ProofFigure {
   id: string;
-  /** The value exactly as it is rendered, e.g. "80", "100%", "$300K". */
+  /**
+   * The value exactly as the public Upwork profile shows it and as it is
+   * rendered, e.g. "80", "100%", "$300K+". A "+" belongs to the value; no
+   * caller appends one.
+   */
   value: string;
 }
 
 export const proofFigures: ProofFigure[] = [
   { id: "jobs", value: "80" },
   { id: "job-success", value: "100%" },
-  { id: "earned", value: "$300K" },
-  { id: "hours", value: "6,600" },
+  { id: "earned", value: "$300K+" },
+  { id: "hours", value: "6,600+" },
   { id: "expert-vetted", value: "Expert-Vetted" },
   { id: "top-percent", value: "Top 1%" },
 ];

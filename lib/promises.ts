@@ -1,5 +1,5 @@
 /**
- * The five promises: the single source, like `lib/catalog.ts` is for prices.
+ * The five promises, in the order a project meets them: the single source, like `lib/catalog.ts` is for prices.
  * `/how-i-work` is where this wording was written and reviewed, so it wins
  * whenever another copy disagreed — `routes/how-i-work.tsx`, both llms
  * files, the home page's "How it works" steps and the FAQ's first answer all
@@ -17,6 +17,8 @@ export interface PromiseItem {
   id: string;
   icon: PromiseIcon;
   title: string;
+  /** When the promise bites, in a project's own time: the timeline's label. */
+  when: string;
   /** The promise as a noun phrase for use mid-sentence ("a five-day refund"). */
   phrase: string;
   desc: string;
@@ -26,9 +28,20 @@ export interface PromiseItem {
 
 export const promises: PromiseItem[] = [
   {
+    id: "ownership",
+    icon: "key",
+    title: "You own everything from day one",
+    when: "Day one",
+    phrase: "full ownership from day one",
+    desc: "Code, accounts, servers and keys are in your name.",
+    why:
+      "Your product is your asset. Nothing about how I work should get in the way of you taking it wherever you need it.",
+  },
+  {
     id: "refund",
     icon: "shield",
     title: "Five-day refund",
+    when: "First 5 days",
     phrase: "a five-day refund",
     desc:
       "If in the first five days you feel this is not working, tell me and I refund what you paid.",
@@ -39,6 +52,7 @@ export const promises: PromiseItem[] = [
     id: "first-milestone",
     icon: "target",
     title: "A small first milestone",
+    when: "Weeks 1–2",
     phrase: "a small first milestone",
     desc:
       "We start with one or two weeks of work. If either of us wants to stop at the end of it, we stop — you keep everything built so far.",
@@ -46,18 +60,10 @@ export const promises: PromiseItem[] = [
       "You don't have to commit to months of work before we know the collaboration is right.",
   },
   {
-    id: "ownership",
-    icon: "key",
-    title: "You own everything from day one",
-    phrase: "full ownership from day one",
-    desc: "Code, accounts, servers and keys are in your name.",
-    why:
-      "Your product is your asset. Nothing about how I work should get in the way of you taking it wherever you need it.",
-  },
-  {
     id: "weekly-software",
     icon: "calendar",
     title: "Weekly working software",
+    when: "Every week",
     phrase: "weekly working software",
     desc:
       "You see working software every week, with a short written update. Calls when they help, not on a schedule for its own sake.",
@@ -68,6 +74,7 @@ export const promises: PromiseItem[] = [
     id: "free-bugfixes",
     icon: "wrench",
     title: "Free bug fixes for 30 days",
+    when: "30 days after",
     phrase: "free bug fixes for 30 days",
     desc: "Bugs in what I delivered are fixed free for 30 days.",
     why:

@@ -143,7 +143,7 @@ export const handler = define.handlers({
   Description: I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
   ${proof("expert-vetted")} (${proof("top-percent")}). ${
       proof("job-success")
-    } Job Success. ${proof("earned")}+ earned. ${proof("jobs")}+ projects.
+    } Job Success. ${proof("earned")} earned. ${proof("jobs")} jobs on Upwork.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${urls}

@@ -225,11 +225,14 @@ export const testimonials: Testimonial[] = [
   },
 ];
 
-/** The three excerpts on the home page, in order. */
+/**
+ * The three excerpts on the home page, in order: three different clients
+ * (#269), so the page never shows one client's praise twice.
+ */
 export const homeTestimonialIds: string[] = [
   "roley-1",
   "corecircle-1",
-  "connectful-1",
+  "foodrazor-2",
 ];
 
 /** Looks a testimonial up by id and throws on a typo. */

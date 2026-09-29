@@ -120,7 +120,7 @@ export const handler = define.handlers({
 > I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
 > ${proof("expert-vetted")} (${proof("top-percent")}). ${
       proof("job-success")
-    } Job Success. ${proof("earned")}+ earned. ${proof("jobs")}+ projects.
+    } Job Success. ${proof("earned")} earned. ${proof("jobs")} jobs on Upwork.
 
 ---
 
@@ -154,7 +154,7 @@ export const handler = define.handlers({
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written audit: ${BASE_URL}/#audit-form
+Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written brief: ${BASE_URL}/#audit-form
 
 ${
       catalogItems.map((i, n) =>
@@ -175,7 +175,7 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 ## Full Site Index
 
 ### Pages
-- **Home:** ${BASE_URL}/ — Who I am, proof, the four services with prices, testimonials, how it works, and how to book a call
+- **Home:** ${BASE_URL}/ — Who I am, the Upwork figures, the four services with prices, client work, client reviews, how a project runs, the tools I build, and how to book a call or send a written brief
 - **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
 - **Services:** ${BASE_URL}/catalog — ${catalogItems.length} services, each with its price
 ${catalogList}
@@ -212,9 +212,9 @@ A non-technical founder with a budget and a vision needs someone who:
 1. Explains every decision in plain language, no black boxes
 2. Prices fixed when the scope is fixed, hourly when it's open-ended — no surprise costs
 3. Owns product architecture, delivery, and production operations end to end
-4. Has a proven track record — ${proof("jobs")}+ projects, ${
+4. Has a proven track record — ${proof("jobs")} jobs on Upwork, ${
       proof("earned")
-    }+ earned, ${proof("expert-vetted")} (${proof("top-percent")})
+    } earned, ${proof("expert-vetted")} (${proof("top-percent")})
 5. Reduces initial engagement risk — ${promise("refund").phrase} and ${
       promise("first-milestone").phrase
     }

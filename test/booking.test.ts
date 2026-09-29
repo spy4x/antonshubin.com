@@ -31,7 +31,6 @@ const UNSET_LEAD_INS: Array<{ path: string; phrase: string }> = [
     phrase: "Book a free 30-minute intro call. No pitch, just advice.",
   },
   { path: "/catalog", phrase: "Not sure which fits your project?" },
-  { path: "/", phrase: "Thirty minutes, free, no pitch" },
   { path: "/how-i-work", phrase: "Book the free 30-minute intro call" },
 ];
 
@@ -46,14 +45,13 @@ Deno.test("booking lead-in lines are gone when SCHEDULE_URL is unset", async () 
       );
     }
 
-    // The home page has two "Rather write?" lead-ins (hero and closing
-    // section), each guarding its own button independently — count both
-    // away rather than checking presence/absence of one occurrence.
+    // The home page's Book buttons render nothing without SCHEDULE_URL, and
+    // no prose promises a call in their place (#269).
     const homeText = visibleText(await site.html("/"));
     assertEquals(
-      count(homeText, /Rather write\?/g),
+      count(homeText, /Book a free 30-minute intro call/g),
       0,
-      `/ still shows "Rather write?" with SCHEDULE_URL unset`,
+      `/ still offers a booking call with SCHEDULE_URL unset`,
     );
 
     // /contact-me's only pre-#161 regression was in the <meta description>,
@@ -85,10 +83,9 @@ Deno.test("booking lead-in lines render when SCHEDULE_URL is set", async () => {
     }
 
     const homeText = visibleText(await site.html("/"));
-    assertEquals(
-      count(homeText, /Rather write\?/g),
-      2,
-      `/ should show "Rather write?" in both the hero and the closing section with SCHEDULE_URL set`,
+    assert(
+      count(homeText, /Book a free 30-minute intro call/g) === 2,
+      `/ should offer Book twice (hero and closing band) with SCHEDULE_URL set`,
     );
   } finally {
     await site.stop();

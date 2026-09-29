@@ -1,4 +1,3 @@
-import type { ComponentChildren } from "preact";
 import { formatPeriod, type Project } from "../lib/data.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
@@ -6,27 +5,12 @@ import { projectStatus } from "../lib/work.ts";
 import GhStars from "../islands/GhStars.tsx";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { ArrowRightIcon, ExternalLinkIcon } from "./Icons.tsx";
+import { Fact, FACT_LINK, FactCard } from "./FactCard.tsx";
 import { NewTabHint } from "./NewTabHint.tsx";
 import StatusMark from "./StatusMark.tsx";
 import { WithNote } from "./WithNote.tsx";
 
-const LINK = "text-parchment underline underline-offset-4 hover:text-accent";
-
-/** One `<dt>`/`<dd>` pair of the fact card, wrapped in a `<div>` as `<dl>` allows. */
-function Fact(
-  { term, children, ...rest }: {
-    term: string;
-    children: ComponentChildren;
-    "data-project-period"?: boolean;
-  },
-) {
-  return (
-    <div class="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3" {...rest}>
-      <dt class="text-graphite">{term}</dt>
-      <dd class="text-parchment min-w-0">{children}</dd>
-    </div>
-  );
-}
+const LINK = FACT_LINK;
 
 /**
  * "Similar work today" link to the project's `catalogSlug` item, with its
@@ -81,11 +65,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
   );
 
   return (
-    <aside
-      data-project-facts
-      aria-label="Project facts"
-      class="bg-paper border border-rule rounded-xl p-5"
-    >
+    <FactCard label="Project facts" data-project-facts>
       <dl class="space-y-2 text-sm">
         {project.madeForName && (
           <Fact term="Client">
@@ -153,6 +133,6 @@ export function ProjectFactCard({ project }: { project: Project }) {
         </BookCallLink>
         <SimilarWorkLink project={project} place="card" />
       </div>
-    </aside>
+    </FactCard>
   );
 }

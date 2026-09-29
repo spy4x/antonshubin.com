@@ -1,6 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
-import { ArrowRightIcon, CheckIcon, SearchIcon } from "../components/Icons.tsx";
+import { ArrowRightIcon, CheckIcon } from "../components/Icons.tsx";
 import { proof } from "../lib/proof.ts";
 import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
 
@@ -109,7 +109,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
   }, [isSuccess]);
 
   return (
-    <div class="bg-paper rounded-xl border border-accent/40 p-4 sm:p-6 relative overflow-hidden">
+    <div class="bg-paper rounded-xl border border-rule p-4 sm:p-6 relative overflow-hidden">
       {
         /* Form section. `inert` once success shows, so its now-hidden inputs
           drop out of the tab order and out of assistive tech, matching the
@@ -126,22 +126,15 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           overflow: "hidden",
         }}
       >
-        <SearchIcon class="w-9 h-9 mb-4 mx-auto text-graphite" />
-        <h2 class="text-2xl sm:text-3xl font-bold text-parchment mb-3 text-center">
-          Not sure where to start?
-        </h2>
-        <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6 text-center">
+        <h3 class="text-xl sm:text-2xl text-parchment mb-3">
+          Send a written brief
+        </h3>
+        <p class="text-graphite text-base mb-6">
           Send me your idea or your current app and I'll write back with 3
-          concrete architectural improvements.
-          <span class="text-accent font-semibold block sm:inline">
-            {" "}No cost.
-          </span>{" "}
-          <span class="text-accent font-semibold block sm:inline">
-            No commitment.
-          </span>
+          concrete architectural improvements. No cost. No commitment.
         </p>
 
-        <form onSubmit={handleSubmit} class="max-w-lg mx-auto space-y-4">
+        <form onSubmit={handleSubmit} class="space-y-4">
           {/* Honeypot — off-screen so bots fill it, humans never see */}
           <div class="absolute -left-[9999px]" aria-hidden="true">
             <label for="lead-website">Website</label>
@@ -231,7 +224,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           >
             {status.value.type === "submitting" ? "Sending..." : (
               <>
-                Get my free architecture audit
+                Send my brief
                 <ArrowRightIcon class="w-5 h-5" />
               </>
             )}
@@ -275,7 +268,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            {proof("jobs")}+ projects shipped
+            {proof("jobs")} jobs on Upwork
           </span>
           <span class="inline-flex items-center gap-1">
             <svg
@@ -316,15 +309,13 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           form field reaches these controls and Enter loads a cross-origin
           iframe invisibly.
 
-          The heading below gets focus once `isSuccess` flips (see the
-          `useEffect` above), which is also what announces the success
-          message to a screen reader. A live region was the other option, but
-          this whole section — including the heading's text — is already in
-          the DOM before submit (only collapsed and `inert`), so nothing about
-          it mutates at the moment of success; an `aria-live` region only
-          announces on a text mutation, not on an ancestor losing `inert` or
-          `max-height: 0`, so it would stay silent. Moving focus works because
-          it targets the heading node directly, independent of that. */
+          The heading below is rendered only once `isSuccess` flips (#269:
+          crawlers that split a page at its headings must not read "Your
+          brief is queued" as a section of the home page), in the same commit
+          that removes `inert` from this wrapper. It gets focus right after
+          that commit (see the `useEffect` above), which is also what
+          announces the success message to a screen reader; a live region
+          would need the text to mutate inside an already-mounted node. */
       }
       <div
         class="transition-all duration-500 ease-in-out text-center"
@@ -338,14 +329,16 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         }}
       >
         <CheckIcon class="w-14 h-14 mb-4 mx-auto text-sage" />
-        <h2
-          id="lead-success-heading"
-          ref={successHeadingRef}
-          tabIndex={-1}
-          class="text-2xl sm:text-3xl font-bold text-parchment mb-3 focus:outline-none"
-        >
-          Your audit is queued
-        </h2>
+        {isSuccess && (
+          <h3
+            id="lead-success-heading"
+            ref={successHeadingRef}
+            tabIndex={-1}
+            class="text-2xl sm:text-3xl text-parchment mb-3 focus:outline-none"
+          >
+            Your brief is queued
+          </h3>
+        )}
         <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6">
           I'll review what you sent and write back with 3 concrete architectural
           improvements.

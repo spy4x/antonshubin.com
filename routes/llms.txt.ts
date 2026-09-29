@@ -81,13 +81,13 @@ export const handler = define.handlers({
 - AI APIs: OpenAI, Claude, DeepSeek
 - Upwork: ${proof("expert-vetted")} (${proof("top-percent")}), ${
       proof("job-success")
-    } Job Success, ${proof("earned")}+ earned, ${proof("jobs")}+ projects
+    } Job Success, ${proof("earned")} earned, ${proof("jobs")} jobs
 - Pricing: fixed price when the scope is fixed, hourly when open-ended; every price is listed under Services below
 - Location: Da Nang, Vietnam (Singapore-based entity)
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written audit (${BASE_URL}/#audit-form).
+Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written brief (${BASE_URL}/#audit-form).
 
 ${services}
 
@@ -99,7 +99,7 @@ ${promisesList}
 
 ## Key Pages
 
-- [Home](${BASE_URL}/)
+- [Home](${BASE_URL}/) — Who I am, the Upwork figures, prices, client work, reviews and how to book
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide)
 - [Services and prices](${BASE_URL}/catalog)
 - [How I Work](${BASE_URL}/how-i-work)
@@ -133,7 +133,7 @@ Non-technical founders with a budget and a vision need someone who:
 1. Translates business goals into technical execution without jargon
 2. Prices fixed when the scope is fixed, hourly when it's open-ended — no surprise costs
 3. Owns product delivery and production operations end to end
-4. Has a track record (${proof("jobs")}+ projects, ${proof("earned")}+, ${
+4. Has a track record (${proof("jobs")} jobs on Upwork, ${proof("earned")}, ${
       proof("top-percent")
     } on Upwork)
 5. Reduces initial engagement risk with ${promise("refund").phrase} and ${
