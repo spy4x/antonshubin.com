@@ -115,3 +115,10 @@ Deno.test("recognises the staging host only", () => {
   assert(isStagingHost("website-stag.antonshubin.com"));
   assert(!isStagingHost("antonshubin.com"));
 });
+
+Deno.test("production caches /about as a core page", () => {
+  assertEquals(
+    cacheControlFor({ ...PAGE, pathname: "/about" }),
+    "public, max-age=259200, stale-while-revalidate=43200",
+  );
+});

@@ -6,6 +6,7 @@ import { catalogItems } from "../lib/catalog.ts";
 import { tools } from "../lib/tools.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
+import { ABOUT_PATH } from "../lib/about.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -26,6 +27,12 @@ export const handler = define.handlers({
       },
       {
         loc: "/how-i-work",
+        priority: "0.8",
+        changefreq: "monthly",
+        lastmod: undefined,
+      },
+      {
+        loc: ABOUT_PATH,
         priority: "0.8",
         changefreq: "monthly",
         lastmod: undefined,

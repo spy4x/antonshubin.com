@@ -2,7 +2,8 @@
 /**
  * Generates the 1200×630 link-preview PNGs this site commits under
  * `static/img/og/`: one per blog post, one per project page, one per tool
- * page plus the `/tools` hub (#189), one for `/work` (#270), and one
+ * page plus the `/tools` hub (#189), one for `/work` (#270), one for
+ * `/about` (#294), and one
  * landscape default for the site (#193).
  *
  * Run with:
@@ -27,6 +28,8 @@ import { ROLE } from "../lib/head.ts";
 import { tools } from "../lib/tools.ts";
 import { metaDescription } from "../lib/llms.ts";
 import { workDescription } from "../lib/work.ts";
+import { ABOUT_NAME, aboutDescription } from "../lib/about.ts";
+import { LOCATION } from "../lib/config.ts";
 import type { Browser } from "playwright";
 import { fromFileUrl } from "@std/path";
 
@@ -170,6 +173,15 @@ async function main() {
       new URL("work.png", OG_DIR),
     );
     console.log(`work.png  ${fmtBytes(workBytes)}`);
+    count++;
+
+    // /about (#294): the page's name and meta description.
+    const aboutBytes = await render(
+      browser,
+      cardHtml(ABOUT_NAME, aboutDescription(LOCATION)),
+      new URL("about.png", OG_DIR),
+    );
+    console.log(`about.png  ${fmtBytes(aboutBytes)}`);
     count++;
 
     const defaultHtml = cardHtml("Anton Shubin", ROLE);

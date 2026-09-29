@@ -1,5 +1,6 @@
 import { define } from "../lib/utils.ts";
-import { BASE_URL } from "../lib/config.ts";
+import { BASE_URL, LOCATION } from "../lib/config.ts";
+import { ABOUT_PATH } from "../lib/about.ts";
 import { blogArticles, hackathons, highlightSlugs } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { decapitalize, promise, promises } from "../lib/promises.ts";
@@ -66,7 +67,7 @@ export const handler = define.handlers({
       proof("job-success")
     } Job Success, ${proof("earned")} earned, ${proof("jobs")} jobs
 - Pricing: fixed price when the scope is fixed, hourly when open-ended; every price is listed under Services below
-- Location: Da Nang, Vietnam (Singapore-based entity)
+- Location: ${LOCATION} (Singapore-based entity)
 
 ## Services
 
@@ -83,6 +84,7 @@ ${promisesList}
 ## Key Pages
 
 - [Home](${BASE_URL}/) — Who I am, the Upwork figures, prices, client work, reviews and how to book
+- [About](${BASE_URL}${ABOUT_PATH}) — Who I am, since 2010: the career story, what I run myself and how to pay
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide)
 - [Services and prices](${BASE_URL}/catalog)
 - [How I Work](${BASE_URL}/how-i-work)
