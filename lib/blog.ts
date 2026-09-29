@@ -26,6 +26,8 @@ export function postHref(slug: string): string {
 
 /** The tool a post links to, resolved to a page and a repository. */
 export interface ToolLink {
+  /** The tool's `lib/tools.ts` slug. */
+  slug: string;
   name: string;
   href: string;
   /** The public repository, `https://github.com/<owner>/<repo>`. */
@@ -49,6 +51,7 @@ export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
     );
   }
   return {
+    slug: found.slug,
     name: found.name,
     href: `/tools/${found.slug}`,
     repoUrl: repoUrl(found),

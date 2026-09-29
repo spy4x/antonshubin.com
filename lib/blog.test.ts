@@ -10,6 +10,7 @@ import {
 } from "./blog.ts";
 import type { BlogArticle } from "./blog-posts.ts";
 import { blogArticles } from "./data.ts";
+import { toolsForPost } from "./tools.ts";
 
 function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
   return {
@@ -45,6 +46,7 @@ Deno.test("an unknown relatedTool or catalogSlug throws", () => {
 
 Deno.test("a relatedTool links its /tools page in one hop and its repository", () => {
   assertEquals(relatedToolLink(post("x", { relatedTool: "mig" })), {
+    slug: "mig",
     name: "mig",
     href: "/tools/mig",
     repoUrl: "https://github.com/spy4x/mig",
@@ -134,4 +136,17 @@ Deno.test("the latest post date skips archived posts and counts updates", () => 
     ]),
     "2026-05-01",
   );
+});
+
+Deno.test("a post's relatedTool is the tool whose posts list names it, and only that one", () => {
+  // lib/tools.ts lists each tool's posts (#273) and a post's front matter
+  // names its tool: the two must never disagree.
+  for (const article of blogArticles) {
+    assertEquals(
+      article.relatedTool,
+      toolsForPost(article.slug)[0]?.slug,
+      article.slug,
+    );
+    assertEquals(toolsForPost(article.slug).length <= 1, true, article.slug);
+  }
 });

@@ -338,7 +338,7 @@ export default define.page(function BlogPost(ctx) {
                 The tool:{" "}
                 <a
                   href={tool.href}
-                  data-umami-event={`post-tool-${tool.href.split("/").pop()}`}
+                  data-umami-event={`post-tool-${tool.slug}`}
                   class="text-parchment underline underline-offset-4 hover:text-graphite"
                 >
                   {tool.name}
