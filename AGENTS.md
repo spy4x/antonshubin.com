@@ -134,9 +134,10 @@ which lives only in the main checkout: Syncthing replicates it as part of
 `~/sync/code`; keep an offline copy as well. A linked git worktree needs no copy
 of its own: the module finds the MAIN checkout's key itself by reading the
 worktree's `.git` file, so skip the global `env-key-copy.ts` step here. Run
-`deno task env:decrypt` to turn `.env.prod.age` into `.env.prod`. Agents never
-copy an env file (`.env`, `.env.prod`, or the key itself) between checkouts or
-worktrees — decrypt it fresh in each one.
+`deno task env:decrypt` to turn `.env.prod.age` into `.env.prod` and
+`.env.deploy.age` into `.env.deploy`. Agents never copy an env file (`.env`,
+`.env.prod`, or the key itself) between checkouts or worktrees — decrypt it
+fresh in each one.
 
 ## Deploy
 
@@ -148,6 +149,14 @@ The deploy script passes the local commit hash to the remote build as
 `BUILD_ID`, which becomes the service worker's cache name (`routes/sw.js.ts`).
 Nothing is written back to a tracked file, so a deploy leaves `git status` clean
 — see `docs/deploy.md`.
+
+After `docker compose up` the deploy waits for the new build and purges
+Cloudflare: `/sw.js` plus every `static/` file changed since the build that was
+live (#268, `scripts/cloudflare-purge.ts`). It fails open. Its token,
+`CLOUDFLARE_API_TOKEN`, lives in `.env.deploy` (gitignored, committed as
+`.env.deploy.age`, restored by `deno task env:decrypt`), which the deploy reads
+locally and never uploads; the container does not need it. See `docs/deploy.md`
+"Cloudflare purge after a deploy".
 
 The newsletter subscriber list (`data/subscribers.json`) lives on the host:
 `compose.yml` bind-mounts the app directory's `data/`, and the deploy's

@@ -11,11 +11,50 @@ The script reads the local commit hash and passes it to the remote build as
 Nothing is written back to a tracked file, so `git status` is clean before and
 after a deploy.
 
-Decrypt env before deploy if needed:
+Decrypt env before deploy if needed (it writes `.env.prod` and `.env.deploy`):
 
 ```bash
 deno task env:decrypt
 ```
+
+## Cloudflare purge after a deploy
+
+Cloudflare sits in front of production. While the container restarts, Traefik
+answers 404 for a few seconds, and Cloudflare once cached that 404 for `/sw.js`
+for minutes (#268). Files under `static/` (`/img/*`, favicons, `/manifest.json`)
+are cached at the edge for days, so a replaced image kept showing the old one.
+
+So after `docker compose up` succeeds, `scripts/deploy.ts`:
+
+1. Waits, at most 60 s, until `https://<domain>/sw.js` serves the new
+   `BUILD_ID`. The check adds its own query string, so Cloudflare's cached copy
+   does not answer it. On timeout it warns and purges anyway.
+2. Works out which `static/` files changed. Before uploading anything it read
+   the live `/sw.js`, whose cache name holds the build id that was live; the
+   step runs `git diff --name-only --no-renames <that id> <this id> -- static/`.
+   When that id is unknown (a `dev` build, a 404, or a commit this clone lacks)
+   it says so and purges `/sw.js` only.
+3. Purges `https://<domain>/sw.js` plus each changed file's URL (`static/x` is
+   served at `/x`) through Cloudflare's purge-by-URL API, 30 URLs per call. The
+   zone id is looked up by name (`antonshubin.com`). Only the apex is purged:
+   `www.antonshubin.com` answers every path with a redirect to the apex. Staging
+   purges its own domain's URLs; `website-stag.antonshubin.com` is not proxied
+   by Cloudflare today, so there the purge changes nothing.
+
+Every failure in this step (no token, network, API error, timeout) prints a
+warning and the deploy still counts as successful. The script never prints the
+token or the request headers.
+
+The token is `CLOUDFLARE_API_TOKEN` (Zone Read and Cache Purge on the zone). The
+script takes it from the environment, else from `.env.deploy` in the checkout.
+`.env.deploy` is gitignored; its encrypted copy `.env.deploy.age` is committed
+and `deno task env:decrypt` restores it. It stays on the deploying machine:
+`.dockerignore`'s `.env.*` keeps it out of the source rsync, and the env-file
+rsync names only `.env` and the target's env file. `scripts/deploy.test.ts`
+guards both. `.env.deploy.example` lists the key.
+
+To purge by hand, in the Cloudflare dashboard: antonshubin.com → Caching →
+Configuration → Custom Purge → URL.
 
 ## Subscriber data
 
