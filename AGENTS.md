@@ -336,6 +336,18 @@ case page reads "Home / Work / <title>" and `/work` shows none; every page keeps
 its `BreadcrumbList` JSON-LD, whose last item is the page name, not the full
 `<title>`.
 
+Since #270 the index is titled "Client work". The highlights are cards, in
+`highlightSlugs` order (`lib/data.ts`; the home page takes the first three),
+each with the picture from the project's optional `cardImage` (a WebP about
+720px wide made from its first screenshot; a phone shot is centred on a Lamp
+panel, and without one the card shows the logo). Only the first card image is
+eager, and none has `fetchpriority`. The archive is a dated list. Each project's
+one link is its title, and the status marks come from `lib/work.ts`'s
+`projectStatus()`, which the fact card uses too. The page carries a
+`CollectionPage` whose `ItemList` names every client project in page order, each
+pointing at its page's `#project` node, with no review markup.
+`test/work-index.test.ts` checks the built page.
+
 ### Project page
 
 `routes/work/[slug].tsx` (#246) is a two-column case study from 1024px: a real
@@ -346,14 +358,16 @@ the right column, first at 390px) beside the main column: the screenshot gallery
 as the hero, the pull quote, "What I built", "Client reviews", "Video" and "More
 work" (`relatedProjects()` in `lib/data.ts`: three client projects ranked by
 shared tags). A closing band on Desk ends the page with two promises through
-`promise()`, Book, the catalog link and How I work. Book appears twice, once in
-the card and once in the band, and nowhere else on the page.
-`islands/ImageGallery.tsx` renders the strip: slides sized by width with centre
-snap, captions from the file names (`screenshotCaption()`, the same text as the
-`alt`), a "n / N" counter, Previous/Next buttons from 1024px, and only the first
-image eager with `fetchpriority="high"`. A margin note inside the narrow fact
-card uses `WithNote`'s `note-stack` class, which keeps the note under its claim
-at every width. `test/work-page.test.ts` checks the built pages.
+`promise()`, Book, the catalog link and How I work. The band is
+`components/ClosingBand.tsx`, shared with `/work`, which passes `/catalog` as
+its catalog link and adds Infrastructure. Book appears twice, once in the card
+and once in the band, and nowhere else on the page. `islands/ImageGallery.tsx`
+renders the strip: slides sized by width with centre snap, captions from the
+file names (`screenshotCaption()`, the same text as the `alt`), a "n / N"
+counter, Previous/Next buttons from 1024px, and only the first image eager with
+`fetchpriority="high"`. A margin note inside the narrow fact card uses
+`WithNote`'s `note-stack` class, which keeps the note under its claim at every
+width. `test/work-page.test.ts` checks the built pages.
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
 gets `logoPlate: true` in `lib/data.ts`: the /work card and the project page
