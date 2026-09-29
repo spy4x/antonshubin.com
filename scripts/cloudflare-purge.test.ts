@@ -5,6 +5,7 @@ import {
   liveBuildId,
   parseBuildId,
   PURGE_BATCH_SIZE,
+  purgeAfterDeploy,
   purgeCloudflare,
   purgeList,
   staticUrls,
@@ -245,4 +246,244 @@ Deno.test("waitForBuild gives up after the timeout", async () => {
   assertEquals(ok, false);
   assertEquals(calls.length, 31);
   assertEquals(clock, 60_000);
+});
+
+/**
+ * A fetch that never answers on its own: like the real one, it rejects only
+ * when the request's signal aborts. Without a signal it would hang forever.
+ */
+function stalledFetch() {
+  let calls = 0;
+  const fetch = (_input: string | URL | Request, init?: RequestInit) => {
+    calls++;
+    return new Promise<Response>((_, reject) => {
+      init?.signal?.addEventListener(
+        "abort",
+        () => reject(init.signal?.reason),
+      );
+    });
+  };
+  return { fetch: fetch as typeof globalThis.fetch, calls: () => calls };
+}
+
+/** Fails the test loudly instead of letting a hung promise stall the run. */
+async function within<T>(ms: number, promise: Promise<T>): Promise<T> {
+  let timer: number | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`still pending after ${ms} ms`)),
+      ms,
+    );
+  });
+  try {
+    return await Promise.race([promise, deadline]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+Deno.test("purgeCloudflare gives up on a stalled request and reports it", async () => {
+  const { fetch, calls } = stalledFetch();
+  const result = await within(
+    2_000,
+    purgeCloudflare({
+      token: TOKEN,
+      urls: ["https://antonshubin.com/sw.js"],
+      fetch,
+      requestTimeoutMs: 20,
+    }),
+  );
+  assertEquals(result.success, false);
+  assert(result.error.startsWith("Cloudflare request failed:"), result.error);
+  assertEquals(calls(), 1);
+});
+
+Deno.test("purgeCloudflare gives up on a stalled purge call after the zone lookup", async () => {
+  const stalled = stalledFetch();
+  const fetch =
+    ((input: string | URL | Request, init?: RequestInit) =>
+      String(input).includes("/zones?name=")
+        ? Promise.resolve(zoneFound())
+        : stalled.fetch(input, init)) as typeof globalThis.fetch;
+  const result = await within(
+    2_000,
+    purgeCloudflare({
+      token: TOKEN,
+      urls: ["https://antonshubin.com/sw.js"],
+      fetch,
+      requestTimeoutMs: 20,
+    }),
+  );
+  assertEquals(result.success, false);
+  assert(result.error.startsWith("Cloudflare request failed:"), result.error);
+  assertEquals(stalled.calls(), 1);
+});
+
+Deno.test("waitForBuild returns false when every sw.js request stalls", async () => {
+  const { fetch, calls } = stalledFetch();
+  let clock = 0;
+  const ok = await within(
+    2_000,
+    waitForBuild({
+      domain: "antonshubin.com",
+      buildId: "bee5678",
+      timeoutMs: 4_000,
+      intervalMs: 2_000,
+      requestTimeoutMs: 20,
+      fetch,
+      sleep: (ms) => Promise.resolve(void (clock += ms)),
+      now: () => clock,
+    }),
+  );
+  assertEquals(ok, false);
+  assertEquals(calls(), 3);
+});
+
+Deno.test("liveBuildId answers undefined when the read stalls", async () => {
+  const { fetch } = stalledFetch();
+  assertEquals(
+    await within(2_000, liveBuildId("antonshubin.com", fetch, 20)),
+    undefined,
+  );
+});
+
+/** A fetch for purgeAfterDeploy: sw.js serves `live`, the API accepts every purge. */
+function deployFetch(live: string) {
+  const purged: string[][] = [];
+  const { fetch } = stubFetch((call) => {
+    if (call.url.includes("/sw.js")) {
+      return new Response(`const CACHE = "antonshubin-${live}";`);
+    }
+    if (call.url.includes("/zones?name=")) return zoneFound();
+    purged.push(JSON.parse(String(call.init?.body)).files);
+    return json({ success: true });
+  });
+  return { fetch, purged };
+}
+
+const quickWait = {
+  timeoutMs: 0,
+  intervalMs: 1,
+  sleep: () => Promise.resolve(),
+};
+
+Deno.test("purgeAfterDeploy purges only /sw.js when the previous build is unknown", async () => {
+  const { fetch, purged } = deployFetch("bee5678");
+  const gitCalls: string[][] = [];
+  const warnings: string[] = [];
+  await purgeAfterDeploy({
+    domain: "antonshubin.com",
+    buildId: "bee5678",
+    previousBuildId: undefined,
+    git: (args) => {
+      gitCalls.push(args);
+      return Promise.resolve({ code: 0, stdout: "static/img/a.png\n" });
+    },
+    token: () => TOKEN,
+    fetch,
+    log: () => {},
+    warn: (message) => warnings.push(message),
+    wait: quickWait,
+  });
+  assertEquals(purged, [["https://antonshubin.com/sw.js"]]);
+  assertEquals(gitCalls, []);
+  assert(
+    warnings.some((w) => w.includes("purging /sw.js only")),
+    warnings.join("\n"),
+  );
+});
+
+Deno.test("purgeAfterDeploy purges sw.js and the static files changed since the live build", async () => {
+  const { fetch, purged } = deployFetch("bee5678");
+  const gitCalls: string[][] = [];
+  await purgeAfterDeploy({
+    domain: "antonshubin.com",
+    buildId: "bee5678",
+    previousBuildId: "a0a1234",
+    git: (args) => {
+      gitCalls.push(args);
+      return Promise.resolve({
+        code: 0,
+        stdout: "static/img/a.png\nstatic/favicon.ico\n",
+      });
+    },
+    token: () => TOKEN,
+    fetch,
+    log: () => {},
+    warn: () => {},
+    wait: quickWait,
+  });
+  assertEquals(purged, [[
+    "https://antonshubin.com/sw.js",
+    "https://antonshubin.com/img/a.png",
+    "https://antonshubin.com/favicon.ico",
+  ]]);
+  assertEquals(gitCalls[1], [
+    "diff",
+    "--name-only",
+    "--no-renames",
+    "a0a1234",
+    "bee5678",
+    "--",
+    "static/",
+  ]);
+});
+
+Deno.test("purgeAfterDeploy resolves with a warning when a dependency throws", async () => {
+  const { fetch } = deployFetch("bee5678");
+  const base = {
+    domain: "antonshubin.com",
+    buildId: "bee5678",
+    previousBuildId: "a0a1234",
+    fetch,
+    log: () => {},
+    wait: quickWait,
+  };
+
+  const gitWarnings: string[] = [];
+  await purgeAfterDeploy({
+    ...base,
+    git: () => Promise.reject(new Error("git exploded")),
+    token: () => TOKEN,
+    warn: (message) => gitWarnings.push(message),
+  });
+  assert(
+    gitWarnings.some((w) => w.includes("git exploded")),
+    gitWarnings.join("\n"),
+  );
+
+  const tokenWarnings: string[] = [];
+  await purgeAfterDeploy({
+    ...base,
+    git: () => Promise.resolve({ code: 0, stdout: "" }),
+    token: () => {
+      throw new Error("token file unreadable");
+    },
+    warn: (message) => tokenWarnings.push(message),
+  });
+  assert(
+    tokenWarnings.some((w) => w.includes("token file unreadable")),
+    tokenWarnings.join("\n"),
+  );
+});
+
+Deno.test("purgeAfterDeploy skips the purge with a warning when there is no token", async () => {
+  const { fetch, purged } = deployFetch("bee5678");
+  const warnings: string[] = [];
+  await purgeAfterDeploy({
+    domain: "antonshubin.com",
+    buildId: "bee5678",
+    previousBuildId: undefined,
+    git: () => Promise.resolve({ code: 0, stdout: "" }),
+    token: () => undefined,
+    fetch,
+    log: () => {},
+    warn: (message) => warnings.push(message),
+    wait: quickWait,
+  });
+  assertEquals(purged, []);
+  assert(
+    warnings.some((w) => w.includes("CLOUDFLARE_API_TOKEN missing")),
+    warnings.join("\n"),
+  );
 });

@@ -75,3 +75,25 @@ Deno.test("the Cloudflare token file is never committed or uploaded", () => {
     "the env-file rsync must not upload .env.deploy",
   );
 });
+
+// The purge needs the build that was live before anything is uploaded, and it
+// may only run once compose has started the new build (#268).
+Deno.test("the deploy reads the live build before the upload and purges after compose", () => {
+  const source = read("scripts/deploy.ts");
+  const liveRead = source.indexOf("await liveBuildId(TARGET.domain");
+  const upload = source.indexOf("rsync -avz --delete");
+  const compose = source.indexOf("docker compose -p");
+  const composeRun = source.indexOf("`ssh ${SERVER} '${composeCmd}'`");
+  const purge = source.indexOf("await purgeAfterDeploy(");
+  assert(
+    liveRead >= 0,
+    "scripts/deploy.ts must read the live build with liveBuildId",
+  );
+  assert(purge >= 0, "scripts/deploy.ts must call purgeAfterDeploy");
+  assert(
+    upload >= 0 && compose >= 0 && composeRun >= 0,
+    "deploy steps not found",
+  );
+  assert(liveRead < upload, "liveBuildId must run before the first rsync");
+  assert(purge > composeRun, "purgeAfterDeploy must run after docker compose");
+});
