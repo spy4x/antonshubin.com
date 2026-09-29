@@ -354,7 +354,30 @@ siteTest(
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
       assertEquals(count(html, /data-tool-doors/g), 1, t.slug);
-      const more = html.slice(html.indexOf('id="more"'));
+      // The two doors sit in ClosingBand's children slot, which ends the page.
+      assertEquals(count(html, /data-closing-band/g), 1, t.slug);
+      const band = html.slice(html.indexOf("data-closing-band"));
+      assert(band.includes("data-tool-doors"), `${t.slug}: doors in the band`);
+      assert(
+        html.indexOf('id="more"') < html.indexOf("data-closing-band"),
+        `${t.slug}: the band ends the page, after More tools`,
+      );
+      const doors = visibleText(
+        band.slice(band.indexOf(">", band.indexOf("data-tool-doors")) + 1),
+      );
+      assertEquals(
+        doors.startsWith("Use it"),
+        !!t.repo,
+        `${t.slug}: first door`,
+      );
+      assert(
+        doors.includes("Need something like this for your team?"),
+        `${t.slug}: second door`,
+      );
+      const more = html.slice(
+        html.indexOf('id="more"'),
+        html.indexOf("data-closing-band"),
+      );
       assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
       assert(
         html.includes(`data-umami-event="tool-${t.slug}-catalog"`),
@@ -638,3 +661,22 @@ siteTest(
     );
   },
 );
+
+Deno.test("a tool page's closing band carries a Book action", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  });
+  try {
+    for (const t of tools) {
+      const html = await site.html(`/tools/${t.slug}`);
+      const band = html.slice(html.indexOf("data-closing-band"));
+      assertEquals(count(band, /data-primary-book/g), 1, t.slug);
+      assert(
+        band.includes(`data-umami-event="tool-${t.slug}-book"`),
+        `${t.slug}: Book event`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});

@@ -12,6 +12,7 @@ import { InstallLine } from "../../components/InstallLine.tsx";
 import { ToolCard } from "../../components/ToolCard.tsx";
 import ImageGallery from "../../islands/ImageGallery.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { catalogItem, catalogPath } from "../../lib/catalog.ts";
 import { blogArticles } from "../../lib/data.ts";
 import { firstSentence, metaDescription } from "../../lib/llms.ts";
@@ -222,13 +223,69 @@ export default define.page(async function ToolPage(ctx) {
         </header>
 
         <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-start">
-          <FactCard
-            id="facts"
-            title="Facts"
+          <div
             data-fact-card
-            footer={(repo || catalog) && (
-              <>
+            class="order-first lg:order-2 lg:sticky lg:top-8"
+          >
+            <FactCard label="Tool facts">
+              <h2 class="text-lg text-parchment mb-3">Facts</h2>
+              <dl class="space-y-3 text-sm">
+                <Fact term="Status">
+                  <StatusMark status={tool.status} />
+                </Fact>
+                {tool.registry && (
+                  <Fact term="Version">
+                    <span data-version>
+                      {tool.registry.published
+                        ? tool.registry.version
+                        : `${tool.registry.version}, publishing to ${tool.registry.name}`}
+                    </span>
+                    {tool.registry.published && (
+                      <>
+                        {" on "}
+                        <a href={tool.registry.url} class={linkClass}>
+                          {tool.registry.name}
+                        </a>
+                      </>
+                    )}
+                  </Fact>
+                )}
+                {licence && <Fact term="Licence">{licence}</Fact>}
+                {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
+                {tool.live && (
+                  <Fact term="Live">
+                    <a
+                      href={tool.live.href}
+                      data-umami-event={event("live")}
+                      class={linkClass}
+                    >
+                      {tool.live.label}
+                    </a>
+                  </Fact>
+                )}
                 {repo && (
+                  <Fact term="Code">
+                    <a href={repo} class={linkClass}>{tool.repo}</a>
+                    {snap && snap.stars >= MIN_STARS_SHOWN && (
+                      <span class="text-graphite">, {snap.stars} stars</span>
+                    )}
+                  </Fact>
+                )}
+                {tool.ci && snap && (
+                  <Fact term="CI">
+                    <CiPill
+                      ci={snap.ci}
+                      pipelinesUrl={ciUrl(tool)!}
+                      labelHidden
+                    />
+                    <span data-checked class="block mt-1 text-graphite">
+                      {checkedLabel(live)}
+                    </span>
+                  </Fact>
+                )}
+              </dl>
+              {repo && (
+                <div class="mt-4 pt-4 border-t border-rule text-sm space-y-2">
                   <p>
                     <a
                       href={repo}
@@ -246,60 +303,10 @@ export default define.page(async function ToolPage(ctx) {
                       Report an issue
                     </a>
                   </p>
-                )}
-              </>
-            )}
-          >
-            <Fact term="Status">
-              <StatusMark status={tool.status} />
-            </Fact>
-            {tool.registry && (
-              <Fact term="Version">
-                <span data-version>
-                  {tool.registry.published
-                    ? tool.registry.version
-                    : `${tool.registry.version}, publishing to ${tool.registry.name}`}
-                </span>
-                {tool.registry.published && (
-                  <>
-                    {" on "}
-                    <a href={tool.registry.url} class={linkClass}>
-                      {tool.registry.name}
-                    </a>
-                  </>
-                )}
-              </Fact>
-            )}
-            {licence && <Fact term="Licence">{licence}</Fact>}
-            {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
-            {tool.live && (
-              <Fact term="Live">
-                <a
-                  href={tool.live.href}
-                  data-umami-event={event("live")}
-                  class={linkClass}
-                >
-                  {tool.live.label}
-                </a>
-              </Fact>
-            )}
-            {repo && (
-              <Fact term="Code">
-                <a href={repo} class={linkClass}>{tool.repo}</a>
-                {snap && snap.stars >= MIN_STARS_SHOWN && (
-                  <span class="text-graphite">, {snap.stars} stars</span>
-                )}
-              </Fact>
-            )}
-            {tool.ci && snap && (
-              <Fact term="CI">
-                <CiPill ci={snap.ci} pipelinesUrl={ciUrl(tool)!} labelHidden />
-                <span data-checked class="block mt-1 text-graphite">
-                  {checkedLabel(live)}
-                </span>
-              </Fact>
-            )}
-          </FactCard>
+                </div>
+              )}
+            </FactCard>
+          </div>
 
           <div class="lg:order-1 min-w-0 space-y-12">
             {tool.screenshots && (
@@ -433,42 +440,6 @@ export default define.page(async function ToolPage(ctx) {
           </div>
         </div>
 
-        {
-          /* The two doors. The shared closing band replaces this section once
-            it lands (#270); until then the doors are plain links. */
-        }
-        <section
-          aria-labelledby="next"
-          data-tool-doors
-          class="mt-12 border-t border-rule pt-8 grid gap-6 sm:grid-cols-2"
-        >
-          <h2 id="next" class="sr-only">What next</h2>
-          {repo && (
-            <div>
-              <p class="text-parchment">Star it or open an issue.</p>
-              <a
-                href={`${repo}/issues`}
-                data-umami-event={event("issue")}
-                class={linkClass}
-              >
-                {tool.repo} on GitHub
-              </a>
-            </div>
-          )}
-          <div>
-            <p class="text-parchment">
-              Need something like this for your team? That's my day job.
-            </p>
-            <a
-              href={catalog ? catalogPath(catalog.slug) : "/catalog"}
-              data-umami-event={event("catalog")}
-              class={linkClass}
-            >
-              {catalog ? catalog.title : "Services"}
-            </a>
-          </div>
-        </section>
-
         <section aria-labelledby="more" class="mt-12">
           <h2 id="more" class="text-2xl text-parchment">More tools</h2>
           <ul class="mt-4 grid gap-4 sm:grid-cols-3">
@@ -480,6 +451,43 @@ export default define.page(async function ToolPage(ctx) {
             <a href="/tools" class={linkClass}>All tools</a>
           </p>
         </section>
+
+        {/* ── Closing band: two doors, one Book ─────────────────────── */}
+        <ClosingBand
+          promiseIds={[]}
+          bookEvent={event("book")}
+          catalogLink={
+            <a
+              href={catalog ? catalogPath(catalog.slug) : "/catalog"}
+              data-umami-event={event("catalog")}
+              class={linkClass}
+            >
+              {catalog ? catalog.title : "Services"}
+            </a>
+          }
+        >
+          <div data-tool-doors class="grid gap-6 sm:grid-cols-2 mb-6">
+            {repo && (
+              <div>
+                <h2 class="text-xl text-parchment">Use it</h2>
+                <p class="mt-1 text-graphite">Star it or open an issue.</p>
+                <a
+                  href={`${repo}/issues`}
+                  data-umami-event={event("issue")}
+                  class={linkClass}
+                >
+                  {tool.repo} on GitHub
+                </a>
+              </div>
+            )}
+            <div>
+              <h2 class="text-xl text-parchment">
+                Need something like this for your team?
+              </h2>
+              <p class="mt-1 text-graphite">That's my day job.</p>
+            </div>
+          </div>
+        </ClosingBand>
       </div>
     </Layout>
   );
