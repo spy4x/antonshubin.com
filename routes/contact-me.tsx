@@ -19,15 +19,13 @@ import { originOf } from "../lib/csp.ts";
 import { leadService } from "../lib/lead.ts";
 import { promise } from "../lib/promises.ts";
 import {
+  contactTestimonialId,
   testimonial,
   testimonialProject,
   visibleTestimonials,
 } from "../lib/testimonials.ts";
 import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
 import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
-
-/** The client sentence beside the calendar (#272, Psych 5): not one the home page shows. */
-const QUOTE_ID = "roley-2";
 
 /** The call, capitalised for a heading: "Book a free 30-minute intro call". */
 const BOOK_HEADING = `Book a ${INTRO_CALL}`;
@@ -57,7 +55,7 @@ export default define.page(function ContactMe(ctx) {
     ogType: "website",
     pageName: "Contact",
   };
-  const quote = visibleTestimonials([testimonial(QUOTE_ID)])[0];
+  const quote = visibleTestimonials([testimonial(contactTestimonialId)])[0];
   const schedulerOrigin = originOf(SCHEDULE_URL);
   // What follows the call, in the promises' own words (#272, Psych 4): a
   // small first milestone either side can stop after, and the work is yours.

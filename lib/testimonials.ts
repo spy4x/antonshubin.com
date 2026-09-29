@@ -241,6 +241,12 @@ export const homeTestimonialIds: string[] = [
  */
 export const aboutTestimonialIds: string[] = ["gopingu-1", "connectful-2"];
 
+/**
+ * The client sentence beside the calendar on `/contact-me` (#272, Psych 5):
+ * not one the home page shows.
+ */
+export const contactTestimonialId = "roley-2";
+
 /** Looks a testimonial up by id and throws on a typo. */
 export function testimonial(id: string): Testimonial {
   const t = testimonials.find((x) => x.id === id);
