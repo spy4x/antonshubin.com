@@ -339,6 +339,10 @@ siteTest(
           post.includes(`href="/tools/${t.slug}"`),
           `/blog/${slug} does not link /tools/${t.slug}`,
         );
+        assert(
+          post.includes(`data-umami-event="post-tool-${t.slug}"`),
+          `/blog/${slug} link to /tools/${t.slug} carries no Umami event`,
+        );
       }
     }
   },
