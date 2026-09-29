@@ -1,219 +1,265 @@
+import { Head } from "fresh/runtime";
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
-import { getBreadcrumb, head } from "../lib/head.ts";
+import { getBreadcrumb, head, ROLE } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
-import { ArrowRightIcon } from "../components/Icons.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
-import { SCHEDULE_URL } from "../lib/config.ts";
+import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
+import { TestimonialCard } from "../components/TestimonialCard.tsx";
+import { SCHEDULE_URL, TIMEZONE_LABEL, UPWORK_URL } from "../lib/config.ts";
+import { INTRO_CALL } from "../lib/catalog.ts";
+import { originOf } from "../lib/csp.ts";
+import { leadService } from "../lib/lead.ts";
+import { promise } from "../lib/promises.ts";
 import {
-  CalendarIcon,
-  GithubIcon,
-  LinkedInIcon,
-  MailIcon,
-  TelegramIcon,
-  YouTubeIcon,
-} from "../components/Icons.tsx";
-import MeetEmbed, { embedUrl } from "../islands/MeetEmbed.tsx";
-import { buttonClass } from "../components/Button.tsx";
+  testimonial,
+  testimonialProject,
+  visibleTestimonials,
+} from "../lib/testimonials.ts";
+import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
+import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
+
+/** The one address on the page, written out in full so it can be copied (#272, Mkt 3). */
+const EMAIL = "hello@antonshubin.com";
+
+/** The client sentence beside the calendar (#272, Psych 5): not one the home page shows. */
+const QUOTE_ID = "roley-2";
+
+/** The call, capitalised for a heading: "Book a free 30-minute intro call". */
+const BOOK_HEADING = `Book a ${INTRO_CALL}`;
 
 /**
- * The ways to reach me. Everything else is an icon below. The "Book a call"
- * card is omitted when `SCHEDULE_URL` is unset, since it links to `#book`,
- * a section that itself only renders when the scheduler is configured.
+ * The booking page (#272, the merged spec on the issue). Every Book link
+ * ends here, so the heading names the call and the calendar follows it,
+ * with a quiet side panel beside it at 1440px (who, time zone, email,
+ * Telegram, Upwork, invoicing) and after it at 390px. Then "After the call",
+ * one client quote and the written brief (`#brief`) as the one second path.
+ * With `SCHEDULE_URL` unset the page leads with the brief instead.
+ * `?service=<slug>` prefills the brief when it names a catalog item; any
+ * other value is ignored.
  */
-const contacts = [
-  ...(SCHEDULE_URL
-    ? [{
-      icon: <CalendarIcon class="w-6 h-6" />,
-      title: "Book a call",
-      desc: "A free 30-minute intro call. Pick a time that works for you.",
-      href: "#book",
-      color: "bg-sage/15 text-sage border-sage/30 hover:border-sage",
-      btnClass: buttonClass("primary", "px-4 py-2 text-sm"),
-      isPrimaryBook: true,
-      // The glyph is rendered separately, wrapped in an `aria-hidden` span, so
-      // a screen reader doesn't read "downwards arrow" after the label.
-      btnText: "Book now",
-      downArrow: true,
-      // The down arrow in the text already points at the #book section below,
-      // so the trailing ArrowRightIcon every other card gets would be a second,
-      // conflicting arrow here.
-      hideArrow: true,
-    }]
-    : []),
-  {
-    icon: <MailIcon class="w-6 h-6" />,
-    title: "Email",
-    desc: "Prefer writing? Email me anytime.",
-    href: "mailto:hello@antonshubin.com",
-    color:
-      "bg-rule-strong/20 text-graphite border-rule-strong/30 hover:border-rule-strong",
-    btnClass: buttonClass("secondary", "px-4 py-2 text-sm inline-block"),
-    isPrimaryBook: false,
-    btnText: "Send email",
-    hideArrow: false,
-    downArrow: false,
-  },
-  {
-    icon: <TelegramIcon class="w-6 h-6" />,
-    title: "Telegram",
-    desc: "Quick messages. Best for async chat and file sharing.",
-    href: "https://t.me/spy4x",
-    color: "bg-mist/20 text-mist border-mist/30 hover:border-mist",
-    btnClass: buttonClass("secondary", "px-4 py-2 text-sm inline-block"),
-    isPrimaryBook: false,
-    btnText: "Message me",
-    hideArrow: false,
-    downArrow: false,
-  },
-];
-
-/**
- * The intro sentence names how many cards are on the page, so it has to
- * follow `contacts.length` instead of hardcoding "Three" — the only two
- * possible counts once the "Book a call" card is optional (#152).
- */
-const CONTACT_COUNT_WORD: Record<number, string> = { 2: "Two", 3: "Three" };
-
-const profiles = [
-  {
-    name: "LinkedIn",
-    href: "https://www.linkedin.com/in/anton-shubin",
-    icon: <LinkedInIcon class="w-6 h-6" />,
-  },
-  {
-    name: "GitHub",
-    href: "https://github.com/spy4x",
-    icon: <GithubIcon class="w-6 h-6" />,
-  },
-  {
-    name: "YouTube",
-    href: "https://www.youtube.com/@anton-shubin",
-    icon: <YouTubeIcon class="w-6 h-6" />,
-  },
-];
-
-export default define.page(function ContactMe() {
+export default define.page(function ContactMe(ctx) {
+  const booking = Boolean(SCHEDULE_URL);
+  const service = leadService(ctx.url.searchParams.get("service"));
   head.value = {
     ...head.value,
-    title: "Contact Anton Shubin",
-    description: SCHEDULE_URL
-      ? "Book a free 30-minute intro call, email me, or message me on Telegram."
-      : "Email me or message me on Telegram.",
+    title: booking
+      ? "Contact Anton Shubin: book a free 30-minute call"
+      : "Contact Anton Shubin",
+    description: booking
+      ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via NeatSoft PTE LTD, Singapore.`
+      : "Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via NeatSoft PTE LTD, Singapore.",
     canonical: "https://antonshubin.com/contact-me",
     ogType: "website",
+    pageName: "Contact",
   };
+  const quote = visibleTestimonials([testimonial(QUOTE_ID)])[0];
+  const schedulerOrigin = originOf(SCHEDULE_URL);
+  // What follows the call, in the promises' own words (#272, Psych 4): a
+  // small first milestone either side can stop after, and the work is yours.
+  const milestone = promise("first-milestone");
+  const ownership = promise("ownership");
+
   return (
     <Layout currentPath="/contact-me">
       <SEOHead />
+      {schedulerOrigin && (
+        <Head>
+          <link rel="preconnect" href={schedulerOrigin} />
+        </Head>
+      )}
       <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
+        items={getBreadcrumb(head.value.canonical, head.value.pageName!)}
       />
-      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <h1 class="text-3xl sm:text-4xl font-bold text-parchment text-center mb-2">
-          Get in touch
-        </h1>
-        <p class="text-graphite text-center mb-10 sm:mb-12 text-base sm:text-lg">
-          {CONTACT_COUNT_WORD[contacts.length]}{" "}
-          ways to reach me. Pick the one that suits you.
-        </p>
+      <div class="max-w-6xl mx-auto grid gap-x-10 gap-y-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
+        {/* 1. Heading and the first action: the calendar, or the brief */}
+        <div class="lg:col-start-1 lg:row-start-1 min-w-0">
+          <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
+            {booking ? BOOK_HEADING : "Send a written brief"}
+          </h1>
+          {booking
+            ? (
+              <>
+                <p class="mt-3 text-lg text-graphite">
+                  No pitch, just advice.
+                </p>
+                <p class="mt-2 text-graphite">
+                  Rather write?{" "}
+                  <a
+                    href="#brief"
+                    data-umami-event="contact-brief-link"
+                    class={FACT_LINK}
+                  >
+                    Send a written brief
+                  </a>{" "}
+                  <span aria-hidden="true">↓</span>
+                </p>
+                {
+                  /* Off-screen until focused. Not `sr-only`: routes/_app.tsx
+                    inlines an unlayered `.sr-only` rule that beats Tailwind's
+                    layered `focus:not-sr-only`, so that pair never shows. */
+                }
+                <a
+                  href="#brief"
+                  data-contact-skip
+                  class="absolute -left-[9999px] focus:static focus:inline-block focus:mt-3 focus:underline focus:text-parchment"
+                >
+                  Skip the calendar
+                </a>
+                <section
+                  id="book"
+                  aria-label="Booking calendar"
+                  class="mt-6 scroll-mt-4"
+                >
+                  <MeetEmbed
+                    url={embedUrl(SCHEDULE_URL)}
+                    scheduleUrl={SCHEDULE_URL}
+                    briefHref="#brief"
+                  />
+                  <p class="mt-3 text-sm text-graphite">
+                    <a
+                      href={SCHEDULE_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-umami-event="meet-embed-fallback-click"
+                      class={FACT_LINK}
+                    >
+                      {NEW_TAB_LABEL}
+                      <NewTabHint />
+                    </a>
+                  </p>
+                </section>
+              </>
+            )
+            : (
+              <>
+                <p class="mt-3 text-lg text-graphite">{BRIEF_PROMISE}</p>
+                <section id="brief" aria-label="Written brief" class="mt-6">
+                  <LeadForm
+                    scheduleUrl=""
+                    service={service}
+                    submitEvent="contact-brief-submit"
+                    intro={false}
+                  />
+                </section>
+              </>
+            )}
+        </div>
 
-        {
-          /* Two full literal class strings, chosen by count — Tailwind only
-            picks up a class name that appears complete in the source, so
-            this can't be built by interpolating the column count in. */
-        }
+        {/* 2. Side panel: who is on the other end, and how else to reach him */}
         <div
-          class={contacts.length === 3
-            ? "grid gap-5 sm:grid-cols-3"
-            : "grid gap-5 sm:grid-cols-2"}
+          data-contact-facts
+          class="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-8"
         >
-          {contacts.map((c) => (
-            <a
-              href={c.href}
-              target={c.href.startsWith("http") ? "_blank" : undefined}
-              rel={c.href.startsWith("http")
-                ? "noopener noreferrer"
-                : undefined}
-              data-contact-option
-              class={`block p-4 sm:p-6 rounded-xl border transition-all ${c.color} group`}
-            >
-              <div class="flex items-center gap-3 mb-3">
-                <div class="p-2 rounded-lg bg-paper/50">{c.icon}</div>
-                <h2 class="text-lg font-semibold text-parchment">{c.title}</h2>
-              </div>
-              <p class="text-graphite text-sm mb-4">{c.desc}</p>
-              <span
-                class={c.btnClass + " inline-flex items-center gap-1"}
-                {...(c.isPrimaryBook ? { "data-primary-book": true } : {})}
-              >
-                {c.btnText}
-                {c.downArrow && <span aria-hidden="true">↓</span>}
-                {!c.hideArrow && <ArrowRightIcon class="w-4 h-4" />}
-              </span>
-              {c.href.startsWith("http") && <NewTabHint />}
-            </a>
-          ))}
-        </div>
-
-        <ul class="mt-10 flex justify-center gap-4">
-          {profiles.map((p) => (
-            <li key={p.name}>
-              <a
-                href={p.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${p.name} (opens in a new tab)`}
-                title={p.name}
-                class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-paper border border-rule text-graphite hover:text-parchment hover:border-accent transition-colors"
-              >
-                {p.icon}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <p class="mt-8 text-center text-graphite text-sm">
-          Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R),
-          where I'm co-founder and CEO.
-        </p>
-
-        {SCHEDULE_URL && (
-          <section id="book" class="mt-12 scroll-mt-4">
-            <h2 class="text-2xl font-bold text-parchment text-center mb-2">
-              Book a free 30-min intro call
-            </h2>
-            <p class="text-graphite text-center mb-6 text-sm">
-              Roles, press, or a quick question — email or Telegram above.
-            </p>
-            <div class="flex justify-center">
-              <MeetEmbed url={embedUrl(SCHEDULE_URL)} />
+          <FactCard label="Contact details">
+            <div class="flex items-center gap-4 mb-5">
+              <img
+                class="h-16 w-16 rounded-full border border-rule-strong"
+                src="/img/photo-64.webp"
+                alt="Photo of Anton Shubin"
+                width="64"
+                height="64"
+              />
+              <p>
+                <span class="block font-semibold text-parchment">
+                  Anton Shubin
+                </span>
+                <span class="block text-sm text-graphite">{ROLE}</span>
+              </p>
             </div>
-            <p class="text-xs text-graphite mt-3 text-center">
-              Or{" "}
+            <dl class="space-y-2 text-sm">
+              <Fact term="Time zone">{TIMEZONE_LABEL}</Fact>
+              <Fact term="Email">
+                <a
+                  href={`mailto:${EMAIL}`}
+                  data-umami-event="contact-email-click"
+                  class={`${FACT_LINK} break-all`}
+                >
+                  {EMAIL}
+                </a>
+              </Fact>
+              <Fact term="Telegram">
+                <a
+                  href="https://t.me/spy4x"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-umami-event="contact-telegram-click"
+                  class={FACT_LINK}
+                >
+                  @spy4x
+                  <NewTabHint />
+                </a>
+              </Fact>
+            </dl>
+            <p class="mt-4 text-sm text-graphite">
+              Found me on Upwork?{" "}
               <a
-                href={SCHEDULE_URL}
+                href={UPWORK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="meet-embed-fallback-click"
-                class="underline hover:text-accent"
+                data-umami-event="contact-upwork-click"
+                class={FACT_LINK}
               >
-                open standalone
+                Hire me there
                 <NewTabHint />
-              </a>.
+              </a>
             </p>
-          </section>
-        )}
-
-        {/* QR code */}
-        <div class="mt-16 text-center">
-          <img
-            class="w-full max-w-xs mx-auto object-cover"
-            src="/img/qr-share.webp"
-            alt="QR code — antonshubin.com"
-          />
+            <p class="mt-4 text-sm text-graphite">
+              Invoices are issued by NeatSoft PTE LTD, Singapore (UEN
+              202300222R), where I'm co-founder and CEO.
+            </p>
+          </FactCard>
         </div>
+
+        {/* 3. After the call, one client sentence, the written brief */}
+        {booking && (
+          <div class="lg:col-start-1 lg:row-start-2 min-w-0 space-y-12">
+            <section aria-labelledby="after-call">
+              <h2 id="after-call" class="h2 mb-4">After the call</h2>
+              <ol
+                data-after-call
+                class="space-y-4 border-l-2 border-rule-strong pl-6 text-graphite"
+              >
+                <li>
+                  <h3 class="text-lg text-parchment">We talk</h3>
+                  <p class="mt-1">
+                    We talk about what you are building and whether I can help.
+                  </p>
+                </li>
+                {[milestone, ownership].map((p) => (
+                  <li key={p.id}>
+                    <h3 class="text-lg text-parchment">{p.title}</h3>
+                    <p class="mt-1">{p.desc}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            {quote && (
+              <div data-contact-quote>
+                <TestimonialCard
+                  t={quote}
+                  project={testimonialProject(quote)}
+                />
+              </div>
+            )}
+
+            <section
+              id="brief"
+              aria-labelledby="brief-heading"
+              class="scroll-mt-4"
+            >
+              <h2 id="brief-heading" class="h2 mb-4">Prefer writing?</h2>
+              <LeadForm
+                scheduleUrl={SCHEDULE_URL}
+                calendarAbove="#book"
+                service={service}
+                submitEvent="contact-brief-submit"
+              />
+            </section>
+          </div>
+        )}
       </div>
     </Layout>
   );

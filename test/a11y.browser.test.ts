@@ -436,6 +436,75 @@ Deno.test("the tools hub and every tool page have no horizontal scroll and no ax
   }
 });
 
+for (
+  const [label, scheduleUrl] of [
+    ["with the calendar", "https://meet.example.com/book"],
+    ["without a scheduler", ""],
+  ]
+) {
+  Deno.test(`/contact-me ${label} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
+    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
+    let browser: Browser | undefined;
+    try {
+      browser = await launchChromium();
+      for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+        const page: Page = await newPage(browser, { viewport });
+        try {
+          const where = `/contact-me ${label} at ${viewport.width}px`;
+          await page.goto(`${site.origin}/contact-me`, {
+            waitUntil: "networkidle",
+          });
+          const scrollWidth = await page.evaluate(() =>
+            document.documentElement.scrollWidth
+          );
+          assert(
+            scrollWidth <= viewport.width,
+            `${where} scrolls sideways: ${scrollWidth}px wide`,
+          );
+          assertEquals(await axeViolations(page), [], where);
+        } finally {
+          await page.close();
+        }
+      }
+    } finally {
+      await browser?.close();
+      await site.stop();
+    }
+  });
+}
+
+Deno.test("the booking page's skip link shows on focus and jumps past the calendar to the brief", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
+    try {
+      await page.goto(`${site.origin}/contact-me`, {
+        waitUntil: "networkidle",
+      });
+      const skip = page.getByRole("link", { name: "Skip the calendar" });
+      await skip.focus();
+      const box = await skip.boundingBox();
+      assert(box && box.width > 20, "the focused skip link is not visible");
+      await page.keyboard.press("Enter");
+      await page.waitForURL(/#brief$/);
+      const brief = await page.locator("#brief").boundingBox();
+      assert(
+        brief && brief.y < DESKTOP_VIEWPORT.height,
+        "the brief is not in view after the skip link",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
 Deno.test("blog image lightbox is named, its Close button is named, and focus returns", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
