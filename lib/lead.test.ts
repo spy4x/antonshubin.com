@@ -92,3 +92,31 @@ Deno.test("leadService returns a catalog item's slug and short title, and nothin
   assertEquals(leadService("free-architecture-audit"), undefined);
   assertEquals(leadService(undefined), undefined);
 });
+
+Deno.test("refuses a brief that holds only the service prefill, and mails nothing", async () => {
+  const slug = "codebase-health-audit";
+  const prefill = `About: ${catalogItem(slug).shortTitle}\n\n`;
+  for (const techStack of [prefill, `  ${prefill.trim()}  `]) {
+    const { relay, deps } = setup();
+    const outcome = acceptLead(
+      { ...LEAD, email: "jane@example.com", service: slug, techStack },
+      deps,
+    );
+    await outcome.mail;
+    assertEquals([outcome.status, outcome.body], [400, {
+      error: "Tech stack description is required",
+    }]);
+    assertEquals(relay.mails.length, 0);
+  }
+  // With text beyond the prefill, the same brief goes out.
+  const { relay, deps } = setup();
+  const outcome = acceptLead({
+    ...LEAD,
+    email: "jane@example.com",
+    service: slug,
+    techStack: `${prefill}A Deno app`,
+  }, deps);
+  await outcome.mail;
+  assertEquals(outcome.status, 200);
+  assertEquals(relay.mails.length, 1);
+});

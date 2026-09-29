@@ -4,6 +4,7 @@ import { ArrowRightIcon, CheckIcon } from "../components/Icons.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { proof } from "../lib/proof.ts";
 import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
+import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts";
 
 /** The calendar island's component, loaded only when the success panel needs it. */
 type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
@@ -49,6 +50,7 @@ type SubmitStatus =
 /** The id of the field a validation error is about, so it can carry aria-invalid/aria-describedby. */
 function validate(
   form: FormState,
+  serviceTitle?: string,
 ): { field: string; message: string } | null {
   if (!form.name.trim()) {
     return { field: "lead-name", message: "Name is required" };
@@ -59,7 +61,7 @@ function validate(
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
     return { field: "lead-email", message: "Please enter a valid email" };
   }
-  if (!form.techStack.trim()) {
+  if (isEmptyBrief(form.techStack, serviceTitle)) {
     return {
       field: "lead-stack",
       message: "Describe your idea or your current app",
@@ -80,7 +82,7 @@ export default function LeadForm(
   const name = useSignal("");
   const email = useSignal("");
   const techStack = useSignal(
-    service ? `About: ${service.shortTitle}\n\n` : "",
+    service ? briefPrefill(service.shortTitle) : "",
   );
   const status = useSignal<SubmitStatus>({ type: "idle" });
 
@@ -99,7 +101,7 @@ export default function LeadForm(
       email: email.value,
       techStack: techStack.value,
     };
-    const error = validate(form);
+    const error = validate(form, service?.shortTitle);
     if (error) {
       status.value = {
         type: "error",
@@ -144,7 +146,11 @@ export default function LeadForm(
   const wantsCalendar = isSuccess && Boolean(scheduleUrl) && !calendarAbove;
   useEffect(() => {
     if (!wantsCalendar || MeetEmbed) return;
-    import("./MeetEmbed.tsx").then((m) => setMeetEmbed(() => m.default));
+    import("./MeetEmbed.tsx")
+      .then((m) => setMeetEmbed(() => m.default))
+      // A failed chunk load (offline, a deploy in between) leaves the panel
+      // without a calendar; the new-tab link under it still works.
+      .catch(() => {});
   }, [wantsCalendar]);
 
   // Runs after the DOM commits the success state, once the heading is no

@@ -2,6 +2,7 @@
 // to the owner. Kept out of the route so a test can run it against a fake
 // mail relay.
 import { catalogItem } from "./catalog.ts";
+import { isEmptyBrief } from "./brief-prefill.ts";
 import { bareAddress } from "./email-field.ts";
 import { type Lead, type LeadMailDeps, notifyOwner } from "./lead-mail.ts";
 
@@ -72,10 +73,14 @@ export function validateLead(
   if (!email) {
     return { ok: false, error: "Valid email is required" };
   }
-  if (typeof body.techStack !== "string" || !body.techStack.trim()) {
+  const service = leadService(body.service);
+  // "About: <title>" alone is the prefill, not a description (#272).
+  if (
+    typeof body.techStack !== "string" ||
+    isEmptyBrief(body.techStack, service?.shortTitle)
+  ) {
     return { ok: false, error: "Tech stack description is required" };
   }
-  const service = leadService(body.service);
   return {
     ok: true,
     data: {

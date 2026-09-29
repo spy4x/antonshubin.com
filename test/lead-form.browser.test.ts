@@ -333,3 +333,48 @@ Deno.test("the home page loads the calendar's script and mounts it only after a 
     await site.stop();
   }
 });
+
+Deno.test("the booking page's brief refuses to send only the prefilled About line", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      let posts = 0;
+      await page.route("**/api/lead", (route: Route) => {
+        posts++;
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ok: true }),
+        });
+      });
+      await page.goto(
+        `${site.origin}/contact-me?service=codebase-health-audit`,
+        { waitUntil: "networkidle" },
+      );
+      await page.fill("#lead-name", "Ada Lovelace");
+      await page.fill("#lead-email", "ada@example.com");
+      await clickSubmitButtonWithoutScrolling(page);
+      const error = page.locator("#lead-form-error");
+      await error.waitFor({ state: "visible" });
+      assertEquals(
+        await error.innerText(),
+        "Describe your idea or your current app",
+      );
+      assertEquals(
+        await page.getAttribute("#lead-stack", "aria-invalid"),
+        "true",
+      );
+      assertEquals(posts, 0, "a brief with only the prefill was sent");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});

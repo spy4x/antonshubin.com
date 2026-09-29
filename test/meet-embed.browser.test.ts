@@ -85,6 +85,20 @@ function startStubMig(): { origin: string; stop: () => void } {
           { headers: { "content-type": "text/html" } },
         );
       }
+      if (pathname === "/late/embed") {
+        // Answers only after the placeholder has given up, like mig on a
+        // very slow network: the calendar must still appear.
+        return new Response(
+          `<!doctype html><html><body>mig stub, late
+            <script>
+              setTimeout(() => {
+                window.parent.postMessage({ type: "mig:height", height: 720 }, "*");
+              }, ${EMBED_TIMEOUT_MS + 1500});
+            </script>
+          </body></html>`,
+          { headers: { "content-type": "text/html" } },
+        );
+      }
       if (pathname === "/xfo/embed" || pathname === "/refused/embed") {
         // mig's /embed today (checked 30 Sep 2026) sends X-Frame-Options:
         // DENY beside a frame-ancestors policy that allows the site. /xfo
@@ -475,5 +489,80 @@ Deno.test("a refused frame turns the placeholder into a message with the new-tab
     await browser?.close();
     await site.stop();
     stub.stop();
+  }
+});
+
+Deno.test("a height that arrives after the timeout still turns the failure message into the calendar", async () => {
+  const stub = startStubMig();
+  const site = await startSite({
+    env: { SCHEDULE_URL: `${stub.origin}/late` },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await page.goto(`${site.origin}/contact-me`, {
+        waitUntil: "networkidle",
+      });
+      await page.waitForSelector('[data-meet-embed="failed"]', {
+        timeout: EMBED_TIMEOUT_MS + 5000,
+      });
+      await page.waitForSelector('[data-meet-embed="ready"]', {
+        timeout: 10000,
+      });
+      const frame = page.locator(
+        'iframe[title="Schedule a call with Anton Shubin"]',
+      );
+      assert(await frame.isVisible(), "the late calendar stays hidden");
+      assertEquals(
+        await frame.evaluate((el) => parseInt(getComputedStyle(el).height, 10)),
+        720,
+      );
+      assertEquals(
+        await page.locator("[data-meet-embed-placeholder]").count(),
+        0,
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    stub.stop();
+  }
+});
+
+Deno.test("without JavaScript the calendar box offers the new-tab link instead of a loading line", async () => {
+  const scheduleUrl = "https://meet.example.com";
+  const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, { javaScriptEnabled: false });
+    try {
+      await page.goto(`${site.origin}/contact-me`);
+      const box = page.locator("[data-meet-embed-placeholder]");
+      assert(
+        await box.getByText("The calendar needs JavaScript.").isVisible(),
+        "the no-JavaScript line is not shown",
+      );
+      const link = box.getByRole("link", {
+        name: /Open the calendar in a new tab/,
+      });
+      assert(await link.isVisible(), "the new-tab link is not shown");
+      assertEquals(await link.getAttribute("href"), scheduleUrl);
+      assertEquals(
+        await box.getByText("Loading the calendar…").isVisible(),
+        false,
+        "the box still says it is loading without JavaScript",
+      );
+      assertEquals(await page.locator("iframe").count(), 0);
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
   }
 });

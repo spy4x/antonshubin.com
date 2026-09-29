@@ -207,6 +207,9 @@ Deno.test("the booking page says what follows the call, quotes one client and of
       "/contact-me: the roley-2 quote is missing",
     );
     assert(text.includes("Prefer writing?"));
+    // Under "Prefer writing?" the form's own heading is hidden, so the phrase
+    // shows once: the "Rather write?" link under the H1.
+    assertEquals(count(text, /Send a written brief/g), 1);
     // One calendar on the page: the brief's success panel points up to it.
     assertEquals(count(html, /data-meet-embed="/g), 1);
     const success = html.slice(html.indexOf("data-lead-success"));
@@ -228,6 +231,8 @@ Deno.test("without SCHEDULE_URL the booking page leads with the written brief", 
   try {
     const html = await site.html("/contact-me");
     assertEquals(h1s(html), ["Send a written brief"]);
+    // The form hides its own "Send a written brief" heading under this H1.
+    assertEquals(count(visibleText(html), /Send a written brief/g), 1);
     assert(
       /<section\b[^>]*id="brief"/.test(html) && html.includes("data-lead-form"),
       "/contact-me: the brief form is not on the page without a scheduler",

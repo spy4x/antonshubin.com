@@ -250,10 +250,12 @@ export default define.page(function ContactMe(ctx) {
               aria-labelledby="brief-heading"
               class="scroll-mt-4"
             >
-              <h2 id="brief-heading" class="h2 mb-4">Prefer writing?</h2>
+              <h2 id="brief-heading" class="h2 mb-3">Prefer writing?</h2>
+              <p class="mb-6 text-graphite">{BRIEF_PROMISE}</p>
               <LeadForm
                 scheduleUrl={SCHEDULE_URL}
                 calendarAbove="#book"
+                intro={false}
                 service={service}
                 submitEvent="contact-brief-submit"
               />

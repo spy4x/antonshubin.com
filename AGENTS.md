@@ -488,8 +488,10 @@ only after a submit, so a home view never loads the scheduler. With
 `SCHEDULE_URL` unset the page leads with the brief. `?service=<slug>` prefills
 the brief with "About: <shortTitle>" and posts the slug, checked by
 `lib/lead.ts`'s `leadService()`; any other value is dropped, never echoed. The
-page alone preconnects to the scheduler's origin and carries the `ContactPage`
-JSON-LD node. `test/booking.test.ts` checks the built page.
+prefill alone does not count as a description, in the form or in `/api/lead`
+(`lib/brief-prefill.ts`). The page alone preconnects to the scheduler's origin
+and carries the `ContactPage` JSON-LD node. `test/booking.test.ts` checks the
+built page.
 
 ### Type
 
@@ -752,8 +754,9 @@ page. Never retry a test on this error.
   proves the placeholder: the frame shows on the first valid message (the
   listener exists before the island inserts the frame), a frame allowed by
   `frame-ancestors` shows despite `X-Frame-Options: DENY` (what mig's `/embed`
-  sends today), and a refused frame ends in the failure message after
-  `EMBED_TIMEOUT_MS`.
+  sends today), a refused frame ends in the failure message after
+  `EMBED_TIMEOUT_MS`, a height that arrives after that still shows the calendar,
+  and without JavaScript the box shows the new-tab link.
 - `test/blog-overflow.browser.test.ts` (#222, #274): at 390px, no blog post in
   the sitemap is wider than the screen, and no "Read next" row
   (`[data-read-next] li` in `routes/blog/[slug].tsx`) ends past its right edge;
