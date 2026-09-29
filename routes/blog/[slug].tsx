@@ -345,7 +345,7 @@ export default define.page(function BlogPost(ctx) {
                 </a>
                 {tool.repoUrl && (
                   <>
-                    <span aria-hidden="true">{" · "}</span>
+                    <span aria-hidden="true" class="mx-1">·</span>
                     Code:{" "}
                     <a
                       href={tool.repoUrl}
