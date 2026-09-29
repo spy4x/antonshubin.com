@@ -166,6 +166,7 @@ function CardPicture({ project, eager }: { project: Project; eager: boolean }) {
           <img
             src={project.logoImageURL}
             alt=""
+            aria-hidden="true"
             width={96}
             height={96}
             loading={eager ? "eager" : "lazy"}
@@ -204,6 +205,7 @@ function HighlightCard(
             <img
               src={project.logoImageURL}
               alt=""
+              aria-hidden="true"
               width={28}
               height={28}
               loading={eager ? "eager" : "lazy"}
