@@ -9,22 +9,16 @@
  *
  * Everything here fails open: a purge error is reported, never thrown, so the
  * deploy itself still succeeds. No message ever contains the API token.
+ *
+ * The Cloudflare client itself (zone lookup, batches of 30, the purge calls)
+ * is `purgeUrls` from `@spy4x/integrations/cloudflare`; this file keeps what
+ * only this site needs.
  */
 
-/** Cloudflare's purge-by-URL endpoint accepts at most this many files per call. */
-export const PURGE_BATCH_SIZE = 30;
-
-const API = "https://api.cloudflare.com/client/v4";
+import { purgeUrls } from "@spy4x/integrations/cloudflare";
 
 /** The zone every deploy target lives in (production and staging alike). */
 export const ZONE_NAME = "antonshubin.com";
-
-/** Outcome of a purge: `output` for the log on success, `error` otherwise. */
-export interface PurgeResult {
-  success: boolean;
-  output: string;
-  error: string;
-}
 
 /**
  * Reads the build id out of a served `/sw.js` (`const CACHE = "antonshubin-<id>"`,
@@ -60,15 +54,6 @@ export function purgeList(domain: string, changedPaths: string[]): string[] {
   ];
 }
 
-/** Splits `items` into consecutive groups of at most `size`. */
-export function batches<T>(items: T[], size: number): T[][] {
-  const groups: T[][] = [];
-  for (let i = 0; i < items.length; i += size) {
-    groups.push(items.slice(i, i + size));
-  }
-  return groups;
-}
-
 /** Returns the value of `key` in a dotenv-style text, or undefined when unset or empty. */
 export function envValue(text: string, key: string): string | undefined {
   for (const line of text.split("\n")) {
@@ -83,111 +68,11 @@ export function envValue(text: string, key: string): string | undefined {
   return undefined;
 }
 
-/** Summarises a Cloudflare API error body without echoing anything we sent. */
-function apiError(body: unknown, status: number): string {
-  const errors = (body as { errors?: { code?: number; message?: string }[] })
-    ?.errors;
-  const detail = errors?.map((e) =>
-    `${e.code ?? "?"} ${e.message ?? ""}`.trim()
-  ).join("; ");
-  return `HTTP ${status}${detail ? `: ${detail}` : ""}`;
-}
-
-async function readJson(res: Response): Promise<unknown> {
-  try {
-    return await res.json();
-  } catch {
-    return undefined;
-  }
-}
-
 /** How long one Cloudflare API call may take before it is abandoned. */
 export const API_TIMEOUT_MS = 10_000;
 
 /** How long one read of the live `/sw.js` may take before it is abandoned. */
 export const SW_TIMEOUT_MS = 5_000;
-
-interface PurgeOptions {
-  token: string;
-  urls: string[];
-  zoneName?: string;
-  fetch?: typeof globalThis.fetch;
-  /** Per-call limit, {@link API_TIMEOUT_MS} by default. */
-  requestTimeoutMs?: number;
-}
-
-/**
- * Purges `urls` from the Cloudflare zone named `zoneName`, looking the zone id
- * up by name first, in batches of {@link PURGE_BATCH_SIZE}. Each call is
- * abandoned after `requestTimeoutMs`. Stops at the first failed call and
- * reports it; never throws.
- */
-export async function purgeCloudflare(
-  options: PurgeOptions,
-): Promise<PurgeResult> {
-  const {
-    token,
-    urls,
-    zoneName = ZONE_NAME,
-    fetch = globalThis.fetch,
-    requestTimeoutMs = API_TIMEOUT_MS,
-  } = options;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-  try {
-    const zoneRes = await fetch(
-      `${API}/zones?name=${encodeURIComponent(zoneName)}`,
-      { headers, signal: AbortSignal.timeout(requestTimeoutMs) },
-    );
-    const zoneBody = await readJson(zoneRes);
-    const zoneId = (zoneBody as { result?: { id?: string }[] })?.result?.[0]
-      ?.id;
-    if (!zoneRes.ok || !zoneId) {
-      const why = zoneRes.ok
-        ? "no such zone"
-        : apiError(zoneBody, zoneRes.status);
-      return {
-        success: false,
-        output: "",
-        error: `zone lookup for ${zoneName} failed (${why})`,
-      };
-    }
-    let done = 0;
-    for (const files of batches(urls, PURGE_BATCH_SIZE)) {
-      const res = await fetch(`${API}/zones/${zoneId}/purge_cache`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ files }),
-        signal: AbortSignal.timeout(requestTimeoutMs),
-      });
-      const body = await readJson(res);
-      if (!res.ok || (body as { success?: boolean })?.success !== true) {
-        return {
-          success: false,
-          output: "",
-          error: `purge failed after ${done} of ${urls.length} URL(s) (${
-            apiError(body, res.status)
-          })`,
-        };
-      }
-      done += files.length;
-    }
-    return {
-      success: true,
-      output: `purged ${done} URL(s) from Cloudflare`,
-      error: "",
-    };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return {
-      success: false,
-      output: "",
-      error: `Cloudflare request failed: ${message}`,
-    };
-  }
-}
 
 /**
  * Fetches `/sw.js` from `domain` and returns the build id it serves, if any.
@@ -293,7 +178,10 @@ export interface PurgeAfterDeployOptions {
   git: GitRunner;
   /** Returns the Cloudflare API token, or undefined when there is none. */
   token: () => string | undefined;
+  /** Used for the `/sw.js` reads and passed on to `purge`. */
   fetch?: typeof globalThis.fetch;
+  /** The Cloudflare purge client, `purgeUrls` by default. */
+  purge?: typeof purgeUrls;
   log?: (message: string) => void;
   warn?: (message: string) => void;
   /** Overrides for the wait; production uses the defaults (60 s, 2 s). */
@@ -301,6 +189,7 @@ export interface PurgeAfterDeployOptions {
     WaitOptions,
     "timeoutMs" | "intervalMs" | "requestTimeoutMs" | "sleep" | "now"
   >;
+  /** Limit for each Cloudflare API call, {@link API_TIMEOUT_MS} by default. */
   requestTimeoutMs?: number;
 }
 
@@ -320,10 +209,11 @@ export async function purgeAfterDeploy(
     git,
     token,
     fetch = globalThis.fetch,
+    purge = purgeUrls,
     log = console.log,
     warn = console.warn,
     wait = {},
-    requestTimeoutMs,
+    requestTimeoutMs = API_TIMEOUT_MS,
   } = options;
   try {
     log("  waiting for the new build...");
@@ -350,13 +240,14 @@ export async function purgeAfterDeploy(
       );
       return;
     }
-    const result = await purgeCloudflare({
+    const result = await purge({
       token: key,
+      zoneName: ZONE_NAME,
       urls,
       fetch,
       requestTimeoutMs,
     });
-    if (result.success) log(`  ${result.output}`);
+    if (result.success) log(`  Cloudflare: ${result.output}`);
     else warn(`  ⚠️  Cloudflare purge skipped: ${result.error}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

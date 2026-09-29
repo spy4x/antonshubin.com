@@ -47,8 +47,10 @@ warning and the deploy still counts as successful. Each request has its own
 limit: 5 s for a read of `/sw.js`, 10 s for each Cloudflare API call, so a
 stalled server cannot hang the deploy before the upload or after it. The step
 lives in `scripts/cloudflare-purge.ts` (`purgeAfterDeploy()`), with its git
-runner, token reader and `fetch` passed in, so its tests need no network. The
-script never prints the token or the request headers.
+runner, token reader, `fetch` and purge client passed in, so its tests need no
+network. The Cloudflare calls themselves (zone lookup, batches of 30, redacted
+errors) are `purgeUrls` from `jsr:@spy4x/integrations/cloudflare`, pinned in
+`deno.json`. Neither prints the token or the request headers.
 
 The token is `CLOUDFLARE_API_TOKEN` (Zone Read and Cache Purge on the zone). The
 script takes it from the environment, else from `.env.deploy` in the checkout.

@@ -1,19 +1,17 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
+import type { purgeUrls } from "@spy4x/integrations/cloudflare";
 import {
-  batches,
+  API_TIMEOUT_MS,
   envValue,
   liveBuildId,
   parseBuildId,
-  PURGE_BATCH_SIZE,
   purgeAfterDeploy,
-  purgeCloudflare,
   purgeList,
   staticUrls,
   waitForBuild,
 } from "./cloudflare-purge.ts";
 
 const TOKEN = "test-token-not-real";
-const ZONE_ID = "0123456789abcdef0123456789abcdef";
 
 interface Call {
   url: string;
@@ -30,15 +28,6 @@ function stubFetch(respond: (call: Call, index: number) => Response) {
   };
   return { calls, fetch: fetch as typeof globalThis.fetch };
 }
-
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-const zoneFound = () =>
-  json({ success: true, result: [{ id: ZONE_ID, name: "antonshubin.com" }] });
 
 Deno.test("parseBuildId reads the commit hash from a served sw.js", () => {
   const sw = `// Cache version\nconst CACHE = "antonshubin-b7910f3";\n`;
@@ -79,12 +68,6 @@ Deno.test("purgeList always starts with sw.js on the target's own domain, withou
   );
 });
 
-Deno.test("batches splits into groups of at most the given size", () => {
-  const items = Array.from({ length: 61 }, (_, i) => i);
-  assertEquals(batches(items, 30).map((b) => b.length), [30, 30, 1]);
-  assertEquals(batches([], 30), []);
-});
-
 Deno.test("envValue reads one key and treats an empty value as unset", () => {
   const text = `# comment\nOTHER=x\nCLOUDFLARE_API_TOKEN="abc"\n`;
   assertEquals(envValue(text, "CLOUDFLARE_API_TOKEN"), "abc");
@@ -93,108 +76,6 @@ Deno.test("envValue reads one key and treats an empty value as unset", () => {
     undefined,
   );
   assertEquals(envValue("OTHER=x", "CLOUDFLARE_API_TOKEN"), undefined);
-});
-
-Deno.test("purgeCloudflare looks the zone up by name and purges in batches of 30", async () => {
-  const urls = Array.from(
-    { length: 31 },
-    (_, i) => `https://antonshubin.com/img/${i}.png`,
-  );
-  const { calls, fetch } = stubFetch((_, i) =>
-    i === 0 ? zoneFound() : json({ success: true })
-  );
-  const result = await purgeCloudflare({ token: TOKEN, urls, fetch });
-
-  assertEquals(result, {
-    success: true,
-    output: "purged 31 URL(s) from Cloudflare",
-    error: "",
-  });
-  assertEquals(calls.length, 3);
-  assertEquals(
-    calls[0].url,
-    "https://api.cloudflare.com/client/v4/zones?name=antonshubin.com",
-  );
-  const purges = calls.slice(1);
-  for (const call of purges) {
-    assertEquals(
-      call.url,
-      `https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache`,
-    );
-    assertEquals(call.init?.method, "POST");
-    assertEquals(
-      (call.init?.headers as Record<string, string>).Authorization,
-      `Bearer ${TOKEN}`,
-    );
-  }
-  const sent = purges.map((c) =>
-    JSON.parse(String(c.init?.body)).files as string[]
-  );
-  assertEquals(sent.map((files) => files.length), [PURGE_BATCH_SIZE, 1]);
-  assertEquals(sent.flat(), urls);
-});
-
-Deno.test("purgeCloudflare reports an API error without throwing or echoing the token", async () => {
-  const { fetch } = stubFetch((_, i) =>
-    i === 0 ? zoneFound() : json(
-      { success: false, errors: [{ code: 10000, message: "Auth" }] },
-      403,
-    )
-  );
-  const result = await purgeCloudflare({
-    token: TOKEN,
-    urls: ["https://antonshubin.com/sw.js"],
-    fetch,
-  });
-
-  assertEquals(result.success, false);
-  assertEquals(
-    result.error,
-    "purge failed after 0 of 1 URL(s) (HTTP 403: 10000 Auth)",
-  );
-  assert(!JSON.stringify(result).includes(TOKEN));
-});
-
-Deno.test("purgeCloudflare treats an HTTP 200 answer marked unsuccessful as a failure", async () => {
-  const { fetch } = stubFetch((_, i) =>
-    i === 0
-      ? zoneFound()
-      : json({ success: false, errors: [{ code: 1134, message: "Busy" }] })
-  );
-  const result = await purgeCloudflare({
-    token: TOKEN,
-    urls: ["https://antonshubin.com/sw.js"],
-    fetch,
-  });
-  assertEquals(result.success, false);
-  assertEquals(
-    result.error,
-    "purge failed after 0 of 1 URL(s) (HTTP 200: 1134 Busy)",
-  );
-});
-
-Deno.test("purgeCloudflare reports a missing zone and a network failure as errors", async () => {
-  const missing = stubFetch(() => json({ success: true, result: [] }));
-  const noZone = await purgeCloudflare({
-    token: TOKEN,
-    urls: ["u"],
-    fetch: missing.fetch,
-  });
-  assertEquals(noZone.success, false);
-  assertEquals(missing.calls.length, 1);
-
-  const offline =
-    (() => Promise.reject(new TypeError("network down"))) as typeof fetch;
-  const down = await purgeCloudflare({
-    token: TOKEN,
-    urls: ["u"],
-    fetch: offline,
-  });
-  assertEquals(down, {
-    success: false,
-    output: "",
-    error: "Cloudflare request failed: network down",
-  });
 });
 
 Deno.test("liveBuildId reads the live build and bypasses the edge cache", async () => {
@@ -282,43 +163,6 @@ async function within<T>(ms: number, promise: Promise<T>): Promise<T> {
   }
 }
 
-Deno.test("purgeCloudflare gives up on a stalled request and reports it", async () => {
-  const { fetch, calls } = stalledFetch();
-  const result = await within(
-    2_000,
-    purgeCloudflare({
-      token: TOKEN,
-      urls: ["https://antonshubin.com/sw.js"],
-      fetch,
-      requestTimeoutMs: 20,
-    }),
-  );
-  assertEquals(result.success, false);
-  assert(result.error.startsWith("Cloudflare request failed:"), result.error);
-  assertEquals(calls(), 1);
-});
-
-Deno.test("purgeCloudflare gives up on a stalled purge call after the zone lookup", async () => {
-  const stalled = stalledFetch();
-  const fetch =
-    ((input: string | URL | Request, init?: RequestInit) =>
-      String(input).includes("/zones?name=")
-        ? Promise.resolve(zoneFound())
-        : stalled.fetch(input, init)) as typeof globalThis.fetch;
-  const result = await within(
-    2_000,
-    purgeCloudflare({
-      token: TOKEN,
-      urls: ["https://antonshubin.com/sw.js"],
-      fetch,
-      requestTimeoutMs: 20,
-    }),
-  );
-  assertEquals(result.success, false);
-  assert(result.error.startsWith("Cloudflare request failed:"), result.error);
-  assertEquals(stalled.calls(), 1);
-});
-
 Deno.test("waitForBuild returns false when every sw.js request stalls", async () => {
   const { fetch, calls } = stalledFetch();
   let clock = 0;
@@ -347,18 +191,31 @@ Deno.test("liveBuildId answers undefined when the read stalls", async () => {
   );
 });
 
-/** A fetch for purgeAfterDeploy: sw.js serves `live`, the API accepts every purge. */
-function deployFetch(live: string) {
+type PurgeOptions = Parameters<typeof purgeUrls>[0];
+type PurgeResult = Awaited<ReturnType<typeof purgeUrls>>;
+
+/**
+ * Stubs for purgeAfterDeploy: sw.js serves `live`, and the purge client
+ * records each call's options and answers `result` without any request.
+ */
+function deployFetch(
+  live: string,
+  result: PurgeResult = { success: true, output: "purged", error: "" },
+) {
   const purged: string[][] = [];
+  const purgeCalls: PurgeOptions[] = [];
   const { fetch } = stubFetch((call) => {
     if (call.url.includes("/sw.js")) {
       return new Response(`const CACHE = "antonshubin-${live}";`);
     }
-    if (call.url.includes("/zones?name=")) return zoneFound();
-    purged.push(JSON.parse(String(call.init?.body)).files);
-    return json({ success: true });
+    throw new Error(`unexpected request to ${call.url}`);
   });
-  return { fetch, purged };
+  const purge = (options: PurgeOptions) => {
+    purgeCalls.push(options);
+    purged.push([...options.urls]);
+    return Promise.resolve(result);
+  };
+  return { fetch, purge, purged, purgeCalls };
 }
 
 const quickWait = {
@@ -368,7 +225,7 @@ const quickWait = {
 };
 
 Deno.test("purgeAfterDeploy purges only /sw.js when the previous build is unknown", async () => {
-  const { fetch, purged } = deployFetch("bee5678");
+  const { fetch, purge, purged } = deployFetch("bee5678");
   const gitCalls: string[][] = [];
   const warnings: string[] = [];
   await purgeAfterDeploy({
@@ -381,6 +238,7 @@ Deno.test("purgeAfterDeploy purges only /sw.js when the previous build is unknow
     },
     token: () => TOKEN,
     fetch,
+    purge,
     log: () => {},
     warn: (message) => warnings.push(message),
     wait: quickWait,
@@ -394,7 +252,7 @@ Deno.test("purgeAfterDeploy purges only /sw.js when the previous build is unknow
 });
 
 Deno.test("purgeAfterDeploy purges sw.js and the static files changed since the live build", async () => {
-  const { fetch, purged } = deployFetch("bee5678");
+  const { fetch, purge, purged } = deployFetch("bee5678");
   const gitCalls: string[][] = [];
   await purgeAfterDeploy({
     domain: "antonshubin.com",
@@ -409,6 +267,7 @@ Deno.test("purgeAfterDeploy purges sw.js and the static files changed since the 
     },
     token: () => TOKEN,
     fetch,
+    purge,
     log: () => {},
     warn: () => {},
     wait: quickWait,
@@ -430,12 +289,13 @@ Deno.test("purgeAfterDeploy purges sw.js and the static files changed since the 
 });
 
 Deno.test("purgeAfterDeploy resolves with a warning when a dependency throws", async () => {
-  const { fetch } = deployFetch("bee5678");
+  const { fetch, purge } = deployFetch("bee5678");
   const base = {
     domain: "antonshubin.com",
     buildId: "bee5678",
     previousBuildId: "a0a1234",
     fetch,
+    purge,
     log: () => {},
     wait: quickWait,
   };
@@ -465,10 +325,23 @@ Deno.test("purgeAfterDeploy resolves with a warning when a dependency throws", a
     tokenWarnings.some((w) => w.includes("token file unreadable")),
     tokenWarnings.join("\n"),
   );
+
+  const purgeWarnings: string[] = [];
+  await purgeAfterDeploy({
+    ...base,
+    git: () => Promise.resolve({ code: 0, stdout: "" }),
+    token: () => TOKEN,
+    purge: () => Promise.reject(new Error("purge client exploded")),
+    warn: (message) => purgeWarnings.push(message),
+  });
+  assert(
+    purgeWarnings.some((w) => w.includes("purge client exploded")),
+    purgeWarnings.join("\n"),
+  );
 });
 
 Deno.test("purgeAfterDeploy skips the purge with a warning when there is no token", async () => {
-  const { fetch, purged } = deployFetch("bee5678");
+  const { fetch, purge, purged } = deployFetch("bee5678");
   const warnings: string[] = [];
   await purgeAfterDeploy({
     domain: "antonshubin.com",
@@ -477,6 +350,7 @@ Deno.test("purgeAfterDeploy skips the purge with a warning when there is no toke
     git: () => Promise.resolve({ code: 0, stdout: "" }),
     token: () => undefined,
     fetch,
+    purge,
     log: () => {},
     warn: (message) => warnings.push(message),
     wait: quickWait,
@@ -486,4 +360,92 @@ Deno.test("purgeAfterDeploy skips the purge with a warning when there is no toke
     warnings.some((w) => w.includes("CLOUDFLARE_API_TOKEN missing")),
     warnings.join("\n"),
   );
+});
+
+Deno.test("purgeAfterDeploy asks purgeUrls for the antonshubin.com zone with a 10 s limit per call", async () => {
+  const { fetch, purge, purgeCalls } = deployFetch("bee5678");
+  const logs: string[] = [];
+  await purgeAfterDeploy({
+    domain: "website-stag.antonshubin.com",
+    buildId: "bee5678",
+    previousBuildId: undefined,
+    git: () => Promise.resolve({ code: 0, stdout: "" }),
+    token: () => TOKEN,
+    fetch,
+    purge,
+    log: (message) => logs.push(message),
+    warn: () => {},
+    wait: quickWait,
+  });
+  assertEquals(purgeCalls.length, 1);
+  const call = purgeCalls[0];
+  assertEquals(call.token, TOKEN);
+  assertEquals(call.zoneName, "antonshubin.com");
+  assertEquals(call.zoneId, undefined);
+  assertEquals(call.urls, ["https://website-stag.antonshubin.com/sw.js"]);
+  assertEquals(call.requestTimeoutMs, API_TIMEOUT_MS);
+  assertEquals(API_TIMEOUT_MS, 10_000);
+  assertEquals(call.fetch, fetch);
+  assert(logs.some((l) => l.includes("Cloudflare: purged")), logs.join("\n"));
+});
+
+Deno.test("purgeAfterDeploy resolves with a warning when purgeUrls reports a failure", async () => {
+  const { fetch, purge } = deployFetch("bee5678", {
+    success: false,
+    output: "",
+    error: "zone lookup for antonshubin.com failed (HTTP 403)",
+  });
+  const logs: string[] = [];
+  const warnings: string[] = [];
+  await purgeAfterDeploy({
+    domain: "antonshubin.com",
+    buildId: "bee5678",
+    previousBuildId: undefined,
+    git: () => Promise.resolve({ code: 0, stdout: "" }),
+    token: () => TOKEN,
+    fetch,
+    purge,
+    log: (message) => logs.push(message),
+    warn: (message) => warnings.push(message),
+    wait: quickWait,
+  });
+  assert(
+    warnings.some((w) =>
+      w.includes("Cloudflare purge skipped: zone lookup for antonshubin.com")
+    ),
+    warnings.join("\n"),
+  );
+  assert(!logs.some((l) => l.includes("Cloudflare:")), logs.join("\n"));
+});
+
+Deno.test("purgeAfterDeploy gives up on a stalled Cloudflare call with a warning and never prints the token", async () => {
+  const stalled = stalledFetch();
+  // sw.js answers at once; every Cloudflare API call stalls until its signal aborts.
+  const fetch =
+    ((input: string | URL | Request, init?: RequestInit) =>
+      String(input).includes("/sw.js")
+        ? Promise.resolve(new Response(`const CACHE = "antonshubin-bee5678";`))
+        : stalled.fetch(input, init)) as typeof globalThis.fetch;
+  const output: string[] = [];
+  await within(
+    2_000,
+    purgeAfterDeploy({
+      domain: "antonshubin.com",
+      buildId: "bee5678",
+      previousBuildId: undefined,
+      git: () => Promise.resolve({ code: 0, stdout: "" }),
+      token: () => TOKEN,
+      fetch,
+      log: (message) => output.push(message),
+      warn: (message) => output.push(message),
+      wait: quickWait,
+      requestTimeoutMs: 20,
+    }),
+  );
+  assertEquals(stalled.calls(), 1);
+  assert(
+    output.some((line) => line.includes("Cloudflare purge skipped:")),
+    output.join("\n"),
+  );
+  assert(!output.some((line) => line.includes(TOKEN)), output.join("\n"));
 });
