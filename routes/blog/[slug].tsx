@@ -1,6 +1,7 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
+import { NotFound } from "../../components/NotFound.tsx";
 import { type BlogArticle, blogArticles } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts";
@@ -50,7 +51,7 @@ interface PageData {
   related: BlogArticle[];
 }
 
-// Unknown slugs keep the friendly "Not Found" view below, but must answer with
+// Unknown slugs show the shared not-found page (components/NotFound.tsx), but must answer with
 // a real 404 so search engines drop removed articles instead of indexing an
 // empty 200.
 export const handler = define.handlers({
@@ -195,22 +196,7 @@ export default define.page(function BlogPost(ctx) {
   const { article, content, headings, related } = ctx.data as PageData;
 
   if (!article) {
-    return (
-      <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto py-8 sm:py-12 text-center">
-          <h1 class="text-3xl text-parchment mb-4">Not Found</h1>
-          <p class="text-graphite mb-6">
-            The article you're looking for does not exist.
-          </p>
-          <a
-            href="/blog"
-            class="text-parchment underline underline-offset-4 hover:text-graphite"
-          >
-            ← All writing
-          </a>
-        </div>
-      </Layout>
-    );
+    return <NotFound pathname={ctx.url.pathname} />;
   }
 
   const canonical = `${SITE}${postHref(article.slug)}`;

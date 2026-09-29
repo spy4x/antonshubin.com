@@ -4,6 +4,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
+import { NotFound } from "../../components/NotFound.tsx";
 import StatusMark from "../../components/StatusMark.tsx";
 import Button from "../../components/Button.tsx";
 import { CiPill } from "../../components/CiPill.tsx";
@@ -110,17 +111,7 @@ export default define.page(async function ToolPage(ctx) {
   const found = findTool(ctx.params.slug);
 
   if (!found) {
-    return (
-      <Layout currentPath={ctx.url.pathname}>
-        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl text-parchment mb-4">Not Found</h1>
-          <p class="text-graphite mb-6">
-            There is no tool at this address.
-          </p>
-          <a href="/tools" class={linkClass}>All tools</a>
-        </div>
-      </Layout>
-    );
+    return <NotFound pathname={ctx.url.pathname} />;
   }
 
   const live = await toolsLive();
