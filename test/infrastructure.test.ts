@@ -130,6 +130,14 @@ siteTest(
         !article.archived,
         `${slug} is archived: it keeps its text as written`,
       );
+      // The post's own text, not the page: the nav or the footer also links /infrastructure.
+      const source = await Deno.readTextFile(
+        new URL(`../content/blog/${slug}.md`, import.meta.url),
+      );
+      assert(
+        /\]\(\/infrastructure\)/.test(source),
+        `/blog/${slug} does not link /infrastructure in its text`,
+      );
       const html = await site.html(`/blog/${slug}`);
       assert(
         count(html, /<a[^>]+href="\/infrastructure"/) >= 1,
