@@ -1,6 +1,8 @@
 // What `/api/lead` does with a posted audit request: validate it, then mail it
 // to the owner. Kept out of the route so a test can run it against a fake
 // mail relay.
+import { catalogItem } from "./catalog.ts";
+import { isEmptyBrief } from "./brief-prefill.ts";
 import { bareAddress } from "./email-field.ts";
 import { type Lead, type LeadMailDeps, notifyOwner } from "./lead-mail.ts";
 
@@ -15,6 +17,23 @@ export interface AcceptLeadOutcome {
 /** The dependencies of {@link acceptLead}: the owner's mail, and a clock. */
 export interface AcceptLeadDeps extends LeadMailDeps {
   now?: () => number;
+}
+
+/**
+ * The catalog item named by a `?service=` value or a posted `service` field,
+ * or `undefined` for anything that is not a current catalog slug (#272). An
+ * unknown value is dropped, never echoed onto the page or into the mail.
+ */
+export function leadService(
+  slug: unknown,
+): { slug: string; shortTitle: string } | undefined {
+  if (typeof slug !== "string" || !slug) return undefined;
+  try {
+    const item = catalogItem(slug);
+    return { slug: item.slug, shortTitle: item.shortTitle };
+  } catch {
+    return undefined;
+  }
 }
 
 /**
@@ -54,7 +73,12 @@ export function validateLead(
   if (!email) {
     return { ok: false, error: "Valid email is required" };
   }
-  if (typeof body.techStack !== "string" || !body.techStack.trim()) {
+  const service = leadService(body.service);
+  // "About: <title>" alone is the prefill, not a description (#272).
+  if (
+    typeof body.techStack !== "string" ||
+    isEmptyBrief(body.techStack, service?.shortTitle)
+  ) {
     return { ok: false, error: "Tech stack description is required" };
   }
   return {
@@ -63,6 +87,7 @@ export function validateLead(
       name: body.name.trim(),
       email,
       techStack: body.techStack.trim(),
+      ...(service ? { service } : {}),
     },
   };
 }

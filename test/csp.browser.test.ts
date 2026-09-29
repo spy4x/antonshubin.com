@@ -16,10 +16,10 @@
 //   as any other page, plus a mobile-viewport check that the mobile menu
 //   still hydrates there (proof client JS actually ran, not just that
 //   nothing tried to and so violated nothing).
-// - The /contact-me booking facade: clicking it inserts a same-policy
-//   cross-origin <iframe> (frame-src) at runtime, which only exists after
-//   client JS runs (islands/MeetEmbed.tsx) — never in the server-rendered
-//   HTML the other rendered-page tests read.
+// - The /contact-me booking calendar: after hydration it inserts a
+//   same-policy cross-origin <iframe> (frame-src) at runtime, which only
+//   exists after client JS runs (islands/MeetEmbed.tsx) — never in the
+//   server-rendered HTML the other rendered-page tests read.
 // - A real unsubscribe link end to end: GET the confirm page, POST the form.
 // - Two negative controls, proving the listener and the policy actually do
 //   something rather than the tests above passing vacuously: an inline
@@ -183,7 +183,7 @@ Deno.test("the mobile menu still hydrates on an unmatched URL", async () => {
   }
 });
 
-Deno.test("the booking facade's iframe loads without a CSP violation", async () => {
+Deno.test("the booking calendar's iframe loads without a CSP violation", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL, UMAMI_URL, UMAMI_ID },
   });
@@ -196,14 +196,12 @@ Deno.test("the booking facade's iframe loads without a CSP violation", async () 
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
       });
-      await assertNoViolations(page, "before opening the booking facade");
-
-      await page.getByRole("button", { name: "Book a free 30-min intro call" })
-        .click();
+      // The calendar inserts its frame by itself after hydration; it stays
+      // hidden here, since the RFC 2606 host never answers with a height.
       const frame = page.locator(
         'iframe[title="Schedule a call with Anton Shubin"]',
       );
-      await frame.waitFor({ state: "visible" });
+      await frame.waitFor({ state: "attached" });
       assertEquals(
         await frame.getAttribute("src"),
         `${SCHEDULE_URL}/embed?theme=dark`,

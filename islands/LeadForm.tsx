@@ -1,8 +1,39 @@
 import { useSignal } from "@preact/signals";
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { ArrowRightIcon, CheckIcon } from "../components/Icons.tsx";
+import { NewTabHint } from "../components/NewTabHint.tsx";
 import { proof } from "../lib/proof.ts";
-import MeetEmbed, { embedUrl } from "./MeetEmbed.tsx";
+import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
+import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts";
+
+/** The calendar island's component, loaded only when the success panel needs it. */
+type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
+
+/** What the written brief promises; the form and `/contact-me` without a scheduler both say it. */
+export const BRIEF_PROMISE =
+  "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment.";
+
+/** The catalog item a visitor came from (`/contact-me?service=<slug>`), already checked against `lib/catalog.ts`. */
+export interface LeadService {
+  slug: string;
+  shortTitle: string;
+}
+
+interface LeadFormProps {
+  scheduleUrl: string;
+  /**
+   * The id-link of a calendar already on the page (`/contact-me` passes
+   * `#book`). The success panel then points up to it instead of rendering a
+   * second calendar (#272).
+   */
+  calendarAbove?: string;
+  /** Prefills the brief with "About: <shortTitle>" and sends the slug with it. */
+  service?: LeadService;
+  /** The submit button's Umami event; the home page keeps `form-submit-audit`. */
+  submitEvent?: string;
+  /** False when the page's own heading already says "Send a written brief" and its promise. */
+  intro?: boolean;
+}
 
 interface FormState {
   name: string;
@@ -19,6 +50,7 @@ type SubmitStatus =
 /** The id of the field a validation error is about, so it can carry aria-invalid/aria-describedby. */
 function validate(
   form: FormState,
+  serviceTitle?: string,
 ): { field: string; message: string } | null {
   if (!form.name.trim()) {
     return { field: "lead-name", message: "Name is required" };
@@ -29,7 +61,7 @@ function validate(
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
     return { field: "lead-email", message: "Please enter a valid email" };
   }
-  if (!form.techStack.trim()) {
+  if (isEmptyBrief(form.techStack, serviceTitle)) {
     return {
       field: "lead-stack",
       message: "Describe your idea or your current app",
@@ -38,10 +70,20 @@ function validate(
   return null;
 }
 
-export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
+export default function LeadForm(
+  {
+    scheduleUrl,
+    calendarAbove,
+    service,
+    submitEvent = "form-submit-audit",
+    intro = true,
+  }: LeadFormProps,
+) {
   const name = useSignal("");
   const email = useSignal("");
-  const techStack = useSignal("");
+  const techStack = useSignal(
+    service ? briefPrefill(service.shortTitle) : "",
+  );
   const status = useSignal<SubmitStatus>({ type: "idle" });
 
   // Set page-load timestamp on mount
@@ -59,7 +101,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
       email: email.value,
       techStack: techStack.value,
     };
-    const error = validate(form);
+    const error = validate(form, service?.shortTitle);
     if (error) {
       status.value = {
         type: "error",
@@ -75,6 +117,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          ...(service ? { service: service.slug } : {}),
           _t: pageLoad.value,
           _website: "",
         }),
@@ -96,6 +139,19 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
   const errorField = status.value.type === "error"
     ? status.value.field
     : undefined;
+
+  // The calendar's code is fetched only once a brief went out and this panel
+  // is going to show it (#272).
+  const [MeetEmbed, setMeetEmbed] = useState<MeetEmbedComponent | null>(null);
+  const wantsCalendar = isSuccess && Boolean(scheduleUrl) && !calendarAbove;
+  useEffect(() => {
+    if (!wantsCalendar || MeetEmbed) return;
+    import("./MeetEmbed.tsx")
+      .then((m) => setMeetEmbed(() => m.default))
+      // A failed chunk load (offline, a deploy in between) leaves the panel
+      // without a calendar; the new-tab link under it still works.
+      .catch(() => {});
+  }, [wantsCalendar]);
 
   // Runs after the DOM commits the success state, once the heading is no
   // longer inside an `inert` subtree and can actually take focus.
@@ -126,13 +182,14 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           overflow: "hidden",
         }}
       >
-        <h3 class="text-xl sm:text-2xl text-parchment mb-3">
-          Send a written brief
-        </h3>
-        <p class="text-graphite text-base mb-6">
-          Send me your idea or your current app and I'll write back with 3
-          concrete architectural improvements. No cost. No commitment.
-        </p>
+        {intro && (
+          <>
+            <h3 class="text-xl sm:text-2xl text-parchment mb-3">
+              Send a written brief
+            </h3>
+            <p class="text-graphite text-base mb-6">{BRIEF_PROMISE}</p>
+          </>
+        )}
 
         <form onSubmit={handleSubmit} class="space-y-4">
           {/* Honeypot — off-screen so bots fill it, humans never see */}
@@ -219,7 +276,7 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           <button
             type="submit"
             disabled={status.value.type === "submitting"}
-            data-umami-event="form-submit-audit"
+            data-umami-event={submitEvent}
             class="w-full px-8 py-3.5 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {status.value.type === "submitting" ? "Sending..." : (
@@ -302,12 +359,9 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
           taller-than-expected frame gets clipped by this panel's
           `overflow: hidden` before the iframe's own height ever comes into
           play. Taller than the form section's maxHeight (800px) for the
-          same reason. `inert` until success, so the facade button and
-          fallback link can't
-          be Tab'd to (and silently activated) while this panel is collapsed
-          to `maxHeight: 0` and `opacity: 0` — without it, Tab from the last
-          form field reaches these controls and Enter loads a cross-origin
-          iframe invisibly.
+          same reason. `inert` until success, so the new-tab link can't be
+          Tab'd to while this panel is collapsed to `maxHeight: 0` and
+          `opacity: 0`. The calendar itself mounts only on success.
 
           The heading below is rendered only once `isSuccess` flips (#269:
           crawlers that split a page at its headings must not read "Your
@@ -342,12 +396,37 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
         <p class="text-graphite text-base sm:text-lg max-w-xl mx-auto mb-6">
           I'll review what you sent and write back with 3 concrete architectural
           improvements.
-          {scheduleUrl &&
+          {scheduleUrl && !calendarAbove &&
             " If you'd rather talk it through, book an intro call."}
+          {scheduleUrl && calendarAbove && (
+            <>
+              {" If you'd rather talk it through, "}
+              <a
+                href={calendarAbove}
+                class="text-parchment underline underline-offset-4 hover:text-accent"
+              >
+                book an intro call
+              </a>{" "}
+              in the calendar above.
+            </>
+          )}
         </p>
-        {scheduleUrl && (
+        {scheduleUrl && !calendarAbove && (
           <>
-            <MeetEmbed url={embedUrl(scheduleUrl)} />
+            {
+              /* Mounted only after a successful submit, from code loaded only
+                then: the calendar inserts its frame as soon as it mounts, and
+                neither the scheduler nor the calendar's script may slow every
+                home page view. */
+            }
+            {isSuccess && MeetEmbed && (
+              <div class="flex justify-center">
+                <MeetEmbed
+                  url={embedUrl(scheduleUrl)}
+                  scheduleUrl={scheduleUrl}
+                />
+              </div>
+            )}
             <p class="mt-4">
               <a
                 href={scheduleUrl}
@@ -356,7 +435,8 @@ export default function LeadForm({ scheduleUrl }: { scheduleUrl: string }) {
                 data-umami-event="meet-embed-fallback-click"
                 class="text-graphite hover:text-accent underline underline-offset-4 text-sm"
               >
-                Open standalone
+                {NEW_TAB_LABEL}
+                <NewTabHint />
               </a>
             </p>
             <p class="text-graphite text-sm mt-4">

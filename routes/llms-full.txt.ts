@@ -172,7 +172,7 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 ${catalogList}
 - **About:** ${BASE_URL}${ABOUT_PATH} — Who I am, since 2010: the career story, two client reviews about working with me, what I run myself and how to pay
 - **How I Work:** ${BASE_URL}/how-i-work — Five promises, pricing, and FAQ
-- **Contact:** ${BASE_URL}/contact-me — Book a call, email, or Telegram
+- **Contact:** ${BASE_URL}/contact-me — Book a ${INTRO_CALL} in the calendar on the page, or send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x. Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R)
 - **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how each layer is run: handover, backups, monitoring, deploys, sign-in. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.

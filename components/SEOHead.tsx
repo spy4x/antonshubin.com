@@ -47,6 +47,9 @@ export function SEOHead() {
       "breadcrumb": { "@id": breadcrumb["@id"] },
     }, breadcrumb]
     : [breadcrumb];
+  // The booking page is the site's contact page (#272): a ContactPage node
+  // says so to search engines and AI crawlers. No ScheduleAction, no review.
+  const isContact = path === "/contact-me";
 
   return (
     <Head>
@@ -114,6 +117,13 @@ export function SEOHead() {
                 "url": "https://antonshubin.com",
                 "image": "https://antonshubin.com/img/photo-big.webp",
                 "email": "mailto:hello@antonshubin.com",
+                "contactPoint": {
+                  "@type": "ContactPoint",
+                  "contactType": "sales",
+                  "email": "hello@antonshubin.com",
+                  "url": "https://antonshubin.com/contact-me",
+                  "availableLanguage": ["en", "ru"],
+                },
                 "knowsLanguage": ["en", "ru"],
                 "knowsAbout": [
                   "Software Architecture",
@@ -191,6 +201,18 @@ export function SEOHead() {
                 "publisher": { "@id": "https://antonshubin.com/#person" },
               },
               ...pageNodes,
+              ...(isContact
+                ? [{
+                  "@type": "ContactPage",
+                  "@id": `${h.canonical}#webpage`,
+                  "url": h.canonical,
+                  "name": h.title,
+                  "isPartOf": { "@id": "https://antonshubin.com/#website" },
+                  "about": { "@id": "https://antonshubin.com/#person" },
+                  "breadcrumb": { "@id": `${h.canonical}#breadcrumb` },
+                  "inLanguage": "en-US",
+                }]
+                : []),
             ],
           }),
         }}

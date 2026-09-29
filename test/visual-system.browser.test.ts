@@ -114,8 +114,8 @@ Deno.test("the accent colour is a background only on the primary button and the 
             const bg = getComputedStyle(el).backgroundColor;
             if (bg !== accentRgb) continue;
             // The only allowed use: an element `components/Button.tsx`,
-            // `components/BookCallLink.tsx` or a hand-marked primary Book
-            // facade (islands/MeetEmbed.tsx, routes/contact-me.tsx) stamped
+            // `components/BookCallLink.tsx` or another hand-marked primary
+            // Book action stamped
             // with `data-primary-book` — never guessed from text content
             // ("book" appears in plenty of non-CTA copy) or element shape.
             const isPrimaryBook = el.hasAttribute("data-primary-book");

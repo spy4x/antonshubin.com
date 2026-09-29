@@ -350,12 +350,11 @@ class string as a plain string, for the handful of call sites that can't render
 the site goes through it; it owns the `href`/`target`/empty-`url` behaviour
 `<Button
 href=…>` doesn't, and stamps `data-primary-book` itself for its default
-`variant="primary"`) and `islands/MeetEmbed.tsx`'s click-to-load facade.
-`buttonClass`'s base class string carries no padding, gap or text-size utility —
-two Tailwind classes for the same property don't reliably resolve by their order
-in one element's `class="..."` attribute, only by the order Tailwind happens to
-emit them in the compiled stylesheet, so every call site supplies its own sizing
-via `extra` instead of fighting a default.
+`variant="primary"`). `buttonClass`'s base class string carries no padding, gap
+or text-size utility — two Tailwind classes for the same property don't reliably
+resolve by their order in one element's `class="..."` attribute, only by the
+order Tailwind happens to emit them in the compiled stylesheet, so every call
+site supplies its own sizing via `extra` instead of fighting a default.
 
 `components/StatusMark.tsx` renders a shape plus a word for a project or tool
 status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`, `outcome`,
@@ -467,6 +466,32 @@ gets `logoPlate: true` in `lib/data.ts`: the /work card and the project page
 then render it on a light plate (`bg-parchment rounded-lg`). Today that is Roley
 and Sogroya; `test/work-index.test.ts` pins that list across client projects and
 tools. No per-project inline logo styles.
+
+### Booking page
+
+`/contact-me` (#272, `routes/contact-me.tsx`) is where every Book and brief
+action ends. Its `<h1>` names the call (`Book a ${INTRO_CALL}`) and the calendar
+follows it: `islands/MeetEmbed.tsx` has no click-to-load button any more. The
+server renders a reserved placeholder (`data-meet-embed`,
+`INITIAL_EMBED_HEIGHT_PX` tall, "Loading the calendar…"); after hydration the
+island attaches the `mig:height` listener and then inserts the iframe, hidden
+until the first valid message; with none within `EMBED_TIMEOUT_MS` (8 s) the box
+says the calendar didn't load and offers the new-tab link and `#brief`. "Open
+the calendar in a new tab" (`NEW_TAB_LABEL`) is the one wording for the
+scheduler's own page. A `FactCard` side panel (portrait, `ROLE`,
+`TIMEZONE_LABEL`, email, Telegram, Upwork, the invoicing line) sits beside the
+calendar from 1024px and after it at 390px; then "After the call" (through
+`promise()`), the `roley-2` quote and the brief (`#brief`). The brief's
+`LeadForm` gets `calendarAbove="#book"`, so its success panel points up instead
+of rendering a second calendar; on `/` the success panel mounts its calendar
+only after a submit, so a home view never loads the scheduler. With
+`SCHEDULE_URL` unset the page leads with the brief. `?service=<slug>` prefills
+the brief with "About: <shortTitle>" and posts the slug, checked by
+`lib/lead.ts`'s `leadService()`; any other value is dropped, never echoed. The
+prefill alone does not count as a description, in the form or in `/api/lead`
+(`lib/brief-prefill.ts`). The page alone preconnects to the scheduler's origin
+and carries the `ContactPage` JSON-LD node. `test/booking.test.ts` checks the
+built page.
 
 ### Type
 
@@ -646,7 +671,10 @@ page. Never retry a test on this error.
   `/api/lead`), asserts focus lands on the success heading without scrolling the
   page, and that the form/success panels swap `inert`. The success heading needs
   `focus({ preventScroll: true })`; the test only reproduces the scroll jump
-  with the submit button pinned to the bottom of the viewport.
+  with the submit button pinned to the bottom of the viewport. Since #272 it
+  also checks that a brief sent from `/contact-me?service=<slug>` posts the slug
+  and its success panel points up to `#book` instead of a second calendar, and
+  that the home page mounts the calendar only after a submit.
 - `test/a11y.browser.test.ts` (#165): the project and blog lightboxes' dialog
   naming, button names and focus-return to the trigger; the nav (#185): the
   phone More dialog's Escape handling (closes it, returns focus to More, and
@@ -673,7 +701,7 @@ page. Never retry a test on this error.
   "Content-Security-Policy" below) actually holds in a real browser —
   `securitypolicyviolation` events, not just the header's text — across every
   static page and one representative page per dynamic route, the `/contact-me`
-  booking facade's runtime `<iframe>`, and a full unsubscribe link (GET the
+  booking calendar's runtime `<iframe>`, and a full unsubscribe link (GET the
   confirm page, POST the form). Two negative controls prove the listener and the
   policy do something: an inline `<script>` with no `nonce` is blocked and
   reported, and an iframe to a disallowed origin is reported. Served with
@@ -722,7 +750,13 @@ page. Never retry a test on this error.
   (`SCHEDULE_URL` pointed at it), not a real mig instance. A second case proves
   the "same origin, wrong window" guard: a same-origin sibling iframe posting a
   spoofed `mig:height` message never resizes the booking iframe, because
-  `event.source` isn't that iframe's own `contentWindow`.
+  `event.source` isn't that iframe's own `contentWindow`. Since #272 it also
+  proves the placeholder: the frame shows on the first valid message (the
+  listener exists before the island inserts the frame), a frame allowed by
+  `frame-ancestors` shows despite `X-Frame-Options: DENY` (what mig's `/embed`
+  sends today), a refused frame ends in the failure message after
+  `EMBED_TIMEOUT_MS`, a height that arrives after that still shows the calendar,
+  and without JavaScript the box shows the new-tab link.
 - `test/blog-overflow.browser.test.ts` (#222, #274): at 390px, no blog post in
   the sitemap is wider than the screen, and no "Read next" row
   (`[data-read-next] li` in `routes/blog/[slug].tsx`) ends past its right edge;

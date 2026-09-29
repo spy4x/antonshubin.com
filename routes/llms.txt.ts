@@ -86,7 +86,7 @@ ${promisesList}
 - [Services and prices](${BASE_URL}/catalog)
 - [How I Work](${BASE_URL}/how-i-work)
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect, and how deploys, backups, monitoring and sign-in are handled
-- [Contact](${BASE_URL}/contact-me)
+- [Contact](${BASE_URL}/contact-me) — Book a ${INTRO_CALL} on the page, send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting
 - [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install${hackathonsLink}
