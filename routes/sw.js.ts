@@ -1,4 +1,5 @@
 import { define } from "../lib/utils.ts";
+import { pagesFor } from "../lib/pages.ts";
 
 // Cache name is derived from the build, not hand-bumped, so a deploy never
 // edits a tracked file. BUILD_ID is set from the deploy commit hash (see
@@ -7,15 +8,9 @@ import { define } from "../lib/utils.ts";
 const BUILD_ID = Deno.env.get("BUILD_ID") || "dev";
 const CACHE = `antonshubin-${BUILD_ID}`;
 
+// `lib/pages.ts`'s core pages, plus the web manifest.
 const PRECACHE_URLS = [
-  "/",
-  "/catalog",
-  "/how-i-work",
-  "/contact-me",
-  "/blog",
-  "/work",
-  "/tools",
-  "/pay",
+  ...pagesFor("precache").map((p) => p.path),
   "/manifest.json",
 ];
 
