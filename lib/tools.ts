@@ -16,9 +16,10 @@
  * request and tests stay deterministic.
  *
  * This module reads no environment variable and imports only `proof.ts` and
- * the committed snapshot, so tests and scripts can load it without any
- * permission.
+ * the committed snapshot (`github-snapshot.ts`, for `toolLicence()`), so tests
+ * and scripts can load it without any permission.
  */
+import { githubSnapshot } from "./github-snapshot.ts";
 import { proof } from "./proof.ts";
 
 /**
@@ -649,6 +650,18 @@ export function groupedTools(
       rows: rows.filter((r) => r.group === group.id),
     }))
     .filter((g) => g.tools.length + g.rows.length > 0);
+}
+
+/**
+ * The licence a page shows: the one the entry names, else the one GitHub
+ * detected in the committed snapshot. Null when neither is known or GitHub
+ * found no recognisable licence. The hub, the tool page and its JSON-LD all
+ * read it, so they never disagree.
+ */
+export function toolLicence(t: Tool): string | null {
+  const found = t.licence ??
+    (t.repo ? githubSnapshot.repos[t.repo]?.licence : null) ?? null;
+  return found && found !== "NOASSERTION" ? found : null;
 }
 
 /** The tool's GitHub URL, or undefined when its code is not public. */

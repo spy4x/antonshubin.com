@@ -76,7 +76,7 @@ export const redirectTable: ReadonlyMap<string, string> = buildRedirectTable({
  *
  * Besides the table, a `[slug]` route 404s on a trailing slash (lib/head.ts's
  * breadcrumb comment explains why: canonical URLs never carry one), so any
- * `/blog/<slug>/` or `/work/<slug>/` redirects to the slash-free form
+ * `/blog/<slug>/`, `/work/<slug>/` or `/tools/<slug>/` redirects to the slash-free form
  * regardless of whether `<slug>` itself is valid — an unknown slug then 404s
  * the normal way.
  */
@@ -88,5 +88,5 @@ export function redirectTarget(
   if (pathname === "/") return undefined;
   const target = table.get(pathname);
   if (target) return target;
-  return pathname.match(/^(\/(?:blog|work)\/[^/]+)\/$/)?.[1];
+  return pathname.match(/^(\/(?:blog|work|tools)\/[^/]+)\/$/)?.[1];
 }

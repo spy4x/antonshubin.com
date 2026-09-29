@@ -11,6 +11,7 @@ import {
   groupedTools,
   statusMeanings,
   type Tool,
+  toolLicence,
   type ToolRow as ToolRowEntry,
   type ToolStatus,
 } from "../../lib/tools.ts";
@@ -69,7 +70,7 @@ function ToolRow({ tool }: { tool: Tool }) {
           </span>
         )}
         {tool.ci && snap && <CiPill ci={snap.ci} pipelinesUrl={ciUrl(tool)!} />}
-        {tool.licence && <span>{tool.licence}</span>}
+        {toolLicence(tool) && <span>{toolLicence(tool)}</span>}
       </div>
       {tool.registry && (
         <div class="mt-3">
@@ -111,7 +112,7 @@ export default define.page(function ToolsIndex(ctx) {
     title: `${TITLE} — Anton Shubin`,
     pageName: "Tools",
     description:
-      "Open-source tools Anton Shubin builds and uses in his own work, each with its status, CI status, a pinned install command and live proof.",
+      "Tools Anton Shubin builds and uses in his own work: libraries, services and apps, each with its status.",
     canonical: "https://antonshubin.com/tools",
     ogType: "website",
     ogImage: "https://antonshubin.com/img/og/tools.png",

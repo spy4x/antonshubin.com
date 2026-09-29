@@ -134,6 +134,13 @@ Deno.test("redirects a trailing-slash work URL to the slash-free form", () => {
   assertEquals(redirectTarget("/work/smartlite/"), "/work/smartlite");
 });
 
+Deno.test("redirects a trailing-slash tool URL to the slash-free form", () => {
+  assertEquals(redirectTarget("/tools/mig/"), "/tools/mig");
+  assertEquals(redirectTarget("/tools/no-such-tool/"), "/tools/no-such-tool");
+  assertEquals(redirectTarget("/tools"), undefined);
+  assertEquals(redirectTarget("/tools/mig"), undefined);
+});
+
 Deno.test("redirects a trailing-slash URL even for an unknown slug — the target then 404s normally", () => {
   assertEquals(redirectTarget("/blog/no-such-post/"), "/blog/no-such-post");
 });

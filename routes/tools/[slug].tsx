@@ -9,11 +9,18 @@ import Button from "../../components/Button.tsx";
 import { CiPill } from "../../components/CiPill.tsx";
 import { InstallLine } from "../../components/InstallLine.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
-import { ciUrl, findTool, repoUrl, type Tool, tools } from "../../lib/tools.ts";
+import { metaDescription } from "../../lib/llms.ts";
+import {
+  ciUrl,
+  findTool,
+  repoUrl,
+  type Tool,
+  toolLicence,
+  tools,
+} from "../../lib/tools.ts";
 import {
   githubSnapshot,
   MIN_STARS_SHOWN,
-  type RepoSnapshot,
   repoSnapshot,
 } from "../../lib/github-snapshot.ts";
 
@@ -23,8 +30,8 @@ import {
  * until the version is really on its registry, `codeRepository` for code that
  * is not public, `license` when neither the entry nor GitHub names one.
  */
-function toolJsonLd(tool: Tool, snap: RepoSnapshot | null, canonical: string) {
-  const licence = tool.licence ?? snap?.licence ?? null;
+function toolJsonLd(tool: Tool, canonical: string) {
+  const licence = toolLicence(tool);
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
@@ -36,9 +43,7 @@ function toolJsonLd(tool: Tool, snap: RepoSnapshot | null, canonical: string) {
     ...(tool.programmingLanguage
       ? { "programmingLanguage": tool.programmingLanguage }
       : {}),
-    ...(licence && licence !== "NOASSERTION"
-      ? { "license": `https://spdx.org/licenses/${licence}` }
-      : {}),
+    ...(licence ? { "license": `https://spdx.org/licenses/${licence}` } : {}),
     ...(tool.registry?.published ? { "version": tool.registry.version } : {}),
     "author": { "@id": "https://antonshubin.com/#person" },
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
@@ -88,7 +93,7 @@ export default define.page(function ToolPage(ctx) {
   }
 
   const snap = tool.repo ? repoSnapshot(tool.repo) : null;
-  const licence = tool.licence ?? snap?.licence ?? null;
+  const licence = toolLicence(tool);
   const repo = repoUrl(tool);
   const others = tools.filter((t) => t.slug !== tool.slug);
 
@@ -96,7 +101,7 @@ export default define.page(function ToolPage(ctx) {
     ...head.value,
     title: `${tool.name}: ${tool.job} — Anton Shubin`,
     pageName: tool.name,
-    description: tool.summary,
+    description: metaDescription(tool.summary),
     canonical: `https://antonshubin.com/tools/${tool.slug}`,
     ogType: "article",
     ogImage: `https://antonshubin.com/img/og/tools/${tool.slug}.png`,
@@ -110,7 +115,7 @@ export default define.page(function ToolPage(ctx) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: toJsonLd(toolJsonLd(tool, snap, head.value.canonical)),
+          __html: toJsonLd(toolJsonLd(tool, head.value.canonical)),
         }}
       />
       <div class="max-w-5xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
@@ -172,9 +177,7 @@ export default define.page(function ToolPage(ctx) {
                   </span>
                 </Fact>
               )}
-              {licence && licence !== "NOASSERTION" && (
-                <Fact label="Licence">{licence}</Fact>
-              )}
+              {licence && <Fact label="Licence">{licence}</Fact>}
               {tool.runtime && <Fact label="Runs on">{tool.runtime}</Fact>}
               {tool.registry && (
                 <Fact label="Registry">

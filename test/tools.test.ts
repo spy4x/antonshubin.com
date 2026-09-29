@@ -6,7 +6,14 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
-import { ciUrl, groupedTools, tool, toolRows, tools } from "../lib/tools.ts";
+import {
+  ciUrl,
+  groupedTools,
+  tool,
+  toolLicence,
+  toolRows,
+  tools,
+} from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
 
 /** The word components/StatusMark.tsx prints for each tool status. */
@@ -416,5 +423,74 @@ siteTest(
       await target.body?.cancel();
       assertEquals(target.status, 200, to);
     }
+  },
+);
+
+/** The `<meta name="description">` content of a page. */
+function metaDescriptionOf(html: string): string {
+  const tag = html.match(/<meta[^>]*name="description"[^>]*>/)?.[0] ?? "";
+  return tag.match(/content="([^"]*)"/)?.[1] ?? "";
+}
+
+siteTest(
+  "every tool page's meta description is one line of at most 160 characters",
+  async (site) => {
+    for (const t of tools) {
+      const raw = metaDescriptionOf(await site.html(`/tools/${t.slug}`));
+      assert(!/[\n\r]/.test(raw), `${t.slug}: a newline`);
+      const description = visibleText(raw);
+      assert(description.length > 0, `${t.slug}: empty description`);
+      assert(
+        description.length <= 160,
+        `${t.slug}: ${description.length} characters`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the hub's meta description promises no install command or live proof",
+  async (site) => {
+    const description = metaDescriptionOf(await site.html("/tools"));
+    assert(description.length > 0 && description.length <= 160, description);
+    for (const word of ["install", "proof"]) {
+      assert(
+        !description.toLowerCase().includes(word),
+        `hub description says "${word}"`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the hub row and the tool page show the same licence",
+  async (site) => {
+    const hub = await site.html("/tools");
+    for (const t of tools) {
+      const licence = toolLicence(t);
+      const start = hub.indexOf(`data-tool="${t.slug}"`);
+      const row = visibleText(
+        `<x ${hub.slice(start, hub.indexOf("</li>", start))}`,
+      );
+      const page = visibleText(await site.html(`/tools/${t.slug}`));
+      if (licence) {
+        assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
+        assert(page.includes(licence), `${t.slug}: page has no ${licence}`);
+      }
+    }
+    assertEquals(toolLicence(tool("mig")), "AGPL-3.0");
+  },
+);
+
+siteTest(
+  "a tool URL with a trailing slash answers one 301 to the slash-free page",
+  async (site) => {
+    const res = await site.get("/tools/mig/");
+    await res.body?.cancel();
+    assertEquals(res.status, 301);
+    assertEquals(
+      new URL(res.headers.get("location")!, "http://x").pathname,
+      "/tools/mig",
+    );
   },
 );
