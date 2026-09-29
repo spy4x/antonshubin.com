@@ -386,14 +386,14 @@ export function startSteps(slug: string): StartStep[] | undefined {
 /**
  * The free call next to the paid session, for the index and the Strategy
  * page (#271): the free call is a first conversation, the session is "a paid
- * hour of advice, not a sales call" (the last sentence of its `desc`).
+ * hour of advice, not a sales call", shown by its `summary` here so the page's
+ * own `desc` above is not repeated).
  */
 export function callVersusSession(): {
   free: StartStep;
   paid: StartStep;
 } {
   const session = catalogItem("strategy-call");
-  const sentences = session.desc.split(/(?<=\.)\s+/);
   return {
     free: {
       title: "Free 30-minute intro call",
@@ -402,7 +402,7 @@ export function callVersusSession(): {
     },
     paid: {
       title: session.shortTitle,
-      desc: sentences[sentences.length - 1],
+      desc: session.summary,
     },
   };
 }

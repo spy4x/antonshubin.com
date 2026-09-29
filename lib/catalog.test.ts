@@ -144,5 +144,13 @@ Deno.test("the free call and the paid session are two different things side by s
   const { free, paid } = callVersusSession();
   assert(free.title.includes("30-minute"));
   assertEquals(paid.title, "Strategy session");
-  assert(paid.desc.includes("paid hour of advice"), paid.desc);
+  assertEquals(paid.desc, catalogItems[0].summary);
+  assertEquals(
+    free.desc,
+    "A first conversation about your project, before you decide anything.",
+  );
+  assert(
+    !catalogItems[0].desc.includes(paid.desc),
+    "the card must not repeat the description above it",
+  );
 });

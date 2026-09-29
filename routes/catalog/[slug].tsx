@@ -329,7 +329,10 @@ export default define.page(function CatalogDetail(ctx) {
                   class={`inline-flex items-center gap-1 ${FACT_LINK}`}
                 >
                   Next step: {next.shortTitle} ·{" "}
-                  <span class="price">{priceLabel(next)}</span>
+                  <span class="price">
+                    {priceLabel(next).charAt(0).toLowerCase()}
+                    {priceLabel(next).slice(1)}
+                  </span>
                   <ArrowRightIcon class="w-3.5 h-3.5" />
                 </a>
               </p>

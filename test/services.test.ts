@@ -182,8 +182,14 @@ siteTest(
     }
     assertFalse(visibleText(html).includes("Talk about this"));
     assertEquals(count(html, /Book a free 30-minute call/g), 1);
-    // "Recent work" for every service that has a project, none for Strategy.
+    // "Client work" for every service that has a project, none for Strategy.
     assertEquals(count(html, /data-catalog-work/g), 3);
+    // No time claim: the audit's project is from 2017 and Ongoing's from 2018.
+    assertFalse(
+      /recent/i.test(visibleText(html)),
+      "/catalog claims recent work",
+    );
+    assertEquals(count(html, /Send a written brief/g), 1);
   },
 );
 
@@ -291,6 +297,8 @@ siteTest(
   async (site) => {
     const html = await site.html("/catalog/strategy-call");
     assert(html.includes("data-service-versus"));
+    const versus = html.slice(html.indexOf("data-service-versus"));
+    assertEquals(count(versus.slice(0, 1500), /paid hour of advice/g), 0);
     const other = await site.html("/catalog/codebase-health-audit");
     assertFalse(other.includes("data-service-versus"));
   },

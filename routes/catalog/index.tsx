@@ -14,7 +14,7 @@ import { formatPeriod } from "../../lib/data.ts";
 import { projectsForCatalog, workHref } from "../../lib/work.ts";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { FACT_LINK } from "../../components/FactCard.tsx";
-import { BOOK_LABEL } from "../../components/ServicePriceCard.tsx";
+import { BOOK_LABEL, BRIEF_LABEL } from "../../components/ServicePriceCard.tsx";
 import {
   ArrowRightIcon,
   CatalogIcon,
@@ -113,7 +113,7 @@ export default define.page(function Catalog() {
                 <div class="mt-auto pt-5">
                   {work && (
                     <p class="mb-3 text-sm text-graphite" data-catalog-work>
-                      Recent work:{" "}
+                      Client work:{" "}
                       <a href={workHref(work.slug ?? "")} class={FACT_LINK}>
                         {work.title}
                       </a>
@@ -139,6 +139,15 @@ export default define.page(function Catalog() {
           bookEvent="services-cta-book-band"
           bookLabel={BOOK_LABEL}
           promiseIds={[]}
+          catalogLink={
+            <a
+              href="/contact-me#brief"
+              data-umami-event="services-cta-brief-band"
+              class={`text-sm ${FACT_LINK}`}
+            >
+              {BRIEF_LABEL}
+            </a>
+          }
           links={[{
             href: "/how-i-work",
             label: "How I work",
