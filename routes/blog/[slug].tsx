@@ -11,6 +11,7 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
+import { toolsForPost } from "../../lib/tools.ts";
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((a) => a.slug === slug);
@@ -218,6 +219,22 @@ export default define.page(function BlogArticle(ctx) {
             <p class="text-graphite text-base sm:text-lg leading-relaxed mb-8">
               {article.description}
             </p>
+            {toolsForPost(article.slug).map((t) => (
+              <p
+                key={t.slug}
+                data-post-tool={t.slug}
+                class="text-graphite mb-8 -mt-4"
+              >
+                The tool behind this post:{" "}
+                <a
+                  href={`/tools/${t.slug}`}
+                  data-umami-event={`post-tool-${t.slug}`}
+                  class="text-accent underline underline-offset-4"
+                >
+                  {t.name}
+                </a>
+              </p>
+            ))}
 
             {/* YouTube Video */}
             {article.youtubeVideoId && (

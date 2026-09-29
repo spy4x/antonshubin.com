@@ -284,6 +284,23 @@ reaches production. Rerun the script and commit the JSON when a CI status
 matters; `test/tools.test.ts` checks each page shows what the snapshot holds.
 Each tool page's 1200×630 preview comes from `deno task og`, like a post's.
 
+**Hourly refresh (#273).** On the server, `lib/tools-live.ts` refreshes each
+tool's latest version (JSR or npm, from `registry.latestFrom`), stars and CI
+status at most once an hour, in memory, through the same calls the script makes
+(`lib/snapshot-fetch.ts`). A failed call keeps the committed value for that item
+and never throws. It runs only when `TOOLS_LIVE_REFRESH=1` (set in
+`compose.yml`), so `deno task test` and a dev server never call out; tests build
+a refresher with a stub `fetch` (`lib/tools-live.test.ts`). Pages say when the
+CI status was checked and whether it is the committed file (`checkedLabel()`).
+`/tools` and `/tools/*` are cached for an hour so a refresh reaches visitors
+(`lib/cache-control.ts`). A tool's `posts` link each post to its page (the post
+shows "The tool behind this post"); its `catalogSlug` picks the catalog item the
+"hire me" door names; `deployable` adds `SoftwareApplication` JSON-LD, whose
+`url` is only ever its running `live` instance. The hub carries
+`CollectionPage` and `ItemList` JSON-LD. Umami events are
+`tool-<slug>-<install-copy|github|issue|live|catalog|post>`,
+`tools-hub-<slug>` and `post-tool-<slug>`.
+
 ## Navigation
 
 `lib/nav.ts` is the only list of navigation destinations (#185): the desktop
@@ -335,8 +352,8 @@ emit them in the compiled stylesheet, so every call site supplies its own sizing
 via `extra` instead of fighting a default.
 
 `components/StatusMark.tsx` renders a shape plus a word for a project or tool
-status (`ready`, `beta`, `wip`, `paused`, `archived`, `outcome`, `issue`,
-`live`, `offline`) — never colour alone; used today on `routes/work/index.tsx`
+status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`, `outcome`,
+`issue`, `live`, `offline`) — never colour alone; used today on `routes/work/index.tsx`
 and in the project page's fact card (`components/ProjectFactCard.tsx`: live,
 offline or archived).
 
@@ -620,8 +637,8 @@ page. Never retry a test on this error.
   both lightboxes are kept on purpose, even though native `<dialog>` already
   restores focus. Since #246 it also checks the project gallery's "n / N"
   counter and its named Previous/Next buttons, and runs every axe-core WCAG 2
-  A/AA rule plus a horizontal-scroll check on six sample project pages at 390
-  and 1440px.
+  A/AA rule plus a horizontal-scroll check on six sample project pages, and on
+  `/tools` and every tool page, at 390 and 1440px.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the
@@ -863,7 +880,6 @@ const CORE_PAGES = new Set([
   "/contact-me",
   "/blog",
   "/work",
-  "/tools",
   "/catalog",
   "/pay",
   "/saas-architecture-guide",
@@ -878,6 +894,7 @@ Cache tiers:
 | Immutable         | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*`             | Content-hashed files (fingerprint = immutable)                |
 | Images and static | 7 days + stale-while-revalidate | `/img/*`, favicons, `/manifest.json` | Photos, illustrations, small root files (rarely change)       |
 | Core pages        | 3 days + stale-while-revalidate | `CORE_PAGES` set                     | SSR pages that update every few days                          |
+| Tools pages       | 1 hour + stale-while-revalidate | `/tools`, `/tools/*`                 | Versions, stars and CI status the server refreshes hourly     |
 | No cache          | `no-cache, must-revalidate`     | `/sw.js`                             | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
 
 Error responses (status ≥ 400) are never cached, regardless of which tier the

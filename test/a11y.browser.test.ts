@@ -19,6 +19,7 @@ import axeCore from "axe-core";
 import type { Browser, Locator, Page } from "playwright";
 import { startSite } from "./harness.ts";
 import { launchChromium, newPage } from "./browser.ts";
+import { tools } from "../lib/tools.ts";
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
 const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
@@ -385,6 +386,42 @@ Deno.test("the phone More dialog links About and marks it current on /about", as
       );
     } finally {
       await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the tools hub and every tool page have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+  // The closing band's Book renders only with a booking URL; RFC 2606 host.
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const paths = ["/tools", ...tools.map((t) => `/tools/${t.slug}`)];
+    for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+      const page: Page = await newPage(browser, { viewport });
+      try {
+        for (const path of paths) {
+          const where = `${path} at ${viewport.width}px`;
+          await page.goto(`${site.origin}${path}`, {
+            waitUntil: "networkidle",
+          });
+          const scrollWidth = await page.evaluate(() =>
+            document.documentElement.scrollWidth
+          );
+          assert(
+            scrollWidth <= viewport.width,
+            `${where} scrolls sideways: ${scrollWidth}px wide`,
+          );
+          assertEquals(await axeViolations(page), [], where);
+        }
+      } finally {
+        await page.close();
+      }
     }
   } finally {
     await browser?.close();

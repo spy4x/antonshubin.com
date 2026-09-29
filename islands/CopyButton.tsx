@@ -10,10 +10,12 @@ interface CopyButtonProps {
   label?: string;
   class?: string;
   title?: string;
+  /** Umami event name, sent when the button is pressed. */
+  umamiEvent?: string;
 }
 
 export default function CopyButton(
-  { elementId, label, class: className, title }: CopyButtonProps,
+  { elementId, label, class: className, title, umamiEvent }: CopyButtonProps,
 ) {
   const copied = useSignal(false);
 
@@ -45,6 +47,7 @@ export default function CopyButton(
       onClick={handleCopy}
       class={`${className || ""} ${baseClass}`.trim()}
       aria-live="polite"
+      data-umami-event={umamiEvent}
       {...(title && !copied.value ? { title, "aria-label": title } : {})}
     >
       {copied.value
