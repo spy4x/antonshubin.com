@@ -7,7 +7,13 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import { TestimonialCard } from "../components/TestimonialCard.tsx";
-import { SCHEDULE_URL, TIMEZONE_LABEL, UPWORK_URL } from "../lib/config.ts";
+import { SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts";
+import {
+  EMAIL_ADDRESS,
+  emailContact,
+  profile,
+  telegramContact,
+} from "../lib/profiles.ts";
 import { INTRO_CALL } from "../lib/catalog.ts";
 import { originOf } from "../lib/csp.ts";
 import { leadService } from "../lib/lead.ts";
@@ -21,7 +27,6 @@ import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
 import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
 
 /** The one address on the page, written out in full so it can be copied (#272, Mkt 3). */
-const EMAIL = "hello@antonshubin.com";
 
 /** The client sentence beside the calendar (#272, Psych 5): not one the home page shows. */
 const QUOTE_ID = "roley-2";
@@ -172,16 +177,16 @@ export default define.page(function ContactMe(ctx) {
               <Fact term="Time zone">{TIMEZONE_LABEL}</Fact>
               <Fact term="Email">
                 <a
-                  href={`mailto:${EMAIL}`}
+                  href={emailContact.href}
                   data-umami-event="contact-email-click"
                   class={`${FACT_LINK} break-all`}
                 >
-                  {EMAIL}
+                  {EMAIL_ADDRESS}
                 </a>
               </Fact>
               <Fact term="Telegram">
                 <a
-                  href="https://t.me/spy4x"
+                  href={telegramContact.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-umami-event="contact-telegram-click"
@@ -195,7 +200,7 @@ export default define.page(function ContactMe(ctx) {
             <p class="mt-4 text-sm text-graphite">
               Found me on Upwork?{" "}
               <a
-                href={UPWORK_URL}
+                href={profile("upwork").href}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-umami-event="contact-upwork-click"

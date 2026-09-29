@@ -3,9 +3,9 @@ import { UPWORK_URL } from "./config.ts";
 /**
  * Anton's public profiles and contact channels (#293): the one place a
  * profile URL is written. The footer (`components/Footer.tsx`), the
- * `/contact-me` side panel and the `sameAs` list in the Person JSON-LD
- * (`components/SEOHead.tsx`) all read from here, so a new or renamed profile
- * is one edit.
+ * `/contact-me` side panel (email, Telegram, Upwork) and the `sameAs` list in
+ * the Person JSON-LD (`components/SEOHead.tsx`) all read from here, so a new
+ * or renamed profile is one edit.
  */
 export interface Profile {
   id: string;
@@ -58,21 +58,15 @@ export const footerProfiles: Profile[] = pick([
   "x",
 ]);
 
-/** The `/contact-me` side panel's icon row, in its current order. */
-export const contactProfiles: Profile[] = pick([
-  "linkedin",
-  "github",
-  "youtube",
-]);
-
 /** The Person JSON-LD's `sameAs`. */
 export const sameAsUrls: string[] = profiles.map((p) => p.href);
 
 /** Direct contact channels, shown in the footer's "Contact" group. */
+export const EMAIL_ADDRESS = "hello@antonshubin.com";
 export const emailContact: Profile = {
   id: "email",
   label: "Email",
-  href: "mailto:hello@antonshubin.com",
+  href: `mailto:${EMAIL_ADDRESS}`,
 };
 export const telegramContact: Profile = {
   id: "telegram",

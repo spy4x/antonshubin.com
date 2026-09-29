@@ -2,7 +2,7 @@ import { Head } from "fresh/runtime";
 import { Layout } from "./Layout.tsx";
 import Button from "./Button.tsx";
 import { navItemFor } from "../lib/nav.ts";
-import { emailContact } from "../lib/profiles.ts";
+import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
 
 /** The three sections a lost visitor most likely wants, in this order. */
 const SECTIONS = ["/work", "/tools", "/blog"];
@@ -55,7 +55,7 @@ export function NotFound({ pathname }: { pathname: string }) {
             href={emailContact.href}
             class="text-parchment underline underline-offset-4"
           >
-            {emailContact.href.replace("mailto:", "")}
+            {EMAIL_ADDRESS}
           </a>.
         </p>
       </div>

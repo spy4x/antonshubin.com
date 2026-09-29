@@ -3,7 +3,7 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { head } from "../lib/head.ts";
-import { emailContact } from "../lib/profiles.ts";
+import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
 
 /**
  * What the site collects (#192). Every sentence is something the code in this
@@ -101,7 +101,7 @@ export default define.page(function Privacy(ctx) {
               href={emailContact.href}
               class="text-parchment underline underline-offset-4"
             >
-              {emailContact.href.replace("mailto:", "")}
+              {EMAIL_ADDRESS}
             </a>.
           </p>
         </Section>
