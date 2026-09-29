@@ -1,5 +1,6 @@
 import { define } from "../lib/utils.ts";
-import { BASE_URL, COMPANY, COMPANY_LINE, LOCATION } from "../lib/config.ts";
+import { BASE_URL, LOCATION } from "../lib/config.ts";
+import { COMPANY, COMPANY_LINE } from "../lib/company.ts";
 import { ABOUT_PATH } from "../lib/about.ts";
 import { hackathons, highlightSlugs } from "../lib/data.ts";
 import { llmsBlogSections } from "../lib/blog.ts";

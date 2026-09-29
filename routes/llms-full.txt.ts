@@ -1,11 +1,6 @@
 import { define } from "../lib/utils.ts";
-import {
-  BASE_URL,
-  COMPANY,
-  COMPANY_LINE,
-  LOCATION,
-  TIMEZONE_LABEL,
-} from "../lib/config.ts";
+import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
+import { COMPANY, COMPANY_LINE } from "../lib/company.ts";
 import {
   ABOUT_HOBBIES,
   ABOUT_PATH,

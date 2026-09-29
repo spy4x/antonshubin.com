@@ -5,7 +5,8 @@ import {
   ROLE,
   SITE_DESCRIPTION,
 } from "../lib/head.ts";
-import { COMPANY, LOCATION, X_HANDLE } from "../lib/config.ts";
+import { LOCATION, X_HANDLE } from "../lib/config.ts";
+import { COMPANY } from "../lib/company.ts";
 import { sameAsUrls } from "../lib/profiles.ts";
 import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts";
 import { proof } from "../lib/proof.ts";
@@ -179,7 +180,7 @@ export function SEOHead() {
               {
                 "@type": "Organization",
                 "@id": "https://neatsoft.dev/#org",
-                "name": "NeatSoft PTE LTD",
+                "name": COMPANY.name,
                 "url": "https://neatsoft.dev",
                 "founder": { "@id": "https://antonshubin.com/#person" },
                 "identifier": {

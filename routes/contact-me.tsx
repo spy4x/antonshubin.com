@@ -18,6 +18,7 @@ import { INTRO_CALL } from "../lib/catalog.ts";
 import { originOf } from "../lib/csp.ts";
 import { leadService } from "../lib/lead.ts";
 import { promise } from "../lib/promises.ts";
+import { COMPANY } from "../lib/company.ts";
 import {
   contactTestimonialId,
   testimonial,
@@ -49,8 +50,8 @@ export default define.page(function ContactMe(ctx) {
       ? "Contact Anton Shubin: book a free 30-minute call"
       : "Contact Anton Shubin",
     description: booking
-      ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via NeatSoft PTE LTD, Singapore.`
-      : "Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via NeatSoft PTE LTD, Singapore.",
+      ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`
+      : `Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`,
     canonical: "https://antonshubin.com/contact-me",
     ogType: "website",
     pageName: "Contact",

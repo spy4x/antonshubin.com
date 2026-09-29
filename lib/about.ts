@@ -11,6 +11,8 @@
  * "Outside Work" section, and `/contact-me`'s NeatSoft line.
  */
 
+import { COMPANY } from "./company.ts";
+
 export const ABOUT_PATH = "/about";
 
 /** The page's name: the `<h1>`, the breadcrumb's last item and the `ProfilePage` name. */
@@ -43,7 +45,7 @@ export const aboutSteps: AboutStep[] = [
   {
     when: "Today",
     text:
-      "I'm co-founder and CEO of NeatSoft PTE LTD in Singapore, and clients can contract through it. I build SaaS for clients and my own open-source tools.",
+      `I'm co-founder and CEO of ${COMPANY.name} in ${COMPANY.country}, and clients can contract through it. I build SaaS for clients and my own open-source tools.`,
   },
 ];
 
@@ -53,7 +55,7 @@ export const aboutSteps: AboutStep[] = [
  * this module reads no environment.
  */
 export function aboutDescription(location: string): string {
-  return `Software developer since 2010, freelancing since 2013, co-founder and CEO of NeatSoft PTE LTD in Singapore. Based in ${location}.`;
+  return `Software developer since 2010, freelancing since 2013, co-founder and CEO of ${COMPANY.name} in ${COMPANY.country}. Based in ${location}.`;
 }
 
 /** The hobbies clause, shared by `/about`'s "Outside work" and `/llms-full.txt`. */

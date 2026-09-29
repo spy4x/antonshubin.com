@@ -1,4 +1,5 @@
 import { crossOriginPreconnect } from "./preconnect.ts";
+import { COMPANY_LINE } from "./company.ts";
 export const DOMAIN = Deno.env.get("DOMAIN") || "antonshubin.com";
 export const BASE_URL = DOMAIN.startsWith("https://")
   ? DOMAIN
@@ -63,21 +64,6 @@ export const SMTP_PORT = parseInt(Deno.env.get("SMTP_PORT") || "587");
 export const SMTP_FROM = Deno.env.get("SMTP_FROM") || "";
 export const SMTP_USERNAME = Deno.env.get("SMTP_USERNAME") || "";
 export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
-/**
- * Anton's company: its legal name, country and Singapore registration number
- * (UEN). The invoices sentence, both llms files and the `Organization`
- * JSON-LD read it here, so a change of company is one edit.
- */
-export const COMPANY = {
-  name: "NeatSoft PTE LTD",
-  country: "Singapore",
-  uen: "202300222R",
-} as const;
-
-/** The company as one line: name, country and UEN. */
-export const COMPANY_LINE =
-  `${COMPANY.name}, ${COMPANY.country} (UEN ${COMPANY.uen})`;
-
 /**
  * The invoices sentence (#293): the footer, `/contact-me` and `/about` show
  * it.

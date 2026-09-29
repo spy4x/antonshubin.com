@@ -18,6 +18,7 @@ import {
   aboutSteps,
   paymentSentence,
 } from "../lib/about.ts";
+import { COMPANY } from "../lib/company.ts";
 import { proof } from "../lib/proof.ts";
 import { tool } from "../lib/tools.ts";
 import {
@@ -129,10 +130,10 @@ export default define.page(function About(ctx) {
                       data-umami-event="about-outbound-neatsoft"
                       class={LINK}
                     >
-                      NeatSoft PTE LTD
+                      {COMPANY.name}
                       <NewTabHint />
                     </a>
-                    , Singapore
+                    , {COMPANY.country}
                   </Fact>
                   <Fact term="Upwork">
                     <WithNote id="upwork-profile" class="note-stack">
