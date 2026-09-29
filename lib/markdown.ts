@@ -1,20 +1,5 @@
 import { Marked, Parser, TextRenderer } from "marked";
 import type { Renderer, Tokens } from "marked";
-import hljs from "highlight.js/lib/core";
-import bash from "highlight.js/lib/languages/bash";
-import json from "highlight.js/lib/languages/json";
-import sql from "highlight.js/lib/languages/sql";
-import typescript from "highlight.js/lib/languages/typescript";
-import yaml from "highlight.js/lib/languages/yaml";
-
-// Server-side highlighting only (#274, UX 4): the languages the posts use,
-// registered once. The page ships the highlighted HTML and a few CSS rules
-// in assets/styles.css, never highlight.js itself.
-hljs.registerLanguage("bash", bash);
-hljs.registerLanguage("json", json);
-hljs.registerLanguage("sql", sql);
-hljs.registerLanguage("typescript", typescript);
-hljs.registerLanguage("yaml", yaml);
 
 /** A fence's info string -> the name its code block's header shows. */
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -237,27 +222,25 @@ blogMarked.use({
     /**
      * A fenced code block (#274, UX 4): a header row with the language and a
      * Copy button (hidden until `islands/BlogImageEnhancer.tsx` wires it up,
-     * since it does nothing without JS), then the code, highlighted here on
-     * the server when the language is registered above. The group's name
-     * says what it is, "Code, TypeScript", for a screen reader.
+     * since it does nothing without JS), then the code, escaped. There is no
+     * syntax highlighting: measured with `deno task lcp --ab`, its markup
+     * made a code-heavy post's network LCP about 50ms slower. The group's
+     * name says what it is, "Code, TypeScript", for a screen reader.
      */
     code({ text, lang }) {
       const info = (lang ?? "").trim().split(/\s+/)[0].toLowerCase();
       const name = LANGUAGE_NAMES[info] ??
         (info ? info.toUpperCase() : undefined);
-      const highlighted = info && hljs.getLanguage(info)
-        ? hljs.highlight(text, { language: info, ignoreIllegals: true }).value
-        : escapeEncode(text);
-      const codeClass = info
-        ? ` class="hljs language-${escapeEncode(info)}"`
-        : "";
+      const codeClass = info ? ` class="language-${escapeEncode(info)}"` : "";
       const label = name ? `Code, ${escapeEncode(name)}` : "Code";
       const langTag = name
         ? `<span class="code-lang" aria-hidden="true">${
           escapeEncode(name)
         }</span>`
         : "<span></span>";
-      return `<div class="code-block" role="group" aria-label="${label}"><div class="code-head">${langTag}<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy</button></div><pre tabindex="0"><code${codeClass}>${highlighted}\n</code></pre></div>\n`;
+      return `<div class="code-block" role="group" aria-label="${label}"><div class="code-head">${langTag}<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy</button></div><pre tabindex="0"><code${codeClass}>${
+        escapeEncode(text)
+      }\n</code></pre></div>\n`;
     },
     /**
      * A paragraph that holds only an image becomes a `<figure>` (#274, UX 5

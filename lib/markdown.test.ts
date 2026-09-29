@@ -345,7 +345,7 @@ Deno.test("heading ids start over for every post", async () => {
   assertEquals(headings.map((h) => h.id), ["intro"]);
 });
 
-Deno.test("a fenced code block gets a language label, a hidden Copy button and highlighting", async () => {
+Deno.test("a fenced code block gets a language label, a hidden Copy button and escaped code", async () => {
   const md = '```ts\nconst x = "<a>" // note\n```\n';
   const html = await renderBlogMarkdown(md);
   assertMatch(
@@ -360,21 +360,12 @@ Deno.test("a fenced code block gets a language label, a hidden Copy button and h
     html,
     /<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy<\/button>/,
   );
-  assertMatch(html, /<span class="hljs-keyword">const<\/span>/);
-  assertMatch(html, /<span class="hljs-comment">\/\/ note<\/span>/);
-  // The string's markup is escaped, never live.
-  assertMatch(html, /&quot;&lt;a&gt;&quot;/);
-  assertEquals(html.includes('"<a>"'), false);
-});
-
-Deno.test("a code block in an unregistered language is escaped, not highlighted", async () => {
-  const html = await renderBlogMarkdown("```html\n<b>x</b>\n```\n");
-  assertMatch(html, /aria-label="Code, HTML"/);
+  // The code's markup is escaped, never live, and carries no highlighting.
   assertMatch(
     html,
-    /<code class="hljs language-html">&lt;b&gt;x&lt;\/b&gt;\n<\/code>/,
+    /<code class="language-ts">const x = &quot;&lt;a&gt;&quot; \/\/ note\n<\/code>/,
   );
-  assertEquals(html.includes("hljs-"), false);
+  assertEquals(html.includes('"<a>"'), false);
 });
 
 Deno.test("an image on its own line becomes a figure with a lightbox button and caption", async () => {

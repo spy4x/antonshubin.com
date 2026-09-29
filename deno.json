@@ -43,7 +43,6 @@
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
     "arktype": "npm:arktype@2.2.3",
     "fresh": "jsr:@fresh/core@^2.3.3",
-    "highlight.js": "npm:highlight.js@11.12.0",
     "marked": "npm:marked@^17.0.1",
     "preact": "npm:preact@^10.29.1",
     "@preact/signals": "npm:@preact/signals@^2.9.0",

@@ -701,30 +701,6 @@ kbd {
   }
 }
 
-/* Highlighting in tokens only: comments Graphite, strings Sage, keywords and types Mist. */
-.hljs-comment,
-.hljs-quote,
-.hljs-meta {
-  color: var(--color-graphite);
-  font-style: italic;
-}
-
-.hljs-string,
-.hljs-regexp,
-.hljs-symbol,
-.hljs-template-tag {
-  color: var(--color-sage);
-}
-
-.hljs-keyword,
-.hljs-built_in,
-.hljs-type,
-.hljs-literal,
-.hljs-title.class_,
-.hljs-selector-tag {
-  color: var(--color-mist);
-}
-
 /* Lightbox (UX 8): the close button clears the notch and the home bar. */
 .lightbox-frame {
   display: flex;
