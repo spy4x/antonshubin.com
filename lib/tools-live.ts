@@ -15,11 +15,12 @@ import {
   githubSnapshot,
   type RepoSnapshot,
 } from "./github-snapshot.ts";
+import { ONE_HOUR_IN_MILLISECONDS } from "@spy4x/platform/universal/time-constants";
 import { type Fetcher, latestVersion, snapshotRepo } from "./snapshot-fetch.ts";
 import { type Tool, tools } from "./tools.ts";
 
 /** How long an answer is kept. */
-export const REFRESH_TTL_MS = 60 * 60 * 1000;
+export const REFRESH_TTL_MS = ONE_HOUR_IN_MILLISECONDS;
 
 /** What the tool pages render from. */
 export interface ToolsLive {

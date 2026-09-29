@@ -627,6 +627,32 @@ siteTest(
 );
 
 siteTest(
+  "the BreadcrumbList items are absolute addresses that end on the page's own canonical address",
+  async (site) => {
+    const path = `/work/${projects.freelance[0].slug}`;
+    const html = await site.html(path);
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    assert(canonical, `${path}: no canonical link`);
+    const trail = jsonLd(html)
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
+      .find((n) => (n as { "@type"?: string })["@type"] === "BreadcrumbList") as
+        | {
+          "@id": string;
+          itemListElement: { position: number; item: string }[];
+        }
+        | undefined;
+    assert(trail, `${path}: no BreadcrumbList JSON-LD`);
+    assertEquals(trail["@id"], `${canonical}#breadcrumb`);
+    assertEquals(trail.itemListElement.map((i) => i.position), [1, 2, 3]);
+    const origin = new URL(canonical).origin;
+    assertEquals(
+      trail.itemListElement.map((i) => i.item),
+      [`${origin}/`, `${origin}/work`, canonical],
+    );
+  },
+);
+
+siteTest(
   "the WebSite JSON-LD description is the same on every page",
   async (site) => {
     const paths = ["/", "/catalog", `/blog/${blogArticles[0].slug}`];

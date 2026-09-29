@@ -1,4 +1,5 @@
 import { useSignal } from "@preact/signals";
+import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
 import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
 
 interface CopyButtonProps {
@@ -19,20 +20,11 @@ export default function CopyButton(
 ) {
   const copied = useSignal(false);
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const el = document.getElementById(elementId);
     if (!el) return;
     const txt = el.textContent?.trim() || "";
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(txt);
-    } else {
-      const ta = document.createElement("textarea");
-      ta.value = txt;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-    }
+    if (!(await copyToClipboard(txt))) return;
     copied.value = true;
     setTimeout(() => {
       copied.value = false;

@@ -29,8 +29,7 @@ _after_ the full component tree resolves.
 
 New files:
 
-- `lib/head.ts` — signal store, `PageHead` interface,
-  `breadcrumbFromCanonical()`, `getBreadcrumb()`
+- `lib/head.ts` — signal store, `PageHead` interface, `getBreadcrumb()`
 - `components/SEOHead.tsx` — `<Head>`-based per-page injection of title,
   description, canonical, OG, Twitter, and JSON-LD graph
 

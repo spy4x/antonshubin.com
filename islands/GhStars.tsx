@@ -1,5 +1,6 @@
 import { useComputed, useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
+import { ONE_HOUR_IN_MILLISECONDS } from "@spy4x/platform/universal/time-constants";
 import { StarIcon } from "../components/Icons.tsx";
 
 interface GhStarsProps {
@@ -8,7 +9,7 @@ interface GhStarsProps {
 }
 
 const CACHE_KEY = "gh-stars";
-const CACHE_TTL = 3600_000; // 1 hour
+const CACHE_TTL = ONE_HOUR_IN_MILLISECONDS;
 // Below this, the star count reads as "not maintained" rather than as proof.
 const MIN_VISIBLE_STARS = 25;
 

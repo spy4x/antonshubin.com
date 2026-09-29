@@ -1,5 +1,4 @@
 import { signal } from "@preact/signals";
-import { BASE_URL } from "./config.ts";
 
 export interface PageHead {
   title: string;
@@ -82,42 +81,6 @@ function humanize(slug: string): string {
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
-}
-
-/**
- * Generate a BreadcrumbList itemListElement array from a canonical URL.
- * Used by the JSON-LD structured data in _app.tsx.
- *
- * Href values are WITHOUT trailing slashes (e.g. "/blog" not "/blog/").
- * A [slug] route 404s when the path ends in a trailing slash
- * (e.g. /work/smartlite/ 404s, /work/smartlite is 200), so
- * canonical values, breadcrumb hrefs and sitemap loc values are all
- * written without a trailing slash. The root "/" is the only exception
- * (kept for correctness).
- */
-export function breadcrumbFromCanonical(
-  canonical: string,
-  pageName: string,
-) {
-  const segments = new URL(canonical).pathname.split("/").filter(Boolean);
-
-  const items: unknown[] = [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-  ];
-
-  let acc = "";
-  segments.forEach((seg, idx) => {
-    acc += "/" + seg;
-    const isLast = idx === segments.length - 1;
-    items.push({
-      "@type": "ListItem",
-      position: idx + 2,
-      name: isLast ? pageName : humanize(seg),
-      item: `${BASE_URL}${acc}`,
-    });
-  });
-
-  return items;
 }
 
 /**

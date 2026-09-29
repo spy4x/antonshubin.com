@@ -1,10 +1,6 @@
 import { Head } from "fresh/runtime";
-import {
-  breadcrumbFromCanonical,
-  head,
-  ROLE,
-  SITE_DESCRIPTION,
-} from "../lib/head.ts";
+import { getBreadcrumb, head, ROLE, SITE_DESCRIPTION } from "../lib/head.ts";
+import { breadcrumbListJsonLd } from "@spy4x/platform/universal/seo";
 import { LOCATION, X_HANDLE } from "../lib/config.ts";
 import { COMPANY } from "../lib/company.ts";
 import { sameAsUrls } from "../lib/profiles.ts";
@@ -21,14 +17,10 @@ export function SEOHead() {
   // item says nothing (#269).
   const isHome = path === "/";
   const isAbout = path === ABOUT_PATH;
-  const breadcrumb = {
-    "@type": "BreadcrumbList",
-    "@id": `${h.canonical}#breadcrumb`,
-    "itemListElement": breadcrumbFromCanonical(
-      h.canonical,
-      h.pageName ?? h.title,
-    ),
-  };
+  const breadcrumb = breadcrumbListJsonLd(
+    h.canonical,
+    getBreadcrumb(h.canonical, h.pageName ?? h.title),
+  );
   const pageNodes = isHome
     ? [{
       "@type": "WebPage",
