@@ -191,7 +191,7 @@ siteTest(
 );
 
 siteTest(
-  "/privacy has one H1, its canonical and a footer link, and no marketing claims",
+  "/privacy has one H1, its canonical, is indexable and is linked from the footer",
   async (site) => {
     const html = await site.html("/privacy");
     assertEquals(count(html, /<h1\b/g), 1);
