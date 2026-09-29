@@ -1,5 +1,55 @@
 import { Marked, Parser, TextRenderer } from "marked";
 import type { Renderer, Tokens } from "marked";
+import hljs from "highlight.js/lib/core";
+import bash from "highlight.js/lib/languages/bash";
+import json from "highlight.js/lib/languages/json";
+import sql from "highlight.js/lib/languages/sql";
+import typescript from "highlight.js/lib/languages/typescript";
+import yaml from "highlight.js/lib/languages/yaml";
+
+// Server-side highlighting only (#274, UX 4): the languages the posts use,
+// registered once. The page ships the highlighted HTML and a few CSS rules
+// in assets/styles.css, never highlight.js itself.
+hljs.registerLanguage("bash", bash);
+hljs.registerLanguage("json", json);
+hljs.registerLanguage("sql", sql);
+hljs.registerLanguage("typescript", typescript);
+hljs.registerLanguage("yaml", yaml);
+
+/** A fence's info string -> the name its code block's header shows. */
+const LANGUAGE_NAMES: Record<string, string> = {
+  bash: "Shell",
+  sh: "Shell",
+  shell: "Shell",
+  json: "JSON",
+  sql: "SQL",
+  ts: "TypeScript",
+  typescript: "TypeScript",
+  yaml: "YAML",
+  yml: "YAML",
+  html: "HTML",
+  css: "CSS",
+  js: "JavaScript",
+  javascript: "JavaScript",
+  tsx: "TSX",
+  dockerfile: "Dockerfile",
+};
+
+/** One `h2` or `h3` of a post, for its contents list (#274). */
+export interface PostHeading {
+  depth: 2 | 3;
+  id: string;
+  /** The heading's plain text, unescaped, for JSX to escape once. */
+  text: string;
+}
+
+/**
+ * Per-render state for heading ids. `renderBlogPost()` resets it before
+ * every parse, and a parse is synchronous (no async extension is
+ * registered), so two posts can never share it.
+ */
+let headingIds = new Map<string, number>();
+let headings: PostHeading[] = [];
 
 const ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
@@ -169,6 +219,76 @@ blogMarked.use({
   },
   renderer: {
     /**
+     * `h2` and `h3` get an `id` from their text (kebab-case, `-2`, `-3` on a
+     * repeat) and a "#" link to themselves, shown on hover and focus, so a
+     * reader can link to a section and the contents list has targets (#274,
+     * UX 2, SEO 6). Other levels keep marked's own output.
+     */
+    heading({ tokens, depth }) {
+      if (depth !== 2 && depth !== 3) return false;
+      const html = this.parser.parseInline(tokens);
+      const text = decodeEntities(
+        this.parser.parseInline(tokens, this.parser.textRenderer),
+      ).replace(/\s+/g, " ").trim();
+      const id = uniqueId(slugify(text) || "section");
+      headings.push({ depth, id, text });
+      return `<h${depth} id="${id}">${html}<a class="heading-anchor" href="#${id}"><span aria-hidden="true">#</span><span class="sr-only">Link to this section</span></a></h${depth}>\n`;
+    },
+    /**
+     * A fenced code block (#274, UX 4): a header row with the language and a
+     * Copy button (hidden until `islands/BlogImageEnhancer.tsx` wires it up,
+     * since it does nothing without JS), then the code, highlighted here on
+     * the server when the language is registered above. The group's name
+     * says what it is, "Code, TypeScript", for a screen reader.
+     */
+    code({ text, lang }) {
+      const info = (lang ?? "").trim().split(/\s+/)[0].toLowerCase();
+      const name = LANGUAGE_NAMES[info] ??
+        (info ? info.toUpperCase() : undefined);
+      const highlighted = info && hljs.getLanguage(info)
+        ? hljs.highlight(text, { language: info, ignoreIllegals: true }).value
+        : escapeEncode(text);
+      const codeClass = info
+        ? ` class="hljs language-${escapeEncode(info)}"`
+        : "";
+      const label = name ? `Code, ${escapeEncode(name)}` : "Code";
+      const langTag = name
+        ? `<span class="code-lang" aria-hidden="true">${
+          escapeEncode(name)
+        }</span>`
+        : "<span></span>";
+      return `<div class="code-block" role="group" aria-label="${label}"><div class="code-head">${langTag}<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy</button></div><pre tabindex="0"><code${codeClass}>${highlighted}\n</code></pre></div>\n`;
+    },
+    /**
+     * A paragraph that holds only an image becomes a `<figure>` (#274, UX 5
+     * and 8): the image sits in a real `<button>` that opens the lightbox,
+     * reachable by keyboard from the server HTML, and a markdown image title
+     * becomes its `<figcaption>`. The `<img>` itself is exactly what the
+     * `image` override below renders, plus lazy loading.
+     */
+    paragraph({ tokens }) {
+      const only = tokens.filter((t) =>
+        !(t.type === "text" && t.raw.trim() === "")
+      );
+      if (only.length !== 1 || only[0].type !== "image") return false;
+      const image = only[0] as Tokens.Image;
+      if (cleanUrl(image.href) === null) return false;
+      const img = this.parser.parseInline([image]).replace(
+        /^<img /,
+        '<img loading="lazy" decoding="async" ',
+      );
+      const alt = escapeNoEncode(
+        image.tokens
+          ? this.parser.parseInline(image.tokens, this.parser.textRenderer)
+          : image.text,
+      );
+      const name = alt ? `View larger image: ${alt}` : "View larger image";
+      const caption = image.title
+        ? `<figcaption>${escapeNoEncode(image.title)}</figcaption>`
+        : "";
+      return `<figure class="post-figure"><button type="button" class="post-image" data-lightbox aria-label="${name}">${img}</button>${caption}</figure>\n`;
+    },
+    /**
      * The only renderer method this module overrides — everything else
      * (the `<li>`, the `<p>` a loose list wraps it in, inline formatting)
      * stays exactly what marked's own default produces, so a checklist's
@@ -264,6 +384,51 @@ function addPreTabIndex(html: string): string {
  * shared default `marked` export, untouched by this module.
  */
 export async function renderBlogMarkdown(markdown: string): Promise<string> {
-  const html = await blogMarked.parse(markdown);
-  return addPreTabIndex(addNewTabHints(html));
+  return (await renderBlogPost(markdown)).html;
+}
+
+/** A rendered post: its HTML and its `h2`/`h3` headings in page order. */
+export interface RenderedPost {
+  html: string;
+  headings: PostHeading[];
+}
+
+/**
+ * Renders a post like `renderBlogMarkdown()` and also returns its headings,
+ * with the same ids the HTML carries, for the contents list.
+ */
+export function renderBlogPost(markdown: string): Promise<RenderedPost> {
+  headingIds = new Map();
+  headings = [];
+  const raw = blogMarked.parse(markdown, { async: false }) as string;
+  const result = { html: addPreTabIndex(addNewTabHints(raw)), headings };
+  headings = [];
+  return Promise.resolve(result);
+}
+
+/** "Why Deno? (and not Node)" -> "why-deno-and-not-node". */
+export function slugify(text: string): string {
+  return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** `base`, or `base-2`, `base-3`, ... when this render already used it. */
+function uniqueId(base: string): string {
+  const seen = headingIds.get(base) ?? 0;
+  headingIds.set(base, seen + 1);
+  return seen === 0 ? base : `${base}-${seen + 1}`;
+}
+
+/** Decodes the few entities marked's text renderer can leave in a heading. */
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
 }

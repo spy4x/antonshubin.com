@@ -7,7 +7,7 @@
 // raw markdown syntax into the label instead of its resolved text).
 import { assert, assertEquals, assertMatch } from "jsr:@std/assert@^1.0.0";
 import { marked } from "marked";
-import { renderBlogMarkdown } from "./markdown.ts";
+import { renderBlogMarkdown, renderBlogPost } from "./markdown.ts";
 
 /** Strips the `aria-label="..."` this module adds to a checkbox `<input>`, so what's left can be compared against plain marked's own output. */
 function withoutAriaLabel(html: string): string {
@@ -33,6 +33,15 @@ function withoutAltEscaping(html: string): string {
         .replace(/&gt;/g, ">")
         .replace(/&amp;/g, "&")
     }"`);
+}
+
+/**
+ * The `<img>` tag alone, without the lazy-loading attributes a standalone
+ * image's `<figure>` adds (#274), so it can be compared with plain marked's.
+ */
+function imgTag(html: string): string {
+  const tag = html.match(/<img\b[^>]*>/)?.[0] ?? "";
+  return tag.replace(' loading="lazy" decoding="async"', "");
 }
 
 Deno.test("a tight checklist keeps marked's own HTML, plus aria-label", async () => {
@@ -220,7 +229,7 @@ Deno.test("an image alt with a quote is escaped, not a live attribute", async ()
   // straight into `alt="${n}"` with no escaping at all, so this markdown
   // renders `<img src="i.png" alt="" onfocus="x">` — a second, live
   // attribute a browser or a screen reader would act on.
-  assertMatch(ours, /<img src="i\.png" alt="&quot; onfocus=&quot;x">/);
+  assertEquals(imgTag(ours), '<img src="i.png" alt="&quot; onfocus=&quot;x">');
   for (const img of ours.match(/<img[^>]*>/g) ?? []) {
     assertEquals(/\son\w+="/i.test(img), false, img);
   }
@@ -236,7 +245,7 @@ Deno.test("an image with formatted alt and a title renders like marked, alt esca
   // attribute with its existing entities kept, not re-encoded) must stay
   // exactly as plain marked renders it — compared against a live call, not
   // a hardcoded string, so a change to marked's own output would show here.
-  assertEquals(withoutAltEscaping(ours), plain);
+  assertEquals(withoutAltEscaping(imgTag(ours)), imgTag(plain));
   assertMatch(ours, /alt="a b &quot;c&quot;"/);
   assertMatch(ours, /title="Tom &amp; Jerry &quot;show&quot; O&#39;Brien"/);
 });
@@ -245,7 +254,7 @@ Deno.test("a raw quote in an image title cannot add an attribute", async () => {
   // Mutation: drop the title escape in lib/markdown.ts's image() override.
   const md = '![a](x.png "a \\" onfocus=\\"x")\n';
   const ours = await renderBlogMarkdown(md);
-  assertEquals(ours, await marked(md));
+  assertEquals(imgTag(ours), imgTag(await marked(md)));
   assertMatch(ours, /title="a &quot; onfocus=&quot;x"/);
 });
 
@@ -310,4 +319,73 @@ Deno.test("a real <pre> gets tabindex; an escaped <pre> inside code does not", a
   // escaped by marked to entities — it must stay untouched, not turned into
   // a second (fake) tabindex-bearing <pre> tag.
   assertMatch(html, /&lt;pre&gt;literal text&lt;\/pre&gt;/);
+});
+
+Deno.test("h2 and h3 headings get unique ids and a link to themselves", async () => {
+  const md =
+    "## Why `Deno`? & more\n\ntext\n\n## Why `Deno`? & more\n\n### Setup\n\n#### Deep\n";
+  const { html, headings } = await renderBlogPost(md);
+  assertEquals(headings, [
+    { depth: 2, id: "why-deno-more", text: "Why Deno? & more" },
+    { depth: 2, id: "why-deno-more-2", text: "Why Deno? & more" },
+    { depth: 3, id: "setup", text: "Setup" },
+  ]);
+  assertMatch(
+    html,
+    /<h2 id="why-deno-more">Why <code>Deno<\/code>\? &amp; more<a class="heading-anchor" href="#why-deno-more">/,
+  );
+  assertMatch(html, /<h2 id="why-deno-more-2">/);
+  // Other levels keep marked's own output.
+  assertMatch(html, /<h4>Deep<\/h4>/);
+});
+
+Deno.test("heading ids start over for every post", async () => {
+  await renderBlogPost("## Intro\n");
+  const { headings } = await renderBlogPost("## Intro\n");
+  assertEquals(headings.map((h) => h.id), ["intro"]);
+});
+
+Deno.test("a fenced code block gets a language label, a hidden Copy button and highlighting", async () => {
+  const md = '```ts\nconst x = "<a>" // note\n```\n';
+  const html = await renderBlogMarkdown(md);
+  assertMatch(
+    html,
+    /<div class="code-block" role="group" aria-label="Code, TypeScript">/,
+  );
+  assertMatch(
+    html,
+    /<span class="code-lang" aria-hidden="true">TypeScript<\/span>/,
+  );
+  assertMatch(
+    html,
+    /<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy<\/button>/,
+  );
+  assertMatch(html, /<span class="hljs-keyword">const<\/span>/);
+  assertMatch(html, /<span class="hljs-comment">\/\/ note<\/span>/);
+  // The string's markup is escaped, never live.
+  assertMatch(html, /&quot;&lt;a&gt;&quot;/);
+  assertEquals(html.includes('"<a>"'), false);
+});
+
+Deno.test("a code block in an unregistered language is escaped, not highlighted", async () => {
+  const html = await renderBlogMarkdown("```html\n<b>x</b>\n```\n");
+  assertMatch(html, /aria-label="Code, HTML"/);
+  assertMatch(
+    html,
+    /<code class="hljs language-html">&lt;b&gt;x&lt;\/b&gt;\n<\/code>/,
+  );
+  assertEquals(html.includes("hljs-"), false);
+});
+
+Deno.test("an image on its own line becomes a figure with a lightbox button and caption", async () => {
+  const html = await renderBlogMarkdown('![A chart](c.svg "Cost per line")\n');
+  assertMatch(
+    html,
+    /^<figure class="post-figure"><button type="button" class="post-image" data-lightbox aria-label="View larger image: A chart"><img loading="lazy" decoding="async" src="c\.svg" alt="A chart" title="Cost per line"><\/button><figcaption>Cost per line<\/figcaption><\/figure>/,
+  );
+});
+
+Deno.test("an image inside a sentence stays a plain inline image", async () => {
+  const html = await renderBlogMarkdown("See ![x](x.png) here.\n");
+  assertEquals(html, '<p>See <img src="x.png" alt="x"> here.</p>\n');
 });
