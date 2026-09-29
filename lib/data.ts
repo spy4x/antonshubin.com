@@ -64,12 +64,6 @@ export interface Project {
   companyOutcome?: { text: string; href: string };
   /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
   ghRepo?: string;
-  /**
-   * True for my own open-source tools (as opposed to a video channel or an
-   * archived, no-longer-maintained project). Drives the "Open Source
-   * Projects" list in both llms files — see lib/llms.ts.
-   */
-  openSource?: boolean;
 }
 
 /** Years a project ran: `to` omitted means one year, `ongoing` means still running. */
@@ -102,210 +96,16 @@ export interface BlogArticle {
 }
 
 export const projects = {
+  /**
+   * My own projects that are not tools: the video channel. Every other own
+   * project lives in `lib/tools.ts` (#273) and has its page under `/tools`.
+   */
   my: [
-    {
-      title: "Financy",
-      slug: "financy",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/financy",
-      ghRepo: "spy4x/financy",
-      description:
-        "Self-hosted finance tracker for a person or a family — open source, work in progress, not ready for everyday use. Targets multi-currency accounts and group or family collaboration with role-based access; transfers between accounts follow double-entry principles.",
-      logoImageURL: "/img/projects/financy/logo.svg",
-      tags: [
-        "Deno",
-        "Preact",
-        "Hono",
-        "PostgreSQL",
-        "Docker",
-        "PWA",
-      ],
-      outcome: "Being revived — work in progress, not ready for everyday use.",
-    },
-    {
-      title: "Air Quality Sensor",
-      slug: "air-quality-sensor",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/air-quality-sensor",
-      ghRepo: "spy4x/air-quality-sensor",
-      description:
-        "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
-      logoImageURL: "/img/projects/air-quality-sensor/logo.svg",
-      tags: [
-        "ESP32",
-        "C++",
-        "Svelte",
-        "Firebase",
-        "Home Assistant",
-        "IoT",
-      ],
-    },
     {
       title: "YouTube Tech Channel",
       externalURL: "https://www.youtube.com/@anton-shubin",
       description: "Short tech videos about software development and SaaS.",
       logoImageURL: "/img/projects/youtube-channel/logo.svg",
-    },
-    {
-      title: "Toread.Today",
-      slug: "toread-today",
-      externalURL: "https://toread-today.web.app",
-      description:
-        "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",
-      logoImageURL: "/img/projects/toread-today/logo.svg",
-      tags: [
-        "Angular",
-        "Node.js",
-        "Express.js",
-        "GCP",
-        "Firebase",
-        "Firestore",
-      ],
-      screenshotURLs: ["1.webp", "2.webp", "3.webp"],
-      archived: true,
-    },
-    {
-      title: "The Seed",
-      externalURL: "https://github.com/spy4x/seed",
-      ghRepo: "spy4x/seed",
-      description:
-        "A one-person SaaS application codebase template. Ship your project idea in days instead of months. It is addictive.",
-      logoImageURL: "/img/projects/seed/logo.webp",
-      archived: true,
-    },
-    {
-      title: "caldav-tasks-web",
-      slug: "todoapp-caldav",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/caldav-tasks-web",
-      ghRepo: "spy4x/caldav-tasks-web",
-      screenshotURLs: [
-        "desktop-dashboard.png",
-        "desktop-kanban.png",
-        "desktop-settings.png",
-        "mobile-dashboard.png",
-      ],
-      description:
-        "Touch-first PWA for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface with a Radicale and a Stalwart implementation), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos.",
-      tags: [
-        "Vite",
-        "Preact",
-        "Preact Signals",
-        "Tailwind v4",
-        "Hono",
-        "SQLite",
-        "CalDAV",
-        "PWA",
-        "CQRS",
-      ],
-      outcome:
-        "Tested in production against Radicale; Nextcloud and Baikal are expected to work but untested; Stalwart support is currently broken (README has the details).",
-    },
-    {
-      title: "caldav-mcp",
-      slug: "caldav-mcp",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/caldav-mcp",
-      ghRepo: "spy4x/caldav-mcp",
-      description:
-        "MCP server that lets AI assistants read and write CalDAV events and tasks — Claude Desktop, OpenCode, Cursor, and Open WebUI all work with it. Built on web standards with zero npm dependencies, and runs as a single Deno binary.",
-      tags: [
-        "Deno",
-        "TypeScript",
-        "MCP",
-        "CalDAV",
-        "Zero npm deps",
-        "Open source",
-      ],
-    },
-    {
-      title: "Zond",
-      slug: "zond",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/zond",
-      ghRepo: "spy4x/zond",
-      logoImageURL: "/img/projects/zond/logo.svg",
-      description:
-        "Internal health probe bridge for services behind SSO proxies. Originally Deno+TS, rewritten to Go as a single 10 MB distroless binary. Sits beside the containers on the same Docker network and probes them directly, so Gatus and other monitoring tools that lack SSO support can still check services behind Authelia. Runs in production at probe-home.antonshubin.com.",
-      tags: [
-        "Go",
-        "Docker",
-        "Self-hosted",
-        "Authelia",
-        "Monitoring",
-        "Health-check",
-        "SSO",
-      ],
-    },
-    {
-      title: "rostok",
-      slug: "rostok",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/rostok",
-      ghRepo: "spy4x/rostok",
-      logoImageURL: "/img/projects/rostok/logo.svg",
-      description:
-        "росток (sprout) — one-command scaffolder for a self-hosted homelab from a curated service catalog. The CLI writes your servers/, config.json, and .env files; every secret mutation is auto-encrypted to .env.age via age64 so secrets stay safe to commit. Bridges my homelab IaC knowledge into a reusable tool others can run.",
-      outcome:
-        "Deploys my own servers: four instances in different regions, each running a different set of services.",
-      tags: [
-        "Deno",
-        "TypeScript",
-        "CLI",
-        "IaC",
-        "Self-hosted",
-        "JSR",
-        "age64",
-        "Docker",
-      ],
-    },
-    {
-      title: "Deno Platform Template",
-      slug: "template",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/template",
-      ghRepo: "spy4x/template",
-      logoImageURL: "/img/projects/template/logo.svg",
-      description:
-        `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
-          proof("jobs")
-        }+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.`,
-      outcome:
-        "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
-      tags: [
-        "Deno",
-        "TypeScript",
-        "CQRS",
-        "PostgreSQL",
-        "Offline sync",
-        "Outbox",
-        "Template",
-        "SPA",
-        "MPA",
-        "Worker",
-      ],
-    },
-    {
-      title: "mig",
-      slug: "mig",
-      openSource: true,
-      externalURL: "https://github.com/spy4x/mig",
-      ghRepo: "spy4x/mig",
-      logoImageURL: "/img/projects/mig/logo.svg",
-      description:
-        "миг (moment) — tiny self-hosted meeting scheduler, built on web standards. One owner, one URL, one feature: book a time slot. Runs as a single Deno binary, with JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a static meeting link without a Next.js + Postgres deployment.",
-      outcome:
-        "Powers my own booking link at meet.antonshubin.com — dogfooded daily for client intros.",
-      tags: [
-        "Deno",
-        "Fresh",
-        "TypeScript",
-        "Tailwind v4",
-        "Self-hosted",
-        "SMTP",
-        "ICS",
-        "Single binary",
-      ],
     },
   ] as Project[],
   freelance: [

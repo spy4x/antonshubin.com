@@ -5,14 +5,7 @@ import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { decapitalize, promise, promises } from "../lib/promises.ts";
 import { proof } from "../lib/proof.ts";
 import { ROLE } from "../lib/head.ts";
-import {
-  clientProject,
-  clientSummary,
-  firstSentence,
-  openSourceProjects,
-  toolLines,
-  withOutcome,
-} from "../lib/llms.ts";
+import { clientProject, clientSummary, toolLines } from "../lib/llms.ts";
 
 export const handler = define.handlers({
   GET() {
@@ -30,18 +23,8 @@ export const handler = define.handlers({
       )
       .join("\n");
 
-    // Generated from lib/data.ts so this list can't drift from the project
-    // pages or their READMEs; the outcome carries status facts (a broken
-    // server, a revival, a production URL) a bare description often doesn't.
-    const openSourceList = openSourceProjects()
-      .map((p) =>
-        `- [${p.title}](${BASE_URL}/work/${p.slug}) — ${
-          withOutcome(firstSentence(p.description), p.outcome)
-        }`
-      )
-      .join("\n");
-
-    // The first two highlights, in the order /work shows them,
+    // The first two highlights, in the order /work shows them
+    // (highlightSlugs is ordered strongest-first),
     // generated from lib/data.ts: what each product is, then its outcome (see
     // clientSummary's docs).
     const clientList = highlightSlugs
@@ -108,10 +91,6 @@ ${promisesList}
 - [Blog](${BASE_URL}/blog)
 - [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install${hackathonsLink}
-
-## Open Source Projects
-
-${openSourceList}
 
 ## Tools
 

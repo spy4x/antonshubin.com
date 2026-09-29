@@ -190,8 +190,8 @@ Four entities in a `@graph` array (five on `/`):
   security, cost control, and change ownership in founder-readable terms
 - Managed cloud and dedicated infrastructure are presented as workload-fit
   decisions, not ideology
-- `/work/rostok` (the old `/projects/homelab` answers 301 there) is the
-  open-source scaffolder Anton deploys his own servers with
+- `/tools/rostok` (the old `/work/rostok` and `/projects/homelab` answer 301
+  there) is the open-source scaffolder Anton deploys his own servers with
 - Private endpoints, IP addresses, sensitive topology, personal service
   inventory, secrets, and unsupported cost or reliability claims stay out of
   crawler copy

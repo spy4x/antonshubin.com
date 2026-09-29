@@ -130,7 +130,7 @@ async function main() {
       count++;
     }
 
-    const allProjects = [...projects.my, ...projects.freelance].filter((
+    const allProjects = projects.freelance.filter((
       p,
     ): p is typeof p & { slug: string } => Boolean(p.slug));
     for (const project of allProjects) {

@@ -1,4 +1,5 @@
 export type Status =
+  | "in-use"
   | "ready"
   | "beta"
   | "wip"
@@ -15,6 +16,7 @@ interface StatusConfig {
 }
 
 const CONFIG: Record<Status, StatusConfig> = {
+  "in-use": { label: "In use", colorClass: "text-sage" },
   ready: { label: "Ready", colorClass: "text-sage" },
   beta: { label: "Beta", colorClass: "text-mist" },
   wip: { label: "WIP", colorClass: "text-graphite" },
@@ -37,6 +39,25 @@ function Shape(
     class: className,
   };
   switch (status) {
+    case "in-use":
+      return (
+        <svg {...common} aria-hidden="true">
+          <circle
+            cx="8"
+            cy="8"
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <path
+            d="M5 8.2 7.1 10.3 11 5.9"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+        </svg>
+      );
     case "ready":
       return (
         <svg {...common} aria-hidden="true">

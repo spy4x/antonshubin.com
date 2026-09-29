@@ -223,7 +223,7 @@ export default define.page(function Infrastructure() {
               </p>
             </a>
             <a
-              href="/work/rostok"
+              href="/tools/rostok"
               data-e2e="infrastructure-view-rostok"
               class="group min-h-44 rounded-xl border border-rule bg-paper p-5 transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >

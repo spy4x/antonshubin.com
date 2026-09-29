@@ -6,11 +6,19 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
-import { ciUrl, groupedTools, tool, tools } from "../lib/tools.ts";
+import {
+  ciUrl,
+  groupedTools,
+  tool,
+  toolLicence,
+  toolRows,
+  tools,
+} from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
 
 /** The word components/StatusMark.tsx prints for each tool status. */
 const STATUS_WORDS = {
+  "in-use": "In use",
   ready: "Ready",
   beta: "Beta",
   wip: "WIP",
@@ -44,9 +52,28 @@ siteTest(
     const html = await site.html("/tools");
     assertEquals(count(html, /<h1[\s>]/g), 1);
     assert(visibleText(html).includes("Tools I build and run myself"));
-    assertEquals(count(html, /data-tool="/g), tools.length);
-    for (const { group, tools: inGroup } of groupedTools()) {
+    assertEquals(count(html, /data-tool="/g), tools.length + toolRows.length);
+    for (const { group, tools: inGroup, rows } of groupedTools()) {
       const section = groupSection(html, group.id);
+      for (const r of rows) {
+        assert(
+          section.includes(`data-tool="${r.slug}"`),
+          `${r.slug} not in ${group.id}`,
+        );
+        for (const l of r.links) {
+          assert(section.includes(`href="${l.href}"`), `${r.slug}: ${l.href}`);
+        }
+        const rowStart = section.indexOf(`data-tool="${r.slug}"`);
+        const row = section.slice(rowStart, section.indexOf("</li>", rowStart));
+        assert(
+          visibleText(`<x ${row}`).includes(STATUS_WORDS[r.status]),
+          `${r.slug}'s row has no "${STATUS_WORDS[r.status]}" status mark`,
+        );
+        assert(
+          !section.includes(`href="/tools/${r.slug}"`),
+          `${r.slug} has no page but the hub links one`,
+        );
+      }
       for (const t of inGroup) {
         assert(
           section.includes(`data-tool="${t.slug}"`),
@@ -92,9 +119,12 @@ siteTest(
         ...html.matchAll(/<a[^>]*data-ci-status="[^"]*"[^>]*>([\s\S]*?)<\/a>/g),
       ]
         .map((m) => visibleText(m[1]));
-      const expected = path === "/tools"
-        ? tools.map((t) => `CI ${ciReading(repoSnapshot(t.repo).ci).word}`)
-        : [`CI ${ciReading(repoSnapshot(tool(path.slice(7)).repo).ci).word}`];
+      const withCi = path === "/tools"
+        ? tools.filter((t) => t.ci)
+        : [tool(path.slice(7))].filter((t) => t.ci);
+      const expected = withCi.map((t) =>
+        `CI ${ciReading(repoSnapshot(t.repo!).ci).word}`
+      );
       assertEquals(pills, expected, path);
     }
   },
@@ -103,7 +133,7 @@ siteTest(
 siteTest(
   "every CI pill links the tool's repository on Woodpecker, not one pipeline",
   async (site) => {
-    for (const t of tools) {
+    for (const t of tools.filter((t) => t.ci)) {
       for (const path of ["/tools", `/tools/${t.slug}`]) {
         const html = await site.html(path);
         const hrefs = [
@@ -111,7 +141,7 @@ siteTest(
         ]
           .map((m) => m[1]);
         assert(
-          hrefs.includes(ciUrl(t)),
+          hrefs.includes(ciUrl(t)!),
           `${path}: no CI pill links ${ciUrl(t)}`,
         );
         assert(
@@ -127,7 +157,7 @@ siteTest(
   "an unpublished tool's version reads as publishing on the hub row and the fact card",
   async (site) => {
     const hub = await site.html("/tools");
-    for (const t of tools) {
+    for (const t of tools.filter((t) => t.registry)) {
       const rowStart = hub.indexOf(`data-tool="${t.slug}"`);
       const row = hub.slice(rowStart, hub.indexOf("</li>", rowStart));
       const hubVersion = visibleText(
@@ -137,8 +167,8 @@ siteTest(
       const cardVersion = visibleText(
         page.match(/<span data-version[^>]*>([\s\S]*?)<\/span>/)![1],
       );
-      const { version, name } = t.registry;
-      if (t.registry.published) {
+      const { version, name, published } = t.registry!;
+      if (published) {
         assertEquals(hubVersion, `${version} on ${name}`, t.slug);
         assertEquals(cardVersion, version, t.slug);
       } else {
@@ -152,14 +182,14 @@ siteTest(
 siteTest(
   "an install command gets a copy button only once it is on its registry",
   async (site) => {
-    for (const t of tools) {
+    for (const t of tools.filter((t) => t.registry)) {
       const html = await site.html(`/tools/${t.slug}`);
       assert(
-        html.includes(t.registry.install),
+        html.includes(t.registry!.install),
         `${t.slug} shows no install command`,
       );
       const copyButtons = count(html, /aria-label="Copy the install command/g);
-      if (t.registry.published) {
+      if (t.registry!.published) {
         assert(
           copyButtons > 0,
           `${t.slug} is published but has no copy button`,
@@ -203,11 +233,18 @@ siteTest(
       >[];
       const node = nodes.find((n) => n["@type"] === "SoftwareSourceCode");
       assert(node, `${t.slug} has no SoftwareSourceCode node`);
-      assertEquals(node.codeRepository, `https://github.com/${t.repo}`);
+      if (t.repo) {
+        assertEquals(node.codeRepository, `https://github.com/${t.repo}`);
+      }
       assertEquals(
         "version" in node,
-        t.registry.published,
+        t.registry?.published ?? false,
         `${t.slug}: version`,
+      );
+      assertEquals(
+        "codeRepository" in node,
+        Boolean(t.repo),
+        `${t.slug}: codeRepository`,
       );
     }
   },
@@ -238,7 +275,7 @@ siteTest(
         .map((m) => visibleText(m[1]).split(" ")[0]);
       assertEquals(
         labels,
-        t.fits.map((f) => (f.planned ? "Planned" : "Today")),
+        (t.fits ?? []).map((f) => (f.planned ? "Planned" : "Today")),
         t.slug,
       );
     }
@@ -294,13 +331,166 @@ siteTest(
       );
     }
     // The unpublished tool must not offer its command in the llms files either.
-    const unpublished = tools.filter((t) => !t.registry.published);
+    const unpublished = tools.filter((t) => t.registry?.published === false);
     const llms = await site.html("/llms.txt");
     for (const t of unpublished) {
       assert(
-        !llms.includes(t.registry.install),
+        !llms.includes(t.registry!.install),
         `${t.slug}: llms.txt offers its install`,
       );
     }
+  },
+);
+
+siteTest(
+  "a tool with no registry, CI or repository shows no install line, version, CI pill or repository row",
+  async (site) => {
+    const bare = tools.filter((t) => !t.registry && !t.ci && !t.repo);
+    assert(bare.length > 0, "no tool without registry, CI and repo to check");
+    for (const t of bare) {
+      const page = await site.html(`/tools/${t.slug}`);
+      assertEquals(count(page, /data-install=/g), 0, `${t.slug}: install`);
+      assertEquals(count(page, /data-version/g), 0, `${t.slug}: version`);
+      assertEquals(count(page, /data-ci-status=/g), 0, `${t.slug}: CI`);
+      assertEquals(
+        count(page, />Repository</g),
+        0,
+        `${t.slug}: repository row`,
+      );
+      assert(
+        !page.includes("Star it or open an issue"),
+        `${t.slug}: a star-it door with no repository`,
+      );
+      const hub = await site.html("/tools");
+      const rowStart = hub.indexOf(`data-tool="${t.slug}"`);
+      const row = hub.slice(rowStart, hub.indexOf("</li>", rowStart));
+      assertEquals(count(row, /data-install=|data-ci-status=/g), 0, t.slug);
+    }
+  },
+);
+
+siteTest(
+  "a running tool shows In use, and no tool page calls a repository link Live",
+  async (site) => {
+    const mig = visibleText(await site.html("/tools/mig"));
+    assert(mig.includes("In use"), "/tools/mig has no In use status");
+    for (const t of tools) {
+      const html = await site.html(`/tools/${t.slug}`);
+      const liveRow = html.match(
+        /<dt[^>]*>Live<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/,
+      )?.[1];
+      if (liveRow) {
+        assert(
+          !liveRow.includes('href="https://github.com/'),
+          `${t.slug}: Live links a repository`,
+        );
+      } else {
+        assert(!t.live, `${t.slug}: live link has no Live row`);
+      }
+    }
+  },
+);
+
+siteTest(
+  "zond's page no longer names probe-home, and mig's page links the booking page",
+  async (site) => {
+    const zond = await site.html("/tools/zond");
+    assert(!zond.includes("probe-home"), "zond still names probe-home");
+    const mig = await site.html("/tools/mig");
+    assert(mig.includes('href="/contact-me"'), "mig does not link /contact-me");
+  },
+);
+
+siteTest(
+  "an old /work URL of a moved own project answers one 301 to its tool page, and the tool page answers 200",
+  async (site) => {
+    for (
+      const [from, to] of [
+        ["/work/mig", "/tools/mig"],
+        ["/projects/rostok", "/tools/rostok"],
+        ["/work/todoapp-caldav/", "/tools/caldav-tasks-web"],
+        ["/projects/todoapp-caldav", "/tools/caldav-tasks-web"],
+      ]
+    ) {
+      const res = await site.get(from);
+      await res.body?.cancel();
+      assertEquals(res.status, 301, from);
+      assertEquals(
+        new URL(res.headers.get("location")!, "http://x").pathname,
+        to,
+      );
+      const target = await site.get(to);
+      await target.body?.cancel();
+      assertEquals(target.status, 200, to);
+    }
+  },
+);
+
+/** The `<meta name="description">` content of a page. */
+function metaDescriptionOf(html: string): string {
+  const tag = html.match(/<meta[^>]*name="description"[^>]*>/)?.[0] ?? "";
+  return tag.match(/content="([^"]*)"/)?.[1] ?? "";
+}
+
+siteTest(
+  "every tool page's meta description is one line of at most 160 characters",
+  async (site) => {
+    for (const t of tools) {
+      const raw = metaDescriptionOf(await site.html(`/tools/${t.slug}`));
+      assert(!/[\n\r]/.test(raw), `${t.slug}: a newline`);
+      const description = visibleText(raw);
+      assert(description.length > 0, `${t.slug}: empty description`);
+      assert(
+        description.length <= 160,
+        `${t.slug}: ${description.length} characters`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the hub's meta description promises no install command or live proof",
+  async (site) => {
+    const description = metaDescriptionOf(await site.html("/tools"));
+    assert(description.length > 0 && description.length <= 160, description);
+    for (const word of ["install", "proof"]) {
+      assert(
+        !description.toLowerCase().includes(word),
+        `hub description says "${word}"`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the hub row and the tool page show the same licence",
+  async (site) => {
+    const hub = await site.html("/tools");
+    for (const t of tools) {
+      const licence = toolLicence(t);
+      const start = hub.indexOf(`data-tool="${t.slug}"`);
+      const row = visibleText(
+        `<x ${hub.slice(start, hub.indexOf("</li>", start))}`,
+      );
+      const page = visibleText(await site.html(`/tools/${t.slug}`));
+      if (licence) {
+        assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
+        assert(page.includes(licence), `${t.slug}: page has no ${licence}`);
+      }
+    }
+    assertEquals(toolLicence(tool("mig")), "AGPL-3.0");
+  },
+);
+
+siteTest(
+  "a tool URL with a trailing slash answers one 301 to the slash-free page",
+  async (site) => {
+    const res = await site.get("/tools/mig/");
+    await res.body?.cancel();
+    assertEquals(res.status, 301);
+    assertEquals(
+      new URL(res.headers.get("location")!, "http://x").pathname,
+      "/tools/mig",
+    );
   },
 );

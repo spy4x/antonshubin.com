@@ -14,7 +14,7 @@
  * lift GitHub's anonymous rate limit. The token is only sent to
  * api.github.com and never written anywhere.
  */
-import { tools } from "../lib/tools.ts";
+import { snapshotRepos } from "../lib/tools.ts";
 import type {
   CiRunStatus,
   CiSnapshot,
@@ -75,32 +75,33 @@ interface GithubRepo {
 
 async function snapshotRepo(
   repo: string,
-  repoId: number,
+  repoId: number | undefined,
 ): Promise<RepoSnapshot> {
   const token = Deno.env.get("GITHUB_TOKEN");
   const gh = await getJson<GithubRepo>(
     `https://api.github.com/repos/${repo}`,
     token ? { Authorization: `Bearer ${token}` } : {},
   );
-  const pipelines = await getJson<WoodpeckerPipeline[]>(
-    `${WOODPECKER}/api/repos/${repoId}/pipelines?perPage=50`,
-  );
+  // A repository with no Woodpecker pipeline has no CI status to record.
+  const pipelines = repoId === undefined ? [] : await getJson<
+    WoodpeckerPipeline[]
+  >(`${WOODPECKER}/api/repos/${repoId}/pipelines?perPage=50`);
   return {
     stars: gh.stargazers_count,
     licence: gh.license?.spdx_id ?? null,
     pushedAt: gh.pushed_at,
-    ci: latestBranchPipeline(pipelines, gh.default_branch, repoId),
+    ci: repoId === undefined
+      ? null
+      : latestBranchPipeline(pipelines, gh.default_branch, repoId),
   };
 }
 
 async function main() {
   const repos: Record<string, RepoSnapshot> = {};
-  for (const t of tools) {
-    repos[t.repo] = await snapshotRepo(t.repo, t.ci.repoId);
-    const ci = repos[t.repo].ci;
-    console.log(
-      `${t.repo}: CI ${ci ? `${ci.status} #${ci.pipeline}` : "none"}`,
-    );
+  for (const { repo, ciRepoId } of snapshotRepos()) {
+    repos[repo] = await snapshotRepo(repo, ciRepoId);
+    const ci = repos[repo].ci;
+    console.log(`${repo}: CI ${ci ? `${ci.status} #${ci.pipeline}` : "none"}`);
   }
   const snapshot: GithubSnapshot = {
     checkedOn: new Date().toISOString().slice(0, 10),

@@ -69,15 +69,6 @@ export function metaDescription(text: string, max = 160): string {
   return `${cut.replace(/[\s,;:—–-]+$/, "")}…`;
 }
 
-/**
- * My own open-source tools, in the order declared in lib/data.ts — not a
- * video channel, and not an archived, no-longer-maintained project. Driven
- * by the `openSource` field, not by matching a title string.
- */
-export function openSourceProjects(): Project[] {
-  return projects.my.filter((p) => p.openSource && !p.archived);
-}
-
 /** Looks up a freelance project by slug (e.g. from `highlightSlugs`), and throws on a typo. */
 export function clientProject(slug: string): Project {
   const p = projects.freelance.find((x) => x.slug === slug);
@@ -87,6 +78,7 @@ export function clientProject(slug: string): Project {
 
 /** A status word as a reader of the llms files needs it: the same words `/tools` shows. */
 const STATUS_WORDS: Record<Tool["status"], string> = {
+  "in-use": "In use",
   ready: "Ready",
   beta: "Beta",
   wip: "WIP",
@@ -96,18 +88,24 @@ const STATUS_WORDS: Record<Tool["status"], string> = {
 
 /**
  * One tool's line for the llms files, from `lib/tools.ts` only: its job,
- * status, licence and install. An unpublished tool says so instead of
- * offering a command that cannot work yet.
+ * status, licence (when the entry names one) and install (when it has a
+ * registry). An unpublished tool says so instead of offering a command that
+ * cannot work yet.
  */
 export function toolSummary(t: Tool): string {
-  const install = t.registry.published
-    ? `Install: \`${t.registry.install}\` (${t.registry.name}).`
-    : `Not yet on ${t.registry.name}: ${t.registry.version} is being published now.`;
+  const install = !t.registry
+    ? ""
+    : t.registry.published
+    ? ` Install: \`${t.registry.install}\` (${t.registry.name}).`
+    : ` Not yet on ${t.registry.name}: ${t.registry.version} is being published now.`;
   const job = `${t.job.charAt(0).toUpperCase()}${t.job.slice(1)}.`;
   const credit = t.credit ? ` ${t.credit.text}` : "";
+  const licence = t.licence ? ` ${t.licence}.` : "";
+  const usedFor = t.usedFor ? ` ${t.usedFor}` : "";
+  const standing = t.standing ? ` ${t.standing}` : "";
   return `${job}${credit} Status: ${
     STATUS_WORDS[t.status]
-  }. ${t.licence}. ${install}`;
+  }.${usedFor}${standing}${licence}${install}`;
 }
 
 /** Every tool in `lib/tools.ts`, as llms-file lines linking its `/tools/<slug>` page. */

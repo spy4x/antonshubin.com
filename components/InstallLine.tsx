@@ -10,6 +10,7 @@ import type { Tool } from "../lib/tools.ts";
  */
 export function InstallLine({ tool, id }: { tool: Tool; id: string }) {
   const { registry } = tool;
+  if (!registry) return null;
   return (
     <div data-install={registry.published ? "available" : "not-yet"}>
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">

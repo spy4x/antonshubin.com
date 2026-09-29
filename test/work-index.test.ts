@@ -19,6 +19,7 @@ import {
   highlightSlugs,
   projects,
 } from "../lib/data.ts";
+import { tools } from "../lib/tools.ts";
 import {
   projectTestimonials,
   repeatClients,
@@ -72,11 +73,10 @@ siteTest(
       const seen = [...highlights, ...archive].filter((s) => s === p.slug);
       assertEquals(seen.length, 1, `${p.slug} appears ${seen.length} times`);
     }
-    for (const p of projects.my) {
-      if (!p.slug) continue;
+    for (const t of tools) {
       assert(
-        !highlights.includes(p.slug) && !archive.includes(p.slug),
-        `tool ${p.slug} is listed as client work`,
+        !highlights.includes(t.slug) && !archive.includes(t.slug),
+        `tool ${t.slug} is listed as client work`,
       );
     }
   },
@@ -88,13 +88,14 @@ siteTest(
     const html = await site.html("/work");
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     assert(main.length > 0, "/work has no <main>");
+    for (const t of tools) {
+      assert(
+        !main.includes(`href="/work/${t.slug}"`) &&
+          !main.includes(`href="/tools/${t.slug}"`),
+        `/work links tool page ${t.slug}`,
+      );
+    }
     for (const p of projects.my) {
-      if (p.slug) {
-        assert(
-          !main.includes(`href="/work/${p.slug}"`),
-          `/work links tool page ${p.slug}`,
-        );
-      }
       if (p.externalURL) {
         assert(
           !main.includes(`href="${p.externalURL}"`),

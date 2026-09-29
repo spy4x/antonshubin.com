@@ -259,11 +259,19 @@ reference.
 
 ## Tools registry
 
-`lib/tools.ts` is the only list of open-source tools (#189): `/tools`,
+`lib/tools.ts` is the only list of my own projects (#189, #273): `/tools`,
 `/tools/<slug>`, the sitemap and both llms files read it, and adding a tool is
-adding an entry there. A tool's `registry.published` decides whether its pinned
-install command is offered with a copy button or marked "Not yet available";
-flip it to `true` the day that version is really on its registry.
+adding an entry there. Every field except the name, the job line, the summary,
+the status, the group and the kind is optional, and the page shows only the
+blocks an entry has data for: no registry means no install line, no `ci` means
+no CI pill, no `repo` means no repository row. A project with no page yet (oko,
+the Seed) is a `toolRows` entry, a hub line with links, and is not in the
+sitemap or the llms files. A status is written down for every entry, never
+guessed from its link: `in-use`, `ready`, `beta`, `wip`, `paused` or `archived`,
+and "Live" is only ever a link to a running public instance. A tool's
+`registry.published` decides whether its pinned install command is offered with
+a copy button or marked "Not yet available"; flip it to `true` the day that
+version is really on its registry.
 
 Numbers that change on their own — stars, licence GitHub detected, last push,
 and the latest push pipeline's status on the default branch in Woodpecker — live
@@ -336,16 +344,14 @@ offline or archived).
 
 `/work` (#188, `routes/work/index.tsx`) lists client work only: the Highlights
 and Archive sections from #232, read through `lib/work.ts`'s `clientWork()`. My
-own projects keep their pages at `/work/<slug>` (the same route serves both,
-`findWorkProject()`), but the index never lists a tool or the YouTube channel;
-those pages are reached from the sitemap, both llms files and the pages that
-link them (rostok from `/infrastructure`, the guide and a post). `lib/work.ts`
-is derived from `lib/data.ts` and `lib/testimonials.ts` and writes no copy of
-its own. The visible breadcrumb shows only on pages two levels deep
-(`components/Breadcrumb.tsx` renders nothing for a trail of two items), so a
-case page reads "Home / Work / <title>" and `/work` shows none; every page keeps
-its `BreadcrumbList` JSON-LD, whose last item is the page name, not the full
-`<title>`.
+own projects have their pages at `/tools/<slug>` since #273 (`lib/tools.ts`;
+their old `/work/<slug>` URLs answer 301), and `/work/<slug>` serves client
+projects only (`findWorkProject()`). `lib/work.ts` is derived from `lib/data.ts`
+and `lib/testimonials.ts` and writes no copy of its own. The visible breadcrumb
+shows only on pages two levels deep (`components/Breadcrumb.tsx` renders nothing
+for a trail of two items), so a case page reads "Home / Work / <title>" and
+`/work` shows none; every page keeps its `BreadcrumbList` JSON-LD, whose last
+item is the page name, not the full `<title>`.
 
 Since #270 the index is titled "Client work". The highlights are cards, in
 `highlightSlugs` order (`lib/data.ts`; the home page takes the first three),
@@ -924,24 +930,26 @@ their name table: it holds the OFL licence.
 
 `lib/redirects.ts` holds the one 301 table (#188) for URLs that no longer exist
 as written: the old `/projects` section (`/projects` goes to `/work`, and each
-`/projects/<slug>` goes to `/tools/<slug>` when a tool page has that slug,
-otherwise to `/work/<slug>`), the retired `/projects/homelab` (to
-`/work/rostok`) and blog slugs retired by a rename (today: the CalDAV post).
-Every old path is listed with and without a trailing slash, so both land in one
-hop, and no entry points at another redirect. A `/projects/<x>` with no new home
-is not in the table and answers 404. Besides the table, a trailing slash on any
-`/blog/<slug>` or `/work/<slug>` URL redirects to the slash-free form.
-`redirectTarget()` is a pure function, unit-tested in `lib/redirects.test.ts`
-without a server — the same pattern as `lib/csp.ts` and `lib/cache-control.ts`;
-`test/structure.test.ts` checks every old URL on the built site (one 301, query
-string kept, a 200 behind it), and its internal-link crawl fails on any link
-that the table would redirect. `main.ts` wires it as its own middleware, placed
-after the CSP and cache middlewares but before `staticFiles()`/`app.fsRoutes()`:
-a redirect response still needs the CSP and cache headers every other response
-gets, and it gets them because those two middlewares set headers on whatever
-`ctx.next()` resolves to, which is this middleware's response when it doesn't
-call `ctx.next()` itself. It appends the request's query string to the target,
-so launch links keep their UTM tags.
+`/projects/<slug>` goes to `/work/<slug>` for a client project), the nine own
+projects that moved to `/tools` in #273 (`/work/<old>` and `/projects/<old>` go
+to `/tools/<new>`, `lib/tools.ts`'s `movedSlugs`; `todoapp-caldav` became
+`caldav-tasks-web`), the retired `/projects/homelab` (to `/tools/rostok`) and
+blog slugs retired by a rename (today: the CalDAV post). Every old path is
+listed with and without a trailing slash, so both land in one hop, and no entry
+points at another redirect. A `/projects/<x>` with no new home is not in the
+table and answers 404. Besides the table, a trailing slash on any
+`/blog/<slug>`, `/work/<slug>` or `/tools/<slug>` URL redirects to the
+slash-free form. `redirectTarget()` is a pure function, unit-tested in
+`lib/redirects.test.ts` without a server — the same pattern as `lib/csp.ts` and
+`lib/cache-control.ts`; `test/structure.test.ts` checks every old URL on the
+built site (one 301, query string kept, a 200 behind it), and its internal-link
+crawl fails on any link that the table would redirect. `main.ts` wires it as its
+own middleware, placed after the CSP and cache middlewares but before
+`staticFiles()`/`app.fsRoutes()`: a redirect response still needs the CSP and
+cache headers every other response gets, and it gets them because those two
+middlewares set headers on whatever `ctx.next()` resolves to, which is this
+middleware's response when it doesn't call `ctx.next()` itself. It appends the
+request's query string to the target, so launch links keep their UTM tags.
 
 ## Shared libraries
 

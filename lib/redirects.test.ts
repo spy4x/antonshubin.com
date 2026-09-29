@@ -28,19 +28,47 @@ const EXPECTED_PROJECT_REDIRECTS: Record<string, string> = {
   "/projects/calltrack": "/work/calltrack",
   "/projects/sajari": "/work/sajari",
   "/projects/code-review": "/work/code-review",
-  // My own projects: none has a /tools/<slug> page yet, so each keeps its page under /work.
-  "/projects/financy": "/work/financy",
-  "/projects/air-quality-sensor": "/work/air-quality-sensor",
-  "/projects/toread-today": "/work/toread-today",
-  "/projects/todoapp-caldav": "/work/todoapp-caldav",
-  "/projects/caldav-mcp": "/work/caldav-mcp",
-  "/projects/zond": "/work/zond",
-  "/projects/rostok": "/work/rostok",
-  "/projects/template": "/work/template",
-  "/projects/mig": "/work/mig",
+  // My own projects moved to /tools (#273); todoapp-caldav is now caldav-tasks-web.
+  "/projects/financy": "/tools/financy",
+  "/projects/air-quality-sensor": "/tools/air-quality-sensor",
+  "/projects/toread-today": "/tools/toread-today",
+  "/projects/todoapp-caldav": "/tools/caldav-tasks-web",
+  "/projects/caldav-mcp": "/tools/caldav-mcp",
+  "/projects/zond": "/tools/zond",
+  "/projects/rostok": "/tools/rostok",
+  "/projects/template": "/tools/template",
+  "/projects/mig": "/tools/mig",
   // #231: homelab was reborn as rostok.
-  "/projects/homelab": "/work/rostok",
+  "/projects/homelab": "/tools/rostok",
 };
+
+/** Every old `/work/<slug>` URL of an own project that moved to /tools (#273). */
+const EXPECTED_WORK_REDIRECTS: Record<string, string> = {
+  "/work/financy": "/tools/financy",
+  "/work/air-quality-sensor": "/tools/air-quality-sensor",
+  "/work/toread-today": "/tools/toread-today",
+  "/work/todoapp-caldav": "/tools/caldav-tasks-web",
+  "/work/caldav-mcp": "/tools/caldav-mcp",
+  "/work/zond": "/tools/zond",
+  "/work/rostok": "/tools/rostok",
+  "/work/template": "/tools/template",
+  "/work/mig": "/tools/mig",
+};
+
+Deno.test("every old /work URL of a moved own project redirects to its tool page in one hop, with and without a trailing slash", () => {
+  for (const [from, to] of Object.entries(EXPECTED_WORK_REDIRECTS)) {
+    assertEquals(redirectTarget(from), to, from);
+    assertEquals(redirectTarget(`${from}/`), to, `${from}/`);
+  }
+});
+
+Deno.test("the table holds no /work URL beyond the moved own projects", () => {
+  const extra = [...redirectTable.keys()]
+    .filter((k) => k.startsWith("/work/"))
+    .map((k) => k.replace(/(.)\/$/, "$1"))
+    .filter((k) => !(k in EXPECTED_WORK_REDIRECTS));
+  assertEquals(extra, []);
+});
 
 Deno.test("every old /projects URL redirects to its new home", () => {
   for (const [from, to] of Object.entries(EXPECTED_PROJECT_REDIRECTS)) {
@@ -68,7 +96,7 @@ Deno.test("no redirect lands on another redirect", () => {
   }
 });
 
-Deno.test("every /projects redirect lands on a page that exists", () => {
+Deno.test("every redirect lands on a page that exists", () => {
   for (const to of new Set(redirectTable.values())) {
     if (to === "/work" || to.startsWith("/blog/")) continue;
     const [, section, slug] = to.split("/");
@@ -77,23 +105,20 @@ Deno.test("every /projects redirect lands on a page that exists", () => {
   }
 });
 
-Deno.test("a /projects slug that has a tool page redirects to the tool page", () => {
+Deno.test("a moved slug redirects from /work and /projects to its new tool slug, a client slug stays under /work", () => {
   const table = buildRedirectTable({
-    workSlugs: ["some-tool", "client-app"],
-    toolSlugs: ["some-tool"],
+    workSlugs: ["client-app"],
+    movedSlugs: { "old-name": "new-name" },
   });
-  assertEquals(
-    redirectTarget("/projects/some-tool", table),
-    "/tools/some-tool",
-  );
-  assertEquals(
-    redirectTarget("/projects/some-tool/", table),
-    "/tools/some-tool",
-  );
+  for (const from of ["/projects/old-name", "/work/old-name"]) {
+    assertEquals(redirectTarget(from, table), "/tools/new-name", from);
+    assertEquals(redirectTarget(`${from}/`, table), "/tools/new-name", from);
+  }
   assertEquals(
     redirectTarget("/projects/client-app", table),
     "/work/client-app",
   );
+  assertEquals(redirectTarget("/work/client-app", table), undefined);
 });
 
 Deno.test("an unknown /projects slug is not redirected, so it answers 404", () => {
@@ -106,7 +131,14 @@ Deno.test("redirects a trailing-slash post URL to the slash-free form", () => {
 });
 
 Deno.test("redirects a trailing-slash work URL to the slash-free form", () => {
-  assertEquals(redirectTarget("/work/mig/"), "/work/mig");
+  assertEquals(redirectTarget("/work/smartlite/"), "/work/smartlite");
+});
+
+Deno.test("redirects a trailing-slash tool URL to the slash-free form", () => {
+  assertEquals(redirectTarget("/tools/mig/"), "/tools/mig");
+  assertEquals(redirectTarget("/tools/no-such-tool/"), "/tools/no-such-tool");
+  assertEquals(redirectTarget("/tools"), undefined);
+  assertEquals(redirectTarget("/tools/mig"), undefined);
 });
 
 Deno.test("redirects a trailing-slash URL even for an unknown slug — the target then 404s normally", () => {
@@ -137,7 +169,7 @@ Deno.test("never redirects the home page", () => {
 
 Deno.test("leaves an ordinary post or work URL alone", () => {
   assertEquals(redirectTarget("/blog/ship-it-today"), undefined);
-  assertEquals(redirectTarget("/work/mig"), undefined);
+  assertEquals(redirectTarget("/work/smartlite"), undefined);
   assertEquals(redirectTarget("/work"), undefined);
 });
 
@@ -146,8 +178,11 @@ Deno.test("leaves unrelated trailing-slash paths alone", () => {
   assertEquals(redirectTarget("/blog/"), undefined);
 });
 
-Deno.test("the retired homelab slug's target is a real project and homelab itself is gone", () => {
-  const all = [...projects.my, ...projects.freelance];
-  assert(all.some((p) => p.slug === "rostok"), "no rostok project");
-  assert(!all.some((p) => p.slug === "homelab"), "homelab is still a project");
+Deno.test("the retired homelab slug's target is a real tool and homelab itself is gone", () => {
+  assert(findTool("rostok"), "no rostok tool");
+  assert(!findTool("homelab"), "homelab is still a tool");
+  assert(
+    !projects.freelance.some((p) => p.slug === "homelab"),
+    "homelab is still a project",
+  );
 });

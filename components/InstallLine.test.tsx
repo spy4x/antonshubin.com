@@ -1,11 +1,11 @@
-import { assert } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { render } from "npm:preact-render-to-string@^6.6.3";
 import { InstallLine } from "./InstallLine.tsx";
-import { type Tool, tools } from "../lib/tools.ts";
+import { type Tool, tool } from "../lib/tools.ts";
 
 // Made-up tools, so these tests hold whatever the real registry says is published.
 const published: Tool = {
-  ...tools[0],
+  ...tool("ts-libs"),
   name: "Sample",
   slug: "sample",
   registry: {
@@ -18,7 +18,7 @@ const published: Tool = {
 };
 const unpublished: Tool = {
   ...published,
-  registry: { ...published.registry, published: false },
+  registry: { ...published.registry!, published: false },
 };
 
 Deno.test("a published tool's install line offers a copy button", () => {
@@ -38,4 +38,11 @@ Deno.test("an unpublished tool's install line has no copy button and says it is 
     html.includes("Not yet available: 9.9.9 is being published to JSR now."),
     `no "not yet available" note:\n${html}`,
   );
+});
+
+Deno.test("a tool with no registry renders no install line at all", () => {
+  const html = render(
+    <InstallLine tool={{ ...published, registry: undefined }} id="install" />,
+  );
+  assertEquals(html, "");
 });

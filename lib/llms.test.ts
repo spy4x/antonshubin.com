@@ -6,11 +6,11 @@ import {
   toolSummary,
 } from "./llms.ts";
 import type { Project } from "./data.ts";
-import { type Tool, tools } from "./tools.ts";
+import { type Tool, tool } from "./tools.ts";
 
 // Made-up tools, so these tests hold whatever the real registry says is published.
 const published: Tool = {
-  ...tools[0],
+  ...tool("ts-libs"),
   name: "Sample",
   slug: "sample",
   registry: {
@@ -23,7 +23,7 @@ const published: Tool = {
 };
 const unpublished: Tool = {
   ...published,
-  registry: { ...published.registry, published: false },
+  registry: { ...published.registry!, published: false },
 };
 
 Deno.test("toolSummary gives a published tool's install command", () => {
@@ -41,6 +41,21 @@ Deno.test("toolSummary never gives an unpublished tool's install command", () =>
     line.includes("Not yet on JSR: 9.9.9 is being published now."),
     `no "not yet" note:\n${line}`,
   );
+});
+
+Deno.test("toolSummary for a tool with no registry offers no install and carries its status, use and standing", () => {
+  const line = toolSummary({
+    ...published,
+    registry: undefined,
+    status: "in-use",
+    usedFor: "Runs my booking page.",
+    standing: "Stalwart support is broken.",
+  });
+  assert(!line.includes("Install"), `install offered:\n${line}`);
+  assert(!line.includes("Not yet on"), `unpublished note:\n${line}`);
+  assert(line.includes("Status: In use."), `no status:\n${line}`);
+  assert(line.includes("Runs my booking page."), `no usedFor:\n${line}`);
+  assert(line.includes("Stalwart support is broken."), `no standing:\n${line}`);
 });
 
 const base: Project = {
