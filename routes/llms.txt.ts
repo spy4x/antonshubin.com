@@ -89,7 +89,8 @@ ${promisesList}
 - [Contact](${BASE_URL}/contact-me) — Book a ${INTRO_CALL} on the page, send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting
 - [Work](${BASE_URL}/work)
-- [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install${hackathonsLink}
+- [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install
+- [Privacy](${BASE_URL}/privacy) — What the brief form, the newsletter and analytics collect${hackathonsLink}
 
 ## Tools
 
