@@ -1,4 +1,3 @@
-import { proof } from "./proof.ts";
 import { type BlogArticle, loadBlogArticles } from "./blog-posts.ts";
 
 export type { BlogArticle };
