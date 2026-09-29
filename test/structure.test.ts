@@ -787,24 +787,29 @@ siteTest(
 );
 
 siteTest(
-  "the home page JSON-LD is one ProfilePage about Anton, with no breadcrumb, review or rating",
+  "the home page JSON-LD is a WebPage about Anton, with no profile, breadcrumb, review or rating",
   async (site) => {
     const nodes = jsonLd(await site.html("/"))
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d]) as {
         "@type"?: string;
         name?: string;
-        mainEntity?: { "@id": string };
+        about?: { "@id": string };
       }[];
-    const profiles = nodes.filter((n) => n["@type"] === "ProfilePage");
-    assertEquals(profiles.length, 1);
-    assertEquals(profiles[0].mainEntity, {
-      "@id": "https://antonshubin.com/#person",
-    });
+    const pages = nodes.filter((n) => n["@type"] === "WebPage");
+    assertEquals(pages.length, 1);
+    assertEquals(pages[0].about, { "@id": "https://antonshubin.com/#person" });
     assertEquals(
       nodes.find((n) => n["@type"] === "WebSite")?.name,
       "Anton Shubin",
     );
-    for (const type of ["BreadcrumbList", "Review", "AggregateRating"]) {
+    for (
+      const type of [
+        "ProfilePage",
+        "BreadcrumbList",
+        "Review",
+        "AggregateRating",
+      ]
+    ) {
       assert(!nodes.some((n) => n["@type"] === type), `${type} on /`);
     }
   },
