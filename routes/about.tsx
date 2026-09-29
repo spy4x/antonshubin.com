@@ -3,6 +3,7 @@ import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { head, ROLE } from "../lib/head.ts";
 import {
+  INVOICE_NOTE,
   LOCATION,
   SCHEDULE_URL,
   TIMEZONE_LABEL,
@@ -279,10 +280,9 @@ export default define.page(function About(ctx) {
                 Paying and contracting
               </h2>
               <p class="max-w-2xl text-graphite leading-relaxed">
-                Invoices are issued by NeatSoft PTE LTD, Singapore (UEN
-                202300222R), where I'm co-founder and CEO. You can pay by card
-                through Stripe, by US bank transfer (ACH or Fedwire) or in
-                crypto.{" "}
+                {INVOICE_NOTE}{" "}
+                You can pay by card through Stripe, by US bank transfer (ACH or
+                Fedwire) or in crypto.{" "}
                 <a href="/pay" data-umami-event="about-pay" class={LINK}>
                   Payment details
                   <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />

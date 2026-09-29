@@ -39,6 +39,10 @@ Deno.test("Book goes to /contact-me from the rail and the tab bar on every page,
           `${path}: ${link.tag}`,
         );
         assert(!link.tag.includes("target="), `${path}: ${link.tag}`);
+        assert(
+          link.tag.includes(`aria-current="false"`),
+          `${path}: Book is not marked aria-current="false": ${link.tag}`,
+        );
         assert(link.tag.includes("data-primary-book"), `${path}: ${link.tag}`);
         assert(link.text.startsWith("Book"), `${path}: reads "${link.text}"`);
       }
@@ -64,6 +68,10 @@ Deno.test("Book reads Write and goes to the brief on /contact-me when SCHEDULE_U
           `${path}: ${link.tag}`,
         );
         assertEquals(link.text, "Write", `${path}: reads "${link.text}"`);
+        assert(
+          link.tag.includes(`aria-current="false"`),
+          `${path}: Write is not marked aria-current="false": ${link.tag}`,
+        );
       }
     }
     const contact = await site.html("/contact-me");

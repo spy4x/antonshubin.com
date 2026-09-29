@@ -7,7 +7,7 @@ import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import { TestimonialCard } from "../components/TestimonialCard.tsx";
-import { SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts";
+import { INVOICE_NOTE, SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts";
 import {
   EMAIL_ADDRESS,
   emailContact,
@@ -25,8 +25,6 @@ import {
 } from "../lib/testimonials.ts";
 import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
 import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
-
-/** The one address on the page, written out in full so it can be copied (#272, Mkt 3). */
 
 /** The client sentence beside the calendar (#272, Psych 5): not one the home page shows. */
 const QUOTE_ID = "roley-2";
@@ -211,8 +209,7 @@ export default define.page(function ContactMe(ctx) {
               </a>
             </p>
             <p class="mt-4 text-sm text-graphite">
-              Invoices are issued by NeatSoft PTE LTD, Singapore (UEN
-              202300222R), where I'm co-founder and CEO.
+              {INVOICE_NOTE}
             </p>
           </FactCard>
         </div>

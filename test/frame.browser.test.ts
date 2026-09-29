@@ -93,6 +93,20 @@ Deno.test("the home page, a nested page, /privacy and the 404 have no axe violat
             `${where} scrolls sideways: ${scrollWidth}px wide`,
           );
           assertEquals(await axeViolations(page), [], where);
+          // The footer's `content-visibility: auto` clips overflow, so the
+          // scroll check above cannot see it: check each element's edge.
+          const past = await page.evaluate(
+            (width) =>
+              [...document.querySelectorAll("footer, footer *")]
+                .filter((el) => el.getBoundingClientRect().right > width + 0.5)
+                .map((el) => el.tagName + "." + el.className),
+            viewport.width,
+          );
+          assertEquals(
+            past,
+            [],
+            `${where}: footer element past the right edge`,
+          );
           assertEquals(
             await page.locator("footer").count(),
             1,

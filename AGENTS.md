@@ -408,10 +408,10 @@ own projects have their pages at `/tools/<slug>` since #273 (`lib/tools.ts`;
 their old `/work/<slug>` URLs answer 301), and `/work/<slug>` serves client
 projects only (`findWorkProject()`). `lib/work.ts` is derived from `lib/data.ts`
 and `lib/testimonials.ts` and writes no copy of its own. The visible breadcrumb
-shows only on pages two levels deep (`components/Breadcrumb.tsx` renders nothing
-for a trail of two items), so a case page reads "Home / Work / <title>" and
-`/work` shows none; every page keeps its `BreadcrumbList` JSON-LD, whose last
-item is the page name, not the full `<title>`.
+is one "‹ Work" back link on pages two levels deep (`components/Breadcrumb.tsx`
+renders nothing for a trail of two items), so a case page has it and `/work` has
+none; every page keeps its `BreadcrumbList` JSON-LD, whose last item is the page
+name, not the full `<title>`.
 
 Since #270 the index is titled "Client work". The highlights are cards, in
 `highlightSlugs` order (`lib/data.ts`; the home page takes the first three),

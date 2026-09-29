@@ -6,6 +6,7 @@ import { Layout } from "../components/Layout.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import Button from "../components/Button.tsx";
+import { BOOK_HREF, WRITE_FALLBACK_HREF } from "../lib/nav.ts";
 import { ClosingBand } from "../components/ClosingBand.tsx";
 import { FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import {
@@ -34,8 +35,6 @@ import { repeatClientsLine } from "../lib/testimonials.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
 
 /** Where Book goes: the booking page (#272). The written brief is its `#brief` section. */
-const BOOK_HREF = "/contact-me";
-const BRIEF_HREF = "/contact-me#brief";
 
 /** The public repository the AI-agent setup's rules live in. */
 const DOTFILES_URL = "https://github.com/spy4x/dotfiles";
@@ -142,7 +141,7 @@ export default define.page(function HowIWork() {
                   Book a free intro call
                 </BookCallLink>
                 <Button
-                  href={BRIEF_HREF}
+                  href={WRITE_FALLBACK_HREF}
                   data-umami-event="how-i-work-brief-card"
                   class="justify-center px-6 py-3"
                 >
@@ -263,7 +262,7 @@ export default define.page(function HowIWork() {
           promiseIds={[]}
           links={[
             {
-              href: BRIEF_HREF,
+              href: WRITE_FALLBACK_HREF,
               label: "Send a written brief",
               event: "how-i-work-brief-band",
             },

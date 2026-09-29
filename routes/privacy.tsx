@@ -46,8 +46,10 @@ export default define.page(function Privacy(ctx) {
         <Section title="The brief form">
           <p>
             The form asks for your name, your email address and a description of
-            your tech stack. Sending it emails those three answers to me. The
-            site writes no database record or file for them.
+            your tech stack, and it can carry the service you chose. Sending it
+            emails those answers to me. The site writes no database record or
+            file for them. If the site's mail is not set up, the whole brief is
+            written to the server's log instead.
           </p>
         </Section>
 
@@ -76,13 +78,26 @@ export default define.page(function Privacy(ctx) {
         <Section title="What your browser does">
           <p>
             Project pages that show a GitHub star count ask GitHub's API from
-            your browser, so GitHub sees your network address. The browser keeps
-            the count in local storage for an hour.
+            your browser, so GitHub sees your network address. The browser
+            reuses the count for an hour and keeps it in local storage until a
+            newer one overwrites it.
           </p>
           <p>
             A page with an embedded video loads it from YouTube. The site also
             installs a service worker that keeps copies of its pages in your
             browser so they open faster.
+          </p>
+        </Section>
+
+        <Section title="Cloudflare and the booking calendar">
+          <p>
+            The site is served through Cloudflare, which sees every request to
+            it.
+          </p>
+          <p>
+            The Contact page embeds the booking calendar from a separate booking
+            host, which has its own handling of your data. That is out of scope
+            here.
           </p>
         </Section>
 

@@ -1,4 +1,4 @@
-import { LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
+import { INVOICE_NOTE, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
 import { siteItems } from "../lib/nav.ts";
 import {
   emailContact,
@@ -75,8 +75,7 @@ export function Footer({ canBook }: { canBook: boolean }) {
           <p>{ROLE}</p>
           <p>{LOCATION} ({TIMEZONE_LABEL})</p>
           <p class="pt-2">
-            Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R),
-            where I'm co-founder and CEO.
+            {INVOICE_NOTE}
           </p>
         </div>
         {groups.map((g) => (
