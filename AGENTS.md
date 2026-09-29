@@ -310,20 +310,57 @@ are `tool-<slug>-<install-copy|github|issue|live|catalog|post>`,
 ## Navigation
 
 `lib/nav.ts` is the only list of navigation destinations (#185): the desktop
-rail, the phone tab bar, the phone More dialog and the Links groups all read it,
-so changing a destination is one entry there. `components/Nav.tsx` renders the
-rail and the tab bar on the server; only More (`islands/NavMore.tsx`, its
-dialog's contents rendered when it opens) and the rail's Links popover
-(`islands/NavLinks.tsx`, its groups rendered the first time it opens) ship JS.
+rail, the phone tab bar, the phone More dialog and the footer's Site group all
+read it, so changing a destination is one entry there. `components/Nav.tsx`
+renders the rail and the tab bar on the server; only More
+(`islands/NavMore.tsx`, its dialog's contents rendered when it opens) ships JS.
+There is no Links control (#293): More lists pages only (Home, About, How I
+work, Writing, Infrastructure), and the profiles and feeds live in the footer.
 The nav's icons are `components/Icons.tsx`'s `NavGlyph` (one short path each,
 styled by `.nav-icon`) and its states are the `.nav-*` classes in
 `assets/styles.css`: keep its markup small, because under `scripts/lcp.ts`'s
 network profile every extra KB on every page measurably delays the home page's
-LCP image. The phone header (photo, name, `TIMEZONE_LABEL` from `lib/config.ts`)
-is plain markup in `components/Layout.tsx`. Book goes to `SCHEDULE_URL` and
-carries `data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes
-to the home page's brief form (`/#audit-form`). `test/nav.test.ts` checks both
-on every page.
+LCP image. The phone header (photo, name, and `ROLE` on the right) is plain
+markup in `components/Layout.tsx`; the time zone is in the footer. Book goes to
+`SCHEDULE_URL` and carries `data-primary-book`; with `SCHEDULE_URL` unset it
+reads "Write" and goes to the home page's brief form (`/#audit-form`).
+`test/nav.test.ts` checks both on every page.
+
+## Site frame
+
+The frame is what every page shares (#293). `components/Layout.tsx` renders the
+phone header, the nav, `<main>` and `components/Footer.tsx`. The footer is plain
+server markup on Desk with five parts: identity (name, `ROLE`, `LOCATION` and
+`TIMEZONE_LABEL`, the NeatSoft invoices sentence) and four labelled lists, Site
+(`lib/nav.ts`'s `siteItems` plus Privacy), Contact, Elsewhere and For machines.
+At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
+
+- `lib/profiles.ts` is the only list of profile URLs. The footer's Elsewhere
+  group (`footerProfiles`), the `/contact-me` icon row (`contactProfiles`) and
+  the Person JSON-LD's `sameAs` (`sameAsUrls`) read it; `profile(id)` throws on
+  a typo. A new profile is one entry there.
+- `lib/pages.ts` is the only list of core pages: `CORE_PAGES`
+  (`lib/cache-control.ts`), the service worker's precache (`routes/sw.js.ts`)
+  and the sitemap's static entries read it through `pagesFor(surface)`. An entry
+  is in all three unless its `notIn` says why not (`/tools` has its own one-hour
+  cache tier, `/hackathons` answers 404 while there are none, `/pay` is not for
+  search). A new page is one entry there, not three edits.
+- `components/Breadcrumb.tsx` renders one "‹ Section" back link on a page two
+  levels deep, first in the content column, under the nav's word for the section
+  (`lib/nav.ts`'s `navLabel()`); the `BreadcrumbList` JSON-LD is unchanged.
+- `components/NotFound.tsx` is the one not-found page: `routes/_404.tsx` and the
+  `[slug]` routes of blog, work, catalog, tools and hackathons (which answer 404
+  themselves) render it. It has a title, one H1, buttons to Work, Tools and
+  Writing with the requested section's button first, and an email line.
+- `routes/privacy.tsx` says only what the code proves. Change a sentence only
+  together with the code it describes, and add nothing about retention or the
+  mail provider: the repository cannot show either.
+- The site-wide skip link is hidden by `routes/_app.tsx`'s inline critical CSS,
+  whose unlayered `.sr-only` rule would beat Tailwind's layered
+  `focus:not-sr-only`. That rule is `.sr-only:not(:focus)` for this reason;
+  `test/frame.browser.test.ts` checks the link shows when focused.
+
+`test/frame.test.ts` and `test/frame.browser.test.ts` guard all of this.
 
 ## Visual system
 
@@ -693,11 +730,11 @@ own before a build.
 
 Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-eleven files below and fails loudly, naming the install command, if none is
+twelve files below and fails loudly, naming the install command, if none is
 found. Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
 — a mismatch downloads a different Chromium build than the one launched. All
-eleven call `startSite()` and run under `deno task test:browser` with `-A`, not
+twelve call `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
 Two rules keep them stable on a busy machine (#219). Open a page with
@@ -726,15 +763,16 @@ page. Never retry a test on this error.
   phone More dialog's Escape handling (closes it, returns focus to More, and
   does nothing when already closed), the desktop rail's top-to-bottom Tab order
   with no rotated ancestor, horizontal labels and an icon on every stop, the
-  Links popover listing its groups when opened, and the 390px tab bar (five
-  tabs, Book centred, the current page and section styled after hydration, More
-  outlined on a page listed under it, its dialog marking that page, and a tap on
-  the backdrop closing it). The explicit `triggerRef.current?.focus()` calls in
-  both lightboxes are kept on purpose, even though native `<dialog>` already
-  restores focus. Since #246 it also checks the project gallery's "n / N"
-  counter and its named Previous/Next buttons, and runs every axe-core WCAG 2
-  A/AA rule plus a horizontal-scroll check on six sample project pages, and on
-  `/tools` and every tool page, at 390 and 1440px.
+  absence of any Links control in the rail and the More dialog, and the 390px
+  tab bar (five tabs, Book centred, the current page and section styled after
+  hydration, More outlined on a page listed under it, its dialog marking that
+  page, and a tap on the backdrop closing it). The explicit
+  `triggerRef.current?.focus()` calls in both lightboxes are kept on purpose,
+  even though native `<dialog>` already restores focus. Since #246 it also
+  checks the project gallery's "n / N" counter and its named Previous/Next
+  buttons, and runs every axe-core WCAG 2 A/AA rule plus a horizontal-scroll
+  check on six sample project pages, and on `/tools` and every tool page, at 390
+  and 1440px.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the
@@ -820,6 +858,10 @@ page. Never retry a test on this error.
   way, so the test checks the tag's content and, separately, that the tab bar's
   padding follows a 34px inset set through CDP's
   `Emulation.setSafeAreaInsetsOverride`.
+- `test/frame.browser.test.ts` (#293): the skip link is hidden until focused and
+  then visible; `/`, a project page, `/privacy` and a not-found blog URL have no
+  axe violations and no sideways scroll at 390 and 1440px, each with one footer;
+  and at 390px the footer's last line clears the tab bar.
 
 ## Content-Security-Policy
 
@@ -975,24 +1017,9 @@ function unit-tested in `lib/cache-control.test.ts`, applied to every response
 by `main.ts`'s cache middleware. `fetch()` drops a `Host` header, so
 `test/unsubscribe.test.ts` checks the staging wiring with a raw HTTP request
 instead. `/sw.js` sets its own header in `routes/sw.js.ts`. When adding or
-changing routes, update the `CORE_PAGES` set there if the new page should be
-cached at the edge:
-
-```ts
-const CORE_PAGES = new Set([
-  "/",
-  "/how-i-work",
-  "/about",
-  "/infrastructure",
-  "/contact-me",
-  "/blog",
-  "/work",
-  "/catalog",
-  "/pay",
-  "/saas-architecture-guide",
-  "/hackathons",
-]);
-```
+changing routes, add a new core page to `lib/pages.ts` (see "Site frame"): its
+`CORE_PAGES` set, the service worker's precache list and the sitemap all read
+that one list.
 
 Cache tiers:
 
