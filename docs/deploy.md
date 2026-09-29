@@ -26,14 +26,15 @@ are cached at the edge for days, so a replaced image kept showing the old one.
 
 So after `docker compose up` succeeds, `scripts/deploy.ts`:
 
-1. Waits, at most 60 s, until `https://<domain>/sw.js` serves the new
+1. Waits about 60 s at most until `https://<domain>/sw.js` serves the new
    `BUILD_ID`. The check adds its own query string, so Cloudflare's cached copy
    does not answer it. On timeout it warns and purges anyway.
 2. Works out which `static/` files changed. Before uploading anything it read
    the live `/sw.js`, whose cache name holds the build id that was live; the
    step runs `git diff --name-only --no-renames <that id> <this id> -- static/`.
    When that id is unknown (a `dev` build, a 404, or a commit this clone lacks)
-   it says so and purges `/sw.js` only.
+   it says so and purges `/sw.js` only. The diff uses the committed `HEAD`,
+   while rsync uploads the working tree, so deploy from a clean `main`.
 3. Purges `https://<domain>/sw.js` plus each changed file's URL (`static/x` is
    served at `/x`) through Cloudflare's purge-by-URL API, 30 URLs per call. The
    zone id is looked up by name (`antonshubin.com`). Only the apex is purged:
@@ -42,8 +43,12 @@ So after `docker compose up` succeeds, `scripts/deploy.ts`:
    by Cloudflare today, so there the purge changes nothing.
 
 Every failure in this step (no token, network, API error, timeout) prints a
-warning and the deploy still counts as successful. The script never prints the
-token or the request headers.
+warning and the deploy still counts as successful. Each request has its own
+limit: 5 s for a read of `/sw.js`, 10 s for each Cloudflare API call, so a
+stalled server cannot hang the deploy before the upload or after it. The step
+lives in `scripts/cloudflare-purge.ts` (`purgeAfterDeploy()`), with its git
+runner, token reader and `fetch` passed in, so its tests need no network. The
+script never prints the token or the request headers.
 
 The token is `CLOUDFLARE_API_TOKEN` (Zone Read and Cache Purge on the zone). The
 script takes it from the environment, else from `.env.deploy` in the checkout.
