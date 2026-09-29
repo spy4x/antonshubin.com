@@ -53,6 +53,17 @@ Deno.test("booking lead-in lines are gone when SCHEDULE_URL is unset", async () 
       0,
       `/ still offers a booking call with SCHEDULE_URL unset`,
     );
+
+    // /contact-me's only pre-#161 regression was in the <meta description>,
+    // which visibleText() can't see (it strips tags, attributes with them) —
+    // check the raw HTML instead.
+    const contactHtml = await site.html("/contact-me");
+    assertFalse(
+      contactHtml.includes(
+        "Book a free 30-minute intro call, email me, or message me on Telegram.",
+      ),
+      "/contact-me's <meta description> still promises a booking call with SCHEDULE_URL unset",
+    );
   } finally {
     await site.stop();
   }

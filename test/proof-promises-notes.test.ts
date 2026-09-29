@@ -252,7 +252,8 @@ Deno.test("the home page shows the public Upwork earnings with the date they wer
   const site = await startSite();
   try {
     const text = visibleText(await site.html("/"));
-    assert(text.includes("$300K"), "home page does not show $300K");
+    // The "+" is part of the figure as the profile shows it (#269).
+    assert(text.includes("$300K+"), "home page does not show $300K+");
     assert(
       text.includes("checked 26 Sep 2026"),
       "home page does not show the checked date",
@@ -281,6 +282,17 @@ Deno.test("no page or llms file shows the private earnings figure or the old ema
         );
       }
     }
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("llms.txt states the earnings figure with its plus sign", async () => {
+  const site = await startSite();
+  try {
+    const body = await site.html("/llms.txt");
+    assert(body.includes("$300K+"), "llms.txt does not show $300K+");
+    assert(!body.includes("$300K++"), "llms.txt appends a second plus");
   } finally {
     await site.stop();
   }

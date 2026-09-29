@@ -28,7 +28,12 @@ export function Fact(
  * place. Extra attributes (a `data-*` marker) go on the `<aside>`.
  */
 export function FactCard(
-  { label, children, ...rest }: {
+  {
+    label,
+    children,
+    "data-project-facts": projectFacts,
+    "data-home-facts": homeFacts,
+  }: {
     /** The landmark's accessible name, e.g. "Project facts". */
     label: string;
     children: ComponentChildren;
@@ -40,7 +45,8 @@ export function FactCard(
     <aside
       aria-label={label}
       class="bg-paper border border-rule rounded-xl p-5"
-      {...rest}
+      data-project-facts={projectFacts}
+      data-home-facts={homeFacts}
     >
       {children}
     </aside>
