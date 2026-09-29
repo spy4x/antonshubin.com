@@ -73,8 +73,8 @@ Deno.test("booking lead-in lines render when SCHEDULE_URL is set", async () => {
 
     const homeText = visibleText(await site.html("/"));
     assert(
-      count(homeText, /Book a free 30-minute intro call/g) >= 1,
-      `/ offers no booking call with SCHEDULE_URL set`,
+      count(homeText, /Book a free 30-minute intro call/g) === 2,
+      `/ should offer Book twice (hero and closing band) with SCHEDULE_URL set`,
     );
   } finally {
     await site.stop();

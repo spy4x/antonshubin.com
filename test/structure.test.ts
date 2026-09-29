@@ -845,3 +845,32 @@ siteTest(
     assert(!/accent/.test(timeline), "the timeline uses the accent colour");
   },
 );
+
+Deno.test(
+  "the home closing band holds the brief form and the page's one primary Book",
+  async () => {
+    const previous = Deno.env.get("SCHEDULE_URL");
+    Deno.env.set("SCHEDULE_URL", "https://meet.example.com");
+    const site = await startSite();
+    try {
+      const html = await site.html("/");
+      const start = html.indexOf("<section data-closing-band");
+      assert(start > 0, "no closing band on /");
+      const band = html.slice(start, html.indexOf("</section>", start));
+      assert(
+        band.includes('data-home-section="cta"'),
+        "band is not the cta section",
+      );
+      assert(
+        band.includes('id="audit-form"'),
+        "the brief form is not in the band",
+      );
+      assertEquals(count(band, /data-primary-cta/g), 1);
+      assertEquals(count(html, /data-primary-cta/g), 1);
+    } finally {
+      await site.stop();
+      if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+      else Deno.env.set("SCHEDULE_URL", previous);
+    }
+  },
+);

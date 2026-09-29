@@ -6,6 +6,7 @@ import { formatPeriod, highlightProjects } from "../lib/data.ts";
 import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
 import { promise } from "../lib/promises.ts";
+import { ClosingBand } from "../components/ClosingBand.tsx";
 import { PromiseTimeline } from "../components/PromiseTimeline.tsx";
 import {
   homeTestimonialIds,
@@ -408,31 +409,18 @@ export default define.page(function Home(ctx) {
           </p>
         </section>
 
-        {
-          /* 6. Closing band. Interim until the shared ClosingBand lands
-          (#270): Book, then the brief form. */
-        }
-        <section
-          id="cta-bottom"
-          data-home-section="cta"
-          class="mb-16 md:mb-24"
+        {/* 6. Closing band: the brief form sits in its `children` slot */}
+        <ClosingBand
+          heading="Book a call or send a brief"
+          bookEvent="home-book-call"
+          bookLabel={`Book a ${INTRO_CALL}`}
+          primaryCta
+          sectionAttrs={{ id: "cta-bottom", "data-home-section": "cta" }}
         >
-          <h2 class="h2 mb-4">Book a call or send a brief</h2>
-          <BookCallLink
-            url={SCHEDULE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="home-book-call"
-            data-primary-cta
-            class="gap-2.5 px-6 py-3 text-base"
-          >
-            <CalendarIcon class="w-5 h-5" />
-            Book a {INTRO_CALL}
-          </BookCallLink>
-          <div id="audit-form" class="mt-8 scroll-mt-4">
+          <div id="audit-form" class="mb-6 scroll-mt-4">
             <LeadForm scheduleUrl={SCHEDULE_URL} />
           </div>
-        </section>
+        </ClosingBand>
       </div>
     </Layout>
   );
