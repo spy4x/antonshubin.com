@@ -119,27 +119,35 @@ siteTest(
   },
 );
 
-siteTest(
+Deno.test(
   "how-i-work sends Book to /contact-me and the brief to /contact-me#brief, with no calendar on the page",
-  async (site) => {
-    const page = await site.html("/how-i-work");
-    // The nav's own Book links are outside the page's content.
-    const html = page.slice(page.indexOf('id="main-content"'));
-    const book = [...html.matchAll(/<a [^>]*data-primary-book[^>]*>/g)].map((
-      m,
-    ) => m[0]);
-    assertEquals(book.length, 2, "Book appears in the card and the band");
-    for (const a of book) {
-      assert(a.includes('href="/contact-me"'), a);
-      assert(!a.includes("_blank"), a);
+  async () => {
+    // With a calendar URL set, a leftover embed would render: the assertion below can fail.
+    const site = await startSite({
+      env: { SCHEDULE_URL: "https://meet.example.com/book" },
+    });
+    try {
+      const page = await site.html("/how-i-work");
+      // The nav's own Book links are outside the page's content.
+      const html = page.slice(page.indexOf('id="main-content"'));
+      const book = [...html.matchAll(/<a [^>]*data-primary-book[^>]*>/g)].map((
+        m,
+      ) => m[0]);
+      assertEquals(book.length, 2, "Book appears in the card and the band");
+      for (const a of book) {
+        assert(a.includes('href="/contact-me"'), a);
+        assert(!a.includes("_blank"), a);
+      }
+      assert(count(html, /href="\/contact-me#brief"/g) >= 3, "brief links");
+      assert(!/<iframe/.test(html), "an embedded calendar");
+      assert(
+        !/mig:height|MeetEmbed|meet-embed/i.test(html),
+        "the scheduler facade",
+      );
+      assert(!html.includes("/#audit-form"), "the old form link");
+    } finally {
+      await site.stop();
     }
-    assert(count(html, /href="\/contact-me#brief"/g) >= 3, "brief links");
-    assert(!/<iframe/.test(html), "an embedded calendar");
-    assert(
-      !/mig:height|MeetEmbed|meet-embed/i.test(html),
-      "the scheduler facade",
-    );
-    assert(!html.includes("/#audit-form"), "the old form link");
   },
 );
 
@@ -227,7 +235,11 @@ siteTest(
     for (const path of ["/llms.txt", "/llms-full.txt"]) {
       const res = await site.get(path);
       const text = await res.text();
-      assert(/\/how-i-work\)? — /.test(text), `${path}: How I Work line`);
+      assert(/\/how-i-work\)? — /.test(text), `${path}: How I work line`);
+      assert(
+        !text.includes("How I Work"),
+        `${path}: link text is "How I Work"`,
+      );
       assert(
         !/Five promises, pricing, and FAQ/.test(text),
         `${path}: old line`,
@@ -267,3 +279,23 @@ siteTest(
     );
   },
 );
+
+Deno.test("a closing band with no bookHref still opens the calendar in a new tab", async () => {
+  const url = "https://meet.example.com/book";
+  const site = await startSite({ env: { SCHEDULE_URL: url } });
+  try {
+    const html = await site.html("/work");
+    const band = slice(html, "<section data-closing-band", "</section>");
+    const book = band.match(/<a [^>]*data-primary-book[^>]*>/)?.[0] ?? "";
+    assert(
+      book.includes(`href="${url}"`),
+      `Book does not open the calendar: ${book}`,
+    );
+    assert(
+      book.includes('target="_blank"'),
+      `Book has no new-tab target: ${book}`,
+    );
+  } finally {
+    await site.stop();
+  }
+});

@@ -135,7 +135,9 @@ Five entities in a `@graph` array (six on `/about`):
   Answers splice the promises through `promise()`; none is hand-written.
 - Every question has a stable anchor, `/how-i-work#faq-<id>`; every promise has
   `/how-i-work#<promise id>`.
-- Provides Google Rich Results for the /how-i-work page
+- Google shows FAQ rich results only for government and health sites (since
+  August 2023), so this node does not earn a rich result here; it stays as
+  structured, machine-readable Q&A
 - AI crawlers parse this as canonical Q&A about engagement terms
 
 ### 7. Project JSON-LD (routes/work/[slug].tsx)
