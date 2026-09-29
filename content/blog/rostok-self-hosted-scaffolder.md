@@ -16,6 +16,9 @@ you go from a fresh folder to a deployable infrastructure-as-code repo for your
 servers — with secrets in `.env.age` so the whole thing is safe to push to a
 public Git mirror or share with a teammate.
 
+I deploy my own servers with it; [how I run production](/infrastructure) shows
+what that looks like.
+
 ## The shape of the problem
 
 Self-hosting is not the hard part. The hard part is the _plumbing around it_:

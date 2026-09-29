@@ -5,6 +5,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd } from "./html.ts";
+import { blogArticles } from "../lib/data.ts";
 import {
   infraEdges,
   infraGroups,
@@ -110,3 +111,30 @@ siteTest("the crawler files list the page and its map", async (site) => {
   assert(full.includes("/infrastructure"));
   for (const e of infraEdges) assert(full.includes(` ${e.verb} `));
 });
+
+/** The posts about a layer of the map: each links back to the page (SEO 6 on #295). */
+const POSTS_LINKING_BACK = [
+  "cost-optimization-laboratory",
+  "rostok-self-hosted-scaffolder",
+  "zond-sso-probe-bridge",
+  "mig-tiny-self-hosted-scheduler",
+];
+
+siteTest(
+  "each post about a layer of the map links back to /infrastructure",
+  async (site) => {
+    for (const slug of POSTS_LINKING_BACK) {
+      const article = blogArticles.find((a) => a.slug === slug);
+      assert(article, `no post "${slug}"`);
+      assert(
+        !article.archived,
+        `${slug} is archived: it keeps its text as written`,
+      );
+      const html = await site.html(`/blog/${slug}`);
+      assert(
+        count(html, /<a[^>]+href="\/infrastructure"/) >= 1,
+        `/blog/${slug} does not link /infrastructure`,
+      );
+    }
+  },
+);
