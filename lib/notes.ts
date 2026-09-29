@@ -42,6 +42,12 @@ export const notes: Note[] = [
     text: "Live when I last checked.",
     checkedOn: "2026-09-25",
   },
+  {
+    id: "infra-live-checked",
+    text:
+      "All three answered when I checked. The CI link opens a public repository's pipelines, because the root asks for a GitHub sign-in.",
+    checkedOn: "2026-09-30",
+  },
 ];
 
 /** Looks a note up by id and throws on a typo, so a bad id fails the build, not a visitor. */

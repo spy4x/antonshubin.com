@@ -423,6 +423,22 @@ comes back. `/about` carries the site's only `ProfilePage` JSON-LD
 `ProfilePage`. It is linked from the phone More sheet, the home fact card and a
 top line on the 2022 post.
 
+### Infrastructure page
+
+`routes/infrastructure.tsx` (#295) is "How I run production": the three live
+links first (dash., ci., meet., with one `infra-live-checked` note that carries
+the date they last answered 200), then a map in plain HTML, a SmartLite block,
+one open section per layer (job first, tool in parentheses), a "This site"
+colophon, the workload rows, two catalog cards and the closing band.
+`lib/infrastructure.ts` is the only list of the map's boxes, arrows (each with
+its verb) and live links; the page, `llms-full.txt` and the `TechArticle`
+`mentions` read it, and `lib/infrastructure.test.ts` fails on an arrow to a
+missing box. Add an arrow only when it is true today; never link probe-home (503
+whenever a home-lab service is down). The CI link is mig's public pipeline list
+because the root of ci. asks for a GitHub sign-in. The colophon's "this build"
+reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the live links and bump
+`LIVE_CHECKED_ON` and the note's `checkedOn` together.
+
 ### Project page
 
 `routes/work/[slug].tsx` (#246) is a two-column case study from 1024px: a real

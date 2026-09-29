@@ -298,7 +298,8 @@ Deno.test("the six sample project pages have no horizontal scroll and no axe vio
   }
 });
 
-Deno.test("/work has no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+/** No sideways scroll and no axe violation on `path` at 390 and 1440px, with a booking URL set. */
+async function assertPageSound(path: string) {
   const previous = Deno.env.get("SCHEDULE_URL");
   // The closing band's Book renders only with a booking URL; RFC 2606 host.
   Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
@@ -309,8 +310,8 @@ Deno.test("/work has no horizontal scroll and no axe violations at 390 and 1440p
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
       const page: Page = await newPage(browser, { viewport });
       try {
-        const where = `/work at ${viewport.width}px`;
-        await page.goto(`${site.origin}/work`, { waitUntil: "networkidle" });
+        const where = `${path} at ${viewport.width}px`;
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
         const scrollWidth = await page.evaluate(() =>
           document.documentElement.scrollWidth
         );
@@ -329,7 +330,13 @@ Deno.test("/work has no horizontal scroll and no axe violations at 390 and 1440p
     if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
     else Deno.env.set("SCHEDULE_URL", previous);
   }
-});
+}
+
+for (const path of ["/work", "/infrastructure"]) {
+  Deno.test(`${path} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
+    await assertPageSound(path);
+  });
+}
 
 Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440px", async () => {
   // Book renders only with a booking URL; RFC 2606 host.

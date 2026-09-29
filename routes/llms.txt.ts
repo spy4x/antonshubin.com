@@ -88,7 +88,7 @@ ${promisesList}
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide)
 - [Services and prices](${BASE_URL}/catalog)
 - [How I Work](${BASE_URL}/how-i-work)
-- [Production Infrastructure](${BASE_URL}/infrastructure) — Operational proof of deployable, observable, recoverable, and transferable systems
+- [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect, and how deploys, backups, monitoring and sign-in are handled
 - [Contact](${BASE_URL}/contact-me)
 - [Blog](${BASE_URL}/blog)
 - [Work](${BASE_URL}/work)
