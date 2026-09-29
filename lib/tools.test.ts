@@ -10,8 +10,11 @@ import {
   toolGroups,
   toolRows,
   tools,
+  toolsForPost,
 } from "./tools.ts";
 import { repoSnapshot } from "./github-snapshot.ts";
+import { blogArticles } from "./data.ts";
+import { catalogItem } from "./catalog.ts";
 
 /** A minimal tool for the tests that build their own list. */
 const sample = (slug: string, group: Tool["group"]): Tool => ({
@@ -143,4 +146,30 @@ Deno.test("repoUrl and ciUrl are undefined for a tool without a repository or a 
   assertEquals(ciUrl(bare), undefined);
   assertEquals(repoUrl(tool("mig")), "https://github.com/spy4x/mig");
   assertEquals(ciUrl(tool("mig")), "https://ci.antonshubin.com/repos/12");
+});
+
+Deno.test("every post a tool names is a real post, and every catalogSlug a real catalog item", () => {
+  for (const t of tools) {
+    for (const slug of t.posts ?? []) {
+      assert(
+        blogArticles.some((a) => a.slug === slug),
+        `${t.slug}: no post "${slug}"`,
+      );
+    }
+    if (t.catalogSlug) catalogItem(t.catalogSlug);
+  }
+});
+
+Deno.test("toolsForPost finds the tool that names a post, and none for another", () => {
+  assertEquals(
+    toolsForPost("mig-tiny-self-hosted-scheduler").map((t) => t.slug),
+    ["mig"],
+  );
+  assertEquals(toolsForPost("ship-it-today"), []);
+});
+
+Deno.test("a runnable tool names its schema.org category, and a tool never names a rating", () => {
+  for (const t of tools) {
+    if (t.deployable) assert(t.appCategory, `${t.slug}: no appCategory`);
+  }
 });

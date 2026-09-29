@@ -8,7 +8,9 @@ import type { Tool } from "../lib/tools.ts";
  * that cannot work yet. `id` must be unique on the page: the copy button
  * reads the command's text through it.
  */
-export function InstallLine({ tool, id }: { tool: Tool; id: string }) {
+export function InstallLine(
+  { tool, id }: { tool: Tool; id: string },
+) {
   const { registry } = tool;
   if (!registry) return null;
   return (
@@ -27,6 +29,7 @@ export function InstallLine({ tool, id }: { tool: Tool; id: string }) {
             elementId={id}
             label="Copy"
             title={`Copy the install command for ${tool.name}`}
+            umamiEvent={`tool-${tool.slug}-install-copy`}
           />
         )}
       </div>

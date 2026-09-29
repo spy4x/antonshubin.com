@@ -12,7 +12,6 @@ export const CORE_PAGES = new Set([
   "/contact-me",
   "/blog",
   "/work",
-  "/tools",
   "/catalog",
   "/pay",
   "/saas-architecture-guide",
@@ -107,6 +106,13 @@ export function cacheControlFor(
   // Vary for HTML. A single cached copy would reach everyone, so a bot's
   // page would drop analytics for every visitor. The rule needs a cache key
   // that separates bots from browsers.
+
+  // The tools hub and every tool page show versions, stars and CI status that
+  // the server refreshes hourly (lib/tools-live.ts), so a three-day edge copy
+  // would hide every refresh: keep them for an hour.
+  if (pathname === "/tools" || pathname.startsWith("/tools/")) {
+    return "public, max-age=3600, stale-while-revalidate=600";
+  }
 
   // Core static pages — cache 3 days at edge, stale-while-revalidate
   // for PWA background refreshes. The site content changes every few

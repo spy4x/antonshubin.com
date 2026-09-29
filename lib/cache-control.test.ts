@@ -122,3 +122,25 @@ Deno.test("production caches /about as a core page", () => {
     "public, max-age=259200, stale-while-revalidate=43200",
   );
 });
+
+Deno.test("the tools hub and every tool page are kept for an hour, not three days", () => {
+  for (const pathname of ["/tools", "/tools/mig", "/tools/ts-libs"]) {
+    const value = cacheControlFor({ ...PAGE, pathname });
+    assertEquals(
+      value,
+      "public, max-age=3600, stale-while-revalidate=600",
+      pathname,
+    );
+  }
+  assertEquals(
+    cacheControlFor({ ...PAGE, pathname: "/work" }),
+    "public, max-age=259200, stale-while-revalidate=43200",
+  );
+});
+
+Deno.test("a missing tool page is never cached", () => {
+  assertEquals(
+    cacheControlFor({ ...PAGE, pathname: "/tools/no-such-tool", status: 404 }),
+    "no-store",
+  );
+});

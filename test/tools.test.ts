@@ -92,7 +92,8 @@ siteTest(
       }
     }
     assert(
-      visibleText(html).includes("Status key"),
+      html.includes("data-status-key") &&
+        visibleText(html).includes("What the status marks mean"),
       "/tools has no status key",
     );
   },
@@ -224,27 +225,190 @@ siteTest(
 );
 
 siteTest(
-  "every tool page carries SoftwareSourceCode JSON-LD for its repo",
+  "a tool page carries SoftwareSourceCode for its repo, SoftwareApplication for a runnable tool, and no rating, review or offer",
   async (site) => {
     for (const t of tools) {
       const nodes = jsonLd(await site.html(`/tools/${t.slug}`)) as Record<
         string,
         unknown
       >[];
-      const node = nodes.find((n) => n["@type"] === "SoftwareSourceCode");
-      assert(node, `${t.slug} has no SoftwareSourceCode node`);
-      if (t.repo) {
-        assertEquals(node.codeRepository, `https://github.com/${t.repo}`);
+      const code = nodes.find((n) => n["@type"] === "SoftwareSourceCode");
+      const app = nodes.find((n) => n["@type"] === "SoftwareApplication");
+      assertEquals(Boolean(code), Boolean(t.repo), `${t.slug}: code node`);
+      if (code) {
+        assertEquals(code.codeRepository, `https://github.com/${t.repo}`);
+        assertEquals(
+          "version" in code,
+          t.registry?.published ?? false,
+          `${t.slug}: version`,
+        );
+        assertEquals(
+          code.programmingLanguage,
+          t.programmingLanguage,
+          `${t.slug}: programmingLanguage`,
+        );
       }
-      assertEquals(
-        "version" in node,
-        t.registry?.published ?? false,
-        `${t.slug}: version`,
+      assertEquals(Boolean(app), Boolean(t.deployable), `${t.slug}: app node`);
+      if (app) {
+        assertEquals("url" in app, Boolean(t.live), `${t.slug}: app url`);
+        assert(
+          !String(app.url ?? "").includes("github.com"),
+          `${t.slug}: app url is a repository`,
+        );
+      }
+      const text = JSON.stringify(
+        nodes.filter((n) =>
+          n["@type"] === "SoftwareSourceCode" ||
+          n["@type"] === "SoftwareApplication"
+        ),
+      );
+      for (const banned of ["Review", "AggregateRating", "Offer"]) {
+        assert(!text.includes(banned), `${t.slug}: ${banned} in JSON-LD`);
+      }
+    }
+  },
+);
+
+siteTest(
+  "/tools carries CollectionPage JSON-LD listing every page tool in hub order",
+  async (site) => {
+    const nodes = jsonLd(await site.html("/tools")) as Record<
+      string,
+      unknown
+    >[];
+    const page = nodes.find((n) => n["@type"] === "CollectionPage");
+    assert(page, "no CollectionPage node");
+    const list = page.mainEntity as {
+      "@type": string;
+      itemListElement: { position: number; url: string }[];
+    };
+    assertEquals(list["@type"], "ItemList");
+    const expected = groupedTools().flatMap((g) => g.tools).map((t) =>
+      `https://antonshubin.com/tools/${t.slug}`
+    );
+    assertEquals(list.itemListElement.map((i) => i.url), expected);
+    assertEquals(
+      list.itemListElement.map((i) => i.position),
+      expected.map((_, i) => i + 1),
+    );
+  },
+);
+
+siteTest(
+  "the hub shows tools first and puts the status key in a closed details at the end",
+  async (site) => {
+    const html = await site.html("/tools");
+    const order = [...html.matchAll(/data-tool-group="([^"]+)"/g)].map((m) =>
+      m[1]
+    );
+    assertEquals(order, ["tools", "products", "archive"]);
+    assert(
+      html.indexOf("data-status-key") >
+        html.indexOf('data-tool-group="archive"'),
+      "status key is not after the groups",
+    );
+    assert(
+      !/<details[^>]*data-status-key[^>]*\sopen/.test(html),
+      "key is open",
+    );
+    assertEquals(count(html, /install-/g), 0, "the hub offers an install line");
+  },
+);
+
+siteTest(
+  "every page saying CI status says whether it is the committed snapshot",
+  async (site) => {
+    for (const path of ["/tools", "/tools/mig", "/tools/ts-libs"]) {
+      const text = visibleText(await site.html(path));
+      assert(text.includes("committed snapshot"), `${path}: no freshness note`);
+    }
+  },
+);
+
+siteTest(
+  "each tool with posts links them, and each of those posts links its tool page back",
+  async (site) => {
+    const withPosts = tools.filter((t) => t.posts?.length);
+    assertEquals(withPosts.length, 6);
+    for (const t of withPosts) {
+      const page = await site.html(`/tools/${t.slug}`);
+      for (const slug of t.posts!) {
+        assert(page.includes(`href="/blog/${slug}"`), `${t.slug} -> ${slug}`);
+        const post = await site.html(`/blog/${slug}`);
+        assert(
+          post.includes(`href="/tools/${t.slug}"`),
+          `/blog/${slug} does not link /tools/${t.slug}`,
+        );
+        assert(
+          post.includes(`data-umami-event="post-tool-${t.slug}"`),
+          `/blog/${slug} link to /tools/${t.slug} carries no Umami event`,
+        );
+      }
+    }
+  },
+);
+
+siteTest(
+  "a tool page ends with two doors and three more tools, and its links carry Umami events",
+  async (site) => {
+    for (const t of tools) {
+      const html = await site.html(`/tools/${t.slug}`);
+      assertEquals(count(html, /data-tool-doors/g), 1, t.slug);
+      // The two doors sit in ClosingBand's children slot, which ends the page.
+      assertEquals(count(html, /data-closing-band/g), 1, t.slug);
+      const band = html.slice(html.indexOf("data-closing-band"));
+      assert(band.includes("data-tool-doors"), `${t.slug}: doors in the band`);
+      assert(
+        html.indexOf('id="more"') < html.indexOf("data-closing-band"),
+        `${t.slug}: the band ends the page, after More tools`,
+      );
+      const doors = visibleText(
+        band.slice(band.indexOf(">", band.indexOf("data-tool-doors")) + 1),
       );
       assertEquals(
-        "codeRepository" in node,
-        Boolean(t.repo),
-        `${t.slug}: codeRepository`,
+        doors.startsWith("Use it"),
+        !!t.repo,
+        `${t.slug}: first door`,
+      );
+      assert(
+        doors.includes("Need something like this for your team?"),
+        `${t.slug}: second door`,
+      );
+      const more = html.slice(
+        html.indexOf('id="more"'),
+        html.indexOf("data-closing-band"),
+      );
+      assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
+      assert(
+        html.includes(`data-umami-event="tool-${t.slug}-catalog"`),
+        `${t.slug}: catalog event`,
+      );
+      if (t.repo) {
+        assert(
+          html.includes(`data-umami-event="tool-${t.slug}-issue"`),
+          `${t.slug}: issue event`,
+        );
+      }
+      if (t.registry?.published) {
+        assert(
+          html.includes(`data-umami-event="tool-${t.slug}-install-copy"`),
+          `${t.slug}: install copy event`,
+        );
+      }
+    }
+  },
+);
+
+siteTest(
+  "the hub and the tool pages are cached for an hour, not three days",
+  async (site) => {
+    for (const path of ["/tools", "/tools/mig"]) {
+      const res = await site.get(path);
+      await res.body?.cancel();
+      assertEquals(
+        res.headers.get("cache-control"),
+        "public, max-age=3600, stale-while-revalidate=600",
+        path,
       );
     }
   },
@@ -474,7 +638,10 @@ siteTest(
       );
       const page = visibleText(await site.html(`/tools/${t.slug}`));
       if (licence) {
-        assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
+        // The archive group is one line per project, without a licence.
+        if (t.group !== "archive") {
+          assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
+        }
         assert(page.includes(licence), `${t.slug}: page has no ${licence}`);
       }
     }
@@ -494,3 +661,22 @@ siteTest(
     );
   },
 );
+
+Deno.test("a tool page's closing band carries a Book action", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  });
+  try {
+    for (const t of tools) {
+      const html = await site.html(`/tools/${t.slug}`);
+      const band = html.slice(html.indexOf("data-closing-band"));
+      assertEquals(count(band, /data-primary-book/g), 1, t.slug);
+      assert(
+        band.includes(`data-umami-event="tool-${t.slug}-book"`),
+        `${t.slug}: Book event`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});

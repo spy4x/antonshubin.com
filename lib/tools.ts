@@ -21,6 +21,7 @@
  */
 import { githubSnapshot } from "./github-snapshot.ts";
 import { proof } from "./proof.ts";
+import type { RegistryPackage } from "./snapshot-fetch.ts";
 
 /**
  * Where a tool stands, shown as a shape plus a word by
@@ -51,6 +52,8 @@ export type ToolGroupId = "tools" | "products" | "archive";
 
 export interface ToolGroup {
   id: ToolGroupId;
+  /** How the hub draws the group: cards in two columns, wide cards, or one line each. */
+  layout: "grid" | "wide" | "compact";
   title: string;
   /** One sentence under the group heading. */
   intro: string;
@@ -64,16 +67,19 @@ export interface ToolGroup {
 export const toolGroups: ToolGroup[] = [
   {
     id: "tools",
+    layout: "grid",
     title: "Tools",
     intro: "Tools I run and use in my own work.",
   },
   {
     id: "products",
+    layout: "wide",
     title: "Products",
     intro: "Products I am building. Both are work in progress.",
   },
   {
     id: "archive",
+    layout: "compact",
     title: "Paused or archived",
     intro: "Projects I am not working on right now.",
   },
@@ -105,6 +111,12 @@ export interface ToolRegistry {
   published: boolean;
   /** One command, pinned to `version`. */
   install: string;
+  /**
+   * Where the server asks for the latest version once an hour
+   * (`lib/tools-live.ts`). `version` and `install` are the committed
+   * fallback when that call fails or the refresh is off.
+   */
+  latestFrom?: RegistryPackage;
 }
 
 export interface ToolCi {
@@ -184,6 +196,20 @@ export interface Tool {
   screenshots?: ToolScreenshot[];
   /** Credit a tool must show visibly, such as the design a port is based on. */
   credit?: { text: string; links: ToolLink[] };
+  /**
+   * The `lib/catalog.ts` item closest to this tool today, linked from the
+   * page's "hire me" door. Absent: the door links `/catalog`.
+   */
+  catalogSlug?: string;
+  /** Blog post slugs about this tool; each post links back to the page. */
+  posts?: string[];
+  /**
+   * True for a tool someone can deploy and run (a service, a self-hosted app):
+   * the page then also carries `SoftwareApplication` JSON-LD.
+   */
+  deployable?: true;
+  /** schema.org `applicationCategory` for a deployable tool. */
+  appCategory?: string;
 }
 
 /**
@@ -211,6 +237,16 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
+    posts: ["mig-tiny-self-hosted-scheduler"],
+    deployable: true,
+    appCategory: "BusinessApplication",
+    useIf: [
+      "You want a static meeting link without a Next.js + Postgres deployment.",
+    ],
+    dontUseIf: [
+      "You need more than one owner or more than one feature: it books a time slot for one owner.",
+      "You need a database: storage is a JSON file.",
+    ],
     repo: "spy4x/mig",
     runtime: "Deno, as a single binary",
     programmingLanguage: "TypeScript",
@@ -231,6 +267,12 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
+    posts: ["zond-sso-probe-bridge"],
+    deployable: true,
+    appCategory: "DeveloperApplication",
+    useIf: [
+      "Your monitoring tool has no SSO support and the services it checks sit behind Authelia.",
+    ],
     repo: "spy4x/zond",
     runtime: "Go, as a single distroless binary",
     programmingLanguage: "Go",
@@ -246,6 +288,12 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
+    posts: ["building-mcp-servers-with-deno"],
+    deployable: true,
+    appCategory: "DeveloperApplication",
+    useIf: [
+      "You want an AI assistant such as Claude Desktop, OpenCode, Cursor or Open WebUI to read and write CalDAV events and tasks.",
+    ],
     repo: "spy4x/caldav-mcp",
     runtime: "Deno, as a single binary",
     programmingLanguage: "TypeScript",
@@ -260,6 +308,7 @@ export const tools: Tool[] = [
     kind: "cli",
     status: "in-use",
     group: "tools",
+    posts: ["rostok-self-hosted-scaffolder"],
     repo: "spy4x/rostok",
     programmingLanguage: "TypeScript",
     usedFor:
@@ -275,6 +324,7 @@ export const tools: Tool[] = [
     kind: "library",
     status: "ready",
     group: "tools",
+    catalogSlug: "zero-to-production-saas-mvp",
     repo: "spy4x/ts-libs",
     registry: {
       name: "JSR",
@@ -282,6 +332,7 @@ export const tools: Tool[] = [
       version: "1.3.0",
       published: true,
       install: "deno add jsr:@spy4x/server@1.3.0",
+      latestFrom: { registry: "jsr", name: "@spy4x/server" },
     },
     licence: "MIT",
     runtime:
@@ -354,6 +405,7 @@ export const tools: Tool[] = [
     kind: "component-library",
     status: "beta",
     group: "tools",
+    catalogSlug: "zero-to-production-saas-mvp",
     repo: "spy4x/preact-components",
     registry: {
       name: "JSR",
@@ -361,6 +413,7 @@ export const tools: Tool[] = [
       version: "0.1.1",
       published: true,
       install: "deno add jsr:@spy4x/preact-ui@0.1.1",
+      latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
     },
     licence: "MIT",
     runtime:
@@ -472,6 +525,12 @@ export const tools: Tool[] = [
     kind: "app",
     status: "wip",
     group: "products",
+    catalogSlug: "zero-to-production-saas-mvp",
+    deployable: true,
+    appCategory: "FinanceApplication",
+    dontUseIf: [
+      "You need something ready for everyday use: it is a work in progress.",
+    ],
     repo: "spy4x/financy",
     programmingLanguage: "TypeScript",
     standing: "Being revived — work in progress, not ready for everyday use.",
@@ -488,6 +547,14 @@ export const tools: Tool[] = [
     kind: "template",
     status: "wip",
     group: "products",
+    catalogSlug: "zero-to-production-saas-mvp",
+    posts: ["deno-platform-template"],
+    useIf: [
+      "You start a SaaS product and want API, SPA, MPA, worker, persistence and offline sync foundations.",
+    ],
+    dontUseIf: [
+      "You want product-specific business logic: it has none.",
+    ],
     repo: "spy4x/template",
     runtime: "Deno",
     programmingLanguage: "TypeScript",
@@ -504,6 +571,13 @@ export const tools: Tool[] = [
     kind: "app",
     status: "paused",
     group: "archive",
+    posts: ["self-hosted-caldav-web-ui-tasks-org"],
+    deployable: true,
+    appCategory: "ProductivityApplication",
+    useIf: [
+      "You keep your tasks in Tasks.org and want a web UI over the same CalDAV VTODO files.",
+    ],
+    dontUseIf: ["You use Stalwart: support is currently broken."],
     repo: "spy4x/caldav-tasks-web",
     runtime: "Deno, with Hono and Preact",
     programmingLanguage: "TypeScript",
@@ -545,6 +619,8 @@ export const tools: Tool[] = [
     kind: "app",
     status: "archived",
     group: "archive",
+    deployable: true,
+    appCategory: "ProductivityApplication",
     live: {
       label: "Open it (still online, not maintained)",
       href: "https://toread-today.web.app",
@@ -624,6 +700,11 @@ export function tool(slug: string): Tool {
   const found = tools.find((t) => t.slug === slug);
   if (!found) throw new Error(`lib/tools.ts: no tool "${slug}"`);
   return found;
+}
+
+/** The tools that name the blog post `slug` in their `posts`, in registry order. */
+export function toolsForPost(slug: string): Tool[] {
+  return tools.filter((t) => t.posts?.includes(slug));
 }
 
 /** The tool for `slug`, or undefined: for a route that answers 404 instead of throwing. */

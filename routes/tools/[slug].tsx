@@ -7,9 +7,15 @@ import { Layout } from "../../components/Layout.tsx";
 import StatusMark from "../../components/StatusMark.tsx";
 import Button from "../../components/Button.tsx";
 import { CiPill } from "../../components/CiPill.tsx";
+import { Fact, FactCard } from "../../components/FactCard.tsx";
 import { InstallLine } from "../../components/InstallLine.tsx";
+import { ToolCard } from "../../components/ToolCard.tsx";
+import ImageGallery from "../../islands/ImageGallery.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
-import { metaDescription } from "../../lib/llms.ts";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
+import { catalogItem, catalogPath } from "../../lib/catalog.ts";
+import { blogArticles } from "../../lib/data.ts";
+import { firstSentence, metaDescription } from "../../lib/llms.ts";
 import {
   ciUrl,
   findTool,
@@ -18,51 +24,76 @@ import {
   toolLicence,
   tools,
 } from "../../lib/tools.ts";
+import { MIN_STARS_SHOWN } from "../../lib/github-snapshot.ts";
 import {
-  githubSnapshot,
-  MIN_STARS_SHOWN,
-  repoSnapshot,
-} from "../../lib/github-snapshot.ts";
+  checkedLabel,
+  liveRepo,
+  toolsLive,
+  withLiveVersion,
+} from "../../lib/tools-live.ts";
+
+const SITE = "https://antonshubin.com";
+const linkClass = "text-accent underline underline-offset-4";
 
 /**
  * The tool's `SoftwareSourceCode` JSON-LD node, from registry fields only.
  * A field the entry has no data for is left out, never guessed: `version`
- * until the version is really on its registry, `codeRepository` for code that
- * is not public, `license` when neither the entry nor GitHub names one.
+ * until the version is really on its registry, `programmingLanguage` when it
+ * is not written down, `license` when neither the entry nor GitHub names one.
+ * No rating, review or offer.
  */
-function toolJsonLd(tool: Tool, canonical: string) {
+function sourceCodeJsonLd(tool: Tool, url: string) {
   const licence = toolLicence(tool);
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
-    "@id": `${canonical}#tool`,
+    "@id": `${url}#tool`,
     "name": tool.name,
     "description": tool.summary,
-    "url": canonical,
-    ...(tool.repo ? { "codeRepository": repoUrl(tool) } : {}),
+    "url": url,
+    "codeRepository": repoUrl(tool),
     ...(tool.programmingLanguage
       ? { "programmingLanguage": tool.programmingLanguage }
       : {}),
     ...(licence ? { "license": `https://spdx.org/licenses/${licence}` } : {}),
     ...(tool.registry?.published ? { "version": tool.registry.version } : {}),
-    "author": { "@id": "https://antonshubin.com/#person" },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+    "author": { "@id": `${SITE}/#person` },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": url },
   };
 }
 
-/** One row of the fact card. */
-function Fact(
-  { label, children }: { label: string; children: preact.ComponentChildren },
-) {
-  return (
-    <div class="py-3 border-t border-rule first:border-t-0">
-      <dt class="text-xs uppercase tracking-wider text-graphite">{label}</dt>
-      <dd class="mt-1 text-parchment">{children}</dd>
-    </div>
-  );
+/**
+ * `SoftwareApplication` for a tool someone can run. Its `url` is only ever a
+ * running public instance (`live`), never the repository.
+ */
+function applicationJsonLd(tool: Tool, url: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${url}#app`,
+    "name": tool.name,
+    "description": tool.summary,
+    ...(tool.appCategory ? { "applicationCategory": tool.appCategory } : {}),
+    ...(tool.live
+      ? {
+        "url": tool.live.href.startsWith("/")
+          ? `${SITE}${tool.live.href}`
+          : tool.live.href,
+      }
+      : {}),
+    "author": { "@id": `${SITE}/#person` },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": url },
+  };
 }
 
-const linkClass = "text-accent underline underline-offset-4";
+/** Up to `count` other tools for the strip at the foot: same group first, then the rest. */
+function moreTools(tool: Tool, count = 3): Tool[] {
+  const others = tools.filter((t) => t.slug !== tool.slug);
+  return [
+    ...others.filter((t) => t.group === tool.group),
+    ...others.filter((t) => t.group !== tool.group),
+  ].slice(0, count);
+}
 
 // An unknown slug answers a real 404, like /work/<slug>, so a removed
 // tool page drops out of search instead of indexing an empty 200.
@@ -75,10 +106,10 @@ export const handler = define.handlers({
   },
 });
 
-export default define.page(function ToolPage(ctx) {
-  const tool = findTool(ctx.params.slug);
+export default define.page(async function ToolPage(ctx) {
+  const found = findTool(ctx.params.slug);
 
-  if (!tool) {
+  if (!found) {
     return (
       <Layout currentPath={ctx.url.pathname}>
         <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
@@ -92,41 +123,68 @@ export default define.page(function ToolPage(ctx) {
     );
   }
 
-  const snap = tool.repo ? repoSnapshot(tool.repo) : null;
+  const live = await toolsLive();
+  const tool = withLiveVersion(found, live);
+  const snap = liveRepo(tool, live);
   const licence = toolLicence(tool);
   const repo = repoUrl(tool);
-  const others = tools.filter((t) => t.slug !== tool.slug);
+  const canonical = `${SITE}/tools/${tool.slug}`;
+  const lead = tool.usedFor ?? tool.standing ?? firstSentence(tool.summary);
+  const posts = (tool.posts ?? []).map((slug) => {
+    const post = blogArticles.find((a) => a.slug === slug);
+    if (!post) {
+      throw new Error(`lib/tools.ts: ${tool.slug} names no post "${slug}"`);
+    }
+    return post;
+  });
+  const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null;
+  const event = (what: string) => `tool-${tool.slug}-${what}`;
 
   head.value = {
     ...head.value,
     title: `${tool.name}: ${tool.job} — Anton Shubin`,
     pageName: tool.name,
     description: metaDescription(tool.summary),
-    canonical: `https://antonshubin.com/tools/${tool.slug}`,
+    canonical,
     ogType: "article",
-    ogImage: `https://antonshubin.com/img/og/tools/${tool.slug}.png`,
+    ogImage: `${SITE}/img/og/tools/${tool.slug}.png`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
   };
 
+  const hasFit = (tool.useIf?.length ?? 0) + (tool.dontUseIf?.length ?? 0) > 0;
+
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: toJsonLd(toolJsonLd(tool, head.value.canonical)),
-        }}
-      />
+      {repo && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: toJsonLd(sourceCodeJsonLd(tool, canonical)),
+          }}
+        />
+      )}
+      {tool.deployable && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: toJsonLd(applicationJsonLd(tool, canonical)),
+          }}
+        />
+      )}
       <div class="max-w-5xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <Breadcrumb items={getBreadcrumb(head.value.canonical, tool.name)} />
+        <Breadcrumb items={getBreadcrumb(canonical, tool.name)} />
 
         <header class="max-w-3xl">
           <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
-            {tool.name}: {tool.job}
+            {tool.name}:{" "}
+            <span class="block mt-1 text-xl sm:text-2xl text-graphite">
+              {tool.job}
+            </span>
           </h1>
-          <p class="mt-4 text-graphite text-base sm:text-lg leading-relaxed">
-            {tool.summary}
+          <p class="mt-4 text-parchment text-base sm:text-lg leading-relaxed">
+            {lead}
           </p>
           {tool.credit && (
             <p data-credit class="mt-4 text-parchment">
@@ -139,110 +197,158 @@ export default define.page(function ToolPage(ctx) {
               ))}
             </p>
           )}
-          <div class="mt-6 flex flex-wrap gap-3">
-            {tool.registry && (
-              <Button href="#install" class="px-4 py-2.5 text-sm">
-                Install
-              </Button>
-            )}
-            {repo && (
-              <Button href={repo} class="px-4 py-2.5 text-sm">
-                GitHub
-              </Button>
-            )}
-            {tool.live && (
-              <Button href={tool.live.href} class="px-4 py-2.5 text-sm">
-                {tool.live.label}
-              </Button>
-            )}
+          <div class="mt-6">
+            {tool.registry
+              ? <InstallLine tool={tool} id={`install-${tool.slug}`} />
+              : tool.live
+              ? (
+                <Button
+                  href={tool.live.href}
+                  data-umami-event={event("live")}
+                  class="px-4 py-2.5 text-sm"
+                >
+                  {tool.live.label}
+                </Button>
+              )
+              : repo && (
+                <Button
+                  href={repo}
+                  data-umami-event={event("github")}
+                  class="px-4 py-2.5 text-sm"
+                >
+                  GitHub
+                </Button>
+              )}
           </div>
         </header>
 
         <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-start">
-          <aside
-            aria-labelledby="facts"
-            class="lg:order-2 lg:sticky lg:top-8 bg-paper border border-rule rounded-xl p-5"
+          <div
+            data-fact-card
+            class="order-first lg:order-2 lg:sticky lg:top-8"
           >
-            <h2 id="facts" class="text-lg text-parchment mb-2">Facts</h2>
-            <dl data-fact-card>
-              <Fact label="Status">
-                <StatusMark status={tool.status} />
-              </Fact>
-              {tool.registry && (
-                <Fact label="Version">
-                  <span data-version>
-                    {tool.registry.published
-                      ? tool.registry.version
-                      : `${tool.registry.version}, publishing to ${tool.registry.name}`}
-                  </span>
+            <FactCard label="Tool facts">
+              <h2 class="text-lg text-parchment mb-3">Facts</h2>
+              <dl class="space-y-3 text-sm">
+                <Fact term="Status">
+                  <StatusMark status={tool.status} />
                 </Fact>
+                {tool.registry && (
+                  <Fact term="Version">
+                    <span data-version>
+                      {tool.registry.published
+                        ? tool.registry.version
+                        : `${tool.registry.version}, publishing to ${tool.registry.name}`}
+                    </span>
+                    {tool.registry.published && (
+                      <>
+                        {" on "}
+                        <a href={tool.registry.url} class={linkClass}>
+                          {tool.registry.name}
+                        </a>
+                      </>
+                    )}
+                  </Fact>
+                )}
+                {licence && <Fact term="Licence">{licence}</Fact>}
+                {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
+                {tool.live && (
+                  <Fact term="Live">
+                    <a
+                      href={tool.live.href}
+                      data-umami-event={event("live")}
+                      class={linkClass}
+                    >
+                      {tool.live.label}
+                    </a>
+                  </Fact>
+                )}
+                {repo && (
+                  <Fact term="Code">
+                    <a href={repo} class={linkClass}>{tool.repo}</a>
+                    {snap && snap.stars >= MIN_STARS_SHOWN && (
+                      <span class="text-graphite">, {snap.stars} stars</span>
+                    )}
+                  </Fact>
+                )}
+                {tool.ci && snap && (
+                  <Fact term="CI">
+                    <CiPill
+                      ci={snap.ci}
+                      pipelinesUrl={ciUrl(tool)!}
+                      labelHidden
+                    />
+                    <span data-checked class="block mt-1 text-graphite">
+                      {checkedLabel(live, tool.repo)}
+                    </span>
+                  </Fact>
+                )}
+              </dl>
+              {repo && (
+                <div class="mt-4 pt-4 border-t border-rule text-sm space-y-2">
+                  <p>
+                    <a
+                      href={repo}
+                      data-umami-event={event("github")}
+                      class={linkClass}
+                    >
+                      Star on GitHub
+                    </a>
+                    {" · "}
+                    <a
+                      href={`${repo}/issues`}
+                      data-umami-event={event("issue")}
+                      class={linkClass}
+                    >
+                      Report an issue
+                    </a>
+                  </p>
+                </div>
               )}
-              {licence && <Fact label="Licence">{licence}</Fact>}
-              {tool.runtime && <Fact label="Runs on">{tool.runtime}</Fact>}
-              {tool.registry && (
-                <Fact label="Registry">
-                  <a href={tool.registry.url} class={linkClass}>
-                    {tool.registry.name}
-                  </a>
-                </Fact>
-              )}
-              {tool.live && (
-                <Fact label="Live">
-                  <a href={tool.live.href} class={linkClass}>
-                    {tool.live.label}
-                  </a>
-                </Fact>
-              )}
-              {repo && snap && (
-                <Fact label="Repository">
-                  <a href={repo} class={linkClass}>{tool.repo}</a>
-                  {snap.stars >= MIN_STARS_SHOWN && (
-                    <span class="text-graphite">, {snap.stars} stars</span>
-                  )}
-                </Fact>
-              )}
-              {tool.ci && snap && (
-                <Fact label="CI">
-                  <CiPill
-                    ci={snap.ci}
-                    pipelinesUrl={ciUrl(tool)!}
-                    labelHidden
-                  />
-                  <span class="block mt-1 text-sm text-graphite">
-                    Checked {githubSnapshot.checkedOn}
-                  </span>
-                </Fact>
-              )}
-              {tool.registry && (
-                <Fact label="Install">
-                  <InstallLine tool={tool} id={`fact-install-${tool.slug}`} />
-                </Fact>
-              )}
-            </dl>
-          </aside>
+            </FactCard>
+          </div>
 
           <div class="lg:order-1 min-w-0 space-y-12">
-            {(tool.usedFor || tool.proofLinks) && (
-              <section aria-labelledby="proof">
-                <h2 id="proof" class="text-2xl text-parchment">Live proof</h2>
-                {tool.usedFor && (
-                  <p class="mt-3 text-graphite leading-relaxed">
-                    {tool.usedFor}
-                  </p>
-                )}
-                {tool.proofLinks && (
-                  <ul class="mt-3 space-y-1">
-                    {tool.proofLinks.map((l) => (
-                      <li key={l.href}>
-                        <a href={l.href} class={linkClass}>{l.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+            {tool.screenshots && (
+              <section aria-labelledby="screenshots">
+                <h2 id="screenshots" class="sr-only">Screenshots</h2>
+                <ImageGallery images={tool.screenshots} hero />
               </section>
             )}
 
-            {tool.standing && (
+            {tool.proofLinks && (
+              <section aria-labelledby="proof">
+                <h2 id="proof" class="text-2xl text-parchment">Live proof</h2>
+                <ul class="mt-3 space-y-1">
+                  {tool.proofLinks.map((l) => (
+                    <li key={l.href}>
+                      <a href={l.href} class={linkClass}>{l.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <section aria-labelledby="what">
+              <h2 id="what" class="text-2xl text-parchment">What it is</h2>
+              <p class="mt-3 text-graphite leading-relaxed">{tool.summary}</p>
+              {tool.packages && (
+                <>
+                  <p class="mt-4 text-graphite">
+                    {tool.packages.length} packages, each installed on its own:
+                  </p>
+                  <ul class="mt-2 flex flex-wrap gap-2">
+                    {tool.packages.map((p) => (
+                      <li key={p}>
+                        <code class="text-sm">{p}</code>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
+
+            {tool.standing && tool.usedFor && (
               <section aria-labelledby="standing">
                 <h2 id="standing" class="text-2xl text-parchment">
                   Where it stands
@@ -253,75 +359,33 @@ export default define.page(function ToolPage(ctx) {
               </section>
             )}
 
-            {tool.screenshots && (
-              <section aria-labelledby="screenshots">
-                <h2 id="screenshots" class="text-2xl text-parchment">
-                  Screenshots
-                </h2>
-                {tool.screenshots.map((s) => (
-                  <figure
-                    key={s.src}
-                    class="mt-6 bg-paper border border-rule rounded-xl p-3"
-                  >
-                    <img
-                      src={s.src}
-                      alt={s.alt}
-                      width={s.width}
-                      height={s.height}
-                      loading="lazy"
-                      class="w-full h-auto rounded-lg"
-                    />
-                  </figure>
-                ))}
-              </section>
-            )}
-
-            {tool.registry && (
-              <section aria-labelledby="install">
-                <h2 id="install" class="text-2xl text-parchment">Install</h2>
-                <div class="mt-3">
-                  <InstallLine tool={tool} id={`install-${tool.slug}`} />
-                </div>
-                {tool.packages && (
-                  <>
-                    <p class="mt-4 text-graphite">
-                      {tool.packages.length}{" "}
-                      packages, each installed on its own:
-                    </p>
-                    <ul class="mt-2 flex flex-wrap gap-2">
-                      {tool.packages.map((p) => (
-                        <li key={p}>
-                          <code class="text-sm">{p}</code>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </section>
-            )}
-
-            {((tool.useIf?.length ?? 0) + (tool.dontUseIf?.length ?? 0) > 0) &&
-              (
-                <section
-                  aria-labelledby="fit"
-                  class="grid gap-8 sm:grid-cols-2"
-                >
+            {hasFit && (
+              <section aria-labelledby="fit" class="grid gap-8 sm:grid-cols-2">
+                {(tool.useIf?.length ?? 0) > 0 && (
                   <div>
                     <h2 id="fit" class="text-xl text-parchment">Use it if</h2>
                     <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                      {tool.useIf?.map((line) => <li key={line}>{line}</li>)}
+                      {tool.useIf!.map((line) => <li key={line}>{line}</li>)}
                     </ul>
                   </div>
+                )}
+                {(tool.dontUseIf?.length ?? 0) > 0 && (
                   <div>
-                    <h2 class="text-xl text-parchment">Don't use it if</h2>
+                    <h2
+                      id={tool.useIf?.length ? undefined : "fit"}
+                      class="text-xl text-parchment"
+                    >
+                      Don't use it if
+                    </h2>
                     <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                      {tool.dontUseIf?.map((line) => (
+                      {tool.dontUseIf!.map((line) => (
                         <li key={line}>{line}</li>
                       ))}
                     </ul>
                   </div>
-                </section>
-              )}
+                )}
+              </section>
+            )}
 
             {(tool.fits?.length ?? 0) > 0 && (
               <section aria-labelledby="fits">
@@ -353,39 +417,77 @@ export default define.page(function ToolPage(ctx) {
               </section>
             )}
 
-            <section
-              aria-labelledby="next"
-              class="border-t border-rule pt-8 grid gap-6 sm:grid-cols-2"
-            >
-              <h2 id="next" class="sr-only">What next</h2>
-              {repo && (
-                <div>
-                  <p class="text-parchment">Star it or open an issue.</p>
-                  <a href={`${repo}/issues`} class={linkClass}>
-                    {tool.repo} on GitHub
-                  </a>
-                </div>
-              )}
-              <div>
-                <p class="text-parchment">
-                  Need something like this for your team? That's my day job.
-                </p>
-                <a href="/catalog" class={linkClass}>Services</a>
-              </div>
-            </section>
-
-            {others.length > 0 && (
-              <nav aria-label="Other tools" class="text-sm text-graphite">
-                Other tools: {others.map((t, i) => (
-                  <span key={t.slug}>
-                    {i > 0 && " · "}
-                    <a href={`/tools/${t.slug}`} class={linkClass}>{t.name}</a>
-                  </span>
-                ))} · <a href="/tools" class={linkClass}>All tools</a>
-              </nav>
+            {posts.length > 0 && (
+              <section aria-labelledby="posts">
+                <h2 id="posts" class="text-2xl text-parchment">
+                  {posts.length > 1 ? "Posts" : "The post"}
+                </h2>
+                <ul class="mt-3 space-y-1">
+                  {posts.map((p) => (
+                    <li key={p.slug}>
+                      <a
+                        href={`/blog/${p.slug}`}
+                        data-umami-event={event("post")}
+                        class={linkClass}
+                      >
+                        {p.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
           </div>
         </div>
+
+        <section aria-labelledby="more" class="mt-12">
+          <h2 id="more" class="text-2xl text-parchment">More tools</h2>
+          <ul class="mt-4 grid gap-4 sm:grid-cols-3">
+            {moreTools(tool).map((t) => (
+              <ToolCard key={t.slug} tool={t} live={live} variant="more" />
+            ))}
+          </ul>
+          <p class="mt-4 text-sm">
+            <a href="/tools" class={linkClass}>All tools</a>
+          </p>
+        </section>
+
+        {/* ── Closing band: two doors, one Book ─────────────────────── */}
+        <ClosingBand
+          promiseIds={[]}
+          bookEvent={event("book")}
+          catalogLink={
+            <a
+              href={catalog ? catalogPath(catalog.slug) : "/catalog"}
+              data-umami-event={event("catalog")}
+              class={linkClass}
+            >
+              {catalog ? catalog.title : "Services"}
+            </a>
+          }
+        >
+          <div data-tool-doors class="grid gap-6 sm:grid-cols-2 mb-6">
+            {repo && (
+              <div>
+                <h2 class="text-xl text-parchment">Use it</h2>
+                <p class="mt-1 text-graphite">Star it or open an issue.</p>
+                <a
+                  href={`${repo}/issues`}
+                  data-umami-event={event("issue")}
+                  class={linkClass}
+                >
+                  {tool.repo} on GitHub
+                </a>
+              </div>
+            )}
+            <div>
+              <h2 class="text-xl text-parchment">
+                Need something like this for your team?
+              </h2>
+              <p class="mt-1 text-graphite">That's my day job.</p>
+            </div>
+          </div>
+        </ClosingBand>
       </div>
     </Layout>
   );

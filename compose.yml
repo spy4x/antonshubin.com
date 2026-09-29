@@ -15,6 +15,11 @@ services:
     # Env vars for container: loaded from file at runtime
     # YAML substitution (${DOMAIN}) comes from `--env-file .env.prod` CLI flag
     env_file: .env.prod
+    # /tools refreshes versions, stars and CI status from JSR, GitHub and
+    # Woodpecker at most once an hour (lib/tools-live.ts). Off everywhere else,
+    # so a test or a dev server never calls out.
+    environment:
+      TOOLS_LIVE_REFRESH: "1"
     # Newsletter subscribers (data/subscribers.json) live on the host, in the
     # app directory next to this file, so the container that every deploy
     # recreates never holds the only copy. `:z` relabels the directory for

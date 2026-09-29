@@ -15,91 +15,26 @@
  * api.github.com and never written anywhere.
  */
 import { snapshotRepos } from "../lib/tools.ts";
-import type {
-  CiRunStatus,
-  CiSnapshot,
-  GithubSnapshot,
-  RepoSnapshot,
-} from "../lib/github-snapshot.ts";
+import type { GithubSnapshot, RepoSnapshot } from "../lib/github-snapshot.ts";
+import {
+  latestBranchPipeline,
+  snapshotRepo,
+  type WoodpeckerPipeline,
+} from "../lib/snapshot-fetch.ts";
 
-const WOODPECKER = "https://ci.antonshubin.com";
 const OUT = new URL("../lib/github-snapshot.json", import.meta.url);
 
-/** The fields this script reads from Woodpecker's pipeline list. */
-export interface WoodpeckerPipeline {
-  number: number;
-  status: string;
-  event: string;
-  branch: string;
-  started: number;
-  finished: number;
-}
-
-/**
- * The latest push pipeline on `branch`, as a snapshot entry, or null when the
- * list has none. Pull-request, tag and cron pipelines are skipped: a failing
- * pull request says nothing about the code that is on the default branch.
- * Woodpecker lists newest first, so the first match is the latest.
- */
-export function latestBranchPipeline(
-  pipelines: WoodpeckerPipeline[],
-  branch: string,
-  repoId: number,
-): CiSnapshot | null {
-  const run = pipelines.find((p) => p.event === "push" && p.branch === branch);
-  if (!run) return null;
-  const seconds = run.finished || run.started;
-  return {
-    status: run.status as CiRunStatus,
-    pipeline: run.number,
-    at: new Date(seconds * 1000).toISOString(),
-    url: `${WOODPECKER}/repos/${repoId}/pipeline/${run.number}`,
-  };
-}
-
-async function getJson<T>(url: string, headers: HeadersInit = {}): Promise<T> {
-  const res = await fetch(url, { headers });
-  if (!res.ok) {
-    await res.body?.cancel();
-    throw new Error(`${url} answered ${res.status}`);
-  }
-  return await res.json() as T;
-}
-
-interface GithubRepo {
-  stargazers_count: number;
-  license: { spdx_id: string } | null;
-  pushed_at: string;
-  default_branch: string;
-}
-
-async function snapshotRepo(
-  repo: string,
-  repoId: number | undefined,
-): Promise<RepoSnapshot> {
-  const token = Deno.env.get("GITHUB_TOKEN");
-  const gh = await getJson<GithubRepo>(
-    `https://api.github.com/repos/${repo}`,
-    token ? { Authorization: `Bearer ${token}` } : {},
-  );
-  // A repository with no Woodpecker pipeline has no CI status to record.
-  const pipelines = repoId === undefined ? [] : await getJson<
-    WoodpeckerPipeline[]
-  >(`${WOODPECKER}/api/repos/${repoId}/pipelines?perPage=50`);
-  return {
-    stars: gh.stargazers_count,
-    licence: gh.license?.spdx_id ?? null,
-    pushedAt: gh.pushed_at,
-    ci: repoId === undefined
-      ? null
-      : latestBranchPipeline(pipelines, gh.default_branch, repoId),
-  };
-}
+export { latestBranchPipeline, type WoodpeckerPipeline };
 
 async function main() {
   const repos: Record<string, RepoSnapshot> = {};
   for (const { repo, ciRepoId } of snapshotRepos()) {
-    repos[repo] = await snapshotRepo(repo, ciRepoId);
+    repos[repo] = await snapshotRepo(
+      fetch,
+      repo,
+      ciRepoId,
+      Deno.env.get("GITHUB_TOKEN"),
+    );
     const ci = repos[repo].ci;
     console.log(`${repo}: CI ${ci ? `${ci.status} #${ci.pipeline}` : "none"}`);
   }
