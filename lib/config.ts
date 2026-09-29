@@ -4,7 +4,7 @@ export const BASE_URL = DOMAIN.startsWith("https://")
   ? DOMAIN
   : `https://${DOMAIN}`;
 export const SCHEDULE_URL = Deno.env.get("SCHEDULE_URL") || "";
-/** Shown next to the name in the phone header (#185); Da Nang is ICT. */
+/** Shown after `LOCATION` in the footer (#293); Da Nang is ICT. */
 export const TIMEZONE_LABEL = "UTC+7";
 /**
  * Where Anton lives (#294): the About page, the Person JSON-LD's
@@ -63,16 +63,5 @@ export const SMTP_PORT = parseInt(Deno.env.get("SMTP_PORT") || "587");
 export const SMTP_FROM = Deno.env.get("SMTP_FROM") || "";
 export const SMTP_USERNAME = Deno.env.get("SMTP_USERNAME") || "";
 export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
-export const SAME_AS_URLS = [
-  "https://www.upwork.com/freelancers/ashubin",
-  "https://github.com/spy4x",
-  "https://www.linkedin.com/in/anton-shubin",
-  "https://www.youtube.com/@anton-shubin",
-  // The vlog channel (#294), linked from /about. Checked on 30 Sep 2026: it
-  // answers 200, while an unknown handle answers 404.
-  "https://www.youtube.com/@anton-shubin-live",
-  "https://x.com/spy4x",
-] as const;
-
 /** Anton's X handle, confirmed on 27 Sep 2026 (#193). */
 export const X_HANDLE = "@spy4x";

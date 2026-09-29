@@ -28,14 +28,15 @@ import { TestimonialCard } from "../components/TestimonialCard.tsx";
 import { WithNote } from "../components/WithNote.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
+import { profile } from "../lib/profiles.ts";
 
 const LINK = FACT_LINK;
 
 /** The 2022 post the story is told from; linked as "the longer story". */
 const STORY_POST = "from-office-job-to-freelance-to-my-startups";
 
-/** Anton's vlog channel, the one in `SAME_AS_URLS` next to the work channel. */
-const VLOG_URL = "https://www.youtube.com/@anton-shubin-live";
+/** Anton's vlog channel, from `lib/profiles.ts` next to the work channel. */
+const VLOG_URL = profile("youtube-vlog").href;
 
 /**
  * Two reviews about how Anton treats people and money (psychologist 2), from
