@@ -29,11 +29,14 @@ async function blogSlugsFromSitemap(site: Site): Promise<string[]> {
     .map((p) => p.slice("/blog/".length));
 }
 
-Deno.test("how-i-work renders exactly five promise cards", async () => {
+Deno.test("how-i-work renders exactly five promises, as one timeline", async () => {
   const site = await startSite();
   try {
     const body = await site.html("/how-i-work");
-    assertEquals(count(body, /\bdata-promise\b/g), 5);
+    assertEquals(count(body, /data-promise-timeline="full"/g), 1);
+    const start = body.indexOf('data-promise-timeline="full"');
+    const timeline = body.slice(start, body.indexOf("</ol>", start));
+    assertEquals(count(timeline, /<li /g), 5);
   } finally {
     await site.stop();
   }

@@ -1,5 +1,5 @@
-// Guards for issue #111, #152 and #272: the booking calendar on `/`,
-// `/how-i-work` and `/contact-me`. Since #272 there is no click-to-load
+// Guards for issue #111, #152 and #272: the booking calendar on `/` and
+// `/contact-me` (`/how-i-work` had one until #275). Since #272 there is no click-to-load
 // button: the server renders a reserved placeholder (`data-meet-embed`) and
 // the island inserts the iframe after hydration. Four things are guarded per
 // page:
@@ -294,29 +294,6 @@ Deno.test("home page keeps the collapsed success panel out of the tab order", as
   }
 });
 
-Deno.test("how-i-work ships the calendar placeholder after the FAQ, no iframe in the HTML", async () => {
-  const previous = Deno.env.get("SCHEDULE_URL");
-  Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
-  const site = await startSite();
-  try {
-    const body = await site.html("/how-i-work");
-    assertBookingPlaceholder(body, "/how-i-work", 1, SCHEDULER_ORIGIN);
-
-    const faqIndex = body.indexOf("Frequently Asked Questions");
-    const embedIndex = body.search(EMBED_MARKER);
-    assert(faqIndex >= 0, "/how-i-work: FAQ heading not found");
-    assert(embedIndex >= 0, "/how-i-work: calendar placeholder not found");
-    assert(
-      embedIndex > faqIndex,
-      "/how-i-work: the calendar must come after the FAQ section, so objections are cleared before the ask",
-    );
-  } finally {
-    await site.stop();
-    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-    else Deno.env.set("SCHEDULE_URL", previous);
-  }
-});
-
 Deno.test("contact-me ships the calendar placeholder in #book, a preconnect and no iframe", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
@@ -364,19 +341,6 @@ Deno.test("lead form success panel renders no booking block when SCHEDULE_URL is
     const wrapper = findDivByAttr(body, "data-lead-success");
     const wrapperHtml = body.slice(wrapper.start, wrapper.end);
     assertNoBookingBlock(wrapperHtml, "/ (LeadForm success panel)");
-  } finally {
-    await site.stop();
-    if (previous !== undefined) Deno.env.set("SCHEDULE_URL", previous);
-  }
-});
-
-Deno.test("how-i-work renders no booking block when SCHEDULE_URL is unset", async () => {
-  const previous = Deno.env.get("SCHEDULE_URL");
-  Deno.env.delete("SCHEDULE_URL");
-  const site = await startSite();
-  try {
-    const body = await site.html("/how-i-work");
-    assertNoBookingBlock(body, "/how-i-work");
   } finally {
     await site.stop();
     if (previous !== undefined) Deno.env.set("SCHEDULE_URL", previous);

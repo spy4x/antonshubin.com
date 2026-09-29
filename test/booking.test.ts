@@ -4,7 +4,7 @@
 // "Rather write?" — over the spot where the button used to sit. These
 // tests pin each lead-in phrase absent when SCHEDULE_URL is unset and
 // present when it is set, for every page the issue names, plus the
-// how-i-work FAQ and contact-me <meta description> wording that
+// contact-me <meta description> wording that
 // regressed once silently before (main's pre-#161 wording, restored in
 // the reviewer gate on #161 with every other test still green).
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0";
@@ -36,7 +36,6 @@ const UNSET_LEAD_INS: Array<{ path: string; phrase: string }> = [
     path: "/saas-architecture-guide",
     phrase: "Book a free 30-minute intro call. No pitch, just advice.",
   },
-  { path: "/how-i-work", phrase: "Book the free 30-minute intro call" },
 ];
 
 Deno.test("booking lead-in lines are gone when SCHEDULE_URL is unset", async () => {
