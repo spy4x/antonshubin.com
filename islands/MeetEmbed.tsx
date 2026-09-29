@@ -2,6 +2,10 @@ import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { originOf } from "../lib/csp.ts";
+import { NEW_TAB_LABEL } from "../lib/meet-embed.ts";
+
+// Kept importable from here, where the tests and routes already look.
+export { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
 
 /**
  * Umami's tracking function, loaded onto `window` by the analytics script.
@@ -11,21 +15,6 @@ import { originOf } from "../lib/csp.ts";
  */
 interface UmamiGlobal {
   umami?: { track: (eventName: string) => void };
-}
-
-/**
- * Builds the iframe-friendly scheduler URL from `SCHEDULE_URL`, trimming a
- * trailing slash first so the result is never `//embed`, and appending
- * `?theme=dark` — antonshubin.com is dark-only (no theme toggle), and mig's
- * `/embed` honours the query param through the whole booking flow (mig#44).
- * Returns the empty string when `scheduleUrl` is empty (the local/test
- * default, when the env var is unset) rather than the misleading
- * `/embed?theme=dark` — a relative path that would load this site's own 404
- * page inside the frame.
- */
-export function embedUrl(scheduleUrl: string): string {
-  if (!scheduleUrl) return "";
-  return `${scheduleUrl.replace(/\/+$/, "")}/embed?theme=dark`;
 }
 
 /**
@@ -103,9 +92,6 @@ export function isEmbedHeightMessage(
  * message, not `load`, is the only proof the calendar rendered (#272).
  */
 export const EMBED_TIMEOUT_MS = 8000;
-
-/** The words on the one link that opens the scheduler outside the frame (#272). */
-export const NEW_TAB_LABEL = "Open the calendar in a new tab";
 
 /** The placeholder's three states: waiting, the calendar showed, or it never did. */
 export type EmbedState = "loading" | "ready" | "failed";

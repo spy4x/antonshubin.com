@@ -283,7 +283,7 @@ Deno.test("on the booking page a brief carries its ?service= slug and its succes
   }
 });
 
-Deno.test("the home page mounts the calendar only after a successful brief", async () => {
+Deno.test("the home page loads the calendar's script and mounts it only after a successful brief", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   });
@@ -301,7 +301,18 @@ Deno.test("the home page mounts the calendar only after a successful brief", asy
             body: JSON.stringify({ ok: true }),
           }),
       );
+      const calendarScripts: string[] = [];
+      page.on("request", (req) => {
+        if (req.url().includes("fresh-island__MeetEmbed")) {
+          calendarScripts.push(req.url());
+        }
+      });
       await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      assertEquals(
+        calendarScripts,
+        [],
+        "the calendar's script loaded before a submit",
+      );
       assertEquals(await page.locator("iframe").count(), 0);
       assertEquals(await page.locator("[data-meet-embed]").count(), 0);
 
@@ -309,6 +320,11 @@ Deno.test("the home page mounts the calendar only after a successful brief", asy
       await page.locator("[data-lead-success] [data-meet-embed]").waitFor({
         state: "attached",
       });
+      // The calendar's code arrived with the submit, not with the page.
+      assert(
+        calendarScripts.length > 0,
+        "the calendar mounted without fetching its script after the submit",
+      );
     } finally {
       await page.close();
     }

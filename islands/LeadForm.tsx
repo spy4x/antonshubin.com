@@ -1,9 +1,12 @@
 import { useSignal } from "@preact/signals";
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { ArrowRightIcon, CheckIcon } from "../components/Icons.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { proof } from "../lib/proof.ts";
-import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "./MeetEmbed.tsx";
+import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
+
+/** The calendar island's component, loaded only when the success panel needs it. */
+type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
 
 /** What the written brief promises; the form and `/contact-me` without a scheduler both say it. */
 export const BRIEF_PROMISE =
@@ -134,6 +137,15 @@ export default function LeadForm(
   const errorField = status.value.type === "error"
     ? status.value.field
     : undefined;
+
+  // The calendar's code is fetched only once a brief went out and this panel
+  // is going to show it (#272).
+  const [MeetEmbed, setMeetEmbed] = useState<MeetEmbedComponent | null>(null);
+  const wantsCalendar = isSuccess && Boolean(scheduleUrl) && !calendarAbove;
+  useEffect(() => {
+    if (!wantsCalendar || MeetEmbed) return;
+    import("./MeetEmbed.tsx").then((m) => setMeetEmbed(() => m.default));
+  }, [wantsCalendar]);
 
   // Runs after the DOM commits the success state, once the heading is no
   // longer inside an `inert` subtree and can actually take focus.
@@ -396,11 +408,12 @@ export default function LeadForm(
         {scheduleUrl && !calendarAbove && (
           <>
             {
-              /* Mounted only after a successful submit: the calendar inserts
-                its frame as soon as it mounts, and a collapsed panel must not
-                load the scheduler on every home page view. */
+              /* Mounted only after a successful submit, from code loaded only
+                then: the calendar inserts its frame as soon as it mounts, and
+                neither the scheduler nor the calendar's script may slow every
+                home page view. */
             }
-            {isSuccess && (
+            {isSuccess && MeetEmbed && (
               <div class="flex justify-center">
                 <MeetEmbed
                   url={embedUrl(scheduleUrl)}
