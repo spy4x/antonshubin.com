@@ -320,3 +320,20 @@ siteTest(
     }
   },
 );
+
+siteTest(
+  "every brief link lands on the #brief section with its service prefilled",
+  async (site) => {
+    for (const item of catalogItems) {
+      const path = briefPath(item.slug);
+      const [url, fragment] = path.split("#");
+      assertEquals(fragment, "brief");
+      const html = await site.html(url);
+      assert(html.includes(`id="brief"`), `${path}: no #brief section`);
+      assert(
+        html.includes(`About: ${item.shortTitle}`),
+        `${path}: form not prefilled`,
+      );
+    }
+  },
+);
