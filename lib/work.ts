@@ -2,6 +2,7 @@
 // project's page. Everything here is derived from `lib/data.ts` and
 // `lib/testimonials.ts`; this file writes no copy of its own, so an empty
 // field stays empty and the page renders nothing for it.
+import { catalogItem } from "./catalog.ts";
 import {
   archiveProjects,
   highlightProjects,
@@ -213,4 +214,17 @@ export function repeatClientsSegments(
   return line.split(pattern).filter(Boolean).map((text) =>
     bySlug.has(text) ? { text, slug: bySlug.get(text) } : { text }
   );
+}
+
+/**
+ * The client projects sold under a catalog item (#271): the reverse of
+ * `catalogSlug`, highlights first, then the archive, so a service page shows
+ * its strongest work first. A slug with no project (the strategy session)
+ * gives an empty list, and a typo throws through `catalogItem()`.
+ */
+export function projectsForCatalog(slug: string, count = 3): Project[] {
+  catalogItem(slug);
+  return [...highlightProjects(), ...archiveProjects()]
+    .filter((p) => p.catalogSlug === slug)
+    .slice(0, count);
 }

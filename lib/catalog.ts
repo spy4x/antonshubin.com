@@ -39,11 +39,20 @@ export interface CatalogExample {
   desc: string;
 }
 
+/** A kind of work sold under an item; its `id` is the page's `#fragment`. */
+export interface CatalogCover extends CatalogExample {
+  id: string;
+}
+
 export interface CatalogItem {
   icon: CatalogIconName;
   slug: string;
-  /** Full title: page heading, `<title>`, JSON-LD name. */
+  /** Full title: page heading and JSON-LD name. */
   title: string;
+  /** What the page's `<title>` says, before " — Anton Shubin" (#271). */
+  seoTitle: string;
+  /** schema.org `serviceType` (#271). */
+  category: string;
   /** Short title for cards and lists. */
   shortTitle: string;
   /** One or two prices. Two means the client picks, as with the Ongoing item. */
@@ -61,8 +70,16 @@ export interface CatalogItem {
   /** How the engagement starts, when that is worth spelling out. */
   firstStep?: CatalogExample;
   /** Kinds of work that are sold under this item rather than as their own. */
-  alsoCovers?: CatalogExample[];
+  alsoCovers?: CatalogCover[];
+  /** A line under the price, when the price alone would mislead. */
+  priceNote?: string;
+  /** The item a buyer usually looks at after this one (a `slug`). */
+  next?: string;
 }
+
+/** Under a single "from" price: nothing is charged before the buyer has a number. */
+export const QUOTE_NOTE =
+  "You get a quote for your scope before any work starts.";
 
 /** The free intro call is a call to action, not a catalog item. */
 export const INTRO_CALL = "free 30-minute intro call";
@@ -72,6 +89,9 @@ export const catalogItems: CatalogItem[] = [
     icon: "target",
     slug: "strategy-call",
     title: "Strategy Session — 60 Minutes",
+    seoTitle: "Technical strategy session, 60 minutes",
+    category: "Technical consulting",
+    next: "codebase-health-audit",
     shortTitle: "Strategy session",
     prices: [{ usd: 150, from: false }],
     delivery: "60 minutes",
@@ -101,6 +121,9 @@ export const catalogItems: CatalogItem[] = [
     icon: "search",
     slug: "codebase-health-audit",
     title: "Code Audit & Refactoring Roadmap",
+    seoTitle: "Code audit and refactoring roadmap",
+    category: "Code audit",
+    next: "zero-to-production-saas-mvp",
     shortTitle: "Code audit",
     prices: [{ usd: 1500, from: true }],
     delivery: "3 days",
@@ -131,6 +154,10 @@ export const catalogItems: CatalogItem[] = [
     icon: "rocket",
     slug: "zero-to-production-saas-mvp",
     title: "Build: SaaS MVP, From Idea to Production",
+    seoTitle: "Build a SaaS MVP from idea to production",
+    category: "Software development",
+    next: "cto-advisory-retainer",
+    priceNote: QUOTE_NOTE,
     shortTitle: "Build: MVP",
     prices: [{ usd: 8000, from: true }],
     delivery: "From 3 weeks",
@@ -147,16 +174,19 @@ export const catalogItems: CatalogItem[] = [
     },
     alsoCovers: [
       {
+        id: "backend-api",
         title: "Backend API",
         desc:
           "A production REST or GraphQL API with PostgreSQL schema design, authentication and authorization, monitoring, automated backups and a CI/CD pipeline.",
       },
       {
+        id: "ai-integration",
         title: "AI integration",
         desc:
           "LLM pipelines and retrieval-augmented generation wired into your existing backend, with secure API key management, rate limiting, caching, monitoring and logging.",
       },
       {
+        id: "mcp-servers",
         title: "MCP servers",
         desc:
           "Custom MCP servers that let your AI assistant read, write and act inside your own tools — CRM, database, email, calendar, internal APIs — shipped as a self-hosted Docker image you own.",
@@ -191,6 +221,9 @@ export const catalogItems: CatalogItem[] = [
     icon: "briefcase",
     slug: "cto-advisory-retainer",
     title: "Ongoing: Fractional CTO, Hourly or on Retainer",
+    seoTitle: "Fractional CTO, hourly or on a monthly retainer",
+    category: "Fractional CTO",
+    priceNote: "The retainer works out cheaper from about 20 hours a month.",
     shortTitle: "Ongoing",
     prices: [
       { usd: 150, from: false, period: "hour" },
@@ -235,10 +268,12 @@ export const catalogItems: CatalogItem[] = [
  * `routes/catalog/[slug].tsx`. Nothing on the site may link to a key of this map.
  */
 export const catalogRedirects: Record<string, string> = {
-  "technical-discovery-sprint": "/catalog/zero-to-production-saas-mvp",
-  "bulletproof-backend-api": "/catalog/zero-to-production-saas-mvp",
-  "surgical-ai-integration": "/catalog/zero-to-production-saas-mvp",
-  "mcp-server-development": "/catalog/zero-to-production-saas-mvp",
+  "technical-discovery-sprint":
+    "/catalog/zero-to-production-saas-mvp#how-it-starts",
+  "bulletproof-backend-api": "/catalog/zero-to-production-saas-mvp#backend-api",
+  "surgical-ai-integration":
+    "/catalog/zero-to-production-saas-mvp#ai-integration",
+  "mcp-server-development": "/catalog/zero-to-production-saas-mvp#mcp-servers",
   "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
   "free-architecture-audit": "/#audit-form",
 };
@@ -271,6 +306,110 @@ export function catalogItem(slug: string): CatalogItem {
 
 export function catalogPath(slug: string): string {
   return `/catalog/${catalogItem(slug).slug}`;
+}
+
+/**
+ * The `lib/promises.ts` ids a service shows beside its price (#271). Build
+ * and Ongoing are the engagements the project pages' closing band already
+ * shows the refund and the first milestone for, so those and ownership apply
+ * to both, and Build adds the bug-fix window its `includes` already names. A
+ * strategy session and a code audit show none: a refund window on a
+ * one-hour call would be a new claim, and Anton has not said which promises
+ * apply to them.
+ */
+export function catalogPromises(slug: string): string[] {
+  switch (catalogItem(slug).slug) {
+    case "zero-to-production-saas-mvp":
+      return ["refund", "first-milestone", "ownership", "free-bugfixes"];
+    case "cto-advisory-retainer":
+      return ["refund", "first-milestone", "ownership"];
+    default:
+      return [];
+  }
+}
+
+/** One row of a price card: "Price", or "Hourly" and "Retainer" for two prices. */
+export interface PriceRow {
+  label: string;
+  price: CatalogPrice;
+  /** `priceNote`, on the item's last row only. */
+  note?: string;
+}
+
+const ROW_LABELS: Record<PricePeriod, string> = {
+  hour: "Hourly",
+  month: "Retainer",
+};
+
+/** An item's prices as card rows, each labelled by its period. */
+export function priceRows(item: CatalogItem): PriceRow[] {
+  return item.prices.map((price, i) => ({
+    label: price.period ? ROW_LABELS[price.period] : "Price",
+    price,
+    ...(i === item.prices.length - 1 && item.priceNote
+      ? { note: item.priceNote }
+      : {}),
+  }));
+}
+
+/** One step of "How it starts". */
+export interface StartStep {
+  title: string;
+  desc: string;
+}
+
+/**
+ * How an engagement starts, for the two items whose page spells it out: the
+ * free intro call, a quote, the first milestone (Build); the session itself
+ * (Strategy). Every sentence is already in the item, `INTRO_CALL` or
+ * `lib/promises.ts`. The other two items have no steps.
+ */
+export function startSteps(slug: string): StartStep[] | undefined {
+  const item = catalogItem(slug);
+  if (item.slug === "zero-to-production-saas-mvp" && item.firstStep) {
+    return [
+      { title: "We talk", desc: `A ${INTRO_CALL} about your project.` },
+      { title: "You get a quote", desc: QUOTE_NOTE },
+      { title: promise("first-milestone").title, desc: item.firstStep.desc },
+    ];
+  }
+  if (item.slug === "strategy-call") {
+    return [
+      { title: "Pick a time", desc: "We agree on a time for the call." },
+      { title: "We talk", desc: item.includes[0] },
+      { title: "You get notes", desc: item.includes[4] },
+    ];
+  }
+  return undefined;
+}
+
+/**
+ * The free call next to the paid session, for the index and the Strategy
+ * page (#271): the free call is a first conversation, the session is "a paid
+ * hour of advice, not a sales call" (the last sentence of its `desc`).
+ */
+export function callVersusSession(): {
+  free: StartStep;
+  paid: StartStep;
+} {
+  const session = catalogItem("strategy-call");
+  const sentences = session.desc.split(/(?<=\.)\s+/);
+  return {
+    free: {
+      title: "Free 30-minute intro call",
+      desc:
+        "A first conversation about your project, before you decide anything.",
+    },
+    paid: {
+      title: session.shortTitle,
+      desc: sentences[sentences.length - 1],
+    },
+  };
+}
+
+/** The written-brief form with this service chosen (`?service=` is read by the booking page, #272). */
+export function briefPath(slug: string): string {
+  return `/contact-me?service=${catalogItem(slug).slug}#brief`;
 }
 
 const UNIT_CODES: Record<PricePeriod, string> = { hour: "HUR", month: "MON" };

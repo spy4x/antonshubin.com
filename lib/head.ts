@@ -74,8 +74,11 @@ export function resetHead() {
 
 // --------------- Breadcrumb helpers ---------------
 
+/** Path segments whose name is not their humanized slug: `/catalog` is "Services" (#271). */
+const SEGMENT_NAMES: Record<string, string> = { catalog: "Services" };
+
 function humanize(slug: string): string {
-  return slug
+  return SEGMENT_NAMES[slug] ?? slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
