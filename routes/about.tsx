@@ -10,10 +10,13 @@ import {
   UPWORK_URL,
 } from "../lib/config.ts";
 import {
+  ABOUT_HOBBIES,
   ABOUT_NAME,
   ABOUT_PATH,
+  ABOUT_TRAVEL,
   aboutDescription,
   aboutSteps,
+  paymentSentence,
 } from "../lib/about.ts";
 import { proof } from "../lib/proof.ts";
 import { tool } from "../lib/tools.ts";
@@ -253,8 +256,7 @@ export default define.page(function About(ctx) {
                 Outside work
               </h2>
               <p class="max-w-2xl text-graphite leading-relaxed">
-                Outside work I ride enduro, ski and scuba dive, and some of it
-                ends up on{" "}
+                {ABOUT_HOBBIES}, and some of it ends up on{" "}
                 <a
                   href={VLOG_URL}
                   target="_blank"
@@ -265,8 +267,7 @@ export default define.page(function About(ctx) {
                   my vlog channel
                   <NewTabHint />
                 </a>
-                . I've travelled to more than 25 countries across Asia and
-                Europe, and I live in {LOCATION}.
+                . I've {ABOUT_TRAVEL}, and I live in {LOCATION}.
               </p>
             </section>
 
@@ -275,9 +276,7 @@ export default define.page(function About(ctx) {
                 Paying and contracting
               </h2>
               <p class="max-w-2xl text-graphite leading-relaxed">
-                {INVOICE_NOTE}{" "}
-                You can pay by card through Stripe, by US bank transfer (ACH or
-                Fedwire) or in crypto.{" "}
+                {INVOICE_NOTE} {paymentSentence()}{" "}
                 <a href="/pay" data-umami-event="about-pay" class={LINK}>
                   Payment details
                   <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />

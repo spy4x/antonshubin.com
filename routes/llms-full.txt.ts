@@ -1,6 +1,12 @@
 import { define } from "../lib/utils.ts";
 import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
-import { ABOUT_PATH, aboutSteps } from "../lib/about.ts";
+import {
+  ABOUT_HOBBIES,
+  ABOUT_PATH,
+  ABOUT_TRAVEL,
+  aboutSteps,
+  paymentList,
+} from "../lib/about.ts";
 import {
   archiveProjects,
   formatPeriod,
@@ -136,7 +142,7 @@ The career story on ${BASE_URL}${ABOUT_PATH}, oldest first:
 
 ${aboutSteps.map((s) => `- **${s.when}:** ${s.text}`).join("\n")}
 
-Outside work I ride enduro, ski and scuba dive, and I've travelled to more than 25 countries across Asia and Europe. Invoices come from NeatSoft PTE LTD, Singapore; payment by card (Stripe), US bank transfer (ACH or Fedwire) or crypto: ${BASE_URL}/pay
+${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from NeatSoft PTE LTD, Singapore; payment by ${paymentList()}: ${BASE_URL}/pay
 
 ## Core Expertise
 

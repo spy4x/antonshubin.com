@@ -178,3 +178,11 @@ siteTest("/about shows two client review cards", async (site) => {
   const section = html.slice(start, html.indexOf("</section>", start));
   assertEquals(count(section, /<figure[\s>]/g), 2);
 });
+
+siteTest("/llms-full.txt carries the About career story", async (site) => {
+  const txt = await site.html("/llms-full.txt");
+  assert(
+    txt.includes(aboutSteps[0].text),
+    "/llms-full.txt lacks the first About step",
+  );
+});
