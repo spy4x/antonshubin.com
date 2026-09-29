@@ -200,7 +200,7 @@ Deno.test("lead form announces success, swaps inert panels, and does not scroll"
 
       assert(
         (await page.textContent("#lead-success-heading"))?.includes(
-          "Your audit is queued",
+          "Your brief is queued",
         ),
         "the focused heading must carry the success text a screen reader announces",
       );

@@ -11,6 +11,10 @@ import { toJsonLd } from "../lib/json-ld.ts";
 
 export function SEOHead() {
   const h = head.value;
+  // The home page is the one page that is Anton's profile (#269): it gets a
+  // ProfilePage node and no BreadcrumbList, whose single "Home" item says
+  // nothing.
+  const isHome = new URL(h.canonical).pathname === "/";
 
   return (
     <Head>
@@ -69,6 +73,7 @@ export function SEOHead() {
                 "@type": "Person",
                 "@id": "https://antonshubin.com/#person",
                 "name": "Anton Shubin",
+                "alternateName": "spy4x",
                 "givenName": "Anton",
                 "familyName": "Shubin",
                 "jobTitle": ROLE,
@@ -143,21 +148,32 @@ export function SEOHead() {
                 "@type": "WebSite",
                 "@id": "https://antonshubin.com/#website",
                 "url": "https://antonshubin.com",
-                "name": `Anton Shubin — ${ROLE}`,
+                // The short name Google shows above a result (#269).
+                "name": "Anton Shubin",
+                "alternateName": "antonshubin.com",
                 // Fixed, not h.description: a WebSite entity describes the
                 // site itself and must read the same on every page (#193).
                 "description": SITE_DESCRIPTION,
                 "inLanguage": "en-US",
                 "publisher": { "@id": "https://antonshubin.com/#person" },
               },
-              {
-                "@type": "BreadcrumbList",
-                "@id": `${h.canonical}#breadcrumb`,
-                "itemListElement": breadcrumbFromCanonical(
-                  h.canonical,
-                  h.pageName ?? h.title,
-                ),
-              },
+              ...(isHome
+                ? [{
+                  "@type": "ProfilePage",
+                  "@id": "https://antonshubin.com/#profile",
+                  "url": "https://antonshubin.com/",
+                  "name": h.title,
+                  "mainEntity": { "@id": "https://antonshubin.com/#person" },
+                  "isPartOf": { "@id": "https://antonshubin.com/#website" },
+                }]
+                : [{
+                  "@type": "BreadcrumbList",
+                  "@id": `${h.canonical}#breadcrumb`,
+                  "itemListElement": breadcrumbFromCanonical(
+                    h.canonical,
+                    h.pageName ?? h.title,
+                  ),
+                }]),
             ],
           }),
         }}

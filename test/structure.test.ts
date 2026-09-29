@@ -192,16 +192,15 @@ Deno.test(
     try {
       const html = await site.html("/");
       const main = html.slice(html.indexOf('id="main-content"'));
-      // "testimonials" only shows up once lib/testimonials.ts has an entry
-      // with a source and permission (#186) — the list ships empty, so the
-      // section is absent today.
+      // The prices sit inside the hero (#269); "testimonials" shows only
+      // while a review is cleared for the site.
       assertEquals(
         [...main.matchAll(/<section[^>]*data-home-section="([^"]*)"/g)].map((
           m,
         ) => m[1]),
         visibleTestimonials().length > 0
-          ? ["hero", "proof", "offers", "testimonials", "how-it-works", "cta"]
-          : ["hero", "proof", "offers", "how-it-works", "cta"],
+          ? ["hero", "work", "testimonials", "how-it-works", "tools", "cta"]
+          : ["hero", "work", "how-it-works", "tools", "cta"],
       );
       assert(
         count(main, /<section[\s>]/g) <= 6,
@@ -762,5 +761,66 @@ siteTest(
         `${path}: no BreadcrumbList JSON-LD`,
       );
     }
+  },
+);
+
+siteTest(
+  "the home page has one H1 that holds the name, and all four catalog prices in the hero",
+  async (site) => {
+    const html = await site.html("/");
+    assertEquals(count(html, /<h1[\s>]/g), 1);
+    const h1 = visibleText(
+      html.slice(html.indexOf("<h1"), html.indexOf("</h1>")),
+    );
+    assert(h1.includes("Anton Shubin") && h1.includes("Tech Lead"), h1);
+    const start = html.indexOf('data-home-section="hero"');
+    const hero = html.slice(start, html.indexOf("</section>", start));
+    for (const item of catalogItems) {
+      assert(
+        hero.includes(`href="/catalog/${item.slug}"`),
+        `no ${item.slug} row in the hero`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the home page JSON-LD is one ProfilePage about Anton, with no breadcrumb, review or rating",
+  async (site) => {
+    const nodes = jsonLd(await site.html("/"))
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d]) as {
+        "@type"?: string;
+        name?: string;
+        mainEntity?: { "@id": string };
+      }[];
+    const profiles = nodes.filter((n) => n["@type"] === "ProfilePage");
+    assertEquals(profiles.length, 1);
+    assertEquals(profiles[0].mainEntity, {
+      "@id": "https://antonshubin.com/#person",
+    });
+    assertEquals(
+      nodes.find((n) => n["@type"] === "WebSite")?.name,
+      "Anton Shubin",
+    );
+    for (const type of ["BreadcrumbList", "Review", "AggregateRating"]) {
+      assert(!nodes.some((n) => n["@type"] === type), `${type} on /`);
+    }
+  },
+);
+
+siteTest(
+  "the home page portrait is the one eager image and its <img> holds no photo URL",
+  async (site) => {
+    const html = await site.html("/");
+    const media = html.slice(html.indexOf("data-hero-media"));
+    const img = media.match(/<img[^>]*>/)![0];
+    assert(img.includes('fetchpriority="high"'), img);
+    assert(
+      !/photo-(big|mobile)/.test(img),
+      `a phone would fetch the photo: ${img}`,
+    );
+    assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source");
+    const main = html.slice(html.indexOf('id="main-content"'));
+    assertEquals(count(main, /fetchpriority="high"/g), 1);
   },
 );
