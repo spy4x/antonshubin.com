@@ -7,6 +7,7 @@ import {
   type ToolsLiveRefresher,
   withLiveVersion,
 } from "./tools-live.ts";
+import { FETCH_TIMEOUT_MS } from "./snapshot-fetch.ts";
 import { tool, tools } from "./tools.ts";
 
 /** The answer after the refresh started by a first request has finished. */
@@ -211,5 +212,44 @@ Deno.test("every outbound call carries a timeout signal", async () => {
   assertEquals(signals.length, calls.length);
   for (const s of signals) {
     assert(s instanceof AbortSignal, "no timeout signal");
+  }
+});
+
+Deno.test("a stalled call is dropped after 5 seconds, not longer", async () => {
+  const original = AbortSignal.timeout;
+  const limits: number[] = [];
+  const controllers: AbortController[] = [];
+  AbortSignal.timeout = (ms: number) => {
+    limits.push(ms);
+    const c = new AbortController();
+    controllers.push(c);
+    return c.signal;
+  };
+  try {
+    // Never answers, but rejects when its signal aborts, as a real fetch does.
+    const stalled = ((_: string | URL | Request, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener(
+          "abort",
+          () =>
+            reject(new Error("aborted")),
+        );
+      })) as typeof fetch;
+    const warnings: string[] = [];
+    const refresher = createToolsLive({
+      enabled: true,
+      fetch: stalled,
+      warn: (m) => warnings.push(m),
+    });
+    await refresher.get();
+    assert(limits.length > 0, "no call carried a timeout");
+    for (const ms of limits) assertEquals(ms, 5000);
+    assertEquals(FETCH_TIMEOUT_MS, 5000);
+    for (const c of controllers) c.abort();
+    await refresher.settled();
+    assert(warnings.length > 0, "an aborted call was not reported");
+    assertEquals((await refresher.get()).source, "committed");
+  } finally {
+    AbortSignal.timeout = original;
   }
 });
