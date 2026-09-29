@@ -21,9 +21,14 @@ export default define.page(function App({ Component, req }) {
         />
         <meta name="theme-color" content="#15120f" />
 
-        {/* Minimal critical CSS to prevent FOUC while CSS loads */}
+        {
+          /* Minimal critical CSS to prevent FOUC while CSS loads. Its
+            `.sr-only` rule is unlayered, so it would beat Tailwind's layered
+            `focus:not-sr-only` and keep the skip link hidden on focus (#293);
+            `:not(:focus)` leaves a focused element to Tailwind. */
+        }
         <style>
-          {`html,body{background-color:#15120f}body{color:#efebe2}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}
+          {`html,body{background-color:#15120f}body{color:#efebe2}.sr-only:not(:focus){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}`}
         </style>
 
         {
