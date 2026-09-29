@@ -43,6 +43,21 @@ Deno.test("toolSummary never gives an unpublished tool's install command", () =>
   );
 });
 
+Deno.test("toolSummary for a tool with no registry offers no install and carries its status, use and standing", () => {
+  const line = toolSummary({
+    ...published,
+    registry: undefined,
+    status: "in-use",
+    usedFor: "Runs my booking page.",
+    standing: "Stalwart support is broken.",
+  });
+  assert(!line.includes("Install"), `install offered:\n${line}`);
+  assert(!line.includes("Not yet on"), `unpublished note:\n${line}`);
+  assert(line.includes("Status: In use."), `no status:\n${line}`);
+  assert(line.includes("Runs my booking page."), `no usedFor:\n${line}`);
+  assert(line.includes("Stalwart support is broken."), `no standing:\n${line}`);
+});
+
 const base: Project = {
   title: "Example",
   slug: "example",

@@ -1,4 +1,4 @@
-import { assert } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { render } from "npm:preact-render-to-string@^6.6.3";
 import { InstallLine } from "./InstallLine.tsx";
 import { type Tool, tool } from "../lib/tools.ts";
@@ -38,4 +38,11 @@ Deno.test("an unpublished tool's install line has no copy button and says it is 
     html.includes("Not yet available: 9.9.9 is being published to JSR now."),
     `no "not yet available" note:\n${html}`,
   );
+});
+
+Deno.test("a tool with no registry renders no install line at all", () => {
+  const html = render(
+    <InstallLine tool={{ ...published, registry: undefined }} id="install" />,
+  );
+  assertEquals(html, "");
 });
