@@ -279,7 +279,7 @@ export default define.page(async function ToolPage(ctx) {
                       labelHidden
                     />
                     <span data-checked class="block mt-1 text-graphite">
-                      {checkedLabel(live)}
+                      {checkedLabel(live, tool.repo)}
                     </span>
                   </Fact>
                 )}

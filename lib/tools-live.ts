@@ -28,7 +28,10 @@ export interface ToolsLive {
   versions: Record<string, string>;
   /** ISO time of the refresh, or null for the committed file. */
   checkedAt: string | null;
+  /** "live" when at least one repository or version came from a live call. */
   source: "live" | "committed";
+  /** Repositories whose GitHub and Woodpecker calls both succeeded in this refresh. */
+  liveRepos: string[];
 }
 
 /** The committed snapshot, used when the refresh is off or every call failed. */
@@ -38,6 +41,7 @@ export function committedToolsLive(): ToolsLive {
     versions: {},
     checkedAt: null,
     source: "committed",
+    liveRepos: [],
   };
 }
 
@@ -50,27 +54,36 @@ export interface ToolsLiveOptions {
   warn?: (message: string) => void;
 }
 
+/** A refresher: `get()` never waits on the network; `settled()` waits for the running refresh (tests). */
+export interface ToolsLiveRefresher {
+  get: () => Promise<ToolsLive>;
+  settled: () => Promise<void>;
+}
+
 /**
- * A refresher that answers from memory for {@link REFRESH_TTL_MS}, fetches
- * once when the answer is older (concurrent requests share the one call),
- * and fails open per repository and per package: a failed call keeps the
- * committed value for that item and never throws.
+ * A refresher that answers at once, never waiting on the network: from memory
+ * for {@link REFRESH_TTL_MS}, and after that, or before the first refresh has
+ * finished, from the last answer (or the committed file) while one refresh
+ * runs in the background (concurrent requests share it). Every outbound call
+ * has a timeout, and a failed call keeps the committed value for that item
+ * and never throws.
  */
 export function createToolsLive(
   options: ToolsLiveOptions,
-): { get: () => Promise<ToolsLive> } {
+): ToolsLiveRefresher {
   const fetcher = options.fetch ?? fetch;
   const now = options.now ?? Date.now;
   const warn = options.warn ??
     ((m: string) => console.warn(`tools-live: ${m}`));
   let cached: { at: number; value: ToolsLive } | undefined;
-  let inflight: Promise<ToolsLive> | undefined;
+  let inflight: Promise<void> | undefined;
 
   async function refresh(): Promise<ToolsLive> {
     const repos: Record<string, RepoSnapshot> = {
       ...githubSnapshot.repos,
     };
-    let anyLive = false;
+    const liveRepos: string[] = [];
+    let liveVersion = false;
     const versions: Record<string, string> = {};
     const jobs: Promise<void>[] = [];
     for (const t of tools) {
@@ -83,7 +96,7 @@ export function createToolsLive(
               repos[repo] = t.ci && snap.ci === null
                 ? { ...snap, ci: githubSnapshot.repos[repo]?.ci ?? null }
                 : snap;
-              anyLive = true;
+              liveRepos.push(repo);
             },
             (e) => warn(`${repo}: ${e instanceof Error ? e.message : e}`),
           ),
@@ -95,7 +108,7 @@ export function createToolsLive(
           latestVersion(fetcher, from).then(
             (v) => {
               versions[t.slug] = v;
-              anyLive = true;
+              liveVersion = true;
             },
             (e) => warn(`${from.name}: ${e instanceof Error ? e.message : e}`),
           ),
@@ -103,31 +116,37 @@ export function createToolsLive(
       }
     }
     await Promise.all(jobs);
-    if (!anyLive) return committedToolsLive();
+    if (liveRepos.length === 0 && !liveVersion) return committedToolsLive();
     return {
       snapshot: { checkedOn: githubSnapshot.checkedOn, repos },
       versions,
       checkedAt: new Date(now()).toISOString(),
       source: "live",
+      liveRepos,
     };
   }
 
+  function startRefresh() {
+    inflight ??= refresh().then((value) => {
+      cached = { at: now(), value };
+    }).catch((e) => warn(String(e))).finally(() => {
+      inflight = undefined;
+    });
+  }
+
   return {
-    async get() {
-      if (!options.enabled) return committedToolsLive();
-      if (cached && now() - cached.at < REFRESH_TTL_MS) return cached.value;
-      inflight ??= refresh().then((value) => {
-        cached = { at: now(), value };
-        return value;
-      }).finally(() => {
-        inflight = undefined;
-      });
-      return await inflight;
+    get() {
+      if (!options.enabled) return Promise.resolve(committedToolsLive());
+      if (!cached || now() - cached.at >= REFRESH_TTL_MS) startRefresh();
+      return Promise.resolve(cached?.value ?? committedToolsLive());
+    },
+    async settled() {
+      await inflight;
     },
   };
 }
 
-let shared: { get: () => Promise<ToolsLive> } | undefined;
+let shared: ToolsLiveRefresher | undefined;
 
 /** The server's one refresher, gated by `TOOLS_LIVE_REFRESH=1`. */
 export function toolsLive(): Promise<ToolsLive> {
@@ -156,12 +175,27 @@ export function liveRepo(t: Tool, live: ToolsLive): RepoSnapshot | null {
   return t.repo ? live.snapshot.repos[t.repo] ?? null : null;
 }
 
-/** "Checked 25 Sep 2026 (committed snapshot)" or "Checked 14:05 UTC (live, refreshed hourly)". */
-export function checkedLabel(live: ToolsLive): string {
-  if (live.checkedAt) {
-    return `Checked ${live.checkedAt.slice(11, 16)} UTC on ${
-      live.checkedAt.slice(0, 10)
-    } (live, refreshed hourly)`;
+/**
+ * The freshness line. With a repository, it is live only when that
+ * repository's own calls succeeded; without one (the hub), live when every
+ * repository on the page is, "partly live" when some are, else the committed
+ * snapshot.
+ */
+export function checkedLabel(live: ToolsLive, repo?: string): string {
+  const committed =
+    `Checked ${live.snapshot.checkedOn} (committed snapshot, not a live check)`;
+  if (!live.checkedAt) return committed;
+  const at = `${live.checkedAt.slice(11, 16)} UTC on ${
+    live.checkedAt.slice(0, 10)
+  }`;
+  if (repo) {
+    return live.liveRepos.includes(repo)
+      ? `Checked ${at} (live, refreshed hourly)`
+      : committed;
   }
-  return `Checked ${live.snapshot.checkedOn} (committed snapshot, not a live check)`;
+  const all = [...new Set(tools.flatMap((t) => t.repo ? [t.repo] : []))];
+  const n = all.filter((r) => live.liveRepos.includes(r)).length;
+  if (n === all.length) return `Checked ${at} (live, refreshed hourly)`;
+  if (n === 0) return committed;
+  return `Checked ${at} (live for ${n} of ${all.length} repositories, the rest from the committed snapshot)`;
 }

@@ -48,12 +48,18 @@ export function latestBranchPipeline(
   };
 }
 
+/** How long one outbound call may take before it is abandoned. */
+export const FETCH_TIMEOUT_MS = 5000;
+
 async function getJson<T>(
   fetcher: Fetcher,
   url: string,
   headers: HeadersInit = {},
 ): Promise<T> {
-  const res = await fetcher(url, { headers });
+  const res = await fetcher(url, {
+    headers,
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   if (!res.ok) {
     await res.body?.cancel();
     throw new Error(`${url} answered ${res.status}`);

@@ -107,9 +107,6 @@ export function cacheControlFor(
   // page would drop analytics for every visitor. The rule needs a cache key
   // that separates bots from browsers.
 
-  // Core static pages — cache 3 days at edge, stale-while-revalidate
-  // for PWA background refreshes. The site content changes every few
-  // days, so 3 days balances freshness with max edge cache HIT rate.
   // The tools hub and every tool page show versions, stars and CI status that
   // the server refreshes hourly (lib/tools-live.ts), so a three-day edge copy
   // would hide every refresh: keep them for an hour.
@@ -117,6 +114,9 @@ export function cacheControlFor(
     return "public, max-age=3600, stale-while-revalidate=600";
   }
 
+  // Core static pages — cache 3 days at edge, stale-while-revalidate
+  // for PWA background refreshes. The site content changes every few
+  // days, so 3 days balances freshness with max edge cache HIT rate.
   if (CORE_PAGES.has(pathname)) {
     return "public, max-age=259200, stale-while-revalidate=43200";
   }
