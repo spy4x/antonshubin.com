@@ -36,7 +36,6 @@ const UNSET_LEAD_INS: Array<{ path: string; phrase: string }> = [
     path: "/saas-architecture-guide",
     phrase: "Book a free 30-minute intro call. No pitch, just advice.",
   },
-  { path: "/catalog", phrase: "Not sure which fits your project?" },
   { path: "/how-i-work", phrase: "Book the free 30-minute intro call" },
 ];
 

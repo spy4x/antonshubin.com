@@ -31,9 +31,9 @@
 //      a different, already-passing rule)
 //   6. components/Breadcrumb.tsx's "/" separator (text-gray-600 -> gray-400)
 //      — /contact-me, via a manual ratio check, not axe (see below)
-//   7. routes/catalog/index.tsx's "Not included" "x" marker
-//      (text-gray-600 -> gray-400) — /catalog, after opening its two nested
-//      <details>, via the same manual ratio check
+//   7. the "Not included" "x" marker (text-gray-600 -> gray-400), now in
+//      routes/catalog/[slug].tsx's scope block (#271) — checked on
+//      /catalog/zero-to-production-saas-mvp via the same manual ratio check
 //   8. bg-sky-600 -> bg-sky-700 on the Telegram button (routes/contact-me.tsx)
 //      — /contact-me
 //   9 & 10. routes/blog/[slug].tsx's two captions (text-gray-600 -> gray-400)
@@ -362,26 +362,12 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
         `breadcrumb separator contrast ratio must be >= 4.5, got ${breadcrumbSepRatio}`,
       );
 
-      // /catalog's "Not included" list sits inside two nested <details>,
-      // closed by default — axe only checks visible content, so opening both
-      // is required to exercise routes/catalog/index.tsx's "x" marker fix
-      // (see the file header). Playwright's click on <summary> toggles the
-      // native <details>, same as a real visitor would.
       await page.goto(`${site.origin}/catalog`, { waitUntil: "networkidle" });
-      for (
-        const label of ["What's included", "Not included"]
-      ) {
-        const summaries = page.getByText(label, { exact: true });
-        const count = await summaries.count();
-        for (let i = 0; i < count; i++) {
-          await summaries.nth(i).click();
-        }
-      }
       const catalogResult = await colorContrastResult(page, "html");
       assertEquals(
         catalogResult.violations.map((n) => n.html),
         [],
-        "/catalog, with its 'Not included' details open, must have zero axe color-contrast violations",
+        "/catalog must have zero axe color-contrast violations",
       );
       // /catalog's "Talk about this" button was one of the nine gradient CTAs
       // (bg-gradient-to-r from-orange-600 to-amber-500, white text 2.13:1
@@ -397,15 +383,19 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
 
       // The "x" marker itself: axe classifies it as "non-text content" and
       // never puts it in `violations` regardless of colour (see the file
-      // header) — checked manually instead.
+      // header) — checked manually instead, on the service page that lists
+      // what a service leaves out (#271; the index no longer has the list).
+      await page.goto(`${site.origin}/catalog/zero-to-production-saas-mvp`, {
+        waitUntil: "networkidle",
+      });
       const catalogXRatio = await getContrastRatio(
         page,
-        "details[open] span",
+        "[data-service-scope] span",
         "×",
       );
       assert(
         catalogXRatio !== null && catalogXRatio >= 4.5,
-        `catalog "not included" x marker contrast ratio must be >= 4.5, got ${catalogXRatio}`,
+        `service page "not included" x marker contrast ratio must be >= 4.5, got ${catalogXRatio}`,
       );
 
       // Synthetic probe for the old --color-gray-400/gray-700 pairing: see

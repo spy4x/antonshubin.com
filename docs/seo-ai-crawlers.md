@@ -45,6 +45,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
   posts, grouped under the three Writing topics with each post's tool link, and
   the Archive last (#274); `lib/blog.ts`'s `llmsBlogSections()` builds the list
   for both llms files
+- Each catalog item line names the kinds of work sold under it with their
+  `#fragment` (`alsoCovers` ids, #271) and the promises its page shows
+  (`catalogPromises()`)
 - Client work in two lists: every highlight (`highlightSlugs`, through
   `clientSummary()`, so each line carries its client and period) and the archive
   (`archiveProjects()`, newest first, with period and role), in the same order
@@ -66,6 +69,13 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - AI-friendly XML comments describing the site and its purpose
 - All blog posts, projects, catalog items included; `/blog`'s `lastmod` is the
   newest current post's date, and an archived post has priority 0.3 (#274)
+- All blog posts, projects, catalog items included
+- Catalog pages (#271): `/catalog` is "Services" in the breadcrumb and carries
+  an `OfferCatalog` that lists the four `Service` nodes by `@id`; each
+  `/catalog/<slug>` page has one `Service` (`serviceType` from the item's
+  `category`, its `<title>` from `seoTitle`) and no rating or review markup. The
+  retired slugs answer one 301 to the `#fragment` of the section that absorbed
+  them
 - Project pages live at `/work/<slug>` since #188; every old `/projects` URL
   answers one 301 there (`lib/redirects.ts`), so the sitemap and both llms files
   list only the new URLs

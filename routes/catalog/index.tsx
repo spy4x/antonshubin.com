@@ -3,157 +3,148 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
-import { SCHEDULE_URL } from "../../lib/config.ts";
-import { catalogItems, priceLabel } from "../../lib/catalog.ts";
-import { BookCallLink } from "../../components/BookCallLink.tsx";
-import { CatalogIcon, CheckIcon } from "../../components/Icons.tsx";
+import {
+  callVersusSession,
+  catalogItems,
+  INTRO_CALL,
+  priceLabel,
+} from "../../lib/catalog.ts";
+import { toJsonLd } from "../../lib/json-ld.ts";
+import { formatPeriod } from "../../lib/data.ts";
+import { projectsForCatalog, workHref } from "../../lib/work.ts";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
+import { FACT_LINK } from "../../components/FactCard.tsx";
+import { BOOK_LABEL } from "../../components/ServicePriceCard.tsx";
+import {
+  ArrowRightIcon,
+  CatalogIcon,
+  CheckIcon,
+} from "../../components/Icons.tsx";
+
+const CANONICAL = "https://antonshubin.com/catalog";
 
 export default define.page(function Catalog() {
   head.value = {
     ...head.value,
-    title: "Services — Anton Shubin",
+    title:
+      "Services and prices: SaaS builds, code audits, fractional CTO — Anton Shubin",
+    pageName: "Services",
     description: `Services and prices: ${
       catalogItems.map((i) => `${i.shortTitle} (${priceLabel(i)})`).join(", ")
     }.`,
-    canonical: "https://antonshubin.com/catalog",
+    canonical: CANONICAL,
     ogType: "website",
   };
+  const { paid } = callVersusSession();
 
   return (
     <Layout currentPath="/catalog">
       <SEOHead />
-      <Breadcrumb
-        items={getBreadcrumb(head.value.canonical, head.value.title)}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: toJsonLd({
+            "@context": "https://schema.org",
+            "@type": "OfferCatalog",
+            "@id": `${CANONICAL}#offers`,
+            "url": CANONICAL,
+            "name": "Services",
+            "provider": { "@id": "https://antonshubin.com/#person" },
+            // The four services by @id: each item page defines its own
+            // Service node, so nothing is described twice.
+            "itemListElement": catalogItems.map((i) => ({
+              "@id": `${CANONICAL}/${i.slug}#service`,
+            })),
+          }),
+        }}
       />
-      <div class="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <h1 class="text-3xl sm:text-4xl font-bold text-parchment text-center mb-2">
-          Services
-        </h1>
-        <p class="text-graphite text-center mb-10 sm:mb-12 text-base sm:text-lg">
-          Four ways to work with me, each with its price. Every price that says
-          "from" gets a quote for your scope before any work starts.
-        </p>
+      <div class="max-w-6xl mx-auto">
+        <Breadcrumb items={getBreadcrumb(CANONICAL, "Services")} />
 
-        <div class="space-y-6">
-          {catalogItems.map((item, i) => (
-            <div
-              key={i}
-              data-catalog-item={item.slug}
-              class="bg-paper rounded-xl border border-rule overflow-hidden"
-            >
-              <div class="p-3 sm:p-4">
-                <a
-                  href={`/catalog/${item.slug}`}
-                  class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 group"
-                >
-                  <div class="flex items-center gap-3">
-                    <CatalogIcon
-                      name={item.icon}
-                      class="w-8 h-8 text-accent shrink-0"
-                    />
-                    <h2 class="text-xl font-semibold text-parchment group-hover:text-accent transition-colors">
-                      {item.title}
-                    </h2>
-                  </div>
-                  <div class="flex items-center gap-3 shrink-0">
-                    <span class="inline-block px-3 py-1 bg-sage/15 text-sage text-sm font-medium rounded-full">
-                      {priceLabel(item)}
-                    </span>
-                    <span class="inline-block px-3 py-1 bg-mist/15 text-mist text-sm font-medium rounded-full">
-                      {item.delivery}
-                    </span>
-                  </div>
-                </a>
+        <header class="mb-10 max-w-3xl">
+          <h1 class="text-3xl sm:text-4xl text-parchment">Services</h1>
+          <p class="mt-4 text-lg text-graphite">
+            Four ways to work with me, each with its price. Every price that
+            says "from" gets a quote for your scope before any work starts. Not
+            sure which fits? Start with the {INTRO_CALL}. The{" "}
+            {paid.title.toLowerCase()}{" "}
+            is a paid hour of advice, not a sales call.
+          </p>
+        </header>
 
-                <p class="text-graphite text-sm mb-4 leading-relaxed">
-                  {item.desc}
+        <ul class="grid gap-6 lg:grid-cols-2">
+          {catalogItems.map((item) => {
+            const work = projectsForCatalog(item.slug, 1)[0];
+            return (
+              <li
+                key={item.slug}
+                data-catalog-item={item.slug}
+                class="bg-paper rounded-xl border border-rule p-5 sm:p-6 flex flex-col"
+              >
+                <div class="flex items-center gap-3">
+                  <CatalogIcon
+                    name={item.icon}
+                    class="w-6 h-6 text-graphite shrink-0"
+                  />
+                  <h2 class="text-2xl text-parchment">{item.shortTitle}</h2>
+                </div>
+                <p class="mt-2 text-sm text-graphite">{item.audience}</p>
+                <p class="mt-4">
+                  <span class="price text-2xl font-semibold text-parchment">
+                    {priceLabel(item)}
+                  </span>
+                  <span class="block text-sm text-graphite">
+                    {item.delivery}
+                  </span>
                 </p>
-
-                <div class="mb-4 p-3 bg-sage/10 border border-sage/20 rounded-lg">
-                  <p class="text-sage text-sm font-medium leading-relaxed">
-                    {item.outcome}
-                  </p>
-                </div>
-
-                <details class="mb-4">
-                  <summary class="text-accent text-sm cursor-pointer hover:text-accent transition-colors">
-                    What's included
-                  </summary>
-                  <ul class="mt-3 space-y-1.5">
-                    {item.includes.map((inc, j) => (
-                      <li
-                        key={j}
-                        class="text-graphite text-sm flex items-start gap-2"
-                      >
-                        <CheckIcon class="w-4 h-4 text-sage shrink-0 mt-0.5" />
-                        {inc}
-                      </li>
-                    ))}
-                  </ul>
-                  {item.exclusions && item.exclusions.length > 0 && (
-                    <details class="mt-3">
-                      <summary class="text-graphite text-xs cursor-pointer hover:text-graphite transition-colors">
-                        Not included
-                      </summary>
-                      <ul class="mt-2 space-y-1.5">
-                        {item.exclusions.map((exc, j) => (
-                          <li
-                            key={j}
-                            class="text-graphite text-xs flex items-start gap-2"
-                          >
-                            <span class="text-graphite shrink-0">×</span>
-                            {exc}
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  )}
-                </details>
-
-                <div class="flex flex-wrap gap-2 mb-5">
-                  {item.tech.map((t, j) => (
-                    <span
-                      key={j}
-                      class="px-2 py-0.5 text-xs rounded bg-lamp text-graphite"
+                <p class="mt-4 text-parchment">{item.summary}</p>
+                <p class="mt-2 text-graphite">{item.outcome}</p>
+                <ul class="mt-4 space-y-1.5">
+                  {item.includes.slice(0, 3).map((inc) => (
+                    <li
+                      key={inc}
+                      class="flex items-start gap-2 text-sm text-graphite"
                     >
-                      {t}
-                    </span>
+                      <CheckIcon class="w-4 h-4 text-graphite shrink-0 mt-0.5" />
+                      {inc}
+                    </li>
                   ))}
-                </div>
-
-                <div class="flex flex-wrap items-center gap-3">
-                  <a
-                    href="/contact-me"
-                    class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors text-sm"
-                  >
-                    Talk about this
-                  </a>
+                </ul>
+                <div class="mt-auto pt-5">
+                  {work && (
+                    <p class="mb-3 text-sm text-graphite" data-catalog-work>
+                      Recent work:{" "}
+                      <a href={workHref(work.slug ?? "")} class={FACT_LINK}>
+                        {work.title}
+                      </a>
+                      {work.period && ` (${formatPeriod(work.period)})`}
+                    </p>
+                  )}
                   <a
                     href={`/catalog/${item.slug}`}
-                    class="inline-flex items-center gap-1 px-4 py-2 bg-transparent border border-rule-strong hover:bg-lamp text-parchment text-sm font-medium rounded-lg transition-colors"
+                    data-umami-event={`service-cta-${item.slug}-details`}
+                    class={`inline-flex items-center gap-1 ${FACT_LINK}`}
                   >
-                    Details
+                    Scope, price and what's included
+                    <span class="sr-only">: {item.shortTitle}</span>
+                    <ArrowRightIcon class="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </li>
+            );
+          })}
+        </ul>
 
-        <div class="text-center mt-12">
-          {SCHEDULE_URL && (
-            <p class="text-graphite text-sm mb-4">
-              Not sure which fits your project?
-            </p>
-          )}
-          <BookCallLink
-            url={SCHEDULE_URL}
-            target="_blank"
-            class="px-8 py-3.5"
-          >
-            Book a free 30-min intro call
-          </BookCallLink>
-        </div>
+        <ClosingBand
+          bookEvent="services-cta-book-band"
+          bookLabel={BOOK_LABEL}
+          promiseIds={[]}
+          links={[{
+            href: "/how-i-work",
+            label: "How I work",
+            event: "services-cta-how-i-work",
+          }]}
+        />
       </div>
     </Layout>
   );

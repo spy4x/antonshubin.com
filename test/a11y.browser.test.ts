@@ -879,3 +879,46 @@ Deno.test("Escape leaves focus alone when the mobile menu is already closed", as
     await site.stop();
   }
 });
+
+Deno.test("/catalog and two service pages have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+  const previous = Deno.env.get("SCHEDULE_URL");
+  // Book renders only with a booking URL; RFC 2606 host.
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+      const page: Page = await newPage(browser, { viewport });
+      try {
+        for (
+          const path of [
+            "/catalog",
+            "/catalog/zero-to-production-saas-mvp",
+            "/catalog/strategy-call",
+          ]
+        ) {
+          const where = `${path} at ${viewport.width}px`;
+          await page.goto(`${site.origin}${path}`, {
+            waitUntil: "networkidle",
+          });
+          const scrollWidth = await page.evaluate(() =>
+            document.documentElement.scrollWidth
+          );
+          assert(
+            scrollWidth <= viewport.width,
+            `${where} scrolls sideways: ${scrollWidth}px wide`,
+          );
+          assertEquals(await axeViolations(page), [], where);
+        }
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
+    else Deno.env.set("SCHEDULE_URL", previous);
+  }
+});

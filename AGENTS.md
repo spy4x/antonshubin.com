@@ -439,6 +439,28 @@ whenever a home-lab service is down). The CI link is mig's public pipeline list
 because the root of ci. asks for a GitHub sign-in. The colophon's "this build"
 reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the live links and bump the
 `infra-live-checked` note's `checkedOn`.
+### Services pages
+
+`/catalog` ("Services" in the rail, H1 and breadcrumb) and `/catalog/<slug>`
+(#271) keep their URLs. The item page has the project page's frame: the H1 and
+the item's `outcome` as the lead, `components/ServicePriceCard.tsx` (built on
+`FactCard`, first at 390px, sticky from 1024px: the price rows from
+`priceRows()`, time, stack, the promises from `catalogPromises()`, Book and
+"Send a written brief"), then the scope (included and not included side by
+side), "How it starts" (`startSteps()`: Build and Strategy only), the
+`alsoCovers` kinds of work as H3s whose ids are fragment targets, who it is for,
+"Projects this fits", the work sold under it (`projectsForCatalog()` in
+`lib/work.ts`, at most three `MoreWorkCard`s plus one `TestimonialCard`; none
+for the strategy session, whose page would imply a client bought one), one "Next
+step" link (`CatalogItem.next`) and the closing band. The index is a 2×2
+comparison from 1024px, one details link per card. A retired slug answers 301 to
+the fragment of the section that absorbed it, so `alsoCovers` ids and the
+`how-it-starts` id must not change without editing `catalogRedirects`. The two
+action wordings are `BOOK_LABEL` and `BRIEF_LABEL` in `ServicePriceCard.tsx`;
+the brief link is `briefPath(slug)`. A promise shown for a service is the
+owner's decision (`catalogPromises()`): the strategy session and the audit show
+none until Anton says which apply. `test/services.test.ts` checks the built
+pages.
 
 ### Project page
 

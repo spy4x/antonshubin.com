@@ -1,26 +1,42 @@
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
-import { BASE_URL, SCHEDULE_URL } from "../../lib/config.ts";
+import { BASE_URL } from "../../lib/config.ts";
 import {
+  briefPath,
+  callVersusSession,
   type CatalogItem,
+  catalogItem,
   catalogItems,
   catalogOffers,
+  catalogPromises,
   catalogRedirects,
   priceLabel,
+  startSteps,
 } from "../../lib/catalog.ts";
-import { marked } from "marked";
+import { projectsForCatalog } from "../../lib/work.ts";
+import {
+  projectTestimonials,
+  testimonialProject,
+} from "../../lib/testimonials.ts";
+import { metaDescription } from "../../lib/llms.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
-import { BookCallLink } from "../../components/BookCallLink.tsx";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
+import { FACT_LINK } from "../../components/FactCard.tsx";
+import { MoreWorkCard } from "../../components/MoreWorkCard.tsx";
 import {
+  BOOK_LABEL,
+  BRIEF_LABEL,
+  ServicePriceCard,
+} from "../../components/ServicePriceCard.tsx";
+import { TestimonialCard } from "../../components/TestimonialCard.tsx";
+import {
+  ArrowRightIcon,
   CatalogIcon,
   CheckIcon,
-  CodeIcon,
-  PersonIcon,
-  TargetIcon,
 } from "../../components/Icons.tsx";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
@@ -58,32 +74,42 @@ export default define.page(function CatalogDetail(ctx) {
     return (
       <Layout currentPath="/catalog">
         <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12 text-center">
-          <h1 class="text-3xl font-bold text-parchment mb-4">Not Found</h1>
-          <p class="text-graphite mb-6">
-            This project catalog item does not exist.
-          </p>
+          <h1 class="text-3xl font-semibold text-parchment mb-4">Not Found</h1>
+          <p class="text-graphite mb-6">This service does not exist.</p>
           <a
             href="/catalog"
             class="text-accent hover:text-accent hover:underline transition-colors"
           >
-            ← Back to catalog
+            ← Back to services
           </a>
         </div>
       </Layout>
     );
   }
 
-  // Render description as markdown so links inside work
-  const descHtml = marked.parse(item.desc, { async: false }) as string;
-
+  const canonical = `https://antonshubin.com/catalog/${item.slug}`;
   head.value = {
     ...head.value,
-    title: `${item.title} — Anton Shubin`,
-    pageName: item.title,
-    description: item.summary,
-    canonical: `https://antonshubin.com/catalog/${item.slug}`,
+    title: `${item.seoTitle} — Anton Shubin`,
+    // The breadcrumb's last item ("Home / Services / <short title>").
+    pageName: item.shortTitle,
+    description: metaDescription(
+      `${item.summary} ${priceLabel(item)}, ${item.delivery.toLowerCase()}.`,
+    ),
+    canonical,
     ogType: "website",
   };
+
+  const steps = startSteps(item.slug);
+  const projects = projectsForCatalog(item.slug);
+  // The first review of the first project that has one.
+  const excerpted = projects
+    .map((p) => ({ p, t: projectTestimonials(p.slug ?? "")[0] }))
+    .find((x) => x.t);
+  const next = item.next ? catalogItem(item.next) : undefined;
+  const isStrategy = item.slug === "strategy-call";
+  const versus = callVersusSession();
+  const bandPromises = catalogPromises(item.slug).slice(0, 2);
 
   return (
     <Layout currentPath="/catalog">
@@ -94,217 +120,242 @@ export default define.page(function CatalogDetail(ctx) {
           __html: toJsonLd({
             "@context": "https://schema.org",
             "@type": "Service",
-            "@id": `https://antonshubin.com/catalog/${item.slug}#service`,
+            "@id": `${canonical}#service`,
+            "url": canonical,
             "name": item.title,
             "description": item.desc,
-            "serviceType": item.title,
+            "serviceType": item.category,
             "provider": { "@id": "https://antonshubin.com/#person" },
             "areaServed": "Worldwide",
-            // No aggregateRating: 80 is the Upwork job count, not a review
-            // count, and there is no on-page review snippet to back a
-            // schema.org rating — Google's review-snippet rules require one
-            // (#193). The Upwork line is shown visibly instead, elsewhere on
-            // the site.
-            // One Offer per price, built from the same lib/catalog.ts entry as the
-            // visible price above — see catalogOffers for how "from" is published.
+            // No aggregateRating or Review: Google treats a person's reviews of
+            // their own work as self-serving (#193, #271). One Offer per price,
+            // built from the same lib/catalog.ts entry as the visible price.
             "offers": catalogOffers(item, BASE_URL),
           }),
         }}
       />
-      <div class="max-w-3xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <Breadcrumb
-          items={getBreadcrumb(head.value.canonical, item.title)}
-        />
+      <div class="max-w-6xl mx-auto">
+        <Breadcrumb items={getBreadcrumb(canonical, item.shortTitle)} />
 
-        <div class="bg-paper rounded-xl border border-rule p-3 sm:p-4 md:p-8">
-          <div class="flex items-center gap-4 mb-6">
+        <header class="mb-8">
+          <div class="flex items-center gap-4">
             <CatalogIcon
               name={item.icon}
-              class="w-10 h-10 text-accent shrink-0"
+              class="w-8 h-8 text-graphite shrink-0"
             />
-            <div>
-              <h1 class="text-2xl sm:text-3xl font-bold text-parchment">
-                {item.title}
-              </h1>
-              <div class="flex items-center gap-3 mt-2">
-                <span class="inline-block px-3 py-1 bg-sage/15 text-sage text-sm font-medium rounded-full">
-                  {priceLabel(item)}
-                </span>
-                <span class="inline-block px-3 py-1 bg-mist/15 text-mist text-sm font-medium rounded-full">
-                  {item.delivery}
-                </span>
+            <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
+              {item.title}
+            </h1>
+          </div>
+          <p
+            data-service-lead
+            class="mt-4 font-heading text-xl text-parchment leading-snug text-balance"
+          >
+            {item.outcome}
+          </p>
+        </header>
+
+        <div class="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
+          {/* The price card: first at 390px, the right column from 1024px */}
+          <div class="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-8">
+            <ServicePriceCard item={item} />
+          </div>
+
+          <div class="lg:col-start-1 lg:row-start-1 min-w-0 space-y-12">
+            <p class="max-w-2xl text-lg text-graphite leading-relaxed">
+              {item.desc}
+            </p>
+
+            {isStrategy && (
+              <section aria-labelledby="service-versus">
+                <h2 id="service-versus" class="text-2xl text-parchment mb-4">
+                  The free call and the paid session
+                </h2>
+                <div class="grid gap-4 sm:grid-cols-2" data-service-versus>
+                  {[versus.free, versus.paid].map((v) => (
+                    <div
+                      key={v.title}
+                      class="bg-paper border border-rule rounded-xl p-5"
+                    >
+                      <h3 class="text-lg text-parchment">{v.title}</h3>
+                      <p class="mt-2 text-graphite">{v.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* What's included and what is not, side by side at the same size */}
+            <section aria-labelledby="service-scope">
+              <h2 id="service-scope" class="text-2xl text-parchment mb-4">
+                What's included
+              </h2>
+              <div
+                data-service-scope
+                class={item.exclusions?.length
+                  ? "grid gap-4 md:grid-cols-2"
+                  : ""}
+              >
+                <div class="bg-paper border border-rule rounded-xl p-5">
+                  <h3 class="text-lg text-parchment mb-3">Included</h3>
+                  <ul class="space-y-2">
+                    {item.includes.map((inc) => (
+                      <li
+                        key={inc}
+                        class="flex items-start gap-2 text-graphite"
+                      >
+                        <CheckIcon class="w-4 h-4 text-graphite shrink-0 mt-1" />
+                        {inc}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {item.exclusions && item.exclusions.length > 0 && (
+                  <div class="bg-paper border border-rule rounded-xl p-5">
+                    <h3 class="text-lg text-parchment mb-3">Not included</h3>
+                    <ul class="space-y-2">
+                      {item.exclusions.map((exc) => (
+                        <li
+                          key={exc}
+                          class="flex items-start gap-2 text-graphite"
+                        >
+                          <span aria-hidden="true" class="shrink-0">×</span>
+                          {exc}
+                        </li>
+                      ))}
+                    </ul>
+                    <p class="mt-4 text-sm text-graphite">
+                      Need something not listed? Most of it can be added — tell
+                      me what you need and I will quote it before I start.
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div
-            class="text-graphite leading-relaxed mb-8 prose prose-invert max-w-none"
-            // deno-lint-ignore react-no-danger
-            dangerouslySetInnerHTML={{ __html: descHtml }}
-          />
+            {steps && (
+              <section aria-labelledby="how-it-starts">
+                <h2 id="how-it-starts" class="text-2xl text-parchment mb-4">
+                  How it starts
+                </h2>
+                <ol class="space-y-4 max-w-2xl" data-service-steps>
+                  {steps.map((step, i) => (
+                    <li
+                      key={step.title}
+                      class="grid grid-cols-[2rem_minmax(0,1fr)]"
+                    >
+                      <span class="font-heading text-lg text-graphite">
+                        {i + 1}
+                      </span>
+                      <div>
+                        <h3 class="text-lg text-parchment">{step.title}</h3>
+                        <p class="mt-1 text-graphite">{step.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
 
-          {/* Outcome — what you'll achieve */}
-          <div class="mb-8 p-4 bg-sage/10 border border-sage/20 rounded-lg">
-            <h2 class="text-lg font-semibold text-parchment mb-2 flex items-center gap-2">
-              <TargetIcon class="w-5 h-5 text-sage" /> Outcome
-            </h2>
-            <p class="text-sage leading-relaxed">{item.outcome}</p>
-          </div>
+            {item.alsoCovers && item.alsoCovers.length > 0 && (
+              <section aria-labelledby="service-also">
+                <h2 id="service-also" class="text-2xl text-parchment mb-4">
+                  Also built under this item
+                </h2>
+                <div class="space-y-5 max-w-2xl">
+                  {item.alsoCovers.map((c) => (
+                    <div key={c.id}>
+                      <h3 id={c.id} class="text-lg text-parchment">
+                        {c.title}
+                      </h3>
+                      <p class="mt-1 text-graphite leading-relaxed">{c.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
-          {item.firstStep && (
-            <div class="mb-8">
-              <h2 class="text-lg font-semibold text-parchment mb-3 flex items-center gap-2">
-                <span class="text-accent">1.</span> {item.firstStep.title}
+            <section aria-labelledby="service-audience">
+              <h2 id="service-audience" class="text-2xl text-parchment mb-4">
+                Who this is for
               </h2>
-              <p class="text-graphite leading-relaxed">{item.firstStep.desc}</p>
-            </div>
-          )}
-
-          {item.alsoCovers && item.alsoCovers.length > 0 && (
-            <div class="mb-8">
-              <h2 class="text-lg font-semibold text-parchment mb-3">
-                Also built under this item
-              </h2>
-              <ul class="space-y-3">
-                {item.alsoCovers.map((c) => (
-                  <li key={c.title} class="text-graphite leading-relaxed">
-                    <span class="text-parchment font-medium">{c.title}.</span>
-                    {" "}
-                    {c.desc}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Who it's for */}
-          <div class="mb-8">
-            <h2 class="text-lg font-semibold text-parchment mb-3 flex items-center gap-2">
-              <PersonIcon class="w-5 h-5 text-accent" /> Who this is for
-            </h2>
-            <p class="text-graphite leading-relaxed">{item.audience}</p>
-          </div>
-
-          {/* Example use cases */}
-          {item.examples.length > 0 && (
-            <div class="mb-8">
-              <h2 class="text-lg font-semibold text-parchment mb-3 flex items-center gap-2">
-                <CodeIcon class="w-5 h-5 text-accent" /> Example use cases
-              </h2>
-              <ul class="space-y-2">
-                {item.examples.map((ex, j) => (
-                  <li
-                    key={j}
-                    class="text-graphite flex items-start gap-2"
-                  >
-                    <span class="text-accent shrink-0 mt-0.5">→</span>
-                    {ex}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* What's included */}
-          <div class="mb-8">
-            <h2 class="text-lg font-semibold text-parchment mb-3 flex items-center gap-2">
-              <CheckIcon class="w-5 h-5 text-sage" /> What's included
-            </h2>
-            <ul class="space-y-2">
-              {item.includes.map((inc, j) => (
-                <li
-                  key={j}
-                  class="text-graphite flex items-start gap-2"
-                >
-                  <CheckIcon class="w-4 h-4 text-sage shrink-0 mt-0.5" />
-                  {inc}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Not included (exclusions) */}
-          {item.exclusions && item.exclusions.length > 0 && (
-            <div class="mb-8">
-              <h2 class="text-lg font-semibold text-parchment mb-3 flex items-center gap-2">
-                <span class="text-graphite">×</span> Not included
-              </h2>
-              <ul class="space-y-2">
-                {item.exclusions.map((exc, j) => (
-                  <li
-                    key={j}
-                    class="text-graphite flex items-start gap-2 text-sm"
-                  >
-                    <span class="text-graphite shrink-0 mt-0.5">×</span>
-                    {exc}
-                  </li>
-                ))}
-              </ul>
-              <p class="text-graphite text-xs mt-3 italic">
-                Need something not listed? Most of it can be added — tell me
-                what you need and I will quote it before I start.
+              <p class="max-w-2xl text-graphite leading-relaxed">
+                {item.audience}
               </p>
-            </div>
-          )}
+            </section>
 
-          {/* Tech stack */}
-          <div class="mb-8">
-            <h2 class="text-lg font-semibold text-parchment mb-3">
-              Tech Stack
-            </h2>
-            <div class="flex flex-wrap gap-2">
-              {item.tech.map((t, j) => (
-                <span
-                  key={j}
-                  class="px-3 py-1 text-sm rounded bg-lamp text-graphite"
+            {item.examples.length > 0 && (
+              <section aria-labelledby="service-fits">
+                <h2 id="service-fits" class="text-2xl text-parchment mb-4">
+                  Projects this fits
+                </h2>
+                <ul class="space-y-2 max-w-2xl">
+                  {item.examples.map((ex) => (
+                    <li key={ex} class="flex items-start gap-2 text-graphite">
+                      <ArrowRightIcon class="w-4 h-4 text-graphite shrink-0 mt-1" />
+                      {ex}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {projects.length > 0 && (
+              <section aria-labelledby="service-work">
+                <h2 id="service-work" class="text-2xl text-parchment mb-4">
+                  Work under this service
+                </h2>
+                <ul class="grid gap-4 sm:grid-cols-3" data-service-work>
+                  {projects.map((p) => (
+                    <MoreWorkCard key={p.slug} project={p} />
+                  ))}
+                </ul>
+                {excerpted && (
+                  <div class="mt-4 max-w-2xl" data-service-excerpt>
+                    <TestimonialCard
+                      t={excerpted.t}
+                      project={testimonialProject(excerpted.t)}
+                    />
+                  </div>
+                )}
+              </section>
+            )}
+
+            {next && (
+              <p data-service-next>
+                <a
+                  href={`/catalog/${next.slug}`}
+                  data-umami-event={`service-cta-${item.slug}-next`}
+                  class={`inline-flex items-center gap-1 ${FACT_LINK}`}
                 >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA buttons — same height */}
-          <div class="flex flex-wrap items-stretch justify-between gap-4 pt-6 border-t border-rule">
-            <div class="flex flex-wrap items-stretch gap-4">
-              <a
-                href="/contact-me"
-                class="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors"
-              >
-                Talk about this
-              </a>
-              <BookCallLink
-                url={SCHEDULE_URL}
-                target="_blank"
-                class="justify-center gap-1 px-6 py-3"
-              >
-                Book a free intro call
-              </BookCallLink>
-            </div>
-            <a
-              href="/how-i-work"
-              class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
-            >
-              How I work
-              <svg
-                aria-hidden="true"
-                focusable="false"
-                class="w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                />
-              </svg>
-            </a>
+                  Next step: {next.shortTitle} ·{" "}
+                  <span class="price">{priceLabel(next)}</span>
+                  <ArrowRightIcon class="w-3.5 h-3.5" />
+                </a>
+              </p>
+            )}
           </div>
         </div>
+
+        <ClosingBand
+          bookEvent={`service-cta-${item.slug}-book-band`}
+          bookLabel={BOOK_LABEL}
+          promiseIds={bandPromises}
+          catalogLink={
+            <a
+              href={briefPath(item.slug)}
+              data-umami-event={`service-cta-${item.slug}-brief-band`}
+              class={`text-sm ${FACT_LINK}`}
+            >
+              {BRIEF_LABEL}
+            </a>
+          }
+          links={[{
+            href: "/how-i-work",
+            label: "How I work",
+            event: `service-cta-${item.slug}-how-i-work`,
+          }]}
+        />
       </div>
     </Layout>
   );
