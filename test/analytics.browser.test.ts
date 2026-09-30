@@ -37,11 +37,16 @@ Deno.test("a post counts as read once, only after its end was on screen and 15 s
       await page.clock.runFor(1000);
       const marker = page.locator("[data-post-end]");
       assertEquals(await marker.count(), 1, "the post has no end marker");
+      // Zero height, so the body's bottom margin still collapses into the
+      // author box's and the post keeps its spacing.
+      assertEquals(
+        await marker.evaluate((el) => el.getBoundingClientRect().height),
+        0,
+      );
       assert(
-        !(await marker.isVisible() &&
-          await marker.evaluate((el) =>
-            el.getBoundingClientRect().top < globalThis.innerHeight
-          )),
+        await marker.evaluate((el) =>
+          el.getBoundingClientRect().top >= globalThis.innerHeight
+        ),
         "the end of the post is on the first screen, so the test proves nothing",
       );
 

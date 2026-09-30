@@ -274,9 +274,7 @@ export default define.page(function Infrastructure() {
                         {...(n.external
                           ? { target: "_blank", rel: "noopener noreferrer" }
                           : {})}
-                        {...linkEvent(n.href, {
-                          to: n.external ? n.id : undefined,
-                        })}
+                        {...linkEvent(n.href, { to: n.id })}
                         class={`${LINK} font-semibold break-all`}
                       >
                         {n.label}

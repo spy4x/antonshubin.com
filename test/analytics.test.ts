@@ -87,6 +87,12 @@ Deno.test("every Umami event on the site is in the closed list, with its propert
           for (const key of Object.keys(props)) {
             assert(key in PROP_KEYS, `${path}: unknown property "${key}"`);
           }
+          // A subdomain of this site goes by its short id ("dash", "meet"),
+          // so one destination is one row in Umami, not two.
+          assert(
+            !props.to?.endsWith("antonshubin.com"),
+            `${path}: outbound "to" is a host, not a short id: ${tag}`,
+          );
           if (props.place) {
             assert(
               (PLACES as readonly string[]).includes(props.place),

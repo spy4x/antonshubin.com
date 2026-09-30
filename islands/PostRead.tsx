@@ -46,5 +46,5 @@ export default function PostRead({ slug }: { slug: string }) {
     };
   }, [slug]);
 
-  return <div ref={markerRef} data-post-end aria-hidden="true" class="h-px" />;
+  return <div ref={markerRef} data-post-end aria-hidden="true" />;
 }

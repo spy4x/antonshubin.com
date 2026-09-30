@@ -112,7 +112,8 @@ const OWN_HOSTS = ["antonshubin.com", "www.antonshubin.com"];
 
 /**
  * The `to` property for a link to another site: `email` for `mailto:`, a
- * short name from `OUTBOUND_NAMES`, or else the host without `www.`. Null for
+ * short name from `OUTBOUND_NAMES`, the first label of one of this site's
+ * subdomains (`dash`, `meet`), or else the host without `www.`. Null for
  * a link that stays on this site (a path, a fragment, or this site's host).
  */
 export function outboundTo(href: string): string | null {
@@ -126,6 +127,7 @@ export function outboundTo(href: string): string | null {
   }
   if (OWN_HOSTS.includes(host)) return null;
   const bare = host.replace(/^www\./, "");
+  if (bare.endsWith(`.${OWN_HOSTS[0]}`)) return bare.split(".")[0];
   return OUTBOUND_NAMES[bare] ?? bare;
 }
 

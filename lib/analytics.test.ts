@@ -21,7 +21,7 @@ Deno.test("outboundTo names the site a link leaves for, and null for this site",
   assertEquals(outboundTo("mailto:someone@example.com"), "email");
   assertEquals(
     outboundTo("https://dash.antonshubin.com/"),
-    "dash.antonshubin.com",
+    "dash",
   );
   assertEquals(outboundTo("https://www.example.org/x"), "example.org");
   assertEquals(outboundTo("https://antonshubin.com/work"), null);
