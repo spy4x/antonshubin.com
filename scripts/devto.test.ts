@@ -3,6 +3,7 @@ import {
   absolutizeImageUrls,
   buildDevToPayload,
   createDevToDraft,
+  devToApiKey,
   type DevToArticlePayload,
 } from "./devto.ts";
 
@@ -287,8 +288,6 @@ Deno.test("absolutizeImageUrls skips only the malformed image and still rewrites
 });
 
 Deno.test("createDevToDraft skips the network call and does not throw when DEVTO_API_KEY is unset", async () => {
-  const previous = Deno.env.get("DEVTO_API_KEY");
-  Deno.env.delete("DEVTO_API_KEY");
   const originalFetch = globalThis.fetch;
   let calls = 0;
   globalThis.fetch = (() => {
@@ -296,12 +295,11 @@ Deno.test("createDevToDraft skips the network call and does not throw when DEVTO
     return Promise.reject(new Error("fetch should not have been called"));
   }) as typeof fetch;
   try {
-    await createDevToDraft("title", "slug", "body");
+    // An empty key stands for "none in the environment or .env.deploy".
+    await createDevToDraft("title", "slug", "body", "slug", "");
     assertEquals(calls, 0);
   } finally {
     globalThis.fetch = originalFetch;
-    if (previous === undefined) Deno.env.delete("DEVTO_API_KEY");
-    else Deno.env.set("DEVTO_API_KEY", previous);
   }
 });
 
@@ -342,5 +340,28 @@ Deno.test("createDevToDraft sends the article's campaign in the First published 
   } finally {
     globalThis.fetch = originalFetch;
     Deno.env.delete("DEVTO_API_KEY");
+  }
+});
+
+Deno.test("devToApiKey reads the key from .env.deploy when the environment has none", () => {
+  const previous = Deno.env.get("DEVTO_API_KEY");
+  Deno.env.delete("DEVTO_API_KEY");
+  try {
+    assertEquals(
+      devToApiKey(() => "# comment\nDEVTO_API_KEY=from-file\n"),
+      "from-file",
+    );
+    assertEquals(devToApiKey(() => "DEVTO_API_KEY=\n"), undefined);
+    assertEquals(
+      devToApiKey(() => {
+        throw new Deno.errors.NotFound();
+      }),
+      undefined,
+    );
+    Deno.env.set("DEVTO_API_KEY", "from-env");
+    assertEquals(devToApiKey(() => "DEVTO_API_KEY=from-file\n"), "from-env");
+  } finally {
+    if (previous === undefined) Deno.env.delete("DEVTO_API_KEY");
+    else Deno.env.set("DEVTO_API_KEY", previous);
   }
 });
