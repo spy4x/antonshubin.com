@@ -161,8 +161,9 @@ registered the old one, and the purge reads the build id from its
 `const CACHE = "antonshubin-<id>"` line. Its token, `CLOUDFLARE_API_TOKEN`,
 lives in `.env.deploy` (gitignored, committed as `.env.deploy.age`, restored by
 `deno task env:decrypt`), which the deploy reads locally and never uploads; the
-container does not need it. See `docs/deploy.md` "Cloudflare purge after a
-deploy".
+container does not need it. The same file holds `DEVTO_API_KEY` for
+`publish:blog`'s Dev.to draft, read locally the same way. See `docs/deploy.md`
+"Cloudflare purge after a deploy".
 
 The newsletter subscriber list (`data/subscribers.json`) lives on the host:
 `compose.yml` bind-mounts the app directory's `data/`, and the deploy's
