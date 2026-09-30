@@ -42,13 +42,13 @@ export async function launchChromium(): Promise<Browser> {
 
 /**
  * Opens a page with service workers blocked. The site registers
- * `/sw.js` on every page. islands/SWUpdater.tsx used to reload the page
- * once that worker took control, which landed mid-test and failed the next
- * `page.evaluate` with "Execution context was destroyed" (#219); it no
- * longer does (#259), and blocking still keeps the worker's cache out of
- * tests that are not about it. Every browser test that isn't about the
- * service worker opens its pages through this; test/sw-cache.browser.test.ts
- * and test/sw-updater.browser.test.ts are, and use `browser.newContext()`.
+ * `/sw.js` on every page, and that worker reloaded the page once it took
+ * control, which landed mid-test and failed the next `page.evaluate` with
+ * "Execution context was destroyed" (#219). The site registers no worker
+ * any more (#285); blocking keeps any future one out of tests that are not
+ * about it. Every browser test that isn't about the service worker opens its
+ * pages through this; test/sw-retired.browser.test.ts is, and uses
+ * `browser.newContext()`.
  */
 export function newPage(
   browser: Browser,

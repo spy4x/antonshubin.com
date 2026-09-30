@@ -1,16 +1,15 @@
 /**
- * The site's core pages (#293, #192): the one list behind three things that
+ * The site's core pages (#293, #192): the one list behind two things that
  * used to keep their own copy. `lib/cache-control.ts` builds `CORE_PAGES`
- * (the three-day edge cache) from it, `routes/sw.js.ts` builds the service
- * worker's precache list from it, and `routes/sitemap.xml.ts` builds its
- * static entries from it. A page added here is in all three.
+ * (the three-day edge cache) from it and `routes/sitemap.xml.ts` builds its
+ * static entries from it. A page added here is in both.
  *
  * Dynamic pages (`/blog/<slug>`, `/work/<slug>`, ...) are not listed: their
  * routes generate them from `lib/data.ts`, `lib/catalog.ts` and
  * `lib/tools.ts`.
  */
 
-export type PageSurface = "sitemap" | "precache" | "edge";
+export type PageSurface = "sitemap" | "edge";
 
 export interface CorePage {
   path: string;
@@ -20,7 +19,7 @@ export interface CorePage {
   changefreq: "weekly" | "monthly";
   /**
    * Surfaces this page is deliberately left out of, with the reason at the
-   * entry. Everything else is in all three.
+   * entry. Everything else is in both.
    */
   notIn?: readonly PageSurface[];
 }
@@ -47,10 +46,6 @@ export const corePages: readonly CorePage[] = [
     path: "/hackathons",
     priority: "0.7",
     changefreq: "monthly",
-    // It answers 404 while `lib/data.ts`'s `hackathons` is empty, and one
-    // 404 fails the service worker's whole precache. The sitemap adds it
-    // only when there are hackathons.
-    notIn: ["precache"],
   },
   { path: "/privacy", priority: "0.3", changefreq: "monthly" },
   {

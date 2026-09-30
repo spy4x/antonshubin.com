@@ -1,71 +1,34 @@
 import { define } from "../lib/utils.ts";
-import { pagesFor } from "../lib/pages.ts";
 
-// Cache name is derived from the build, not hand-bumped, so a deploy never
-// edits a tracked file. BUILD_ID is set from the deploy commit hash (see
-// scripts/deploy.ts); it falls back to a fixed value so `deno task dev` and
-// local builds still work without it.
+// The site has no service worker any more (#285). Browsers that registered
+// the old one (#259: it reloaded a first visit; it precached eight pages)
+// still check this URL on their next visit. This script replaces it: it
+// deletes every cache, unregisters itself and does nothing else, so those
+// browsers end up with no worker and no stored pages. Nothing registers it
+// now. Keep the route until old registrations have had time to expire (until
+// about the end of January 2027), then delete it together with the purge
+// step's build-id read (scripts/cloudflare-purge.ts).
+//
+// BUILD_ID is set from the deploy commit hash (see scripts/deploy.ts). The
+// script still carries it as `const CACHE = "antonshubin-<id>"` because the
+// deploy reads that line from the live URL to know when the new build is up
+// and which static files changed since the previous one.
 const BUILD_ID = Deno.env.get("BUILD_ID") || "dev";
-const CACHE = `antonshubin-${BUILD_ID}`;
-
-// `lib/pages.ts`'s core pages, plus the web manifest.
-const PRECACHE_URLS = [
-  ...pagesFor("precache").map((p) => p.path),
-  "/manifest.json",
-];
 
 const SW_SCRIPT =
-  `// Cache version — derived from the build id, never hand-edited.
-const CACHE = "${CACHE}";
+  `// Retired service worker: clears its caches and unregisters itself.
+const CACHE = "antonshubin-${BUILD_ID}";
 
-const PRECACHE_URLS = ${JSON.stringify(PRECACHE_URLS)};
-
-// Install: precache core pages
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE_URLS)),
-  );
+self.addEventListener("install", () => {
+  self.skipWaiting();
 });
 
-// Activate: delete old caches, claim all clients
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-    ).then(() => clients.claim()),
+    caches.keys()
+      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+      .then(() => self.registration.unregister()),
   );
-});
-
-// The fetch handler never writes a response marked no-store (the unsubscribe
-// page shows one subscriber's address) to the cache, and never serves one
-// from it. The precache list above holds no such page.
-const isNoStore = (response) =>
-  (response.headers.get("Cache-Control") || "").includes("no-store");
-
-// Fetch: stale-while-revalidate — serve cache instantly, refresh in background
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-
-  event.respondWith(
-    caches.match(event.request).then((match) => {
-      const cached = match && !isNoStore(match) ? match : undefined;
-      const fetchPromise = fetch(event.request).then((response) => {
-        if (response.ok && response.type === "basic" && !isNoStore(response)) {
-          const clone = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || fetchPromise;
-    }),
-  );
-});
-
-// Message: allow page to trigger skipWaiting
-self.addEventListener("message", (event) => {
-  if (event.data?.action === "skipWaiting") {
-    self.skipWaiting();
-  }
 });
 `;
 
@@ -74,8 +37,8 @@ export const handler = define.handlers({
     return new Response(SW_SCRIPT, {
       headers: {
         "Content-Type": "text/javascript; charset=utf-8",
-        // The browser detects a service-worker update byte for byte, so this
-        // file must never be cached.
+        // The browser detects a worker update byte for byte, so this file
+        // must never be cached.
         "Cache-Control": "no-cache, must-revalidate",
       },
     });

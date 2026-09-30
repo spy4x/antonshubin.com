@@ -1,6 +1,5 @@
 import { define } from "../lib/utils.ts";
 import { UMAMI_ID, UMAMI_PRECONNECT_ORIGIN, UMAMI_URL } from "../lib/config.ts";
-import SWUpdater from "../islands/SWUpdater.tsx";
 import { resetHead } from "../lib/head.ts";
 import { isBot } from "../lib/bots.ts";
 import { analyticsAllowed } from "../lib/analytics.ts";
@@ -105,7 +104,6 @@ export default define.page(function App({ Component, req }) {
           Skip to main content
         </a>
         <Component />
-        <SWUpdater />
       </body>
     </html>
   );

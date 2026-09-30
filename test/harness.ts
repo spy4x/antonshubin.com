@@ -58,7 +58,7 @@ export interface StartSiteOptions {
   /**
    * Port to listen on. Omit for a free one. A test that restarts the site
    * passes the stopped one's port, so the browser sees the same origin
-   * (test/sw-updater.browser.test.ts deploys a new service worker that way).
+   * (a test of a deploy that changes `BUILD_ID` can restart the site that way).
    */
   port?: number;
 }

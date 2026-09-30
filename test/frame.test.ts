@@ -6,7 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
-import { corePages, pagesFor } from "../lib/pages.ts";
+import { corePages } from "../lib/pages.ts";
 import { footerProfiles, sameAsUrls } from "../lib/profiles.ts";
 import { ROLE } from "../lib/head.ts";
 
@@ -125,10 +125,6 @@ siteTest(
         new URL(m[1]).pathname
       ),
     );
-    const sw = await site.html("/sw.js");
-    const precache: string[] = JSON.parse(
-      sw.match(/const PRECACHE_URLS = (\[[^\]]*\])/)![1],
-    );
     for (const page of corePages) {
       const hackathonsEmpty = page.path === "/hackathons";
       assertEquals(
@@ -136,17 +132,7 @@ siteTest(
         !page.notIn?.includes("sitemap") && !hackathonsEmpty,
         `sitemap: ${page.path}`,
       );
-      assertEquals(
-        precache.includes(page.path),
-        !page.notIn?.includes("precache"),
-        `precache: ${page.path}`,
-      );
     }
-    assert(precache.includes("/privacy"), "/privacy is not precached");
-    assertEquals(
-      pagesFor("precache").map((p) => p.path),
-      precache.filter((p) => p !== "/manifest.json"),
-    );
   },
 );
 
