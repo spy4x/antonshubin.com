@@ -198,6 +198,9 @@ Five entities in a `@graph` array (six on `/about`):
   (`postTitleTag()` in `lib/blog.ts`)
 - Every `h2` and `h3` in a post has a stable id from its text, so a section can
   be linked; posts of 8 minutes or more list their `h2`s under "Contents"
+- Every post opens with a "TL;DR" `h2` (id `tldr`) and its front matter's `tldr`
+  lines, the first heading after the `h1`; `llms-full.txt` lists the same lines
+  under each post. The `description` stays the meta description
 - The old `/blog?tab=<topic>` filters answer one 301 to `/blog`
   (`blogTabRedirect()` in `lib/redirects.ts`); the topics are sections of the
   one page

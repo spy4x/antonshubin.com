@@ -70,6 +70,9 @@ draft against the brief before the pull request opens.
    ---
    title: "The post's title"
    description: "One or two sentences; the first 150 characters carry the point"
+   tldr: # required; two to four lines, each at most 200 characters
+     - "The one result the reader takes away."
+     - "The next thing they can act on."
    publishedAt: "2026-09-26"
    updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
@@ -85,18 +88,31 @@ draft against the brief before the pull request opens.
    A missing, mistyped or unknown field fails the tests, naming the file. An
    Upwork figure in a title or description is written `{proof:jobs}`, never the
    number itself. Link the post's tool with `relatedTool` and the service it
-   sells with `catalogSlug` (#191's writing standard): the post shows the
-   repository under the byline and both links in the author box. A post with a
-   `catalogSlug` shows a price, so `test/structure.test.ts` adds it to
-   `PRICE_PAGES` on its own.
-3. Posts of 8 minutes or more get a contents list of their `##` headings, so
+   sells with `catalogSlug` (#191's writing standard): the post shows the tool's
+   page, demo and repository under the byline and both links in the author box.
+   A post with a `catalogSlug` shows a price, so `test/structure.test.ts` adds
+   it to `PRICE_PAGES` on its own.
+3. **Every post opens with a TL;DR** (Anton, 30 September 2026): the `tldr`
+   list, rendered as a "TL;DR" heading and a list above the body, and listed
+   under the post in `llms-full.txt`. Write it last, from the finished draft, as
+   [voice.md](voice.md) "TL;DR" describes; a post without one, with fewer than
+   two or more than four lines, or with a line over 200 characters fails the
+   tests. The `description` stays the search snippet; don't copy one into the
+   other. When an update note opens the Markdown, the TL;DR already says what
+   the update changed.
+4. **A post about a project opens with its links.** Set `relatedTool` to its
+   `lib/tools.ts` slug: the post's header then shows the tool's page, its
+   running instance or demo (`live`) and its repository (`repo`), all read from
+   that entry. Never write those links by hand at the top of the Markdown; if
+   the tool has no demo yet, add `live` to its entry the day one runs.
+5. Posts of 8 minutes or more get a contents list of their `##` headings, so
    give a long post real section headings. Every `##` and `###` gets an id from
    its text.
-4. Add any figures the post uses under `static/img/blog/<slug>/`, run
+6. Add any figures the post uses under `static/img/blog/<slug>/`, run
    `deno task strip-metadata` on them, then run `deno task og` for the 1200×630
    preview and commit the PNG. No cover image: the post opens with its title,
    and the preview PNG is the link and search image.
-5. Check the "AI crawler optimization" table in AGENTS.md. The sitemap, the RSS
+7. Check the "AI crawler optimization" table in AGENTS.md. The sitemap, the RSS
    feed and both llms files read `blogArticles`, so they update themselves; the
    doc rows may still need a line.
 
