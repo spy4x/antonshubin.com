@@ -61,7 +61,7 @@ function Lane({ lane }: { lane: InfraLane }) {
                 <li
                   key={`${link.edge.from}-${link.edge.to}`}
                   data-infra-edge={`${link.edge.from}-${link.edge.to}`}
-                  class="flex flex-row lg:flex-col items-center justify-center gap-2 lg:gap-1 py-0 lg:py-0 lg:px-3 lg:w-28 lg:shrink-0 text-xs text-graphite"
+                  class="flex flex-row lg:flex-col items-center justify-center gap-2 lg:gap-1 py-0 lg:py-0 lg:px-2 lg:w-20 lg:shrink-0 text-xs text-graphite"
                 >
                   <Arrow forward={link.forward} />
                   <span class="font-semibold text-graphite">
@@ -71,7 +71,7 @@ function Lane({ lane }: { lane: InfraLane }) {
               )}
               <li
                 data-infra-node={n.id}
-                class="relative bg-paper border border-rule rounded-lg px-3 py-1.5 lg:px-4 lg:py-3 lg:w-52 lg:shrink-0"
+                class="relative bg-paper border border-rule rounded-lg px-3 py-1.5 lg:px-4 lg:py-3 lg:flex-1 lg:min-w-0 lg:max-w-52"
               >
                 <a
                   href={n.href}
