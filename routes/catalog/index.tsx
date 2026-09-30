@@ -80,7 +80,7 @@ export default define.page(function Catalog() {
               <li
                 key={item.slug}
                 data-catalog-item={item.slug}
-                class="bg-paper rounded-xl border border-rule p-5 sm:p-6 flex flex-col"
+                class="relative bg-paper rounded-xl border border-rule p-5 sm:p-6 flex flex-col transition-colors hover:border-rule-strong focus-within:border-rule-strong"
               >
                 <div class="flex items-center gap-3">
                   <CatalogIcon
@@ -113,7 +113,10 @@ export default define.page(function Catalog() {
                 </ul>
                 <div class="mt-auto pt-5">
                   {work && (
-                    <p class="mb-3 text-sm text-graphite" data-catalog-work>
+                    <p
+                      class="relative z-10 mb-3 text-sm text-graphite"
+                      data-catalog-work
+                    >
                       Client work:{" "}
                       <a href={workHref(work.slug ?? "")} class={FACT_LINK}>
                         {work.title}
@@ -127,7 +130,7 @@ export default define.page(function Catalog() {
                       place: "card",
                       target: `/catalog/${item.slug}`,
                     })}
-                    class={`inline-flex items-center gap-1 ${FACT_LINK}`}
+                    class={`inline-flex items-center gap-1 ${FACT_LINK} after:absolute after:inset-0 after:rounded-xl`}
                   >
                     Scope, price and what's included
                     <span class="sr-only">: {item.shortTitle}</span>

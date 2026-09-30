@@ -23,7 +23,7 @@ export function CiPill(
     <a
       href={pipelinesUrl}
       data-ci-status={word}
-      class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-lamp rounded-full hover:underline underline-offset-4"
+      class="relative z-10 inline-flex items-center gap-1.5 px-2.5 py-1 bg-lamp rounded-full hover:underline underline-offset-4"
     >
       <span class={labelHidden ? "sr-only" : "text-sm text-parchment"}>CI</span>
       {

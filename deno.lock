@@ -1672,6 +1672,8 @@
     "https://esm.sh/@jsquash/png@3.0.1/denonext/png.mjs": "83c8619b21c0ccb4c49986c2fdd50817c433af997c7e612878ec9477bc65e883",
     "https://esm.sh/@jsquash/png@3.0.1?target=denonext": "2415e4ca044ca4ca0bee8dfbe19106ab8de9cd3f49811e8c3eb4dba2c3137bd4",
     "https://esm.sh/@jsquash/png@3.0.1?target=denonext&pin=v135": "2415e4ca044ca4ca0bee8dfbe19106ab8de9cd3f49811e8c3eb4dba2c3137bd4",
+    "https://esm.sh/@jsquash/resize@2.1.0/denonext/resize.mjs": "105ebba24df34feb5eb6d62cb48c3d4d31844c53b7d67d13c5662f31b81ee687",
+    "https://esm.sh/@jsquash/resize@2.1.0?target=denonext&pin=v135": "65bd4c72bbfd148d762b5f878a8930fb4801d2a258e2f5b8b32618016519be74",
     "https://esm.sh/@jsquash/webp@1.5.0/denonext/codec/enc/webp_enc.mjs": "0e862f2a77eada4b7533fef2ef7856ad61ee003396264533fdc3c69cc8e1abcb",
     "https://esm.sh/@jsquash/webp@1.5.0/denonext/codec/enc/webp_enc_simd.mjs": "9496c771fb8d9a5b33f4b447fe285b7d0196a5eafe46f0b57bd5e1fa5e4c89d2",
     "https://esm.sh/@jsquash/webp@1.5.0/denonext/webp.mjs": "274fbbd982d3c1081d517594644ca782760141474f1fa1c02434abc5138c7cf7",

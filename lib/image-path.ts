@@ -11,3 +11,10 @@ export function webpForPng(src: string): string | null {
   if (!src.toLowerCase().endsWith(".png")) return null;
   return src.slice(0, -4) + ".webp";
 }
+
+/**
+ * The widest a project screenshot may be. Wider ones make the lightbox lag,
+ * because the browser decodes every pixel before it paints (#336).
+ * `deno task optimize:screenshots` scales down to it.
+ */
+export const MAX_SCREENSHOT_WIDTH = 1600;

@@ -1,17 +1,26 @@
 #!/usr/bin/env -S deno run -A
 /**
- * Optimize project screenshots: PNG to WebP.
+ * Optimize project screenshots: PNG to WebP, at most `MAX_WIDTH` pixels wide.
  *
  * Run once to regenerate webp variants under static/img/projects/:
  *   deno task optimize:screenshots
  *
  * Idempotent — skips files whose webp output is already newer than the source.
+ * A WebP with no PNG source (older projects) is resized in place when it is
+ * wider than `MAX_WIDTH`: the browser decodes every pixel before the lightbox
+ * paints, so pixel count, not file size, is what makes a big screenshot lag
+ * (#336).
  *
- * @jsquash/png and @jsquash/webp are pure-WASM, no native deps.
+ * @jsquash/png, @jsquash/webp and @jsquash/resize are pure-WASM, no native deps.
  */
 import { walk } from "jsr:@std/fs@^1.0.0/walk";
 import { decode as decodePng } from "https://esm.sh/@jsquash/png@3.0.1?target=denonext&pin=v135";
-import { encode as encodeWebp } from "https://esm.sh/@jsquash/webp@1.5.0?target=denonext&pin=v135";
+import {
+  decode as decodeWebp,
+  encode as encodeWebp,
+} from "https://esm.sh/@jsquash/webp@1.5.0?target=denonext&pin=v135";
+import resize from "https://esm.sh/@jsquash/resize@2.1.0?target=denonext&pin=v135";
+import { MAX_SCREENSHOT_WIDTH as MAX_WIDTH } from "../lib/image-path.ts";
 
 const PROJECT_ROOT = new URL("../", import.meta.url).pathname;
 const SCREENSHOTS_DIR = `${PROJECT_ROOT}static/img/projects`;
@@ -62,11 +71,39 @@ async function processPng(pngPath: string): Promise<ProcessedFile | null> {
   // Uint8Array, so widen via `as`.
   // deno-lint-ignore no-explicit-any
   const imageData = await decodePng(pngBytes as any);
-  // deno-lint-ignore no-explicit-any
-  const encoded = await encodeWebp(imageData, { quality: WEBP_QUALITY } as any);
-  const webpBytes = asUint8Array(encoded);
+  const webpBytes = await encodeCapped(imageData);
   await Deno.writeFile(outPath, webpBytes);
   return { input: pngPath, output: outPath, bytes: webpBytes.byteLength };
+}
+
+/** Scales an image down to `MAX_WIDTH` (never up) and encodes it as WebP. */
+async function encodeCapped(imageData: ImageData): Promise<Uint8Array> {
+  const scaled = imageData.width > MAX_WIDTH
+    ? await resize(imageData, {
+      width: MAX_WIDTH,
+      height: Math.round(imageData.height * MAX_WIDTH / imageData.width),
+    })
+    : imageData;
+  // deno-lint-ignore no-explicit-any
+  const encoded = await encodeWebp(scaled, { quality: WEBP_QUALITY } as any);
+  return asUint8Array(encoded);
+}
+
+/** Resizes a WebP that has no PNG source in place when it is wider than `MAX_WIDTH`. */
+async function shrinkWebp(webpPath: string): Promise<ProcessedFile | null> {
+  const pngPath = webpPath.replace(/\.webp$/, ".png");
+  try {
+    await Deno.stat(pngPath);
+    return null; // built from its PNG above
+  } catch {
+    // no PNG source
+  }
+  // deno-lint-ignore no-explicit-any
+  const imageData = await decodeWebp(await Deno.readFile(webpPath) as any);
+  if (imageData.width <= MAX_WIDTH) return null;
+  const webpBytes = await encodeCapped(imageData);
+  await Deno.writeFile(webpPath, webpBytes);
+  return { input: webpPath, output: webpPath, bytes: webpBytes.byteLength };
 }
 
 const pngs: string[] = [];
@@ -97,6 +134,27 @@ for (const png of pngs) {
     console.log(`  ${rel} → ${fmtBytes(result.bytes)}`);
   } catch (e) {
     console.error(`  FAIL ${png}: ${(e as Error).message}`);
+  }
+}
+
+const webps: string[] = [];
+for await (
+  const entry of walk(SCREENSHOTS_DIR, { includeDirs: false, exts: [".webp"] })
+) {
+  webps.push(entry.path);
+}
+for (const webp of webps) {
+  try {
+    const result = await shrinkWebp(webp);
+    if (result) {
+      console.log(
+        `  ${webp.replace(PROJECT_ROOT, "")} resized → ${
+          fmtBytes(result.bytes)
+        }`,
+      );
+    }
+  } catch (e) {
+    console.error(`  FAIL ${webp}: ${(e as Error).message}`);
   }
 }
 

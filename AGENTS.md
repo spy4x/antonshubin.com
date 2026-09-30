@@ -869,6 +869,11 @@ page. Never retry a test on this error.
   then visible; `/`, a project page, `/privacy` and a not-found blog URL have no
   axe violations and no sideways scroll at 390 and 1440px, each with one footer;
   and at 390px the footer's last line clears the tab bar.
+- `test/card-links.browser.test.ts` (#336): a click on an empty corner of a
+  `/work` archive row, a `/tools` card or a `/catalog` card opens its page (the
+  card's one link is stretched over it with `after:absolute after:inset-0`, as
+  on the highlight cards), and a link inside a catalog card keeps its own
+  target.
 - `test/analytics.browser.test.ts` (#318): `post-read` counts once, only when
   the end of a post has been on screen and 15 s have passed (Playwright's fake
   clock), and the not-found page counts `not-found`. It, `lead-form` (brief
@@ -1164,6 +1169,14 @@ Chromium) never runs it, it only serves the PNGs already committed.
 `test/og-images.test.ts` guards that every post and project has its PNG at
 exactly 1200×630, reading each file's PNG header directly — deterministic and
 offline, no browser needed to run the check itself.
+
+## Project screenshots
+
+No project screenshot WebP is wider than `MAX_SCREENSHOT_WIDTH` (1600px,
+`lib/image-path.ts`, #336): the lightbox decodes every pixel before it paints,
+so a 2500px shot lagged. `deno task optimize:screenshots` scales PNG sources and
+oversized WebP-only files down to it, and `test/screenshot-width.test.ts` fails
+on a wider one.
 
 ## Image metadata
 
