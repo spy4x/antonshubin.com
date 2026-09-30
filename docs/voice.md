@@ -35,6 +35,26 @@ kinds, and a new post takes the shape of the kind it is:
 Both kinds talk to the reader directly and casually: "Hey there!", "But let's be
 real", "Why Drone CI is cool".
 
+## TL;DR
+
+Every post starts with one (Anton, 30 September 2026: he is annoyed by articles
+without one). It is the front matter's `tldr` list, and the page shows it under
+the header, as the first block of the post body (docs/publishing.md, step 3).
+
+- Two to four lines. Each is one plain claim a skimming reader can act on or
+  remember: the result, the decision, the rule, the catch.
+- Write it last, from the finished post. Every line says only what the post
+  says: no new claim, number or name (AGENTS.md "Content rule").
+- The post's own voice: "I" where the post is first person, "you" for the
+  reader. Short sentences; each line is at most 200 characters.
+- Not a teaser and not the description again. "Opus 5.5 cost about half as much
+  per line" beats "I compared four models and the results surprised me".
+- When an update note opens the post, the first line says what the update
+  changed, starting "Update:", and the rest says what still holds.
+- Name the tool when the post is about one ("mig is a meeting scheduler…"), but
+  put no links or repository in it: a post about a project already opens with
+  those links, from `relatedTool`.
+
 ## How a post opens
 
 - It says what the post is and who it is for, plainly, often under the headings

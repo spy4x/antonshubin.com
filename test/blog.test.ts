@@ -7,6 +7,7 @@ import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
 import { blogArticles } from "../lib/data.ts";
 import { TOC_MIN_MINUTES } from "../lib/blog.ts";
+import { findTool } from "../lib/tools.ts";
 
 const SITE = "https://antonshubin.com";
 
@@ -219,19 +220,91 @@ siteTest(
 );
 
 siteTest(
-  "a post about a tool links its repository under the byline",
+  "every post in the sitemap opens with its TL;DR heading and list before any other heading",
   async (site) => {
-    const html = await site.html("/blog/building-mcp-servers-with-deno");
-    const code = block(html, "data-code-link", "p");
-    assert(
-      code.includes('href="https://github.com/spy4x/caldav-mcp"'),
-      `no repository link: ${code}`,
+    const xml = await site.html("/sitemap.xml");
+    const slugs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname)
+      .filter((p) => p.startsWith("/blog/"))
+      .map((p) => p.slice("/blog/".length));
+    assertEquals(
+      [...slugs].sort(),
+      blogArticles.map((a) => a.slug).sort(),
+      "the sitemap and content/blog list different posts",
     );
-    const without = await site.html("/blog/opus-5-5-vs-sonnet-5-agent-costs");
-    assert(
-      !without.includes("data-code-link"),
-      "a post without a tool has one",
-    );
+    let updateNotes = 0;
+    for (const slug of slugs) {
+      const article = blogArticles.find((a) => a.slug === slug)!;
+      const html = await site.html(`/blog/${slug}`);
+      const afterTitle = html.slice(html.indexOf("</h1>"));
+      const firstHeading = afterTitle.match(/<h[1-6]\b[^>]*>[^<]*/)?.[0] ?? "";
+      assert(
+        firstHeading.includes('id="tldr"') && firstHeading.endsWith("TL;DR"),
+        `${slug}: the first heading after the H1 is ${firstHeading}`,
+      );
+      const box = section(html, "data-tldr");
+      assertEquals(count(box, /<h2\b/), 1, `${slug}: TL;DR heading`);
+      assertEquals(count(box, /<li\b/), article.tldr.length, slug);
+      const text = visibleText(box);
+      for (const line of article.tldr) {
+        assert(text.includes(line), `${slug}: no "${line}" in ${text}`);
+      }
+      // A note at the top of the Markdown (an update) sits directly below
+      // the TL;DR, with nothing in between.
+      const markdown = await Deno.readTextFile(`content/blog/${slug}.md`);
+      const body = markdown.replace(/^---[\s\S]*?---\s*/, "");
+      if (!body.startsWith(">")) continue;
+      updateNotes++;
+      const afterBox = html.slice(
+        html.indexOf("</section>", html.indexOf("data-tldr")),
+      );
+      assert(
+        /^<\/section>\s*<div[^>]*class="blog-content[^"]*"[^>]*>\s*<blockquote\b/
+          .test(afterBox),
+        `${slug}: its update note does not follow the TL;DR`,
+      );
+    }
+    assert(updateNotes > 0, "no post opens with an update note to check");
+  },
+);
+
+siteTest(
+  "every post about a tool shows its live link and repository above the TL;DR, and no other post has the row",
+  async (site) => {
+    let lives = 0;
+    let repos = 0;
+    for (const article of blogArticles) {
+      const html = await site.html(`/blog/${article.slug}`);
+      if (!article.relatedTool) {
+        assert(
+          !html.includes("data-code-link"),
+          `${article.slug} has a project row without a project`,
+        );
+        continue;
+      }
+      const tool = findTool(article.relatedTool)!;
+      const row = block(html, "data-code-link", "p");
+      assert(
+        row && html.indexOf("data-code-link") < html.indexOf('id="tldr"'),
+        `${article.slug}: no project row above the TL;DR`,
+      );
+      assert(row.includes(`href="/tools/${tool.slug}"`), row);
+      if (tool.live) {
+        lives++;
+        assert(
+          row.includes(`href="${tool.live.href}"`),
+          `${article.slug}: no live link in ${row}`,
+        );
+      }
+      if (tool.repo) {
+        repos++;
+        assert(
+          row.includes(`href="https://github.com/${tool.repo}"`),
+          `${article.slug}: no repository link in ${row}`,
+        );
+      }
+    }
+    assert(lives > 0 && repos > 0, "no post's tool has a live link or a repo");
   },
 );
 

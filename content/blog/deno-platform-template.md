@@ -1,6 +1,11 @@
 ---
 title: "Deno Platform Template: distilling {proof:jobs}+ client projects into one repo"
 description: "What I learned shipping the same SaaS skeleton over and over for paying clients. Group core, personal groups, REST + CQRS, offline sync, an outbox processor — and a deliberate decision to ship it as a template, not a framework."
+tldr:
+  - "This template is the SaaS skeleton I kept rebuilding for clients: a multi-tenant API, an offline-first Preact client and a worker that drains an outbox."
+  - "Groups are the load-bearing decision: a user belongs to many groups, a group owns the data, and every user gets a personal group from day one."
+  - "CQRS without a framework: every endpoint is one async command or query, and the API handler is a thin adapter around it."
+  - "It is a template, not a framework: you clone it and change it, because both times I shipped a framework, the second project had to work around it."
 publishedAt: "2026-08-26"
 readTime: 11
 topic: "founders"

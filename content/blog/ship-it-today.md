@@ -1,6 +1,10 @@
 ---
 title: "Why you have to ship your idea today and with shittiest code possible"
 description: "Or why so many developers abandon their attempts to release a product"
+tldr:
+  - "Build something small that solves a real itch, ideally your own, and check that other people have it too."
+  - "Use the stack you already know and keep it simple; linting, tests and CI can wait until people care."
+  - "Don't wait for perfect: publish something today and improve it every day."
 publishedAt: "2022-04-27"
 readTime: 5
 topic: "founders"

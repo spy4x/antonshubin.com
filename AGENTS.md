@@ -306,13 +306,13 @@ say when the CI status was checked and whether it is the committed file
 (`checkedLabel()`; a repository counts as live only when its GitHub and
 Woodpecker calls both succeeded). `/tools` and `/tools/*` are cached for an hour
 so a refresh reaches visitors (`lib/cache-control.ts`). A tool's `posts` link
-each post to its page (the post header shows "The tool: <name>"); its
-`catalogSlug` picks the catalog item the "hire me" door names; `deployable` adds
-`SoftwareApplication` JSON-LD, whose `url` is only ever its running `live`
-instance. The hub carries `CollectionPage` and `ItemList` JSON-LD. A tool page's
-links send `outbound` (`to` `live` or `github`, `item` the slug), `cta` and
-`book` with `item`, and its copy button `tool-install-copy`; see "Analytics"
-below.
+each post to its page (the post header shows "The tool: <name>", then its `live`
+link and its repository); its `catalogSlug` picks the catalog item the "hire me"
+door names; `deployable` adds `SoftwareApplication` JSON-LD, whose `url` is only
+ever its running `live` instance. The hub carries `CollectionPage` and
+`ItemList` JSON-LD. A tool page's links send `outbound` (`to` `live` or
+`github`, `item` the slug), `cta` and `book` with `item`, and its copy button
+`tool-install-copy`; see "Analytics" below.
 
 ## Navigation
 
@@ -1057,7 +1057,12 @@ request with the post file and its front matter (no `lib/data.ts` entry: the
 metadata is read from the file), review, merge, deploy, then
 `deno task publish:blog <slug>`. That script writes no file: it checks the post
 answers 200 live, creates the Dev.to draft and prints every channel's tagged
-link and the newsletter preview. Three hard rules:
+link and the newsletter preview. Every post opens with a TL;DR, two to four
+short lines in its required `tldr` front matter (`lib/blog-posts.ts` fails the
+build without it, and `llms-full.txt` lists it), and a post about a project sets
+`relatedTool`, so its header shows that tool's demo (`live`) and repository
+(`repo`) from `lib/tools.ts`, never hand-written links; `test/blog.test.ts`
+checks both on every post. Three hard rules:
 
 - **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
   text per channel with its tagged link and show it in chat; Anton pastes it.

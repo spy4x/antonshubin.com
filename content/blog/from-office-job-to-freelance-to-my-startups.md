@@ -1,6 +1,11 @@
 ---
 title: "My journey from an office job to freelance to my startups"
 description: "While traveling and enjoying life"
+tldr:
+  - "I went from an office job to freelance in 2013, then to part-time consulting, to free up time for my own products."
+  - "Before you leave a job, save two or three times the expenses you expect and have a plan B; it always takes longer than planned."
+  - "Communication and initiative raised my rate most: speak without fear, ask clients for feedback and get close to the decision-maker."
+  - "Go deep in one niche instead of chasing hype, and don't delay starting your own project."
 publishedAt: "2022-06-07"
 readTime: 15
 topic: "founders"

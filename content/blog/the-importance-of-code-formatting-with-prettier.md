@@ -1,6 +1,10 @@
 ---
 title: "Dev tricks, Part 1: The Importance of Code Formatting with Prettier"
 description: "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day!"
+tldr:
+  - "Let Prettier format your code, so code reviews stop arguing about style."
+  - "Run it on save in your editor, in a pre-commit hook with Husky and lint-staged, and as a check in CI."
+  - "My own .prettierrc is at the end, with every option explained."
 publishedAt: "2022-12-21"
 readTime: 7
 topic: "founders"

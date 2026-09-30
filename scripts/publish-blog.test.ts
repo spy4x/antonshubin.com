@@ -18,6 +18,7 @@ const ARTICLE: BlogArticle = {
   title: "A <test> post",
   slug: "a-test-post",
   description: "What the post is about",
+  tldr: ["One point.", "Another point."],
   readTime: 3,
   publishedAt: "2026-09-26",
   topic: "ai-mcp",

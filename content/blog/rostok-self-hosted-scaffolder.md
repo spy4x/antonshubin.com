@@ -1,6 +1,11 @@
 ---
 title: "rostok: scaffold a self-hosted homelab from a curated service catalog"
 description: "The CLI I built to remove 80% of the friction between 'I want to self-host X' and 'X is running, secrets are committed, deploy is one command'. One wizard, a few prompts, and the same IaC structure I use for my own infrastructure."
+tldr:
+  - "rostok is a CLI wizard that turns an empty folder into an infrastructure-as-code repo for your servers, with services picked from a catalog."
+  - "Secrets live in .env.age files, so the whole repo is safe to push; the key stays on the machine you deploy from."
+  - "The catalog is the product: each stack's typed meta file drives both the wizard's prompts and the deploy config, and adding a stack is one PR."
+  - "For a solo homelab, age encryption is enough; Vault or Doppler is overkill when the risk is losing the box."
 publishedAt: "2026-08-26"
 readTime: 8
 topic: "self-hosting"

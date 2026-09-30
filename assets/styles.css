@@ -451,6 +451,13 @@ kbd {
   font-size: 1rem;
 }
 
+/* The TL;DR every post opens with: a hairline box, no fill (Anton, 30 Sep 2026). */
+.post-tldr {
+  border: 1px solid var(--color-rule);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+}
+
 .post-toc-details > summary {
   cursor: pointer;
   font-weight: 600;

@@ -1,6 +1,11 @@
 ---
 title: "zond: a 10 MB probe bridge so Gatus can see through your SSO proxy"
 description: "Health checks behind Authelia fail because Gatus cannot follow SSO redirects. Zond sits beside your services on the Docker network and answers 200 or 503 — no auth bypass, no internal URLs leaked, one config file."
+tldr:
+  - "Gatus can't health-check services behind Authelia or Authentik, because it can't follow SSO redirects, and a TCP check misses a service that answers 500."
+  - "zond sits on the same Docker network, takes Gatus's probe on a public URL and checks the service by its Docker name, answering 200 or 503."
+  - "It needs no authentication: it only says whether a service is up, which your status page already shows."
+  - "I rewrote it from Deno to Go after a 180 ms cold start on a Raspberry Pi; the image shrank from about 80 MB to about 10 MB."
 publishedAt: "2026-08-26"
 readTime: 6
 topic: "self-hosting"

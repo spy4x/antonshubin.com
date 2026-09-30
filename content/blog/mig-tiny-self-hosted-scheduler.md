@@ -1,6 +1,11 @@
 ---
 title: "mig: a lightweight meeting scheduler because Calendly alternatives are overkill"
 description: "One owner, one URL, one feature: book a time slot. A single Deno binary, JSON-file storage, SMTP confirmations with ICS attachments, cancellable links signed with SHA-256 HMAC. Built because I needed a static meeting link, not a database."
+tldr:
+  - "mig is a meeting scheduler for one owner and one URL: a single Deno binary, bookings in a JSON file, confirmations over SMTP with an ICS attachment."
+  - "It leaves out accounts, calendar sync, payments, round-robin and a database on purpose; if you need those, use Cal.com."
+  - "Cancel links need no database: each link carries a random token and its HMAC signature."
+  - "Confirmation emails show the time in both the host's and the visitor's time zone, with Intl and no date library."
 publishedAt: "2026-08-26"
 readTime: 7
 topic: "self-hosting"

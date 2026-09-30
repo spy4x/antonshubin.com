@@ -13,7 +13,7 @@ import {
   catalogPath,
   priceLabel,
 } from "./catalog.ts";
-import { findTool, repoUrl } from "./tools.ts";
+import { findTool, repoUrl, type ToolLink as LiveLink } from "./tools.ts";
 
 export { topic, topics };
 
@@ -33,14 +33,17 @@ export interface ToolLink {
   href: string;
   /** The public repository, `https://github.com/<owner>/<repo>`. */
   repoUrl?: string;
+  /** The tool's running instance or demo, its `lib/tools.ts` `live` link. */
+  live?: LiveLink;
 }
 
 /**
  * Resolves a post's `relatedTool` to a link, or undefined when it has none:
- * the tool's own `/tools/<slug>` page (one hop, never an old `/work` path)
- * and its public repository. A slug that is not in `lib/tools.ts` throws,
- * naming the post, so a typo fails the test run instead of shipping a
- * broken link.
+ * the tool's own `/tools/<slug>` page (one hop, never an old `/work` path),
+ * its running instance or demo and its public repository, all read from
+ * `lib/tools.ts` so a post never writes them by hand. A slug that is not in
+ * `lib/tools.ts` throws, naming the post, so a typo fails the test run
+ * instead of shipping a broken link.
  */
 export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
   const slug = article.relatedTool;
@@ -56,6 +59,7 @@ export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
     name: found.name,
     href: `/tools/${found.slug}`,
     repoUrl: repoUrl(found),
+    live: found.live,
   };
 }
 
@@ -145,7 +149,7 @@ export function archivedPosts(
 /**
  * The llms files' post list (SEO 10): current posts grouped under their
  * topic, each with its tool link, then the Archive. `detailed` adds the
- * description, read time and date, for llms-full.txt.
+ * description, read time, date and TL;DR, for llms-full.txt.
  */
 export function llmsBlogSections(
   baseUrl: string,
@@ -163,7 +167,14 @@ export function llmsBlogSections(
         a.updatedAt ? `, updated ${a.updatedAt}` : ""
       })`
       : "";
-    return `- [${a.title}](${baseUrl}${postHref(a.slug)})${detail}${toolPart}`;
+    // The full file lists the post's TL;DR under it, so a crawler reads the
+    // same points a skimming visitor sees first.
+    const tldr = detailed
+      ? `\n  TL;DR:\n${a.tldr.map((l) => `  - ${l}`).join("\n")}`
+      : "";
+    return `- [${a.title}](${baseUrl}${
+      postHref(a.slug)
+    })${detail}${toolPart}${tldr}`;
   };
   const sections = topics.map((t) =>
     `${hashes} ${t.title}\n${topicPosts(t.id).map(line).join("\n")}`

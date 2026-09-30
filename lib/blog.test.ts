@@ -2,6 +2,7 @@ import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
   archiveNoteText,
   latestPostDate,
+  llmsBlogSections,
   postDate,
   postTitleTag,
   readNext,
@@ -11,13 +12,14 @@ import {
 } from "./blog.ts";
 import type { BlogArticle } from "./blog-posts.ts";
 import { blogArticles } from "./data.ts";
-import { toolsForPost } from "./tools.ts";
+import { findTool, toolsForPost } from "./tools.ts";
 
 function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
   return {
     slug,
     title: `Post ${slug}`,
     description: "About it",
+    tldr: ["One point.", "Another point."],
     readTime: 5,
     publishedAt: "2026-01-01",
     topic: "self-hosting",
@@ -45,17 +47,18 @@ Deno.test("an unknown relatedTool or catalogSlug throws", () => {
   );
 });
 
-Deno.test("a relatedTool links its /tools page in one hop and its repository", () => {
+Deno.test("a relatedTool links its /tools page in one hop, its live instance and its repository, from lib/tools.ts", () => {
   assertEquals(relatedToolLink(post("x", { relatedTool: "mig" })), {
     slug: "mig",
     name: "mig",
     href: "/tools/mig",
     repoUrl: "https://github.com/spy4x/mig",
+    live: findTool("mig")!.live,
   });
-  assertEquals(
-    relatedToolLink(post("x", { relatedTool: "ts-libs" }))?.href,
-    "/tools/ts-libs",
-  );
+  assert(findTool("mig")!.live, "mig lost its live link; pick another tool");
+  const libs = relatedToolLink(post("x", { relatedTool: "ts-libs" }));
+  assertEquals(libs?.href, "/tools/ts-libs");
+  assertEquals(libs?.live, undefined, "ts-libs has no live instance");
 });
 
 Deno.test("the service label reads the title and price from lib/catalog.ts", () => {
@@ -168,4 +171,20 @@ Deno.test("a post date does not move to the previous day west of UTC", async () 
   }).output();
   assert(success, new TextDecoder().decode(stderr));
   assertEquals(new TextDecoder().decode(stdout).trim(), "1 January 2026");
+});
+
+Deno.test("the full llms list carries every post's TL;DR, the short list none", () => {
+  const full = llmsBlogSections("https://example.com", true);
+  const short = llmsBlogSections("https://example.com", false);
+  assertEquals(short.includes("TL;DR"), false);
+  for (const article of blogArticles) {
+    const at = full.indexOf(`(https://example.com/blog/${article.slug})`);
+    assert(at !== -1, `${article.slug} is not in the list`);
+    // The entry runs to the next post's line, or to the end of the list.
+    const next = full.indexOf("\n- [", at);
+    const entry = full.slice(at, next === -1 ? undefined : next);
+    for (const line of article.tldr) {
+      assert(entry.includes(`  - ${line}`), `${article.slug}: no "${line}"`);
+    }
+  }
 });

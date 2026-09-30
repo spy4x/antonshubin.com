@@ -1,6 +1,10 @@
 ---
 title: "Setting Up Your Own CI/CD Server with Drone CI"
 description: "Running your own CI/CD with Drone CI on a $10 VPS. Docker Compose setup, pipeline config, GitHub integration — skip vendor lock-in, keep your builds private."
+tldr:
+  - "Drone CI is an open-source CI/CD server you can run yourself with one Docker Compose file and a GitHub OAuth app."
+  - "Pipelines are YAML files in your repository, and a push to GitHub starts a build."
+  - "One server can serve many small projects, because they rarely build at the same time."
 publishedAt: "2023-02-12"
 readTime: 5
 topic: "self-hosting"
