@@ -41,10 +41,12 @@ services:
       - "traefik.http.middlewares.${PROJECT:-antonshubincom}-redirect.redirectregex.regex=^https://www\\.${DOMAIN}/(.*)"
       - "traefik.http.middlewares.${PROJECT:-antonshubincom}-redirect.redirectregex.replacement=https://${DOMAIN}/$${1}"
       - "traefik.http.middlewares.${PROJECT:-antonshubincom}-redirect.redirectregex.permanent=true"
-      # This is a public-facing site that we WANT to be indexed by search engines.
-      # Override the default `security-headers` X-Robots-Tag deny with the
-      # `allow-index` middleware defined in stacks/traefik/dynamic.yml.
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.middlewares=${PROJECT:-antonshubincom}-redirect,allow-index@file"
+      # No `allow-index@file` here: it forces `X-Robots-Tag: all` on every
+      # response and would overwrite the per-path value the app sets in
+      # routes/_middleware.ts (noindex for /pay, /unsubscribe,
+      # /subscribe/confirm and every error page). rostok's `security-headers`
+      # no longer carries an X-Robots-Tag, so the app's header is what ships.
+      - "traefik.http.routers.${PROJECT:-antonshubincom}.middlewares=${PROJECT:-antonshubincom}-redirect"
     deploy:
       resources:
         limits:

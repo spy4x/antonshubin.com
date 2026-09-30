@@ -3,7 +3,7 @@
 // address joins the list when its owner confirms on `/subscribe/confirm`:
 // `confirmSubscription`. Kept out of the routes so a test can run both against
 // fake storage and a fake mail relay.
-import type { SubscriberStore } from "./subscribers.ts";
+import type { SubscriberStore, UnsubscribeMark } from "./subscribers.ts";
 import { bareAddress } from "./email-field.ts";
 import {
   sendConfirmationMail,
@@ -81,6 +81,13 @@ export interface ConfirmSubscriptionDeps {
   update: SubscriberStore["update"];
   /** Reads the address out of a confirmation token, or says why it is refused. */
   verify(token: string): Promise<ConfirmTokenResult>;
+  /** Whether `email` unsubscribed at or after `issuedAt` (Unix milliseconds),
+   * which makes the link a replay (#327). */
+  unsubscribedSince(
+    marks: UnsubscribeMark[],
+    email: string,
+    issuedAt: number,
+  ): Promise<boolean>;
   /** Throws when the link cannot be signed, e.g. without UNSUBSCRIBE_SECRET. */
   unsubscribeLink(email: string): Promise<string>;
   mail: SubscribeMailDeps;
@@ -92,11 +99,14 @@ export interface ConfirmSubscriptionDeps {
 export type ConfirmSubscriptionOutcome =
   | { state: "confirmed"; email: string; mails: Promise<void> }
   | { state: "expired" | "invalid" | "error" };
+// A link issued before the address's last unsubscribe answers "invalid".
 
 /**
  * Adds the address `token` confirms to the list, unless it is already there,
  * then welcomes the subscriber and notifies the owner. Confirming a second
- * time (a reload, a double click) changes nothing and sends nothing.
+ * time (a reload, a double click) changes nothing and sends nothing. A link
+ * issued before the address unsubscribed changes nothing either and answers
+ * "invalid" (#327); one issued after it subscribes again.
  *
  * The unsubscribe link is built before anything is saved, so an address is
  * never stored with an unsubscribe link that cannot work.
@@ -120,11 +130,16 @@ export async function confirmSubscription(
 
   let added: boolean;
   let total: number;
+  let replay = false;
   try {
     ({ added, total } = await deps.update<{ added: boolean; total: number }>(
-      (subs) => {
+      async (subs, marks) => {
         const known = subs.some((s) => s.email === email);
         if (known) {
+          return { result: { added: false, total: subs.length } };
+        }
+        if (await deps.unsubscribedSince(marks, email, checked.issuedAt)) {
+          replay = true;
           return { result: { added: false, total: subs.length } };
         }
         const list = [...subs, {
@@ -138,6 +153,7 @@ export async function confirmSubscription(
     log.error("[SUBSCRIBE] failed to save:", err);
     return { state: "error" };
   }
+  if (replay) return { state: "invalid" };
   if (!added) return { state: "confirmed", email, mails: Promise.resolve() };
 
   const mails = sendSubscribeMails(

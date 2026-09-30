@@ -1,6 +1,7 @@
 import { define } from "../lib/utils.ts";
 import { UMAMI_ID, UMAMI_PRECONNECT_ORIGIN, UMAMI_URL } from "../lib/config.ts";
 import { resetHead } from "../lib/head.ts";
+import { referrerPolicyFor } from "../lib/referrer.ts";
 import { isBot } from "../lib/bots.ts";
 import { analyticsAllowed } from "../lib/analytics.ts";
 
@@ -14,10 +15,13 @@ export default define.page(function App({ Component, req }) {
   // page view's full URL, and the unsubscribe link's token is a credential.
   const tracked = !isCrawler && analyticsAllowed(new URL(req.url).pathname);
 
+  const referrer = referrerPolicyFor(new URL(req.url).pathname);
+
   return (
     <html lang="en" class="h-full bg-ink">
       <head>
         <meta charset="utf-8" />
+        {referrer && <meta name="referrer" content={referrer} />}
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, viewport-fit=cover"

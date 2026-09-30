@@ -1008,9 +1008,10 @@ Replies (#266): lead mail sets `Reply-To` to the visitor, and the confirmation
 mail, the welcome mail and every newsletter set it to `CONTACT_EMAIL`, because
 the mailbox they are sent from is noreply. A lead whose send failed is appended
 to `data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that
-it was kept. The `noreply` password is shared by four senders (this site, mig,
-Healthchecks and Vaultwarden) and must rotate in all four together
-(`docs/deploy.md` "Shared mail password").
+it was kept; at 10 MB (`LEADS_FAILED_MAX_BYTES` overrides, #327) a lead is not
+kept and one log line without its contents says so. The `noreply` password is
+shared by four senders (this site, mig, Healthchecks and Vaultwarden) and must
+rotate in all four together (`docs/deploy.md` "Shared mail password").
 
 Sign-up is double opt-in (#253): `/api/subscribe` only mails a signed
 confirmation link (`lib/subscribe-token.ts`, purpose `subscribe-confirm`, valid
@@ -1020,8 +1021,25 @@ welcome mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
 `/api/subscribe`, `/api/lead`, `/unsubscribe` and `/subscribe/confirm`, with the
 site's own `BASE_URL` as the allowed origin. `/subscribe/confirm` is in
 `UNTRACKED_PATHS` (its URL holds the address). Both it and `/unsubscribe` send
-`Referrer-Policy: no-referrer`, and the confirming POST answers 303 to
-`/subscribe/confirm?done=1`, so no token reaches the next page as a referrer.
+`Referrer-Policy: strict-origin` and carry
+`<meta name="referrer"
+content="strict-origin">` (`lib/referrer.ts`, read by
+`routes/_middleware.ts` and `routes/_app.tsx`, the meta first in `<head>`),
+because rostok's Traefik `security-headers` overwrites the header and a meta
+policy wins for the document (#327). Not `no-referrer`: that makes the page's
+own form POST send `Origin:
+null`, which Fresh's `csrf()` passes only with
+`Sec-Fetch-Site: same-origin`, and Safari before 16.4 does not send that header.
+With `strict-origin` the next page's referrer is `https://antonshubin.com/`, no
+path or token, and the POST carries the real Origin. The confirming POST answers
+303 to `/subscribe/confirm?done=1`, so the done page's own URL holds no token.
+The site's router does not use `allow-index@file`: it forces `X-Robots-Tag: all`
+over the app's per-path value (#327). An unsubscribe writes a mark
+(`lib/unsubscribed.ts`: an HMAC of the address and the time, no address) to
+`subscribers.json.unsubscribed` in the same locked change as the removal;
+`confirmSubscription` refuses, as "invalid", a link issued (`issuedAt`, from the
+token's expiry) before that time, and marks older than the three-day token life
+are dropped on the next write.
 
 ## Publishing a blog post
 

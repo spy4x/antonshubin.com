@@ -11,7 +11,9 @@ a mail scanner that opens the link subscribes nobody). The welcome mail and the
 owner's notice go out after that. The link works for three days
 (`lib/subscribe-token.ts`, signed with `UNSUBSCRIBE_SECRET`, purpose
 `subscribe-confirm`; the token carries the address). Confirming again changes
-nothing.
+nothing. A link issued before the address unsubscribed no longer subscribes it
+(#327): answers "link not recognised", changes nothing and sends no mail; a link
+requested after the unsubscribe works as usual.
 
 Addresses are stored in `data/subscribers.json`. On the server that directory is
 bind-mounted from the app directory, so the file survives deploys, and it is
@@ -110,8 +112,12 @@ AGENTS.md "Newsletter subscribers & unsubscribe links"). Opening the link only
 shows a confirm page with the address; removal needs a `POST` (the on-page form,
 or a mail client's one-click unsubscribe) with a token that verifies. A forged
 token and an address that's already been removed both answer "link not
-recognised" — the same response either way, on purpose. Requires
-`UNSUBSCRIBE_SECRET` (see `.env.example`).
+recognised" — the same response either way, on purpose. An unsubscribe also adds
+`{ mark, at }` to `data/subscribers.json.unsubscribed`, next to the list and
+under its lock: `mark` is an HMAC of the address under `UNSUBSCRIBE_SECRET` (no
+address is stored), and marks older than the three-day confirmation link are
+dropped on the next write (`lib/unsubscribed.ts`). Requires `UNSUBSCRIBE_SECRET`
+(see `.env.example`).
 
 Tokens use the ts-libs signed payload codec (#233). The older bare-signature
 token is no longer accepted (#237); a link carrying one answers "link not

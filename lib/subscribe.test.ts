@@ -9,7 +9,12 @@ import {
   requestSubscription,
   type RequestSubscriptionDeps,
 } from "./subscribe.ts";
-import { createSubscriberStore, type Subscriber } from "./subscribers.ts";
+import {
+  createSubscriberStore,
+  type Subscriber,
+  type UnsubscribeMark,
+} from "./subscribers.ts";
+import { recordUnsubscribe, unsubscribedSince } from "./unsubscribed.ts";
 import { createConfirmToken, verifyConfirmToken } from "./subscribe-token.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
@@ -125,10 +130,15 @@ function confirmSetup(
 ) {
   const relay = fakeRelay();
   const saved: Subscriber[][] = [];
+  let marks: UnsubscribeMark[] = [];
   const log = recordingLog();
   const deps: ConfirmSubscriptionDeps = {
     update: async (change) => {
-      const outcome = await change(structuredClone(start));
+      const outcome = await change(
+        structuredClone(start),
+        structuredClone(marks),
+      );
+      if (outcome.unsubscribed) marks = outcome.unsubscribed;
       if (outcome.list) {
         saved.push(structuredClone(outcome.list));
         start = outcome.list;
@@ -136,6 +146,8 @@ function confirmSetup(
       return outcome.result;
     },
     verify: (token) => verifyConfirmToken(token, SECRET, now),
+    unsubscribedSince: (m, email, issuedAt) =>
+      unsubscribedSince(m, email, SECRET, issuedAt),
     unsubscribeLink: (email) =>
       Promise.resolve(`${BASE}/unsubscribe?token=for-${email}`),
     mail: {
@@ -147,7 +159,17 @@ function confirmSetup(
     now: () => new Date("2026-09-26T00:00:00.000Z"),
     log,
   };
-  return { relay, saved, log, deps };
+  return {
+    relay,
+    saved,
+    log,
+    deps,
+    /** Unsubscribes `email` at `at`, the way routes/unsubscribe.tsx does. */
+    unsubscribe: async (email: string, at: Date) => {
+      marks = await recordUnsubscribe(marks, email, SECRET, at);
+      start = start.filter((s) => s.email !== email);
+    },
+  };
 }
 
 Deno.test("confirming adds the address, then welcomes it and tells the owner", async () => {
@@ -294,4 +316,50 @@ Deno.test("refuses a token signed for another purpose even when its payload and 
   const { deps, saved } = confirmSetup();
   assertEquals((await confirmSubscription(token, deps)).state, "invalid");
   assertEquals(saved.length, 0);
+});
+
+Deno.test("a confirmation link issued before the address unsubscribed subscribes nobody, however often it is used", async () => {
+  const HOUR = 60 * 60 * 1000;
+  const issued = Date.UTC(2026, 8, 26, 12);
+  let clock = issued;
+  const { relay, saved, deps, unsubscribe } = confirmSetup([], () => clock);
+  const token = await createConfirmToken(
+    "reader@example.com",
+    SECRET,
+    () => issued,
+  );
+  const first = await confirmSubscription(token, deps);
+  assert(first.state === "confirmed");
+  await first.mails;
+  assertEquals(saved.length, 1);
+  const mailsBefore = relay.mails.length;
+
+  clock = issued + HOUR;
+  await unsubscribe("reader@example.com", new Date(clock));
+  clock = issued + 2 * HOUR;
+  for (let i = 0; i < 2; i++) {
+    const replay = await confirmSubscription(token, deps);
+    assertEquals(replay.state, "invalid");
+  }
+  assertEquals(saved.length, 1, "the list was not written again");
+  assertEquals(relay.mails.length, mailsBefore, "no mail was sent");
+});
+
+Deno.test("a link issued after the unsubscribe subscribes the address again", async () => {
+  const HOUR = 60 * 60 * 1000;
+  const start = Date.UTC(2026, 8, 26, 12);
+  let clock = start;
+  const { saved, deps, unsubscribe } = confirmSetup([], () => clock);
+  await unsubscribe("reader@example.com", new Date(start));
+  clock = start + HOUR;
+  const fresh = await createConfirmToken(
+    "reader@example.com",
+    SECRET,
+    () => clock,
+  );
+  const outcome = await confirmSubscription(fresh, deps);
+  assertEquals(outcome.state, "confirmed");
+  assertEquals(saved.map((l) => l.map((s) => s.email)), [[
+    "reader@example.com",
+  ]]);
 });

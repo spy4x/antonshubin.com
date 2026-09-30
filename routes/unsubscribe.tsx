@@ -5,6 +5,7 @@ import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { loadSubscribers, updateSubscribers } from "../lib/subscribers.ts";
 import { findSubscriberByToken } from "../lib/unsubscribe.ts";
+import { recordUnsubscribe } from "../lib/unsubscribed.ts";
 import { getUnsubscribeSecret } from "../lib/config.ts";
 import { readFormBody, SMALL_FORM_MAX_BYTES } from "../lib/request-body.ts";
 
@@ -102,8 +103,11 @@ export const handler = define.handlers({
         await findSubscriberByToken(await loadSubscribers(), token, secret);
       if (match) {
         const email = match.email;
-        await updateSubscribers((list) => ({
+        // The record of this unsubscribe goes in the same change, so a
+        // confirmation link issued earlier cannot bring the address back.
+        await updateSubscribers(async (list, marks) => ({
           list: list.filter((s) => s.email !== email),
+          unsubscribed: await recordUnsubscribe(marks, email, secret!),
           result: null,
         }));
       }

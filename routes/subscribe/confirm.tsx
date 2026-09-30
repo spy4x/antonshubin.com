@@ -5,6 +5,7 @@ import { head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { updateSubscribers } from "../../lib/subscribers.ts";
 import { unsubscribeLink } from "../../lib/unsubscribe.ts";
+import { unsubscribedSince } from "../../lib/unsubscribed.ts";
 import { verifyConfirmToken } from "../../lib/subscribe-token.ts";
 import { confirmSubscription } from "../../lib/subscribe.ts";
 import { SITE_SENDER } from "../../lib/site-sender.ts";
@@ -94,6 +95,8 @@ export const handler = define.handlers({
     const outcome = await confirmSubscription(token, {
       update: updateSubscribers,
       verify: check,
+      unsubscribedSince: (marks, email, issuedAt) =>
+        unsubscribedSince(marks, email, getUnsubscribeSecret(), issuedAt),
       unsubscribeLink,
       mail: {
         sender: SITE_SENDER,

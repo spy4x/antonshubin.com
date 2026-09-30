@@ -13,6 +13,13 @@
  * empty list: its raw text is kept aside in `<file>.invalid` and nothing
  * writes over it until a person repairs it.
  *
+ * Next to the list sits `<file>.unsubscribed`, the short-lived record that
+ * stops an old confirmation link from re-subscribing someone who has since
+ * unsubscribed (`lib/unsubscribed.ts` says what it holds). It is read and
+ * written in the same locked change as the list; when a change writes both, the
+ * record goes first, so a crash in between never leaves the address removed
+ * without the record.
+ *
  * The path is read from `SUBSCRIBERS_FILE` at call time (not a module-level
  * constant), so tests can point it at a temp file per run instead of the
  * repo's `data/subscribers.json`.
@@ -35,6 +42,15 @@ export interface Subscriber {
 const SUBSCRIBER_LIST = type({ email: "string", subscribedAt: "string" })
   .array();
 
+/** One address that unsubscribed: a keyed hash of it, never the address, and
+ * when. See `lib/unsubscribed.ts`. */
+export interface UnsubscribeMark {
+  mark: string;
+  at: string;
+}
+
+const MARK_LIST = type({ mark: "string", at: "string" }).array();
+
 /** The subscriber file exists but does not hold a subscriber list. */
 export class SubscriberFileError extends Error {
   override readonly name = "SubscriberFileError";
@@ -44,6 +60,8 @@ export class SubscriberFileError extends Error {
  * result for the caller. Leaving out `list` writes nothing. */
 export interface SubscriberChange<T> {
   list?: Subscriber[];
+  /** The new unsubscribe record, if it changes. Written before the list. */
+  unsubscribed?: UnsubscribeMark[];
   result: T;
 }
 
@@ -58,6 +76,7 @@ export interface SubscriberStore {
   update<T>(
     change: (
       list: Subscriber[],
+      unsubscribed: UnsubscribeMark[],
     ) => SubscriberChange<T> | Promise<SubscriberChange<T>>,
   ): Promise<T>;
 }
@@ -97,6 +116,7 @@ export function createSubscriberStore(
   const fs = options.fs ?? denoFileSystem;
   const log = options.log ?? console;
   const path = options.path;
+  const marksPath = `${path}.unsubscribed`;
   const attempts = options.lockAttempts ?? 100;
   const retryMs = options.lockRetryMs ?? 20;
 
@@ -153,14 +173,35 @@ export function createSubscriberStore(
     }
   }
 
+  /** The unsubscribe record. A missing file is `[]`. An unreadable one is
+   * logged and also `[]`: the list itself must stay writable, and the record
+   * only guards a three-day replay window. */
+  async function loadMarks(): Promise<UnsubscribeMark[]> {
+    const read = await readJsonFile<unknown>(fs, marksPath);
+    if (read.kind === "missing") return [];
+    if (read.kind === "ok") {
+      const checked = MARK_LIST(read.value);
+      if (!(checked instanceof type.errors)) return checked;
+    }
+    log.error("[SUBSCRIBERS]", `${marksPath} is not an unsubscribe record`);
+    return [];
+  }
+
   function update<T>(
     change: (
       list: Subscriber[],
+      unsubscribed: UnsubscribeMark[],
     ) => SubscriberChange<T> | Promise<SubscriberChange<T>>,
   ): Promise<T> {
     return enqueue(path, () =>
       withFileLock(async () => {
-        const outcome = await change(await load());
+        const outcome = await change(await load(), await loadMarks());
+        if (outcome.unsubscribed) {
+          await atomicWriteJson(fs, marksPath, outcome.unsubscribed, {
+            pid: Deno.pid,
+            sequence: ++writeSequence,
+          });
+        }
         if (outcome.list) {
           await atomicWriteJson(fs, path, outcome.list, {
             pid: Deno.pid,
@@ -193,6 +234,7 @@ export function loadSubscribers(): Promise<Subscriber[]> {
 export function updateSubscribers<T>(
   change: (
     list: Subscriber[],
+    unsubscribed: UnsubscribeMark[],
   ) => SubscriberChange<T> | Promise<SubscriberChange<T>>,
 ): Promise<T> {
   return createSubscriberStore({ path: dataFile() }).update(change);

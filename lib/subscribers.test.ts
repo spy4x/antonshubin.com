@@ -185,3 +185,32 @@ Deno.test("waits for a lock another process holds, and gives up without writing"
     }
   });
 });
+
+Deno.test("keeps the unsubscribe record next to the list, hands it to the next change, and treats a damaged record as empty", async () => {
+  await withFile(async (path, dir) => {
+    const log = recordingLog();
+    const store = createSubscriberStore({ path, log });
+    assertEquals(await store.update((_, marks) => ({ result: marks })), []);
+    const mark = { mark: "abc", at: AT };
+    await store.update(() => ({
+      list: [row("a@example.com")],
+      unsubscribed: [mark],
+      result: null,
+    }));
+    assertEquals(await store.update((_, marks) => ({ result: marks })), [mark]);
+    assertEquals(await names(dir), [
+      "subscribers.json",
+      "subscribers.json.lock",
+      "subscribers.json.unsubscribed",
+    ]);
+    // A change that returns no record leaves the file as it was.
+    await store.update((list) => ({ list, result: null }));
+    assertEquals(JSON.parse(await Deno.readTextFile(`${path}.unsubscribed`)), [
+      mark,
+    ]);
+
+    await Deno.writeTextFile(`${path}.unsubscribed`, "not json");
+    assertEquals(await store.update((_, marks) => ({ result: marks })), []);
+    assertStringIncludes(log.errors.join("\n"), "is not an unsubscribe record");
+  });
+});
