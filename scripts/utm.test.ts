@@ -172,7 +172,7 @@ Deno.test("docs/utm.md's channel table matches the code's channel table", async 
   );
 });
 
-// 2026-09-30 is a Wednesday, 2026-10-02 a Friday.
+// 2026-09-30 is a Wednesday, 2026-10-01 a Thursday.
 const LINKEDIN = channel("linkedin").window!;
 const YOUTUBE = channel("youtube").window!;
 const HCM = "Asia/Ho_Chi_Minh";
@@ -186,7 +186,7 @@ Deno.test("a window later this week names its day in UTC and local time", () => 
 
 Deno.test("a window already over this week comes back next week", () => {
   assertEquals(
-    describeWindow(LINKEDIN, new Date("2026-10-02T12:00:00Z"), HCM),
+    describeWindow(LINKEDIN, new Date("2026-10-01T16:00:00Z"), HCM),
     "Tue 13:00–15:00 UTC (Tue 20:00–22:00 Asia/Ho_Chi_Minh)",
   );
 });
@@ -200,7 +200,7 @@ Deno.test("inside a window it says now and when it ends", () => {
 
 Deno.test("a UTC machine gets no second time zone", () => {
   assertEquals(
-    describeWindow(LINKEDIN, new Date("2026-10-02T12:00:00Z"), "UTC"),
+    describeWindow(LINKEDIN, new Date("2026-10-01T16:00:00Z"), "UTC"),
     "Tue 13:00–15:00 UTC",
   );
 });
