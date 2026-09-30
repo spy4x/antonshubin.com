@@ -470,19 +470,26 @@ top line on the 2022 post.
 
 ### Infrastructure page
 
-`routes/infrastructure.tsx` (#295) is "How I run production": the three live
-links first (dash., ci., meet., with one `infra-live-checked` note that carries
-the date they last answered 200), then a map in plain HTML, a SmartLite block,
-one open section per layer (job first, tool in parentheses), a "This site"
-colophon, the workload rows, two catalog cards and the closing band.
-`lib/infrastructure.ts` is the only list of the map's boxes, arrows (each with
-its verb) and live links; the page, `llms-full.txt` and the `TechArticle`
-`mentions` read it, and `lib/infrastructure.test.ts` fails on an arrow to a
-missing box. Add an arrow only when it is true today; never link probe-home (503
-whenever a home-lab service is down). The CI link is mig's public pipeline list
-because the root of ci. asks for a GitHub sign-in. The colophon's "this build"
-reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the live links and bump the
-`infra-live-checked` note's `checkedOn`.
+`routes/infrastructure.tsx` (#295, layout #344) is "How I run production" in the
+project page's two columns: the claim and the three live links (dash., ci.,
+meet., with one `infra-live-checked` note that carries the date they last
+answered 200) on the left, the sticky "This site" card with Book and the brief
+on the right. Below it come the map, "Your cloud is fine too" (SmartLite is the
+Managed cloud card's example), "How risk is controlled" (four blocks) and the
+closing band, which holds the two catalog cards. Book appears in the card and
+the band only, and goes to `/book`. `lib/infrastructure.ts` is the only list of
+the map's boxes, arrows (each with its verb), lanes (`infraLanes`, two to four
+boxes each, neighbours must share an arrow), the four blocks (`infraLayers`) and
+the live links; `components/InfraMap.tsx` draws the lanes as one piece of server
+HTML (boxes are links with `data-infra-node`, connectors carry
+`data-infra-edge`, the verb is visible text, the arrow is decorative). The page,
+`llms-full.txt` and the `TechArticle` `mentions` read the lists, and
+`lib/infrastructure.test.ts` fails on an arrow to a missing box or a lane
+neighbour with no arrow. Add an arrow only when it is true today; never link
+probe-home (503 whenever a home-lab service is down). The CI link is mig's
+public pipeline list because the root of ci. asks for a GitHub sign-in. The
+colophon's "this build" reads `BUILD_ID` like `routes/sw.js.ts`. Recheck the
+live links and bump the `infra-live-checked` note's `checkedOn`.
 
 ### Services pages
 

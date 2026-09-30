@@ -938,3 +938,53 @@ Deno.test("/catalog and two service pages have no horizontal scroll and no axe v
     else Deno.env.set("SCHEDULE_URL", previous);
   }
 });
+
+Deno.test("/infrastructure map lanes stay inside the content column and labels break only after a dot, from 1024 to 1440px", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (const width of [1024, 1280, 1440]) {
+      const page: Page = await newPage(browser, {
+        viewport: { width, height: 900 },
+      });
+      try {
+        await page.goto(`${site.origin}/infrastructure`, {
+          waitUntil: "networkidle",
+        });
+        const overflow = await page.evaluate(() => {
+          const map = document.querySelector("[data-infra-map]")!
+            .getBoundingClientRect();
+          return [...document.querySelectorAll("[data-infra-lane]")]
+            .map((l) => l.getBoundingClientRect().right - map.right)
+            .filter((d) => d > 1);
+        });
+        assertEquals(
+          overflow,
+          [],
+          `a lane passes the map's right edge at ${width}px`,
+        );
+        const split = await page.evaluate(() =>
+          [...document.querySelectorAll("[data-infra-node] [data-label-part]")]
+            .filter((p) =>
+              !/\s/.test(p.textContent!) && p.getClientRects().length > 1
+            )
+            .map((p) => p.textContent)
+        );
+        assertEquals(split, [], `a box label breaks mid-word at ${width}px`);
+        const scrollWidth = await page.evaluate(() =>
+          document.documentElement.scrollWidth
+        );
+        assert(
+          scrollWidth <= width,
+          `/infrastructure scrolls sideways at ${width}px`,
+        );
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});

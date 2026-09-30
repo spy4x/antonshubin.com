@@ -167,7 +167,7 @@ ${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from ${COMPANY.name}, 
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written brief: ${BASE_URL}/#audit-form
+Start with a ${INTRO_CALL}, or send your idea or current app through the brief form for a free written brief: ${BASE_URL}${WRITE_FALLBACK_HREF}
 
 ${
       catalogItems.map((i, n) =>
@@ -205,7 +205,7 @@ ${catalogList}
     } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email hello@antonshubin.com, or Telegram @spy4x. Invoices are issued by ${COMPANY_LINE}
 - **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
-- **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how each layer is run: handover, backups, monitoring, deploys, sign-in. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
+- **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how risk is controlled in four blocks: handover (with sign-in), backups, monitoring, deploys and builds. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 ${infrastructureLines(BASE_URL)}
 - **Writing:** ${BASE_URL}/blog — Posts on decisions for founders, AI and MCP, and self-hosting, grouped by topic, with an Archive of older posts kept as written
 - **Privacy:** ${BASE_URL}/privacy — What the brief form, the newsletter and analytics collect, where it is stored, and how to unsubscribe
@@ -274,7 +274,7 @@ Existing pages for each of these queries:
 - Talking through an idea: /catalog/${strategy.slug}, or the ${INTRO_CALL}
 - Ongoing technical leadership, a fractional CTO, or post-launch support: /catalog/${ongoing.slug}
 - Production infrastructure guidance: /infrastructure
-- Free written feedback first: /#audit-form
+- Free written feedback first: ${WRITE_FALLBACK_HREF}
 `;
 
     return new Response(txt, {

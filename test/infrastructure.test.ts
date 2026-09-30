@@ -8,9 +8,12 @@ import { count, jsonLd } from "./html.ts";
 import { blogArticles } from "../lib/data.ts";
 import {
   infraEdges,
-  infraGroups,
+  infraLanes,
+  infraLayers,
   infraNodes,
+  laneConnections,
   liveLinks,
+  mentionedToolIds,
 } from "../lib/infrastructure.ts";
 
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -51,12 +54,81 @@ siteTest(
   "/infrastructure draws every box and every arrow of the map",
   async (site) => {
     const html = await site.html("/infrastructure");
-    assertEquals(count(html, /data-infra-group="/), infraGroups.length);
+    assertEquals(count(html, /data-infra-lane="/), infraLanes.length);
     assertEquals(count(html, /data-infra-node="/), infraNodes.length);
     assertEquals(count(html, /data-infra-edge/), infraEdges.length);
     for (const n of infraNodes) {
+      assert(
+        html.includes(`data-infra-node="${n.id}"`),
+        `${n.id} is not drawn`,
+      );
       assert(html.includes(`href="${n.href}"`), `${n.id} is not linked`);
     }
+    for (const e of infraEdges) {
+      assert(
+        html.includes(`data-infra-edge="${e.from}-${e.to}"`),
+        `${e.from} ${e.verb} ${e.to} is not drawn`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "/infrastructure draws every arrow with its verb as text and a decorative arrow",
+  async (site) => {
+    const html = await site.html("/infrastructure");
+    for (const e of infraEdges) {
+      const start = html.indexOf(`data-infra-edge="${e.from}-${e.to}"`);
+      const item = html.slice(start, html.indexOf("</li>", start));
+      assert(item.includes(`>${e.verb}<`), `${e.verb} is not visible text`);
+      assert(
+        item.includes('aria-hidden="true"'),
+        `${e.verb}: arrow is not decorative`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "/infrastructure points each arrow the way its edge runs",
+  async (site) => {
+    const html = await site.html("/infrastructure");
+    for (const lane of infraLanes) {
+      for (const { edge, forward } of laneConnections(lane)) {
+        const start = html.indexOf(`data-infra-edge="${edge.from}-${edge.to}"`);
+        const item = html.slice(start, html.indexOf("</li>", start));
+        assertEquals(
+          item.includes("flex-col-reverse lg:flex-row-reverse"),
+          !forward,
+          `${edge.from} ${edge.verb} ${edge.to} points the wrong way`,
+        );
+      }
+    }
+  },
+);
+
+siteTest(
+  "the TechArticle mentions exactly the tool pages the map links",
+  async (site) => {
+    const html = await site.html("/infrastructure");
+    const map = html.slice(
+      html.indexOf("data-infra-map"),
+      html.indexOf("</section>", html.indexOf("data-infra-map")),
+    );
+    const linked = [
+      ...new Set(
+        [...map.matchAll(
+          /data-infra-node="[^"]+"[^>]*>\s*<a[^>]+href="\/tools\/([^"]+)"/g,
+        )]
+          .map((m) => `https://antonshubin.com/tools/${m[1]}#tool`),
+      ),
+    ].sort();
+    const article = jsonLd(html).find((n) =>
+      (n as { "@type"?: string })["@type"] === "TechArticle"
+    ) as { mentions: { "@id": string }[] };
+    assert(linked.length > 0, "the map links no tool page");
+    assertEquals(article.mentions.map((m) => m["@id"]).sort(), linked);
+    assertEquals(mentionedToolIds().sort(), linked);
   },
 );
 
@@ -93,7 +165,19 @@ siteTest(
   async (site) => {
     const html = await site.html("/infrastructure");
     assertEquals(count(html, /data-closing-band/), 1);
-    assertEquals(count(html, /data-primary-book/), 2);
+    // The nav's own Book sits outside <main>: the page adds two, the card's and the band's.
+    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    const bookLinks = [...main.matchAll(/<a[^>]*data-primary-book[^>]*>/g)]
+      .map((m) => m[0]);
+    assertEquals(bookLinks.length, 2);
+    for (const a of bookLinks) {
+      assert(a.includes('href="/book"'), `Book does not go to /book: ${a}`);
+      assert(!a.includes("_blank"), `Book opens a new tab: ${a}`);
+    }
+    assert(!html.includes("/#audit-form"), "the old form link");
+    assert(html.includes('href="/book#brief"'), "the brief link");
+    assertEquals(count(html, /data-infra-layer="/), infraLayers.length);
+    assertEquals(count(html, /data-infra-posts/), 0);
     assertEquals(
       count(
         html.slice(html.indexOf("data-infra-services")),

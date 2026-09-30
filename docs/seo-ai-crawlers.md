@@ -250,8 +250,9 @@ Five entities in a `@graph` array (six on `/about`):
 ### 10. `/infrastructure` and Production Infrastructure Lab
 
 - `/infrastructure` ("How I run production") links the live services, draws how
-  they connect and explains deploys, observability, recovery, sign-in and change
-  ownership in founder-readable terms
+  they connect in four lanes (Booking, Monitoring, Builds, Deploys) and explains
+  handover (with sign-in), backups, monitoring and deploys in four blocks, in
+  founder-readable terms. `llms-full.txt` lists the blocks, boxes and arrows
 - Managed cloud and dedicated infrastructure are presented as workload-fit
   decisions, not ideology
 - `/tools/rostok` (the old `/work/rostok` and `/projects/homelab` answer 301

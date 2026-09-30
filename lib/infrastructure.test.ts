@@ -2,10 +2,12 @@ import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
   edgesFrom,
   infraEdges,
-  infraGroups,
+  infraLanes,
+  infraLayers,
   infraNode,
   infraNodes,
   infrastructureLines,
+  laneConnections,
   liveLinks,
   mentionedToolIds,
   toolLink,
@@ -22,12 +24,48 @@ Deno.test("every arrow joins two boxes that exist", () => {
   }
 });
 
-Deno.test("every box sits in a group and links somewhere", () => {
-  const groups = new Set(infraGroups.map((g) => g.id));
+Deno.test("every box links somewhere and is flagged external only off-site", () => {
   for (const n of infraNodes) {
-    assert(groups.has(n.group), `${n.id} is in an unknown group`);
     assert(n.href !== "", `${n.id} has no link`);
     assertEquals(n.external, !n.href.startsWith("/"), `${n.id}: external flag`);
+  }
+});
+
+Deno.test("every lane has two to four boxes, neighbours share an arrow, and every box is in a lane", () => {
+  const inLane = new Set<string>();
+  for (const lane of infraLanes) {
+    assert(
+      lane.nodes.length >= 2 && lane.nodes.length <= 4,
+      `lane ${lane.id} has ${lane.nodes.length} boxes`,
+    );
+    for (const id of lane.nodes) inLane.add(infraNode(id).id);
+    assertEquals(laneConnections(lane).length, lane.nodes.length - 1);
+  }
+  assertEquals([...inLane].sort(), infraNodes.map((n) => n.id).sort());
+  assertThrows(
+    () => laneConnections({ id: "x", title: "x", nodes: ["site", "mig"] }),
+    Error,
+    "no arrow",
+  );
+});
+
+Deno.test("a lane's connector points the way its arrow runs", () => {
+  const monitoring = infraLanes.find((l) => l.id === "monitoring")!;
+  assertEquals(
+    laneConnections(monitoring).map((c) => `${c.edge.verb}:${c.forward}`),
+    ["feeds:true", "reads:false", "draws:true"],
+  );
+});
+
+Deno.test("the four risk blocks each have a job title, tools and a place to check", () => {
+  assertEquals(infraLayers.map((l) => l.id), [
+    "handover",
+    "backups",
+    "monitoring",
+    "deploys",
+  ]);
+  for (const l of infraLayers) {
+    assert(l.title && l.tools && l.text && l.checks.length > 0, l.id);
   }
 });
 
@@ -48,9 +86,10 @@ Deno.test("every tool link resolves through lib/tools.ts", () => {
   assertThrows(() => toolLink("no-such-tool"), Error, "no tool");
 });
 
-Deno.test("the map draws the seven arrows that are true today, and no probe-home", () => {
+Deno.test("the map draws the eight arrows that are true today, and no probe-home", () => {
   const drawn = infraEdges.map((e) => `${e.from} ${e.verb} ${e.to}`).sort();
   assertEquals(drawn, [
+    "ci runs woodpecker",
     "meet runs mig",
     "oko draws dash",
     "oko reads gatus",
@@ -100,4 +139,5 @@ Deno.test("the llms lines name every box and every arrow, with absolute links", 
   }
   assert(text.includes("(https://example.test/tools/rostok)"));
   assert(text.includes("(https://example.test/)"));
+  for (const l of infraLayers) assert(text.includes(l.title), l.id);
 });
