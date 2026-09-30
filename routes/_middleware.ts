@@ -5,13 +5,16 @@ export async function handler(
   ctx: { req: Request; url: URL; next: () => Promise<Response> },
 ): Promise<Response> {
   const pathname = ctx.url.pathname;
+  // "/unsubscribe/" serves the same page as "/unsubscribe", so it gets the
+  // same headers.
+  const page = pathname.replace(/\/+$/, "") || "/";
   const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
   const res = await ctx.next();
 
   // A page whose URL carries a token sends no Referer, so the token (which
   // holds the subscriber's address) never reaches the next page's analytics.
-  if (pathname === "/unsubscribe" || pathname === "/subscribe/confirm") {
+  if (page === "/unsubscribe" || page === "/subscribe/confirm") {
     res.headers.set("Referrer-Policy", "no-referrer");
   }
 
@@ -20,7 +23,7 @@ export async function handler(
     // Already set by main.ts cache middleware — preserve noindex
   } else if (
     pathname === "/pay" || pathname.startsWith("/pay/") ||
-    pathname === "/unsubscribe" || pathname === "/subscribe/confirm"
+    page === "/unsubscribe" || page === "/subscribe/confirm"
   ) {
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
   } else if (res.status >= 400) {

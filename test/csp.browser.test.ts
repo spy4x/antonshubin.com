@@ -266,7 +266,7 @@ Deno.test("a signed unsubscribe link loads and its form submits without a CSP vi
   }
 });
 
-Deno.test("a signed subscription-confirmation link loads and its form submits without a CSP violation", async () => {
+Deno.test("a signed subscription-confirmation link submits without a CSP violation and leaves no token in the address or the next referrer", async () => {
   const dir = await Deno.makeTempDir();
   const file = `${dir}/subscribers.json`;
   try {

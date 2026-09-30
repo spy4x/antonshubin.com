@@ -88,6 +88,8 @@ Deno.test("the confirm and unsubscribe pages send no referrer", async () => {
         "/subscribe/confirm?done=1",
         "/unsubscribe?token=forged",
         "/subscribe/confirm",
+        `/subscribe/confirm/?token=${token}`,
+        "/unsubscribe/?token=forged",
       ]
     ) {
       const res = await site.get(path);
