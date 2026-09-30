@@ -106,12 +106,11 @@ Five entities in a `@graph` array (six on `/about`):
   Place (`lib/config.ts`'s `LOCATION`). `/` has no BreadcrumbList (its one
   "Home" item says nothing), and no `Review` or `AggregateRating` for the three
   review cards. The home meta description comes from `lib/home.ts`.
-- **ContactPage** — on `/contact-me` only (#272): `about` the Person, `isPartOf`
-  the WebSite, `breadcrumb` the page's BreadcrumbList. The Person carries a
-  `contactPoint` (sales, `hello@antonshubin.com`, `/contact-me`, en and ru) on
-  every page. No `ScheduleAction` and no review markup: the calendar is an
-  iframe from the `noindex` scheduler, so the page states the call's facts in
-  its own HTML.
+- **ContactPage** — on `/book` only (#272): `about` the Person, `isPartOf` the
+  WebSite, `breadcrumb` the page's BreadcrumbList. The Person carries a
+  `contactPoint` (sales, `hello@antonshubin.com`, `/book`, en and ru) on every
+  page. No `ScheduleAction` and no review markup: the calendar is an iframe from
+  the `noindex` scheduler, so the page states the call's facts in its own HTML.
 - **BreadcrumbList** — on every page but `/`, built from `head.value.pageName`
   (falls back to `title` when a page hasn't set it), so the trail reads "Ship It
   Today", not "Ship It Today — Anton Shubin"
@@ -126,7 +125,7 @@ Five entities in a `@graph` array (six on `/about`):
 - `twitter:site` and `twitter:creator` are `@spy4x`, the handle Anton confirmed
   on 27 Sep 2026 (#193); the Person `sameAs` lists Upwork, GitHub, LinkedIn,
   both YouTube channels (work and the `@anton-shubin-live` vlog, #294) and X
-  (`lib/profiles.ts`, the list the footer and `/contact-me` read too, #293)
+  (`lib/profiles.ts`, the list the footer and `/book` read too, #293)
 
 ### 6. FAQ Schema (routes/how-i-work.tsx, lib/faqs.ts)
 

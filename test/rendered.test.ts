@@ -66,7 +66,7 @@ const RETIRED_PHRASE_PAGES = [
   "/",
   "/how-i-work",
   "/catalog",
-  "/contact-me",
+  "/book",
   "/llms.txt",
   "/llms-full.txt",
 ];

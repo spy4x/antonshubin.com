@@ -36,7 +36,7 @@ Deno.test("/sw.js unregisters itself, clears caches, and serves no pages", async
 Deno.test("no server-rendered page mentions a service worker", async () => {
   const site = await startSite();
   try {
-    for (const path of ["/", "/contact-me", "/blog", "/tools"]) {
+    for (const path of ["/", "/book", "/blog", "/tools"]) {
       const html = await site.html(path);
       assert(!html.includes("serviceWorker"), `${path} mentions a worker`);
     }

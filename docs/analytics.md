@@ -46,22 +46,22 @@ and about 90 others) stopped on 2026-09-30. The weekly report says so until
 `scripts/umami-reports.ts` keeps these saved reports in Umami. Each one answers
 one question:
 
-| Report                                       | Question                                                                     |
-| -------------------------------------------- | ---------------------------------------------------------------------------- |
-| Goal: book                                   | How many Book clicks, across every place they sit?                           |
-| Goal: brief-sent                             | How many written briefs actually reached Anton?                              |
-| Goal: call-booked                            | How many intro calls were actually booked?                                   |
-| Goal: newsletter-signup                      | How many newsletter signups succeeded?                                       |
-| Goal: post-read                              | How many post views reached the end of the post?                             |
-| Funnel: any page → /contact-me → call-booked | Of all visitors, how many open the booking page, and how many of those book? |
-| Funnel: /contact-me → call-booked            | Of the visitors who open the booking page, how many book?                    |
-| Funnel: any page → brief-sent                | How many visitors send a written brief?                                      |
+| Report                                 | Question                                                                     |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| Goal: book                             | How many Book clicks, across every place they sit?                           |
+| Goal: brief-sent                       | How many written briefs actually reached Anton?                              |
+| Goal: call-booked                      | How many intro calls were actually booked?                                   |
+| Goal: newsletter-signup                | How many newsletter signups succeeded?                                       |
+| Goal: post-read                        | How many post views reached the end of the post?                             |
+| Funnel: any page → /book → call-booked | Of all visitors, how many open the booking page, and how many of those book? |
+| Funnel: /book → call-booked            | Of the visitors who open the booking page, how many book?                    |
+| Funnel: any page → brief-sent          | How many visitors send a written brief?                                      |
 
 Every funnel gives a visitor 60 minutes from its first step. A step may match
 the same page view or event as the step before it (Umami's `getFunnel.ts`
-compares the times inclusively), so a visitor who lands straight on
-`/contact-me` counts for both "any page" and `/contact-me`. The two-step booking
-funnel asks the same question without the entry step.
+compares the times inclusively), so a visitor who lands straight on `/book`
+counts for both "any page" and `/book`. The two-step booking funnel asks the
+same question without the entry step.
 
 **Attribution and Journey live in the weekly report.** In Umami 3 (checked in
 v3.3.1 and v3.4.0) the Attribution and Journeys pages keep their settings
@@ -96,11 +96,14 @@ It needs the same three variables as the weekly report
 belongs to an Umami user who can edit the website. The script lists the
 website's saved reports, matches each of its reports by name, updates one whose
 settings differ, creates one that is missing and prints `unchanged` for the
-rest. It never deletes a report and never touches a report whose name it does
-not own, so a report made by hand in Umami stays. Every call has a 10-second
-timeout; a failed call ends the run with exit code 1, and running it again
-finishes the rest. Rerun it after changing a report in `REPORTS`, or after an
-event is renamed.
+rest. It never touches a report whose name it does not own, so a report made by
+hand in Umami stays. The one thing it deletes is a report listed in
+`RETIRED_REPORTS` whose description still carries its "Managed by" marker: since
+the booking page moved to `/book` (#190), the first run after that deploy
+deletes the two old `/contact-me` funnels, and later runs find nothing to
+delete. Every call has a 10-second timeout; a failed call ends the run with exit
+code 1, and running it again finishes the rest. Rerun it after changing a report
+in `REPORTS`, or after an event is renamed.
 
 ### Umami API used
 

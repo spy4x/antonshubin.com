@@ -1,3 +1,4 @@
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
 import { Head } from "fresh/runtime";
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
@@ -17,7 +18,7 @@ import {
 import { INTRO_CALL } from "../lib/catalog.ts";
 import { originOf } from "../lib/csp.ts";
 import { leadService } from "../lib/lead.ts";
-import { promise } from "../lib/promises.ts";
+import { decapitalize, promise } from "../lib/promises.ts";
 import { COMPANY } from "../lib/company.ts";
 import {
   contactTestimonialId,
@@ -42,18 +43,18 @@ const BOOK_HEADING = `Book a ${INTRO_CALL}`;
  * `?service=<slug>` prefills the brief when it names a catalog item; any
  * other value is ignored.
  */
-export default define.page(function ContactMe(ctx) {
+export default define.page(function Book(ctx) {
   const booking = Boolean(SCHEDULE_URL);
   const service = leadService(ctx.url.searchParams.get("service"));
   head.value = {
     ...head.value,
     title: booking
-      ? "Contact Anton Shubin: book a free 30-minute call"
+      ? `Contact Anton Shubin: ${decapitalize(BOOK_LABEL)}`
       : "Contact Anton Shubin",
     description: booking
       ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`
       : `Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`,
-    canonical: "https://antonshubin.com/contact-me",
+    canonical: "https://antonshubin.com/book",
     ogType: "website",
     pageName: "Contact",
   };
@@ -65,7 +66,7 @@ export default define.page(function ContactMe(ctx) {
   const ownership = promise("ownership");
 
   return (
-    <Layout currentPath="/contact-me">
+    <Layout currentPath="/book">
       <SEOHead />
       {schedulerOrigin && (
         <Head>
@@ -79,7 +80,7 @@ export default define.page(function ContactMe(ctx) {
         {/* 1. Heading and the first action: the calendar, or the brief */}
         <div class="lg:col-start-1 lg:row-start-1 min-w-0">
           <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
-            {booking ? BOOK_HEADING : "Send a written brief"}
+            {booking ? BOOK_HEADING : BRIEF_LABEL}
           </h1>
           {booking
             ? (
@@ -94,7 +95,7 @@ export default define.page(function ContactMe(ctx) {
                     {...eventAttrs("brief", { place: "top" })}
                     class={FACT_LINK}
                   >
-                    Send a written brief
+                    {BRIEF_LABEL}
                   </a>{" "}
                   <span aria-hidden="true">↓</span>
                 </p>

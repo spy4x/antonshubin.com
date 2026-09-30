@@ -10,6 +10,7 @@ import { NewTabHint } from "./NewTabHint.tsx";
 import StatusMark from "./StatusMark.tsx";
 import { WithNote } from "./WithNote.tsx";
 import { eventAttrs } from "../lib/analytics.ts";
+import { BOOK_LABEL } from "../lib/nav.ts";
 
 const LINK = FACT_LINK;
 
@@ -133,7 +134,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
           event={eventAttrs("book", { place: "card", item: project.slug })}
           class="w-full justify-center px-5 py-3"
         >
-          Book a free intro call
+          {BOOK_LABEL}
         </BookCallLink>
         <SimilarWorkLink project={project} place="card" />
       </div>

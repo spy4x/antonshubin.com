@@ -103,13 +103,32 @@ siteTest("a redirect keeps the query string", async (site) => {
   );
 });
 
+siteTest(
+  "the old booking page /contact-me answers one 301 to /book, query string kept",
+  async (site) => {
+    for (const from of ["/contact-me", "/contact-me/"]) {
+      const res = await site.get(`${from}?service=codebase-health-audit`);
+      await res.body?.cancel();
+      assertEquals(res.status, 301, from);
+      const location = (res.headers.get("location") ?? "").replace(
+        site.origin,
+        "",
+      );
+      assertEquals(location, "/book?service=codebase-health-audit", from);
+      const landed = await site.get(location);
+      await landed.body?.cancel();
+      assertEquals(landed.status, 200, `${from} -> ${location}`);
+    }
+  },
+);
+
 siteTest("the free audit carries no deadline anywhere", async (site) => {
   for (
     const path of [
       "/",
       "/catalog",
       "/how-i-work",
-      "/contact-me",
+      "/book",
       "/infrastructure",
       "/llms.txt",
       "/llms-full.txt",
@@ -249,7 +268,7 @@ siteTest(
       const path of [
         "/",
         "/how-i-work",
-        "/contact-me",
+        "/book",
         "/work",
         "/blog",
         "/infrastructure",

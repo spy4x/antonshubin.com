@@ -4,10 +4,12 @@ import {
   assertThrows,
 } from "jsr:@std/assert@^1.0.0";
 import {
+  MANAGED,
   planReportCalls,
   readConfig,
   type ReportDefinition,
   REPORTS,
+  RETIRED_REPORTS,
   type SavedReport,
   syncReports,
   type UmamiConfig,
@@ -183,8 +185,8 @@ Deno.test("REPORTS holds the five goals and a funnel for each outcome, with uniq
     (r.parameters.steps as { value: string }[]).map((s) => s.value)
   );
   assertEquals(funnels, [
-    ["/*", "/contact-me", "call-booked"],
-    ["/contact-me", "call-booked"],
+    ["/*", "/book", "call-booked"],
+    ["/book", "call-booked"],
     ["/*", "brief-sent"],
   ]);
 });
@@ -245,4 +247,61 @@ Deno.test("syncReports gives every Umami call a 10-second timeout, so a stalled 
   assertEquals(calls.length, 1 + REPORTS.length);
   assertEquals(timeouts, calls.map(() => 10_000));
   for (const c of calls) assertEquals(c.signal instanceof AbortSignal, true);
+});
+
+Deno.test("syncReports deletes each retired /contact-me funnel it once created, and nothing else", async () => {
+  const current = REPORTS.map((r, i) => ({ id: `r${i}`, ...r }));
+  const retired = RETIRED_REPORTS.map((name, i) => ({
+    id: `old${i}`,
+    name,
+    type: "funnel",
+    description: `Retired. ${MANAGED}`,
+    parameters: {},
+  }));
+  // Carries the marker but is neither current nor retired: never deleted.
+  const unknown = {
+    id: "other",
+    name: "Funnel: some report this script no longer names",
+    type: "funnel",
+    description: `Older. ${MANAGED}`,
+    parameters: {},
+  };
+  const { fetchFn, calls } = stubFetch([...current, ...retired, unknown]);
+  const result = await syncReports(config, { fetchFn });
+  assertEquals(result.success, true);
+  const writes = calls.filter((c) => c.method !== "GET");
+  assertEquals(
+    writes.map((c) => `${c.method} ${c.url.pathname}`),
+    ["DELETE /api/reports/old0", "DELETE /api/reports/old1"],
+  );
+  assertEquals(RETIRED_REPORTS.every((n) => n.includes("/contact-me")), true);
+});
+
+Deno.test("a report with a retired name but no managed marker is never deleted", () => {
+  const byHand: SavedReport = {
+    id: "hand",
+    name: RETIRED_REPORTS[0],
+    type: "funnel",
+    description: "Made in the Umami UI.",
+    parameters: {},
+  };
+  const calls = planReportCalls([byHand], [], "site-id");
+  assertEquals(calls, []);
+});
+
+Deno.test("syncReports under dry-run plans the retired deletions but sends none", async () => {
+  const retired: SavedReport = {
+    id: "old0",
+    name: RETIRED_REPORTS[0],
+    type: "funnel",
+    description: MANAGED,
+    parameters: {},
+  };
+  const { fetchFn, calls } = stubFetch([retired]);
+  const result = await syncReports(config, { fetchFn, dryRun: true });
+  assertEquals(calls.map((c) => c.method), ["GET"]);
+  assertEquals(
+    result.output.filter((l) => l.startsWith("[dry-run] delete")).length,
+    1,
+  );
 });

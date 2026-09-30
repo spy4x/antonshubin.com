@@ -30,12 +30,12 @@ Deno.test("outboundTo names the site a link leaves for, and null for this site",
 });
 
 Deno.test("linkEvent tells a brief, a Book, another page and another site apart", () => {
-  assertEquals(linkEvent("/contact-me#brief", { place: "band" }), {
+  assertEquals(linkEvent("/book#brief", { place: "band" }), {
     "data-umami-event": "brief",
     "data-umami-event-place": "band",
   });
   assertEquals(linkEvent("/#audit-form")["data-umami-event"], "brief");
-  assertEquals(linkEvent("/contact-me?service=x")["data-umami-event"], "book");
+  assertEquals(linkEvent("/book?service=x")["data-umami-event"], "book");
   assertEquals(linkEvent("/how-i-work", { place: "band" }), {
     "data-umami-event": "cta",
     "data-umami-event-place": "band",
@@ -61,7 +61,7 @@ Deno.test("the unsubscribe and payment pages are never tracked, other pages are"
   ) {
     assertEquals(analyticsAllowed(path), false, path);
   }
-  for (const path of ["/", "/payments", "/blog/pay", "/contact-me"]) {
+  for (const path of ["/", "/payments", "/blog/pay", "/book"]) {
     assertEquals(analyticsAllowed(path), true, path);
   }
 });

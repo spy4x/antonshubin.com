@@ -25,7 +25,7 @@ export default define.page(function ServerError() {
             ← Back to home
           </a>
           <a
-            href="/contact-me"
+            href="/book"
             class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-rule-strong hover:bg-lamp text-parchment font-semibold rounded-lg transition-colors"
           >
             Report this issue

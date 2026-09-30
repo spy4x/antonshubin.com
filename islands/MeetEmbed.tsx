@@ -4,6 +4,8 @@ import { NewTabHint } from "../components/NewTabHint.tsx";
 import { originOf } from "../lib/csp.ts";
 import { NEW_TAB_LABEL } from "../lib/meet-embed.ts";
 import { eventAttrs, track } from "../lib/analytics.ts";
+import { BRIEF_LABEL } from "../lib/nav.ts";
+import { decapitalize } from "../lib/promises.ts";
 
 // Kept importable from here, where the tests and routes already look.
 export { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
@@ -240,7 +242,7 @@ export default function MeetEmbed(
                     {...eventAttrs("brief", { place: "calendar" })}
                     class={linkClass}
                   >
-                    send a written brief
+                    {decapitalize(BRIEF_LABEL)}
                   </a>
                 </>
               )}

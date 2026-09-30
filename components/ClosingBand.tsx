@@ -4,6 +4,7 @@ import { SCHEDULE_URL } from "../lib/config.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { ArrowRightIcon } from "./Icons.tsx";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+import { BOOK_LABEL } from "../lib/nav.ts";
 
 const LINK =
   "inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent";
@@ -40,7 +41,7 @@ export interface ClosingBandProps {
   /** False hides Book; the band then shows only its links. */
   book?: boolean;
   /**
-   * Where Book goes when it is an on-site page (`/contact-me`) instead of the
+   * Where Book goes when it is an on-site page (`/book`) instead of the
    * calendar: it then opens in the same tab and shows even when
    * `SCHEDULE_URL` is unset. Omitted, Book opens `SCHEDULE_URL` in a new tab.
    */
@@ -70,7 +71,7 @@ export function ClosingBand(
     promiseIds = DEFAULT_BAND_PROMISES,
     children,
     book = true,
-    bookLabel = "Book a free intro call",
+    bookLabel = BOOK_LABEL,
     bookHref,
     catalogLink,
     links = [],

@@ -254,7 +254,7 @@ Deno.test("on the booking page a brief carries its ?service= slug and its succes
         });
       });
       const slug = "codebase-health-audit";
-      await page.goto(`${site.origin}/contact-me?service=${slug}`, {
+      await page.goto(`${site.origin}/book?service=${slug}`, {
         waitUntil: "networkidle",
       });
       const about = `About: ${catalogItem(slug).shortTitle}`;
@@ -358,7 +358,7 @@ Deno.test("the booking page's brief refuses to send only the prefilled About lin
         });
       });
       await page.goto(
-        `${site.origin}/contact-me?service=codebase-health-audit`,
+        `${site.origin}/book?service=codebase-health-audit`,
         { waitUntil: "networkidle" },
       );
       await page.fill("#lead-name", "Ada Lovelace");
@@ -409,7 +409,7 @@ Deno.test("a brief counts as sent only once the server accepts it, with its serv
           body: JSON.stringify(answer === 200 ? { ok: true } : { error: "x" }),
         }));
       const slug = "codebase-health-audit";
-      await page.goto(`${site.origin}/contact-me?service=${slug}`, {
+      await page.goto(`${site.origin}/book?service=${slug}`, {
         waitUntil: "networkidle",
       });
       // The submit button's click is not an event any more.
@@ -470,7 +470,7 @@ Deno.test("a brief the form refuses counts as invalid and never as sent", async 
       // Only the prefilled About line: the browser lets it through, and the
       // form's own check refuses it.
       await page.goto(
-        `${site.origin}/contact-me?service=codebase-health-audit`,
+        `${site.origin}/book?service=codebase-health-audit`,
         { waitUntil: "networkidle" },
       );
       await page.fill("#lead-name", "Ada Lovelace");

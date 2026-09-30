@@ -65,7 +65,7 @@ export const SMTP_FROM = Deno.env.get("SMTP_FROM") || "";
 export const SMTP_USERNAME = Deno.env.get("SMTP_USERNAME") || "";
 export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
 /**
- * The invoices sentence (#293): the footer, `/contact-me` and `/about` show
+ * The invoices sentence (#293): the footer, `/book` and `/about` show
  * it.
  */
 export const INVOICE_NOTE =

@@ -132,4 +132,4 @@ I use mig for my own booking link at
 iframe-friendly page at [/embed](https://meet.antonshubin.com/embed) if you want
 to inline the scheduler on another site. If you want a strategy call to talk
 through whether you need a custom build, the link is on
-[/contact-me](https://antonshubin.com/contact-me).
+[/book](https://antonshubin.com/book).

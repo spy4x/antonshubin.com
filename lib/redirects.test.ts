@@ -90,6 +90,12 @@ Deno.test("the table holds no /projects URL beyond the expected ones", () => {
   assertEquals(extra, []);
 });
 
+Deno.test("the old booking page /contact-me redirects to /book in one hop, with and without a trailing slash", () => {
+  assertEquals(redirectTarget("/contact-me"), "/book");
+  assertEquals(redirectTarget("/contact-me/"), "/book");
+  assertEquals(redirectTarget("/book"), undefined);
+});
+
 Deno.test("no redirect lands on another redirect", () => {
   for (const [from, to] of redirectTable) {
     assertEquals(redirectTarget(to), undefined, `${from} -> ${to} chains`);
@@ -98,7 +104,7 @@ Deno.test("no redirect lands on another redirect", () => {
 
 Deno.test("every redirect lands on a page that exists", () => {
   for (const to of new Set(redirectTable.values())) {
-    if (to === "/work" || to.startsWith("/blog/")) continue;
+    if (to === "/work" || to === "/book" || to.startsWith("/blog/")) continue;
     const [, section, slug] = to.split("/");
     const found = section === "tools" ? findTool(slug) : findWorkProject(slug);
     assert(found, `${to} has no page`);

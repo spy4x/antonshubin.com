@@ -14,7 +14,7 @@ import { formatPeriod } from "../../lib/data.ts";
 import { projectsForCatalog, workHref } from "../../lib/work.ts";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { FACT_LINK } from "../../components/FactCard.tsx";
-import { BOOK_LABEL, BRIEF_LABEL } from "../../components/ServicePriceCard.tsx";
+import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts";
 import {
   ArrowRightIcon,
   CatalogIcon,
@@ -144,7 +144,7 @@ export default define.page(function Catalog() {
           promiseIds={[]}
           catalogLink={
             <a
-              href="/contact-me#brief"
+              href="/book#brief"
               {...eventAttrs("brief", { place: "band" })}
               class={`text-sm ${FACT_LINK}`}
             >

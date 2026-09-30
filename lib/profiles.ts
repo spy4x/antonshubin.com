@@ -3,7 +3,7 @@ import { UPWORK_URL } from "./config.ts";
 /**
  * Anton's public profiles and contact channels (#293): the one place a
  * profile URL is written. The footer (`components/Footer.tsx`), the
- * `/contact-me` side panel (email, Telegram, Upwork) and the `sameAs` list in
+ * `/book` side panel (email, Telegram, Upwork) and the `sameAs` list in
  * the Person JSON-LD (`components/SEOHead.tsx`) all read from here, so a new
  * or renamed profile is one edit.
  */

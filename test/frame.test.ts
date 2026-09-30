@@ -86,7 +86,7 @@ siteTest(
         "/privacy",
         "/infrastructure",
         "/about",
-        "/contact-me",
+        "/book",
       ]
     ) assert(hrefs.includes(href), `footer lacks ${href}`);
     const text = visibleText(footer);

@@ -1,3 +1,4 @@
+import { BOOK_LABEL } from "../lib/nav.ts";
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
@@ -159,7 +160,7 @@ export default define.page(function About(ctx) {
                     event={eventAttrs("book", { place: "card" })}
                     class="w-full justify-center px-5 py-3"
                   >
-                    Book a free intro call
+                    {BOOK_LABEL}
                   </BookCallLink>
                   <a
                     href="/how-i-work"

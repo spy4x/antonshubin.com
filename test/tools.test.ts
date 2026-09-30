@@ -568,7 +568,7 @@ siteTest(
     const zond = await site.html("/tools/zond");
     assert(!zond.includes("probe-home"), "zond still names probe-home");
     const mig = await site.html("/tools/mig");
-    assert(mig.includes('href="/contact-me"'), "mig does not link /contact-me");
+    assert(mig.includes('href="/book"'), "mig does not link /book");
   },
 );
 

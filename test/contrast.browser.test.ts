@@ -12,7 +12,7 @@
 // belongs in a one-off audit script, not a task that runs on every push —
 // this only needs to catch a *regression* in the fixed tokens
 // (assets/styles.css `@theme`) or the class edits that went with them
-// (islands/Menu.tsx, routes/contact-me.tsx, the four text-gray-600-to-400
+// (islands/Menu.tsx, routes/book.tsx, the four text-gray-600-to-400
 // spots, assets/styles.css's .img-title and inline <code> rules), not repeat
 // the full audit.
 //
@@ -30,12 +30,12 @@
 //      in its body text (not just fenced ```code blocks, which use <pre> and
 //      a different, already-passing rule)
 //   6. components/Breadcrumb.tsx's "/" separator (text-gray-600 -> gray-400)
-//      — /contact-me, via a manual ratio check, not axe (see below)
+//      — /book, via a manual ratio check, not axe (see below)
 //   7. the "Not included" "x" marker (text-gray-600 -> gray-400), now in
 //      routes/catalog/[slug].tsx's scope block (#271) — checked on
 //      /catalog/zero-to-production-saas-mvp via the same manual ratio check
-//   8. bg-sky-600 -> bg-sky-700 on the Telegram button (routes/contact-me.tsx)
-//      — /contact-me
+//   8. bg-sky-600 -> bg-sky-700 on the Telegram button (routes/book.tsx)
+//      — /book
 //   9 & 10. routes/blog/[slug].tsx's two captions (text-gray-600 -> gray-400)
 //      — both render on every blog post below
 //   11. The nine `bg-gradient-to-r from-orange-600 to-amber-500` CTA buttons,
@@ -49,7 +49,7 @@
 //      is set (the main test below sets a placeholder): bg-green-600 ->
 //      bg-green-700 on the blog, catalog and contact buttons and the
 //      MeetEmbed facade, and the home and /pay gradient buttons made solid
-//      (bg-green-700, bg-blue-600) — /, /contact-me, both blog posts, /pay
+//      (bg-green-700, bg-blue-600) — /, /book, both blog posts, /pay
 //      and /catalog
 //
 // #2 needs its own probe: --color-gray-400 was already comfortably above AA
@@ -270,7 +270,7 @@ Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch p
     try {
       // white text on bg-sky-600 (Tailwind v4's oklch(58.8% .158 241.966),
       // #0084d1 once painted) is a known quantity: axe itself reports this
-      // exact pairing's ratio as 4.02 on routes/contact-me.tsx's Telegram
+      // exact pairing's ratio as 4.02 on routes/book.tsx's Telegram
       // button pre-fix (see the PR body's evidence). Reproducing that number
       // here, from a synthetic element rather than a real page, is this
       // helper's own proof that routing colours through a <canvas> — needed
@@ -319,7 +319,7 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       for (
         const path of [
           "/",
-          "/contact-me",
+          "/book",
           "/blog/ship-it-today",
           "/blog/building-mcp-servers-with-deno",
           "/pay",
@@ -337,7 +337,7 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       // (the home CTA, the contact page's new-tab link, the blog post
       // footer). Without this, a server that never received the placeholder
       // would pass the loop above vacuously.
-      for (const path of ["/", "/contact-me", "/blog/ship-it-today"]) {
+      for (const path of ["/", "/book", "/blog/ship-it-today"]) {
         await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
         const bookingLinks = await page.locator(
           `a[href="${PLACEHOLDER_SCHEDULE_URL}"]`,

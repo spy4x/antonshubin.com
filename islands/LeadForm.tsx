@@ -6,15 +6,17 @@ import { proof } from "../lib/proof.ts";
 import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
 import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts";
 import { type BriefErrorReason, eventAttrs, track } from "../lib/analytics.ts";
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
+import { decapitalize } from "../lib/promises.ts";
 
 /** The calendar island's component, loaded only when the success panel needs it. */
 type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
 
-/** What the written brief promises; the form and `/contact-me` without a scheduler both say it. */
+/** What the written brief promises; the form and `/book` without a scheduler both say it. */
 export const BRIEF_PROMISE =
   "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment.";
 
-/** The catalog item a visitor came from (`/contact-me?service=<slug>`), already checked against `lib/catalog.ts`. */
+/** The catalog item a visitor came from (`/book?service=<slug>`), already checked against `lib/catalog.ts`. */
 export interface LeadService {
   slug: string;
   shortTitle: string;
@@ -23,7 +25,7 @@ export interface LeadService {
 interface LeadFormProps {
   scheduleUrl: string;
   /**
-   * The id-link of a calendar already on the page (`/contact-me` passes
+   * The id-link of a calendar already on the page (`/book` passes
    * `#book`). The success panel then points up to it instead of rendering a
    * second calendar (#272).
    */
@@ -191,7 +193,7 @@ export default function LeadForm(
         {intro && (
           <>
             <h3 class="text-xl sm:text-2xl text-parchment mb-3">
-              Send a written brief
+              {BRIEF_LABEL}
             </h3>
             <p class="text-graphite text-base mb-6">{BRIEF_PROMISE}</p>
           </>
@@ -402,7 +404,7 @@ export default function LeadForm(
           I'll review what you sent and write back with 3 concrete architectural
           improvements.
           {scheduleUrl && !calendarAbove &&
-            " If you'd rather talk it through, book an intro call."}
+            ` If you'd rather talk it through, ${decapitalize(BOOK_LABEL)}.`}
           {scheduleUrl && calendarAbove && (
             <>
               {" If you'd rather talk it through, "}
@@ -410,7 +412,7 @@ export default function LeadForm(
                 href={calendarAbove}
                 class="text-parchment underline underline-offset-4 hover:text-accent"
               >
-                book an intro call
+                {decapitalize(BOOK_LABEL)}
               </a>{" "}
               in the calendar above.
             </>

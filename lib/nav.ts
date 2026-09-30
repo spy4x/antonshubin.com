@@ -81,10 +81,26 @@ const allItems: NavItem[] = [
 /**
  * Where Book goes: the booking page, with the calendar on it (#293). When
  * `SCHEDULE_URL` is unset the button reads "Write" and goes to that page's
- * written brief (`routes/contact-me.tsx`'s `#brief`).
+ * written brief (`routes/book.tsx`'s `#brief`).
  */
-export const BOOK_HREF = "/contact-me";
-export const WRITE_FALLBACK_HREF = "/contact-me#brief";
+export const BOOK_HREF = "/book";
+export const WRITE_FALLBACK_HREF = `${BOOK_HREF}#brief`;
+
+/**
+ * The one wording of the Book action on every page (#190): every button or
+ * link that books the call says this, and only the nav says it shorter
+ * (`NAV_BOOK_LABEL`). `test/action-wording.test.ts` fails on a third wording.
+ */
+export const BOOK_LABEL = "Book a free 30-minute call";
+
+/** The one wording of the written-brief action on every page (#190). */
+export const BRIEF_LABEL = "Send a written brief";
+
+/** The nav's short Book, where `BOOK_LABEL` does not fit a tab. */
+export const NAV_BOOK_LABEL = "Book";
+
+/** What Book reads, in the nav and the footer, when `SCHEDULE_URL` is unset. */
+export const NAV_WRITE_LABEL = "Write";
 
 /**
  * The nav's own word for a section, given the section's path: "Writing" for

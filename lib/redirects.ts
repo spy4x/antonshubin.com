@@ -1,11 +1,13 @@
 // The one 301 table for URLs that no longer exist as written (#188): the old
-// `/projects` section, retired blog and project slugs, and a trailing slash on
-// a post or project URL. Every entry points at a page that answers 200, never
-// at another redirect. Pure and unit-tested without a server, the same pattern
-// lib/csp.ts uses — main.ts's middleware is the only caller, and it keeps the
-// query string (launch links carry UTM tags).
+// `/projects` section, retired blog and project slugs, the old booking page
+// `/contact-me` (#190), and a trailing slash on a post or project URL. Every
+// entry points at a page that answers 200, never at another redirect. Pure and
+// unit-tested without a server, the same pattern lib/csp.ts uses — main.ts's
+// middleware is the only caller, and it keeps the query string (launch links
+// carry UTM tags).
 import { WORK_PATH, workHref, workProjects } from "./work.ts";
 import { movedSlugs } from "./tools.ts";
+import { BOOK_HREF } from "./nav.ts";
 
 const TOOLS_PATH = "/tools";
 
@@ -18,6 +20,9 @@ const RETIRED_BLOG_SLUGS: Record<string, string> = {
 const RETIRED_PROJECT_SLUGS: Record<string, string> = {
   "homelab": "rostok",
 };
+
+/** The booking page's path before #190 renamed it `/book`. */
+export const OLD_BOOK_PATH = "/contact-me";
 
 /** What the table is built from: every slug with a work page and every own project that moved. */
 export interface RedirectSources {
@@ -35,7 +40,9 @@ export interface RedirectSources {
  * - `/projects/<old>` and `/work/<old>` -> `/tools/<new>` for an own project
  *   that moved to `/tools` (#273);
  * - `/projects/homelab` -> `/tools/rostok` (retired slug);
- * - `/blog/<retired>` -> the post that absorbed it.
+ * - `/blog/<retired>` -> the post that absorbed it;
+ * - `/contact-me` -> `/book`, the booking page's name since #190 (the
+ *   browser keeps a `#brief` fragment, the caller keeps `?service=<slug>`).
  *
  * A `/projects/<x>` with no new home is not in the table and answers 404: a
  * 301 to `/work` for a page that no longer exists is a soft 404 to a search
@@ -61,6 +68,7 @@ export function buildRedirectTable(
   for (const [old, now] of Object.entries(RETIRED_BLOG_SLUGS)) {
     add(`/blog/${old}`, `/blog/${now}`);
   }
+  add(OLD_BOOK_PATH, BOOK_HREF);
   return table;
 }
 

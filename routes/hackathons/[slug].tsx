@@ -1,3 +1,4 @@
+import { BOOK_LABEL } from "../../lib/nav.ts";
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
@@ -183,17 +184,22 @@ export default define.page(function HackathonDetail(ctx) {
                       event={eventAttrs("book", { place: "end", item: h.slug })}
                       class="gap-2 px-5 py-2.5 text-sm"
                     >
-                      {h.ctaLabel || "Book a free intro call"}
+                      {h.ctaLabel || BOOK_LABEL}
                     </BookCallLink>
-                    <BookCallLink
-                      url={SCHEDULE_URL}
-                      target="_blank"
-                      variant="secondary"
-                      event={eventAttrs("book", { place: "end", item: h.slug })}
-                      class="gap-2 px-5 py-2.5 text-sm"
-                    >
-                      Free intro call
-                    </BookCallLink>
+                    {h.ctaLink && (
+                      <BookCallLink
+                        url={SCHEDULE_URL}
+                        target="_blank"
+                        variant="secondary"
+                        event={eventAttrs("book", {
+                          place: "end",
+                          item: h.slug,
+                        })}
+                        class="gap-2 px-5 py-2.5 text-sm"
+                      >
+                        {BOOK_LABEL}
+                      </BookCallLink>
+                    )}
                   </div>
                 </div>
               </div>

@@ -8,7 +8,7 @@
  * Every fact comes from the issue's list of allowed material: the 2022 post
  * `from-office-job-to-freelance-to-my-startups` (without its income figures,
  * the loan, the 80/20 split or its "leave freelance" goal), the old home page
- * "Outside Work" section, and `/contact-me`'s NeatSoft line.
+ * "Outside Work" section, and `/book`'s NeatSoft line.
  */
 
 import { COMPANY } from "./company.ts";
