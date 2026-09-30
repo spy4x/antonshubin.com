@@ -1,3 +1,4 @@
+import { BOOK_LABEL } from "../../lib/nav.ts";
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
@@ -466,7 +467,7 @@ export default define.page(function BlogPost(ctx) {
                     })}
                     class="justify-center px-4 py-2 text-sm"
                   >
-                    Book a free intro call
+                    {BOOK_LABEL}
                   </BookCallLink>
                   <SecondaryLink
                     article={article}

@@ -1,3 +1,4 @@
+import { BOOK_LABEL } from "../../lib/nav.ts";
 import { HttpError } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
@@ -211,7 +212,7 @@ export default define.page(function Hackathons(ctx) {
               event={eventAttrs("book", { place: "band" })}
               class="gap-2 px-6 py-3"
             >
-              Book a free intro call
+              {BOOK_LABEL}
             </BookCallLink>
             <a
               href="/catalog"

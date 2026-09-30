@@ -16,6 +16,12 @@ import { ROLE } from "../lib/head.ts";
 import { promise } from "../lib/promises.ts";
 import { testimonial } from "../lib/testimonials.ts";
 import { INITIAL_EMBED_HEIGHT_PX } from "../islands/MeetEmbed.tsx";
+import { BOOK_LABEL } from "../lib/nav.ts";
+
+/** The page's `<main>`, without the frame's nav and footer. */
+function mainOf(html: string): string {
+  return html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+}
 
 /** RFC 2606 example domain — never a real scheduler, safe in a rendered test. */
 const PLACEHOLDER_SCHEDULE_URL = "https://example.com/book";
@@ -53,7 +59,7 @@ Deno.test("booking lead-in lines are gone when SCHEDULE_URL is unset", async () 
     // no prose promises a call in their place (#269).
     const homeText = visibleText(await site.html("/"));
     assertEquals(
-      count(homeText, /Book a free 30-minute intro call/g),
+      count(homeText, new RegExp(BOOK_LABEL, "g")),
       0,
       `/ still offers a booking call with SCHEDULE_URL unset`,
     );
@@ -86,9 +92,10 @@ Deno.test("booking lead-in lines render when SCHEDULE_URL is set", async () => {
       );
     }
 
-    const homeText = visibleText(await site.html("/"));
+    // The footer's Contact group says it too; count inside <main> only.
+    const homeMain = visibleText(mainOf(await site.html("/")));
     assert(
-      count(homeText, /Book a free 30-minute intro call/g) === 2,
+      count(homeMain, new RegExp(BOOK_LABEL, "g")) === 2,
       `/ should offer Book twice (hero and closing band) with SCHEDULE_URL set`,
     );
   } finally {

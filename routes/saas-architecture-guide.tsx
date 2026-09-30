@@ -1,3 +1,4 @@
+import { BOOK_LABEL } from "../lib/nav.ts";
 import { define } from "../lib/utils.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
@@ -292,7 +293,7 @@ export default define.page(function SaasArchGuide() {
               event={eventAttrs("book", { place: "end" })}
               class="gap-2 px-6 py-3"
             >
-              Book a free intro call
+              {BOOK_LABEL}
             </BookCallLink>
           </div>
         )}

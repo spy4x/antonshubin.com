@@ -500,10 +500,10 @@ step" link (`CatalogItem.next`) and the closing band. The index is a 2×2
 comparison from 1024px, one details link per card. A retired slug answers 301 to
 the fragment of the section that absorbed it, so `alsoCovers` ids and the
 `how-it-starts` id must not change without editing `catalogRedirects`. The two
-action wordings are `BOOK_LABEL` and `BRIEF_LABEL` in `ServicePriceCard.tsx`;
-the brief link is `briefPath(slug)`. A promise shown for a service is the
-owner's decision (`catalogPromises()`): the strategy session and the audit show
-none until Anton says which apply. `test/services.test.ts` checks the built
+action wordings are `BOOK_LABEL` and `BRIEF_LABEL` in `lib/nav.ts` (see "Booking
+page"); the brief link is `briefPath(slug)`. A promise shown for a service is
+the owner's decision (`catalogPromises()`): the strategy session and the audit
+show none until Anton says which apply. `test/services.test.ts` checks the built
 pages.
 
 ### Project page
@@ -556,7 +556,20 @@ slug, checked by `lib/lead.ts`'s `leadService()`; any other value is dropped,
 never echoed. The prefill alone does not count as a description, in the form or
 in `/api/lead` (`lib/brief-prefill.ts`). The page alone preconnects to the
 scheduler's origin and carries the `ContactPage` JSON-LD node.
-`test/booking.test.ts` checks the built page.
+`test/booking.test.ts` checks the built page. The page was `/contact-me` until
+#190; that URL answers one 301 to `/book` (see "Redirect table").
+
+**One wording per action (#190).** Every link or button that books the call says
+`BOOK_LABEL` ("Book a free 30-minute call") and every one that opens the brief
+says `BRIEF_LABEL` ("Send a written brief"), both in `lib/nav.ts` next to
+`BOOK_HREF` and `WRITE_FALLBACK_HREF`; inside a sentence they are spliced
+through `decapitalize()`. Only the nav says it shorter (`NAV_BOOK_LABEL`,
+"Book"), "Write" (`NAV_WRITE_LABEL`) replaces Book when `SCHEDULE_URL` is unset,
+and `NEW_TAB_LABEL` is the scheduler's own page. Headings and prose that name
+the call use `INTRO_CALL`. `test/action-wording.test.ts` scans every sitemap
+page, `/pay`, a not-found URL and both llms files, and fails on any other
+wording; its `EXCEPTIONS` list names each deliberate one with its reason and
+fails when one is no longer on its page.
 
 ### How I work page
 
@@ -1156,27 +1169,28 @@ as written: the old `/projects` section (`/projects` goes to `/work`, and each
 `/projects/<slug>` goes to `/work/<slug>` for a client project), the nine own
 projects that moved to `/tools` in #273 (`/work/<old>` and `/projects/<old>` go
 to `/tools/<new>`, `lib/tools.ts`'s `movedSlugs`; `todoapp-caldav` became
-`caldav-tasks-web`), the retired `/projects/homelab` (to `/tools/rostok`) and
-blog slugs retired by a rename (today: the CalDAV post). Every old path is
-listed with and without a trailing slash, so both land in one hop, and no entry
-points at another redirect. A `/projects/<x>` with no new home is not in the
-table and answers 404. Besides the table, a trailing slash on any
-`/blog/<slug>`, `/work/<slug>` or `/tools/<slug>` URL redirects to the
-slash-free form. An old `/blog?tab=<x>` link (the retired tab filter) answers
-one 301 to `/blog`, keeping any other parameters: `lib/redirects.ts`'s
-`blogTabRedirect()`, called from `routes/blog/index.tsx`'s handler, since it
-depends on the query rather than the path. `redirectTarget()` is a pure
-function, unit-tested in `lib/redirects.test.ts` without a server — the same
-pattern as `lib/csp.ts` and `lib/cache-control.ts`; `test/structure.test.ts`
-checks every old URL on the built site (one 301, query string kept, a 200 behind
-it), and its internal-link crawl fails on any link that the table would
-redirect. `main.ts` wires it as its own middleware, placed after the CSP and
-cache middlewares but before `staticFiles()`/`app.fsRoutes()`: a redirect
-response still needs the CSP and cache headers every other response gets, and it
-gets them because those two middlewares set headers on whatever `ctx.next()`
-resolves to, which is this middleware's response when it doesn't call
-`ctx.next()` itself. It appends the request's query string to the target, so
-launch links keep their UTM tags.
+`caldav-tasks-web`), the retired `/projects/homelab` (to `/tools/rostok`), the
+old booking page `/contact-me` (to `/book`, #190; `?service=<slug>` is kept like
+any query and the browser keeps `#brief`) and blog slugs retired by a rename
+(today: the CalDAV post). Every old path is listed with and without a trailing
+slash, so both land in one hop, and no entry points at another redirect. A
+`/projects/<x>` with no new home is not in the table and answers 404. Besides
+the table, a trailing slash on any `/blog/<slug>`, `/work/<slug>` or
+`/tools/<slug>` URL redirects to the slash-free form. An old `/blog?tab=<x>`
+link (the retired tab filter) answers one 301 to `/blog`, keeping any other
+parameters: `lib/redirects.ts`'s `blogTabRedirect()`, called from
+`routes/blog/index.tsx`'s handler, since it depends on the query rather than the
+path. `redirectTarget()` is a pure function, unit-tested in
+`lib/redirects.test.ts` without a server — the same pattern as `lib/csp.ts` and
+`lib/cache-control.ts`; `test/structure.test.ts` checks every old URL on the
+built site (one 301, query string kept, a 200 behind it), and its internal-link
+crawl fails on any link that the table would redirect. `main.ts` wires it as its
+own middleware, placed after the CSP and cache middlewares but before
+`staticFiles()`/`app.fsRoutes()`: a redirect response still needs the CSP and
+cache headers every other response gets, and it gets them because those two
+middlewares set headers on whatever `ctx.next()` resolves to, which is this
+middleware's response when it doesn't call `ctx.next()` itself. It appends the
+request's query string to the target, so launch links keep their UTM tags.
 
 ## Shared libraries
 

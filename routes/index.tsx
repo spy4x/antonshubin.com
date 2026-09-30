@@ -1,9 +1,10 @@
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
 import { define } from "../lib/utils.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts";
 import { formatPeriod, highlightProjects } from "../lib/data.ts";
-import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts";
+import { catalogItems, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
 import { promise } from "../lib/promises.ts";
 import { ClosingBand } from "../components/ClosingBand.tsx";
@@ -118,14 +119,14 @@ export default define.page(function Home(ctx) {
                 class="gap-2 px-6 py-3 text-base"
               >
                 <CalendarIcon class="w-5 h-5" />
-                Book a {INTRO_CALL}
+                {BOOK_LABEL}
               </BookCallLink>
               <Button
                 href="#audit-form"
                 {...eventAttrs("brief", { place: "hero" })}
                 class="px-6 py-3 text-base"
               >
-                Send a written brief
+                {BRIEF_LABEL}
               </Button>
             </div>
             <p class="mt-4 text-sm text-graphite">
@@ -443,7 +444,7 @@ export default define.page(function Home(ctx) {
         {/* 6. Closing band: the brief form sits in its `children` slot */}
         <ClosingBand
           heading="Book a call or send a brief"
-          bookLabel={`Book a ${INTRO_CALL}`}
+          bookLabel={BOOK_LABEL}
           primaryCta
           sectionAttrs={{ id: "cta-bottom", "data-home-section": "cta" }}
         >

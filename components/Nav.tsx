@@ -3,6 +3,8 @@ import { BOOK, FOCUS, navIcon, STACKED, STATES } from "./NavParts.tsx";
 import NavMore from "../islands/NavMore.tsx";
 import {
   BOOK_HREF,
+  NAV_BOOK_LABEL,
+  NAV_WRITE_LABEL,
   navCurrent,
   type NavItem,
   railItems,
@@ -21,10 +23,10 @@ interface NavProps {
 /** The Book action: "Book" on the booking page, or "Write" on its brief. */
 function bookLink(scheduleUrl: string) {
   return scheduleUrl
-    ? { href: BOOK_HREF, label: "Book", icon: <NavGlyph name="book" /> }
+    ? { href: BOOK_HREF, label: NAV_BOOK_LABEL, icon: <NavGlyph name="book" /> }
     : {
       href: WRITE_FALLBACK_HREF,
-      label: "Write",
+      label: NAV_WRITE_LABEL,
       icon: <NavGlyph name="write" />,
     };
 }

@@ -11,12 +11,7 @@ import { BookCallLink } from "./BookCallLink.tsx";
 import { buttonClass } from "./Button.tsx";
 import { Fact, FactCard } from "./FactCard.tsx";
 import { eventAttrs } from "../lib/analytics.ts";
-
-/** The one wording of the primary action on every service page (#271). */
-export const BOOK_LABEL = "Book a free 30-minute call";
-
-/** The one wording of the secondary action. */
-export const BRIEF_LABEL = "Send a written brief";
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
 
 /**
  * The service page's price card (#271), built on the shared `FactCard` shell:

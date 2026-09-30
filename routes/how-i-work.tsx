@@ -6,7 +6,12 @@ import { Layout } from "../components/Layout.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import Button from "../components/Button.tsx";
-import { BOOK_HREF, WRITE_FALLBACK_HREF } from "../lib/nav.ts";
+import {
+  BOOK_HREF,
+  BOOK_LABEL,
+  BRIEF_LABEL,
+  WRITE_FALLBACK_HREF,
+} from "../lib/nav.ts";
 import { ClosingBand } from "../components/ClosingBand.tsx";
 import { FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import {
@@ -138,14 +143,14 @@ export default define.page(function HowIWork() {
                   event={eventAttrs("book", { place: "card" })}
                   class="justify-center px-6 py-3"
                 >
-                  Book a free intro call
+                  {BOOK_LABEL}
                 </BookCallLink>
                 <Button
                   href={WRITE_FALLBACK_HREF}
                   {...eventAttrs("brief", { place: "card" })}
                   class="justify-center px-6 py-3"
                 >
-                  Send a written brief
+                  {BRIEF_LABEL}
                 </Button>
               </div>
               <p class="mt-4 text-sm">
@@ -265,7 +270,7 @@ export default define.page(function HowIWork() {
           links={[
             {
               href: WRITE_FALLBACK_HREF,
-              label: "Send a written brief",
+              label: BRIEF_LABEL,
             },
             {
               href: "/catalog",

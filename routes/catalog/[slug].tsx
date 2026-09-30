@@ -28,11 +28,8 @@ import { toJsonLd } from "../../lib/json-ld.ts";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { FACT_LINK } from "../../components/FactCard.tsx";
 import { MoreWorkCard } from "../../components/MoreWorkCard.tsx";
-import {
-  BOOK_LABEL,
-  BRIEF_LABEL,
-  ServicePriceCard,
-} from "../../components/ServicePriceCard.tsx";
+import { ServicePriceCard } from "../../components/ServicePriceCard.tsx";
+import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts";
 import { TestimonialCard } from "../../components/TestimonialCard.tsx";
 import {
   ArrowRightIcon,

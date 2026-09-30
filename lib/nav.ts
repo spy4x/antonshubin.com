@@ -87,6 +87,22 @@ export const BOOK_HREF = "/book";
 export const WRITE_FALLBACK_HREF = `${BOOK_HREF}#brief`;
 
 /**
+ * The one wording of the Book action on every page (#190): every button or
+ * link that books the call says this, and only the nav says it shorter
+ * (`NAV_BOOK_LABEL`). `test/action-wording.test.ts` fails on a third wording.
+ */
+export const BOOK_LABEL = "Book a free 30-minute call";
+
+/** The one wording of the written-brief action on every page (#190). */
+export const BRIEF_LABEL = "Send a written brief";
+
+/** The nav's short Book, where `BOOK_LABEL` does not fit a tab. */
+export const NAV_BOOK_LABEL = "Book";
+
+/** What Book reads, in the nav and the footer, when `SCHEDULE_URL` is unset. */
+export const NAV_WRITE_LABEL = "Write";
+
+/**
  * The nav's own word for a section, given the section's path: "Writing" for
  * `/blog`, "Services" for `/catalog`. The back link on a nested page
  * (`components/Breadcrumb.tsx`) uses it, so it never says "Blog" where the

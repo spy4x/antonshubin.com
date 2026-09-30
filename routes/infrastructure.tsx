@@ -1,3 +1,4 @@
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
@@ -241,7 +242,7 @@ export default define.page(function Infrastructure() {
               event={eventAttrs("book", { place: "top" })}
               class="justify-center px-6 py-3"
             >
-              Book a free intro call
+              {BOOK_LABEL}
             </BookCallLink>
           </div>
         </section>
@@ -462,7 +463,7 @@ export default define.page(function Infrastructure() {
           links={[
             {
               href: "/#audit-form",
-              label: "Request a free written audit",
+              label: BRIEF_LABEL,
             },
             {
               href: "/how-i-work",
