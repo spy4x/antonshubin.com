@@ -277,8 +277,10 @@ siteTest(
       const html = await site.html(`/blog/${article.slug}`);
       const video = html.indexOf("youtube.com/embed/");
       assert(video > 0, `${article.slug}: no video`);
+      const tldr = html.indexOf('id="tldr"');
+      assert(tldr > 0, `${article.slug}: no TL;DR heading`);
       assert(
-        html.indexOf('id="tldr"') < video,
+        tldr < video,
         `${article.slug}: the video comes before the TL;DR`,
       );
     }

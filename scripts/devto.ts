@@ -38,7 +38,14 @@ export function devToOpening(article: BlogArticle): string {
   ];
   const tool = relatedToolLink(article);
   const links: string[] = [];
-  if (tool?.live) links.push(`Live: [${tool.live.label}](${tool.live.href})`);
+  if (tool?.live) {
+    // A live instance on this site (mig's /book) is a relative path; on Dev.to
+    // it would resolve against dev.to.
+    const href = tool.live.href.startsWith("/")
+      ? `${DEVTO_BASE_URL}${tool.live.href}`
+      : tool.live.href;
+    links.push(`Live: [${tool.live.label}](${href})`);
+  }
   if (tool?.repoUrl) {
     links.push(
       `Code: [${tool.repoUrl.replace(/^https:\/\//, "")}](${tool.repoUrl})`,

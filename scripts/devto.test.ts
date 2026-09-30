@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import {
   absolutizeImageUrls,
   buildDevToPayload,
@@ -7,7 +7,7 @@ import {
   type DevToArticlePayload,
   devToOpening,
 } from "./devto.ts";
-import type { BlogArticle } from "@/lib/data.ts";
+import { type BlogArticle, blogArticles } from "@/lib/data.ts";
 import { findTool, repoUrl } from "@/lib/tools.ts";
 
 const FOOTER_START = "\n\n---\n\n_First published on ";
@@ -426,4 +426,21 @@ Deno.test("the Dev.to opening for a project post adds its live and repository li
     }) · Code: [${repoUrl(tool)!.replace("https://", "")}](${repoUrl(tool)})`,
   );
   assertEquals(opening.includes("antonshubin.com"), false);
+});
+
+Deno.test("the Dev.to opening turns a live link on this site into a full address", () => {
+  const mig = blogArticles.find((a) =>
+    a.slug === "mig-tiny-self-hosted-scheduler"
+  );
+  assert(mig, "the mig post exists");
+  const targets = [...devToOpening(mig).matchAll(/\]\(([^)]+)\)/g)].map((m) =>
+    m[1]
+  );
+  assert(targets.length > 0, "the mig opening has links");
+  for (const target of targets) {
+    assert(
+      target.startsWith("https://"),
+      `relative link in the opening: ${target}`,
+    );
+  }
 });
