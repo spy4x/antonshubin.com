@@ -208,9 +208,10 @@ export function devToApiKey(
   const fromEnv = Deno.env.get("DEVTO_API_KEY");
   if (fromEnv) return fromEnv;
   try {
-    return envValue(readDeployEnv(), "DEVTO_API_KEY") || undefined;
-  } catch {
-    return undefined;
+    return envValue(readDeployEnv(), "DEVTO_API_KEY");
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) return undefined;
+    throw err;
   }
 }
 

@@ -365,3 +365,27 @@ Deno.test("devToApiKey reads the key from .env.deploy when the environment has n
     else Deno.env.set("DEVTO_API_KEY", previous);
   }
 });
+
+Deno.test("createDevToDraft sends the key from .env.deploy when the environment has none", async () => {
+  const previous = Deno.env.get("DEVTO_API_KEY");
+  Deno.env.delete("DEVTO_API_KEY");
+  const originalFetch = globalThis.fetch;
+  const originalCwd = Deno.cwd();
+  const dir = await Deno.makeTempDir();
+  let sentKey: string | null = null;
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+    sentKey = new Headers(init?.headers).get("api-key");
+    return Promise.resolve(new Response("{}", { status: 201 }));
+  }) as typeof fetch;
+  try {
+    await Deno.writeTextFile(`${dir}/.env.deploy`, "DEVTO_API_KEY=dummy-key\n");
+    Deno.chdir(dir);
+    await createDevToDraft("title", "slug", "body");
+    assertEquals(sentKey, "dummy-key");
+  } finally {
+    Deno.chdir(originalCwd);
+    globalThis.fetch = originalFetch;
+    await Deno.remove(dir, { recursive: true });
+    if (previous !== undefined) Deno.env.set("DEVTO_API_KEY", previous);
+  }
+});

@@ -72,7 +72,9 @@ script takes it from the environment, else from `.env.deploy` in the checkout.
 and `deno task env:decrypt` restores it. It stays on the deploying machine:
 `.dockerignore`'s `.env.*` keeps it out of the source rsync, and the env-file
 rsync names only `.env` and the target's env file. `scripts/deploy.test.ts`
-guards both. `.env.deploy.example` lists the key.
+guards both. `.env.deploy.example` lists the key. The same file holds
+`DEVTO_API_KEY`, which `deno task publish:blog` reads locally for the Dev.to
+draft (`scripts/devto.ts`).
 
 To purge by hand, in the Cloudflare dashboard: antonshubin.com → Caching →
 Configuration → Custom Purge → URL.
