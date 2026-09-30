@@ -32,6 +32,7 @@ import { ReviewSource } from "../../components/ReviewSource.tsx";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { ArrowRightIcon } from "../../components/Icons.tsx";
 import StatusMark from "../../components/StatusMark.tsx";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 const BASE = "https://antonshubin.com";
 
@@ -217,7 +218,10 @@ function HighlightCard(
           <a
             href={workHref(project.slug ?? "")}
             data-work-link={project.slug}
-            data-umami-event={`work-card-${project.slug}`}
+            {...eventAttrs("cta", {
+              place: "body",
+              target: workHref(project.slug ?? ""),
+            })}
             class={`${TITLE_LINK} after:absolute after:inset-0 after:rounded-xl`}
           >
             {project.title}
@@ -274,7 +278,10 @@ function ArchiveRow(
           <a
             href={workHref(project.slug ?? "")}
             data-work-link={project.slug}
-            data-umami-event={`work-card-${project.slug}`}
+            {...eventAttrs("cta", {
+              place: "body",
+              target: workHref(project.slug ?? ""),
+            })}
             class={TITLE_LINK}
           >
             {project.title}
@@ -441,11 +448,10 @@ export default define.page(function Work(ctx) {
         )}
 
         <ClosingBand
-          bookEvent="work-book-call"
           catalogLink={
             <a
               href="/catalog"
-              data-umami-event="work-catalog"
+              {...eventAttrs("cta", { place: "band", target: "/catalog" })}
               class="inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
             >
               Services and prices
@@ -456,12 +462,10 @@ export default define.page(function Work(ctx) {
             {
               href: "/how-i-work",
               label: "How I work",
-              event: "work-how-i-work",
             },
             {
               href: "/infrastructure",
               label: "Infrastructure",
-              event: "work-infrastructure",
             },
           ]}
         />

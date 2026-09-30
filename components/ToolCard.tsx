@@ -3,6 +3,7 @@ import { liveRepo, type ToolsLive } from "../lib/tools-live.ts";
 import { ciUrl, type Tool, toolLicence, type ToolRow } from "../lib/tools.ts";
 import { CiPill } from "./CiPill.tsx";
 import StatusMark from "./StatusMark.tsx";
+import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 const linkClass = "text-accent underline underline-offset-4";
 
@@ -59,7 +60,7 @@ export function ToolCard(
   const title = (
     <a
       href={`/tools/${tool.slug}`}
-      data-umami-event={`tools-hub-${tool.slug}`}
+      {...eventAttrs("cta", { place: "body", target: `/tools/${tool.slug}` })}
       class="hover:text-accent underline-offset-4 hover:underline"
     >
       {tool.name}
@@ -121,7 +122,7 @@ export function ToolRowCard(
           <a
             key={l.href}
             href={l.href}
-            data-umami-event={`tools-hub-${row.slug}-link`}
+            {...linkEvent(l.href, { item: row.slug })}
             class={linkClass}
           >
             {l.label}
@@ -143,7 +144,7 @@ export function ToolRowCard(
           <a
             key={l.href}
             href={l.href}
-            data-umami-event={`tools-hub-${row.slug}-link`}
+            {...linkEvent(l.href, { item: row.slug })}
             class={linkClass}
           >
             {l.label}

@@ -291,12 +291,11 @@ export default define.page(function ProjectDetail(ctx) {
 
         {/* ── Closing band: one decision ────────────────────────────── */}
         <ClosingBand
-          bookEvent={`project-cta-${project.slug}-schedule-bottom`}
+          bookItem={project.slug}
           catalogLink={<SimilarWorkLink project={project} place="bottom" />}
           links={[{
             href: "/how-i-work",
             label: "How I work",
-            event: `project-cta-${project.slug}-how-i-work`,
           }]}
         />
       </div>

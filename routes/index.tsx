@@ -27,6 +27,7 @@ import { TestimonialCard } from "../components/TestimonialCard.tsx";
 import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import StatusMark from "../components/StatusMark.tsx";
 import { ArrowRightIcon, CalendarIcon } from "../components/Icons.tsx";
+import { eventAttrs } from "../lib/analytics.ts";
 
 /** The section link style: Parchment, underlined, accent on hover. */
 const LINK = FACT_LINK;
@@ -112,7 +113,7 @@ export default define.page(function Home(ctx) {
                 url={SCHEDULE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="hero-book-call"
+                event={eventAttrs("book", { place: "hero" })}
                 data-e2e="hero-book-call"
                 class="gap-2 px-6 py-3 text-base"
               >
@@ -121,7 +122,7 @@ export default define.page(function Home(ctx) {
               </BookCallLink>
               <Button
                 href="#audit-form"
-                data-umami-event="hero-brief-link"
+                {...eventAttrs("brief", { place: "hero" })}
                 class="px-6 py-3 text-base"
               >
                 Send a written brief
@@ -130,7 +131,7 @@ export default define.page(function Home(ctx) {
             <p class="mt-4 text-sm text-graphite">
               <a
                 href="/how-i-work"
-                data-umami-event="hero-promises-link"
+                {...eventAttrs("cta", { place: "hero", target: "/how-i-work" })}
                 class="hover:text-parchment"
               >
                 {heroPromises.join(" · ")}
@@ -188,7 +189,7 @@ export default define.page(function Home(ctx) {
                     href={UPWORK_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    data-umami-event="home-outbound-upwork"
+                    {...eventAttrs("outbound", { to: "upwork" })}
                     class={LINK}
                   >
                     {proof("expert-vetted")} · {proof("top-percent")}
@@ -202,7 +203,7 @@ export default define.page(function Home(ctx) {
                   href={UPWORK_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-umami-event="home-hire-on-upwork"
+                  {...eventAttrs("outbound", { to: "upwork" })}
                   class={LINK}
                 >
                   Hire me there
@@ -215,7 +216,7 @@ export default define.page(function Home(ctx) {
                 <a
                   href="/about"
                   data-home-about
-                  data-umami-event="home-about"
+                  {...eventAttrs("cta", { place: "card", target: "/about" })}
                   class={LINK}
                 >
                   About me
@@ -237,7 +238,10 @@ export default define.page(function Home(ctx) {
                 <li key={item.slug} class="border-t border-rule">
                   <a
                     href={`/catalog/${item.slug}`}
-                    data-umami-event={`home-offer-${item.slug}`}
+                    {...eventAttrs("cta", {
+                      place: "card",
+                      target: `/catalog/${item.slug}`,
+                    })}
                     class="group flex items-baseline justify-between gap-4 py-3"
                   >
                     <span class="min-w-0">
@@ -261,7 +265,7 @@ export default define.page(function Home(ctx) {
               work starts.{" "}
               <a
                 href="/catalog"
-                data-umami-event="home-catalog-all"
+                {...eventAttrs("cta", { place: "card", target: "/catalog" })}
                 class={LINK}
               >
                 All services and prices
@@ -280,7 +284,10 @@ export default define.page(function Home(ctx) {
                 <a
                   href={`/work/${p.slug}`}
                   data-e2e={`home-view-${p.slug}`}
-                  data-umami-event={`home-work-${p.slug}`}
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/work/${p.slug}`,
+                  })}
                   class="group block py-5"
                 >
                   <span class="block font-heading text-xl text-parchment leading-snug text-balance">
@@ -310,7 +317,10 @@ export default define.page(function Home(ctx) {
                   {i > 0 && " · "}
                   <a
                     href={`/work/${a.slug}`}
-                    data-umami-event={`home-work-${a.slug}`}
+                    {...eventAttrs("cta", {
+                      place: "body",
+                      target: `/work/${a.slug}`,
+                    })}
                     class={LINK}
                   >
                     {a.label}
@@ -320,7 +330,7 @@ export default define.page(function Home(ctx) {
             </span>
             <a
               href="/work"
-              data-umami-event="home-work-all"
+              {...eventAttrs("cta", { place: "body", target: "/work" })}
               class={LINK}
             >
               All client work
@@ -352,7 +362,7 @@ export default define.page(function Home(ctx) {
                 href={UPWORK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="home-reviews-upwork"
+                {...eventAttrs("outbound", { to: "upwork" })}
                 class={LINK}
               >
                 All reviews on Upwork
@@ -369,12 +379,11 @@ export default define.page(function Home(ctx) {
           <PromiseTimeline
             variant="compact"
             headingLevel={3}
-            umamiPrefix="home-promise-"
           />
           <p class="mt-6 text-sm">
             <a
               href="/how-i-work"
-              data-umami-event="home-how-i-work"
+              {...eventAttrs("cta", { place: "body", target: "/how-i-work" })}
               class={LINK}
             >
               How I work, the five promises in full
@@ -391,7 +400,10 @@ export default define.page(function Home(ctx) {
               <li key={t.slug} class="border-t border-rule">
                 <a
                   href={`/tools/${t.slug}`}
-                  data-umami-event={`home-tool-${t.slug}`}
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/tools/${t.slug}`,
+                  })}
                   class="group flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3"
                 >
                   <span class="min-w-0">
@@ -406,13 +418,20 @@ export default define.page(function Home(ctx) {
             ))}
           </ul>
           <p class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-            <a href="/tools" data-umami-event="home-tools-all" class={LINK}>
+            <a
+              href="/tools"
+              {...eventAttrs("cta", { place: "body", target: "/tools" })}
+              class={LINK}
+            >
               All tools
               <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
             </a>
             <a
               href="/saas-architecture-guide"
-              data-umami-event="home-guide"
+              {...eventAttrs("cta", {
+                place: "body",
+                target: "/saas-architecture-guide",
+              })}
               class={LINK}
             >
               SaaS Architecture Guide
@@ -424,7 +443,6 @@ export default define.page(function Home(ctx) {
         {/* 6. Closing band: the brief form sits in its `children` slot */}
         <ClosingBand
           heading="Book a call or send a brief"
-          bookEvent="home-book-call"
           bookLabel={`Book a ${INTRO_CALL}`}
           primaryCta
           sectionAttrs={{ id: "cta-bottom", "data-home-section": "cta" }}

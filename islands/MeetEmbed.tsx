@@ -3,19 +3,10 @@ import { useEffect, useRef } from "preact/hooks";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { originOf } from "../lib/csp.ts";
 import { NEW_TAB_LABEL } from "../lib/meet-embed.ts";
+import { eventAttrs, track } from "../lib/analytics.ts";
 
 // Kept importable from here, where the tests and routes already look.
 export { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
-
-/**
- * Umami's tracking function, loaded onto `window` by the analytics script.
- * Declared locally rather than widening the global `Window` type, since only
- * this file calls it directly (every other event on the site is tracked via
- * the `data-umami-event` attribute, which the script picks up on its own).
- */
-interface UmamiGlobal {
-  umami?: { track: (eventName: string) => void };
-}
 
 /**
  * The reserved height of the placeholder box, and the hidden frame's height
@@ -66,14 +57,10 @@ export function isEmbedHeightMessage(
   embedOrigin: string,
   iframeWindow: Window | null | undefined,
 ): number | null {
-  if (!embedOrigin || event.origin !== embedOrigin) return null;
-  if (!iframeWindow || event.source !== iframeWindow) return null;
+  const data = embedMessageData(event, embedOrigin, iframeWindow);
+  if (!data || data.type !== "mig:height") return null;
 
-  const data = event.data;
-  if (!data || typeof data !== "object") return null;
-  if ((data as { type?: unknown }).type !== "mig:height") return null;
-
-  const height = (data as { height?: unknown }).height;
+  const height = data.height;
   // The `typeof` check exists only to narrow `height` to `number` for
   // TypeScript below — `Number.isInteger()` alone already rejects every
   // non-number value (it never coerces), NaN and Infinity, so no separate
@@ -83,6 +70,38 @@ export function isEmbedHeightMessage(
   if (height <= 0) return null;
 
   return Math.min(height, MAX_EMBED_HEIGHT_PX);
+}
+
+/**
+ * True when `event` is a genuine `{ type: "mig:booked" }` message, which mig
+ * posts from its confirmation page after a new booking (#318). The guard is
+ * exactly `isEmbedHeightMessage()`'s: the embed's origin and the embed's own
+ * iframe window, so no other frame on the page can fake a booking.
+ */
+export function isEmbedBookedMessage(
+  event: Pick<MessageEvent, "origin" | "source" | "data">,
+  embedOrigin: string,
+  iframeWindow: Window | null | undefined,
+): boolean {
+  return embedMessageData(event, embedOrigin, iframeWindow)?.type ===
+    "mig:booked";
+}
+
+/**
+ * The message's data object when it comes from the embed's own iframe
+ * (`embedOrigin` and that exact `contentWindow`), or null. The shared guard
+ * behind `isEmbedHeightMessage()` and `isEmbedBookedMessage()`.
+ */
+function embedMessageData(
+  event: Pick<MessageEvent, "origin" | "source" | "data">,
+  embedOrigin: string,
+  iframeWindow: Window | null | undefined,
+): { type?: unknown; height?: unknown } | null {
+  if (!embedOrigin || event.origin !== embedOrigin) return null;
+  if (!iframeWindow || event.source !== iframeWindow) return null;
+  const data = event.data;
+  if (!data || typeof data !== "object") return null;
+  return data as { type?: unknown; height?: unknown };
 }
 
 /**
@@ -145,19 +164,32 @@ export default function MeetEmbed(
   // never load before the listener exists: mig posts its height on load and
   // from its first resize callback only (#227). The iframe's window is read
   // when each message arrives, so anything posted by another window fails
-  // the `source` check.
+  // the `source` check. The same guard admits mig's `mig:booked`, which
+  // counts a booking once per message (#318). The first height counts
+  // `calendar-shown` and the timeout `calendar-failed`, once each per mount.
   useEffect(() => {
     if (!embedOrigin) return;
+    let shown = false;
     const onMessage = (event: MessageEvent) => {
       const iframeWindow = iframeRef.current?.contentWindow;
+      if (isEmbedBookedMessage(event, embedOrigin, iframeWindow)) {
+        track("call-booked");
+        return;
+      }
       const next = isEmbedHeightMessage(event, embedOrigin, iframeWindow);
       if (next === null) return;
       height.value = next;
       state.value = "ready";
+      if (!shown) {
+        shown = true;
+        track("calendar-shown");
+      }
     };
     globalThis.addEventListener("message", onMessage);
     const timer = setTimeout(() => {
-      if (state.value === "loading") state.value = "failed";
+      if (state.value !== "loading") return;
+      state.value = "failed";
+      track("calendar-failed");
     }, EMBED_TIMEOUT_MS);
     inserted.value = true;
     return () => {
@@ -165,23 +197,6 @@ export default function MeetEmbed(
       globalThis.removeEventListener("message", onMessage);
     };
   }, [embedOrigin]);
-
-  /**
-   * Fires on the iframe element's native `load` event, which fires the same
-   * way for a rendered scheduler page and for the browser's own error page
-   * when the frame is refused. It counts "the frame finished loading
-   * something", not a rendered calendar; the `mig:height` message above is
-   * the real signal.
-   */
-  const handleLoad = () => {
-    try {
-      (globalThis as unknown as UmamiGlobal).umami?.track(
-        "meet-embed-frame-load",
-      );
-    } catch {
-      // Umami absent or blocked by the visitor — never break the page for it.
-    }
-  };
 
   if (!url) return null;
 
@@ -210,7 +225,7 @@ export default function MeetEmbed(
                   href={scheduleUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-umami-event="meet-embed-failed-newtab"
+                  {...eventAttrs("book", { place: "calendar" })}
                   class={linkClass}
                 >
                   {NEW_TAB_LABEL}
@@ -222,7 +237,7 @@ export default function MeetEmbed(
                   {scheduleUrl ? " or " : "You can "}
                   <a
                     href={briefHref}
-                    data-umami-event="meet-embed-failed-brief"
+                    {...eventAttrs("brief", { place: "calendar" })}
                     class={linkClass}
                   >
                     send a written brief
@@ -254,7 +269,6 @@ export default function MeetEmbed(
           loading="lazy"
           referrerpolicy="strict-origin-when-cross-origin"
           sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
-          onLoad={handleLoad}
           aria-hidden={ready ? undefined : "true"}
           tabIndex={ready ? undefined : -1}
           class={ready ? "block" : "absolute inset-x-0 top-0 invisible"}

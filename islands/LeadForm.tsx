@@ -5,6 +5,7 @@ import { NewTabHint } from "../components/NewTabHint.tsx";
 import { proof } from "../lib/proof.ts";
 import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
 import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts";
+import { type BriefErrorReason, eventAttrs, track } from "../lib/analytics.ts";
 
 /** The calendar island's component, loaded only when the success panel needs it. */
 type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
@@ -29,8 +30,6 @@ interface LeadFormProps {
   calendarAbove?: string;
   /** Prefills the brief with "About: <shortTitle>" and sends the slug with it. */
   service?: LeadService;
-  /** The submit button's Umami event; the home page keeps `form-submit-audit`. */
-  submitEvent?: string;
   /** False when the page's own heading already says "Send a written brief" and its promise. */
   intro?: boolean;
 }
@@ -75,7 +74,6 @@ export default function LeadForm(
     scheduleUrl,
     calendarAbove,
     service,
-    submitEvent = "form-submit-audit",
     intro = true,
   }: LeadFormProps,
 ) {
@@ -108,9 +106,11 @@ export default function LeadForm(
         message: error.message,
         field: error.field,
       };
+      track("brief-error", { reason: "invalid" });
       return;
     }
     status.value = { type: "submitting" };
+    let reason: BriefErrorReason = "server";
     try {
       const resp = await fetch("/api/lead", {
         method: "POST",
@@ -124,14 +124,20 @@ export default function LeadForm(
       });
       if (!resp.ok) {
         const body = await resp.json().catch(() => ({}));
+        // 400 is the server refusing what was typed; anything else is the
+        // server or the network failing (#318).
+        reason = resp.status === 400 ? "invalid" : "server";
         throw new Error(body?.error || "Something went wrong. Try again.");
       }
       status.value = { type: "success" };
+      // Counted only once the server accepted the brief, never on the click.
+      track("brief-sent", { service: service?.slug });
     } catch (err) {
       status.value = {
         type: "error",
         message: err instanceof Error ? err.message : "Something went wrong",
       };
+      track("brief-error", { reason });
     }
   };
 
@@ -276,7 +282,6 @@ export default function LeadForm(
           <button
             type="submit"
             disabled={status.value.type === "submitting"}
-            data-umami-event={submitEvent}
             class="w-full px-8 py-3.5 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {status.value.type === "submitting" ? "Sending..." : (
@@ -432,7 +437,8 @@ export default function LeadForm(
                 href={scheduleUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="meet-embed-fallback-click"
+                data-calendar-newtab="true"
+                {...eventAttrs("book", { place: "calendar" })}
                 class="text-graphite hover:text-accent underline underline-offset-4 text-sm"
               >
                 {NEW_TAB_LABEL}

@@ -215,9 +215,13 @@ Deno.test("the booking page says what follows the call, quotes one client and of
       /href="#book"/.test(success),
       "/contact-me: the brief's success panel does not point up to #book",
     );
+    // A click on submit is not a sent brief: only the island's
+    // `brief-sent`, after the server accepted it, counts (#318).
+    const submit = html.match(/<button[^>]*type="submit"[^>]*>/)?.[0] ?? "";
+    assert(submit, "/contact-me: no submit button");
     assert(
-      html.includes('data-umami-event="contact-brief-submit"'),
-      "/contact-me: the brief's submit button is not counted apart from the home page's",
+      !submit.includes("data-umami-event"),
+      "/contact-me: the brief's submit click is counted as an event",
     );
   } finally {
     await site.stop();

@@ -3,6 +3,8 @@ import { Layout } from "./Layout.tsx";
 import Button from "./Button.tsx";
 import { navItemFor } from "../lib/nav.ts";
 import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
+import { eventAttrs } from "../lib/analytics.ts";
+import TrackPageEvent from "../islands/TrackPageEvent.tsx";
 
 /** The three sections a lost visitor most likely wants, in this order. */
 const SECTIONS = ["/work", "/tools", "/blog"];
@@ -12,7 +14,8 @@ const SECTIONS = ["/work", "/tools", "/blog"];
  * `[slug]` route whose slug matches nothing (they answer 404 themselves, so
  * `_404` never sees them). A real title and H1, buttons to the sections
  * people most likely wanted, and an email line. `pathname` is the requested
- * path: a dead link inside a section puts that section's button first.
+ * path: a dead link inside a section puts that section's button first. The
+ * view counts as `not-found` in Umami (#318), which stores the URL with it.
  */
 export function NotFound({ pathname }: { pathname: string }) {
   // A dead link inside a section (`/blog/no-such-post`) most likely wanted
@@ -53,11 +56,13 @@ export function NotFound({ pathname }: { pathname: string }) {
           Still lost? Email me at{" "}
           <a
             href={emailContact.href}
+            {...eventAttrs("outbound", { to: "email" })}
             class="text-parchment underline underline-offset-4"
           >
             {EMAIL_ADDRESS}
           </a>.
         </p>
+        <TrackPageEvent name="not-found" />
       </div>
     </Layout>
   );

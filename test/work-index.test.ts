@@ -519,7 +519,10 @@ Deno.test("/work shows Book once in its body, in the closing band, beside the ca
     assert(start > 0, "/work has no closing band");
     const band = body.slice(start, body.indexOf("</section>", start));
     assertEquals(count(band, /data-primary-book/g), 1);
-    assert(band.includes(`data-umami-event="work-book-call"`), "Book's event");
+    assert(
+      band.includes(`data-umami-event="book" data-umami-event-place="band"`),
+      "Book's event",
+    );
     for (const href of ["/catalog", "/how-i-work", "/infrastructure"]) {
       assert(band.includes(`href="${href}"`), `the band does not link ${href}`);
     }

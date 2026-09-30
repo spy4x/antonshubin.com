@@ -3,6 +3,7 @@ import { promise } from "../lib/promises.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { ArrowRightIcon } from "./Icons.tsx";
+import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 const LINK =
   "inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent";
@@ -11,8 +12,6 @@ const LINK =
 export interface BandLink {
   href: string;
   label: string;
-  /** The Umami event name the click records. */
-  event: string;
 }
 
 /** The promises the band shows when a page passes none: the two that lower a first engagement's risk. */
@@ -30,8 +29,8 @@ export const DEFAULT_BAND_PROMISES = ["refund", "first-milestone"];
  * `heading` for a band that carries a title.
  */
 export interface ClosingBandProps {
-  /** The Umami event on Book. */
-  bookEvent?: string;
+  /** The catalog item, project, tool or post the page is about: Book's `item` property. */
+  bookItem?: string;
   /** An `<h2>` at the top of the band; none by default. */
   heading?: string;
   /** `lib/promises.ts` ids, in order; an empty list shows no promise line. */
@@ -66,7 +65,7 @@ export interface ClosingBandProps {
  */
 export function ClosingBand(
   {
-    bookEvent,
+    bookItem,
     heading,
     promiseIds = DEFAULT_BAND_PROMISES,
     children,
@@ -104,7 +103,7 @@ export function ClosingBand(
           <BookCallLink
             url={bookHref ?? SCHEDULE_URL}
             target={bookHref ? undefined : "_blank"}
-            data-umami-event={bookEvent}
+            event={eventAttrs("book", { place: "band", item: bookItem })}
             data-primary-cta={primaryCta}
             class="justify-center px-6 py-3"
           >
@@ -116,7 +115,7 @@ export function ClosingBand(
           <a
             key={l.href}
             href={l.href}
-            data-umami-event={l.event}
+            {...linkEvent(l.href, { place: "band" })}
             class={LINK}
           >
             {l.label}

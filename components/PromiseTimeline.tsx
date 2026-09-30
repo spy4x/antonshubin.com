@@ -1,12 +1,11 @@
 import { type PromiseItem, promises } from "../lib/promises.ts";
 import { ArrowRightIcon } from "./Icons.tsx";
+import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 /** A quiet link under one promise of the `full` timeline: a catalog item or a page. */
 export interface PromiseLink {
   href: string;
   label: string;
-  /** The Umami event the click records. */
-  event: string;
 }
 
 /**
@@ -31,7 +30,6 @@ export function PromiseTimeline(
     variant,
     headingLevel,
     items = promises,
-    umamiPrefix,
     layout = "row",
     links = {},
   }: {
@@ -42,8 +40,6 @@ export function PromiseTimeline(
     layout?: "row" | "stack";
     /** `full` only: one quiet link under a promise, keyed by promise id. */
     links?: Record<string, PromiseLink>;
-    /** When set, each compact step link carries `data-umami-event="<prefix><id>"`. */
-    umamiPrefix?: string;
   },
 ) {
   const Heading = `h${headingLevel}` as "h2" | "h3";
@@ -75,7 +71,7 @@ export function PromiseTimeline(
             {variant === "full" && links[p.id] && (
               <a
                 href={links[p.id].href}
-                data-umami-event={links[p.id].event}
+                {...linkEvent(links[p.id].href, { place: "body" })}
                 class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
               >
                 {links[p.id].label}
@@ -104,9 +100,10 @@ export function PromiseTimeline(
               ? (
                 <a
                   href={`/how-i-work#${p.id}`}
-                  data-umami-event={umamiPrefix
-                    ? `${umamiPrefix}${p.id}`
-                    : undefined}
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/how-i-work#${p.id}`,
+                  })}
                   class="block hover:text-parchment"
                 >
                   {body}

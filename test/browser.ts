@@ -56,3 +56,31 @@ export function newPage(
 ): Promise<Page> {
   return browser.newPage({ ...options, serviceWorkers: "block" });
 }
+
+/** One `umami.track()` call the page made: the event name and its data, if any. */
+export type TrackedCall = [string, Record<string, string>?];
+
+/**
+ * Stands in for Umami's tracker on `page` before any page script runs, so a
+ * test can read back every `umami.track()` call with `trackedCalls()`. The
+ * site loads no real tracker in tests (no `UMAMI_URL`), so nothing else
+ * defines `window.umami`.
+ */
+export async function recordUmami(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const calls: unknown[][] = [];
+    const g = globalThis as unknown as {
+      umami: { track: (...args: unknown[]) => void };
+      __umamiCalls: unknown[][];
+    };
+    g.__umamiCalls = calls;
+    g.umami = { track: (...args: unknown[]) => calls.push(args) };
+  });
+}
+
+/** Every `umami.track()` call recorded by `recordUmami()` so far. */
+export function trackedCalls(page: Page): Promise<TrackedCall[]> {
+  return page.evaluate(() =>
+    (globalThis as unknown as { __umamiCalls: TrackedCall[] }).__umamiCalls
+  );
+}

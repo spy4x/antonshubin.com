@@ -40,7 +40,12 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import {
+  launchChromium,
+  newPage,
+  recordUmami,
+  trackedCalls,
+} from "./browser.ts";
 import { EMBED_TIMEOUT_MS } from "../islands/MeetEmbed.tsx";
 
 /** Starts a stub "mig" server whose `/embed` page posts `mig:height`
@@ -119,6 +124,31 @@ function startStubMig(): { origin: string; stop: () => void } {
             </script>
           </body></html>`,
           { headers },
+        );
+      }
+      if (pathname === "/booked/embed") {
+        // Like mig's /embed/confirmed after a new booking (#318): its height,
+        // then one `mig:booked`.
+        return new Response(
+          `<!doctype html><html><body>mig stub, booked
+            <script>
+              window.parent.postMessage({ type: "mig:height", height: 640 }, "*");
+              setTimeout(() => {
+                window.parent.postMessage({ type: "mig:booked" }, "*");
+              }, 150);
+            </script>
+          </body></html>`,
+          { headers: { "content-type": "text/html" } },
+        );
+      }
+      if (pathname === "/spoof-booked.html") {
+        return new Response(
+          `<!doctype html><html><body>spoofed booking
+            <script>
+              window.parent.postMessage({ type: "mig:booked" }, "*");
+            </script>
+          </body></html>`,
+          { headers: { "content-type": "text/html" } },
         );
       }
       if (pathname === "/spoof.html") {
@@ -449,6 +479,7 @@ Deno.test("a refused frame turns the placeholder into a message with the new-tab
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
+      await recordUmami(page);
       await page.goto(`${site.origin}/contact-me`, {
         waitUntil: "networkidle",
       });
@@ -481,6 +512,11 @@ Deno.test("a refused frame turns the placeholder into a message with the new-tab
         ).isVisible(),
         false,
         "the refused frame is shown instead of the message",
+      );
+      assertEquals(
+        await trackedCalls(page),
+        [["calendar-failed"]],
+        "the refused calendar is not counted as failed exactly once",
       );
     } finally {
       await page.close();
@@ -564,5 +600,96 @@ Deno.test("without JavaScript the calendar box offers the new-tab link instead o
   } finally {
     await browser?.close();
     await site.stop();
+  }
+});
+
+Deno.test("a booking from the calendar counts once, and a sibling frame cannot fake one", async () => {
+  const stub = startStubMig();
+  const site = await startSite({
+    env: { SCHEDULE_URL: `${stub.origin}/booked` },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await recordUmami(page);
+      await page.goto(`${site.origin}/contact-me`, {
+        waitUntil: "networkidle",
+      });
+      await page.waitForFunction(() =>
+        (globalThis as unknown as { __umamiCalls: unknown[][] }).__umamiCalls
+          .some(([name]) => name === "call-booked")
+      );
+      assertEquals(await trackedCalls(page), [
+        ["calendar-shown"],
+        ["call-booked"],
+      ]);
+
+      // Same origin as the calendar, but another window: not a booking.
+      await page.evaluate((spoofUrl) => {
+        return new Promise<void>((resolve) => {
+          const spoof = document.createElement("iframe");
+          spoof.src = spoofUrl;
+          spoof.onload = () => resolve();
+          document.body.appendChild(spoof);
+        });
+      }, `${stub.origin}/spoof-booked.html`);
+      await page.evaluate(() => new Promise((r) => setTimeout(r, 0)));
+      assertEquals(
+        await trackedCalls(page),
+        [["calendar-shown"], ["call-booked"]],
+        "a mig:booked message from a sibling frame was counted",
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    stub.stop();
+  }
+});
+
+Deno.test("a booking from the calendar in the home page's success panel counts too", async () => {
+  const stub = startStubMig();
+  const site = await startSite({
+    env: { SCHEDULE_URL: `${stub.origin}/booked` },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await recordUmami(page);
+      await page.route("**/api/lead", (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ok: true }),
+        }));
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await page.fill("#lead-name", "Ada Lovelace");
+      await page.fill("#lead-email", "ada@example.com");
+      await page.fill("#lead-stack", "Deno + Fresh, looking for a review");
+      await page.locator('[data-lead-form] button[type="submit"]').evaluate((
+        el,
+      ) => (el as HTMLElement).click());
+      await page.waitForFunction(() =>
+        (globalThis as unknown as { __umamiCalls: unknown[][] }).__umamiCalls
+          .some(([name]) => name === "call-booked")
+      );
+      assertEquals(
+        (await trackedCalls(page)).filter(([name]) => name === "call-booked")
+          .length,
+        1,
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+    stub.stop();
   }
 });

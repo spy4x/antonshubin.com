@@ -141,8 +141,13 @@ Deno.test("/about shows Book in its card and its closing band only", async () =>
     const start = html.indexOf('id="main-content"');
     const main = html.slice(start, html.indexOf("</main>", start));
     const events = [...main.matchAll(/<a\b[^>]*data-primary-book[^>]*>/g)]
-      .map((m) => m[0].match(/data-umami-event="([^"]*)"/)?.[1]);
-    assertEquals(events, ["about-book-top", "about-book-bottom"]);
+      .map((m) =>
+        [
+          m[0].match(/data-umami-event="([^"]*)"/)?.[1],
+          m[0].match(/data-umami-event-place="([^"]*)"/)?.[1],
+        ].join(" ")
+      );
+    assertEquals(events, ["book card", "book band"]);
   } finally {
     await site.stop();
   }

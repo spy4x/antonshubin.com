@@ -24,6 +24,7 @@ import {
 import { toJsonLd } from "../lib/json-ld.ts";
 import { projectLead } from "../lib/llms.ts";
 import { define } from "../lib/utils.ts";
+import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 const BASE = "https://antonshubin.com";
 const REPO = "https://github.com/spy4x/antonshubin.com";
@@ -212,7 +213,7 @@ export default define.page(function Infrastructure() {
                     target="_blank"
                     rel="noopener noreferrer"
                     data-live-link={l.id}
-                    data-umami-event={`infrastructure-live-${l.id}`}
+                    {...eventAttrs("outbound", { to: l.id })}
                     class={buttonClass(
                       "secondary",
                       "w-full sm:w-auto justify-between gap-2 px-4 py-2.5 text-sm break-all",
@@ -237,7 +238,7 @@ export default define.page(function Infrastructure() {
             <BookCallLink
               url={SCHEDULE_URL}
               target="_blank"
-              data-umami-event="infrastructure-book-top"
+              event={eventAttrs("book", { place: "top" })}
               class="justify-center px-6 py-3"
             >
               Book a free intro call
@@ -273,7 +274,9 @@ export default define.page(function Infrastructure() {
                         {...(n.external
                           ? { target: "_blank", rel: "noopener noreferrer" }
                           : {})}
-                        data-umami-event={`infrastructure-node-${n.id}`}
+                        {...linkEvent(n.href, {
+                          to: n.external ? n.id : undefined,
+                        })}
                         class={`${LINK} font-semibold break-all`}
                       >
                         {n.label}
@@ -321,7 +324,10 @@ export default define.page(function Infrastructure() {
             It runs on AWS.{" "}
             <a
               href="/work/smartlite"
-              data-umami-event="infrastructure-smartlite"
+              {...eventAttrs("cta", {
+                place: "body",
+                target: "/work/smartlite",
+              })}
               class={LINK}
             >
               Read the case study
@@ -407,7 +413,10 @@ export default define.page(function Infrastructure() {
           <p class="mt-4">
             <a
               href="/blog/cost-optimization-laboratory"
-              data-umami-event="infrastructure-cost-post"
+              {...eventAttrs("cta", {
+                place: "body",
+                target: "/blog/cost-optimization-laboratory",
+              })}
               class={LINK}
             >
               Managed cloud, dedicated, or hybrid: how I weigh the cost
@@ -436,7 +445,10 @@ export default define.page(function Infrastructure() {
                 <p class="mt-2 text-sm text-graphite">{item.summary}</p>
                 <a
                   href={catalogPath(item.slug)}
-                  data-umami-event={`infrastructure-catalog-${item.slug}`}
+                  {...eventAttrs("cta", {
+                    place: "card",
+                    target: catalogPath(item.slug),
+                  })}
                   class={`mt-3 inline-flex items-center gap-1 text-sm ${LINK}`}
                 >
                   See what is included
@@ -448,18 +460,15 @@ export default define.page(function Infrastructure() {
         </section>
 
         <ClosingBand
-          bookEvent="infrastructure-book-call"
           promiseIds={["ownership", "first-milestone"]}
           links={[
             {
               href: "/#audit-form",
               label: "Request a free written audit",
-              event: "infrastructure-audit",
             },
             {
               href: "/how-i-work",
               label: "How I work",
-              event: "infrastructure-how-i-work",
             },
           ]}
         />
