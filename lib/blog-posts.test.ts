@@ -150,6 +150,21 @@ Deno.test("a coverImage outside static/img, of another type, or missing fails na
   }
 });
 
+Deno.test("every post's Dev.to cover is a 1000x420 PNG", () => {
+  const withCover = blogArticles.filter((a) => a.coverImage);
+  assertEquals(withCover.length > 0, true, "no post has a coverImage");
+  for (const { slug, coverImage } of withCover) {
+    const png = Deno.readFileSync(`static${coverImage}`);
+    const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
+    // A PNG's IHDR chunk holds the width and height at bytes 16 and 20.
+    assertEquals(
+      [view.getUint32(16), view.getUint32(20)],
+      [1000, 420],
+      `${slug}: ${coverImage}`,
+    );
+  }
+});
+
 Deno.test("a {proof:<id>} placeholder reads the figure from lib/proof.ts", () => {
   assertEquals(
     fillProof("from {proof:jobs}+ projects"),
