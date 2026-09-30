@@ -204,6 +204,6 @@ export function postDate(iso: string): string {
 export const AUTHOR_LINE =
   "I build greenfield SaaS on a modern, lightweight stack, alone or with a team of senior developers from my own pool, and I cover full-stack, DevOps and architecture.";
 
-/** The newsletter's promise (#274, Mkt 5): the three topics, nothing invented. */
+/** The newsletter's promise (#274, Mkt 5): the three topics and how often (Anton, #301). */
 export const NEWSLETTER_LINE =
-  "New posts on decisions for founders, AI and MCP, and self-hosting. Unsubscribe with one click.";
+  "New posts on decisions for founders, AI and MCP, and self-hosting, only when there's a new post and about once a week at most. Unsubscribe with one click.";

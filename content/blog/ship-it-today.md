@@ -9,6 +9,7 @@ publishedAt: "2022-04-27"
 readTime: 5
 topic: "founders"
 archived: true
+archiveNote: "I still ship this way: the tools on my Tools page each went out small and early."
 ---
 
 ## What is it about?

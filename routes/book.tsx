@@ -30,6 +30,14 @@ import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
 import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
 import { eventAttrs } from "../lib/analytics.ts";
 
+/**
+ * What happens when a visitor books, from mig's own behaviour: times in the
+ * visitor's time zone, and a confirmation email with an invite and a cancel
+ * link to both sides (#301, answers 4 and 5).
+ */
+const BOOKING_FACTS =
+  "You talk to me, not a salesperson. The calendar shows times in your own time zone. Once you book, you and I each get an email with a calendar invite and a cancel link; reply to it with anything you want to cover.";
+
 /** The call, capitalised for a heading: "Book a free 30-minute intro call". */
 const BOOK_HEADING = `Book a ${INTRO_CALL}`;
 
@@ -133,6 +141,9 @@ export default define.page(function Book(ctx) {
                       {NEW_TAB_LABEL}
                       <NewTabHint />
                     </a>
+                  </p>
+                  <p data-booking-facts class="mt-3 text-sm text-graphite">
+                    {BOOKING_FACTS}
                   </p>
                 </section>
               </>

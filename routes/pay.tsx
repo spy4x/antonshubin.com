@@ -10,6 +10,7 @@ import {
 } from "../components/Icons.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import CopyButton from "../islands/CopyButton.tsx";
+import { INTERNATIONAL_BANK_LINE } from "../lib/about.ts";
 
 export default define.page(function Pay() {
   head.value = {
@@ -190,8 +191,8 @@ export default define.page(function Pay() {
                 </div>
 
                 <div class="pt-3 border-t border-rule mt-4">
-                  <p class="text-mist text-xs font-medium">
-                    Not for collections from outside the US
+                  <p data-international-bank class="text-mist text-xs">
+                    {INTERNATIONAL_BANK_LINE}
                   </p>
                 </div>
               </div>

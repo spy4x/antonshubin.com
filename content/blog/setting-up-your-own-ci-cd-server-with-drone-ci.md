@@ -9,6 +9,7 @@ publishedAt: "2023-02-12"
 readTime: 5
 topic: "self-hosting"
 archived: true
+archiveNote: "I now run Woodpecker CI, a community fork of Drone; my Infrastructure page shows it."
 ---
 
 Drone CI is an open-source Continuous Integration and Continuous Deployment

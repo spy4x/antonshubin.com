@@ -8,7 +8,8 @@ import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts";
  * `faqs`, and every promise an answer mentions is spliced through
  * `promise()`, so the promise guard in `test/proof-promises-notes.test.ts`
  * (which scans this file too) still holds. The who-does-the-work and mobile
- * answers come from the facts Anton recorded on #249 (26 Sep 2026).
+ * answers come from the facts Anton recorded on #249 (26 Sep 2026); how to
+ * ask for the refund and the AI-provider answer from #301 (30 Sep 2026).
  *
  * No imports of config or the environment, so a script can load it.
  */
@@ -23,7 +24,7 @@ export interface Faq {
 }
 
 /** The most questions the page carries. */
-export const MAX_FAQS = 7;
+export const MAX_FAQS = 8;
 
 /** New information first, the fit question last. */
 export const faqs: Faq[] = [
@@ -61,12 +62,17 @@ export const faqs: Faq[] = [
     link: { href: WRITE_FALLBACK_HREF, label: BRIEF_LABEL },
   },
   {
+    id: "ai-and-your-code",
+    q: "Does my code go to an AI provider?",
+    a: "Yes. I work with AI coding agents, so the code I work on is sent to an AI model provider. I read, test and review every change before you see it. If your company has its own AI account, I can work through that one, so your code stays under your contract. If your policy rules out AI tools, tell me on the call and we agree how to handle it before any work starts.",
+  },
+  {
     id: "not-a-good-fit",
     q: "What if we start working together and it is not a good fit?",
     a: `That is exactly why I offer ${promise("refund").phrase}. ${
       promise("refund").desc
-    } We also start with ${promise("first-milestone").phrase}: ${
-      decapitalize(promise("first-milestone").desc)
-    }`,
+    } To ask for it, tell me by email or on Upwork: I refund the full amount the same way you paid, within the week. We also start with ${
+      promise("first-milestone").phrase
+    }: ${decapitalize(promise("first-milestone").desc)}`,
   },
 ];

@@ -312,10 +312,9 @@ export function catalogPath(slug: string): string {
  * The `lib/promises.ts` ids a service shows beside its price (#271). Build
  * and Ongoing are the engagements the project pages' closing band already
  * shows the refund and the first milestone for, so those and ownership apply
- * to both, and Build adds the bug-fix window its `includes` already names. A
- * strategy session and a code audit show none: a refund window on a
- * one-hour call would be a new claim, and Anton has not said which promises
- * apply to them.
+ * to both, and Build adds the bug-fix window its `includes` already names.
+ * The strategy session and the code audit show the refund only (Anton,
+ * #301): a one-off job has no milestone, weekly delivery or code to fix.
  */
 export function catalogPromises(slug: string): string[] {
   switch (catalogItem(slug).slug) {
@@ -323,6 +322,9 @@ export function catalogPromises(slug: string): string[] {
       return ["refund", "first-milestone", "ownership", "free-bugfixes"];
     case "cto-advisory-retainer":
       return ["refund", "first-milestone", "ownership"];
+    case "strategy-call":
+    case "codebase-health-audit":
+      return ["refund"];
     default:
       return [];
   }
@@ -360,8 +362,8 @@ export interface StartStep {
 
 /**
  * How an engagement starts, for the two items whose page spells it out: the
- * free intro call, a quote, the first milestone (Build); the session itself
- * (Strategy). Every sentence is already in the item, `INTRO_CALL` or
+ * free intro call, a quote, the first milestone (Build); a brief, an invoice,
+ * the session and its notes (Strategy: mig takes no payment, #301). Every sentence is already in the item, `INTRO_CALL` or
  * `lib/promises.ts`. The other two items have no steps.
  */
 export function startSteps(slug: string): StartStep[] | undefined {
@@ -375,7 +377,14 @@ export function startSteps(slug: string): StartStep[] | undefined {
   }
   if (item.slug === "strategy-call") {
     return [
-      { title: "Pick a time", desc: "We agree on a time for the call." },
+      {
+        title: "Tell me the topic",
+        desc: "Use the written brief to say what you want the hour to cover.",
+      },
+      {
+        title: "You get an invoice and a time",
+        desc: "I reply with a Stripe invoice and times for the 60-minute call.",
+      },
       { title: "We talk", desc: item.includes[0] },
       { title: "You get notes", desc: item.includes[4] },
     ];

@@ -7,9 +7,9 @@ import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
 
 /**
  * What the site collects (#192). Every sentence is something the code in this
- * repository shows; what it cannot show (how long anything is kept, which
- * provider carries the mail) is left out on purpose. Change a sentence only
- * together with the code it describes.
+ * repository shows, except the "How long things are kept" and mail-server
+ * lines, which are Anton's own rule and his setup (#301, 30 Sep 2026).
+ * Change a sentence only together with the code or the rule it describes.
  */
 function Section(
   { title, children }: { title: string; children: ComponentChildren },
@@ -40,7 +40,8 @@ export default define.page(function Privacy(ctx) {
         <h1 class="text-3xl sm:text-4xl text-parchment">Privacy</h1>
         <p class="mt-4">
           This page lists what this site collects and where it goes. It was
-          checked against the site's code on 30 September 2026.
+          checked against the site's code on 30 September 2026. How long things
+          are kept is my own rule, stated below.
         </p>
 
         <Section title="The brief form">
@@ -72,6 +73,19 @@ export default define.page(function Privacy(ctx) {
             that a confirmation link sent before you unsubscribed cannot
             subscribe you again. A fingerprint older than three days, the life
             of such a link, is cleared the next time anyone unsubscribes.
+          </p>
+        </Section>
+
+        <Section title="How long things are kept">
+          <p>
+            Your address stays on the newsletter list until you unsubscribe. A
+            brief reaches me as an email in my own mailbox. I keep it while we
+            talk, and I delete it when you ask, together with any copy kept in
+            the server file above.
+          </p>
+          <p>
+            The site sends its mail through my own mail server, Stalwart, on a
+            Hetzner server in Germany. No outside mail service carries it.
           </p>
         </Section>
 

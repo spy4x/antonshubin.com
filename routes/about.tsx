@@ -288,6 +288,18 @@ export default define.page(function About(ctx) {
                 </a>
                 . I've {ABOUT_TRAVEL}, and I live in {LOCATION}.
               </p>
+              <img
+                data-about-bike
+                src="/img/about-bike-480.webp"
+                srcset="/img/about-bike-480.webp 480w, /img/about-bike-800.webp 800w"
+                sizes="(min-width: 640px) 320px, calc(100vw - 32px)"
+                alt="Anton Shubin smiling on his Honda motorcycle on a beach, helmet under his arm"
+                width="480"
+                height="600"
+                loading="lazy"
+                decoding="async"
+                class="mt-6 w-full sm:w-80 h-auto rounded-xl"
+              />
             </section>
 
             <section aria-labelledby="about-paying">
