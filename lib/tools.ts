@@ -406,6 +406,7 @@ export const tools: Tool[] = [
     status: "beta",
     group: "tools",
     catalogSlug: "zero-to-production-saas-mvp",
+    posts: ["preact-component-library-without-shadcn"],
     repo: "spy4x/preact-components",
     registry: {
       name: "JSR",
