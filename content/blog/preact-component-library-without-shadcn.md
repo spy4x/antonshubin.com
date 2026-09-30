@@ -12,7 +12,10 @@ topic: "founders"
 relatedTool: "preact-components"
 catalogSlug: "zero-to-production-saas-mvp"
 seoTitle: "A Preact component library without shadcn or Radix"
+coverImage: "/img/blog/preact-component-library-without-shadcn/cover.png"
 ---
+
+![A dashboard in the live guide built only from the library: a frame titled Orbit with Run checks and New project buttons, a filter column, four KPI tiles, a line chart of passed and failed builds this week, and a sortable table of five projects with status badges](/img/blog/preact-component-library-without-shadcn/dashboard-hero.webp "Every part of this demo dashboard is a component from the packages.")
 
 Every new app I start needs the same things: a button, a table, a dialog, a form
 field, a chart, a signed-in layout. I kept rebuilding them, or pulling in a
@@ -26,6 +29,10 @@ by hand. No shadcn, Radix, Headless UI or Material underneath.
 This post is for developers who build with Preact and Tailwind and wonder
 whether owning the UI layer is worth it. I'll show why I decided it is, what is
 in the ten packages, how to try it in a minute, and what is not done yet.
+
+The dashboard above is on the guide's first page. Every part of it is a
+component from these packages, running on local state: you can filter and sort
+the projects, run the checks for a toast, and add a project in the dialog.
 
 ## Why not shadcn, Radix or MUI?
 
@@ -71,6 +78,8 @@ names it plainly, so nobody pretends it is free:
 - positioning: anchoring a popup to its trigger and flipping it when it would
   overflow.
 
+![The New project dialog open over the guide's demo dashboard: a Project name field with a focus ring, the hint "It starts building as soon as it is created.", and Cancel and Create buttons](/img/blog/preact-component-library-without-shadcn/dialog-focus.webp "The demo's New project dialog, a native dialog element: focus moves into its field when it opens.")
+
 Where the platform already has an answer, I use it: native `<dialog>`,
 `<details>`, `<button>` and forms that post before any script has run. A native
 element ships its semantics for free.
@@ -105,6 +114,8 @@ everything by setting variables instead of forking the CSS. Layout goes through
 outer margin. The guide's header switches between light and dark and changes the
 accent colour live, so you can see the tokens at work.
 
+![The same five Kpi tiles from the live guide twice, each showing 42 in the accent, positive, warning, negative and neutral tones: on a dark background above and on a light one below](/img/blog/preact-component-library-without-shadcn/kpi-dark-light.webp "The same Kpi tiles in the guide's dark theme and its light theme.")
+
 ## What is in the ten packages
 
 Every package is published on JSR under `@spy4x/preact-*`, all at the same
@@ -125,11 +136,7 @@ version, so a caret range always resolves to a set that was published together.
 
 The guide's overview counts 81 components and 120 icons across them today.
 
-![A dashboard in the live guide built only from the library: a frame titled Orbit with Run checks and New project buttons, a filter column, four KPI tiles, a line chart of passed and failed builds this week, and a sortable table of five projects with status badges](/img/blog/preact-component-library-without-shadcn/guide-dashboard.webp "Every part of this demo dashboard is a component from the packages.")
-
-The dashboard above is on the guide's first page. Every part of it is a
-component from these packages, running on local state: you can filter and sort
-the projects, run the checks for a toast, and add a project in the dialog.
+![The LineChart card in the live guide: revenue today and a week earlier by hour, a dashed target line at 12, and a tooltip at 14:00 that shows no value for today and 10.9 for a week earlier](/img/blog/preact-component-library-without-shadcn/line-chart-tooltip.webp "A LineChart from @spy4x/preact-charts, with its tooltip open.")
 
 ## Where it came from
 

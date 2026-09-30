@@ -1062,7 +1062,12 @@ short lines in its required `tldr` front matter (`lib/blog-posts.ts` fails the
 build without it, and `llms-full.txt` lists it), and a post about a project sets
 `relatedTool`, so its header shows that tool's demo (`live`) and repository
 (`repo`) from `lib/tools.ts`, never hand-written links; `test/blog.test.ts`
-checks both on every post. Three hard rules:
+checks both on every post. A post about something visual opens with a real
+screenshot right under its TL;DR (lazy like every post image: eager, it made the
+post's phone LCP slower), and its `coverImage` (a 1000×420 PNG under
+`static/img/`) becomes the Dev.to cover; `publish:blog` updates an existing
+unpublished draft with the same `canonical_url` instead of adding a second.
+Three hard rules:
 
 - **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
   text per channel with its tagged link and show it in chat; Anton pastes it.

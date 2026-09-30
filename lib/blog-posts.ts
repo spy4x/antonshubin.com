@@ -70,10 +70,21 @@ export interface BlogArticle {
   /** A `lib/catalog.ts` slug, checked through `catalogItem()`. */
   catalogSlug?: string;
   youtubeVideoId?: string;
+  /**
+   * The Dev.to cover (`main_image`), a site path to a 1000×420 PNG under
+   * `static/img/`, cut from a real screenshot in the post. The page
+   * itself never shows it; `scripts/devto.ts` sends it as a full URL.
+   */
+  coverImage?: string;
 }
 
 const TOPIC_IDS = new Set<string>(topics.map((t) => t.id));
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+/**
+ * A cover's site path: under `/img/`, no `..`, a PNG (a format Dev.to accepts
+ * and `scripts/strip-metadata.ts` cleans).
+ */
+const COVER_PATH = /^\/img\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.png$/;
 /** How many lines a TL;DR may have (Anton, 30 September 2026). */
 export const TLDR_MIN_LINES = 2;
 export const TLDR_MAX_LINES = 4;
@@ -93,9 +104,20 @@ const KNOWN_KEYS = new Set([
   "relatedTool",
   "catalogSlug",
   "youtubeVideoId",
+  "coverImage",
   // The post's UTM campaign, read by scripts/utm.ts (docs/utm.md).
   "utmCampaign",
 ]);
+
+/** Whether `path` names an existing file; a missing path is not an error. */
+function isFile(path: string): boolean {
+  try {
+    return Deno.statSync(path).isFile;
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) return false;
+    throw err;
+  }
+}
 
 /**
  * Replaces each `{proof:<id>}` with that `lib/proof.ts` figure, so a title
@@ -110,7 +132,11 @@ export function fillProof(text: string): string {
  * missing or mistyped field and on any key this module does not know, so a
  * misspelt `updatedat` fails instead of being ignored.
  */
-export function parseBlogArticle(slug: string, raw: string): BlogArticle {
+export function parseBlogArticle(
+  slug: string,
+  raw: string,
+  staticDir = "static",
+): BlogArticle {
   const where = `content/blog/${slug}.md`;
   let attrs: Record<string, unknown>;
   try {
@@ -185,6 +211,20 @@ export function parseBlogArticle(slug: string, raw: string): BlogArticle {
     }
   }
 
+  const coverImage = text("coverImage", false);
+  if (coverImage !== undefined) {
+    if (!COVER_PATH.test(coverImage)) {
+      throw new Error(
+        `${where}: "coverImage" must be a /img/... path to a .png file`,
+      );
+    }
+    if (!isFile(`${staticDir}${coverImage}`)) {
+      throw new Error(
+        `${where}: "coverImage" ${coverImage} is not a file under ${staticDir}/`,
+      );
+    }
+  }
+
   const article: BlogArticle = {
     slug,
     title: fillProof(text("title", true)!),
@@ -201,6 +241,7 @@ export function parseBlogArticle(slug: string, raw: string): BlogArticle {
     relatedTool: text("relatedTool", false),
     catalogSlug: text("catalogSlug", false),
     youtubeVideoId: text("youtubeVideoId", false),
+    coverImage,
   };
   for (const [key, value] of Object.entries(optional)) {
     if (value !== undefined) {

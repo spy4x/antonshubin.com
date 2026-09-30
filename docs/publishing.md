@@ -108,11 +108,25 @@ draft against the brief before the pull request opens.
 5. Posts of 8 minutes or more get a contents list of their `##` headings, so
    give a long post real section headings. Every `##` and `###` gets an id from
    its text.
-6. Add any figures the post uses under `static/img/blog/<slug>/`, run
+6. Add any figures the post uses under `static/img/blog/<slug>/` as WebP, run
    `deno task strip-metadata` on them, then run `deno task og` for the 1200×630
-   preview and commit the PNG. No cover image: the post opens with its title,
-   and the preview PNG is the link and search image.
-7. Check the "AI crawler optimization" table in AGENTS.md. The sitemap, the RSS
+   preview and commit the PNG. The preview PNG stays the link and search image.
+   A post about something you can see (a tool, a UI, a chart) opens with a real
+   screenshot as the first thing in its Markdown, right under the TL;DR. Like
+   every post image it stays lazy: on a phone it sits below the first screen,
+   and loading it eagerly made this page's LCP about 180ms slower on the
+   throttled network (`deno task lcp --ab`, preact-components post). Every image
+   has an alt text that says what it shows and a caption (the Markdown title),
+   and sits next to the text that talks about it. Real screenshots only,
+   captured at 2x with the repo's Chromium (`test/browser.ts`'s
+   `launchChromium()`), never a mockup.
+7. **A Dev.to cover.** Set `coverImage` to a site path of a 1000×420 PNG under
+   `static/img/blog/<slug>/`, cropped from the hero screenshot with no text
+   added; `publish:blog` sends it as the draft's `main_image`.
+   `lib/blog-posts.ts` fails on a path outside `/img/`, a non-PNG or a missing
+   file, and `lib/blog-posts.test.ts` on a cover that is not 1000×420. Without
+   it the draft has no cover.
+8. Check the "AI crawler optimization" table in AGENTS.md. The sitemap, the RSS
    feed and both llms files read `blogArticles`, so they update themselves; the
    doc rows may still need a line.
 
@@ -140,10 +154,14 @@ It writes no file. It:
 2. Fetches `https://antonshubin.com/blog/<slug>` and stops unless it answers
    200. Nothing below runs for a post that is not live.
 3. Creates the Dev.to draft (`published: false`, a clean `canonical_url`, the
-   post's campaign), opening with the TL;DR and, for a post with `relatedTool`,
-   the project's live and repository links. It needs `DEVTO_API_KEY`, from the
-   environment or the local `.env.deploy` (restored by `deno task env:decrypt`,
-   never uploaded); without it, it warns and goes on.
+   post's campaign, the `coverImage` as `main_image`), opening with the TL;DR
+   and, for a post with `relatedTool`, the project's live and repository links.
+   When one of Anton's unpublished Dev.to drafts already has that
+   `canonical_url`, it updates that draft instead of creating a second; one
+   already published is left alone, and a failed lookup creates nothing. It
+   needs `DEVTO_API_KEY`, from the environment or the local `.env.deploy`
+   (restored by `deno task env:decrypt`, never uploaded); without it, it warns
+   and goes on.
 4. Prints the post's tagged link for every channel, and the newsletter's subject
    and body (title, description, TL;DR), whose link is the `email` channel's
    tagged URL.
