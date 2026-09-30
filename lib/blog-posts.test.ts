@@ -109,6 +109,47 @@ Deno.test("a post without a TL;DR of two to four short lines fails naming the fi
   assertEquals(most.tldr.length, 4);
 });
 
+Deno.test("a coverImage is kept when it names a PNG under static/img", () => {
+  const dir = Deno.makeTempDirSync();
+  try {
+    Deno.mkdirSync(`${dir}/img/blog`, { recursive: true });
+    Deno.writeFileSync(`${dir}/img/blog/cover.png`, new Uint8Array([1]));
+    const post = parseBlogArticle(
+      "a-post",
+      variant("readTime: 8", 'readTime: 8\ncoverImage: "/img/blog/cover.png"'),
+      dir,
+    );
+    assertEquals(post.coverImage, "/img/blog/cover.png");
+    assertEquals(parseBlogArticle("a-post", VALID, dir).coverImage, undefined);
+  } finally {
+    Deno.removeSync(dir, { recursive: true });
+  }
+});
+
+Deno.test("a coverImage outside static/img, of another type, or missing fails naming the file", () => {
+  const dir = Deno.makeTempDirSync();
+  try {
+    Deno.mkdirSync(`${dir}/img/blog`, { recursive: true });
+    Deno.writeFileSync(`${dir}/img/blog/cover.webp`, new Uint8Array([1]));
+    Deno.writeFileSync(`${dir}/secret.png`, new Uint8Array([1]));
+    const cases: [string, string][] = [
+      ["https://example.com/cover.png", "must be a /img/... path"],
+      ["/img/../secret.png", "must be a /img/... path"],
+      ["/img/blog/cover.webp", "must be a /img/... path"],
+      ["/img/blog/missing.png", "is not a file under"],
+    ];
+    for (const [path, message] of cases) {
+      const raw = variant("readTime: 8", `readTime: 8\ncoverImage: "${path}"`);
+      const err = assertThrows(() => parseBlogArticle("bad-post", raw, dir));
+      const text = (err as Error).message;
+      assertEquals(text.includes("content/blog/bad-post.md"), true, text);
+      assertEquals(text.includes(message), true, `${message} not in: ${text}`);
+    }
+  } finally {
+    Deno.removeSync(dir, { recursive: true });
+  }
+});
+
 Deno.test("a {proof:<id>} placeholder reads the figure from lib/proof.ts", () => {
   assertEquals(
     fillProof("from {proof:jobs}+ projects"),
