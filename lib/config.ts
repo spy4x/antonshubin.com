@@ -1,4 +1,5 @@
 import { crossOriginPreconnect } from "./preconnect.ts";
+import { COMPANY_LINE } from "./company.ts";
 export const DOMAIN = Deno.env.get("DOMAIN") || "antonshubin.com";
 export const BASE_URL = DOMAIN.startsWith("https://")
   ? DOMAIN
@@ -65,10 +66,10 @@ export const SMTP_USERNAME = Deno.env.get("SMTP_USERNAME") || "";
 export const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
 /**
  * The invoices sentence (#293): the footer, `/contact-me` and `/about` show
- * it, so a change of company is one edit.
+ * it.
  */
 export const INVOICE_NOTE =
-  "Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R), where I'm co-founder and CEO.";
+  `Invoices are issued by ${COMPANY_LINE}, where I'm co-founder and CEO.`;
 
 /** Anton's X handle, confirmed on 27 Sep 2026 (#193). */
 export const X_HANDLE = "@spy4x";

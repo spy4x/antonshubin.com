@@ -10,14 +10,19 @@ import {
   UPWORK_URL,
 } from "../lib/config.ts";
 import {
+  ABOUT_HOBBIES,
   ABOUT_NAME,
   ABOUT_PATH,
+  ABOUT_TRAVEL,
   aboutDescription,
   aboutSteps,
+  paymentSentence,
 } from "../lib/about.ts";
+import { COMPANY } from "../lib/company.ts";
 import { proof } from "../lib/proof.ts";
 import { tool } from "../lib/tools.ts";
 import {
+  aboutTestimonialIds,
   testimonial,
   testimonialProject,
   visibleTestimonials,
@@ -38,12 +43,6 @@ const STORY_POST = "from-office-job-to-freelance-to-my-startups";
 
 /** Anton's vlog channel, from `lib/profiles.ts` next to the work channel. */
 const VLOG_URL = profile("youtube-vlog").href;
-
-/**
- * Two reviews about how Anton treats people and money (psychologist 2), from
- * clients the home page and `/contact-me` don't quote.
- */
-const aboutTestimonialIds = ["gopingu-1", "connectful-2"];
 
 const financy = tool("financy");
 
@@ -131,10 +130,10 @@ export default define.page(function About(ctx) {
                       data-umami-event="about-outbound-neatsoft"
                       class={LINK}
                     >
-                      NeatSoft PTE LTD
+                      {COMPANY.name}
                       <NewTabHint />
                     </a>
-                    , Singapore
+                    , {COMPANY.country}
                   </Fact>
                   <Fact term="Upwork">
                     <WithNote id="upwork-profile" class="note-stack">
@@ -258,8 +257,7 @@ export default define.page(function About(ctx) {
                 Outside work
               </h2>
               <p class="max-w-2xl text-graphite leading-relaxed">
-                Outside work I ride enduro, ski and scuba dive, and some of it
-                ends up on{" "}
+                {ABOUT_HOBBIES}, and some of it ends up on{" "}
                 <a
                   href={VLOG_URL}
                   target="_blank"
@@ -270,8 +268,7 @@ export default define.page(function About(ctx) {
                   my vlog channel
                   <NewTabHint />
                 </a>
-                . I've travelled to more than 25 countries across Asia and
-                Europe, and I live in {LOCATION}.
+                . I've {ABOUT_TRAVEL}, and I live in {LOCATION}.
               </p>
             </section>
 
@@ -280,9 +277,7 @@ export default define.page(function About(ctx) {
                 Paying and contracting
               </h2>
               <p class="max-w-2xl text-graphite leading-relaxed">
-                {INVOICE_NOTE}{" "}
-                You can pay by card through Stripe, by US bank transfer (ACH or
-                Fedwire) or in crypto.{" "}
+                {INVOICE_NOTE} {paymentSentence()}{" "}
                 <a href="/pay" data-umami-event="about-pay" class={LINK}>
                   Payment details
                   <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />

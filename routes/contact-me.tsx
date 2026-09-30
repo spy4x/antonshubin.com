@@ -18,16 +18,15 @@ import { INTRO_CALL } from "../lib/catalog.ts";
 import { originOf } from "../lib/csp.ts";
 import { leadService } from "../lib/lead.ts";
 import { promise } from "../lib/promises.ts";
+import { COMPANY } from "../lib/company.ts";
 import {
+  contactTestimonialId,
   testimonial,
   testimonialProject,
   visibleTestimonials,
 } from "../lib/testimonials.ts";
 import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
 import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
-
-/** The client sentence beside the calendar (#272, Psych 5): not one the home page shows. */
-const QUOTE_ID = "roley-2";
 
 /** The call, capitalised for a heading: "Book a free 30-minute intro call". */
 const BOOK_HEADING = `Book a ${INTRO_CALL}`;
@@ -51,13 +50,13 @@ export default define.page(function ContactMe(ctx) {
       ? "Contact Anton Shubin: book a free 30-minute call"
       : "Contact Anton Shubin",
     description: booking
-      ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via NeatSoft PTE LTD, Singapore.`
-      : "Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via NeatSoft PTE LTD, Singapore.",
+      ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`
+      : `Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`,
     canonical: "https://antonshubin.com/contact-me",
     ogType: "website",
     pageName: "Contact",
   };
-  const quote = visibleTestimonials([testimonial(QUOTE_ID)])[0];
+  const quote = visibleTestimonials([testimonial(contactTestimonialId)])[0];
   const schedulerOrigin = originOf(SCHEDULE_URL);
   // What follows the call, in the promises' own words (#272, Psych 4): a
   // small first milestone either side can stop after, and the work is yours.

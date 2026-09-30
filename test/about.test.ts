@@ -6,6 +6,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
 import { ABOUT_NAME, aboutSteps } from "../lib/about.ts";
+import { bannedWordsIn, moneyAmountIn } from "./about-words.ts";
 
 const PERSON = { "@id": "https://antonshubin.com/#person" };
 
@@ -168,5 +169,33 @@ siteTest(
       post.includes('href="/about"'),
       "the 2022 post does not link /about",
     );
+  },
+);
+
+siteTest("/about shows two client review cards", async (site) => {
+  const html = await site.html("/about");
+  const start = html.indexOf('aria-labelledby="about-reviews"');
+  assert(start > -1, "/about has no reviews section");
+  const section = html.slice(start, html.indexOf("</section>", start));
+  assertEquals(count(section, /<figure[\s>]/g), 2);
+});
+
+siteTest("/llms-full.txt carries the About career story", async (site) => {
+  const txt = await site.html("/llms-full.txt");
+  assert(
+    txt.includes(aboutSteps[0].text),
+    "/llms-full.txt lacks the first About step",
+  );
+});
+
+siteTest(
+  "/about's visible text names no income, loan, 80/20 split, exit goal or money amount",
+  async (site) => {
+    const html = await site.html("/about");
+    const start = html.indexOf('id="main-content"');
+    assert(start > -1, "/about has no main content");
+    const text = visibleText(html.slice(start, html.indexOf("</main>", start)));
+    assertEquals(bannedWordsIn(text), []);
+    assertEquals(moneyAmountIn(text), undefined);
   },
 );
