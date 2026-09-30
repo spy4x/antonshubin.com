@@ -76,10 +76,30 @@ Deno.test("the /pay copy button still copies through the textarea fallback when 
 
 Deno.test("the /pay copy button says Copy failed, not Copied!, when nothing could be copied", async () => {
   await withPage("fails", "/pay", async (page) => {
-    const button = page.getByRole("button").filter({ hasText: /Copy/ }).first();
-    await button.click();
-    await page.getByText("Copy failed").first().waitFor({ timeout: 5000 });
+    await page.getByRole("button", { name: "Copy EVM address" }).click();
+    const failed = page.getByRole("button", { name: "Copy failed" });
+    await failed.waitFor({ timeout: 5000 });
     assertEquals(await page.getByText("Copied!").count(), 0);
+    // The failure reads in the error colour, resolved live so a token edit can't desync the check.
+    // Polled, because the button's colour transition takes a moment to settle.
+    const probe = await page.evaluate(() => {
+      const span = document.createElement("span");
+      span.className = "text-brick";
+      document.body.append(span);
+      const color = getComputedStyle(span).color;
+      span.remove();
+      return color;
+    });
+    const settled = await page.waitForFunction(
+      (brick) =>
+        [...document.querySelectorAll("button")].some((b) =>
+          b.textContent?.trim() === "Copy failed" &&
+          getComputedStyle(b).color === brick
+        ),
+      probe,
+      { timeout: 2000 },
+    ).then(() => true, () => false);
+    assert(settled, "Copy failed is not in the error colour");
   });
 });
 

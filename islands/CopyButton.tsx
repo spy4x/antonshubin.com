@@ -38,8 +38,12 @@ export default function CopyButton(
     }, 10000);
   };
 
+  // One colour class at a time: a failure reads in Brick (error), everything else in Sage.
+  const colorClass = failed.value
+    ? "text-brick hover:text-brick"
+    : "text-sage hover:text-sage";
   const baseClass =
-    "inline-flex items-center min-h-6 gap-1 text-xs text-sage hover:text-sage transition-colors";
+    `inline-flex items-center min-h-6 gap-1 text-xs ${colorClass} transition-colors`;
 
   return (
     <button
