@@ -27,7 +27,7 @@ function repeatsJob(tool: Tool): boolean {
 function Credit({ tool }: { tool: Tool }) {
   if (!tool.credit) return null;
   return (
-    <p data-credit class="mt-2 text-sm text-parchment">
+    <p data-credit class="relative z-10 mt-2 text-sm text-parchment">
       {tool.credit.text} {tool.credit.links.map((l, i) => (
         <span key={l.href}>
           {i > 0 && " · "}
@@ -44,7 +44,8 @@ function Credit({ tool }: { tool: Tool }) {
  * Tools group, `wide` for a product with its first summary sentence,
  * `compact` for one line of a paused or archived project, `more` for the
  * strip at the foot of a tool page. Never shows an install command: that
- * lives on the tool's page.
+ * lives on the tool's page. The name's link is stretched over the card or row
+ * (#336); the credit's links and the CI pill sit above it.
  */
 export function ToolCard(
   { tool, live, variant }: {
@@ -61,7 +62,7 @@ export function ToolCard(
     <a
       href={`/tools/${tool.slug}`}
       {...eventAttrs("cta", { place: "body", target: `/tools/${tool.slug}` })}
-      class="hover:text-accent underline-offset-4 hover:underline"
+      class="hover:text-accent underline-offset-4 hover:underline after:absolute after:inset-0 after:rounded-xl"
     >
       {tool.name}
     </a>
@@ -70,7 +71,7 @@ export function ToolCard(
     return (
       <li
         data-tool={tool.slug}
-        class="py-3 border-t border-rule first:border-t-0 flex flex-wrap items-baseline gap-x-4 gap-y-1"
+        class="relative py-3 border-t border-rule first:border-t-0 flex flex-wrap items-baseline gap-x-4 gap-y-1"
       >
         <span class="text-parchment">{title}</span>
         <span class="text-graphite">{tool.job}.</span>
@@ -81,7 +82,7 @@ export function ToolCard(
   return (
     <li
       data-tool={tool.slug}
-      class={`bg-paper border border-rule rounded-xl p-5 ${
+      class={`relative bg-paper border border-rule rounded-xl p-5 transition-colors hover:border-rule-strong focus-within:border-rule-strong ${
         variant === "wide" ? "sm:p-6" : ""
       }`}
     >

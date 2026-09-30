@@ -256,6 +256,8 @@ function HighlightCard(
  * One archive row, a dated list entry (UX 7 on #270): the period in its own
  * column from 768px, the name as the row's link, the facts line, one
  * sentence, the first review's excerpt and the company's later outcome.
+ * The name's link is stretched over the row (#336); the excerpt's and the
+ * outcome's own links sit above it.
  */
 function ArchiveRow(
   { entry, hiredAgain }: { entry: ArchiveEntry; hiredAgain: boolean },
@@ -264,7 +266,7 @@ function ArchiveRow(
   return (
     <li
       data-archive-row={project.slug}
-      class="py-5 border-t border-rule first:border-t-0 md:grid md:grid-cols-[8rem_minmax(0,1fr)] md:gap-6"
+      class="relative py-5 border-t border-rule first:border-t-0 md:grid md:grid-cols-[8rem_minmax(0,1fr)] md:gap-6"
     >
       <p class="text-sm text-graphite mb-1 md:mb-0 md:pt-1">
         {project.period && (
@@ -282,7 +284,7 @@ function ArchiveRow(
               place: "body",
               target: workHref(project.slug ?? ""),
             })}
-            class={TITLE_LINK}
+            class={`${TITLE_LINK} after:absolute after:inset-0`}
           >
             {project.title}
           </a>
@@ -298,11 +300,14 @@ function ArchiveRow(
             project={project}
             excerpt={review.excerpt}
             href={review.sourceHref}
-            class="mt-3"
+            class="relative z-10 mt-3"
           />
         )}
         {project.companyOutcome && (
-          <p data-company-outcome class="mt-3 text-sm text-graphite">
+          <p
+            data-company-outcome
+            class="relative z-10 mt-3 text-sm text-graphite"
+          >
             The company:{" "}
             <a
               href={project.companyOutcome.href}
