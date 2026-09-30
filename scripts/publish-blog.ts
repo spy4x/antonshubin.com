@@ -9,7 +9,7 @@
  *   deno task publish:blog <slug> --send-newsletter   # only after Anton says yes in chat
  *
  * Both runs first check that `https://antonshubin.com/blog/<slug>` answers
- * 200 and stop otherwise. The default run creates the Dev.to draft, prints
+ * 200 and stop otherwise. The default run creates or updates the Dev.to draft, prints
  * every channel's tagged link and the newsletter's subject and body, and sends
  * nothing. `--send-newsletter` sends the announcement from the production
  * container over SSH, where `scripts/send-newsletter.ts --stdin-json` refuses
@@ -139,6 +139,7 @@ export interface PublishDeps {
     slug: string,
     body: string,
     campaign: string,
+    coverImage?: string,
   ) => Promise<void>;
   /** Runs `command` on the server with `stdin`; resolves to its exit code. */
   runRemote: (command: string, stdin: string) => Promise<number>;
@@ -210,6 +211,7 @@ export async function publishBlog(
     args.slug,
     `${devToOpening(post.article)}\n\n${post.body}`,
     post.campaign,
+    post.article.coverImage,
   );
 
   deps.log(`\nTagged links (campaign ${post.campaign}):`);

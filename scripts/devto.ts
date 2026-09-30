@@ -1,6 +1,7 @@
 /**
  * Dev.to draft creation, used by `scripts/publish-blog.ts` after a post is
- * published on antonshubin.com.
+ * published on antonshubin.com. A second run updates the draft the first one
+ * made instead of adding another (see {@linkcode createDevToDraft}).
  *
  * Non-critical: a missing `DEVTO_API_KEY` or a failed request only warns —
  * it never throws, so the blog publish it rides along with always succeeds
@@ -63,8 +64,13 @@ export interface DevToArticlePayload {
     body_markdown: string;
     published: boolean;
     canonical_url: string;
+    /** The cover Dev.to shows above the post (1000×420), a full URL. */
+    main_image?: string;
   };
 }
+
+/** The Dev.to API, hardcoded like {@linkcode DEVTO_BASE_URL}. */
+const DEVTO_API = "https://dev.to/api";
 
 /** A fence delimiter line (``` or ~~~), parsed but not yet compared to any open fence. */
 interface FenceDelimiter {
@@ -212,15 +218,18 @@ export function absolutizeImageUrls(markdown: string): string {
  * URL that isn't the one search engines should treat as the source. The
  * body ends with {@linkcode firstPublishedLine}, whose link does carry the
  * `devto` channel's tags and `campaign` (the article's, see `docs/utm.md`).
+ * `coverImage`, the post's front matter site path, becomes `main_image` on
+ * the production origin.
  */
 export function buildDevToPayload(
   title: string,
   slug: string,
   bodyMarkdown: string,
   campaign: string = slug,
+  coverImage?: string,
 ): DevToArticlePayload {
   const tagged = channelUrl(DEVTO_BASE_URL, `/blog/${slug}`, "devto", campaign);
-  return {
+  const payload: DevToArticlePayload = {
     article: {
       title,
       body_markdown: `${absolutizeImageUrls(bodyMarkdown)}\n\n---\n\n${
@@ -230,6 +239,39 @@ export function buildDevToPayload(
       canonical_url: `${DEVTO_BASE_URL}/blog/${slug}`,
     },
   };
+  if (coverImage) payload.article.main_image = `${DEVTO_BASE_URL}${coverImage}`;
+  return payload;
+}
+
+/** The fields of one of my Dev.to articles that the lookup below reads. */
+interface MyDevToArticle {
+  id: number;
+  canonical_url: string | null;
+  published: boolean;
+}
+
+/**
+ * Finds my Dev.to article whose `canonical_url` is `canonical`, published or
+ * not, among the newest 1000 (`/articles/me/all`, one page). Throws when the
+ * request fails or the answer is not a list, so the caller never mistakes a
+ * failed lookup for "no draft yet" and makes a second one.
+ */
+async function findMyArticle(
+  apiKey: string,
+  canonical: string,
+): Promise<MyDevToArticle | undefined> {
+  const res = await fetch(`${DEVTO_API}/articles/me/all?per_page=1000`, {
+    headers: { "api-key": apiKey, accept: "application/json" },
+  });
+  if (!res.ok) {
+    await res.body?.cancel();
+    throw new Error(`listing my articles: ${res.status} ${res.statusText}`);
+  }
+  const list = await res.json();
+  if (!Array.isArray(list)) {
+    throw new Error("listing my articles: the answer is not a list");
+  }
+  return (list as MyDevToArticle[]).find((a) => a.canonical_url === canonical);
 }
 
 /**
@@ -250,14 +292,22 @@ export function devToApiKey(
 }
 
 /**
- * Creates a Dev.to draft for the post. Fails open: logs a warning and
- * returns normally when `DEVTO_API_KEY` is unset or the request fails.
+ * Creates the post's Dev.to draft, or updates the unpublished draft that
+ * already has its `canonical_url` (`PUT /articles/{id}`), so running
+ * `publish:blog` twice never leaves two drafts. An article with that
+ * `canonical_url` that is already published is left alone: Anton published
+ * it himself, and a draft run must not rewrite a live post.
+ *
+ * Fails open: logs a warning and returns normally when `DEVTO_API_KEY` is
+ * unset or a request fails. A failed lookup creates nothing, since creating
+ * then could be the duplicate this function exists to prevent.
  */
 export async function createDevToDraft(
   title: string,
   slug: string,
   bodyMarkdown: string,
   campaign: string = slug,
+  coverImage?: string,
   apiKey: string | undefined = devToApiKey(),
 ): Promise<void> {
   if (!apiKey) {
@@ -265,18 +315,40 @@ export async function createDevToDraft(
     return;
   }
   try {
-    const res = await fetch("https://dev.to/api/articles", {
-      method: "POST",
-      headers: {
-        "api-key": apiKey,
-        "content-type": "application/json",
+    const payload = buildDevToPayload(
+      title,
+      slug,
+      bodyMarkdown,
+      campaign,
+      coverImage,
+    );
+    const existing = await findMyArticle(apiKey, payload.article.canonical_url);
+    if (existing?.published) {
+      console.warn(
+        `  ⚠ Dev.to already has this post published (id ${existing.id}) — left it alone`,
+      );
+      return;
+    }
+    const res = await fetch(
+      existing
+        ? `${DEVTO_API}/articles/${existing.id}`
+        : `${DEVTO_API}/articles`,
+      {
+        method: existing ? "PUT" : "POST",
+        headers: {
+          "api-key": apiKey,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(
-        buildDevToPayload(title, slug, bodyMarkdown, campaign),
-      ),
-    });
+    );
+    await res.body?.cancel();
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    console.log("  ✓ Dev.to draft created");
+    console.log(
+      existing
+        ? `  ✓ Dev.to draft updated (id ${existing.id})`
+        : "  ✓ Dev.to draft created",
+    );
   } catch (err) {
     console.warn(`  ⚠ Dev.to draft failed: ${(err as Error).message}`);
   }

@@ -10,6 +10,45 @@ import {
 import { type BlogArticle, blogArticles } from "@/lib/data.ts";
 import { findTool, repoUrl } from "@/lib/tools.ts";
 
+/** One request the stubbed Dev.to API received. */
+interface DevToCall {
+  method: string;
+  url: string;
+  body?: DevToArticlePayload;
+  apiKey: string | null;
+}
+
+/**
+ * Replaces `fetch` with a fake Dev.to API whose `/articles/me/all` answers
+ * `mine` (or `listStatus` with no list), and records every request. Returns
+ * the calls and a `restore()` for `finally`.
+ */
+function stubDevTo(
+  mine: unknown = [],
+  listStatus = 200,
+): { calls: DevToCall[]; restore: () => void } {
+  const originalFetch = globalThis.fetch;
+  const calls: DevToCall[] = [];
+  globalThis.fetch = ((url: string, init?: RequestInit) => {
+    const method = init?.method ?? "GET";
+    calls.push({
+      method,
+      url,
+      body: init?.body ? JSON.parse(String(init.body)) : undefined,
+      apiKey: new Headers(init?.headers).get("api-key"),
+    });
+    if (method === "GET") {
+      return Promise.resolve(
+        listStatus === 200
+          ? Response.json(mine)
+          : new Response("nope", { status: listStatus }),
+      );
+    }
+    return Promise.resolve(new Response("{}", { status: 201 }));
+  }) as typeof fetch;
+  return { calls, restore: () => globalThis.fetch = originalFetch };
+}
+
 const FOOTER_START = "\n\n---\n\n_First published on ";
 
 /** The post body as sent, without the "First published" footer. */
@@ -291,46 +330,41 @@ Deno.test("absolutizeImageUrls skips only the malformed image and still rewrites
 });
 
 Deno.test("createDevToDraft skips the network call and does not throw when DEVTO_API_KEY is unset", async () => {
-  const originalFetch = globalThis.fetch;
-  let calls = 0;
-  globalThis.fetch = (() => {
-    calls++;
-    return Promise.reject(new Error("fetch should not have been called"));
-  }) as typeof fetch;
+  const stub = stubDevTo();
   try {
     // An empty key stands for "none in the environment or .env.deploy".
-    await createDevToDraft("title", "slug", "body", "slug", "");
-    assertEquals(calls, 0);
+    await createDevToDraft("title", "slug", "body", "slug", undefined, "");
+    assertEquals(stub.calls.length, 0);
   } finally {
-    globalThis.fetch = originalFetch;
+    stub.restore();
   }
 });
 
 Deno.test("createDevToDraft warns instead of throwing when the request fails", async () => {
-  Deno.env.set("DEVTO_API_KEY", "test-key");
   const originalFetch = globalThis.fetch;
   globalThis.fetch =
     (() =>
       Promise.resolve(new Response("nope", { status: 500 }))) as typeof fetch;
   try {
     // Must resolve, not reject — a failed Dev.to draft never blocks a publish.
-    await createDevToDraft("title", "slug", "body");
+    await createDevToDraft("title", "slug", "body", "slug", undefined, "k");
   } finally {
     globalThis.fetch = originalFetch;
-    Deno.env.delete("DEVTO_API_KEY");
   }
 });
 
 Deno.test("createDevToDraft sends the article's campaign in the First published link", async () => {
-  Deno.env.set("DEVTO_API_KEY", "test-key");
-  const originalFetch = globalThis.fetch;
-  let sent: DevToArticlePayload | undefined;
-  globalThis.fetch = ((_url: string, init?: RequestInit) => {
-    sent = JSON.parse(String(init?.body));
-    return Promise.resolve(new Response("{}", { status: 201 }));
-  }) as typeof fetch;
+  const stub = stubDevTo();
   try {
-    await createDevToDraft("title", "some-post", "body", "some-campaign");
+    await createDevToDraft(
+      "title",
+      "some-post",
+      "body",
+      "some-campaign",
+      undefined,
+      "test-key",
+    );
+    const sent = stub.calls.find((c) => c.method === "POST")?.body;
     assertEquals(
       sent !== undefined &&
         lastLine(sent).includes("utm_campaign=some-campaign)"),
@@ -341,9 +375,123 @@ Deno.test("createDevToDraft sends the article's campaign in the First published 
       "https://antonshubin.com/blog/some-post",
     );
   } finally {
-    globalThis.fetch = originalFetch;
-    Deno.env.delete("DEVTO_API_KEY");
+    stub.restore();
   }
+});
+
+Deno.test("createDevToDraft creates a new draft when none of mine has the post's canonical url", async () => {
+  const stub = stubDevTo([
+    {
+      id: 7,
+      canonical_url: "https://antonshubin.com/blog/other-post",
+      published: false,
+    },
+    { id: 8, canonical_url: null, published: false },
+  ]);
+  try {
+    await createDevToDraft("title", "a-post", "body", "a-post", undefined, "k");
+    assertEquals(stub.calls.map((c) => `${c.method} ${c.url}`), [
+      "GET https://dev.to/api/articles/me/all?per_page=1000",
+      "POST https://dev.to/api/articles",
+    ]);
+    assertEquals(stub.calls.every((c) => c.apiKey === "k"), true);
+  } finally {
+    stub.restore();
+  }
+});
+
+Deno.test("createDevToDraft updates the unpublished draft with the same canonical url instead of making a second", async () => {
+  const stub = stubDevTo([
+    {
+      id: 7,
+      canonical_url: "https://antonshubin.com/blog/other-post",
+      published: false,
+    },
+    {
+      id: 42,
+      canonical_url: "https://antonshubin.com/blog/a-post",
+      published: false,
+    },
+  ]);
+  try {
+    await createDevToDraft(
+      "New title",
+      "a-post",
+      "body",
+      "a-post",
+      undefined,
+      "k",
+    );
+    assertEquals(stub.calls.map((c) => `${c.method} ${c.url}`), [
+      "GET https://dev.to/api/articles/me/all?per_page=1000",
+      "PUT https://dev.to/api/articles/42",
+    ]);
+    assertEquals(stub.calls[1].body?.article.title, "New title");
+    assertEquals(stub.calls[1].body?.article.published, false);
+  } finally {
+    stub.restore();
+  }
+});
+
+Deno.test("createDevToDraft leaves a post already published on Dev.to alone", async () => {
+  const stub = stubDevTo([
+    {
+      id: 42,
+      canonical_url: "https://antonshubin.com/blog/a-post",
+      published: true,
+    },
+  ]);
+  try {
+    await createDevToDraft("title", "a-post", "body", "a-post", undefined, "k");
+    assertEquals(stub.calls.map((c) => c.method), ["GET"]);
+  } finally {
+    stub.restore();
+  }
+});
+
+Deno.test("createDevToDraft creates nothing when it cannot list my articles", async () => {
+  const answers: [unknown, number][] = [[[], 500], [{ error: "odd" }, 200]];
+  for (const [mine, status] of answers) {
+    const stub = stubDevTo(mine, status);
+    try {
+      await createDevToDraft(
+        "title",
+        "a-post",
+        "body",
+        "a-post",
+        undefined,
+        "k",
+      );
+      assertEquals(stub.calls.map((c) => c.method), ["GET"], String(status));
+    } finally {
+      stub.restore();
+    }
+  }
+});
+
+Deno.test("createDevToDraft sends the post's cover as an absolute main_image", async () => {
+  const stub = stubDevTo();
+  try {
+    await createDevToDraft(
+      "title",
+      "a-post",
+      "body",
+      "a-post",
+      "/img/blog/a-post/cover.png",
+      "k",
+    );
+    assertEquals(
+      stub.calls[1].body?.article.main_image,
+      "https://antonshubin.com/img/blog/a-post/cover.png",
+    );
+  } finally {
+    stub.restore();
+  }
+});
+
+Deno.test("buildDevToPayload sends no main_image for a post without a cover", () => {
+  const payload = buildDevToPayload("title", "a-post", "body");
+  assertEquals("main_image" in payload.article, false);
 });
 
 Deno.test("devToApiKey reads the key from .env.deploy when the environment has none", () => {
@@ -372,22 +520,17 @@ Deno.test("devToApiKey reads the key from .env.deploy when the environment has n
 Deno.test("createDevToDraft sends the key from .env.deploy when the environment has none", async () => {
   const previous = Deno.env.get("DEVTO_API_KEY");
   Deno.env.delete("DEVTO_API_KEY");
-  const originalFetch = globalThis.fetch;
   const originalCwd = Deno.cwd();
   const dir = await Deno.makeTempDir();
-  let sentKey: string | null = null;
-  globalThis.fetch = ((_url: string, init?: RequestInit) => {
-    sentKey = new Headers(init?.headers).get("api-key");
-    return Promise.resolve(new Response("{}", { status: 201 }));
-  }) as typeof fetch;
+  const stub = stubDevTo();
   try {
     await Deno.writeTextFile(`${dir}/.env.deploy`, "DEVTO_API_KEY=dummy-key\n");
     Deno.chdir(dir);
     await createDevToDraft("title", "slug", "body");
-    assertEquals(sentKey, "dummy-key");
+    assertEquals(stub.calls.map((c) => c.apiKey), ["dummy-key", "dummy-key"]);
   } finally {
     Deno.chdir(originalCwd);
-    globalThis.fetch = originalFetch;
+    stub.restore();
     await Deno.remove(dir, { recursive: true });
     if (previous !== undefined) Deno.env.set("DEVTO_API_KEY", previous);
   }

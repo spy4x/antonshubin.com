@@ -34,7 +34,13 @@ interface Recorder {
   deps: PublishDeps;
   fetched: string[];
   inits: (RequestInit | undefined)[];
-  drafts: { title: string; slug: string; body: string; campaign: string }[];
+  drafts: {
+    title: string;
+    slug: string;
+    body: string;
+    campaign: string;
+    coverImage?: string;
+  }[];
   remote: { command: string; stdin: string }[];
   out: string[];
   err: string[];
@@ -69,8 +75,8 @@ function fakes(
       }
       return Promise.resolve(new Response("page", { status }));
     }) as typeof fetch,
-    createDraft: (title, slug, body, campaign) => {
-      r.drafts.push({ title, slug, body, campaign });
+    createDraft: (title, slug, body, campaign, coverImage) => {
+      r.drafts.push({ title, slug, body, campaign, coverImage });
       return Promise.resolve();
     },
     runRemote: (command, stdin) => {
@@ -133,6 +139,7 @@ Deno.test("a live post without --send-newsletter creates the draft and sends not
     slug: "a-test-post",
     body: "**TL;DR**\n\n- One point.\n- Another point.\n\nBody text.",
     campaign: "a-campaign",
+    coverImage: undefined,
   }]);
   assertStringIncludes(
     r.out.join("\n"),
@@ -191,6 +198,16 @@ Deno.test("the Dev.to draft body starts with the TL;DR, then the project's links
     tldr > 0 && tldr < links && links < body.indexOf("Body text."),
     true,
   );
+});
+
+Deno.test("the Dev.to draft gets the post's coverImage", async () => {
+  const post: Post = {
+    ...POST,
+    article: { ...ARTICLE, coverImage: "/img/blog/a-test-post/cover.png" },
+  };
+  const r = fakes({ readPost: () => Promise.resolve(post) });
+  await publishBlog(DEFAULT_RUN, r.deps);
+  assertEquals(r.drafts[0].coverImage, "/img/blog/a-test-post/cover.png");
 });
 
 Deno.test("the newsletter body links to the post only through the email channel's tagged url", async () => {
