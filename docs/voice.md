@@ -39,7 +39,7 @@ real", "Why Drone CI is cool".
 
 Every post starts with one (Anton, 30 September 2026: he is annoyed by articles
 without one). It is the front matter's `tldr` list, and the page shows it under
-the title before anything else (docs/publishing.md, step 1).
+the header, as the first block of the post body (docs/publishing.md, step 3).
 
 - Two to four lines. Each is one plain claim a skimming reader can act on or
   remember: the result, the decision, the rule, the catch.
@@ -51,8 +51,9 @@ the title before anything else (docs/publishing.md, step 1).
   per line" beats "I compared four models and the results surprised me".
 - When an update note opens the post, the first line says what the update
   changed, starting "Update:", and the rest says what still holds.
-- Links, the tool's name or the repository don't go in it: a post about a
-  project already opens with those links, from `relatedTool`.
+- Name the tool when the post is about one ("mig is a meeting scheduler…"), but
+  put no links or repository in it: a post about a project already opens with
+  those links, from `relatedTool`.
 
 ## How a post opens
 
