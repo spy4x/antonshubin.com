@@ -6,7 +6,7 @@ Never write a tagged URL by hand: print it with `deno task links`, or let the
 kits (`launch-kit`, `video-kit`, `publish:blog`) build it.
 
 ```
-deno task links <path> [--campaign <name>] [--content <name>]
+deno task links <path> [--campaign <name>] [--content <name>] [--now <ISO time with offset>]
 ```
 
 It prints one tagged URL per channel in the table below, for the page at
@@ -61,7 +61,7 @@ audience, not measurements; revise them once Umami shows per-channel data.
 | `hn`       | `social`  | Hacker News post or comment | Tue–Thu 13:00–16:00 UTC | US morning, when the front page turns over most                       |
 | `devto`    | `blog`    | Dev.to cross-post           | Tue–Thu 13:00–16:00 UTC | Readers arrive on weekday afternoons in Europe and mornings in the US |
 | `youtube`  | `video`   | YouTube video description   | Thu–Sat 15:00–18:00 UTC | Viewers settle in ahead of the weekend                                |
-| `telegram` | `social`  | Telegram channel post       | Any day 16:00–19:00 UTC | Evening in Moscow, where most of the channel lives                    |
+| `telegram` | `social`  | Telegram channel post       | Any day 16:00–19:00 UTC | Evening in Moscow                                                     |
 | `github`   | `oss`     | README or release notes     |                         |                                                                       |
 | `upwork`   | `dm`      | Upwork proposal or chat     |                         |                                                                       |
 | `email`    | `email`   | Email signature or message  |                         |                                                                       |

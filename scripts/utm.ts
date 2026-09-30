@@ -119,7 +119,7 @@ export const CHANNELS: readonly Channel[] = [
       days: EVERY_DAY,
       from: 16,
       to: 19,
-      why: "Evening in Moscow, where most of the channel lives",
+      why: "Evening in Moscow",
     },
   },
   { source: "github", medium: "oss", label: "README or release notes" },
