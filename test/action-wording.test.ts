@@ -40,6 +40,8 @@ const EXCEPTIONS: Record<string, string> = {
     "a payment question, not a booking; it links the page that lists email and Telegram",
   "/tools/mig | Open the booking page":
     "mig's running instance, the tool page's live link",
+  "/blog/mig-tiny-self-hosted-scheduler | Open the booking page":
+    "mig's running instance, the post's live link read from lib/tools.ts",
   "/tools/mig | The booking page on this site":
     "mig's running instance, in the tool's link list",
   "/blog/cost-optimization-laboratory | free architecture audit":
