@@ -10,6 +10,10 @@
  * `WWW_DOMAIN` is pinned to the staging host itself, not `www.<staging host>`:
  * that name has no DNS record, Traefik would request a certificate for it, and
  * Let's Encrypt would fail the whole order, leaving staging with none.
+ *
+ * `UMAMI_ID` is blanked (#318): with production's id, staging's visits and
+ * test bookings were counted in the production website's numbers. With it
+ * empty, `routes/_app.tsx` renders no tracker at all.
  */
 export function stagingEnv(prodEnv: string, stagingHost: string): string {
   const prodDomain = prodEnv.match(/^DOMAIN=(.*)$/m)?.[1]?.trim();
@@ -28,7 +32,10 @@ export function stagingEnv(prodEnv: string, stagingHost: string): string {
   }
   // Anchor both replacements: an unanchored /DOMAIN=.*/ also matches the tail
   // of WWW_DOMAIN=.
-  return resolved
+  const withHosts = resolved
     .replace(/^DOMAIN=.*$/m, `DOMAIN=${stagingHost}`)
-    .replace(/^WWW_DOMAIN=.*$/m, `WWW_DOMAIN=${stagingHost}`);
+    .replace(/^WWW_DOMAIN=.*$/m, `WWW_DOMAIN=${stagingHost}`)
+    .replace(/^(?:export\s+)?UMAMI_ID=.*(?:\n|$)/gm, "");
+  const ending = withHosts === "" || withHosts.endsWith("\n") ? "" : "\n";
+  return `${withHosts}${ending}UMAMI_ID=\n`;
 }

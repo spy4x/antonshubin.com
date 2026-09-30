@@ -9,6 +9,8 @@ const PROD = [
   "SMTP_HOST=mail.${DOMAIN}",
   "SMTP_FROM=owner@${DOMAIN}",
   "SMTP_USERNAME=owner@${DOMAIN}",
+  "UMAMI_URL=https://stats.example.com/script.js",
+  "UMAMI_ID=prod-website-id",
   "",
 ].join("\n");
 
@@ -81,4 +83,14 @@ Deno.test("refuses a DOMAIN that is not a bare host name", () => {
     Error,
     "bare host name",
   );
+});
+
+Deno.test("blanks the analytics website id so staging reports nothing", () => {
+  const env = stagingEnv(PROD, "stag.example.com");
+  assertEquals(env.match(/^(?:export\s+)?UMAMI_ID=.*$/gm), ["UMAMI_ID="]);
+  const exported = stagingEnv(
+    "DOMAIN=example.com\nexport UMAMI_ID=prod-website-id",
+    "stag.example.com",
+  );
+  assertEquals(exported, "DOMAIN=stag.example.com\nUMAMI_ID=\n");
 });

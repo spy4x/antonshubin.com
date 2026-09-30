@@ -3,6 +3,7 @@ import { UMAMI_ID, UMAMI_PRECONNECT_ORIGIN, UMAMI_URL } from "../lib/config.ts";
 import SWUpdater from "../islands/SWUpdater.tsx";
 import { resetHead } from "../lib/head.ts";
 import { isBot } from "../lib/bots.ts";
+import { analyticsAllowed } from "../lib/analytics.ts";
 
 export default define.page(function App({ Component, req }) {
   resetHead();
@@ -10,6 +11,9 @@ export default define.page(function App({ Component, req }) {
   // Known bots (issue #179) get no analytics script: deciding here, before
   // anything renders, means no regex rewriting the response body afterward.
   const isCrawler = isBot(req.headers.get("user-agent") || "");
+  // `/unsubscribe` and `/pay` never load it either (#318): Umami stores each
+  // page view's full URL, and the unsubscribe link's token is a credential.
+  const tracked = !isCrawler && analyticsAllowed(new URL(req.url).pathname);
 
   return (
     <html lang="en" class="h-full bg-ink">
@@ -75,8 +79,8 @@ export default define.page(function App({ Component, req }) {
           href="https://antonshubin.com/rss.xml"
         />
 
-        {/* Analytics — skipped for known bots, see isCrawler above */}
-        {UMAMI_URL && UMAMI_ID && !isCrawler && (
+        {/* Analytics — skipped for known bots and untracked pages, see above */}
+        {UMAMI_URL && UMAMI_ID && tracked && (
           <>
             {UMAMI_PRECONNECT_ORIGIN && (
               <>
