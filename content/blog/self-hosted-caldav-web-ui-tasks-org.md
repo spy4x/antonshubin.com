@@ -22,9 +22,6 @@ data. After a year of reaching for my phone to edit a todo at my desk, I built
 one. Here is the gap I noticed in the self-hosted ecosystem, and how I closed it
 without breaking the standards-first contract most of us signed up for.
 
-The result is open source at
-[github.com/spy4x/caldav-tasks-web](https://github.com/spy4x/caldav-tasks-web).
-
 ## The gap in the stack
 
 Tasks.org is the strongest Android task manager and it syncs to CalDAV. The data

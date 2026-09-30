@@ -7,6 +7,7 @@ import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
 import { blogArticles } from "../lib/data.ts";
 import { TOC_MIN_MINUTES } from "../lib/blog.ts";
+import { findTool } from "../lib/tools.ts";
 
 const SITE = "https://antonshubin.com";
 
@@ -268,19 +269,42 @@ siteTest(
 );
 
 siteTest(
-  "a post about a tool links its repository under the byline",
+  "every post about a tool shows its live link and repository above the TL;DR, and no other post has the row",
   async (site) => {
-    const html = await site.html("/blog/building-mcp-servers-with-deno");
-    const code = block(html, "data-code-link", "p");
-    assert(
-      code.includes('href="https://github.com/spy4x/caldav-mcp"'),
-      `no repository link: ${code}`,
-    );
-    const without = await site.html("/blog/opus-5-5-vs-sonnet-5-agent-costs");
-    assert(
-      !without.includes("data-code-link"),
-      "a post without a tool has one",
-    );
+    let lives = 0;
+    let repos = 0;
+    for (const article of blogArticles) {
+      const html = await site.html(`/blog/${article.slug}`);
+      if (!article.relatedTool) {
+        assert(
+          !html.includes("data-code-link"),
+          `${article.slug} has a project row without a project`,
+        );
+        continue;
+      }
+      const tool = findTool(article.relatedTool)!;
+      const row = block(html, "data-code-link", "p");
+      assert(
+        row && html.indexOf("data-code-link") < html.indexOf('id="tldr"'),
+        `${article.slug}: no project row above the TL;DR`,
+      );
+      assert(row.includes(`href="/tools/${tool.slug}"`), row);
+      if (tool.live) {
+        lives++;
+        assert(
+          row.includes(`href="${tool.live.href}"`),
+          `${article.slug}: no live link in ${row}`,
+        );
+      }
+      if (tool.repo) {
+        repos++;
+        assert(
+          row.includes(`href="https://github.com/${tool.repo}"`),
+          `${article.slug}: no repository link in ${row}`,
+        );
+      }
+    }
+    assert(lives > 0 && repos > 0, "no post's tool has a live link or a repo");
   },
 );
 

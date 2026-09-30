@@ -321,6 +321,9 @@ export default define.page(function BlogPost(ctx) {
               </p>
             )}
             {tool && (
+              // The project's links, read from lib/tools.ts, never written in
+              // the post's Markdown: its page, its running instance or demo,
+              // and its repository (Anton, 30 September 2026).
               <p data-code-link class="mt-3 text-sm text-graphite">
                 The tool:{" "}
                 <a
@@ -330,12 +333,32 @@ export default define.page(function BlogPost(ctx) {
                 >
                   {tool.name}
                 </a>
+                {tool.live && (
+                  <>
+                    <span aria-hidden="true" class="mx-1">·</span>
+                    <a
+                      data-live-link
+                      href={tool.live.href}
+                      {...eventAttrs("outbound", {
+                        to: "live",
+                        item: tool.slug,
+                      })}
+                      class="text-parchment underline underline-offset-4 hover:text-graphite"
+                    >
+                      {tool.live.label}
+                    </a>
+                  </>
+                )}
                 {tool.repoUrl && (
                   <>
                     <span aria-hidden="true" class="mx-1">·</span>
                     Code:{" "}
                     <a
                       href={tool.repoUrl}
+                      {...eventAttrs("outbound", {
+                        to: "github",
+                        item: tool.slug,
+                      })}
                       target="_blank"
                       rel="noopener noreferrer"
                       class="text-parchment underline underline-offset-4 hover:text-graphite"
