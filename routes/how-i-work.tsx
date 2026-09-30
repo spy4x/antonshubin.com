@@ -231,7 +231,10 @@ export default define.page(function HowIWork() {
                 >
                   how I run production
                 </a>{" "}
-                for proof.
+                for proof. What happens to your code:{" "}
+                <a href="#faq-ai-and-your-code" class={FACT_LINK}>
+                  does my code go to an AI provider?
+                </a>
               </p>
             </section>
 

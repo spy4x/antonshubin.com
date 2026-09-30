@@ -14,7 +14,7 @@ type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
 
 /** What the written brief promises; the form and `/book` without a scheduler both say it. */
 export const BRIEF_PROMISE =
-  "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment.";
+  "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment. I reply by email myself, within one working day.";
 
 /** The catalog item a visitor came from (`/book?service=<slug>`), already checked against `lib/catalog.ts`. */
 export interface LeadService {

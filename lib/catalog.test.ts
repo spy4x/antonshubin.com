@@ -94,9 +94,9 @@ Deno.test("every item has an SEO title and a service type, and no title repeats"
   assertEquals(new Set(catalogItems.map((i) => i.seoTitle)).size, 4);
 });
 
-Deno.test("only Build and Ongoing show promises, each an id lib/promises.ts knows", () => {
-  assertEquals(catalogPromises("strategy-call"), []);
-  assertEquals(catalogPromises("codebase-health-audit"), []);
+Deno.test("the one-off items show only the refund, each id one lib/promises.ts knows", () => {
+  assertEquals(catalogPromises("strategy-call"), ["refund"]);
+  assertEquals(catalogPromises("codebase-health-audit"), ["refund"]);
   assertEquals(catalogPromises("zero-to-production-saas-mvp"), [
     "refund",
     "first-milestone",
@@ -126,9 +126,13 @@ Deno.test("Ongoing is two labelled price rows and the break-even line sits on th
   assertEquals(single.map((r) => r.label), ["Price"]);
 });
 
-Deno.test("How it starts has three steps on Build and Strategy, none elsewhere", () => {
+Deno.test("How it starts has steps on Build and Strategy, none elsewhere", () => {
   assertEquals(startSteps("zero-to-production-saas-mvp")?.length, 3);
-  assertEquals(startSteps("strategy-call")?.length, 3);
+  assertEquals(
+    startSteps("strategy-call")?.[1].title,
+    "You get an invoice and a time",
+  );
+  assertEquals(startSteps("strategy-call")?.length, 4);
   assertEquals(startSteps("codebase-health-audit"), undefined);
   assertEquals(startSteps("cto-advisory-retainer"), undefined);
 });

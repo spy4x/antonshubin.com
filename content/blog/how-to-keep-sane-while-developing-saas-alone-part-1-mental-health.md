@@ -10,6 +10,7 @@ publishedAt: "2022-12-15"
 readTime: 7
 topic: "founders"
 archived: true
+archiveNote: "Part 2 was never written."
 ---
 
 ## What is it about?

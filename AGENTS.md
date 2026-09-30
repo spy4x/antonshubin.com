@@ -359,9 +359,9 @@ At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
   `[slug]` routes of blog, work, catalog, tools and hackathons (which answer 404
   themselves) render it. It has a title, one H1, buttons to Work, Tools and
   Writing with the requested section's button first, and an email line.
-- `routes/privacy.tsx` says only what the code proves. Change a sentence only
-  together with the code it describes, and add nothing about retention or the
-  mail provider: the repository cannot show either.
+- `routes/privacy.tsx` says only what the code proves, plus Anton's own
+  retention rule and mail server (#301), in "How long things are kept". Change a
+  sentence only together with the code or the rule it describes.
 - The site-wide skip link is hidden by `routes/_app.tsx`'s inline critical CSS,
   whose unlayered `.sr-only` rule would beat Tailwind's layered
   `focus:not-sr-only`. That rule is `.sr-only:not(:focus)` for this reason;
@@ -504,8 +504,9 @@ the fragment of the section that absorbed it, so `alsoCovers` ids and the
 action wordings are `BOOK_LABEL` and `BRIEF_LABEL` in `lib/nav.ts` (see "Booking
 page"); the brief link is `briefPath(slug)`. A promise shown for a service is
 the owner's decision (`catalogPromises()`): the strategy session and the audit
-show none until Anton says which apply. `test/services.test.ts` checks the built
-pages.
+show the refund only (#301). The paid session is booked through the brief,
+because mig takes no payment: its "How it starts" is brief, invoice, call,
+notes. `test/services.test.ts` checks the built pages.
 
 ### Project page
 
@@ -586,14 +587,15 @@ card beside the main column (from 1024px; first at 390px) with the pricing rule
 paragraph, links `spy4x/dotfiles`) and the questions, open, each at `#faq-<id>`.
 Book goes to `/book` and the brief to `/book#brief` (#272); the page has no
 calendar embed. `lib/faqs.ts` is the only copy of the questions (at most
-`MAX_FAQS`, seven): the page, the `FAQPage` JSON-LD (joined to the site graph)
+`MAX_FAQS`, eight): the page, the `FAQPage` JSON-LD (joined to the site graph)
 and `llms-full.txt`'s FAQ section read it, and answers splice promises through
 `promise()`. `PromiseTimeline` gained `layout` (`stack` keeps it vertical at
 every width) and `links` (a quiet link under a `full` promise); `ClosingBand`
 gained `bookHref` (an on-site Book target). `test/how-i-work.test.ts` checks the
-built page. Still open with Anton (#301): how a client asks for the refund, and
-what happens to client code with AI providers; the page says nothing about
-either.
+built page. The refund answer says how to ask for it, and "Does my code go to an
+AI provider?" (`#faq-ai-and-your-code`, linked from the AI paragraph) says yes
+without naming a provider or claiming it doesn't train on the code (Anton,
+#301): add either only once Anton confirms it.
 
 ### Type
 

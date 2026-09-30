@@ -58,7 +58,7 @@ const layers: Layer[] = [
     id: "handover",
     title: "Handing it over (versioned config in git)",
     text:
-      "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing. Configuration and deployment logic stay versioned rather than living as undocumented server steps, so another team can take over without asking one operator.",
+      "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing. Configuration and deployment logic stay versioned rather than living as undocumented server steps, so another team can take over without asking one operator. There are four machines: a Hetzner Cloud server in Germany for the public services, a home lab in Singapore, a mini PC that travels with me, and a Raspberry Pi in another country that keeps the offsite backups.",
     check: {
       label: "rostok, the scaffolder I deploy with",
       href: "/tools/rostok",
@@ -69,7 +69,8 @@ const layers: Layer[] = [
     title: "Backups I can restore (restic)",
     text:
       "Restic backups run with integrity checks, retention policies, and a written restore procedure. Recovery is part of the system's design, not a command to research for the first time during an incident.",
-    check: "Not public: backups hold client and personal data.",
+    check:
+      "Not public: backups hold client and personal data. Restore last tested on 30 September 2026.",
   },
   {
     id: "monitoring",
@@ -484,11 +485,14 @@ function ColophonCard({ commit }: { commit: string }) {
       <dl data-infra-colophon class="space-y-2 text-sm">
         <Fact term="Built with">Deno, Fresh, Preact and Tailwind</Fact>
         <Fact term="Runs in">
-          Docker Compose behind Traefik on my own server
+          Docker Compose behind Traefik on a Hetzner Cloud server in Germany
         </Fact>
         <Fact term="Checked by">Woodpecker runs the tests on every push</Fact>
         <Fact term="Analytics">Umami, self-hosted</Fact>
-        <Fact term="Backups">A nightly restic job of the site's data</Fact>
+        <Fact term="Backups">
+          A nightly restic job of the site's data, restored in a test on 30
+          September 2026
+        </Fact>
         <Fact term="Source">
           <a href={REPO} target="_blank" rel="noopener noreferrer" class={LINK}>
             spy4x/antonshubin.com

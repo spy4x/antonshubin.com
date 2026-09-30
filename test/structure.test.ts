@@ -13,6 +13,7 @@ import {
 import { blogArticles, projects } from "../lib/data.ts";
 import { tools } from "../lib/tools.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
+import { MAX_FAQS } from "../lib/faqs.ts";
 import { promises } from "../lib/promises.ts";
 import { redirectTable, redirectTarget } from "../lib/redirects.ts";
 
@@ -287,11 +288,11 @@ siteTest(
 );
 
 siteTest(
-  "how-i-work has at most seven FAQ entries and the JSON-LD comes from them",
+  "how-i-work has at most MAX_FAQS entries and the JSON-LD comes from them",
   async (site) => {
     const html = await site.html("/how-i-work");
     const shown = count(html, /<div[^>]*\bdata-faq\b/g);
-    assert(shown >= 1 && shown <= 7, `${shown} FAQ entries`);
+    assert(shown >= 1 && shown <= MAX_FAQS, `${shown} FAQ entries`);
     const faq = jsonLd(html).find((d) =>
       (d as { "@type"?: string })["@type"] === "FAQPage"
     ) as { mainEntity: unknown[] } | undefined;

@@ -266,7 +266,7 @@ siteTest(
 );
 
 siteTest(
-  "How it starts is a three-step list on Build and Strategy only",
+  "How it starts is a list on Build (three steps) and Strategy (four) only",
   async (site) => {
     for (const item of catalogItems) {
       const html = await site.html(`/catalog/${item.slug}`);
@@ -276,7 +276,8 @@ siteTest(
         item.slug === "strategy-call"
       ) {
         assert(steps, `${item.slug}: no steps`);
-        assertEquals(count(steps[0], /<li\b/g), 3, item.slug);
+        const expected = item.slug === "strategy-call" ? 4 : 3;
+        assertEquals(count(steps[0], /<li\b/g), expected, item.slug);
       } else {
         assertEquals(steps, null, item.slug);
       }

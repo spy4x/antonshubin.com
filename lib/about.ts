@@ -79,12 +79,23 @@ const CARD: PaymentMethod = { name: "card", via: "Stripe" };
 const BANK: PaymentMethod = { name: "US bank transfer", via: "ACH or Fedwire" };
 const CRYPTO: PaymentMethod = { name: "crypto" };
 
+/**
+ * The bank rails for a client outside the US (Anton, #301). `/pay` shows
+ * only the US account's details; these are sent on request.
+ */
+export const INTERNATIONAL_BANK =
+  "SWIFT, SEPA (EUR), Wise, Revolut or a Singapore account";
+
+/** The line under `/pay`'s US bank details. */
+export const INTERNATIONAL_BANK_LINE =
+  `Outside the US: ${INTERNATIONAL_BANK}. Ask and I send the details.`;
+
 /** The payment methods as `/about` says them, a full sentence. */
 export function paymentSentence(): string {
-  return `You can pay by ${CARD.name} through ${CARD.via}, by ${BANK.name} (${BANK.via}) or in ${CRYPTO.name}.`;
+  return `You can pay by ${CARD.name} through ${CARD.via}, by ${BANK.name} (${BANK.via}) or in ${CRYPTO.name}. From outside the US: ${INTERNATIONAL_BANK}.`;
 }
 
 /** The payment methods as `/llms-full.txt` lists them, a clause. */
 export function paymentList(): string {
-  return `${CARD.name} (${CARD.via}), ${BANK.name} (${BANK.via}) or ${CRYPTO.name}`;
+  return `${CARD.name} (${CARD.via}), ${BANK.name} (${BANK.via}), ${CRYPTO.name}, or from outside the US ${INTERNATIONAL_BANK}`;
 }

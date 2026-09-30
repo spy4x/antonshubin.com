@@ -9,6 +9,7 @@ publishedAt: "2022-12-21"
 readTime: 7
 topic: "founders"
 archived: true
+archiveNote: "In my Deno projects deno fmt does this job now, with no config."
 youtubeVideoId: "uaqFYlfOZeE"
 ---
 

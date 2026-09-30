@@ -10,6 +10,7 @@ publishedAt: "2022-06-07"
 readTime: 15
 topic: "founders"
 archived: true
+archiveNote: "Today most of my time goes to client work. The current story is on the About page."
 ---
 
 _Who I am and what I do today: [About me](/about)._
