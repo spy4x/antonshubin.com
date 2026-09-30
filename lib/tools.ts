@@ -410,9 +410,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "0.1.1",
+      version: "1.2.0",
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@0.1.1",
+      install: "deno add jsr:@spy4x/preact-ui@1.2.0",
       latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
     },
     licence: "MIT",
@@ -450,7 +450,7 @@ export const tools: Tool[] = [
     ],
     dontUseIf: [
       "Your app is React: these are Preact components.",
-      "You need an API that will not change: it is before 1.0.",
+      "You need components checked with a screen reader: none has been run against them yet.",
       "You do not use Tailwind: every component renders Tailwind classes.",
     ],
     fits: [
