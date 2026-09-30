@@ -2,9 +2,24 @@
 title: "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost"
 description: "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
 publishedAt: "2026-09-26"
+updatedAt: "2026-09-30"
 readTime: 8
 topic: "ai-mcp"
 ---
+
+> **Update, 30 September 2026: Sonnet 5.5 changes the answer.** I ran it against
+> Opus 5.5 overnight: 48 PRs on Sonnet 5.5 and 33 on Opus 5.5, with the same
+> Opus reviewer for both. Sonnet 5.5 cost $0.68 per 100 merged lines, review
+> included, against $1.20 for Opus 5.5: 0.57 times as much. Unlike Sonnet 5, it
+> made fewer calls than Opus, not more (9.5 against 15.5 per 100 lines). The
+> catch: it passed its first review 13% of the time, against 33%. That broke the
+> bar I had set in advance. I switched my implementers to Sonnet 5.5 anyway,
+> because the extra review rounds are already inside that 0.57 and both models
+> merged about nine PRs in ten. Opus 5.5 still does every review, UI component
+> work and security-sensitive work. It is one night, and Opus used more calls
+> per line that night than earlier in the week, so I will rerun it after a week.
+> The findings below are about Sonnet 5 and still hold for it; the "What I
+> changed" list is my setup as of 26 September.
 
 Opus 5.5 lists at twice the price of Sonnet 5. In my coding agents it cost about
 half as much per line of code. It also replaced Fable 5.1 as my code reviewer,
@@ -163,7 +178,8 @@ added that class of bug to the reviewer's checklist.
 
 ## What I changed
 
-- **Opus 5.5 implements and reviews every diff.** Fable stays paused.
+- **Opus 5.5 implements and reviews every diff.** (Implementers moved to Sonnet
+  5.5 on 30 September; see the update at the top.) Fable stays paused.
 - **Medium effort by default.** Reviews of production code run at xhigh, and
   reviews of auth, crypto, secrets, money, deploys and data migrations run at
   max. An implementer only moves up to xhigh for one fix round, when a PR's
