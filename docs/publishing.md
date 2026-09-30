@@ -140,11 +140,13 @@ It writes no file. It:
 2. Fetches `https://antonshubin.com/blog/<slug>` and stops unless it answers
    200. Nothing below runs for a post that is not live.
 3. Creates the Dev.to draft (`published: false`, a clean `canonical_url`, the
-   post's campaign). It needs `DEVTO_API_KEY`, from the environment or the local
-   `.env.deploy` (restored by `deno task env:decrypt`, never uploaded); without
-   it, it warns and goes on.
+   post's campaign), opening with the TL;DR and, for a post with `relatedTool`,
+   the project's live and repository links. It needs `DEVTO_API_KEY`, from the
+   environment or the local `.env.deploy` (restored by `deno task env:decrypt`,
+   never uploaded); without it, it warns and goes on.
 4. Prints the post's tagged link for every channel, and the newsletter's subject
-   and body, whose link is the `email` channel's tagged URL.
+   and body (title, description, TL;DR), whose link is the `email` channel's
+   tagged URL.
 5. Sends nothing, and prints the one command that sends.
 
 ## 4. Channel texts
