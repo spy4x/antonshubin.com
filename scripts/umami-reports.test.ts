@@ -258,7 +258,15 @@ Deno.test("syncReports deletes each retired /contact-me funnel it once created, 
     description: `Retired. ${MANAGED}`,
     parameters: {},
   }));
-  const { fetchFn, calls } = stubFetch([...current, ...retired]);
+  // Carries the marker but is neither current nor retired: never deleted.
+  const unknown = {
+    id: "other",
+    name: "Funnel: some report this script no longer names",
+    type: "funnel",
+    description: `Older. ${MANAGED}`,
+    parameters: {},
+  };
+  const { fetchFn, calls } = stubFetch([...current, ...retired, unknown]);
   const result = await syncReports(config, { fetchFn });
   assertEquals(result.success, true);
   const writes = calls.filter((c) => c.method !== "GET");
