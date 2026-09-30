@@ -25,6 +25,7 @@ interface Measure {
   img: Rect & { width: number; height: number };
   natural: { width: number; height: number };
   controls: Record<string, Rect | null>;
+  controlsRow: Rect | null;
 }
 
 /** Reads the open lightbox's image rect, its natural size and its controls' rects. */
@@ -55,6 +56,9 @@ function measure(page: Page): Promise<Measure> {
         next: rect(dialog.querySelector('[aria-label="Next image"]')),
         counter: rect(dialog.querySelector("p")),
       },
+      // The row holding Previous, the counter and Next: the image must end above
+      // its top, which the arrows reach and the counter text does not.
+      controlsRow: rect(dialog.querySelector("p")?.parentElement ?? null),
     };
   });
 }
@@ -95,8 +99,8 @@ Deno.test("the lightbox fits every screenshot in the viewport with its controls 
           );
           assert(
             m.img.top >= m.controls.close!.bottom - 1 &&
-              m.img.bottom <= m.controls.counter!.top + 1,
-            `${at}: image overlaps the close button or the counter row`,
+              m.img.bottom <= m.controlsRow!.top + 1,
+            `${at}: image overlaps the close button or the arrows and counter row`,
           );
           for (const [name, rect] of Object.entries(m.controls)) {
             if (name !== "close" && name !== "counter" && slides === 1) {
