@@ -5,7 +5,9 @@ import {
   channel,
   CHANNELS,
   channelUrl,
+  describeWindow,
   stripTrailingSlash,
+  windowText,
 } from "./utm.ts";
 
 const BASE = "https://antonshubin.com";
@@ -160,6 +162,61 @@ Deno.test("docs/utm.md's channel table matches the code's channel table", async 
   const rows = markdownTable(doc, "## Channels");
   assertEquals(
     rows,
-    CHANNELS.map((c) => [c.source, c.medium, c.label]),
+    CHANNELS.map((c) => [
+      c.source,
+      c.medium,
+      c.label,
+      c.window ? windowText(c.window) : "",
+      c.window?.why ?? "",
+    ]),
   );
+});
+
+// 2026-09-30 is a Wednesday, 2026-10-02 a Friday.
+const LINKEDIN = channel("linkedin").window!;
+const YOUTUBE = channel("youtube").window!;
+const HCM = "Asia/Ho_Chi_Minh";
+
+Deno.test("a window later this week names its day in UTC and local time", () => {
+  assertEquals(
+    describeWindow(YOUTUBE, new Date("2026-09-30T16:30:00Z"), HCM),
+    "Thu 15:00–18:00 UTC (Thu 22:00–Fri 01:00 Asia/Ho_Chi_Minh)",
+  );
+});
+
+Deno.test("a window already over this week comes back next week", () => {
+  assertEquals(
+    describeWindow(LINKEDIN, new Date("2026-10-02T12:00:00Z"), HCM),
+    "Tue 13:00–15:00 UTC (Tue 20:00–22:00 Asia/Ho_Chi_Minh)",
+  );
+});
+
+Deno.test("inside a window it says now and when it ends", () => {
+  assertEquals(
+    describeWindow(LINKEDIN, new Date("2026-09-30T14:00:00Z"), HCM),
+    "now, until 15:00 UTC (until 22:00 Asia/Ho_Chi_Minh)",
+  );
+});
+
+Deno.test("a UTC machine gets no second time zone", () => {
+  assertEquals(
+    describeWindow(LINKEDIN, new Date("2026-10-02T12:00:00Z"), "UTC"),
+    "Tue 13:00–15:00 UTC",
+  );
+});
+
+Deno.test("telegram is a social channel open every day", () => {
+  const telegram = channel("telegram");
+  assertEquals(telegram.medium, "social");
+  assertEquals(windowText(telegram.window!), "Any day 16:00–19:00 UTC");
+  assertEquals(
+    describeWindow(telegram.window!, new Date("2026-09-30T20:00:00Z"), "UTC"),
+    "Thu 16:00–19:00 UTC",
+  );
+});
+
+Deno.test("channels where timing is irrelevant have no window", () => {
+  for (const source of ["github", "upwork", "email", "qr-card"]) {
+    assertEquals(channel(source).window, undefined, source);
+  }
 });
