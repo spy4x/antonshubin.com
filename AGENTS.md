@@ -103,7 +103,7 @@ Constraints every review and spec keeps:
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -349,9 +349,8 @@ At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
 - `lib/pages.ts` is the only list of core pages: `CORE_PAGES`
   (`lib/cache-control.ts`) and the sitemap's static entries read it through
   `pagesFor(surface)`. An entry is in both unless its `notIn` says why not
-  (`/tools` has its own one-hour cache tier, `/hackathons` answers 404 while
-  there are none, `/pay` is not for search). A new page is one entry there, not
-  three edits.
+  (`/tools` has its own one-hour cache tier, `/pay` is not for search). A new
+  page is one entry there, not two edits.
 - `components/Breadcrumb.tsx` renders one "‹ Section" back link on a page two
   levels deep, first in the content column, under the nav's word for the section
   (`lib/nav.ts`'s `navLabel()`); the `BreadcrumbList` JSON-LD is unchanged.
@@ -804,7 +803,7 @@ page. Never retry a test on this error.
   for `/sw.js`, registers no worker and keeps a value set on `window`; and
   `/sw.js` registered by hand deletes a cache the old worker left and
   unregisters itself. `test/sw-retired.test.ts` pins the script's text and that
-  no page mentions `serviceWorker`.
+  no server-rendered page mentions `serviceWorker`.
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`
@@ -1071,8 +1070,7 @@ Error responses (status ≥ 400) are never cached, regardless of which tier the
 path would otherwise fall into — a 404 must not survive in a browser or at the
 edge once the page comes back. A route that sets `no-store` itself (for example
 `routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it on
-staging and production alike, and the service worker never caches or serves such
-a response.
+staging and production alike.
 
 **A static-file tier always wins over Fresh's own default, even when `current`
 already says `no-store`** (#183 follow-up, fixed alongside #184): Fresh's

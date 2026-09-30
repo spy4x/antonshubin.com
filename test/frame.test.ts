@@ -1,6 +1,6 @@
 // Guards for the site's frame (#293): the footer on every page, the phone
-// header, the 404, `/privacy`, and the one page list behind the sitemap, the
-// service worker and the edge cache. They read the built site through
+// header, the 404, `/privacy`, and the one page list behind the sitemap and
+// the edge cache. They read the built site through
 // test/harness.ts; see AGENTS.md "Rendered-page tests". Assert structure and
 // short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
@@ -110,7 +110,7 @@ siteTest(
 );
 
 siteTest(
-  "the Person's sameAs is the profile list, and every core page is in the sitemap, the service worker and the page list",
+  "the Person's sameAs is the profile list, and every core page is in the sitemap and the page list",
   async (site) => {
     const person = jsonLd(await site.html("/"))
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])

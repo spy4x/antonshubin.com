@@ -15,6 +15,9 @@ Deno.test("/sw.js unregisters itself, clears caches, and serves no pages", async
     assertEquals(res.headers.get("Cache-Control"), "no-cache, must-revalidate");
     assert(script.includes("caches.delete("), "does not delete caches");
     assert(script.includes("unregister()"), "does not unregister itself");
+    // Taking over an open page makes the old worker's page reload (#285).
+    assert(!script.includes("skipWaiting"), "takes over open pages");
+    assert(!script.includes("claim("), "takes over open pages");
     assert(!script.includes(`"fetch"`), "still intercepts requests");
     assert(!script.includes("cache.addAll"), "still precaches pages");
     // scripts/cloudflare-purge.ts reads the live build from this line.
@@ -24,12 +27,12 @@ Deno.test("/sw.js unregisters itself, clears caches, and serves no pages", async
   }
 });
 
-Deno.test("no page registers a service worker", async () => {
+Deno.test("no server-rendered page mentions a service worker", async () => {
   const site = await startSite();
   try {
     for (const path of ["/", "/contact-me", "/blog", "/tools"]) {
       const html = await site.html(path);
-      assert(!html.includes("serviceWorker"), `${path} registers a worker`);
+      assert(!html.includes("serviceWorker"), `${path} mentions a worker`);
     }
   } finally {
     await site.stop();

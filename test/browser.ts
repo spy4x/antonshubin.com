@@ -41,7 +41,7 @@ export async function launchChromium(): Promise<Browser> {
 }
 
 /**
- * Opens a page with service workers blocked. The site registers
+ * Opens a page with service workers blocked. The site used to register
  * `/sw.js` on every page, and that worker reloaded the page once it took
  * control, which landed mid-test and failed the next `page.evaluate` with
  * "Execution context was destroyed" (#219). The site registers no worker

@@ -35,7 +35,8 @@ right after a deploy. And one Cloudflare rule outside the repo keeps the edge
 from storing it at all: Rules, Cache Rules, "URI Path equals `/sw.js`", cache
 eligibility "Bypass cache". Check with `curl -sI https://antonshubin.com/sw.js`
 right after a deploy: `cf-cache-status` must be `DYNAMIC` or absent, never a
-`HIT` on a 404. The rule is a manual step; whoever sets it up ticks it here.
+`HIT` on a 404. Order it after any existing Cache Rule that matches `*.js`, or
+that rule wins. The rule is a manual step; whoever sets it up ticks it here.
 
 So after `docker compose up` succeeds, `scripts/deploy.ts`:
 
