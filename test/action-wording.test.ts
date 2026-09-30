@@ -57,7 +57,10 @@ function kind(href: string | undefined, label: string): Kind {
     if (/^\/book(\?[^#]*)?#brief$|^#brief$|^\/?#audit-form$/.test(path)) {
       return "brief";
     }
-    if (/^\/book(\?[^#]*)?$|^#book$/.test(path) || path.startsWith(SCHEDULE)) {
+    if (
+      /^\/book(\?[^#]*)?(#book)?$|^#book$/.test(path) ||
+      path.startsWith(SCHEDULE)
+    ) {
       return "book";
     }
   }
