@@ -18,11 +18,17 @@ const BUILD_ID = Deno.env.get("BUILD_ID") || "dev";
 // It never calls skipWaiting() or clients.claim(): replacing the old worker
 // under an open page fires "controllerchange", and the old page's update code
 // reloads on it. So this worker waits until the visitor's old tabs are closed,
-// then clears the caches and unregisters. Calling unregister() at install
+// or until the old page's "New version available" banner asks it to take over
+// (its Reload button posts { action: "skipWaiting" }), then clears the caches
+// and unregisters. Calling unregister() at install
 // instead left the old worker alive and refilling its caches.
 const SW_SCRIPT =
   `// Retired service worker: clears its caches and unregisters itself.
 const CACHE = "antonshubin-${BUILD_ID}";
+
+self.addEventListener("message", (event) => {
+  if (event.data?.action === "skipWaiting") self.skipWaiting();
+});
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
