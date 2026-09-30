@@ -53,7 +53,7 @@ const INNER_LINKS = [
   { path: "/work", link: "[data-archive-row] figure a" },
   { path: "/work", link: "[data-archive-row] [data-company-outcome] a" },
   { path: "/tools", link: "li[data-tool] [data-credit] a" },
-  { path: "/tools", link: 'li[data-tool] a:has-text("CI")' },
+  { path: "/tools", link: "li[data-tool] a[data-ci-status]" },
 ];
 
 Deno.test("links inside archive rows and tool cards stay above the card's link", async () => {
