@@ -6,14 +6,18 @@
  *
  * Idempotent: it lists the website's saved reports, matches each definition
  * below by name, updates a match whose settings differ, creates a missing one
- * and leaves every other report alone. It never deletes a report.
+ * and leaves every other report alone. The one deletion it makes is a report
+ * it once managed and has since retired (`RETIRED_REPORTS`): matched by exact
+ * name and only when its description still carries this script's marker, so a
+ * report made by hand is never removed.
  *
  * `--dry-run` still lists the saved reports (a read), then prints the create
  * and update calls it would send instead of sending them.
  *
  * API shape (umami-software/umami v3.4.0, commit ec0ff50, and v3.3.1):
  * `GET /api/reports?websiteId=&page=&pageSize=` lists, `POST /api/reports`
- * creates and `POST /api/reports/<id>` updates, each body checked by
+ * creates, `POST /api/reports/<id>` updates and `DELETE /api/reports/<id>`
+ * deletes (answering `{ ok: true }`), each write body checked by
  * `reportSchema` in `src/lib/schema.ts` (`websiteId`, `type`, `name`,
  * `description`, `parameters`). A saved goal's parameters are `{ type, value }`
  * and a saved funnel's `{ window, steps }` (`goalParametersSchema` and
@@ -53,9 +57,9 @@ export interface UmamiConfig {
 
 /** One API call the script sends, or would send under `--dry-run`. */
 export interface PlannedCall {
-  action: "create" | "update" | "unchanged";
+  action: "create" | "update" | "delete" | "unchanged";
   name: string;
-  method: "POST" | "NONE";
+  method: "POST" | "DELETE" | "NONE";
   path: string;
   body?: Record<string, unknown>;
 }
@@ -67,7 +71,9 @@ export interface RunResult {
   error?: string;
 }
 
-const MANAGED = "Managed by scripts/umami-reports.ts in spy4x/antonshubin.com.";
+/** The marker every managed report's description ends with. */
+export const MANAGED =
+  "Managed by scripts/umami-reports.ts in spy4x/antonshubin.com.";
 
 /** Minutes a visitor has to complete a funnel, from its first step. */
 export const FUNNEL_WINDOW_MINUTES = 60;
@@ -137,6 +143,18 @@ export const REPORTS: ReportDefinition[] = [
   },
 ];
 
+/**
+ * Reports this script created once and no longer wants, by exact name. The
+ * booking page moved from `/contact-me` to `/book` (#190), so its two funnels
+ * were renamed; the old ones would otherwise stay in Umami, labelled as
+ * managed, counting a path nobody visits any more. A name stays here after
+ * its first deletion, so an instance that missed that run is cleaned too.
+ */
+export const RETIRED_REPORTS: readonly string[] = [
+  "Funnel: any page → /contact-me → call-booked",
+  "Funnel: /contact-me → call-booked",
+];
+
 /** Reads the three Umami settings; throws naming every one that is missing. */
 export function readConfig(
   get: (name: string) => string | undefined = (n) => Deno.env.get(n),
@@ -178,52 +196,69 @@ function parseParameters(value: unknown): unknown {
 
 /**
  * Decides, for each definition, whether to create it, update the saved report
- * with the same name, or leave that report as it is. Reports whose name is
- * not in `definitions` are never touched.
+ * with the same name, or leave that report as it is, then deletes each saved
+ * report named in `retired` that still carries this script's marker. Every
+ * other report is never touched.
  */
 export function planReportCalls(
   saved: SavedReport[],
   definitions: ReportDefinition[],
   websiteId: string,
+  retired: readonly string[] = RETIRED_REPORTS,
 ): PlannedCall[] {
-  return definitions.map((def) => {
-    const body = {
-      websiteId,
-      type: def.type,
-      name: def.name,
-      description: def.description,
-      parameters: def.parameters,
-    };
-    const match = saved.find((r) => r.name === def.name);
-    if (!match) {
+  const deletions: PlannedCall[] = saved
+    .filter((r) =>
+      retired.includes(r.name) &&
+      !definitions.some((d) => d.name === r.name) &&
+      r.description.includes(MANAGED)
+    )
+    .map((r) => ({
+      action: "delete",
+      name: r.name,
+      method: "DELETE",
+      path: `/api/reports/${r.id}`,
+    }));
+  return [
+    ...definitions.map((def): PlannedCall => {
+      const body = {
+        websiteId,
+        type: def.type,
+        name: def.name,
+        description: def.description,
+        parameters: def.parameters,
+      };
+      const match = saved.find((r) => r.name === def.name);
+      if (!match) {
+        return {
+          action: "create",
+          name: def.name,
+          method: "POST",
+          path: "/api/reports",
+          body,
+        };
+      }
+      const same = match.type === def.type &&
+        match.description === def.description &&
+        stableJson(parseParameters(match.parameters)) ===
+          stableJson(def.parameters);
+      if (same) {
+        return {
+          action: "unchanged",
+          name: def.name,
+          method: "NONE",
+          path: `/api/reports/${match.id}`,
+        };
+      }
       return {
-        action: "create",
+        action: "update",
         name: def.name,
         method: "POST",
-        path: "/api/reports",
+        path: `/api/reports/${match.id}`,
         body,
       };
-    }
-    const same = match.type === def.type &&
-      match.description === def.description &&
-      stableJson(parseParameters(match.parameters)) ===
-        stableJson(def.parameters);
-    if (same) {
-      return {
-        action: "unchanged",
-        name: def.name,
-        method: "NONE",
-        path: `/api/reports/${match.id}`,
-      };
-    }
-    return {
-      action: "update",
-      name: def.name,
-      method: "POST",
-      path: `/api/reports/${match.id}`,
-      body,
-    };
-  });
+    }),
+    ...deletions,
+  ];
 }
 
 async function umamiFetch(
@@ -283,6 +318,9 @@ export async function listReports(
 /** One line describing a planned call, with no token in it. */
 export function describeCall(call: PlannedCall): string {
   if (call.action === "unchanged") return `unchanged  ${call.name}`;
+  if (call.action === "delete") {
+    return `delete     ${call.method} ${call.path}  ${call.name}`;
+  }
   return `${call.action.padEnd(9)}  ${call.method} ${call.path}  ${
     JSON.stringify(call.body)
   }`;
@@ -316,10 +354,15 @@ export async function syncReports(
         );
         continue;
       }
-      await umamiFetch(config, fetchFn, call.path, {
-        method: "POST",
-        body: JSON.stringify(call.body),
-      });
+      await umamiFetch(
+        config,
+        fetchFn,
+        call.path,
+        call.action === "delete" ? { method: "DELETE" } : {
+          method: "POST",
+          body: JSON.stringify(call.body),
+        },
+      );
       output.push(describeCall(call));
     }
     return { success: true, output };

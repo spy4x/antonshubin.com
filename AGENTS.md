@@ -117,7 +117,7 @@ deno task publish:blog          # after deploy: live check, Dev.to draft, links;
 deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
 deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
-deno task umami-reports         # create or update the Umami goals and funnels (--dry-run to preview)
+deno task umami-reports         # create, update or retire the Umami goals and funnels (--dry-run to preview)
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
 deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B, --path for another page)

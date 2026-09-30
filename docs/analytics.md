@@ -96,11 +96,14 @@ It needs the same three variables as the weekly report
 belongs to an Umami user who can edit the website. The script lists the
 website's saved reports, matches each of its reports by name, updates one whose
 settings differ, creates one that is missing and prints `unchanged` for the
-rest. It never deletes a report and never touches a report whose name it does
-not own, so a report made by hand in Umami stays. Every call has a 10-second
-timeout; a failed call ends the run with exit code 1, and running it again
-finishes the rest. Rerun it after changing a report in `REPORTS`, or after an
-event is renamed.
+rest. It never touches a report whose name it does not own, so a report made by
+hand in Umami stays. The one thing it deletes is a report listed in
+`RETIRED_REPORTS` whose description still carries its "Managed by" marker: since
+the booking page moved to `/book` (#190), the first run after that deploy
+deletes the two old `/contact-me` funnels, and later runs find nothing to
+delete. Every call has a 10-second timeout; a failed call ends the run with exit
+code 1, and running it again finishes the rest. Rerun it after changing a report
+in `REPORTS`, or after an event is renamed.
 
 ### Umami API used
 
