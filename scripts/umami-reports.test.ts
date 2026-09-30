@@ -179,11 +179,14 @@ Deno.test("REPORTS holds the five goals and a funnel for each outcome, with uniq
     "newsletter-signup",
     "post-read",
   ]);
-  const funnelEnds = REPORTS.filter((r) => r.type === "funnel").map((r) => {
-    const steps = r.parameters.steps as { value: string }[];
-    return steps[steps.length - 1].value;
-  });
-  assertEquals(funnelEnds, ["call-booked", "call-booked", "brief-sent"]);
+  const funnels = REPORTS.filter((r) => r.type === "funnel").map((r) =>
+    (r.parameters.steps as { value: string }[]).map((s) => s.value)
+  );
+  assertEquals(funnels, [
+    ["/*", "/contact-me", "call-booked"],
+    ["/contact-me", "call-booked"],
+    ["/*", "brief-sent"],
+  ]);
 });
 
 Deno.test("syncReports follows Umami's paging, so a report on page two is matched instead of created again", async () => {
@@ -229,9 +232,17 @@ for (
   });
 }
 
-Deno.test("syncReports gives every Umami call an abort signal, so a stalled server cannot hang it", async () => {
+Deno.test("syncReports gives every Umami call a 10-second timeout, so a stalled server cannot hang it", async () => {
   const { fetchFn, calls } = stubFetch([]);
-  await syncReports(config, { fetchFn });
+  const timeout = AbortSignal.timeout;
+  const timeouts: number[] = [];
+  AbortSignal.timeout = (ms: number) => (timeouts.push(ms), timeout(ms));
+  try {
+    await syncReports(config, { fetchFn });
+  } finally {
+    AbortSignal.timeout = timeout;
+  }
   assertEquals(calls.length, 1 + REPORTS.length);
+  assertEquals(timeouts, calls.map(() => 10_000));
   for (const c of calls) assertEquals(c.signal instanceof AbortSignal, true);
 });

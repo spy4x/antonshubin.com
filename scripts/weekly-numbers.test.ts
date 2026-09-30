@@ -441,8 +441,17 @@ Deno.test("an Umami section that fails reports a warning instead of throwing", a
   }
 });
 
-Deno.test("every Umami call carries an abort signal, so a stalled server cannot hang the report", async () => {
-  const { signals } = await withUmamiStub(() => [], fetchUmamiEventsSection);
+Deno.test("every Umami call carries a 10-second timeout, so a stalled server cannot hang the report", async () => {
+  const timeout = AbortSignal.timeout;
+  const timeouts: number[] = [];
+  AbortSignal.timeout = (ms: number) => (timeouts.push(ms), timeout(ms));
+  let signals: (AbortSignal | null | undefined)[];
+  try {
+    ({ signals } = await withUmamiStub(() => [], fetchUmamiEventsSection));
+  } finally {
+    AbortSignal.timeout = timeout;
+  }
+  assertEquals(timeouts, [10_000, 10_000]);
   assertEquals(signals.length, 2);
   for (const signal of signals) {
     assertEquals(signal instanceof AbortSignal, true);
