@@ -12,8 +12,11 @@ import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser } from "playwright";
 import { startSite } from "./harness.ts";
 import { launchChromium } from "./browser.ts";
+import { corePages } from "../lib/pages.ts";
 
 const SETTLE_MS = 2_500;
+/** The pages the old worker precached. */
+const pagePaths = new Set(corePages.map((p) => p.path));
 
 Deno.test("a first visit never reloads, registers a worker or requests another page", async () => {
   const site = await startSite();
@@ -24,9 +27,11 @@ Deno.test("a first visit never reloads, registers a worker or requests another p
     const page = await context.newPage();
     const documents: string[] = [];
     const scripts: string[] = [];
-    page.on("request", (request) => {
+    // On the context: a worker script is fetched outside any page.
+    context.on("request", (request) => {
       const path = new URL(request.url()).pathname;
-      if (request.resourceType() === "document") documents.push(path);
+      // Any kind of request: the old worker fetched its pages with fetch().
+      if (pagePaths.has(path)) documents.push(path);
       if (path === "/sw.js") scripts.push(path);
     });
     let loads = 0;
@@ -74,14 +79,21 @@ Deno.test("/sw.js deletes the old worker's caches and unregisters itself", async
       await cache.put("/x", new Response("stale"));
       await navigator.serviceWorker.register("/sw.js");
     });
-    await page.waitForFunction(
-      async () =>
-        (await navigator.serviceWorker.getRegistrations()).length === 0 &&
-        (await caches.keys()).length === 0,
-      undefined,
-      { timeout: 10_000 },
-    );
-    assertEquals(await page.evaluate(() => caches.keys()), []);
+    // Polls inside the page: Playwright's waitForFunction does not await an
+    // async predicate.
+    const left = await page.evaluate(async () => {
+      let registrations = -1;
+      let caching = -1;
+      for (let i = 0; i < 100; i++) {
+        registrations =
+          (await navigator.serviceWorker.getRegistrations()).length;
+        caching = (await caches.keys()).length;
+        if (registrations === 0 && caching === 0) break;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      return { registrations, caches: caching };
+    });
+    assertEquals(left, { registrations: 0, caches: 0 });
   } finally {
     await browser?.close();
     await site.stop();
