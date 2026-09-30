@@ -93,6 +93,11 @@ Deno.test("the lightbox fits every screenshot in the viewport with its controls 
               m.img.height <= m.natural.height + 1,
             `${at}: image ${m.img.width}x${m.img.height} is scaled past its natural ${m.natural.width}x${m.natural.height}`,
           );
+          assert(
+            m.img.top >= m.controls.close!.bottom - 1 &&
+              m.img.bottom <= m.controls.counter!.top + 1,
+            `${at}: image overlaps the close button or the counter row`,
+          );
           for (const [name, rect] of Object.entries(m.controls)) {
             if (name !== "close" && name !== "counter" && slides === 1) {
               continue;
