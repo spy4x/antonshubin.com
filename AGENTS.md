@@ -975,11 +975,13 @@ token is in the query, so a one-click unsubscribe (RFC 8058) works with any
 body.
 
 `/api/subscribe` and `/api/lead` allow three posts per client per hour through
-`lib/rate-limit.ts` (#252), which uses `@spy4x/platform`'s `clientIp` and
-sweeping `createMemoryRateLimiter`. Production is Cloudflare → Traefik (empty
-`forwardedHeaders.trustedIPs`) → app, so the client is `X-Real-IP` (Traefik
-writes it), or `CF-Connecting-IP` when `X-Real-IP` is a Cloudflare edge;
-`X-Forwarded-For` is never read. An IPv6 client is keyed on its /64. If
+`lib/rate-limit.ts` (#252), which uses `@spy4x/platform`'s `clientIp`,
+`clientIpBucket` and sweeping `createMemoryRateLimiter` (#310). Production is
+Cloudflare → Traefik (empty `forwardedHeaders.trustedIPs`) → app, so the client
+is `X-Real-IP` (Traefik writes it), or `CF-Connecting-IP` when `X-Real-IP` is a
+Cloudflare edge (`clientIp`'s `trustedProxies`, fed the module's Cloudflare
+range list); `X-Forwarded-For` is never read, and a header that is not exactly
+one IP address counts as absent. An IPv6 client is keyed on its /64. If
 Traefik's `trustedIPs` or the Cloudflare setup changes, revisit that module. A
 rendered-site test that posts to either form sends its own `X-Real-IP`, or every
 test shares one bucket.
