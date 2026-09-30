@@ -1,5 +1,6 @@
-// The two mails `/api/subscribe` sends after saving a subscriber: a welcome to
-// the subscriber and a notice to the owner.
+// The mails of a newsletter sign-up (#253): a confirmation link to the address
+// that asked, then, once it is confirmed, a welcome to the subscriber and a
+// notice to the owner.
 import type { EmailMessage, EmailSender, MailLog } from "./mail.ts";
 import { proof } from "./proof.ts";
 
@@ -18,8 +19,39 @@ export interface NewSubscriber {
   unsubscribeLink: string;
 }
 
+/** The address that asked to subscribe, and the link that confirms it. */
+export interface ConfirmationRequest {
+  email: string;
+  confirmLink: string;
+}
+
 /**
- * Sends the welcome and the owner notice side by side. Never throws: each
+ * Mails the confirmation link. Never throws: without SMTP it is skipped with a
+ * log line (the visitor then never gets the link, so the log says so), and a
+ * failure is logged as `[SUBSCRIBE] confirmation failed:`. Replies go to the
+ * contact address.
+ */
+export async function sendConfirmationMail(
+  request: ConfirmationRequest,
+  deps: SubscribeMailDeps,
+): Promise<void> {
+  const log = deps.log ?? console;
+  if (!deps.sender) {
+    log.log("[SUBSCRIBE] SMTP not configured, confirmation not sent");
+    return;
+  }
+  const result = await deps.sender.send({
+    to: request.email,
+    subject: "Confirm your subscription to Anton Shubin's newsletter",
+    text:
+      `Someone asked to send this address the newsletter on ${deps.baseUrl}. If that was you, confirm here:\n${request.confirmLink}\n\nThe link works for three days. If it was not you, ignore this mail and nothing happens.\n\n— Anton`,
+    ...(deps.contactEmail ? { replyTo: deps.contactEmail } : {}),
+  });
+  if (!result.ok) log.error("[SUBSCRIBE] confirmation failed:", result.error);
+}
+
+/**
+ * Sends the welcome and the owner notice side by side, once the address is confirmed. Never throws: each
  * failure is logged on its own (`[SUBSCRIBE] welcome failed:` /
  * `[SUBSCRIBE] notify failed:`), and without SMTP both are skipped with a log
  * line each, as the hand-written client did.
@@ -36,6 +68,7 @@ export async function sendSubscribeMails(
       `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
         proof("jobs")
       }+ projects.\n\nHere's a good place to start:\n${deps.baseUrl}/saas-architecture-guide\n\nUnsubscribe anytime:\n${sub.unsubscribeLink}\n\n— Anton`,
+    ...(deps.contactEmail ? { replyTo: deps.contactEmail } : {}),
   };
   const notice: EmailMessage = {
     to: deps.contactEmail,

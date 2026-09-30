@@ -204,10 +204,11 @@ export function trackWhenReady(
 
 /**
  * Pages that never load the tracker: `/unsubscribe` carries a working
- * unsubscribe token in its URL, and `/pay` holds bank details. Umami stores
- * the full URL of every page view.
+ * unsubscribe token in its URL, `/subscribe/confirm` a confirmation token that
+ * holds the address, and `/pay` holds bank details. Umami stores the full URL
+ * of every page view.
  */
-export const UNTRACKED_PATHS = ["/unsubscribe", "/pay"];
+export const UNTRACKED_PATHS = ["/unsubscribe", "/subscribe/confirm", "/pay"];
 
 /** False for a path in `UNTRACKED_PATHS`, with or without a trailing slash. */
 export function analyticsAllowed(pathname: string): boolean {

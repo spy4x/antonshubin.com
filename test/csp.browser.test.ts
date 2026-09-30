@@ -21,6 +21,7 @@
 //   exists after client JS runs (islands/MeetEmbed.tsx) — never in the
 //   server-rendered HTML the other rendered-page tests read.
 // - A real unsubscribe link end to end: GET the confirm page, POST the form.
+// - A real subscription-confirmation link the same way (#253).
 // - Two negative controls, proving the listener and the policy actually do
 //   something rather than the tests above passing vacuously: an inline
 //   `<script>` with no nonce is blocked (its side effect never runs) and
@@ -33,6 +34,7 @@ import type { Browser, Page } from "playwright";
 import { type Site, startSite } from "./harness.ts";
 import { launchChromium, newPage } from "./browser.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
+import { createConfirmToken } from "../lib/subscribe-token.ts";
 
 // RFC 2606 reserved hosts: a real DNS lookup for these either fails or hits
 // no server this test controls, which is fine — a network failure is not a
@@ -252,6 +254,53 @@ Deno.test("a signed unsubscribe link loads and its form submits without a CSP vi
         await page.getByRole("heading", { name: "You're unsubscribed" })
           .waitFor({ state: "visible" });
         await assertNoViolations(page, "after submitting the unsubscribe form");
+      } finally {
+        await page.close();
+      }
+    } finally {
+      await browser?.close();
+      await site.stop();
+    }
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test("a signed subscription-confirmation link loads and its form submits without a CSP violation", async () => {
+  const dir = await Deno.makeTempDir();
+  const file = `${dir}/subscribers.json`;
+  try {
+    await Deno.writeTextFile(file, "[]");
+    const site = await startSite({
+      env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: TEST_SECRET },
+    });
+    let browser: Browser | undefined;
+    try {
+      browser = await launchChromium();
+      const page = await newPage(browser);
+      try {
+        await registerViolationListener(page);
+        const token = await createConfirmToken(
+          "reader@example.com",
+          TEST_SECRET,
+        );
+        await page.goto(
+          `${site.origin}/subscribe/confirm?token=${encodeURIComponent(token)}`,
+          { waitUntil: "networkidle" },
+        );
+        await assertNoViolations(page, "on the subscription confirm page");
+        await Promise.all([
+          page.waitForNavigation({ waitUntil: "networkidle" }),
+          page.getByRole("button", { name: "Subscribe" }).click(),
+        ]);
+        await page.getByRole("heading", { name: "You're subscribed" })
+          .waitFor({ state: "visible" });
+        await assertNoViolations(page, "after submitting the confirm form");
+        assertEquals(
+          (JSON.parse(await Deno.readTextFile(file)) as { email: string }[])
+            .map((s) => s.email),
+          ["reader@example.com"],
+        );
       } finally {
         await page.close();
       }

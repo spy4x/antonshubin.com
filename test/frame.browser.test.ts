@@ -131,7 +131,21 @@ Deno.test("at 390px the last footer line clears the tab bar", async () => {
     const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
       await page.goto(`${site.origin}/privacy`, { waitUntil: "networkidle" });
-      await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
+      // The footer's `content-visibility: auto` swaps its placeholder size for
+      // its real one once it scrolls into view, which lengthens the page after
+      // a scroll; on a long page (the privacy page) one scroll stops short.
+      // Scroll again, with a pause for the layout to settle, until the height
+      // is the same twice in a row.
+      let height = 0;
+      for (let steady = 0; steady < 2;) {
+        const now = await page.evaluate(async () => {
+          scrollTo(0, document.body.scrollHeight);
+          await new Promise((done) => setTimeout(done, 150));
+          return document.body.scrollHeight;
+        });
+        steady = now === height ? steady + 1 : 0;
+        height = now;
+      }
       const gap = await page.evaluate(() => {
         const last = document.querySelector("footer > p:last-child")!
           .getBoundingClientRect();

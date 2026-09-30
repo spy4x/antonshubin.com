@@ -14,7 +14,7 @@ export async function handler(
     // Already set by main.ts cache middleware — preserve noindex
   } else if (
     pathname === "/pay" || pathname.startsWith("/pay/") ||
-    pathname === "/unsubscribe"
+    pathname === "/unsubscribe" || pathname === "/subscribe/confirm"
   ) {
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
   } else if (res.status >= 400) {

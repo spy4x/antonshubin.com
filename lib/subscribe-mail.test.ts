@@ -1,5 +1,9 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
-import { type NewSubscriber, sendSubscribeMails } from "./subscribe-mail.ts";
+import {
+  type NewSubscriber,
+  sendConfirmationMail,
+  sendSubscribeMails,
+} from "./subscribe-mail.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
 const SUB: NewSubscriber = {
@@ -82,4 +86,67 @@ Deno.test("logs a welcome to an address the mail library cannot parse as failed,
   assertEquals(relay.mails.map((m) => m.to), [["owner@example.com"]]);
   assertEquals(log.errors.length, 1);
   assertStringIncludes(log.errors[0], "[SUBSCRIBE] welcome failed:");
+});
+
+Deno.test("mails the confirmation link to the address that asked, with replies to the owner", async () => {
+  const relay = fakeRelay();
+  const log = recordingLog();
+  await sendConfirmationMail(
+    {
+      email: "reader@example.com",
+      confirmLink: `${BASE}/subscribe/confirm?token=abc`,
+    },
+    {
+      sender: fakeSender(relay),
+      contactEmail: "owner@example.com",
+      baseUrl: BASE,
+      log,
+    },
+  );
+  assertEquals(relay.mails.map((m) => m.to), [["reader@example.com"]]);
+  assertStringIncludes(
+    String(relay.mails[0].text),
+    `${BASE}/subscribe/confirm?token=abc`,
+  );
+  assertStringIncludes(
+    JSON.stringify(relay.mails[0].replyTo),
+    "owner@example.com",
+  );
+  assertEquals(log.errors, []);
+});
+
+Deno.test("logs a confirmation the relay refuses as failed, and says so when SMTP is not configured", async () => {
+  const log = recordingLog();
+  await sendConfirmationMail(
+    { email: "reader@example.com", confirmLink: `${BASE}/x` },
+    {
+      sender: fakeSender(fakeRelay("refuse-recipient")),
+      contactEmail: "owner@example.com",
+      baseUrl: BASE,
+      log,
+    },
+  );
+  assertStringIncludes(log.errors[0], "[SUBSCRIBE] confirmation failed:");
+  await sendConfirmationMail(
+    { email: "reader@example.com", confirmLink: `${BASE}/x` },
+    { sender: null, contactEmail: "owner@example.com", baseUrl: BASE, log },
+  );
+  assertEquals(log.lines, [
+    "[SUBSCRIBE] SMTP not configured, confirmation not sent",
+  ]);
+});
+
+Deno.test("sets Reply-To on the welcome to the owner's address, and not on the owner notice", async () => {
+  const relay = fakeRelay();
+  await sendSubscribeMails(SUB, {
+    sender: fakeSender(relay),
+    contactEmail: "owner@example.com",
+    baseUrl: BASE,
+    log: recordingLog(),
+  });
+  assertStringIncludes(
+    JSON.stringify(relay.mails[0].replyTo),
+    "owner@example.com",
+  );
+  assertEquals(relay.mails[1].replyTo, undefined);
 });

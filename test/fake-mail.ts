@@ -15,6 +15,7 @@ export type RelayBehaviour = "accept" | "refuse-recipient" | "drop-connection";
 export interface CapturedMail {
   from?: unknown;
   to?: unknown;
+  replyTo?: unknown;
   subject?: string;
   text?: unknown;
   html?: unknown;

@@ -49,7 +49,16 @@ Deno.test("linkEvent tells a brief, a Book, another page and another site apart"
 });
 
 Deno.test("the unsubscribe and payment pages are never tracked, other pages are", () => {
-  for (const path of ["/unsubscribe", "/unsubscribe/", "/pay", "/pay/"]) {
+  for (
+    const path of [
+      "/unsubscribe",
+      "/unsubscribe/",
+      "/subscribe/confirm",
+      "/subscribe/confirm/",
+      "/pay",
+      "/pay/",
+    ]
+  ) {
     assertEquals(analyticsAllowed(path), false, path);
   }
   for (const path of ["/", "/payments", "/blog/pay", "/contact-me"]) {

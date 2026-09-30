@@ -118,7 +118,14 @@ Deno.test("every Umami event on the site is in the closed list, with its propert
 Deno.test("the unsubscribe and payment pages load no Umami script, other pages do", async () => {
   const site = await startSite({ env: ENV });
   try {
-    for (const path of ["/unsubscribe?token=abc", "/unsubscribe", "/pay"]) {
+    for (
+      const path of [
+        "/unsubscribe?token=abc",
+        "/unsubscribe",
+        "/subscribe/confirm?token=abc",
+        "/pay",
+      ]
+    ) {
       const html = await body(site, path);
       assert(html.includes("<main"), `${path} did not render a page`);
       assertEquals(
