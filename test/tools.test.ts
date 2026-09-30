@@ -329,7 +329,7 @@ siteTest(
   "each tool with posts links them, and each of those posts links its tool page back",
   async (site) => {
     const withPosts = tools.filter((t) => t.posts?.length);
-    assertEquals(withPosts.length, 6);
+    assertEquals(withPosts.length, 7);
     for (const t of withPosts) {
       const page = await site.html(`/tools/${t.slug}`);
       for (const slug of t.posts!) {
@@ -469,7 +469,7 @@ siteTest(
     assert(credit.includes('href="https://isorokina.com/"'));
     for (const path of ["/llms.txt", "/llms-full.txt"]) {
       const line = (await site.html(path)).split("\n")
-        .find((l) => l.includes("/tools/preact-components)")) ?? "";
+        .find((l) => l.startsWith("- [preact-components](")) ?? "";
       assert(
         line.includes("Eirene"),
         `${path}: the preact-components line does not name Eirene`,
