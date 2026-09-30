@@ -186,15 +186,20 @@ export default define.page(function HackathonDetail(ctx) {
                     >
                       {h.ctaLabel || BOOK_LABEL}
                     </BookCallLink>
-                    <BookCallLink
-                      url={SCHEDULE_URL}
-                      target="_blank"
-                      variant="secondary"
-                      event={eventAttrs("book", { place: "end", item: h.slug })}
-                      class="gap-2 px-5 py-2.5 text-sm"
-                    >
-                      {BOOK_LABEL}
-                    </BookCallLink>
+                    {h.ctaLink && (
+                      <BookCallLink
+                        url={SCHEDULE_URL}
+                        target="_blank"
+                        variant="secondary"
+                        event={eventAttrs("book", {
+                          place: "end",
+                          item: h.slug,
+                        })}
+                        class="gap-2 px-5 py-2.5 text-sm"
+                      >
+                        {BOOK_LABEL}
+                      </BookCallLink>
+                    )}
                   </div>
                 </div>
               </div>
