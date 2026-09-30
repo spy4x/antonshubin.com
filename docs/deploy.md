@@ -123,11 +123,17 @@ you handled. Nothing retries them.
 
 ### Shared mail password
 
-The site sends from the `noreply@antonshubin.com` mailbox, and mig (the booking
-scheduler) sends from the same one: `SMTP_PASSWORD` here and the matching value
-in mig's env (rostok `servers/cloud/configs/mig.env`) are one password. Rotate
-it in both places together, or one of the two stops mailing. The site's value is
-the `SMTP_PASSWORD` of its production env.
+Four senders share the `noreply@antonshubin.com` mailbox and its one password:
+
+- this site: `SMTP_PASSWORD` in its production env;
+- mig, the booking scheduler: `SMTP_PASSWORD` in rostok's
+  `servers/cloud/configs/mig.env`;
+- Healthchecks: `HEALTHCHECKS_SMTP_PASSWORD` in rostok's `servers/cloud/.env`;
+- Vaultwarden: `VAULTWARDEN_SMTP_PASSWORD` in rostok's `servers/cloud/.env`.
+
+Rotate it in all four places together, or the ones left behind stop mailing.
+Rostok's `stacks/mig/README.md`, "Rotate the SMTP password", holds the full list
+and the steps.
 
 ### Backup
 

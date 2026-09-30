@@ -1008,8 +1008,9 @@ Replies (#266): lead mail sets `Reply-To` to the visitor, and the confirmation
 mail, the welcome mail and every newsletter set it to `CONTACT_EMAIL`, because
 the mailbox they are sent from is noreply. A lead whose send failed is appended
 to `data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that
-it was kept. The `noreply` password is shared with mig and must rotate in both
-places together (`docs/deploy.md` "Shared mail password").
+it was kept. The `noreply` password is shared by four senders (this site, mig,
+Healthchecks and Vaultwarden) and must rotate in all four together
+(`docs/deploy.md` "Shared mail password").
 
 Sign-up is double opt-in (#253): `/api/subscribe` only mails a signed
 confirmation link (`lib/subscribe-token.ts`, purpose `subscribe-confirm`, valid
