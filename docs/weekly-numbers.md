@@ -34,11 +34,17 @@ for both weeks. The event names are the ones in `docs/analytics.md`.
 - **Top pages, referrers and campaigns**: the top ten of this week.
 - **What brought conversions (30 days)**: Umami's Attribution for `brief-sent`
   and `call-booked`, by first and by last click: how many visitors converted
-  ("all"), then the top five referrers and campaigns.
-- **Journeys from the home page (30 days)**: the ten most common paths through
-  five steps starting at `/` (a step is a page or an event), with "(left)" where
-  the visit ended. Umami's Attribution and Journeys pages cannot save their
-  settings, so these sections are where the two reports live.
+  ("all"), then the top five referrers and campaigns. Umami leaves direct visits
+  and links from this site out of the referrer list, so the referrer rows need
+  not add up to "all".
+- **Journeys from the home page (30 days)**: the ten most common paths starting
+  at `/`. A step is a page or an event a page sent. A path shows its first five
+  steps and ends in "…" when it goes on, or in "(left)" where the visit ended;
+  the script asks Umami for seven steps, its maximum, because Umami pads shorter
+  requests with the same empty value that marks a visit's end. Umami merges a
+  step repeated back to back, so a shorter path with neither mark stayed on its
+  last step for the rest of its seven. Umami's Attribution and Journeys pages
+  cannot save their settings, so these sections are where the two reports live.
 
 Until 2026-10-14 the report opens with a line saying the event names changed on
 2026-09-30, so week-over-week event and goal comparisons are not meaningful yet

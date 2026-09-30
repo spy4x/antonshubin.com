@@ -475,22 +475,32 @@ export function fetchUmamiAttributionSection(
 
 /** Journeys the journey section lists, most common first. */
 const JOURNEY_LIMIT = 10;
-/** Pages a journey follows after the home page, the home page included. */
-export const JOURNEY_STEPS = 5;
+/**
+ * Steps Umami returns per journey: its maximum. Umami pads every journey with
+ * `null` up to seven slots whatever step count is asked for, so only at seven
+ * does a `null` always mean the visit ended there.
+ */
+export const JOURNEY_STEPS = 7;
+/** Steps a journey shows, the home page included; a longer one ends in "…". */
+export const JOURNEY_SHOWN = 5;
 
 /**
- * One journey as text: its pages joined by arrows, and "(left)" where Umami
- * marks the visit's end with `null`.
+ * One journey as text: its steps (pages, or events a page sent) joined by
+ * arrows, cut to `JOURNEY_SHOWN` with "…" when it goes on, or ending in
+ * "(left)" where Umami marks the visit's end with `null`.
  */
 export function journeyLabel(items: (string | null)[]): string {
   const end = items.indexOf(null);
-  const pages = end === -1 ? items : items.slice(0, end);
-  return [...pages, ...(end === -1 ? [] : ["(left)"])].join(" → ");
+  const steps = end === -1 ? items : items.slice(0, end);
+  if (steps.length > JOURNEY_SHOWN) {
+    return [...steps.slice(0, JOURNEY_SHOWN), "…"].join(" → ");
+  }
+  return [...steps, ...(end === -1 ? [] : ["(left)"])].join(" → ");
 }
 
 /**
  * Umami's Journeys report from the home page, which its page cannot save
- * (#318). Journeys that read the same once cut at the visit's end are merged.
+ * (#318). Journeys that read the same once cut are merged.
  */
 export function fetchUmamiJourneySection(
   source = umamiSource(),

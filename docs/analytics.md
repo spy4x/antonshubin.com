@@ -63,16 +63,17 @@ compares the times inclusively), so a visitor who lands straight on
 funnel asks the same question without the entry step.
 
 **Attribution and Journey live in the weekly report.** In Umami 3 (checked in
-v3.3.1 and v3.4.0) the Attribution and Journeys pages keep their settings in the
-page itself, read nothing from the URL and never load a saved report, so neither
-can be set up once in Umami. `deno task weekly-numbers` asks Umami's API for the
-same answers every Sunday, over the last 30 days because a week holds too few
-conversions to attribute (`docs/weekly-numbers.md`):
+v3.3.1 and v3.4.0) the Attribution and Journeys pages keep their settings
+(model, type, step; steps, start step) in the open page and never load a saved
+report; only the date range comes from the URL. So neither can be set up once in
+Umami. `deno task weekly-numbers` asks Umami's API for the same answers every
+Sunday, over the last 30 days because a week holds too few conversions to
+attribute (`docs/weekly-numbers.md`):
 
-| Section                     | API call                                                                       | Question                                                   |
-| --------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| What brought conversions    | `/attribution`, type `event`, step `call-booked` and `brief-sent`, both models | Which referrer and campaign brought the people who booked? |
-| Journeys from the home page | `/journeys`, 5 steps, start step `/`                                           | Where do visitors go after the home page?                  |
+| Section                     | API call                                                                       | Question                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| What brought conversions    | `/attribution`, type `event`, step `call-booked` and `brief-sent`, both models | Which referrer and campaign brought the people who booked or sent a brief? |
+| Journeys from the home page | `/journeys`, 7 steps (5 shown), start step `/`                                 | Where do visitors go after the home page?                                  |
 
 To look at another step or model, open the page in Umami and pick the same
 settings; they last until the page is closed.

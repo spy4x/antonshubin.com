@@ -513,18 +513,41 @@ Deno.test("attribution asks for both conversions by first and last click over 30
   ]);
 });
 
-Deno.test("a journey reads as pages joined by arrows, ending in (left) where the visit ended", () => {
-  assertEquals(journeyLabel(["/", "/work", null, null]), "/ → /work → (left)");
-  assertEquals(journeyLabel(["/", "/work", "/about"]), "/ → /work → /about");
+Deno.test("a journey reads as steps joined by arrows, ending in (left) only where the visit ended", () => {
+  // Umami's shape: seven slots, padded with null after the visit's last step.
+  assertEquals(
+    journeyLabel(["/", "/work", null, null, null, null, null]),
+    "/ → /work → (left)",
+  );
+  assertEquals(
+    journeyLabel(["/", "/a", "/b", "/c", "/d", null, null]),
+    "/ → /a → /b → /c → /d → (left)",
+  );
+  assertEquals(
+    journeyLabel(["/", "/a", "/b", "/c", "/d", "/e", null]),
+    "/ → /a → /b → /c → /d → …",
+  );
+  assertEquals(
+    journeyLabel(["/", "/a", "/b", "/c", "/d", "/e", "/f"]),
+    "/ → /a → /b → /c → /d → …",
+  );
+  // Umami merged the repeats of /a: the visit stayed there, it did not end.
+  assertEquals(journeyLabel(["/", "/a"]), "/ → /a");
 });
 
 Deno.test("journeys start at the home page, merge ones that read the same, and list the most common first", async () => {
   const { result, urls } = await withUmamiStub(() => [
-    { items: ["/", null], count: 2 },
-    { items: ["/", "/blog", null], count: 3 },
-    { items: ["/", null, null], count: 4 },
+    { items: ["/", "/blog", null, null, null, null, null], count: 3 },
+    { items: ["/", null, null, null, null, null, null], count: 2 },
+    { items: ["/", "/a", "/b", "/c", "/d", "/e", null], count: 1 },
+    { items: ["/", "/a", "/b", "/c", "/d", "/f", "/g"], count: 1 },
+    { items: ["/", null, null, null, null, null, null], count: 4 },
   ], fetchUmamiJourneySection);
   assertEquals(urls[0].searchParams.get("startStep"), "/");
-  assertEquals(urls[0].searchParams.get("steps"), "5");
-  assertEquals(result.rows, [["/ → (left)", "6"], ["/ → /blog → (left)", "3"]]);
+  assertEquals(urls[0].searchParams.get("steps"), "7");
+  assertEquals(result.rows, [
+    ["/ → (left)", "6"],
+    ["/ → /blog → (left)", "3"],
+    ["/ → /a → /b → /c → /d → …", "2"],
+  ]);
 });
