@@ -81,6 +81,40 @@ Deno.test("keys a request without X-Real-IP by the socket address", () => {
   assertEquals(requestClientIp(req, "10.0.0.5"), "10.0.0.5");
 });
 
+Deno.test("treats a header that is not exactly one IP address as absent", () => {
+  // A forged X-Real-IP never reaches the app past Traefik, but without Traefik
+  // a value with a port, a hostname or a list falls back to the socket address.
+  for (
+    const value of [
+      "192.0.2.1:8080",
+      "example.com",
+      "192.0.2.1 x",
+      "x, 192.0.2.1",
+    ]
+  ) {
+    assertEquals(
+      requestClientIp(request({ "x-real-ip": value }), "10.0.0.5"),
+      "10.0.0.5",
+      value,
+    );
+  }
+  // Through Cloudflare, an unreadable CF-Connecting-IP leaves the edge's own address.
+  for (
+    const value of [
+      "198.51.100.7:443",
+      "unknown",
+      "",
+      "not-an-ip, 198.51.100.7",
+    ]
+  ) {
+    const req = request({
+      "x-real-ip": "104.16.0.1",
+      "cf-connecting-ip": value,
+    });
+    assertEquals(requestClientIp(req, "10.0.0.5"), "104.16.0.1", value);
+  }
+});
+
 Deno.test("answers 429 after three submissions even when the spoofed headers rotate", async () => {
   // What stays fixed per client, and which caller-written headers rotate.
   const cases: [
