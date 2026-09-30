@@ -1,10 +1,11 @@
 # Weekly numbers
 
 `scripts/weekly-numbers.ts` (`deno task weekly-numbers`) prints a markdown
-report — visitors, top pages and referrers, CTA/outbound events and top
-campaigns from Umami; stars per repo from GitHub; subscribers and views from
-YouTube — and sends a short summary to NTFY. It is meant to run every Sunday
-from a Woodpecker cron, defined as the `weekly-numbers` step in
+report — from Umami: visitors, visits, pageviews, conversions and the conversion
+rate, the goals, every event, Book clicks by place, posts read to the end, top
+pages, referrers and campaigns; stars per repo from GitHub; subscribers and
+views from YouTube — and sends a short summary to NTFY. It is meant to run every
+Sunday from a Woodpecker cron, defined as the `weekly-numbers` step in
 `.woodpecker.yml`.
 
 Each data source is independent and optional: if its env vars are missing, that
@@ -12,6 +13,33 @@ source is skipped with a warning in the report instead of failing the whole run.
 This is a reporting script, so it follows the repo's fail-open rule for
 non-critical external calls — a broken YouTube key should not stop the Umami and
 GitHub numbers from going out.
+
+## What the Umami part shows
+
+Every Umami number stands beside the same figure for the 7 days before. Visits,
+visitors and pageviews come from `/stats`, whose `comparison` object already
+holds the previous period; every other section asks for both weeks. The event
+names are the ones in `docs/analytics.md`.
+
+- **Last 7 days**: visitors, visits, pageviews, conversions (`brief-sent` plus
+  `call-booked`) and the conversion rate (conversions ÷ visitors, one decimal,
+  "—" when there were no visitors).
+- **Goals**: `book`, `brief-sent`, `call-booked`, `newsletter-signup` and
+  `post-read`, each listed even at zero.
+- **Every event**: all of them, not only the top ten; an event seen only in the
+  previous week is listed with 0 this week.
+- **Book clicks by place** and **posts read to the end**: the `book` event by
+  its `place` property and `post-read` by its `item` (the post slug), from
+  Umami's event-data values endpoint.
+- **Top pages, referrers and campaigns**: the top ten of this week.
+
+Until 2026-10-14 the report opens with a line saying the event names changed on
+2026-09-30, so week-over-week event and goal comparisons are not meaningful yet
+(`EVENT_RENAME_DATE` in the script).
+
+The NTFY push holds only visitors, conversions and the conversion rate, each as
+"previous week → this week". Every Umami call has a 10-second timeout, and a
+section whose call fails shows a warning instead of its table.
 
 ## Campaigns
 
@@ -27,7 +55,7 @@ campaign numbers are reviewed, is in `docs/utm.md`.
 
 | Variable             | Where the value comes from                                              |
 | -------------------- | ----------------------------------------------------------------------- |
-| `UMAMI_API_URL`      | The Umami instance's API base (e.g. `https://antonshubin.com/umami`)    |
+| `UMAMI_API_URL`      | The Umami instance's API base (e.g. `https://stats.antonshubin.com`)    |
 | `UMAMI_API_TOKEN`    | Umami → Settings → API keys (a token with read access to the site)      |
 | `UMAMI_ID`           | Already used by the site's tracking snippet — the same Umami website id |
 | `GITHUB_REPOS`       | Comma-separated `owner/repo` list, e.g. `spy4x/rostok,spy4x/mig`        |
