@@ -1,6 +1,11 @@
 ---
 title: "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost"
 description: "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
+tldr:
+  - "Update: Sonnet 5.5 later cost 0.57 times as much as Opus 5.5 per merged line, review included, but passed its first review less often, 13% against 33%. My implementers now run on it."
+  - "The original finding still holds for Sonnet 5: like for like, Opus 5.5 cost about 0.45 times as much per changed line, although it lists at twice the price."
+  - "In agent work you pay for steps and context, not tokens: cached reads were most of the bill, and they cost the same on both models."
+  - "Opus 5.5 replaced Fable 5.1 as my reviewer at about a third of the price, and neither reviewer caught every security bug on its own."
 publishedAt: "2026-09-26"
 updatedAt: "2026-09-30"
 readTime: 8

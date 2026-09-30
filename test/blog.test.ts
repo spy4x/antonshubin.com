@@ -219,6 +219,55 @@ siteTest(
 );
 
 siteTest(
+  "every post in the sitemap opens with its TL;DR heading and list before any other heading",
+  async (site) => {
+    const xml = await site.html("/sitemap.xml");
+    const slugs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname)
+      .filter((p) => p.startsWith("/blog/"))
+      .map((p) => p.slice("/blog/".length));
+    assertEquals(
+      [...slugs].sort(),
+      blogArticles.map((a) => a.slug).sort(),
+      "the sitemap and content/blog list different posts",
+    );
+    let updateNotes = 0;
+    for (const slug of slugs) {
+      const article = blogArticles.find((a) => a.slug === slug)!;
+      const html = await site.html(`/blog/${slug}`);
+      const afterTitle = html.slice(html.indexOf("</h1>"));
+      const firstHeading = afterTitle.match(/<h[1-6]\b[^>]*>[^<]*/)?.[0] ?? "";
+      assert(
+        firstHeading.includes('id="tldr"') && firstHeading.endsWith("TL;DR"),
+        `${slug}: the first heading after the H1 is ${firstHeading}`,
+      );
+      const box = section(html, "data-tldr");
+      assertEquals(count(box, /<h2\b/), 1, `${slug}: TL;DR heading`);
+      assertEquals(count(box, /<li\b/), article.tldr.length, slug);
+      const text = visibleText(box);
+      for (const line of article.tldr) {
+        assert(text.includes(line), `${slug}: no "${line}" in ${text}`);
+      }
+      // A note at the top of the Markdown (an update) sits directly below
+      // the TL;DR, with nothing in between.
+      const markdown = await Deno.readTextFile(`content/blog/${slug}.md`);
+      const body = markdown.replace(/^---[\s\S]*?---\s*/, "");
+      if (!body.startsWith(">")) continue;
+      updateNotes++;
+      const afterBox = html.slice(
+        html.indexOf("</section>", html.indexOf("data-tldr")),
+      );
+      assert(
+        /^<\/section>\s*<div[^>]*class="blog-content[^"]*"[^>]*>\s*<blockquote\b/
+          .test(afterBox),
+        `${slug}: its update note does not follow the TL;DR`,
+      );
+    }
+    assert(updateNotes > 0, "no post opens with an update note to check");
+  },
+);
+
+siteTest(
   "a post about a tool links its repository under the byline",
   async (site) => {
     const html = await site.html("/blog/building-mcp-servers-with-deno");

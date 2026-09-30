@@ -1,6 +1,11 @@
 ---
 title: "The missing piece in a self-hosted CalDAV stack: a web UI for Tasks.org"
 description: "Tasks.org syncs Android tasks to CalDAV. There is no web UI for that data. The fix is a stateless PWA on top of the CalDAV server you already run — and the architecture that made it boring to ship."
+tldr:
+  - "Update: the app works well with Radicale, but Stalwart support is broken and there is no public demo right now."
+  - "Tasks.org syncs Android tasks to CalDAV, but no web client existed for that data, so I built a stateless web app on top of the CalDAV server you already run."
+  - "The CalDAV server stays the only source of truth: the app stores only accounts and encrypted credentials, so switching servers moves no todos."
+  - "You don't need Nextcloud for it: the whole stack runs on one small box next to your CalDAV server."
 publishedAt: "2026-07-22"
 readTime: 9
 topic: "self-hosting"

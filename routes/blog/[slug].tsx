@@ -364,6 +364,18 @@ export default define.page(function BlogPost(ctx) {
             </details>
           )}
 
+          {
+            /* The TL;DR every post opens with (Anton, 30 September 2026). It
+               follows the phone's collapsed contents list, so a note at the
+               top of the Markdown (an update) sits directly below it. */
+          }
+          <section data-tldr aria-labelledby="tldr" class="post-tldr mt-8">
+            <h2 id="tldr" class="text-lg text-parchment">TL;DR</h2>
+            <ul class="mt-2 list-disc space-y-1.5 pl-5 text-parchment">
+              {article.tldr.map((line) => <li key={line}>{line}</li>)}
+            </ul>
+          </section>
+
           {article.youtubeVideoId && (
             <div class="mt-8 aspect-video rounded-lg overflow-hidden">
               <iframe

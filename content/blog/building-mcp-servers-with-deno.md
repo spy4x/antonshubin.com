@@ -1,6 +1,11 @@
 ---
 title: "Building MCP Servers with Deno: A Practical Guide"
 description: "Why Deno is the right runtime for Model Context Protocol servers, the architecture I use, a working CalDAV example, and what I learned shipping four MCP servers in production."
+tldr:
+  - "I write MCP servers in Deno: TypeScript runs natively, permission flags limit what the server can touch, and deno compile ships one binary."
+  - "Start with Streamable HTTP, not stdio: every one of my four servers ended up needing HTTP anyway."
+  - "Give each tool a context object instead of globals, and design it from its Zod schema first; both keep tools small and testable."
+  - "Ship the minimum first, then add stderr logging, error boundaries, timeouts and a health check as production shows you what you need."
 publishedAt: "2026-06-23"
 readTime: 15
 topic: "ai-mcp"

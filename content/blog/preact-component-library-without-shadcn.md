@@ -1,6 +1,11 @@
 ---
 title: "preact-components: a Preact component library without shadcn or Radix"
 description: "Why I own my UI components instead of using shadcn, Radix or MUI: a Preact component library in ten JSR packages, rendered on the server, keyboard handling written by hand, with a live guide. What is in it, how to try it, and what is not done yet."
+tldr:
+  - "preact-components is my open-source Preact component library: ten JSR packages, rendered on the server, with roles, keyboard handling and focus written by hand."
+  - "I own my components instead of using shadcn, Radix or MUI, because working around their styling, upgrades and limits cost me more than owning them."
+  - "Owning components means owning accessibility, so headless Chromium checks the keyboard handling on every pull request."
+  - "It is beta: no screen reader has been run against it, only Deno is tested, and it is Preact and Tailwind only. Try any component in the live guide first."
 publishedAt: "2026-09-30"
 readTime: 8
 topic: "founders"

@@ -145,7 +145,7 @@ export function archivedPosts(
 /**
  * The llms files' post list (SEO 10): current posts grouped under their
  * topic, each with its tool link, then the Archive. `detailed` adds the
- * description, read time and date, for llms-full.txt.
+ * description, read time, date and TL;DR, for llms-full.txt.
  */
 export function llmsBlogSections(
   baseUrl: string,
@@ -163,7 +163,14 @@ export function llmsBlogSections(
         a.updatedAt ? `, updated ${a.updatedAt}` : ""
       })`
       : "";
-    return `- [${a.title}](${baseUrl}${postHref(a.slug)})${detail}${toolPart}`;
+    // The full file lists the post's TL;DR under it, so a crawler reads the
+    // same points a skimming visitor sees first.
+    const tldr = detailed
+      ? `\n  TL;DR:\n${a.tldr.map((l) => `  - ${l}`).join("\n")}`
+      : "";
+    return `- [${a.title}](${baseUrl}${
+      postHref(a.slug)
+    })${detail}${toolPart}${tldr}`;
   };
   const sections = topics.map((t) =>
     `${hashes} ${t.title}\n${topicPosts(t.id).map(line).join("\n")}`

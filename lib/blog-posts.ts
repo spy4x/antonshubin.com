@@ -43,6 +43,13 @@ export interface BlogArticle {
   slug: string;
   title: string;
   description: string;
+  /**
+   * The TL;DR every post opens with: two to four short, plain claims a
+   * skimming reader can act on (docs/voice.md "TL;DR"). Required, so a post
+   * without one fails the build. Separate from `description`, which stays the
+   * search snippet.
+   */
+  tldr: string[];
   /** `<title>` and `og:title` only, for a title too long for a search result. */
   seoTitle?: string;
   readTime: number;
@@ -67,9 +74,15 @@ export interface BlogArticle {
 
 const TOPIC_IDS = new Set<string>(topics.map((t) => t.id));
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+/** How many lines a TL;DR may have (Anton, 30 September 2026). */
+export const TLDR_MIN_LINES = 2;
+export const TLDR_MAX_LINES = 4;
+/** One line is one short sentence; longer is a paragraph, not a summary. */
+export const TLDR_MAX_CHARS = 200;
 const KNOWN_KEYS = new Set([
   "title",
   "description",
+  "tldr",
   "seoTitle",
   "readTime",
   "publishedAt",
@@ -151,10 +164,32 @@ export function parseBlogArticle(slug: string, raw: string): BlogArticle {
     throw new Error(`${where}: "archiveNote" needs "archived: true"`);
   }
 
+  const tldr = attrs.tldr;
+  if (tldr === undefined) throw new Error(`${where}: "tldr" is missing`);
+  if (
+    !Array.isArray(tldr) || tldr.length < TLDR_MIN_LINES ||
+    tldr.length > TLDR_MAX_LINES
+  ) {
+    throw new Error(
+      `${where}: "tldr" must be a list of ${TLDR_MIN_LINES} to ${TLDR_MAX_LINES} lines`,
+    );
+  }
+  for (const line of tldr) {
+    if (typeof line !== "string" || line.trim() === "") {
+      throw new Error(`${where}: every "tldr" line must be a non-empty string`);
+    }
+    if (line.length > TLDR_MAX_CHARS) {
+      throw new Error(
+        `${where}: a "tldr" line is over ${TLDR_MAX_CHARS} characters: "${line}"`,
+      );
+    }
+  }
+
   const article: BlogArticle = {
     slug,
     title: fillProof(text("title", true)!),
     description: fillProof(text("description", true)!),
+    tldr: tldr.map((line: string) => fillProof(line.trim())),
     readTime,
     publishedAt: date("publishedAt", true)!,
     topic: topicId as TopicId,

@@ -297,6 +297,7 @@ Deno.test("the blog draft carries every required front matter field, as placehol
   const filled = draft
     .replace(`publishedAt: "YYYY-MM-DD"`, `publishedAt: "2026-09-30"`)
     .replace("readTime: 0", "readTime: 4")
+    .replace("tldr: []", 'tldr: ["One point.", "Another point."]')
     .replace(`topic: "founders | ai-mcp | self-hosting"`, `topic: "founders"`);
   const post = parseBlogArticle("some-post", filled);
   assertEquals(

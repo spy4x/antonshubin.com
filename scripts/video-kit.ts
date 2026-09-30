@@ -233,14 +233,15 @@ export function chaptersDraft(ctx: VideoKitContext): string {
 
 /**
  * The companion post's first draft. Its front matter has every field
- * `lib/blog-posts.ts` requires of a `content/blog/*.md` file; `publishedAt`,
- * `readTime` and `topic` are placeholders that fail that parser, naming the
- * file, until the author fills them in.
+ * `lib/blog-posts.ts` requires of a `content/blog/*.md` file; `tldr`,
+ * `publishedAt`, `readTime` and `topic` are placeholders that fail that
+ * parser, naming the file, until the author fills them in.
  */
 export function blogDraft(ctx: VideoKitContext): string {
   return `---
 title: ${JSON.stringify(ctx.titleOptions[0])}
 description: ${JSON.stringify(ctx.summary)}
+tldr: []
 publishedAt: "YYYY-MM-DD"
 readTime: 0
 topic: "founders | ai-mcp | self-hosting"

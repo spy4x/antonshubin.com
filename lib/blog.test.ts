@@ -2,6 +2,7 @@ import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
   archiveNoteText,
   latestPostDate,
+  llmsBlogSections,
   postDate,
   postTitleTag,
   readNext,
@@ -18,6 +19,7 @@ function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
     slug,
     title: `Post ${slug}`,
     description: "About it",
+    tldr: ["One point.", "Another point."],
     readTime: 5,
     publishedAt: "2026-01-01",
     topic: "self-hosting",
@@ -168,4 +170,20 @@ Deno.test("a post date does not move to the previous day west of UTC", async () 
   }).output();
   assert(success, new TextDecoder().decode(stderr));
   assertEquals(new TextDecoder().decode(stdout).trim(), "1 January 2026");
+});
+
+Deno.test("the full llms list carries every post's TL;DR, the short list none", () => {
+  const full = llmsBlogSections("https://example.com", true);
+  const short = llmsBlogSections("https://example.com", false);
+  assertEquals(short.includes("TL;DR"), false);
+  for (const article of blogArticles) {
+    const at = full.indexOf(`(https://example.com/blog/${article.slug})`);
+    assert(at !== -1, `${article.slug} is not in the list`);
+    // The entry runs to the next post's line, or to the end of the list.
+    const next = full.indexOf("\n- [", at);
+    const entry = full.slice(at, next === -1 ? undefined : next);
+    for (const line of article.tldr) {
+      assert(entry.includes(`  - ${line}`), `${article.slug}: no "${line}"`);
+    }
+  }
 });
