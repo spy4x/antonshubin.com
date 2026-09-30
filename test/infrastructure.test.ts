@@ -11,6 +11,7 @@ import {
   infraLanes,
   infraLayers,
   infraNodes,
+  laneConnections,
   liveLinks,
   mentionedToolIds,
 } from "../lib/infrastructure.ts";
@@ -84,6 +85,24 @@ siteTest(
         item.includes('aria-hidden="true"'),
         `${e.verb}: arrow is not decorative`,
       );
+    }
+  },
+);
+
+siteTest(
+  "/infrastructure points each arrow the way its edge runs",
+  async (site) => {
+    const html = await site.html("/infrastructure");
+    for (const lane of infraLanes) {
+      for (const { edge, forward } of laneConnections(lane)) {
+        const start = html.indexOf(`data-infra-edge="${edge.from}-${edge.to}"`);
+        const item = html.slice(start, html.indexOf("</li>", start));
+        assertEquals(
+          item.includes("flex-col-reverse lg:flex-row-reverse"),
+          !forward,
+          `${edge.from} ${edge.verb} ${edge.to} points the wrong way`,
+        );
+      }
     }
   },
 );

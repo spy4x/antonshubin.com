@@ -939,7 +939,7 @@ Deno.test("/catalog and two service pages have no horizontal scroll and no axe v
   }
 });
 
-Deno.test("/infrastructure map lanes stay inside the content column from 1024 to 1440px", async () => {
+Deno.test("/infrastructure map lanes stay inside the content column and labels break only after a dot, from 1024 to 1440px", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -964,6 +964,14 @@ Deno.test("/infrastructure map lanes stay inside the content column from 1024 to
           [],
           `a lane passes the map's right edge at ${width}px`,
         );
+        const split = await page.evaluate(() =>
+          [...document.querySelectorAll("[data-infra-node] [data-label-part]")]
+            .filter((p) =>
+              !/\s/.test(p.textContent!) && p.getClientRects().length > 1
+            )
+            .map((p) => p.textContent)
+        );
+        assertEquals(split, [], `a box label breaks mid-word at ${width}px`);
         const scrollWidth = await page.evaluate(() =>
           document.documentElement.scrollWidth
         );

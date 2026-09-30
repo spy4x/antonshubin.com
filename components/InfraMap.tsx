@@ -40,6 +40,27 @@ function Arrow({ forward }: { forward: boolean }) {
   );
 }
 
+/**
+ * A box label that wraps only after a dot, never mid-word: a hostname in a
+ * narrow box reads "dash." then "antonshubin.com", not "dash.antons…".
+ * Each piece is its own span, so a browser test can see it stays on one line.
+ */
+function Label({ text }: { text: string }) {
+  const parts = text.split(".");
+  return (
+    <>
+      {parts.map((part, i) => (
+        <Fragment key={i}>
+          <span data-label-part>
+            {i < parts.length - 1 ? `${part}.` : part}
+          </span>
+          {i < parts.length - 1 && <wbr />}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 /** One lane: a chain of linked boxes joined by labelled arrows, all in one piece of markup. */
 function Lane({ lane }: { lane: InfraLane }) {
   const links = laneConnections(lane);
@@ -81,7 +102,7 @@ function Lane({ lane }: { lane: InfraLane }) {
                   {...linkEvent(n.href, { to: n.id })}
                   class={`${LINK} font-semibold break-words after:absolute after:inset-0`}
                 >
-                  {n.label}
+                  <Label text={n.label} />
                   {n.external && <NewTabHint />}
                 </a>
                 <p class="text-xs text-graphite">{n.job}</p>
