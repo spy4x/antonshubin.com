@@ -303,7 +303,10 @@ Deno.test("a signed subscription-confirmation link submits without a CSP violati
           page.waitForNavigation({ waitUntil: "networkidle" }),
           page.getByRole("link", { name: /Back to home/ }).click(),
         ]);
-        assertEquals(await page.evaluate(() => document.referrer), "");
+        assertEquals(
+          await page.evaluate(() => document.referrer),
+          `${site.origin}/`,
+        );
         assertEquals(
           (JSON.parse(await Deno.readTextFile(file)) as { email: string }[])
             .map((s) => s.email),
@@ -352,7 +355,7 @@ async function referrerAfterFollowing(
   return await page.evaluate(() => document.referrer);
 }
 
-Deno.test("a token page sends no referrer to the next page even when a proxy forces strict-origin-when-cross-origin", async () => {
+Deno.test("a token page sends no token or path as referrer even when a proxy forces strict-origin-when-cross-origin", async () => {
   const dir = await Deno.makeTempDir();
   const file = `${dir}/subscribers.json`;
   try {
@@ -390,10 +393,14 @@ Deno.test("a token page sends no referrer to the next page even when a proxy for
             "strict-origin-when-cross-origin",
             path,
           );
-          assertEquals(await referrerAfterFollowing(page, "/about"), "", path);
+          assertEquals(
+            await referrerAfterFollowing(page, "/about"),
+            `${site.origin}/`,
+            path,
+          );
         }
         // Control: a page without the meta, behind the same proxy, does
-        // send its URL, so the empty referrers above come from the meta.
+        // send its URL, so the origin-only referrers above come from the meta.
         await page.goto(`${site.origin}/work?from=test`, {
           waitUntil: "networkidle",
         });

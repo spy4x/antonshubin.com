@@ -207,7 +207,6 @@ export default define.page(function Unsubscribe(ctx) {
     canonical: "https://antonshubin.com/unsubscribe",
     ogType: "website",
     noindex: true,
-    referrer: "no-referrer",
   };
 
   return (

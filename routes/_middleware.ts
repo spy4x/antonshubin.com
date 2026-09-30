@@ -1,3 +1,5 @@
+import { referrerPolicyFor } from "../lib/referrer.ts";
+
 // Sets X-Robots-Tag per path and status. Leaving analytics out for known bots
 // happens at render time in routes/_app.tsx (see lib/bots.ts), not here, so no
 // response body is read or rewritten.
@@ -12,11 +14,10 @@ export async function handler(
 
   const res = await ctx.next();
 
-  // A page whose URL carries a token sends no Referer, so the token (which
+  // A page whose URL carries a token sends only its origin as Referer, so the token (which
   // holds the subscriber's address) never reaches the next page's analytics.
-  if (page === "/unsubscribe" || page === "/subscribe/confirm") {
-    res.headers.set("Referrer-Policy", "no-referrer");
-  }
+  const referrer = referrerPolicyFor(pathname);
+  if (referrer) res.headers.set("Referrer-Policy", referrer);
 
   // ── X-Robots-Tag per path ────────────────────────────
   if (isStaging) {

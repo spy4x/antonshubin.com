@@ -1021,16 +1021,18 @@ welcome mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
 `/api/subscribe`, `/api/lead`, `/unsubscribe` and `/subscribe/confirm`, with the
 site's own `BASE_URL` as the allowed origin. `/subscribe/confirm` is in
 `UNTRACKED_PATHS` (its URL holds the address). Both it and `/unsubscribe` send
-`Referrer-Policy: strict-origin` and carry `<meta name="referrer"
-content="strict-origin">` (`lib/referrer.ts`, read by `routes/_middleware.ts` and
-`routes/_app.tsx`, the meta first in `<head>`), because rostok's Traefik
-`security-headers` overwrites the header and a meta policy wins for the document
-(#327). Not `no-referrer`: that makes the page's own form POST send `Origin:
-null`, which Fresh's `csrf()` passes only with `Sec-Fetch-Site: same-origin`, and
-Safari before 16.4 does not send that header. With `strict-origin` the next
-page's referrer is `https://antonshubin.com/`, no path or token, and the POST
-carries the real Origin. The confirming POST answers 303 to
-`/subscribe/confirm?done=1`, so the done page's own URL holds no token.
+`Referrer-Policy: strict-origin` and carry
+`<meta name="referrer"
+content="strict-origin">` (`lib/referrer.ts`, read by
+`routes/_middleware.ts` and `routes/_app.tsx`, the meta first in `<head>`),
+because rostok's Traefik `security-headers` overwrites the header and a meta
+policy wins for the document (#327). Not `no-referrer`: that makes the page's
+own form POST send `Origin:
+null`, which Fresh's `csrf()` passes only with
+`Sec-Fetch-Site: same-origin`, and Safari before 16.4 does not send that header.
+With `strict-origin` the next page's referrer is `https://antonshubin.com/`, no
+path or token, and the POST carries the real Origin. The confirming POST answers
+303 to `/subscribe/confirm?done=1`, so the done page's own URL holds no token.
 The site's router does not use `allow-index@file`: it forces `X-Robots-Tag: all`
 over the app's per-path value (#327). An unsubscribe writes a mark
 (`lib/unsubscribed.ts`: an HMAC of the address and the time, no address) to

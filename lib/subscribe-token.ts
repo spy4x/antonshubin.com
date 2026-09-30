@@ -17,7 +17,11 @@ import {
 } from "@spy4x/platform/signed-payload";
 import { BASE_URL, getUnsubscribeSecret } from "./config.ts";
 
-/** How long a confirmation link works: three days. */
+/** How long a confirmation link works: three days. `issuedAt` (see
+ * {@link verifyConfirmToken}) is the expiry minus this value, so it assumes the
+ * TTL a token was signed with: shortening it makes older tokens look newer than
+ * they are, and a replay of one passes the unsubscribe check for one old TTL
+ * after that deploy. */
 export const CONFIRM_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 
 const PAYLOAD = type({ "+": "reject", email: "string" });

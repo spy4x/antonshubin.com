@@ -5,6 +5,7 @@
 // and SMTP switched off.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
+import { BASE_URL } from "../lib/config.ts";
 import { count, visibleText } from "./html.ts";
 import { createConfirmToken } from "../lib/subscribe-token.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
@@ -79,7 +80,7 @@ Deno.test("pressing the button subscribes the address once, however often the li
   });
 });
 
-Deno.test("the confirm and unsubscribe pages send no referrer", async () => {
+Deno.test("the confirm and unsubscribe pages send only their origin as referrer", async () => {
   await withSite(async (site) => {
     const token = await createConfirmToken("reader@example.com", SECRET);
     for (
@@ -94,7 +95,7 @@ Deno.test("the confirm and unsubscribe pages send no referrer", async () => {
     ) {
       const res = await site.get(path);
       await res.body?.cancel();
-      assertEquals(res.headers.get("Referrer-Policy"), "no-referrer", path);
+      assertEquals(res.headers.get("Referrer-Policy"), "strict-origin", path);
     }
     const other = await site.get("/");
     await other.body?.cancel();
@@ -200,7 +201,7 @@ Deno.test("a confirmation link used again after the address unsubscribed adds no
   });
 });
 
-Deno.test("every state of the confirm and unsubscribe pages carries the no-referrer meta", async () => {
+Deno.test("every state of the confirm and unsubscribe pages carries the strict-origin meta, first after the charset", async () => {
   await withSite(async (site) => {
     const good = await createConfirmToken("reader@example.com", SECRET);
     const expired = await createConfirmToken(
@@ -222,12 +223,55 @@ Deno.test("every state of the confirm and unsubscribe pages carries the no-refer
     for (const path of paths) {
       const html = await (await site.get(path)).text();
       assertEquals(
-        count(html, /<meta name="referrer" content="no-referrer"/g),
+        count(html, /<meta name="referrer" content="strict-origin"/g),
         1,
+        path,
+      );
+      // Right after the charset, so early asset requests use it too.
+      assert(
+        /<meta charset="utf-8"\s*\/?>\s*<meta name="referrer"/.test(html),
         path,
       );
     }
     const home = await (await site.get("/")).text();
     assertEquals(count(home, /<meta name="referrer"/g), 0);
+  });
+});
+
+Deno.test("the forms post with the site's own Origin and no Sec-Fetch-Site, as Safari before 16.4 does", async () => {
+  await withSite(async (site, file) => {
+    const origin = new URL(BASE_URL).origin;
+    const email = "reader@example.com";
+    const form = { "content-type": "application/x-www-form-urlencoded" };
+    const confirm = await createConfirmToken(email, SECRET);
+    // Control: what the pages' forms sent under `no-referrer`, `Origin: null`
+    // with no Sec-Fetch-Site, is refused.
+    let res = await site.get("/subscribe/confirm", {
+      method: "POST",
+      headers: { ...form, origin: "null" },
+      body: new URLSearchParams({ token: confirm }),
+    });
+    await res.body?.cancel();
+    assertEquals(res.status, 403);
+    assertEquals(await listed(file), []);
+
+    res = await site.get("/subscribe/confirm", {
+      method: "POST",
+      headers: { ...form, origin },
+      body: new URLSearchParams({ token: confirm }),
+    });
+    await res.body?.cancel();
+    assertEquals(res.status, 303);
+    assertEquals(await listed(file), [email]);
+
+    const unsub = await createUnsubscribeToken(email, SECRET);
+    res = await site.get("/unsubscribe", {
+      method: "POST",
+      headers: { ...form, origin },
+      body: new URLSearchParams({ token: unsub }),
+    });
+    await res.body?.cancel();
+    assertEquals(res.status, 200);
+    assertEquals(await listed(file), []);
   });
 });

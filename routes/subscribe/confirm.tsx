@@ -208,7 +208,6 @@ export default define.page(function ConfirmSubscription(ctx) {
     canonical: "https://antonshubin.com/subscribe/confirm",
     ogType: "website",
     noindex: true,
-    referrer: "no-referrer",
   };
 
   return (
