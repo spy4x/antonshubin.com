@@ -1,7 +1,8 @@
-import { assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
   archiveNoteText,
   latestPostDate,
+  postDate,
   postTitleTag,
   readNext,
   relatedService,
@@ -149,4 +150,22 @@ Deno.test("a post's relatedTool is the tool whose posts list names it, and only 
     );
     assertEquals(toolsForPost(article.slug).length <= 1, true, article.slug);
   }
+});
+
+Deno.test("a post date reads as day, month name and year", () => {
+  assertEquals(postDate("2026-06-15"), "15 June 2026");
+  assertEquals(postDate("2026-01-01"), "1 January 2026");
+});
+
+Deno.test("a post date does not move to the previous day west of UTC", async () => {
+  const blog = import.meta.resolve("./blog.ts");
+  const { stdout, stderr, success } = await new Deno.Command("deno", {
+    args: [
+      "eval",
+      `import { postDate } from "${blog}"; console.log(postDate("2026-01-01"))`,
+    ],
+    env: { TZ: "America/Los_Angeles" },
+  }).output();
+  assert(success, new TextDecoder().decode(stderr));
+  assertEquals(new TextDecoder().decode(stdout).trim(), "1 January 2026");
 });

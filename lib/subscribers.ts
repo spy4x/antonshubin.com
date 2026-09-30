@@ -22,6 +22,7 @@ import {
   atomicWriteJson,
   readJsonFile,
 } from "@spy4x/platform/server/atomic-json";
+import { sleep } from "@spy4x/platform/universal/async";
 import { denoFileSystem } from "@spy4x/platform/server/deno-fs";
 import { FileLock } from "@spy4x/platform/server/file-lock";
 import type { FileSystemPort } from "@spy4x/platform/server/ports";
@@ -143,7 +144,7 @@ export function createSubscriberStore(
       if (attempt >= attempts) {
         throw new Error(`${path}.lock is held by another process`);
       }
-      await new Promise((resolve) => setTimeout(resolve, retryMs));
+      await sleep(retryMs);
     }
     try {
       return await task();

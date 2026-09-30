@@ -14,6 +14,8 @@
  * to send NTFY. Nothing here needs a value that isn't in `.env.example`.
  */
 
+import { ONE_WEEK_IN_MILLISECONDS } from "@spy4x/platform/universal/time-constants";
+
 export interface Section {
   title: string;
   headers: string[];
@@ -104,7 +106,7 @@ export async function fetchUmamiStatsSection(): Promise<Section> {
   }
   try {
     const endAt = Date.now();
-    const startAt = endAt - 7 * 24 * 60 * 60 * 1000;
+    const startAt = endAt - ONE_WEEK_IN_MILLISECONDS;
     const res = await fetch(
       `${
         apiUrl.replace(/\/$/, "")
@@ -152,7 +154,7 @@ async function umamiMetricSection(
   }
   try {
     const endAt = Date.now();
-    const startAt = endAt - 7 * 24 * 60 * 60 * 1000;
+    const startAt = endAt - ONE_WEEK_IN_MILLISECONDS;
     const metrics = await fetchUmamiMetric(
       apiUrl,
       token,

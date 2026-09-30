@@ -552,28 +552,6 @@ export interface Hackathon {
 // and llms files.
 export const hackathons: Hackathon[] = [];
 
-export function prettyDate(dateString: string): string {
-  const date = new Date(dateString);
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const d = date.getDate();
-  const m = monthNames[date.getMonth()];
-  const y = date.getFullYear();
-  return `${d} ${m} ${y}`;
-}
-
 /**
  * A screenshot's caption, from its file name when the name says what it
  * shows ("01-dashboard.png" → "Dashboard", "05-editor-mobile.webp" →

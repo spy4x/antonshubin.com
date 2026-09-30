@@ -1,4 +1,5 @@
 import { useSignal } from "@preact/signals";
+import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
 import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
 
 interface CopyButtonProps {
@@ -18,20 +19,18 @@ export default function CopyButton(
   { elementId, label, class: className, title, umamiEvent }: CopyButtonProps,
 ) {
   const copied = useSignal(false);
+  const failed = useSignal(false);
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const el = document.getElementById(elementId);
     if (!el) return;
     const txt = el.textContent?.trim() || "";
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(txt);
-    } else {
-      const ta = document.createElement("textarea");
-      ta.value = txt;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
+    if (!(await copyToClipboard(txt))) {
+      failed.value = true;
+      setTimeout(() => {
+        failed.value = false;
+      }, 3000);
+      return;
     }
     copied.value = true;
     setTimeout(() => {
@@ -39,8 +38,12 @@ export default function CopyButton(
     }, 10000);
   };
 
+  // One colour class at a time: a failure reads in Brick (error), everything else in Sage.
+  const colorClass = failed.value
+    ? "text-brick hover:text-brick"
+    : "text-sage hover:text-sage";
   const baseClass =
-    "inline-flex items-center min-h-6 gap-1 text-xs text-sage hover:text-sage transition-colors";
+    `inline-flex items-center min-h-6 gap-1 text-xs ${colorClass} transition-colors`;
 
   return (
     <button
@@ -48,7 +51,9 @@ export default function CopyButton(
       class={`${className || ""} ${baseClass}`.trim()}
       aria-live="polite"
       data-umami-event={umamiEvent}
-      {...(title && !copied.value ? { title, "aria-label": title } : {})}
+      {...(title && !copied.value && !failed.value
+        ? { title, "aria-label": title }
+        : {})}
     >
       {copied.value
         ? (
@@ -56,6 +61,8 @@ export default function CopyButton(
             <CheckIcon class="w-3.5 h-3.5" /> Copied!
           </>
         )
+        : failed.value
+        ? <>Copy failed</>
         : (
           <>
             <CopyIcon class="w-3.5 h-3.5" /> {label ?? title ?? "Copy address"}

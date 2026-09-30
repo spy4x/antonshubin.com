@@ -1,5 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
+import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
 
 /**
  * The post body's two interactive parts, wired to markup `lib/markdown.ts`
@@ -43,12 +44,8 @@ export default function BlogImageEnhancer() {
         button.addEventListener("click", async () => {
           const code = button.closest(".code-block")?.querySelector("pre");
           const text = code?.textContent ?? "";
-          try {
-            await navigator.clipboard.writeText(text.replace(/\n$/, ""));
-            button.textContent = "Copied!";
-          } catch {
-            button.textContent = "Copy failed";
-          }
+          const copied = await copyToClipboard(text.replace(/\n$/, ""));
+          button.textContent = copied ? "Copied!" : "Copy failed";
           setTimeout(() => {
             button.textContent = "Copy";
           }, 3000);
