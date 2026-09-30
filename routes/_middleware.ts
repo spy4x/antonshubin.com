@@ -9,6 +9,12 @@ export async function handler(
 
   const res = await ctx.next();
 
+  // A page whose URL carries a token sends no Referer, so the token (which
+  // holds the subscriber's address) never reaches the next page's analytics.
+  if (pathname === "/unsubscribe" || pathname === "/subscribe/confirm") {
+    res.headers.set("Referrer-Policy", "no-referrer");
+  }
+
   // ── X-Robots-Tag per path ────────────────────────────
   if (isStaging) {
     // Already set by main.ts cache middleware — preserve noindex

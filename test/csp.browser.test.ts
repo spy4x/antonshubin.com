@@ -296,6 +296,14 @@ Deno.test("a signed subscription-confirmation link loads and its form submits wi
         await page.getByRole("heading", { name: "You're subscribed" })
           .waitFor({ state: "visible" });
         await assertNoViolations(page, "after submitting the confirm form");
+        // The done page's URL holds no token, and neither does the referrer
+        // of the page reached from it (Umami records both).
+        assertEquals(page.url().includes("token"), false, page.url());
+        await Promise.all([
+          page.waitForNavigation({ waitUntil: "networkidle" }),
+          page.getByRole("link", { name: /Back to home/ }).click(),
+        ]);
+        assertEquals(await page.evaluate(() => document.referrer), "");
         assertEquals(
           (JSON.parse(await Deno.readTextFile(file)) as { email: string }[])
             .map((s) => s.email),

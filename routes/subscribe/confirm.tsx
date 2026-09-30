@@ -21,7 +21,7 @@ const NO_STORE = { "Cache-Control": "no-store" };
 
 type PageData =
   | { state: "confirm"; email: string; token: string }
-  | { state: "done"; email: string }
+  | { state: "done" }
   | { state: "expired" }
   | { state: "invalid" }
   | { state: "error" };
@@ -50,6 +50,10 @@ async function check(token: string) {
 export const handler = define.handlers({
   async GET(ctx) {
     const token = ctx.url.searchParams.get("token");
+    // Where the confirming POST lands: a URL with no token in it.
+    if (!token && ctx.url.searchParams.get("done") === "1") {
+      return page<PageData>({ state: "done" }, { headers: NO_STORE });
+    }
     if (!token) {
       return page<PageData>({ state: "invalid" }, {
         status: 400,
@@ -99,10 +103,12 @@ export const handler = define.handlers({
     });
     switch (outcome.state) {
       case "confirmed":
-        return page<PageData>(
-          { state: "done", email: outcome.email },
-          { headers: NO_STORE },
-        );
+        // 303 to a URL without the token, so the done page's address bar,
+        // history and referrer never hold it.
+        return new Response(null, {
+          status: 303,
+          headers: { ...NO_STORE, Location: "/subscribe/confirm?done=1" },
+        });
       case "error":
         return page<PageData>({ state: "error" }, {
           status: 500,
@@ -125,7 +131,7 @@ function Body(data: PageData) {
           <h1 class="text-2xl font-bold text-parchment mb-6">
             Subscribe {data.email} to the newsletter?
           </h1>
-          <form method="post">
+          <form method="post" action="/subscribe/confirm">
             <input type="hidden" name="token" value={data.token} />
             <button
               type="submit"
@@ -143,7 +149,7 @@ function Body(data: PageData) {
             You're subscribed
           </h1>
           <p class="text-graphite mb-6">
-            A welcome mail is on its way to {data.email}.
+            A welcome mail is on its way.
           </p>
           <a
             href="/"

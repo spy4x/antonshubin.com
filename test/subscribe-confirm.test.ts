@@ -66,12 +66,37 @@ Deno.test("pressing the button subscribes the address once, however often the li
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ token }),
       });
-      const text = visibleText(await res.text());
-      assertEquals(res.status, 200);
-      assert(text.includes("You're subscribed"), text);
+      await res.body?.cancel();
+      assertEquals(res.status, 303);
+      assertEquals(res.headers.get("Location"), "/subscribe/confirm?done=1");
       assertEquals(res.headers.get("Cache-Control"), "no-store");
     }
+    const done = await site.get("/subscribe/confirm?done=1");
+    const text = visibleText(await done.text());
+    assertEquals(done.status, 200);
+    assert(text.includes("You're subscribed"), text);
     assertEquals(await listed(file), ["reader@example.com"]);
+  });
+});
+
+Deno.test("the confirm and unsubscribe pages send no referrer", async () => {
+  await withSite(async (site) => {
+    const token = await createConfirmToken("reader@example.com", SECRET);
+    for (
+      const path of [
+        linkFor(token),
+        "/subscribe/confirm?done=1",
+        "/unsubscribe?token=forged",
+        "/subscribe/confirm",
+      ]
+    ) {
+      const res = await site.get(path);
+      await res.body?.cancel();
+      assertEquals(res.headers.get("Referrer-Policy"), "no-referrer", path);
+    }
+    const other = await site.get("/");
+    await other.body?.cancel();
+    assertEquals(other.headers.get("Referrer-Policy"), null);
   });
 });
 

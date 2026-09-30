@@ -59,7 +59,7 @@ Deno.test("a confirmation raced against an unsubscribe: the removed address stay
           method: "POST",
         }),
       ]);
-      assertEquals([subscribed.status, unsubscribed.status], [200, 200]);
+      assertEquals([subscribed.status, unsubscribed.status], [303, 200]);
       await subscribed.body?.cancel();
       await unsubscribed.body?.cancel();
       const stored: { email: string }[] = JSON.parse(

@@ -895,9 +895,9 @@ as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
 `not-found` through `islands/TrackPageEvent.tsx`. Links to other sites inside a
 post get `outbound` from `lib/markdown.ts`.
 
+`routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
 (`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`),
-and (`/unsubscribe`, whose URL carries a working token, and `/pay`), and
-`scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
+and `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
 `routes/privacy.tsx` describes exactly this; change it together with the code.
 
 ## Content-Security-Policy
@@ -1012,7 +1012,9 @@ and adds it on POST (`lib/subscribe.ts`'s `confirmSubscription`), then the
 welcome mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
 `/api/subscribe`, `/api/lead`, `/unsubscribe` and `/subscribe/confirm`, with the
 site's own `BASE_URL` as the allowed origin. `/subscribe/confirm` is in
-`UNTRACKED_PATHS` (its URL holds the address).
+`UNTRACKED_PATHS` (its URL holds the address). Both it and `/unsubscribe` send
+`Referrer-Policy: no-referrer`, and the confirming POST answers 303 to
+`/subscribe/confirm?done=1`, so no token reaches the next page as a referrer.
 
 ## Publishing a blog post
 

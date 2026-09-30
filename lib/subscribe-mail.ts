@@ -19,6 +19,12 @@ export interface NewSubscriber {
   unsubscribeLink: string;
 }
 
+/** `text` with every copy of `email` replaced, so a relay's error never puts
+ * the subscriber's address in the log. */
+function withoutAddress(text: string, email: string): string {
+  return text.replaceAll(email, "<REDACTED:EMAIL>");
+}
+
 /** The address that asked to subscribe, and the link that confirms it. */
 export interface ConfirmationRequest {
   email: string;
@@ -47,7 +53,12 @@ export async function sendConfirmationMail(
       `Someone asked to send this address the newsletter on ${deps.baseUrl}. If that was you, confirm here:\n${request.confirmLink}\n\nThe link works for three days. If it was not you, ignore this mail and nothing happens.\n\n— Anton`,
     ...(deps.contactEmail ? { replyTo: deps.contactEmail } : {}),
   });
-  if (!result.ok) log.error("[SUBSCRIBE] confirmation failed:", result.error);
+  if (!result.ok) {
+    log.error(
+      "[SUBSCRIBE] confirmation failed:",
+      withoutAddress(result.error, request.email),
+    );
+  }
 }
 
 /**
@@ -83,7 +94,12 @@ export async function sendSubscribeMails(
       return;
     }
     const result = await deps.sender.send(message);
-    if (!result.ok) log.error(`[SUBSCRIBE] ${what} failed:`, result.error);
+    if (!result.ok) {
+      log.error(
+        `[SUBSCRIBE] ${what} failed:`,
+        withoutAddress(result.error, sub.email),
+      );
+    }
   }
 
   await Promise.all([send(welcome, "welcome"), send(notice, "notify")]);

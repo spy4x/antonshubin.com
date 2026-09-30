@@ -137,7 +137,9 @@ Deno.test("at 390px the last footer line clears the tab bar", async () => {
       // Scroll again, with a pause for the layout to settle, until the height
       // is the same twice in a row.
       let height = 0;
+      let tries = 0;
       for (let steady = 0; steady < 2;) {
+        assert(++tries <= 10, "the page height never settled after 10 scrolls");
         const now = await page.evaluate(async () => {
           scrollTo(0, document.body.scrollHeight);
           await new Promise((done) => setTimeout(done, 150));

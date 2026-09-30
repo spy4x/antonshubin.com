@@ -150,3 +150,32 @@ Deno.test("sets Reply-To on the welcome to the owner's address, and not on the o
   );
   assertEquals(relay.mails[1].replyTo, undefined);
 });
+
+Deno.test("never logs the subscriber's address when the relay's error names it", async () => {
+  const log = recordingLog();
+  const sender = {
+    send: () =>
+      Promise.resolve({
+        ok: false as const,
+        error: "550 no such user reader@example.com",
+        accepted: [],
+        rejected: [],
+        duplicates: [],
+      }),
+  };
+  const deps = {
+    sender,
+    contactEmail: "owner@example.com",
+    baseUrl: BASE,
+    log,
+  };
+  await sendConfirmationMail(
+    { email: "reader@example.com", confirmLink: `${BASE}/x` },
+    deps,
+  );
+  await sendSubscribeMails(SUB, { ...deps, contactEmail: "" });
+  const logged = log.errors.join("\n");
+  assertStringIncludes(logged, "[SUBSCRIBE] confirmation failed:");
+  assertStringIncludes(logged, "[SUBSCRIBE] welcome failed:");
+  assertEquals(logged.includes("reader@example.com"), false, logged);
+});
