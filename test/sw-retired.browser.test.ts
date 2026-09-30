@@ -37,7 +37,9 @@ Deno.test("a first visit never reloads, registers a worker or requests another p
     let loads = 0;
     page.on("load", () => loads++);
 
-    await page.goto(`${site.origin}/book`, { waitUntil: "load" });
+    const res = await page.goto(`${site.origin}/book`, { waitUntil: "load" });
+    // A 404 page would pass every check below, so the visit must land.
+    assertEquals(res?.status(), 200, "the booking page did not load");
     await page.evaluate(() => {
       (globalThis as unknown as { visitorState: string }).visitorState = "kept";
     });
