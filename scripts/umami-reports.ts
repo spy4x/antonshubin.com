@@ -84,10 +84,11 @@ function goal(event: string, question: string): ReportDefinition {
 /**
  * Every report the script manages, by name. The event names are the ones in
  * docs/analytics.md. A path step ending in `*` matches by prefix, so `/*` is
- * any page (`getFunnel.ts` turns a leading or trailing `*` into `%`). The
- * booking funnel starts at `/contact-me` rather than at `/*`: a visitor who
- * lands on `/contact-me` would match `/*` with that same view and then need a
- * second `/contact-me` view to reach step two.
+ * any page (`getFunnel.ts` turns a leading or trailing `*` into `%`). A later
+ * step may match the same event as the step before it (`getFunnel.ts` compares
+ * `created_at between` the earlier step and its window, inclusive), so a
+ * direct landing on `/contact-me` counts for both `/*` and `/contact-me`.
+ * The two-step booking funnel is the same question without the entry step.
  */
 export const REPORTS: ReportDefinition[] = [
   goal("book", "How many Book clicks, across every place they sit?"),
@@ -95,6 +96,20 @@ export const REPORTS: ReportDefinition[] = [
   goal("call-booked", "How many intro calls were actually booked?"),
   goal("newsletter-signup", "How many newsletter signups succeeded?"),
   goal("post-read", "How many post views reached the end of the post?"),
+  {
+    name: "Funnel: any page → /contact-me → call-booked",
+    type: "funnel",
+    description:
+      `Of all visitors, how many open the booking page, and how many of those book a call? ${MANAGED}`,
+    parameters: {
+      window: FUNNEL_WINDOW_MINUTES,
+      steps: [
+        { type: "path", value: "/*" },
+        { type: "path", value: "/contact-me" },
+        { type: "event", value: "call-booked" },
+      ],
+    },
+  },
   {
     name: "Funnel: /contact-me → call-booked",
     type: "funnel",

@@ -31,6 +31,7 @@ interface Recorded {
   url: URL;
   body?: Record<string, unknown>;
   auth: string | null;
+  signal: AbortSignal | null | undefined;
 }
 
 /** A stub `fetch` that answers the list call with `saved` and every write with `{}`. */
@@ -46,6 +47,7 @@ function stubFetch(
       url,
       body: init?.body ? JSON.parse(String(init.body)) : undefined,
       auth: new Headers(init?.headers).get("Authorization"),
+      signal: init?.signal,
     });
     if (method === "GET") {
       return Promise.resolve(
@@ -181,7 +183,7 @@ Deno.test("REPORTS holds the five goals and a funnel for each outcome, with uniq
     const steps = r.parameters.steps as { value: string }[];
     return steps[steps.length - 1].value;
   });
-  assertEquals(funnelEnds, ["call-booked", "brief-sent"]);
+  assertEquals(funnelEnds, ["call-booked", "call-booked", "brief-sent"]);
 });
 
 Deno.test("syncReports follows Umami's paging, so a report on page two is matched instead of created again", async () => {
@@ -211,4 +213,25 @@ Deno.test("syncReports follows Umami's paging, so a report on page two is matche
   const result = await syncReports(config, { fetchFn });
   assertEquals(result.success, true);
   assertEquals(calls, ["GET /api/reports", "GET /api/reports"]);
+});
+
+for (
+  const [field, changed] of [
+    ["description", { description: "An older wording." }],
+    ["type", { type: "funnel" }],
+  ] as const
+) {
+  Deno.test(`planReportCalls updates a same-name report whose ${field} differs`, () => {
+    const saved: SavedReport[] = [{ id: "r1", ...goalBook, ...changed }];
+    const [call] = planReportCalls(saved, [goalBook], "site-id");
+    assertEquals(call.action, "update");
+    assertEquals(call.body?.[field], goalBook[field]);
+  });
+}
+
+Deno.test("syncReports gives every Umami call an abort signal, so a stalled server cannot hang it", async () => {
+  const { fetchFn, calls } = stubFetch([]);
+  await syncReports(config, { fetchFn });
+  assertEquals(calls.length, 1 + REPORTS.length);
+  for (const c of calls) assertEquals(c.signal instanceof AbortSignal, true);
 });

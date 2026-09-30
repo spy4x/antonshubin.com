@@ -200,7 +200,9 @@ const DAY = 24 * 60 * 60 * 1000;
 async function withUmamiStub<T>(
   answer: (url: URL) => unknown,
   fn: (source: UmamiSource) => Promise<T>,
-): Promise<{ result: T; urls: URL[] }> {
+): Promise<
+  { result: T; urls: URL[]; signals: (AbortSignal | null | undefined)[] }
+> {
   const env: Record<string, string> = {
     UMAMI_API_URL: "https://umami.example.com/umami/",
     UMAMI_API_TOKEN: "placeholder-token",
@@ -212,7 +214,9 @@ async function withUmamiStub<T>(
   for (const [n, v] of Object.entries(env)) Deno.env.set(n, v);
   const original = globalThis.fetch;
   const urls: URL[] = [];
-  globalThis.fetch = ((input: string | URL | Request) => {
+  const signals: (AbortSignal | null | undefined)[] = [];
+  globalThis.fetch = ((input: string | URL | Request, init?: RequestInit) => {
+    signals.push(init?.signal);
     const url = new URL(input instanceof Request ? input.url : String(input));
     urls.push(url);
     return Promise.resolve(Response.json(answer(url)));
@@ -224,7 +228,7 @@ async function withUmamiStub<T>(
         "umamiSource() returned undefined with every env var set",
       );
     }
-    return { result: await fn(source), urls };
+    return { result: await fn(source), urls, signals };
   } finally {
     globalThis.fetch = original;
     for (const [n, v] of previous) {
@@ -435,4 +439,27 @@ Deno.test("an Umami section that fails reports a warning instead of throwing", a
       else Deno.env.set(n, v);
     }
   }
+});
+
+Deno.test("every Umami call carries an abort signal, so a stalled server cannot hang the report", async () => {
+  const { signals } = await withUmamiStub(() => [], fetchUmamiEventsSection);
+  assertEquals(signals.length, 2);
+  for (const signal of signals) {
+    assertEquals(signal instanceof AbortSignal, true);
+  }
+});
+
+Deno.test("sections that need the same numbers share one Umami call per URL", async () => {
+  const { urls } = await withUmamiStub(
+    (url) =>
+      url.pathname.endsWith("/stats") ? { visitors: 1, comparison: {} } : [],
+    (source) =>
+      Promise.all([
+        fetchUmamiStatsSection(source),
+        fetchUmamiGoalsSection(source),
+        fetchUmamiEventsSection(source),
+      ]),
+  );
+  const eventCalls = urls.filter((u) => u.searchParams.get("type") === "event");
+  assertEquals(eventCalls.length, 2);
 });
