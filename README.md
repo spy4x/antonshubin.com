@@ -48,6 +48,7 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | `deno task launch-kit`           | Draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts             |
 | `deno task video-kit`            | Transcript → titles, description, chapters, blog draft                    |
 | `deno task weekly-numbers`       | Umami/GitHub/YouTube numbers → markdown + NTFY                            |
+| `deno task umami-reports`        | Create or update the Umami goals and funnels (`--dry-run` to preview)     |
 | `deno task optimize:screenshots` | Compress portfolio screenshots                                            |
 
 ## Documentation
@@ -55,7 +56,7 @@ All tasks are defined in `deno.json`; this list mirrors it.
 - [AGENTS.md](AGENTS.md) — project structure, coding conventions, deploy
   process, CSP, newsletter and SEO-crawler wiring — the source of truth for
   anyone (human or agent) working on this repo.
-- [docs/](docs/) — deploy, dev setup, infra, newsletter, SEO, UTM and
+- [docs/](docs/) — analytics, deploy, dev setup, infra, newsletter, SEO, UTM and
   weekly-numbers reference docs.
 
 ## License

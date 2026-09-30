@@ -18,6 +18,7 @@
     "video-kit": "deno run -A scripts/video-kit.ts",
     "links": "deno run -R --allow-env scripts/links.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
+    "umami-reports": "deno run --allow-env --allow-net scripts/umami-reports.ts",
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
     "lcp": "deno run -A scripts/lcp.ts",
     "og": "deno run -A scripts/og-images.ts",
