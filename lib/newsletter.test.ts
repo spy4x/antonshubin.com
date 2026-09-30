@@ -117,3 +117,26 @@ Deno.test("skips a stored row that is not a bare address, counts it as failed an
     "  ✗ row 4: not a bare address, skipped",
   ]);
 });
+
+Deno.test("sets Reply-To on every issue when a reply address is given, and on none otherwise", async () => {
+  for (const replyTo of ["owner@example.com", undefined]) {
+    const relay = fakeRelay();
+    await sendNewsletter({
+      subscribers: SUBSCRIBERS,
+      subject: "Issue 1",
+      body: "<p>Hello</p>",
+      baseUrl: "https://example.com",
+      unsubscribeLink: link,
+      sender: fakeSender(relay),
+      replyTo,
+      log: recordingLog(),
+    });
+    for (const mail of relay.mails) {
+      if (replyTo) {
+        assertStringIncludes(JSON.stringify(mail.replyTo), replyTo);
+      } else {
+        assertEquals(mail.replyTo, undefined);
+      }
+    }
+  }
+});

@@ -4,6 +4,7 @@
 anton-tasks.md
 data/subscribers.json
 data/subscribers.json.*
+data/leads-failed.jsonl
 data/newsletter-log.json
 .env
 # Environment files

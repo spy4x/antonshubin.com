@@ -1,56 +1,50 @@
-// What `/api/subscribe` does with the posted email field: check it is a bare
-// address, store it once, then welcome the subscriber and notify the owner.
-// Kept out of the route so a test can run it against fake storage and a fake
-// mail relay.
+// The two halves of a newsletter sign-up (#253). `/api/subscribe` only mails a
+// confirmation link to the address it was given: `requestSubscription`. The
+// address joins the list when its owner confirms on `/subscribe/confirm`:
+// `confirmSubscription`. Kept out of the routes so a test can run both against
+// fake storage and a fake mail relay.
 import type { SubscriberStore } from "./subscribers.ts";
 import { bareAddress } from "./email-field.ts";
 import {
+  sendConfirmationMail,
   sendSubscribeMails,
   type SubscribeMailDeps,
 } from "./subscribe-mail.ts";
+import type { ConfirmTokenResult } from "./subscribe-token.ts";
 
-/** Storage, link signing and mail for {@link addSubscriber}. */
-export interface AddSubscriberDeps {
-  /** The subscriber list's read-change-write; throws when the file cannot
-   * be parsed or written. */
-  update: SubscriberStore["update"];
-  /** Throws when the link cannot be signed, e.g. without UNSUBSCRIBE_SECRET. */
-  unsubscribeLink(email: string): Promise<string>;
+/** Link building and mail for {@link requestSubscription}. */
+export interface RequestSubscriptionDeps {
+  /** The confirmation link for a normalized address. Throws when it cannot be
+   * signed, e.g. without UNSUBSCRIBE_SECRET. */
+  confirmLink(email: string): Promise<string>;
   mail: SubscribeMailDeps;
-  now?: () => Date;
   log?: { error(...args: unknown[]): void };
 }
 
-/** The HTTP answer, plus the mails still in flight (the route does not wait
- * for them; a test does). */
-export interface AddSubscriberOutcome {
+/** The HTTP answer, plus the mail still in flight (the route does not wait
+ * for it; a test does). */
+export interface RequestSubscriptionOutcome {
   status: number;
   body: Record<string, unknown>;
   mails: Promise<void>;
 }
 
 /**
- * Stores the address in `field` (the request's raw email field) unless it is
- * already on the list.
+ * Mails a confirmation link to the address in `field` (the request's raw
+ * email field). Nothing is stored: the list is neither read nor written, so a
+ * known address and a new one get the same answer, the same mail and the same
+ * work, and the route cannot be used to test who is on the list.
  *
- * Only a bare address is accepted (#255): anything else answers 400 before the
- * list is read, so nothing is stored and nothing is mailed. The address is
- * stored lowercased.
+ * Only a bare address is accepted (#255): anything else answers 400 before a
+ * link is built. The address is lowercased.
  *
- * A known address gets the same answer as a new one, so the route cannot be
- * used to test whether an address is on the list. For the same reason the
- * unsubscribe link is built first, for both: a missing or unusable
- * UNSUBSCRIBE_SECRET fails every request the same way, instead of saving an
- * address whose unsubscribe link would never work. The list is saved for both
- * too, so an unwritable file answers 500 to a known address as to a new one.
- * The remaining difference is the mails a new address triggers after the
- * answer, and about 0.1 ms of time; a probe with an unknown address
- * subscribes and mails it, so it cannot go unnoticed.
+ * A missing or unusable UNSUBSCRIBE_SECRET answers 500 to every request, so a
+ * misconfigured site never says "check your inbox" for a mail it cannot send.
  */
-export async function addSubscriber(
+export async function requestSubscription(
   field: unknown,
-  deps: AddSubscriberDeps,
-): Promise<AddSubscriberOutcome> {
+  deps: RequestSubscriptionDeps,
+): Promise<RequestSubscriptionOutcome> {
   const log = deps.log ?? console;
   const none = Promise.resolve();
 
@@ -65,9 +59,9 @@ export async function addSubscriber(
 
   let link: string;
   try {
-    link = await deps.unsubscribeLink(email);
+    link = await deps.confirmLink(email);
   } catch (err) {
-    log.error("[SUBSCRIBE] cannot build unsubscribe link:", err);
+    log.error("[SUBSCRIBE] cannot build confirmation link:", err);
     return {
       status: 500,
       body: { error: "Server misconfigured" },
@@ -75,36 +69,80 @@ export async function addSubscriber(
     };
   }
 
-  let known: boolean;
+  const mails = sendConfirmationMail({ email, confirmLink: link }, deps.mail)
+    .catch((err) => log.error("[SUBSCRIBE] mail failed:", err));
+  return { status: 200, body: { ok: true }, mails };
+}
+
+/** Storage, token checking, link signing and mail for {@link confirmSubscription}. */
+export interface ConfirmSubscriptionDeps {
+  /** The subscriber list's read-change-write; throws when the file cannot
+   * be parsed or written. */
+  update: SubscriberStore["update"];
+  /** Reads the address out of a confirmation token, or says why it is refused. */
+  verify(token: string): Promise<ConfirmTokenResult>;
+  /** Throws when the link cannot be signed, e.g. without UNSUBSCRIBE_SECRET. */
+  unsubscribeLink(email: string): Promise<string>;
+  mail: SubscribeMailDeps;
+  now?: () => Date;
+  log?: { error(...args: unknown[]): void };
+}
+
+/** What confirming a link led to. `mails` is in flight; a test waits for it. */
+export type ConfirmSubscriptionOutcome =
+  | { state: "confirmed"; email: string; mails: Promise<void> }
+  | { state: "expired" | "invalid" | "error" };
+
+/**
+ * Adds the address `token` confirms to the list, unless it is already there,
+ * then welcomes the subscriber and notifies the owner. Confirming a second
+ * time (a reload, a double click) changes nothing and sends nothing.
+ *
+ * The unsubscribe link is built before anything is saved, so an address is
+ * never stored with an unsubscribe link that cannot work.
+ */
+export async function confirmSubscription(
+  token: string,
+  deps: ConfirmSubscriptionDeps,
+): Promise<ConfirmSubscriptionOutcome> {
+  const log = deps.log ?? console;
+  const checked = await deps.verify(token);
+  if (!checked.ok) return { state: checked.reason };
+  const email = checked.email;
+
+  let link: string;
+  try {
+    link = await deps.unsubscribeLink(email);
+  } catch (err) {
+    log.error("[SUBSCRIBE] cannot build unsubscribe link:", err);
+    return { state: "error" };
+  }
+
+  let added: boolean;
   let total: number;
   try {
-    // The list is read inside the update, under the lock, after the link
-    // is built: a read taken earlier would be stale by the time it is written.
-    ({ known, total } = await deps.update((subs) => {
-      const known = subs.some((s) => s.email === email);
-      const list = known ? subs : [...subs, {
-        email,
-        subscribedAt: (deps.now?.() ?? new Date()).toISOString(),
-      }];
-      // Written for a known address too, so a failing write answers both the
-      // same way (#278).
-      return { list, result: { known, total: list.length } };
-    }));
+    ({ added, total } = await deps.update<{ added: boolean; total: number }>(
+      (subs) => {
+        const known = subs.some((s) => s.email === email);
+        if (known) {
+          return { result: { added: false, total: subs.length } };
+        }
+        const list = [...subs, {
+          email,
+          subscribedAt: (deps.now?.() ?? new Date()).toISOString(),
+        }];
+        return { list, result: { added: true, total: list.length } };
+      },
+    ));
   } catch (err) {
     log.error("[SUBSCRIBE] failed to save:", err);
-    return {
-      status: 500,
-      body: { error: "Could not save subscription" },
-      mails: none,
-    };
+    return { state: "error" };
   }
-  if (known) return { status: 200, body: { ok: true }, mails: none };
+  if (!added) return { state: "confirmed", email, mails: Promise.resolve() };
 
-  // Welcome the subscriber and notify the owner.
   const mails = sendSubscribeMails(
     { email, total, unsubscribeLink: link },
     deps.mail,
   ).catch((err) => log.error("[SUBSCRIBE] mail failed:", err));
-
-  return { status: 200, body: { ok: true }, mails };
+  return { state: "confirmed", email, mails };
 }

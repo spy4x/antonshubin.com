@@ -4,6 +4,7 @@ import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
 import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
 import { cacheControlFor, isStagingHost } from "./lib/cache-control.ts";
 import { redirectTarget } from "./lib/redirects.ts";
+import { siteCsrf } from "./lib/csrf.ts";
 
 export const app = new App<State>();
 
@@ -69,6 +70,9 @@ app.use(async (ctx) => {
     headers: { Location: target + ctx.url.search },
   });
 });
+
+// Cross-site POSTs to the mailing and unsubscribe routes answer 403 (#253).
+app.use(siteCsrf());
 
 app.use(staticFiles());
 

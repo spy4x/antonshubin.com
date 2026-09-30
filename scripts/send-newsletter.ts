@@ -17,7 +17,7 @@
  */
 
 import { loadSubscribers } from "@/lib/subscribers.ts";
-import { BASE_URL, getUnsubscribeSecret } from "@/lib/config.ts";
+import { BASE_URL, CONTACT_EMAIL, getUnsubscribeSecret } from "@/lib/config.ts";
 import { unsubscribeLink } from "@/lib/unsubscribe.ts";
 import { createSiteSender, smtpSettings } from "@/lib/mail.ts";
 import { type NewsletterIssue, sendNewsletter } from "@/lib/newsletter.ts";
@@ -117,6 +117,7 @@ async function main() {
     baseUrl: BASE_URL,
     unsubscribeLink,
     sender: createSiteSender(smtp),
+    replyTo: CONTACT_EMAIL,
   };
 
   if (!announcement) {

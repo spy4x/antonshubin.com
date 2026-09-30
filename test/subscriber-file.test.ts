@@ -1,10 +1,11 @@
-// Rendered-site guards for the subscriber file (#254): a subscribe raced
+// Rendered-site guards for the subscriber file (#254): a confirmed subscribe raced
 // against an unsubscribe, and a file that does not parse. Boots the built site
 // through test/harness.ts with a temp SUBSCRIBERS_FILE, a throwaway
 // UNSUBSCRIBE_SECRET and SMTP switched off, so nothing is mailed.
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
+import { createConfirmToken } from "../lib/subscribe-token.ts";
 import { denoFileSystem } from "@spy4x/platform/server/deno-fs";
 import { FileLock } from "@spy4x/platform/server/file-lock";
 
@@ -34,7 +35,7 @@ async function withSite(
   }
 }
 
-Deno.test("a subscribe raced against an unsubscribe: the removed address stays removed", async () => {
+Deno.test("a confirmation raced against an unsubscribe: the removed address stays removed", async () => {
   await withSite(async (site, file) => {
     const token = await createUnsubscribeToken("leave@example.com", SECRET);
     for (let round = 1; round <= 10; round++) {
@@ -45,20 +46,20 @@ Deno.test("a subscribe raced against an unsubscribe: the removed address stays r
           { email: "leave@example.com", subscribedAt: AT },
         ]),
       );
+      const confirmToken = await createConfirmToken(
+        `new${round}@example.com`,
+        SECRET,
+      );
       const [subscribed, unsubscribed] = await Promise.all([
-        site.get("/api/subscribe", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-real-ip": `198.51.100.${round}`,
-          },
-          body: JSON.stringify({ email: `new${round}@example.com` }),
-        }),
+        site.get(
+          `/subscribe/confirm?token=${encodeURIComponent(confirmToken)}`,
+          { method: "POST" },
+        ),
         site.get(`/unsubscribe?token=${encodeURIComponent(token)}`, {
           method: "POST",
         }),
       ]);
-      assertEquals([subscribed.status, unsubscribed.status], [200, 200]);
+      assertEquals([subscribed.status, unsubscribed.status], [303, 200]);
       await subscribed.body?.cancel();
       await unsubscribed.body?.cancel();
       const stored: { email: string }[] = JSON.parse(
@@ -79,14 +80,14 @@ Deno.test("an unparseable subscriber file answers 500 everywhere and is never ov
     const token = await createUnsubscribeToken("keep@example.com", SECRET);
     const link = `/unsubscribe?token=${encodeURIComponent(token)}`;
     const answers = [
-      await site.get("/api/subscribe", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-real-ip": "198.51.100.200",
-        },
-        body: JSON.stringify({ email: "new@example.com" }),
-      }),
+      await site.get(
+        `/subscribe/confirm?token=${
+          encodeURIComponent(
+            await createConfirmToken("new@example.com", SECRET),
+          )
+        }`,
+        { method: "POST" },
+      ),
       await site.get(link),
       await site.get(link, { method: "POST" }),
     ];

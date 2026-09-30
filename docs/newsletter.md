@@ -2,9 +2,20 @@
 
 ## How it works
 
-Emails collected via the blog newsletter form are stored in
-`data/subscribers.json`. On the server that directory is bind-mounted from the
-app directory, so the file survives deploys, and it is backed up nightly — see
+Subscribing takes two steps (double opt-in, #253). The blog newsletter form
+posts the address to `/api/subscribe`, which stores nothing: it mails a
+confirmation link to that address and answers the same for a known address as
+for a new one. The address is written to `data/subscribers.json` only when its
+owner opens `/subscribe/confirm?token=...` and presses the button (a `POST`, so
+a mail scanner that opens the link subscribes nobody). The welcome mail and the
+owner's notice go out after that. The link works for three days
+(`lib/subscribe-token.ts`, signed with `UNSUBSCRIBE_SECRET`, purpose
+`subscribe-confirm`; the token carries the address). Confirming again changes
+nothing.
+
+Addresses are stored in `data/subscribers.json`. On the server that directory is
+bind-mounted from the app directory, so the file survives deploys, and it is
+backed up nightly — see
 [deploy.md "Subscriber data"](deploy.md#subscriber-data).
 
 ## Data format
@@ -17,12 +28,23 @@ app directory, so the file survives deploys, and it is backed up nightly — see
 
 ## Endpoints
 
-| Method | Path                     | Description                                                                                      |
-| ------ | ------------------------ | ------------------------------------------------------------------------------------------------ |
-| POST   | `/api/subscribe`         | Subscribe email (JSON: `{"email":"..."}`)                                                        |
-| GET    | `/unsubscribe?token=...` | Confirm page for a signed unsubscribe link — shows the address, removes nothing                  |
-| POST   | `/unsubscribe`           | Removes the subscriber `token` verifies for (form body or query, RFC 8058-compatible)            |
-| GET    | `/api/unsubscribe`       | Legacy: 301s an old `?email=...` link (sent before #177) to `/unsubscribe`, dropping the address |
+| Method | Path                           | Description                                                                                      |
+| ------ | ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| POST   | `/api/subscribe`               | Mail a confirmation link (JSON: `{"email":"..."}`); stores nothing                               |
+| GET    | `/subscribe/confirm?token=...` | Confirm page for a signed link: shows the address, stores nothing                                |
+| POST   | `/subscribe/confirm`           | Adds the address the `token` (form body or query) confirms, then sends the welcome mail          |
+| GET    | `/unsubscribe?token=...`       | Confirm page for a signed unsubscribe link — shows the address, removes nothing                  |
+| POST   | `/unsubscribe`                 | Removes the subscriber `token` verifies for (form body or query, RFC 8058-compatible)            |
+| GET    | `/api/unsubscribe`             | Legacy: 301s an old `?email=...` link (sent before #177) to `/unsubscribe`, dropping the address |
+
+Cross-site POSTs to `/api/subscribe`, `/api/lead`, `/unsubscribe` and
+`/subscribe/confirm` answer 403 (`lib/csrf.ts`, Fresh's `csrf()`): the allowed
+origin is the site's own `BASE_URL`, so staging accepts its own forms. A request
+with neither `Origin` nor `Sec-Fetch-Site`, such as a mail client's one-click
+unsubscribe (RFC 8058), passes.
+
+Replies: the confirmation mail, the welcome mail and every newsletter carry
+`Reply-To: CONTACT_EMAIL`, since they are sent from the noreply mailbox.
 
 ## Sending a newsletter
 

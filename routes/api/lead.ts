@@ -14,6 +14,7 @@ import {
 } from "../../lib/config.ts";
 import { createSiteSender, smtpSettings } from "../../lib/mail.ts";
 import { acceptLead } from "../../lib/lead.ts";
+import { appendFailedLead, failedLeadsPath } from "../../lib/failed-leads.ts";
 import { LEAD_MAX_BYTES, readJsonBody } from "../../lib/request-body.ts";
 
 // Three submissions per client per hour; see lib/rate-limit.ts for how the
@@ -52,6 +53,7 @@ export const handler = define.handlers({
       sender: SENDER,
       contactEmail: CONTACT_EMAIL,
       relay: SMTP_HOST + ":" + SMTP_PORT,
+      keep: (lead) => appendFailedLead(lead, failedLeadsPath()),
     });
     return Response.json(outcome.body, { status: outcome.status });
   },

@@ -47,17 +47,22 @@ export default define.page(function Privacy(ctx) {
           <p>
             The form asks for your name, your email address and a description of
             your tech stack, and it can carry the service you chose. Sending it
-            emails those answers to me. The site writes no database record or
-            file for them. If the site's mail is not set up, the whole brief is
-            written to the server's log instead.
+            emails those answers to me. The site writes no database record for
+            them. If the mail cannot be sent, the brief is appended to a file on
+            the server so it is not lost, and the site's log says that it was
+            kept. If the site's mail is not set up, the whole brief is written
+            to the server's log instead.
           </p>
         </Section>
 
         <Section title="The newsletter">
           <p>
-            Subscribing stores your email address and the time you subscribed in
-            a list file on the server. Subscribing also emails me a notice, and
-            emails you a welcome message. The list is backed up nightly.
+            Entering your address sends one email to it with a confirmation
+            link, and stores nothing yet. The link works for three days. Your
+            address and the time you subscribed go into a list file on the
+            server only when you open the link and press the button on the page
+            it shows. Then the site emails you a welcome message and emails me a
+            notice. The list is backed up nightly.
           </p>
           <p>
             Every newsletter carries an unsubscribe link. Opening it shows a
@@ -76,7 +81,7 @@ export default define.page(function Privacy(ctx) {
           </p>
           <p>
             Umami is not loaded for known search and AI crawlers, or on the
-            unsubscribe and payment pages.
+            unsubscribe, subscription-confirmation and payment pages.
           </p>
           <p>The site's own code sets no cookies.</p>
         </Section>

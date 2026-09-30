@@ -9,9 +9,10 @@ that was booked, and a post that was read to the end. Issue #318 set this up.
 
 - **Staging.** `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging never
   reports into the production website.
-- **`/unsubscribe` and `/pay`.** `routes/_app.tsx` leaves the Umami script out
-  on these pages, as it does for crawlers. An unsubscribe link's token is a
-  working credential, and Umami stores the full query string of every page view.
+- **`/unsubscribe`, `/subscribe/confirm` and `/pay`.** `routes/_app.tsx` leaves
+  the Umami script out on these pages, as it does for crawlers. An unsubscribe
+  link's token is a working credential, a confirmation link's token holds the
+  address, and Umami stores the full query string of every page view.
 - **Crawlers.** `lib/bots.ts`'s `isBot()` decides at render time.
 
 ## Events
@@ -28,7 +29,7 @@ stores the page URL with every event, so no event has a `page` property.
 | `brief-error`                        | the lead form fails                                                                                           | `reason`                                                                                                                   |
 | `call-booked`                        | mig reports a booking                                                                                         | none                                                                                                                       |
 | `calendar-shown` / `calendar-failed` | embed lifecycle                                                                                               | none                                                                                                                       |
-| `newsletter-signup`                  | a signup succeeds                                                                                             | none                                                                                                                       |
+| `newsletter-signup`                  | the server accepts a signup (the address still has to confirm by mail)                                        | none                                                                                                                       |
 | `outbound`                           | a link to another site is clicked, including links inside posts                                               | `to` (short host or profile id: `upwork`, `github`, `youtube`, `telegram`, `email`, `neatsoft`, a tool's `live` …), `item` |
 | `cta`                                | an internal call-to-action link (work card, service card, tool card, How I work, FAQ …)                       | `place`, `target` (the link's path)                                                                                        |
 | `tool-install-copy`                  | an install command is copied                                                                                  | `item`                                                                                                                     |

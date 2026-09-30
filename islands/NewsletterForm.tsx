@@ -21,7 +21,7 @@ export default function NewsletterForm() {
       });
       if (res.ok) {
         setStatus("done");
-        setMsg("Subscribed!");
+        setMsg("Check your inbox to confirm.");
         track("newsletter-signup");
       } else {
         const err = await res.json();
@@ -44,7 +44,7 @@ export default function NewsletterForm() {
       {status === "done"
         ? (
           <span class="px-3 py-2 bg-sage/15 text-sage text-sm font-medium rounded-lg">
-            Subscribed! Check your inbox.
+            Check your inbox to confirm your address.
           </span>
         )
         : (
