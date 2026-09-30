@@ -57,7 +57,9 @@ async function processPng(pngPath: string): Promise<ProcessedFile | null> {
     if (
       webpStat.mtime && pngStat.mtime &&
       webpStat.mtime >= pngStat.mtime &&
-      webpStat.size > 0
+      webpStat.size > 0 &&
+      // deno-lint-ignore no-explicit-any
+      (await decodeWebp(await Deno.readFile(outPath) as any)).width <= MAX_WIDTH
     ) {
       return { input: pngPath, output: outPath, bytes: webpStat.size };
     }

@@ -1,5 +1,6 @@
-// Every project screenshot WebP (what browsers load; the PNG is a fallback) is at most MAX_SCREENSHOT_WIDTH wide (#336): the
-// lightbox lagged on 2500px CallTrack shots, since decode time follows pixels.
+// Every project screenshot WebP (what browsers load; a PNG is only a
+// fallback) is at most MAX_SCREENSHOT_WIDTH wide (#336): the lightbox lagged
+// on 2500px CallTrack shots, since decode time follows pixels.
 import { assert } from "jsr:@std/assert@^1.0.0";
 import { walk } from "jsr:@std/fs@^1.0.0/walk";
 import { MAX_SCREENSHOT_WIDTH } from "../lib/image-path.ts";
@@ -32,7 +33,8 @@ Deno.test("no project screenshot is wider than the lightbox cap", async () => {
     const width = imageWidth(await Deno.readFile(e.path));
     assert(
       width <= MAX_SCREENSHOT_WIDTH,
-      `${e.path}: ${width}px wide, over ${MAX_SCREENSHOT_WIDTH}. Run deno task optimize:screenshots.`,
+      `${e.path}: ${width}px wide, over ${MAX_SCREENSHOT_WIDTH}. ` +
+        `Run deno task optimize:screenshots.`,
     );
     checked++;
   }
