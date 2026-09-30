@@ -9,6 +9,8 @@
 
 import { channelUrl } from "./utm.ts";
 import { envValue } from "./cloudflare-purge.ts";
+import type { BlogArticle } from "@/lib/data.ts";
+import { relatedToolLink } from "@/lib/blog.ts";
 
 // Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
 // must point at production, since it tells search engines which copy is the
@@ -21,6 +23,38 @@ const DEVTO_BASE_URL = "https://antonshubin.com";
  */
 export function firstPublishedLine(taggedUrl: string): string {
   return `_First published on [antonshubin.com](${taggedUrl})._`;
+}
+
+/**
+ * What a Dev.to draft opens with, the same two things the post's page opens
+ * with: the TL;DR list and, for a post with `relatedTool`, the project's live
+ * and repository links. Both come from the data the page reads (`tldr`,
+ * `relatedToolLink()`), and the links go straight to the project, not through
+ * antonshubin.com.
+ */
+export function devToOpening(article: BlogArticle): string {
+  const parts = [
+    `**TL;DR**\n\n${article.tldr.map((line) => `- ${line}`).join("\n")}`,
+  ];
+  const tool = relatedToolLink(article);
+  const links: string[] = [];
+  if (tool?.live) {
+    // A live instance on this site (mig's /book) is a relative path; on Dev.to
+    // it would resolve against dev.to.
+    const href = tool.live.href.startsWith("/")
+      ? `${DEVTO_BASE_URL}${tool.live.href}`
+      : tool.live.href;
+    links.push(`Live: [${tool.live.label}](${href})`);
+  }
+  if (tool?.repoUrl) {
+    links.push(
+      `Code: [${tool.repoUrl.replace(/^https:\/\//, "")}](${tool.repoUrl})`,
+    );
+  }
+  if (links.length > 0) {
+    parts.push(`**${tool!.name}**: ${links.join(" · ")}`);
+  }
+  return parts.join("\n\n");
 }
 
 export interface DevToArticlePayload {
