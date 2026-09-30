@@ -55,6 +55,7 @@ export function SEOHead() {
         name="robots"
         content={h.noindex ? "noindex, nofollow" : "index, follow"}
       />
+      {h.referrer && <meta name="referrer" content={h.referrer} />}
 
       {
         /* Twitter Card — large summary with image. The handle is the one

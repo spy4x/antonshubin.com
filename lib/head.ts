@@ -20,6 +20,13 @@ export interface PageHead {
   ogType: "profile" | "article" | "website" | "service";
   noindex?: boolean;
   /**
+   * A `<meta name="referrer">` policy for the page. The proxy in front of the
+   * site forces its own `Referrer-Policy` header over the app's, and a meta
+   * policy wins over the header for the document, so a page whose URL holds a
+   * token sets it here too.
+   */
+  referrer?: "no-referrer";
+  /**
    * The bare page name for the breadcrumb (visible nav and JSON-LD
    * BreadcrumbList) — "Ship It Today", not "Ship It Today — Anton Shubin".
    * `title` carries the " — Anton Shubin" (or "| ROLE") suffix meant for the
