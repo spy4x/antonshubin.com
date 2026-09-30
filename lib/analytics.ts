@@ -132,9 +132,9 @@ export function outboundTo(href: string): string | null {
 }
 
 /** The written brief: on the booking page, or the home page's form. */
-const BRIEF_HREF = /^\/(?:contact-me(?:\?[^#]*)?#brief|#audit-form)$/;
+const BRIEF_HREF = /^\/(?:book(?:\?[^#]*)?#brief|#audit-form)$/;
 /** The booking page itself. */
-const BOOK_HREF = /^\/contact-me(?:\?[^#]*)?$/;
+const BOOK_HREF = /^\/book(?:\?[^#]*)?$/;
 
 /**
  * The event for a link given only its `href`: `outbound` (with `to` and

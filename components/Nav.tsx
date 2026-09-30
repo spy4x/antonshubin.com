@@ -14,7 +14,7 @@ import { eventAttrs } from "../lib/analytics.ts";
 
 interface NavProps {
   currentPath: string;
-  /** `SCHEDULE_URL`: set → Book; empty → "Write". Both go to `/contact-me`. */
+  /** `SCHEDULE_URL`: set → Book; empty → "Write". Both go to `/book`. */
   scheduleUrl: string;
 }
 

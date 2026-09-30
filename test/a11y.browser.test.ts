@@ -442,7 +442,7 @@ for (
     ["without a scheduler", ""],
   ]
 ) {
-  Deno.test(`/contact-me ${label} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
+  Deno.test(`/book ${label} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
     const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
     let browser: Browser | undefined;
     try {
@@ -450,8 +450,8 @@ for (
       for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
         const page: Page = await newPage(browser, { viewport });
         try {
-          const where = `/contact-me ${label} at ${viewport.width}px`;
-          await page.goto(`${site.origin}/contact-me`, {
+          const where = `/book ${label} at ${viewport.width}px`;
+          await page.goto(`${site.origin}/book`, {
             waitUntil: "networkidle",
           });
           const scrollWidth = await page.evaluate(() =>
@@ -482,7 +482,7 @@ Deno.test("the booking page's skip link shows on focus and jumps past the calend
     browser = await launchChromium();
     const page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
     try {
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
       const skip = page.getByRole("link", { name: "Skip the calendar" });

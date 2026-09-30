@@ -40,7 +40,7 @@ export interface ClosingBandProps {
   /** False hides Book; the band then shows only its links. */
   book?: boolean;
   /**
-   * Where Book goes when it is an on-site page (`/contact-me`) instead of the
+   * Where Book goes when it is an on-site page (`/book`) instead of the
    * calendar: it then opens in the same tab and shows even when
    * `SCHEDULE_URL` is unset. Omitted, Book opens `SCHEDULE_URL` in a new tab.
    */

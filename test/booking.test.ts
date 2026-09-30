@@ -4,7 +4,7 @@
 // "Rather write?" — over the spot where the button used to sit. These
 // tests pin each lead-in phrase absent when SCHEDULE_URL is unset and
 // present when it is set, for every page the issue names, plus the
-// contact-me <meta description> wording that
+// /book <meta description> wording that
 // regressed once silently before (main's pre-#161 wording, restored in
 // the reviewer gate on #161 with every other test still green).
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0";
@@ -58,15 +58,15 @@ Deno.test("booking lead-in lines are gone when SCHEDULE_URL is unset", async () 
       `/ still offers a booking call with SCHEDULE_URL unset`,
     );
 
-    // /contact-me's only pre-#161 regression was in the <meta description>,
+    // /book's only pre-#161 regression was in the <meta description>,
     // which visibleText() can't see (it strips tags, attributes with them) —
     // check the raw HTML instead.
-    const contactHtml = await site.html("/contact-me");
+    const contactHtml = await site.html("/book");
     assertFalse(
       contactHtml.includes(
         "Book a free 30-minute intro call, email me, or message me on Telegram.",
       ),
-      "/contact-me's <meta description> still promises a booking call with SCHEDULE_URL unset",
+      "/book's <meta description> still promises a booking call with SCHEDULE_URL unset",
     );
   } finally {
     await site.stop();
@@ -111,13 +111,13 @@ Deno.test("the booking page leads with one h1 naming the call and the calendar u
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   });
   try {
-    const html = await site.html("/contact-me");
+    const html = await site.html("/book");
     assertEquals(h1s(html), [BOOK_H1]);
     assert(
       html.includes(
         "<title>Contact Anton Shubin: book a free 30-minute call</title>",
       ),
-      "/contact-me: the title does not name the call",
+      "/book: the title does not name the call",
     );
 
     // Heading, then the skip link, then the calendar, then the brief.
@@ -129,16 +129,16 @@ Deno.test("the booking page leads with one h1 naming the call and the calendar u
     ];
     assert(
       order.every((i) => i >= 0),
-      `/contact-me: missing a first-screen element: ${order}`,
+      `/book: missing a first-screen element: ${order}`,
     );
     assertEquals(
       [...order].sort((a, b) => a - b),
       order,
-      "/contact-me: heading, skip link, calendar and brief are out of order",
+      "/book: heading, skip link, calendar and brief are out of order",
     );
     assert(
       visibleText(html).includes("Loading the calendar…"),
-      "/contact-me: the calendar placeholder says nothing while it loads",
+      "/book: the calendar placeholder says nothing while it loads",
     );
     // The placeholder reserves the frame's starting height, so nothing under
     // it moves when the calendar arrives.
@@ -146,7 +146,7 @@ Deno.test("the booking page leads with one h1 naming the call and the calendar u
       new RegExp(
         `data-meet-embed-placeholder[^>]*height:\\s*${INITIAL_EMBED_HEIGHT_PX}px`,
       ).test(html),
-      "/contact-me: the calendar placeholder reserves no height",
+      "/book: the calendar placeholder reserves no height",
     );
 
     // The old page's pieces are gone: the cards, the icon row, the QR code.
@@ -163,9 +163,9 @@ Deno.test("the booking page's side panel states who, time zone, email, Telegram,
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   });
   try {
-    const html = await site.html("/contact-me");
+    const html = await site.html("/book");
     const start = html.indexOf("data-contact-facts");
-    assert(start >= 0, "/contact-me: no side panel");
+    assert(start >= 0, "/book: no side panel");
     const panel = visibleText(
       html.slice(start, html.indexOf("</aside>", start)),
     );
@@ -180,7 +180,7 @@ Deno.test("the booking page's side panel states who, time zone, email, Telegram,
         "Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R), where I'm co-founder and CEO.",
       ]
     ) {
-      assert(panel.includes(fact), `/contact-me: side panel lacks "${fact}"`);
+      assert(panel.includes(fact), `/book: side panel lacks "${fact}"`);
     }
   } finally {
     await site.stop();
@@ -192,17 +192,17 @@ Deno.test("the booking page says what follows the call, quotes one client and of
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   });
   try {
-    const html = await site.html("/contact-me");
+    const html = await site.html("/book");
     const text = visibleText(html);
     for (const id of ["first-milestone", "ownership"]) {
       assert(
         text.includes(promise(id).desc),
-        `/contact-me: "After the call" lacks the ${id} promise`,
+        `/book: "After the call" lacks the ${id} promise`,
       );
     }
     assert(
       text.includes(testimonial("roley-2").excerpt),
-      "/contact-me: the roley-2 quote is missing",
+      "/book: the roley-2 quote is missing",
     );
     assert(text.includes("Prefer writing?"));
     // Under "Prefer writing?" the form's own heading is hidden, so the phrase
@@ -213,15 +213,15 @@ Deno.test("the booking page says what follows the call, quotes one client and of
     const success = html.slice(html.indexOf("data-lead-success"));
     assert(
       /href="#book"/.test(success),
-      "/contact-me: the brief's success panel does not point up to #book",
+      "/book: the brief's success panel does not point up to #book",
     );
     // A click on submit is not a sent brief: only the island's
     // `brief-sent`, after the server accepted it, counts (#318).
     const submit = html.match(/<button[^>]*type="submit"[^>]*>/)?.[0] ?? "";
-    assert(submit, "/contact-me: no submit button");
+    assert(submit, "/book: no submit button");
     assert(
       !submit.includes("data-umami-event"),
-      "/contact-me: the brief's submit click is counted as an event",
+      "/book: the brief's submit click is counted as an event",
     );
   } finally {
     await site.stop();
@@ -231,13 +231,13 @@ Deno.test("the booking page says what follows the call, quotes one client and of
 Deno.test("without SCHEDULE_URL the booking page leads with the written brief", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } });
   try {
-    const html = await site.html("/contact-me");
+    const html = await site.html("/book");
     assertEquals(h1s(html), ["Send a written brief"]);
     // The form hides its own "Send a written brief" heading under this H1.
     assertEquals(count(visibleText(html), /Send a written brief/g), 1);
     assert(
       /<section\b[^>]*id="brief"/.test(html) && html.includes("data-lead-form"),
-      "/contact-me: the brief form is not on the page without a scheduler",
+      "/book: the brief form is not on the page without a scheduler",
     );
     const text = visibleText(html);
     assertFalse(text.includes(BOOK_H1));
@@ -254,16 +254,16 @@ Deno.test("?service= with a catalog slug prefills the brief, and any other value
   });
   try {
     const slug = "codebase-health-audit";
-    const known = await site.html(`/contact-me?service=${slug}`);
+    const known = await site.html(`/book?service=${slug}`);
     const about = `About: ${catalogItem(slug).shortTitle}`;
     assert(
       known.includes(`value="${about}`),
-      `/contact-me?service=${slug}: the brief is not prefilled with "${about}"`,
+      `/book?service=${slug}: the brief is not prefilled with "${about}"`,
     );
     assert(known.includes(slug), "the slug is not passed to the form");
 
     const probe = "zz-not-a-service-7431";
-    const unknown = await site.html(`/contact-me?service=${probe}`);
+    const unknown = await site.html(`/book?service=${probe}`);
     assertFalse(
       unknown.includes(probe),
       "an unknown ?service= value is echoed",
@@ -283,13 +283,13 @@ Deno.test("the booking page carries a ContactPage node, and every page a contact
       jsonLd(html).flatMap((
         d,
       ) => ((d as { "@graph"?: Record<string, unknown>[] })["@graph"] ?? []));
-    const contact = nodes(await site.html("/contact-me"));
+    const contact = nodes(await site.html("/book"));
     const page = contact.find((n) => n["@type"] === "ContactPage");
-    assert(page, "/contact-me: no ContactPage node");
-    assertEquals(page["@id"], "https://antonshubin.com/contact-me#webpage");
+    assert(page, "/book: no ContactPage node");
+    assertEquals(page["@id"], "https://antonshubin.com/book#webpage");
     assertEquals(page["about"], { "@id": "https://antonshubin.com/#person" });
     assertEquals(page["breadcrumb"], {
-      "@id": "https://antonshubin.com/contact-me#breadcrumb",
+      "@id": "https://antonshubin.com/book#breadcrumb",
     });
     assertFalse(
       contact.some((n) =>
@@ -304,7 +304,7 @@ Deno.test("the booking page carries a ContactPage node, and every page a contact
       "@type": "ContactPoint",
       "contactType": "sales",
       "email": "hello@antonshubin.com",
-      "url": "https://antonshubin.com/contact-me",
+      "url": "https://antonshubin.com/book",
       "availableLanguage": ["en", "ru"],
     });
   } finally {

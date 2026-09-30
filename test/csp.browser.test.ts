@@ -16,7 +16,7 @@
 //   as any other page, plus a mobile-viewport check that the mobile menu
 //   still hydrates there (proof client JS actually ran, not just that
 //   nothing tried to and so violated nothing).
-// - The /contact-me booking calendar: after hydration it inserts a
+// - The /book booking calendar: after hydration it inserts a
 //   same-policy cross-origin <iframe> (frame-src) at runtime, which only
 //   exists after client JS runs (islands/MeetEmbed.tsx) — never in the
 //   server-rendered HTML the other rendered-page tests read.
@@ -195,7 +195,7 @@ Deno.test("the booking calendar's iframe loads without a CSP violation", async (
     const page = await newPage(browser);
     try {
       await registerViolationListener(page);
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
       // The calendar inserts its frame by itself after hydration; it stays

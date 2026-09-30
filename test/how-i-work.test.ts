@@ -120,7 +120,7 @@ siteTest(
 );
 
 Deno.test(
-  "how-i-work sends Book to /contact-me and the brief to /contact-me#brief, with no calendar on the page",
+  "how-i-work sends Book to /book and the brief to /book#brief, with no calendar on the page",
   async () => {
     // With a calendar URL set, a leftover embed would render: the assertion below can fail.
     const site = await startSite({
@@ -135,10 +135,10 @@ Deno.test(
       ) => m[0]);
       assertEquals(book.length, 2, "Book appears in the card and the band");
       for (const a of book) {
-        assert(a.includes('href="/contact-me"'), a);
+        assert(a.includes('href="/book"'), a);
         assert(!a.includes("_blank"), a);
       }
-      assert(count(html, /href="\/contact-me#brief"/g) >= 3, "brief links");
+      assert(count(html, /href="\/book#brief"/g) >= 3, "brief links");
       assert(!/<iframe/.test(html), "an embedded calendar");
       assert(
         !/mig:height|MeetEmbed|meet-embed/i.test(html),
@@ -256,8 +256,8 @@ siteTest(
   async (site) => {
     const html = await site.html("/how-i-work");
     const band = slice(html, "<section data-closing-band", "</section>");
-    assert(band.includes('href="/contact-me"'), "Book");
-    assert(band.includes('href="/contact-me#brief"'), "brief");
+    assert(band.includes('href="/book"'), "Book");
+    assert(band.includes('href="/book#brief"'), "brief");
     assert(band.includes('href="/catalog"'), "Services");
     assertEquals(count(band, /<ul/g), 0, "the band repeats promises");
   },

@@ -183,8 +183,8 @@ Deno.test("REPORTS holds the five goals and a funnel for each outcome, with uniq
     (r.parameters.steps as { value: string }[]).map((s) => s.value)
   );
   assertEquals(funnels, [
-    ["/*", "/contact-me", "call-booked"],
-    ["/contact-me", "call-booked"],
+    ["/*", "/book", "call-booked"],
+    ["/book", "call-booked"],
     ["/*", "brief-sent"],
   ]);
 });

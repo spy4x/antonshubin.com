@@ -81,10 +81,10 @@ const allItems: NavItem[] = [
 /**
  * Where Book goes: the booking page, with the calendar on it (#293). When
  * `SCHEDULE_URL` is unset the button reads "Write" and goes to that page's
- * written brief (`routes/contact-me.tsx`'s `#brief`).
+ * written brief (`routes/book.tsx`'s `#brief`).
  */
-export const BOOK_HREF = "/contact-me";
-export const WRITE_FALLBACK_HREF = "/contact-me#brief";
+export const BOOK_HREF = "/book";
+export const WRITE_FALLBACK_HREF = `${BOOK_HREF}#brief`;
 
 /**
  * The nav's own word for a section, given the section's path: "Writing" for

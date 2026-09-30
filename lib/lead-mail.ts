@@ -6,7 +6,7 @@ export interface Lead {
   name: string;
   email: string;
   techStack: string;
-  /** The catalog item the visitor came from (`/contact-me?service=<slug>`), when it is a real one. */
+  /** The catalog item the visitor came from (`/book?service=<slug>`), when it is a real one. */
   service?: { slug: string; shortTitle: string };
 }
 

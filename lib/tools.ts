@@ -253,9 +253,9 @@ export const tools: Tool[] = [
     usedFor:
       "Powers my own booking link at meet.antonshubin.com — dogfooded daily for client intros.",
     proofLinks: [
-      { label: "The booking page on this site", href: "/contact-me" },
+      { label: "The booking page on this site", href: "/book" },
     ],
-    live: { label: "Open the booking page", href: "/contact-me" },
+    live: { label: "Open the booking page", href: "/book" },
     ci: { provider: "woodpecker", repoId: 12 },
   },
   {

@@ -110,8 +110,8 @@ New config:
 - Not applied to `/pay` (noindex page)
 
 All content routes (blog, catalog, projects detail + index pages, how-i-work,
-contact-me, infrastructure) now include
-`<Breadcrumb items={getBreadcrumb(...)} />` after `<SEOHead />`.
+book, infrastructure) now include `<Breadcrumb items={getBreadcrumb(...)} />`
+after `<SEOHead />`.
 
 ### Hotfixes shipped during deployment
 
@@ -159,7 +159,7 @@ Page                           Title                                og:type     
 /projects                      Projects — Anton Shubin             website     ✓           index, follow
 /projects/<slug>               <project> — Anton Shubin            article     ✓           index, follow
 /how-i-work                    How I Deliver — Anton Shubin        website     ✓           index, follow
-/contact-me                    Contact Anton Shubin                website     ✓           index, follow
+/book                          Contact Anton Shubin                website     ✓           index, follow
 /infrastructure                Infrastructure & Architecture...    website     ✓           index, follow
 /pay                           Payment — Anton Shubin | Frac...    website     —           noindex, nofollow
 ```
@@ -228,7 +228,7 @@ When adding a new route, follow the pattern established in T1:
 
 ```bash
 # All page titles
-for p in "/" "/blog" "/how-i-work" "/contact-me" "/infrastructure" "/pay" "/catalog" "/projects"; do
+for p in "/" "/blog" "/how-i-work" "/book" "/infrastructure" "/pay" "/catalog" "/projects"; do
   curl -s "https://antonshubin.com${p}" -H "User-Agent: Mozilla/5.0" | grep -oP '<title>\K[^<]+'
 done
 

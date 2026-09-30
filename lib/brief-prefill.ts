@@ -1,5 +1,5 @@
 // The line a brief starts with when the visitor came from a catalog item
-// (`/contact-me?service=<slug>`, #272). No imports, so the lead form island
+// (`/book?service=<slug>`, #272). No imports, so the lead form island
 // can use it without pulling the catalog into its bundle.
 
 /** The editable first line of a brief about one catalog item. */

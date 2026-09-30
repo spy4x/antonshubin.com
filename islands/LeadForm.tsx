@@ -10,11 +10,11 @@ import { type BriefErrorReason, eventAttrs, track } from "../lib/analytics.ts";
 /** The calendar island's component, loaded only when the success panel needs it. */
 type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
 
-/** What the written brief promises; the form and `/contact-me` without a scheduler both say it. */
+/** What the written brief promises; the form and `/book` without a scheduler both say it. */
 export const BRIEF_PROMISE =
   "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment.";
 
-/** The catalog item a visitor came from (`/contact-me?service=<slug>`), already checked against `lib/catalog.ts`. */
+/** The catalog item a visitor came from (`/book?service=<slug>`), already checked against `lib/catalog.ts`. */
 export interface LeadService {
   slug: string;
   shortTitle: string;
@@ -23,7 +23,7 @@ export interface LeadService {
 interface LeadFormProps {
   scheduleUrl: string;
   /**
-   * The id-link of a calendar already on the page (`/contact-me` passes
+   * The id-link of a calendar already on the page (`/book` passes
    * `#book`). The success panel then points up to it instead of rendering a
    * second calendar (#272).
    */

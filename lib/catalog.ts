@@ -409,7 +409,7 @@ export function callVersusSession(): {
 
 /** The written-brief form with this service chosen (`?service=` is read by the booking page, #272). */
 export function briefPath(slug: string): string {
-  return `/contact-me?service=${catalogItem(slug).slug}#brief`;
+  return `/book?service=${catalogItem(slug).slug}#brief`;
 }
 
 const UNIT_CODES: Record<PricePeriod, string> = { hour: "HUR", month: "MON" };

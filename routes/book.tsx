@@ -42,7 +42,7 @@ const BOOK_HEADING = `Book a ${INTRO_CALL}`;
  * `?service=<slug>` prefills the brief when it names a catalog item; any
  * other value is ignored.
  */
-export default define.page(function ContactMe(ctx) {
+export default define.page(function Book(ctx) {
   const booking = Boolean(SCHEDULE_URL);
   const service = leadService(ctx.url.searchParams.get("service"));
   head.value = {
@@ -53,7 +53,7 @@ export default define.page(function ContactMe(ctx) {
     description: booking
       ? `Book a ${INTRO_CALL} with Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`
       : `Send a written brief to Anton Shubin, senior full-stack engineer and tech lead, or write by email or Telegram. Invoices via ${COMPANY.name}, ${COMPANY.country}.`,
-    canonical: "https://antonshubin.com/contact-me",
+    canonical: "https://antonshubin.com/book",
     ogType: "website",
     pageName: "Contact",
   };
@@ -65,7 +65,7 @@ export default define.page(function ContactMe(ctx) {
   const ownership = promise("ownership");
 
   return (
-    <Layout currentPath="/contact-me">
+    <Layout currentPath="/book">
       <SEOHead />
       {schedulerOrigin && (
         <Head>

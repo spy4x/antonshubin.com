@@ -20,7 +20,7 @@
 //
 // Not covered here: that the `message` listener's cleanup
 // (`removeEventListener`) actually fires on unmount. Every route that
-// renders MeetEmbed (routes/contact-me.tsx,
+// renders MeetEmbed (routes/book.tsx,
 // islands/LeadForm.tsx's success panel) keeps it mounted for the page's
 // whole life once it appears — LeadForm mounts it on a successful submit and
 // never unmounts it — so there's no reachable UI interaction that tears
@@ -197,7 +197,7 @@ Deno.test("the booking iframe resizes to the height mig's stub reports", async (
           attributes: true,
         });
       });
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
 
@@ -260,7 +260,7 @@ Deno.test("the booking iframe takes the height from mig's first and only message
       await page.addInitScript(() => {
         globalThis.requestAnimationFrame = () => 0;
       });
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
 
@@ -325,7 +325,7 @@ Deno.test("the listener ignores a message whose origin is spoofed but whose sour
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
 
@@ -385,7 +385,7 @@ Deno.test("a same-origin message from a different window never resizes the ifram
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
 
@@ -449,7 +449,7 @@ Deno.test("a frame allowed by frame-ancestors shows even though it also sends X-
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
       await page.waitForSelector('[data-meet-embed="ready"]');
@@ -480,7 +480,7 @@ Deno.test("a refused frame turns the placeholder into a message with the new-tab
     const page = await newPage(browser);
     try {
       await recordUmami(page);
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
       // Still loading until the timeout; the frame stays hidden behind it.
@@ -538,7 +538,7 @@ Deno.test("a height that arrives after the timeout still turns the failure messa
     browser = await launchChromium();
     const page = await newPage(browser);
     try {
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
       await page.waitForSelector('[data-meet-embed="failed"]', {
@@ -577,7 +577,7 @@ Deno.test("without JavaScript the calendar box offers the new-tab link instead o
     browser = await launchChromium();
     const page = await newPage(browser, { javaScriptEnabled: false });
     try {
-      await page.goto(`${site.origin}/contact-me`);
+      await page.goto(`${site.origin}/book`);
       const box = page.locator("[data-meet-embed-placeholder]");
       assert(
         await box.getByText("The calendar needs JavaScript.").isVisible(),
@@ -614,7 +614,7 @@ Deno.test("a booking from the calendar counts once, and a sibling frame cannot f
     const page = await newPage(browser);
     try {
       await recordUmami(page);
-      await page.goto(`${site.origin}/contact-me`, {
+      await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
       });
       await page.waitForFunction(() =>

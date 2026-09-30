@@ -198,7 +198,7 @@ export default define.page(function Pay() {
             </div>
             <div class="mt-auto px-5 sm:px-6 pb-5 sm:pb-6">
               <a
-                href="/contact-me"
+                href="/book"
                 class="inline-flex items-center gap-1 text-accent hover:text-accent hover:underline text-sm transition-colors"
               >
                 From outside US? Contact me

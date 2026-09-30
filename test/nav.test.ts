@@ -23,7 +23,7 @@ function bookLinks(html: string): { tag: string; text: string }[] {
     .map((m) => ({ tag: m[1], text: visibleText(m[2]) }));
 }
 
-Deno.test("Book goes to /contact-me from the rail and the tab bar on every page, in the same tab", async () => {
+Deno.test("Book goes to /book from the rail and the tab bar on every page, in the same tab", async () => {
   const site = await startSite({ env: { SCHEDULE_URL } });
   try {
     for (const path of await allPaths(site)) {
@@ -35,7 +35,7 @@ Deno.test("Book goes to /contact-me from the rail and the tab bar on every page,
       );
       for (const link of links) {
         assert(
-          link.tag.includes(`href="/contact-me"`),
+          link.tag.includes(`href="/book"`),
           `${path}: ${link.tag}`,
         );
         assert(!link.tag.includes("target="), `${path}: ${link.tag}`);
@@ -52,7 +52,7 @@ Deno.test("Book goes to /contact-me from the rail and the tab bar on every page,
   }
 });
 
-Deno.test("Book reads Write and goes to the brief on /contact-me when SCHEDULE_URL is unset", async () => {
+Deno.test("Book reads Write and goes to the brief on /book when SCHEDULE_URL is unset", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } });
   try {
     for (const path of await allPaths(site)) {
@@ -64,7 +64,7 @@ Deno.test("Book reads Write and goes to the brief on /contact-me when SCHEDULE_U
       );
       for (const link of links) {
         assert(
-          link.tag.includes(`href="/contact-me#brief"`),
+          link.tag.includes(`href="/book#brief"`),
           `${path}: ${link.tag}`,
         );
         assertEquals(link.text, "Write", `${path}: reads "${link.text}"`);
@@ -74,10 +74,10 @@ Deno.test("Book reads Write and goes to the brief on /contact-me when SCHEDULE_U
         );
       }
     }
-    const contact = await site.html("/contact-me");
+    const contact = await site.html("/book");
     assert(
       contact.includes(`id="brief"`),
-      "/contact-me lost its brief anchor",
+      "/book lost its brief anchor",
     );
   } finally {
     await site.stop();

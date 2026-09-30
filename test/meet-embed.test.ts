@@ -1,5 +1,5 @@
 // Guards for issue #111, #152 and #272: the booking calendar on `/` and
-// `/contact-me` (`/how-i-work` had one until #275). Since #272 there is no click-to-load
+// `/book` (`/how-i-work` had one until #275). Since #272 there is no click-to-load
 // button: the server renders a reserved placeholder (`data-meet-embed`) and
 // the island inserts the iframe after hydration. Four things are guarded per
 // page:
@@ -11,12 +11,12 @@
 //     fetch eagerly (`src`, `srcset`, `<link href>`, a protocol-relative
 //     reference, or a CSS `url(...)`) points at the scheduler's origin. A
 //     plain `<a href>` is allowed, so is the URL inside Fresh's serialized
-//     island props, and on `/contact-me` only, one `<link rel="preconnect">`.
+//     island props, and on `/book` only, one `<link rel="preconnect">`.
 //  3. On `/`, the collapsed success panel carries `inert` and holds no
 //     calendar: the calendar mounts only after a successful submit, so a home
 //     page view never loads the scheduler.
 //  4. With `SCHEDULE_URL` unset, every booking block (placeholder, new-tab
-//     link, and on `/contact-me` the `#book` section) is absent rather than
+//     link, and on `/book` the `#book` section) is absent rather than
 //     rendering a dead end: an empty-`href` link or a heading with nothing
 //     under it.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
@@ -296,32 +296,32 @@ Deno.test("home page keeps the collapsed success panel out of the tab order", as
   }
 });
 
-Deno.test("contact-me ships the calendar placeholder in #book, a preconnect and no iframe", async () => {
+Deno.test("/book ships the calendar placeholder in #book, a preconnect and no iframe", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.set("SCHEDULE_URL", SCHEDULER_ORIGIN);
   const site = await startSite();
   try {
-    const body = await site.html("/contact-me");
+    const body = await site.html("/book");
     // The one allowed reference: a preconnect, which opens a connection but
     // fetches nothing. Checked, then removed before the eager-fetch guard.
     const preconnect = `<link rel="preconnect" href="${SCHEDULER_ORIGIN}"/>`;
     assertEquals(
       count(body, new RegExp(escapeRegExp(preconnect), "g")),
       1,
-      "/contact-me: expected one preconnect to the scheduler's origin",
+      "/book: expected one preconnect to the scheduler's origin",
     );
     assertBookingPlaceholder(
       body.replace(preconnect, ""),
-      "/contact-me",
+      "/book",
       1,
       SCHEDULER_ORIGIN,
     );
 
     const book = /<section\b[^>]*\bid="book"[^>]*>/.exec(body);
-    assert(book, '/contact-me: no section with id="book" found');
+    assert(book, '/book: no section with id="book" found');
     assert(
       body.search(EMBED_MARKER) > book.index,
-      "/contact-me: the calendar placeholder is not inside #book",
+      "/book: the calendar placeholder is not inside #book",
     );
   } finally {
     await site.stop();
@@ -349,24 +349,24 @@ Deno.test("lead form success panel renders no booking block when SCHEDULE_URL is
   }
 });
 
-Deno.test("contact-me renders no #book section, link or preconnect when SCHEDULE_URL is unset", async () => {
+Deno.test("/book renders no #book section, link or preconnect when SCHEDULE_URL is unset", async () => {
   const previous = Deno.env.get("SCHEDULE_URL");
   Deno.env.delete("SCHEDULE_URL");
   const site = await startSite();
   try {
-    const body = await site.html("/contact-me");
-    assertNoBookingBlock(body, "/contact-me");
+    const body = await site.html("/book");
+    assertNoBookingBlock(body, "/book");
     assert(
       !/\bid="book"/.test(body),
-      '/contact-me: found id="book" with SCHEDULE_URL unset',
+      '/book: found id="book" with SCHEDULE_URL unset',
     );
     assert(
       !/href="#book"/.test(body),
-      "/contact-me: a link still points at #book with SCHEDULE_URL unset",
+      "/book: a link still points at #book with SCHEDULE_URL unset",
     );
     assert(
       !/rel="preconnect"/.test(body),
-      "/contact-me: still preconnects to a scheduler with SCHEDULE_URL unset",
+      "/book: still preconnects to a scheduler with SCHEDULE_URL unset",
     );
   } finally {
     await site.stop();

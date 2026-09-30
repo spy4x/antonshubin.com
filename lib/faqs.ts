@@ -57,7 +57,7 @@ export const faqs: Faq[] = [
     id: "no-clear-idea",
     q: "What if I don't have a clear idea yet?",
     a: "Send me a paragraph about your idea or problem as a written brief and I will write back with 3 concrete architectural improvements. No cost, no pitch.",
-    link: { href: "/contact-me#brief", label: "Send me your idea" },
+    link: { href: "/book#brief", label: "Send me your idea" },
   },
   {
     id: "not-a-good-fit",

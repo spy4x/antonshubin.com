@@ -43,7 +43,7 @@ export function SEOHead() {
     : [breadcrumb];
   // The booking page is the site's contact page (#272): a ContactPage node
   // says so to search engines and AI crawlers. No ScheduleAction, no review.
-  const isContact = path === "/contact-me";
+  const isBooking = path === "/book";
 
   return (
     <Head>
@@ -115,7 +115,7 @@ export function SEOHead() {
                   "@type": "ContactPoint",
                   "contactType": "sales",
                   "email": "hello@antonshubin.com",
-                  "url": "https://antonshubin.com/contact-me",
+                  "url": "https://antonshubin.com/book",
                   "availableLanguage": ["en", "ru"],
                 },
                 "knowsLanguage": ["en", "ru"],
@@ -195,7 +195,7 @@ export function SEOHead() {
                 "publisher": { "@id": "https://antonshubin.com/#person" },
               },
               ...pageNodes,
-              ...(isContact
+              ...(isBooking
                 ? [{
                   "@type": "ContactPage",
                   "@id": `${h.canonical}#webpage`,

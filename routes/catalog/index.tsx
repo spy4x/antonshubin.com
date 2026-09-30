@@ -144,7 +144,7 @@ export default define.page(function Catalog() {
           promiseIds={[]}
           catalogLink={
             <a
-              href="/contact-me#brief"
+              href="/book#brief"
               {...eventAttrs("brief", { place: "band" })}
               class={`text-sm ${FACT_LINK}`}
             >

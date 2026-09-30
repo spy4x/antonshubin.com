@@ -29,7 +29,7 @@ const fromProfile = ({ href, label }: Profile): FooterLink => ({ href, label });
  * so its bytes compete with the home page's LCP image (see `components/Nav.tsx`).
  * `canBook` is whether `SCHEDULE_URL` is set: the Contact group's first link
  * reads "Book a call" when it is and "Write" when it isn't, like the nav's
- * Book, and goes to `/contact-me` either way.
+ * Book, and goes to `/book` either way.
  */
 export function Footer({ canBook }: { canBook: boolean }) {
   const groups: FooterGroup[] = [
@@ -45,7 +45,7 @@ export function Footer({ canBook }: { canBook: boolean }) {
       id: "contact",
       label: "Contact",
       links: [
-        { href: "/contact-me", label: canBook ? "Book a call" : "Write" },
+        { href: "/book", label: canBook ? "Book a call" : "Write" },
         fromProfile(emailContact),
         fromProfile(telegramContact),
       ],

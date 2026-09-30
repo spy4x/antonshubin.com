@@ -46,22 +46,22 @@ and about 90 others) stopped on 2026-09-30. The weekly report says so until
 `scripts/umami-reports.ts` keeps these saved reports in Umami. Each one answers
 one question:
 
-| Report                                       | Question                                                                     |
-| -------------------------------------------- | ---------------------------------------------------------------------------- |
-| Goal: book                                   | How many Book clicks, across every place they sit?                           |
-| Goal: brief-sent                             | How many written briefs actually reached Anton?                              |
-| Goal: call-booked                            | How many intro calls were actually booked?                                   |
-| Goal: newsletter-signup                      | How many newsletter signups succeeded?                                       |
-| Goal: post-read                              | How many post views reached the end of the post?                             |
-| Funnel: any page → /contact-me → call-booked | Of all visitors, how many open the booking page, and how many of those book? |
-| Funnel: /contact-me → call-booked            | Of the visitors who open the booking page, how many book?                    |
-| Funnel: any page → brief-sent                | How many visitors send a written brief?                                      |
+| Report                                 | Question                                                                     |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| Goal: book                             | How many Book clicks, across every place they sit?                           |
+| Goal: brief-sent                       | How many written briefs actually reached Anton?                              |
+| Goal: call-booked                      | How many intro calls were actually booked?                                   |
+| Goal: newsletter-signup                | How many newsletter signups succeeded?                                       |
+| Goal: post-read                        | How many post views reached the end of the post?                             |
+| Funnel: any page → /book → call-booked | Of all visitors, how many open the booking page, and how many of those book? |
+| Funnel: /book → call-booked            | Of the visitors who open the booking page, how many book?                    |
+| Funnel: any page → brief-sent          | How many visitors send a written brief?                                      |
 
 Every funnel gives a visitor 60 minutes from its first step. A step may match
 the same page view or event as the step before it (Umami's `getFunnel.ts`
-compares the times inclusively), so a visitor who lands straight on
-`/contact-me` counts for both "any page" and `/contact-me`. The two-step booking
-funnel asks the same question without the entry step.
+compares the times inclusively), so a visitor who lands straight on `/book`
+counts for both "any page" and `/book`. The two-step booking funnel asks the
+same question without the entry step.
 
 **Attribution and Journey live in the weekly report.** In Umami 3 (checked in
 v3.3.1 and v3.4.0) the Attribution and Journeys pages keep their settings

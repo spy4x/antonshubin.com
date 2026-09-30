@@ -136,10 +136,10 @@ Deno.test("every About review is visible, so the About page never hides its revi
   }
 });
 
-Deno.test("the About page quotes no review the home page or /contact-me already shows", () => {
+Deno.test("the About page quotes no review the home page or /book already shows", () => {
   for (const id of aboutTestimonialIds) {
     assert(!homeTestimonialIds.includes(id), `${id} is on the home page too`);
-    assert(id !== contactTestimonialId, `${id} is on /contact-me too`);
+    assert(id !== contactTestimonialId, `${id} is on /book too`);
   }
 });
 

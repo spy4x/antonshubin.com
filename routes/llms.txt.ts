@@ -87,7 +87,7 @@ ${promisesList}
 - [Services and prices](${BASE_URL}/catalog)
 - [How I work](${BASE_URL}/how-i-work) — The five promises in the order a project meets them, prices, who does the work, my AI-agent setup and the questions clients ask
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect, and how deploys, backups, monitoring and sign-in are handled
-- [Contact](${BASE_URL}/contact-me) — Book a ${INTRO_CALL} on the page, send a written brief (${BASE_URL}/contact-me#brief), or email hello@antonshubin.com, or Telegram @spy4x
+- [Contact](${BASE_URL}/book) — Book a ${INTRO_CALL} on the page, send a written brief (${BASE_URL}/book#brief), or email hello@antonshubin.com, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting
 - [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install

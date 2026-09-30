@@ -136,7 +136,7 @@ Deno.test("How it starts has three steps on Build and Strategy, none elsewhere",
 Deno.test("the written brief link carries the service into the brief form", () => {
   assertEquals(
     briefPath("codebase-health-audit"),
-    "/contact-me?service=codebase-health-audit#brief",
+    "/book?service=codebase-health-audit#brief",
   );
 });
 

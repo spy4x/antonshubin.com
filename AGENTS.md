@@ -328,10 +328,10 @@ styled by `.nav-icon`) and its states are the `.nav-*` classes in
 network profile every extra KB on every page measurably delays the home page's
 LCP image. The phone header (photo, name, and `ROLE` on the right) is plain
 markup in `components/Layout.tsx`; the time zone is in the footer. Book goes to
-`/contact-me` in the same tab and carries `data-primary-book`; with
-`SCHEDULE_URL` unset it reads "Write" and goes to that page's written brief
-(`/contact-me#brief`). The footer's Contact group links the same page.
-`test/nav.test.ts` checks both on every page.
+`/book` in the same tab and carries `data-primary-book`; with `SCHEDULE_URL`
+unset it reads "Write" and goes to that page's written brief (`/book#brief`).
+The footer's Contact group links the same page. `test/nav.test.ts` checks both
+on every page.
 
 ## Site frame
 
@@ -343,9 +343,9 @@ server markup on Desk with five parts: identity (name, `ROLE`, `LOCATION` and
 At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
 
 - `lib/profiles.ts` is the only list of profile URLs. The footer's Elsewhere
-  group (`footerProfiles`), the `/contact-me` side panel's email, Telegram and
-  Upwork links and the Person JSON-LD's `sameAs` (`sameAsUrls`) read it;
-  `profile(id)` throws on a typo. A new profile is one entry there.
+  group (`footerProfiles`), the `/book` side panel's email, Telegram and Upwork
+  links and the Person JSON-LD's `sameAs` (`sameAsUrls`) read it; `profile(id)`
+  throws on a typo. A new profile is one entry there.
 - `lib/pages.ts` is the only list of core pages: `CORE_PAGES`
   (`lib/cache-control.ts`) and the sitemap's static entries read it through
   `pagesFor(surface)`. An entry is in both unless its `notIn` says why not
@@ -535,29 +535,28 @@ tools. No per-project inline logo styles.
 
 ### Booking page
 
-`/contact-me` (#272, `routes/contact-me.tsx`) is where every Book and brief
-action ends. Its `<h1>` names the call (`Book a ${INTRO_CALL}`) and the calendar
-follows it: `islands/MeetEmbed.tsx` has no click-to-load button any more. The
-server renders a reserved placeholder (`data-meet-embed`,
-`INITIAL_EMBED_HEIGHT_PX` tall, "Loading the calendar…"); after hydration the
-island attaches the `mig:height` listener and then inserts the iframe, hidden
-until the first valid message; with none within `EMBED_TIMEOUT_MS` (8 s) the box
-says the calendar didn't load and offers the new-tab link and `#brief`. "Open
-the calendar in a new tab" (`NEW_TAB_LABEL`) is the one wording for the
-scheduler's own page. A `FactCard` side panel (portrait, `ROLE`,
-`TIMEZONE_LABEL`, email, Telegram, Upwork, the invoicing line) sits beside the
-calendar from 1024px and after it at 390px; then "After the call" (through
-`promise()`), the `roley-2` quote and the brief (`#brief`). The brief's
-`LeadForm` gets `calendarAbove="#book"`, so its success panel points up instead
-of rendering a second calendar; on `/` the success panel mounts its calendar
-only after a submit, so a home view never loads the scheduler. With
-`SCHEDULE_URL` unset the page leads with the brief. `?service=<slug>` prefills
-the brief with "About: <shortTitle>" and posts the slug, checked by
-`lib/lead.ts`'s `leadService()`; any other value is dropped, never echoed. The
-prefill alone does not count as a description, in the form or in `/api/lead`
-(`lib/brief-prefill.ts`). The page alone preconnects to the scheduler's origin
-and carries the `ContactPage` JSON-LD node. `test/booking.test.ts` checks the
-built page.
+`/book` (#272, `routes/book.tsx`) is where every Book and brief action ends. Its
+`<h1>` names the call (`Book a ${INTRO_CALL}`) and the calendar follows it:
+`islands/MeetEmbed.tsx` has no click-to-load button any more. The server renders
+a reserved placeholder (`data-meet-embed`, `INITIAL_EMBED_HEIGHT_PX` tall,
+"Loading the calendar…"); after hydration the island attaches the `mig:height`
+listener and then inserts the iframe, hidden until the first valid message; with
+none within `EMBED_TIMEOUT_MS` (8 s) the box says the calendar didn't load and
+offers the new-tab link and `#brief`. "Open the calendar in a new tab"
+(`NEW_TAB_LABEL`) is the one wording for the scheduler's own page. A `FactCard`
+side panel (portrait, `ROLE`, `TIMEZONE_LABEL`, email, Telegram, Upwork, the
+invoicing line) sits beside the calendar from 1024px and after it at 390px; then
+"After the call" (through `promise()`), the `roley-2` quote and the brief
+(`#brief`). The brief's `LeadForm` gets `calendarAbove="#book"`, so its success
+panel points up instead of rendering a second calendar; on `/` the success panel
+mounts its calendar only after a submit, so a home view never loads the
+scheduler. With `SCHEDULE_URL` unset the page leads with the brief.
+`?service=<slug>` prefills the brief with "About: <shortTitle>" and posts the
+slug, checked by `lib/lead.ts`'s `leadService()`; any other value is dropped,
+never echoed. The prefill alone does not count as a description, in the form or
+in `/api/lead` (`lib/brief-prefill.ts`). The page alone preconnects to the
+scheduler's origin and carries the `ContactPage` JSON-LD node.
+`test/booking.test.ts` checks the built page.
 
 ### How I work page
 
@@ -571,8 +570,8 @@ card beside the main column (from 1024px; first at 390px) with the pricing rule
 `upwork-profile` note), "Five promises" (H2, promises as H3) as
 `PromiseTimeline variant="full" layout="stack"`, "My AI-agent setup" (one
 paragraph, links `spy4x/dotfiles`) and the questions, open, each at `#faq-<id>`.
-Book goes to `/contact-me` and the brief to `/contact-me#brief` (#272); the page
-has no calendar embed. `lib/faqs.ts` is the only copy of the questions (at most
+Book goes to `/book` and the brief to `/book#brief` (#272); the page has no
+calendar embed. `lib/faqs.ts` is the only copy of the questions (at most
 `MAX_FAQS`, seven): the page, the `FAQPage` JSON-LD (joined to the site graph)
 and `llms-full.txt`'s FAQ section read it, and answers splice promises through
 `promise()`. `PromiseTimeline` gained `layout` (`stack` keeps it vertical at
@@ -706,13 +705,13 @@ to `/` as the current section on every page; `test/a11y.test.ts` checks them.
 The links inside `islands/NavMore.tsx` use `navCurrent()` too, because hydration
 strips Fresh's marker from an island (Preact drops attributes the island's own
 vnode lacks). Book carries a fixed `aria-current="false"`: it is an action,
-never the current page, and its "Write" fallback (`/contact-me#brief`) would
-otherwise be marked by Fresh. `lib/markdown.test.ts` (#160) tests
-`lib/markdown.ts` directly, no server needed. `test/bot-filter.test.ts` (#179)
-boots the site with placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known
-crawlers get no Umami script or preconnect links while browsers do.
-`routes/_app.tsx` makes that decision at render time with `lib/bots.ts`'s
-`isBot()`; nothing rewrites HTML after it is rendered.
+never the current page, and its "Write" fallback (`/book#brief`) would otherwise
+be marked by Fresh. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts`
+directly, no server needed. `test/bot-filter.test.ts` (#179) boots the site with
+placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami
+script or preconnect links while browsers do. `routes/_app.tsx` makes that
+decision at render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML
+after it is rendered.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds
@@ -760,9 +759,9 @@ page. Never retry a test on this error.
   page, and that the form/success panels swap `inert`. The success heading needs
   `focus({ preventScroll: true })`; the test only reproduces the scroll jump
   with the submit button pinned to the bottom of the viewport. Since #272 it
-  also checks that a brief sent from `/contact-me?service=<slug>` posts the slug
-  and its success panel points up to `#book` instead of a second calendar, and
-  that the home page mounts the calendar only after a submit.
+  also checks that a brief sent from `/book?service=<slug>` posts the slug and
+  its success panel points up to `#book` instead of a second calendar, and that
+  the home page mounts the calendar only after a submit.
 - `test/a11y.browser.test.ts` (#165): the project and blog lightboxes' dialog
   naming, button names and focus-return to the trigger; the nav (#185): the
   phone More dialog's Escape handling (closes it, returns focus to More, and
@@ -789,21 +788,21 @@ page. Never retry a test on this error.
 - `test/csp.browser.test.ts` (#177): the Content-Security-Policy (see
   "Content-Security-Policy" below) actually holds in a real browser —
   `securitypolicyviolation` events, not just the header's text — across every
-  static page and one representative page per dynamic route, the `/contact-me`
-  booking calendar's runtime `<iframe>`, and a full unsubscribe link (GET the
-  confirm page, POST the form). Two negative controls prove the listener and the
-  policy do something: an inline `<script>` with no `nonce` is blocked and
-  reported, and an iframe to a disallowed origin is reported. Served with
-  placeholder `SCHEDULE_URL`/`UMAMI_URL`/`UMAMI_ID` (RFC 2606 hosts) so the
-  policy has to cover both — a request failing (no such host) is fine, a CSP
-  violation isn't. See the test file's own header for why it samples pages
-  instead of crawling the whole sitemap.
+  static page and one representative page per dynamic route, the `/book` booking
+  calendar's runtime `<iframe>`, and a full unsubscribe link (GET the confirm
+  page, POST the form). Two negative controls prove the listener and the policy
+  do something: an inline `<script>` with no `nonce` is blocked and reported,
+  and an iframe to a disallowed origin is reported. Served with placeholder
+  `SCHEDULE_URL`/`UMAMI_URL`/`UMAMI_ID` (RFC 2606 hosts) so the policy has to
+  cover both — a request failing (no such host) is fine, a CSP violation isn't.
+  See the test file's own header for why it samples pages instead of crawling
+  the whole sitemap.
 - `test/sw-retired.browser.test.ts` (#285, #259): with service workers allowed,
-  a first visit to `/contact-me` loads once, requests no other page, never asks
-  for `/sw.js`, registers no worker and keeps a value set on `window`; and
-  `/sw.js` registered by hand deletes a cache the old worker left and
-  unregisters itself. `test/sw-retired.test.ts` pins the script's text and that
-  no server-rendered page mentions `serviceWorker`.
+  a first visit to `/book` loads once, requests no other page, never asks for
+  `/sw.js`, registers no worker and keeps a value set on `window`; and `/sw.js`
+  registered by hand deletes a cache the old worker left and unregisters itself.
+  `test/sw-retired.test.ts` pins the script's text and that no server-rendered
+  page mentions `serviceWorker`.
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`

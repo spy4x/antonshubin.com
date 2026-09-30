@@ -136,11 +136,11 @@ Deno.test("the unsubscribe and payment pages load no Umami script, other pages d
     }
     assertEquals(
       count(
-        await body(site, "/contact-me"),
+        await body(site, "/book"),
         /data-website-id="test-website-id"/g,
       ),
       1,
-      "/contact-me is missing the Umami script, so the check above proves nothing",
+      "/book is missing the Umami script, so the check above proves nothing",
     );
   } finally {
     await site.stop();
