@@ -59,13 +59,15 @@ export function createConfirmToken(
 
 /** The reason a token was refused, when it was. */
 export type ConfirmTokenResult =
-  | { ok: true; email: string }
+  | { ok: true; email: string; issuedAt: number }
   | { ok: false; reason: "expired" | "invalid" };
 
 /**
  * The address `token` confirms, or why it does not. The address is read from
  * the token, then the signature is checked again with that address as the
  * context, so a token whose payload was swapped for another address fails.
+ * `issuedAt` (Unix milliseconds) is the expiry minus {@link CONFIRM_TTL_MS};
+ * the signature covers the expiry, so it cannot be moved without the secret.
  */
 export async function verifyConfirmToken(
   token: string,
@@ -73,10 +75,16 @@ export async function verifyConfirmToken(
   now?: () => number,
 ): Promise<ConfirmTokenResult> {
   const codec = codecFor(secret, now);
-  const email = emailInside(token);
-  if (email === undefined) return { ok: false, reason: "invalid" };
-  const result = await codec.verify(token, { context: email });
-  if (result.ok) return { ok: true, email: result.value.email };
+  const inside = envelopeInside(token);
+  if (inside === undefined) return { ok: false, reason: "invalid" };
+  const result = await codec.verify(token, { context: inside.email });
+  if (result.ok) {
+    return {
+      ok: true,
+      email: result.value.email,
+      issuedAt: inside.expiresAt - CONFIRM_TTL_MS,
+    };
+  }
   return {
     ok: false,
     reason: result.error === SignedPayloadErrorCode.Expired
@@ -85,16 +93,23 @@ export async function verifyConfirmToken(
   };
 }
 
-/** Reads the unverified address out of the envelope, to use as the context. */
-function emailInside(token: string): string | undefined {
+/** Reads the unverified address and expiry out of the envelope: the address
+ * to use as the context, the expiry to date the token once it verifies. */
+function envelopeInside(
+  token: string,
+): { email: string; expiresAt: number } | undefined {
   try {
     const encoded = token.split(".")[0] ?? "";
     const padded = encoded.replaceAll("-", "+").replaceAll("_", "/");
     const json = new TextDecoder().decode(
       Uint8Array.from(atob(padded), (c) => c.charCodeAt(0)),
     );
-    const email = JSON.parse(json)?.payload?.email;
-    return typeof email === "string" ? email : undefined;
+    const envelope = JSON.parse(json);
+    const email = envelope?.payload?.email;
+    const expiresAt = envelope?.expiresAt;
+    return typeof email === "string" && Number.isSafeInteger(expiresAt)
+      ? { email, expiresAt }
+      : undefined;
   } catch {
     return undefined;
   }
