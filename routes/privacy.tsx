@@ -81,7 +81,9 @@ export default define.page(function Privacy(ctx) {
             Your address stays on the newsletter list until you unsubscribe. A
             brief reaches me as an email in my own mailbox. I keep it while we
             talk, and I delete it when you ask, together with any copy kept in
-            the server file above.
+            the server file above. The nightly backups keep older copies for up
+            to three months, so a deleted address or brief leaves them within
+            that time.
           </p>
           <p>
             The site sends its mail through my own mail server, Stalwart, on a

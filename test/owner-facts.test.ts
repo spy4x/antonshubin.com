@@ -122,6 +122,7 @@ Deno.test("the owner's #301 facts are on their pages", async (t) => {
       const text = visibleText(await site.html("/privacy"));
       assert(text.includes("until you unsubscribe"), "no retention");
       assert(text.includes("Stalwart"), "no mail server");
+      assert(text.includes("up to three months"), "no backup retention");
     });
   } finally {
     await site.stop();

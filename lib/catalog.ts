@@ -363,8 +363,9 @@ export interface StartStep {
 /**
  * How an engagement starts, for the two items whose page spells it out: the
  * free intro call, a quote, the first milestone (Build); a brief, an invoice,
- * the session and its notes (Strategy: mig takes no payment, #301). Every sentence is already in the item, `INTRO_CALL` or
- * `lib/promises.ts`. The other two items have no steps.
+ * the session and its notes (Strategy). Build's sentences come from the item,
+ * `INTRO_CALL` or `lib/promises.ts`; Strategy's first two are Anton's answer
+ * on #301, since mig takes no payment. The other two items have no steps.
  */
 export function startSteps(slug: string): StartStep[] | undefined {
   const item = catalogItem(slug);

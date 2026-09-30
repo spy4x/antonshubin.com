@@ -206,4 +206,4 @@ export const AUTHOR_LINE =
 
 /** The newsletter's promise (#274, Mkt 5): the three topics and how often (Anton, #301). */
 export const NEWSLETTER_LINE =
-  "New posts on decisions for founders, AI and MCP, and self-hosting, only when there's a new post and about once a week at most. Unsubscribe with one click.";
+  "New posts on decisions for founders, AI and MCP, and self-hosting, about once a week at most, and only when there is one. Unsubscribe with one click.";
