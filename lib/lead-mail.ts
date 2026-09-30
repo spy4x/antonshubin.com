@@ -18,8 +18,9 @@ export interface LeadMailDeps {
   relay: string;
   /** Called with the lead when the relay refused or dropped the mail, so the
    * lead can be kept (#266). Not called when SMTP is not configured: the lead
-   * is logged in that case. May throw; the failure is logged without the lead. */
-  keep?(lead: Lead): Promise<void>;
+   * is logged in that case. Resolves `false` when it declined the lead (and
+   * logged why). May throw; the failure is logged without the lead. */
+  keep?(lead: Lead): Promise<void | boolean>;
   log?: MailLog;
 }
 
@@ -55,8 +56,10 @@ export async function notifyOwner(
     log.error("[LEAD] failed:", result.error);
     if (deps.keep) {
       try {
-        await deps.keep(lead);
-        log.error("[LEAD] kept the lead for a retry");
+        // `false` means the store declined the lead and logged why.
+        if (await deps.keep(lead) !== false) {
+          log.error("[LEAD] kept the lead for a retry");
+        }
       } catch (err) {
         // Never the lead itself: only the reason the file could not be written.
         log.error(

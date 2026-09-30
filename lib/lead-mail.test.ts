@@ -172,3 +172,15 @@ Deno.test("logs why a failed lead could not be kept, without the lead", async ()
   );
   assert(!log.errors.join("\n").includes("jane@example.com"));
 });
+
+Deno.test("does not claim a lead was kept when the store declined it", async () => {
+  const log = recordingLog();
+  await notifyOwner(LEAD, {
+    sender: fakeSender(fakeRelay("drop-connection")),
+    contactEmail: "owner@example.com",
+    relay: RELAY,
+    keep: () => Promise.resolve(false),
+    log,
+  });
+  assert(!log.errors.join("\n").includes("kept the lead"), log.errors.join());
+});
