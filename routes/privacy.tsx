@@ -67,7 +67,11 @@ export default define.page(function Privacy(ctx) {
           <p>
             Every newsletter carries an unsubscribe link. Opening it shows a
             confirmation page, and pressing the button on that page removes your
-            address from the list.
+            address from the list. The server also records a scrambled
+            fingerprint of the address (not the address itself) and the time, so
+            that a confirmation link sent before you unsubscribed cannot
+            subscribe you again. A fingerprint older than three days, the life
+            of such a link, is cleared the next time anyone unsubscribes.
           </p>
         </Section>
 

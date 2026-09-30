@@ -321,6 +321,98 @@ Deno.test("a signed subscription-confirmation link submits without a CSP violati
   }
 });
 
+/** Answers every request through `route.fetch()` with the header a proxy in
+ * front of the site forces: rostok's Traefik `security-headers` sets
+ * `Referrer-Policy: strict-origin-when-cross-origin` over the app's own. */
+async function forceProxyReferrerPolicy(page: Page): Promise<void> {
+  await page.route("**/*", async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      headers: {
+        ...response.headers(),
+        "referrer-policy": "strict-origin-when-cross-origin",
+      },
+    });
+  });
+}
+
+/** Follows the first same-origin link to `href` on the page and returns the
+ * `document.referrer` of the page it reaches. */
+async function referrerAfterFollowing(
+  page: Page,
+  href: string,
+): Promise<string> {
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: "networkidle" }),
+    page.evaluate((h) => {
+      (document.querySelector(`a[href="${h}"]`) as HTMLAnchorElement).click();
+    }, href),
+  ]);
+  return await page.evaluate(() => document.referrer);
+}
+
+Deno.test("a token page sends no referrer to the next page even when a proxy forces strict-origin-when-cross-origin", async () => {
+  const dir = await Deno.makeTempDir();
+  const file = `${dir}/subscribers.json`;
+  try {
+    await Deno.writeTextFile(file, "[]");
+    const site = await startSite({
+      env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: TEST_SECRET },
+    });
+    let browser: Browser | undefined;
+    try {
+      browser = await launchChromium();
+      const page = await newPage(browser);
+      try {
+        await forceProxyReferrerPolicy(page);
+        const confirm = await createConfirmToken(
+          "reader@example.com",
+          TEST_SECRET,
+        );
+        const unsubscribe = await createUnsubscribeToken(
+          "reader@example.com",
+          TEST_SECRET,
+        );
+        const tokenPages = [
+          `/subscribe/confirm?token=${encodeURIComponent(confirm)}`,
+          `/unsubscribe?token=${encodeURIComponent(unsubscribe)}`,
+          "/unsubscribe?token=forged",
+          "/subscribe/confirm?done=1",
+        ];
+        for (const path of tokenPages) {
+          const res = await page.goto(site.origin + path, {
+            waitUntil: "networkidle",
+          });
+          // The proxy's header is really what the browser was sent.
+          assertEquals(
+            res?.headers()["referrer-policy"],
+            "strict-origin-when-cross-origin",
+            path,
+          );
+          assertEquals(await referrerAfterFollowing(page, "/about"), "", path);
+        }
+        // Control: a page without the meta, behind the same proxy, does
+        // send its URL, so the empty referrers above come from the meta.
+        await page.goto(`${site.origin}/work?from=test`, {
+          waitUntil: "networkidle",
+        });
+        assertEquals(
+          await referrerAfterFollowing(page, "/about"),
+          `${site.origin}/work?from=test`,
+        );
+      } finally {
+        await page.close();
+      }
+    } finally {
+      await browser?.close();
+      await site.stop();
+    }
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
 Deno.test("negative controls: an unnonced inline script is blocked and reported, a disallowed iframe origin is reported", async () => {
   const site = await startSite();
   let browser: Browser | undefined;

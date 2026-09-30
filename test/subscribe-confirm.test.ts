@@ -5,7 +5,7 @@
 // and SMTP switched off.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { visibleText } from "./html.ts";
+import { count, visibleText } from "./html.ts";
 import { createConfirmToken } from "../lib/subscribe-token.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
 
@@ -140,5 +140,94 @@ Deno.test("an expired link says so, apart from one that is not recognised", asyn
     const bad = visibleText(await (await site.get(linkFor("forged"))).text());
     assert(old.includes("Link expired"), old);
     assert(bad.includes("Link not recognised"), bad);
+  });
+});
+
+const post = (site: Site, path: string, body?: URLSearchParams) =>
+  site.get(path, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body,
+  });
+
+Deno.test("a confirmation link used again after the address unsubscribed adds nobody, and a link issued afterwards still subscribes", async () => {
+  await withSite(async (site, file) => {
+    const email = "reader@example.com";
+    const old = await createConfirmToken(
+      email,
+      SECRET,
+      () => Date.now() - 1000,
+    );
+    let res = await post(
+      site,
+      "/subscribe/confirm",
+      new URLSearchParams({ token: old }),
+    );
+    await res.body?.cancel();
+    assertEquals(await listed(file), [email]);
+
+    const unsub = await createUnsubscribeToken(email, SECRET);
+    res = await post(site, `/unsubscribe?token=${encodeURIComponent(unsub)}`);
+    await res.body?.cancel();
+    assertEquals(await listed(file), []);
+
+    res = await post(
+      site,
+      "/subscribe/confirm",
+      new URLSearchParams({ token: old }),
+    );
+    const text = visibleText(await res.text());
+    assertEquals(res.status, 400);
+    assert(text.includes("Link not recognised"), text);
+    assertEquals(await listed(file), [], "the replay added nobody");
+    // The record next to the list holds a hash, not the address.
+    const record = await Deno.readTextFile(`${file}.unsubscribed`);
+    assert(!record.includes("reader"), record);
+
+    const fresh = await createConfirmToken(
+      email,
+      SECRET,
+      () => Date.now() + 5000,
+    );
+    res = await post(
+      site,
+      "/subscribe/confirm",
+      new URLSearchParams({ token: fresh }),
+    );
+    await res.body?.cancel();
+    assertEquals(res.status, 303);
+    assertEquals(await listed(file), [email]);
+  });
+});
+
+Deno.test("every state of the confirm and unsubscribe pages carries the no-referrer meta", async () => {
+  await withSite(async (site) => {
+    const good = await createConfirmToken("reader@example.com", SECRET);
+    const expired = await createConfirmToken(
+      "reader@example.com",
+      SECRET,
+      () => Date.now() - 4 * DAY_MS,
+    );
+    const unsub = await createUnsubscribeToken("reader@example.com", SECRET);
+    const paths = [
+      linkFor(good),
+      linkFor(expired),
+      linkFor("forged"),
+      "/subscribe/confirm",
+      "/subscribe/confirm?done=1",
+      "/unsubscribe?token=forged",
+      "/unsubscribe",
+      `/unsubscribe?token=${encodeURIComponent(unsub)}`,
+    ];
+    for (const path of paths) {
+      const html = await (await site.get(path)).text();
+      assertEquals(
+        count(html, /<meta name="referrer" content="no-referrer"/g),
+        1,
+        path,
+      );
+    }
+    const home = await (await site.get("/")).text();
+    assertEquals(count(home, /<meta name="referrer"/g), 0);
   });
 });
