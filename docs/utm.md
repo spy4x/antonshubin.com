@@ -6,7 +6,7 @@ Never write a tagged URL by hand: print it with `deno task links`, or let the
 kits (`launch-kit`, `video-kit`, `publish:blog`) build it.
 
 ```
-deno task links <path> [--campaign <name>] [--content <name>]
+deno task links <path> [--campaign <name>] [--content <name>] [--now <ISO time with offset>]
 ```
 
 It prints one tagged URL per channel in the table below, for the page at
@@ -48,18 +48,24 @@ This table must match `CHANNELS` in `scripts/utm.ts` row for row;
 `scripts/utm.test.ts` fails when they disagree. To add a channel, add it to
 both.
 
-| Source     | Medium    | Where the link goes         |
-| ---------- | --------- | --------------------------- |
-| `x`        | `social`  | X post or reply             |
-| `linkedin` | `social`  | LinkedIn post or comment    |
-| `reddit`   | `social`  | Reddit post or comment      |
-| `hn`       | `social`  | Hacker News post or comment |
-| `devto`    | `blog`    | Dev.to cross-post           |
-| `youtube`  | `video`   | YouTube video description   |
-| `github`   | `oss`     | README or release notes     |
-| `upwork`   | `dm`      | Upwork proposal or chat     |
-| `email`    | `email`   | Email signature or message  |
-| `qr-card`  | `profile` | Business card QR code       |
+The window is a good time to post there, in UTC: `deno task links` prints the
+next one from now, in UTC and in the local time zone, or `now` inside one. The
+windows are practitioner consensus for a US-morning and European-afternoon
+audience, not measurements; revise them once Umami shows per-channel data.
+
+| Source     | Medium    | Where the link goes         | Window                  | Why                                                                   |
+| ---------- | --------- | --------------------------- | ----------------------- | --------------------------------------------------------------------- |
+| `x`        | `social`  | X post or reply             | Tue–Thu 13:00–16:00 UTC | US morning meets the European afternoon                               |
+| `linkedin` | `social`  | LinkedIn post or comment    | Tue–Thu 13:00–15:00 UTC | Working hours in Europe and the US East Coast                         |
+| `reddit`   | `social`  | Reddit post or comment      | Tue–Thu 13:00–15:00 UTC | US morning, before a post sinks down the new list                     |
+| `hn`       | `social`  | Hacker News post or comment | Tue–Thu 13:00–16:00 UTC | US morning, when the front page turns over most                       |
+| `devto`    | `blog`    | Dev.to cross-post           | Tue–Thu 13:00–16:00 UTC | Readers arrive on weekday afternoons in Europe and mornings in the US |
+| `youtube`  | `video`   | YouTube video description   | Thu–Sat 15:00–18:00 UTC | Viewers settle in ahead of the weekend                                |
+| `telegram` | `social`  | Telegram channel post       | Any day 16:00–19:00 UTC | Evening in Moscow                                                     |
+| `github`   | `oss`     | README or release notes     |                         |                                                                       |
+| `upwork`   | `dm`      | Upwork proposal or chat     |                         |                                                                       |
+| `email`    | `email`   | Email signature or message  |                         |                                                                       |
+| `qr-card`  | `profile` | Business card QR code       |                         |                                                                       |
 
 ## Campaigns
 

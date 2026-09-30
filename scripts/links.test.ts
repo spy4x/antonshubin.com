@@ -1,6 +1,7 @@
 import {
   assertEquals,
   assertRejects,
+  assertStringIncludes,
   assertThrows,
 } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "../test/harness.ts";
@@ -28,7 +29,12 @@ Deno.test("parses the path, --campaign and --content in both flag forms", () => 
       "opus55-vs-sonnet5",
       "--content=r-claudeai",
     ]),
-    { path: OPUS_POST, campaign: "opus55-vs-sonnet5", content: "r-claudeai" },
+    {
+      path: OPUS_POST,
+      campaign: "opus55-vs-sonnet5",
+      content: "r-claudeai",
+      now: undefined,
+    },
   );
 });
 
@@ -57,6 +63,27 @@ Deno.test("prints one tagged url per channel, each with its own source", () => {
     assertEquals(url.pathname, OPUS_POST);
     assertEquals(url.searchParams.get("utm_campaign"), "opus55-vs-sonnet5");
   }
+});
+
+Deno.test("--now sets the clock and rejects a value that is not a time", () => {
+  assertEquals(
+    parseLinksArgs(["/", "--now", "2026-09-30T14:00:00Z"]).now?.toISOString(),
+    "2026-09-30T14:00:00.000Z",
+  );
+  assertThrows(() => parseLinksArgs(["/", "--now", "soon"]), Error, "ISO time");
+});
+
+Deno.test("each line shows the channel's next window, or a dash without one", () => {
+  const lines = linkLines(BASE, OPUS_POST, "c", undefined, {
+    now: new Date("2026-09-30T14:00:00Z"),
+    timeZone: "UTC",
+  });
+  const byChannel = Object.fromEntries(
+    lines.map((l) => [l.split(/\s+/)[0], l]),
+  );
+  assertStringIncludes(byChannel.linkedin, "now, until 15:00 UTC");
+  assertStringIncludes(byChannel.youtube, "Thu 15:00–18:00 UTC");
+  assertEquals(byChannel.github.endsWith("  -"), true);
 });
 
 Deno.test("an explicit --campaign wins over the post's front matter", async () => {

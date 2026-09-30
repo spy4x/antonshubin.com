@@ -3,7 +3,10 @@
  * Prints the tagged URL of one page for every channel in `scripts/utm.ts`.
  *
  * Usage:
- *   deno task links <path> [--campaign <name>] [--content <name>]
+ *   deno task links <path> [--campaign <name>] [--content <name>] [--now <ISO time>]
+ *
+ * Each channel with a posting window also shows its next one, in UTC and in
+ * this machine's time zone; `--now` fixes the clock.
  *
  * For a `/blog/<slug>` path with no `--campaign`, the campaign is the post's
  * `utmCampaign` front-matter field, else its slug. Any other path needs
@@ -14,7 +17,12 @@
 import { extract as extractYaml } from "@std/front-matter/yaml";
 import { test as hasFrontMatter } from "@std/front-matter/test";
 import { BASE_URL } from "@/lib/config.ts";
-import { articleCampaign, CHANNELS, channelUrl } from "./utm.ts";
+import {
+  articleCampaign,
+  CHANNELS,
+  channelUrl,
+  describeWindow,
+} from "./utm.ts";
 
 const CONTENT_DIR = "content/blog";
 
@@ -22,10 +30,12 @@ export interface LinksArgs {
   path: string;
   campaign?: string;
   content?: string;
+  /** The clock for the posting windows; the current time when omitted. */
+  now?: Date;
 }
 
 const USAGE =
-  "Usage: deno task links <path> [--campaign <name>] [--content <name>]";
+  "Usage: deno task links <path> [--campaign <name>] [--content <name>] [--now <ISO time>]";
 
 /** Parses `<path> [--campaign x] [--content y]`; `--flag=value` works too. */
 export function parseLinksArgs(args: string[]): LinksArgs {
@@ -33,7 +43,7 @@ export function parseLinksArgs(args: string[]): LinksArgs {
   const flags: Record<string, string> = {};
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    const flag = arg.match(/^--(campaign|content)(?:=(.*))?$/);
+    const flag = arg.match(/^--(campaign|content|now)(?:=(.*))?$/);
     if (flag) {
       const value = flag[2] ?? args[++i];
       if (!value) throw new Error(`--${flag[1]} needs a value. ${USAGE}`);
@@ -52,7 +62,14 @@ export function parseLinksArgs(args: string[]): LinksArgs {
       `The path must start with "/", like /blog/<slug>: got ${path}`,
     );
   }
-  return { path, campaign: flags.campaign, content: flags.content };
+  let now: Date | undefined;
+  if (flags.now !== undefined) {
+    now = new Date(flags.now);
+    if (Number.isNaN(now.getTime())) {
+      throw new Error(`--now "${flags.now}" is not an ISO time. ${USAGE}`);
+    }
+  }
+  return { path, campaign: flags.campaign, content: flags.content, now };
 }
 
 /**
@@ -98,19 +115,28 @@ export async function resolveCampaign(
   return articleCampaign(blog[1], await readFrontMatter(blog[1]));
 }
 
-/** One `<source>  <url>` line per channel, in the table's order. */
+/**
+ * One `<source>  <url>` line per channel, in the table's order. With `timing`,
+ * a channel that has a posting window gets it after the URL, or `-` when not.
+ */
 export function linkLines(
   baseUrl: string,
   path: string,
   campaign: string,
   content?: string,
+  timing?: { now: Date; timeZone: string },
 ): string[] {
   const width = Math.max(...CHANNELS.map((c) => c.source.length));
-  return CHANNELS.map((c) =>
-    `${c.source.padEnd(width)}  ${
+  return CHANNELS.map((c) => {
+    const line = `${c.source.padEnd(width)}  ${
       channelUrl(baseUrl, path, c.source, campaign, content)
-    }`
-  );
+    }`;
+    if (!timing) return line;
+    const when = c.window
+      ? describeWindow(c.window, timing.now, timing.timeZone)
+      : "-";
+    return `${line}  ${when}`;
+  });
 }
 
 async function main() {
@@ -118,7 +144,10 @@ async function main() {
     const args = parseLinksArgs(Deno.args);
     const campaign = await resolveCampaign(args.path, args.campaign);
     console.log(
-      linkLines(BASE_URL, args.path, campaign, args.content).join("\n"),
+      linkLines(BASE_URL, args.path, campaign, args.content, {
+        now: args.now ?? new Date(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }).join("\n"),
     );
   } catch (err) {
     console.error((err as Error).message);
