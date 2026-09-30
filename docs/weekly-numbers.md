@@ -16,10 +16,10 @@ GitHub numbers from going out.
 
 ## What the Umami part shows
 
-Every Umami number stands beside the same figure for the 7 days before. Visits,
-visitors and pageviews come from `/stats`, whose `comparison` object already
-holds the previous period; every other section asks for both weeks. The event
-names are the ones in `docs/analytics.md`.
+Every Umami number except the two 30-day sections stands beside the same figure
+for the 7 days before. Visits, visitors and pageviews come from `/stats`, whose
+`comparison` object already holds the previous period; every other section asks
+for both weeks. The event names are the ones in `docs/analytics.md`.
 
 - **Last 7 days**: visitors, visits, pageviews, conversions (`brief-sent` plus
   `call-booked`) and the conversion rate (conversions ÷ visitors, one decimal,
@@ -32,6 +32,13 @@ names are the ones in `docs/analytics.md`.
   its `place` property and `post-read` by its `item` (the post slug), from
   Umami's event-data values endpoint.
 - **Top pages, referrers and campaigns**: the top ten of this week.
+- **What brought conversions (30 days)**: Umami's Attribution for `brief-sent`
+  and `call-booked`, by first and by last click: how many visitors converted
+  ("all"), then the top five referrers and campaigns.
+- **Journeys from the home page (30 days)**: the ten most common paths through
+  five steps starting at `/` (a step is a page or an event), with "(left)" where
+  the visit ended. Umami's Attribution and Journeys pages cannot save their
+  settings, so these sections are where the two reports live.
 
 Until 2026-10-14 the report opens with a line saying the event names changed on
 2026-09-30, so week-over-week event and goal comparisons are not meaningful yet

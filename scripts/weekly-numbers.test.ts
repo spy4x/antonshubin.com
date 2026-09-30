@@ -5,10 +5,12 @@ import {
   EVENT_RENAME_DATE,
   eventRenameNotice,
   fetchGithubStarsSection,
+  fetchUmamiAttributionSection,
   fetchUmamiBookPlacesSection,
   fetchUmamiCampaignsSection,
   fetchUmamiEventsSection,
   fetchUmamiGoalsSection,
+  fetchUmamiJourneySection,
   fetchUmamiPostReadsSection,
   fetchUmamiStatsSection,
   fetchUmamiTopPagesSection,
@@ -16,6 +18,7 @@ import {
   formatConversionRate,
   formatMarkdownTable,
   formatReport,
+  journeyLabel,
   parseRepoList,
   type Section,
   sendNtfy,
@@ -471,4 +474,57 @@ Deno.test("sections that need the same numbers share one Umami call per URL", as
   );
   const eventCalls = urls.filter((u) => u.searchParams.get("type") === "event");
   assertEquals(eventCalls.length, 2);
+});
+
+Deno.test("attribution asks for both conversions by first and last click over 30 days, and lists what brought them", async () => {
+  const { result, urls } = await withUmamiStub((url) => ({
+    referrer: [
+      { name: "upwork.com", value: 1 },
+      { name: "github.com", value: 2 },
+    ],
+    utm_campaign: [{ name: "launch-mig", value: 1 }],
+    total: { visitors: url.searchParams.get("step") === "call-booked" ? 3 : 0 },
+  }), fetchUmamiAttributionSection);
+  assertEquals(result.warning, undefined);
+  assertEquals(
+    urls.map((u) => {
+      const p = u.searchParams;
+      return `${u.pathname.split("/").pop()} ${p.get("step")} ${
+        p.get("model")
+      } ${p.get("type")}`;
+    }),
+    [
+      "attribution brief-sent first-click event",
+      "attribution brief-sent last-click event",
+      "attribution call-booked first-click event",
+      "attribution call-booked last-click event",
+    ],
+  );
+  for (const u of urls) {
+    const p = u.searchParams;
+    assertEquals(Number(p.get("endAt")), NOW);
+    assertEquals(NOW - Number(p.get("startAt")), 30 * 24 * 60 * 60 * 1000);
+  }
+  assertEquals(result.rows.slice(8, 12), [
+    ["call-booked", "first-click", "all", "3"],
+    ["call-booked", "first-click", "referrer: github.com", "2"],
+    ["call-booked", "first-click", "referrer: upwork.com", "1"],
+    ["call-booked", "first-click", "campaign: launch-mig", "1"],
+  ]);
+});
+
+Deno.test("a journey reads as pages joined by arrows, ending in (left) where the visit ended", () => {
+  assertEquals(journeyLabel(["/", "/work", null, null]), "/ → /work → (left)");
+  assertEquals(journeyLabel(["/", "/work", "/about"]), "/ → /work → /about");
+});
+
+Deno.test("journeys start at the home page, merge ones that read the same, and list the most common first", async () => {
+  const { result, urls } = await withUmamiStub(() => [
+    { items: ["/", null], count: 2 },
+    { items: ["/", "/blog", null], count: 3 },
+    { items: ["/", null, null], count: 4 },
+  ], fetchUmamiJourneySection);
+  assertEquals(urls[0].searchParams.get("startStep"), "/");
+  assertEquals(urls[0].searchParams.get("steps"), "5");
+  assertEquals(result.rows, [["/ → (left)", "6"], ["/ → /blog → (left)", "3"]]);
 });

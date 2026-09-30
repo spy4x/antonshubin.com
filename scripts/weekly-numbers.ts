@@ -403,6 +403,119 @@ export function fetchUmamiPostReadsSection(
   );
 }
 
+/**
+ * Days the attribution and journey sections look back over. A week holds a
+ * handful of conversions at most, too few to say where they came from.
+ */
+export const LONG_WINDOW_DAYS = 30;
+
+/** The `LONG_WINDOW_DAYS` before the end of the current week window. */
+export function longWindow(source: UmamiSource): TimeWindow {
+  const endAt = source.windows.current.endAt;
+  return { startAt: endAt - LONG_WINDOW_DAYS * ONE_DAY_IN_MILLISECONDS, endAt };
+}
+
+/** Rows each attribution breakdown keeps, most visitors first. */
+const ATTRIBUTION_LIMIT = 5;
+
+interface AttributionAnswer {
+  referrer?: { name: string; value: number }[];
+  utm_campaign?: { name: string; value: number }[];
+  total?: { visitors?: number };
+}
+
+/**
+ * Umami's Attribution report, which its page cannot save (#318): for each
+ * conversion event, how many visitors converted, then the referrers and
+ * campaigns that brought them, by first and by last click.
+ */
+export function fetchUmamiAttributionSection(
+  source = umamiSource(),
+): Promise<Section> {
+  return umamiSection(
+    source,
+    `Umami — what brought conversions (${LONG_WINDOW_DAYS} days)`,
+    ["conversion", "model", "source", "visitors"],
+    async (s) => {
+      const window = longWindow(s);
+      const rows: string[][] = [];
+      for (const step of CONVERSION_EVENTS) {
+        for (const model of ["first-click", "last-click"]) {
+          const answer = await s.get("/attribution", {
+            model,
+            type: "event",
+            step,
+            ...window,
+          }) as AttributionAnswer;
+          rows.push([
+            step,
+            model,
+            "all",
+            String(Number(answer.total?.visitors ?? 0)),
+          ]);
+          const top = (
+            label: string,
+            list: { name: string; value: number }[] = [],
+          ) =>
+            [...list].sort((a, b) => b.value - a.value)
+              .slice(0, ATTRIBUTION_LIMIT)
+              .map((
+                r,
+              ) => [step, model, `${label}: ${r.name}`, String(r.value)]);
+          rows.push(
+            ...top("referrer", answer.referrer),
+            ...top("campaign", answer.utm_campaign),
+          );
+        }
+      }
+      return rows;
+    },
+  );
+}
+
+/** Journeys the journey section lists, most common first. */
+const JOURNEY_LIMIT = 10;
+/** Pages a journey follows after the home page, the home page included. */
+export const JOURNEY_STEPS = 5;
+
+/**
+ * One journey as text: its pages joined by arrows, and "(left)" where Umami
+ * marks the visit's end with `null`.
+ */
+export function journeyLabel(items: (string | null)[]): string {
+  const end = items.indexOf(null);
+  const pages = end === -1 ? items : items.slice(0, end);
+  return [...pages, ...(end === -1 ? [] : ["(left)"])].join(" → ");
+}
+
+/**
+ * Umami's Journeys report from the home page, which its page cannot save
+ * (#318). Journeys that read the same once cut at the visit's end are merged.
+ */
+export function fetchUmamiJourneySection(
+  source = umamiSource(),
+): Promise<Section> {
+  return umamiSection(
+    source,
+    `Umami — journeys from the home page (${LONG_WINDOW_DAYS} days)`,
+    ["journey", "visits"],
+    async (s) => {
+      const answer = await s.get("/journeys", {
+        steps: JOURNEY_STEPS,
+        startStep: "/",
+        ...longWindow(s),
+      }) as { items: (string | null)[]; count: number }[];
+      const merged = new Map<string, number>();
+      for (const j of answer) {
+        const label = journeyLabel(j.items);
+        merged.set(label, (merged.get(label) ?? 0) + Number(j.count));
+      }
+      return [...merged].sort((a, b) => b[1] - a[1]).slice(0, JOURNEY_LIMIT)
+        .map(([label, count]) => [label, String(count)]);
+    },
+  );
+}
+
 function topMetricSection(
   source: UmamiSource | undefined,
   title: string,
@@ -568,6 +681,8 @@ async function main() {
     fetchUmamiTopPagesSection(umami),
     fetchUmamiReferrersSection(umami),
     fetchUmamiCampaignsSection(umami),
+    fetchUmamiAttributionSection(umami),
+    fetchUmamiJourneySection(umami),
     fetchGithubStarsSection(),
     fetchYoutubeSection(),
   ]);
