@@ -103,6 +103,10 @@ self-irony:
   a solid half than a shitty whole."
 - An image or two per section with an alt text that is itself a joke or a point:
   "You can't screw up too much if you do something small".
+- A post about something visual (a tool, a UI, a chart) opens with a real
+  screenshot right under the TL;DR, so the reader sees the thing before the
+  argument, and shows more of it where the text talks about it. The same crop,
+  1000×420, is the Dev.to cover (`coverImage`, docs/publishing.md).
 - Technical posts show the real config or code block, then explain it line by
   line in a numbered list.
 
