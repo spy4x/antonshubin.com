@@ -8,6 +8,7 @@
  */
 
 import { channelUrl } from "./utm.ts";
+import { envValue } from "./cloudflare-purge.ts";
 
 // Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
 // must point at production, since it tells search engines which copy is the
@@ -198,6 +199,23 @@ export function buildDevToPayload(
 }
 
 /**
+ * Reads `DEVTO_API_KEY` from the environment or the local `.env.deploy`, which
+ * is never uploaded to the server: the container does not need the key.
+ */
+export function devToApiKey(
+  readDeployEnv: () => string = () => Deno.readTextFileSync(".env.deploy"),
+): string | undefined {
+  const fromEnv = Deno.env.get("DEVTO_API_KEY");
+  if (fromEnv) return fromEnv;
+  try {
+    return envValue(readDeployEnv(), "DEVTO_API_KEY");
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) return undefined;
+    throw err;
+  }
+}
+
+/**
  * Creates a Dev.to draft for the post. Fails open: logs a warning and
  * returns normally when `DEVTO_API_KEY` is unset or the request fails.
  */
@@ -206,8 +224,8 @@ export async function createDevToDraft(
   slug: string,
   bodyMarkdown: string,
   campaign: string = slug,
+  apiKey: string | undefined = devToApiKey(),
 ): Promise<void> {
-  const apiKey = Deno.env.get("DEVTO_API_KEY");
   if (!apiKey) {
     console.warn("  ⚠ DEVTO_API_KEY not set — skipped the Dev.to draft");
     return;
