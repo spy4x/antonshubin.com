@@ -25,16 +25,18 @@ interface ImageGalleryProps {
  * Renders an image with a WebP `<source>` fallback when the src ends in `.png`.
  * Used in both the strip and the lightbox. Emits `width`/`height` only when
  * the caller supplied them; the strip's slides also reserve their box with an
- * aspect ratio, so nothing jumps while an image loads.
+ * aspect ratio, so nothing jumps while an image loads. `pictureClass` styles
+ * the `<picture>` wrapper: a percentage `max-height` on the `<img>` resolves
+ * only against a wrapper with a definite height, so the lightbox sizes it.
  */
 function GalleryImage(
-  { src, alt, width, height, class: className, priority }:
+  { src, alt, width, height, class: className, pictureClass, priority }:
     & GalleryImageData
-    & { class: string; priority?: boolean },
+    & { class: string; pictureClass?: string; priority?: boolean },
 ) {
   const webpSrc = webpForPng(src);
   return (
-    <picture>
+    <picture class={pictureClass}>
       {webpSrc && <source srcset={webpSrc} type="image/webp" />}
       <img
         src={src}
@@ -334,7 +336,8 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
             >
               <GalleryImage
                 {...images[activeIndex.value]}
-                class="max-h-full object-contain"
+                pictureClass="flex w-full h-full items-center justify-center"
+                class="w-auto h-auto max-w-full max-h-full object-contain"
               />
             </div>
 
