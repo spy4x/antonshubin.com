@@ -131,7 +131,7 @@ Deno.test("a live post without --send-newsletter creates the draft and sends not
   assertEquals(r.drafts, [{
     title: "A <test> post",
     slug: "a-test-post",
-    body: "Body text.",
+    body: "**TL;DR**\n\n- One point.\n- Another point.\n\nBody text.",
     campaign: "a-campaign",
   }]);
   assertStringIncludes(
@@ -150,6 +150,47 @@ Deno.test("the default run prints every channel's tagged link with the post's ca
       `https://antonshubin.com/blog/a-test-post?utm_source=${source}&utm_medium=${medium}&utm_campaign=a-campaign`,
     );
   }
+});
+
+Deno.test("the newsletter body shows the TL;DR under the description, with its text escaped", async () => {
+  const post: Post = {
+    ...POST,
+    article: { ...ARTICLE, tldr: ["Use <b> & more.", "Second."] },
+  };
+  const r = fakes({ readPost: () => Promise.resolve(post) });
+  await publishBlog(DEFAULT_RUN, r.deps);
+  const out = r.out.join("\n");
+  const body = out.slice(
+    out.indexOf("Newsletter body:"),
+    out.indexOf("Nothing was sent"),
+  );
+  assertStringIncludes(
+    body,
+    "<p><strong>TL;DR</strong></p>\n<ul><li>Use &lt;b&gt; &amp; more.</li><li>Second.</li></ul>",
+  );
+  assertEquals(body.includes("<b>"), false);
+  assertEquals(
+    body.indexOf("What the post is about") < body.indexOf("TL;DR") &&
+      body.indexOf("TL;DR") < body.indexOf("Read the article"),
+    true,
+  );
+});
+
+Deno.test("the Dev.to draft body starts with the TL;DR, then the project's links, then the post", async () => {
+  const post: Post = {
+    ...POST,
+    article: { ...ARTICLE, relatedTool: "preact-components" },
+  };
+  const r = fakes({ readPost: () => Promise.resolve(post) });
+  await publishBlog(DEFAULT_RUN, r.deps);
+  const body = r.drafts[0].body;
+  const tldr = body.indexOf("- Another point.");
+  const links = body.indexOf("https://github.com/");
+  assertEquals(body.startsWith("**TL;DR**\n\n- One point."), true);
+  assertEquals(
+    tldr > 0 && tldr < links && links < body.indexOf("Body text."),
+    true,
+  );
 });
 
 Deno.test("the newsletter body links to the post only through the email channel's tagged url", async () => {

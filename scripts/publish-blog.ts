@@ -19,7 +19,7 @@
 import { extract as extractYaml } from "@std/front-matter/yaml";
 import { test as hasFrontMatter } from "@std/front-matter/test";
 import { type BlogArticle, blogArticles } from "@/lib/data.ts";
-import { createDevToDraft } from "./devto.ts";
+import { createDevToDraft, devToOpening } from "./devto.ts";
 import { linkLines } from "./links.ts";
 import { articleCampaign, channelUrl } from "./utm.ts";
 import type { PostAnnouncement } from "./send-newsletter.ts";
@@ -122,6 +122,10 @@ export function newsletterFor(post: Post): PostAnnouncement {
     body: [
       `<h2>${escapeHtml(article.title)}</h2>`,
       `<p>${escapeHtml(article.description)}</p>`,
+      `<p><strong>TL;DR</strong></p>`,
+      `<ul>${
+        article.tldr.map((line) => `<li>${escapeHtml(line)}</li>`).join("")
+      }</ul>`,
       `<p><a href="${link}">Read the article</a></p>`,
     ].join("\n"),
   };
@@ -204,7 +208,7 @@ export async function publishBlog(
   await deps.createDraft(
     post.article.title,
     args.slug,
-    post.body,
+    `${devToOpening(post.article)}\n\n${post.body}`,
     post.campaign,
   );
 

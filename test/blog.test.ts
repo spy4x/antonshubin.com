@@ -269,6 +269,23 @@ siteTest(
 );
 
 siteTest(
+  "a post with a video shows its TL;DR before the video",
+  async (site) => {
+    const withVideo = blogArticles.filter((a) => a.youtubeVideoId);
+    assert(withVideo.length > 0, "no post has a video to check");
+    for (const article of withVideo) {
+      const html = await site.html(`/blog/${article.slug}`);
+      const video = html.indexOf("youtube.com/embed/");
+      assert(video > 0, `${article.slug}: no video`);
+      assert(
+        html.indexOf('id="tldr"') < video,
+        `${article.slug}: the video comes before the TL;DR`,
+      );
+    }
+  },
+);
+
+siteTest(
   "every post about a tool shows its live link and repository above the TL;DR, and no other post has the row",
   async (site) => {
     let lives = 0;

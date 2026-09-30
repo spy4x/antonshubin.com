@@ -5,7 +5,10 @@ import {
   createDevToDraft,
   devToApiKey,
   type DevToArticlePayload,
+  devToOpening,
 } from "./devto.ts";
+import type { BlogArticle } from "@/lib/data.ts";
+import { findTool, repoUrl } from "@/lib/tools.ts";
 
 const FOOTER_START = "\n\n---\n\n_First published on ";
 
@@ -388,4 +391,39 @@ Deno.test("createDevToDraft sends the key from .env.deploy when the environment 
     await Deno.remove(dir, { recursive: true });
     if (previous !== undefined) Deno.env.set("DEVTO_API_KEY", previous);
   }
+});
+
+const OPENING_ARTICLE: BlogArticle = {
+  title: "A post",
+  slug: "a-post",
+  description: "About it",
+  tldr: ["First point.", "Second point."],
+  readTime: 3,
+  publishedAt: "2026-09-30",
+  topic: "founders",
+};
+
+Deno.test("the Dev.to opening lists the TL;DR lines and, for a post without a project, nothing else", () => {
+  assertEquals(
+    devToOpening(OPENING_ARTICLE),
+    "**TL;DR**\n\n- First point.\n- Second point.",
+  );
+});
+
+Deno.test("the Dev.to opening for a project post adds its live and repository links straight to the project", () => {
+  const tool = findTool("preact-components")!;
+  const opening = devToOpening({
+    ...OPENING_ARTICLE,
+    relatedTool: "preact-components",
+  });
+  const parts = opening.split("\n\n");
+  assertEquals(parts.length, 3);
+  assertEquals(parts[0], "**TL;DR**");
+  assertEquals(
+    parts[2],
+    `**${tool.name}**: Live: [${tool.live!.label}](${
+      tool.live!.href
+    }) · Code: [${repoUrl(tool)!.replace("https://", "")}](${repoUrl(tool)})`,
+  );
+  assertEquals(opening.includes("antonshubin.com"), false);
 });

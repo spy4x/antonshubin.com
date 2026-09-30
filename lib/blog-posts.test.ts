@@ -144,3 +144,14 @@ Deno.test("posts published the same day keep one order by slug", () => {
     "b-second",
   ]);
 });
+
+Deno.test("a {proof:<id>} placeholder in a TL;DR line is filled with the figure", () => {
+  const article = parseBlogArticle(
+    "a-post",
+    variant('- "First point."', '- "Over {proof:jobs}+ projects."'),
+  );
+  assertEquals(article.tldr, [
+    `Over ${proof("jobs")}+ projects.`,
+    "Second point.",
+  ]);
+});
