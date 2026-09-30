@@ -1,31 +1,35 @@
-import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
+import {
+  BOOK_HREF,
+  BOOK_LABEL,
+  BRIEF_LABEL,
+  WRITE_FALLBACK_HREF,
+} from "../lib/nav.ts";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
-import { buttonClass } from "../components/Button.tsx";
+import Button, { buttonClass } from "../components/Button.tsx";
 import { ClosingBand } from "../components/ClosingBand.tsx";
 import { Fact, FactCard } from "../components/FactCard.tsx";
+import { InfraMap } from "../components/InfraMap.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import StatusMark from "../components/StatusMark.tsx";
 import { WithNote } from "../components/WithNote.tsx";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
-import { SCHEDULE_URL } from "../lib/config.ts";
 import { projects } from "../lib/data.ts";
 import { getBreadcrumb, head } from "../lib/head.ts";
 import {
-  edgesFrom,
-  infraGroups,
-  infraNode,
-  infraNodes,
+  infraLayers,
+  type LayerCheck,
   liveLinks,
+  MAP_CAPTION,
   mentionedToolIds,
 } from "../lib/infrastructure.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
 import { projectLead } from "../lib/llms.ts";
 import { define } from "../lib/utils.ts";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+import { eventAttrs } from "../lib/analytics.ts";
 
 const BASE = "https://antonshubin.com";
 const REPO = "https://github.com/spy4x/antonshubin.com";
@@ -38,105 +42,42 @@ const LINK =
 const LEAD =
   "Founders should not need to manage infrastructure. They should know how product risk is controlled, what happens when something fails, and whether another team can take over cleanly.";
 
-/** A live link's URL by id, so the sections and the first screen never disagree. */
-function liveHref(id: string): string {
-  return liveLinks.find((l) => l.id === id)!.href;
-}
-
-interface Layer {
-  id: string;
-  /** The job first, the tool in parentheses: a founder reads the job, a search reads the tool. */
-  title: string;
-  text: string;
-  /** Where a visitor can check it. */
-  check: { label: string; href: string; external?: boolean } | string;
-}
-
-/** The layers, in the order a founder fears them: handover, backups, failure, deploys, access. */
-const layers: Layer[] = [
-  {
-    id: "handover",
-    title: "Handing it over (versioned config in git)",
-    text:
-      "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing. Configuration and deployment logic stay versioned rather than living as undocumented server steps, so another team can take over without asking one operator. There are four machines: a Hetzner Cloud server in Germany for the public services, a home lab in Singapore, a mini PC that travels with me, and a Raspberry Pi in another country that keeps the offsite backups.",
-    check: {
-      label: "rostok, the scaffolder I deploy with",
-      href: "/tools/rostok",
-    },
-  },
-  {
-    id: "backups",
-    title: "Backups I can restore (restic)",
-    text:
-      "Restic backups run with integrity checks, retention policies, and a written restore procedure. Recovery is part of the system's design, not a command to research for the first time during an incident.",
-    check:
-      "Not public: backups hold client and personal data. Restore last tested on 30 September 2026.",
-  },
-  {
-    id: "monitoring",
-    title: "Knowing when it breaks (Gatus, zond, VictoriaMetrics)",
-    text:
-      "Gatus checks service health and VictoriaMetrics records operational signals. Zond lets Gatus check services that sit behind an SSO proxy. Customer-facing availability stays separate from the deeper measurements, so a failure arrives with diagnostic context.",
-    check: {
-      label: "The status page",
-      href: liveHref("dash"),
-      external: true,
-    },
-  },
-  {
-    id: "deploys",
-    title: "Deploys and builds (Woodpecker, Docker Compose)",
-    text:
-      "A release follows a documented, repeatable path instead of one person's memory. Woodpecker builds the repositories, and the deploy is a versioned script.",
-    check: {
-      label: "The pipelines",
-      href: liveHref("ci"),
-      external: true,
-    },
-  },
-  {
-    id: "access",
-    title: "Sign-in and routing (Authelia, Traefik)",
-    text:
-      "Authelia provides centralized SSO and 2FA, and Traefik handles TLS and routing. Access stays explicit, with boundaries another team can read.",
-    check: "Not public: the configuration names internal services.",
-  },
-];
-
-/** The three rows of "your cloud is fine too", from the page's earlier workload section. */
+/** The three rows of "your cloud is fine too"; `example` adds the SmartLite case under it. */
 const workload = [
   {
     title: "Self-hosted",
     text:
       "Open-source and self-hostable by default, for cost discipline, performance, portability, and auditability. Dedicated hardware when the workload justifies it: single-tenant CPU, NVMe, predictable cost.",
+    example: false,
   },
   {
     title: "Managed cloud",
     text:
       "AWS, GCP, Supabase, and friends when they remove meaningful operational risk, satisfy compliance needs, or let a small team move faster.",
+    example: true,
   },
   {
     title: "Hybrid",
     text:
       "Managed services where they remove risk, stable workloads on dedicated hardware where control and capacity matter more.",
+    example: false,
   },
 ];
 
-/** The three posts that cover a layer, each linked in the section it belongs to. */
-const posts = [
-  {
-    href: "/blog/rostok-self-hosted-scaffolder",
-    label: "rostok: scaffold a self-hosted homelab",
-  },
-  {
-    href: "/blog/zond-sso-probe-bridge",
-    label: "zond: a probe bridge so Gatus can see through your SSO proxy",
-  },
-  {
-    href: "/blog/mig-tiny-self-hosted-scheduler",
-    label: "mig: the tiny scheduler behind the booking page",
-  },
-];
+/** One "where to check" entry: a link, or the sentence saying why there is none. */
+function Check({ c }: { c: LayerCheck }) {
+  if (typeof c === "string") return <>{c}</>;
+  return (
+    <a
+      href={c.href}
+      {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      class={LINK}
+    >
+      {c.label}
+      {c.external && <NewTabHint />}
+    </a>
+  );
+}
 
 /** The `TechArticle` node: the page as a write-up, mentioning each tool page's node. */
 function articleJsonLd(canonical: string) {
@@ -184,213 +125,85 @@ export default define.page(function Infrastructure() {
       <div class="max-w-6xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <Breadcrumb items={getBreadcrumb(canonical, "Infrastructure")} />
 
-        <header class="max-w-3xl" data-infra-hero>
-          <h1 class="text-3xl sm:text-5xl text-parchment text-balance">
-            How I run production
-          </h1>
-          <p class="mt-4 text-graphite text-base sm:text-xl leading-relaxed">
-            {LEAD}
-          </p>
-          <p class="mt-3 text-graphite leading-relaxed">
-            Deployable, observable, recoverable and transferable: Docker Compose
-            behind Traefik, Authelia for sign-in, restic for backups, Gatus for
-            checks and Woodpecker for builds.
-          </p>
-        </header>
+        <div class="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
+          <div class="lg:col-start-1 lg:row-start-1 min-w-0">
+            <header data-infra-hero>
+              <h1 class="text-3xl sm:text-5xl text-parchment text-balance">
+                How I run production
+              </h1>
+              <p class="mt-4 text-graphite text-base sm:text-xl leading-relaxed">
+                {LEAD}
+              </p>
+            </header>
 
-        <section
-          aria-labelledby="see-running"
-          data-infra-live
-          class="mt-8 max-w-3xl"
-        >
-          <h2 id="see-running" class="text-lg text-parchment">
-            See it running
-          </h2>
-          <WithNote id="infra-live-checked" class="note-stack">
-            <ul class="mt-3 flex flex-col sm:flex-row sm:flex-wrap gap-3">
-              {liveLinks.map((l) => (
-                <li key={l.id}>
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-live-link={l.id}
-                    {...eventAttrs("outbound", { to: l.id })}
-                    class={buttonClass(
-                      "secondary",
-                      "w-full sm:w-auto justify-between gap-2 px-4 py-2.5 text-sm break-all",
-                    )}
-                  >
-                    <span>{l.label}</span>
-                    <ArrowRightIcon class="w-3.5 h-3.5 shrink-0" />
-                    <NewTabHint />
-                  </a>
-                  <span class="block mt-1 text-xs text-graphite">
-                    <StatusMark status="live" /> {l.shows}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </WithNote>
-          <p class="mt-4 text-sm text-graphite">
-            A red tile on the status page means something is down now, and you
-            see it when I do.
-          </p>
-          <div class="mt-5">
-            <BookCallLink
-              url={SCHEDULE_URL}
-              target="_blank"
-              event={eventAttrs("book", { place: "top" })}
-              class="justify-center px-6 py-3"
+            <section
+              aria-labelledby="see-running"
+              data-infra-live
+              class="mt-8"
             >
-              {BOOK_LABEL}
-            </BookCallLink>
-          </div>
-        </section>
-
-        <section
-          aria-labelledby="map-heading"
-          data-infra-map
-          class="mt-14"
-        >
-          <h2 id="map-heading" class="text-2xl sm:text-3xl text-parchment">
-            How the pieces connect
-          </h2>
-          <p class="mt-2 text-graphite max-w-3xl">
-            Every box is a link, and every arrow is a fact I can point to.
-          </p>
-          <ol class="mt-6 grid gap-8 lg:grid-cols-4 lg:gap-6">
-            {infraGroups.map((g) => (
-              <li key={g.id} data-infra-group={g.id}>
-                <h3 class="text-lg text-parchment mb-3">{g.title}</h3>
-                <ul class="space-y-3">
-                  {infraNodes.filter((n) => n.group === g.id).map((n) => (
-                    <li
-                      key={n.id}
-                      id={`node-${n.id}`}
-                      data-infra-node={n.id}
-                      class="bg-paper border border-rule rounded-xl p-4 scroll-mt-24"
-                    >
+              <h2 id="see-running" class="text-lg text-parchment">
+                See it running
+              </h2>
+              <WithNote id="infra-live-checked" class="note-stack">
+                <ul class="mt-3 flex flex-col gap-4">
+                  {liveLinks.map((l) => (
+                    <li key={l.id}>
                       <a
-                        href={n.href}
-                        {...(n.external
-                          ? { target: "_blank", rel: "noopener noreferrer" }
-                          : {})}
-                        {...linkEvent(n.href, { to: n.id })}
-                        class={`${LINK} font-semibold break-all`}
+                        href={l.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-live-link={l.id}
+                        {...eventAttrs("outbound", { to: l.id })}
+                        class={buttonClass(
+                          "secondary",
+                          "w-full sm:w-auto justify-between gap-3 px-4 py-2.5 text-sm break-all",
+                        )}
                       >
-                        {n.label}
-                        {n.external && <NewTabHint />}
+                        <span>{l.label}</span>
+                        <ArrowRightIcon class="w-3.5 h-3.5 shrink-0" />
+                        <NewTabHint />
                       </a>
-                      <p class="mt-1 text-sm text-graphite">{n.job}</p>
-                      {edgesFrom(n.id).length > 0 && (
-                        <ul class="mt-3 space-y-1 border-l-2 border-rule-strong pl-3 text-sm">
-                          {edgesFrom(n.id).map((e) => (
-                            <li key={`${e.from}-${e.to}`} data-infra-edge>
-                              <span class="font-semibold text-parchment">
-                                {e.verb}
-                              </span>{" "}
-                              <a
-                                href={`#node-${e.to}`}
-                                class={`${LINK} break-all`}
-                              >
-                                {infraNode(e.to).label}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      <span class="block mt-1 text-xs text-graphite">
+                        <StatusMark status="live" /> {l.shows}
+                      </span>
                     </li>
                   ))}
                 </ul>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section
-          aria-labelledby="client-heading"
-          data-infra-client
-          class="mt-14 max-w-3xl"
-        >
-          <h2 id="client-heading" class="text-2xl sm:text-3xl text-parchment">
-            For a client: SmartLite
-          </h2>
-          <p class="mt-3 text-graphite leading-relaxed">
-            Everything above is my own setup. A client system is a different
-            one: {projectLead(smartlite)}
-          </p>
-          <p class="mt-3 text-sm text-graphite">
-            It runs on AWS.{" "}
-            <a
-              href="/work/smartlite"
-              {...eventAttrs("cta", {
-                place: "body",
-                target: "/work/smartlite",
-              })}
-              class={LINK}
-            >
-              Read the case study
-            </a>
-          </p>
-        </section>
-
-        <div class="mt-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-12">
-          <div class="space-y-12 max-w-3xl">
-            {layers.map((l) => (
-              <section
-                key={l.id}
-                aria-labelledby={`layer-${l.id}`}
-                data-infra-layer={l.id}
-              >
-                <h2
-                  id={`layer-${l.id}`}
-                  class="text-2xl text-parchment text-balance"
-                >
-                  {l.title}
-                </h2>
-                <p class="mt-3 text-graphite leading-relaxed">{l.text}</p>
-                <p class="mt-3 text-sm text-graphite">
-                  <span class="font-semibold text-parchment">
-                    Where to check:
-                  </span>{" "}
-                  {typeof l.check === "string" ? l.check : (
-                    <a
-                      href={l.check.href}
-                      {...(l.check.external
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                      class={LINK}
-                    >
-                      {l.check.label}
-                      {l.check.external && <NewTabHint />}
-                    </a>
-                  )}
-                </p>
-              </section>
-            ))}
-            <section aria-labelledby="posts-heading" data-infra-posts>
-              <h2 id="posts-heading" class="text-2xl text-parchment">
-                Written up
-              </h2>
-              <ul class="mt-3 space-y-2">
-                {posts.map((p) => (
-                  <li key={p.href}>
-                    <a href={p.href} class={LINK}>{p.label}</a>
-                  </li>
-                ))}
-              </ul>
+              </WithNote>
+              <p class="mt-4 text-sm text-graphite">
+                A red tile on the status page means something is down now, and
+                you see it when I do.
+              </p>
             </section>
           </div>
-          <div class="lg:sticky lg:top-8 self-start">
+
+          {/* "This site": after the live links at 390px, the right column from 1024px. */}
+          <div class="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-8">
             <ColophonCard commit={commit} />
           </div>
         </div>
 
         <section
+          aria-labelledby="map-heading"
+          data-infra-map
+          class="mt-10 sm:mt-14"
+        >
+          <h2 id="map-heading" class="text-2xl sm:text-3xl text-parchment">
+            How the pieces connect
+          </h2>
+          <p class="mt-2 text-graphite max-w-3xl">
+            {MAP_CAPTION}{" "}
+            Every box is a link, and every arrow is a fact I can point to.
+          </p>
+          <div class="mt-6">
+            <InfraMap />
+          </div>
+        </section>
+
+        <section
           aria-labelledby="cloud-heading"
           data-infra-workload
-          class="mt-14"
+          class="mt-10 sm:mt-14"
         >
           <h2 id="cloud-heading" class="text-2xl sm:text-3xl text-parchment">
             Your cloud is fine too
@@ -407,6 +220,29 @@ export default define.page(function Infrastructure() {
               >
                 <h3 class="text-lg text-parchment mb-2">{w.title}</h3>
                 <p class="text-sm text-graphite leading-relaxed">{w.text}</p>
+                {w.example && (
+                  <div
+                    data-infra-client
+                    class="mt-3 pt-3 border-t border-rule"
+                  >
+                    <h4 class="text-sm font-semibold text-parchment">
+                      For a client: SmartLite
+                    </h4>
+                    <p class="mt-1 text-sm text-graphite leading-relaxed">
+                      {projectLead(smartlite)} It runs on AWS.{" "}
+                      <a
+                        href="/work/smartlite"
+                        {...eventAttrs("cta", {
+                          place: "body",
+                          target: "/work/smartlite",
+                        })}
+                        class={LINK}
+                      >
+                        Read the case study
+                      </a>
+                    </p>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -425,14 +261,61 @@ export default define.page(function Infrastructure() {
         </section>
 
         <section
-          aria-labelledby="hand-off"
-          data-infra-services
-          class="mt-14"
+          aria-labelledby="risk-heading"
+          data-infra-layers
+          class="mt-10 sm:mt-14"
         >
-          <h2 id="hand-off" class="text-2xl sm:text-3xl text-parchment">
+          <h2 id="risk-heading" class="text-2xl sm:text-3xl text-parchment">
+            How risk is controlled
+          </h2>
+          <div class="mt-6 grid gap-4 lg:grid-cols-2">
+            {infraLayers.map((l) => (
+              <section
+                key={l.id}
+                aria-labelledby={`layer-${l.id}`}
+                data-infra-layer={l.id}
+                class="bg-paper border border-rule rounded-xl p-4 sm:p-5"
+              >
+                <h3 id={`layer-${l.id}`} class="text-lg text-parchment">
+                  {l.title}
+                </h3>
+                <p class="mt-1 text-xs text-graphite">{l.tools}</p>
+                <p class="mt-3 text-sm text-graphite leading-relaxed">
+                  {l.text}
+                </p>
+                <p class="mt-3 text-sm text-graphite">
+                  <span class="font-semibold text-parchment">
+                    Where to check:
+                  </span>{" "}
+                  {l.checks.map((c, i) => (
+                    <span key={i}>
+                      {i > 0 && " · "}
+                      <Check c={c} />
+                    </span>
+                  ))}
+                </p>
+                {l.post && (
+                  <p class="mt-2 text-sm">
+                    <a href={l.post.href} class={LINK}>{l.post.label}</a>
+                  </p>
+                )}
+              </section>
+            ))}
+          </div>
+        </section>
+
+        <ClosingBand
+          promiseIds={["ownership", "first-milestone"]}
+          bookHref={BOOK_HREF}
+          links={[
+            { href: WRITE_FALLBACK_HREF, label: BRIEF_LABEL },
+            { href: "/how-i-work", label: "How I work" },
+          ]}
+        >
+          <h2 class="text-lg text-parchment mb-3">
             If you want this for your product
           </h2>
-          <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+          <ul data-infra-services class="mb-6 grid gap-4 sm:grid-cols-2">
             {[mvp, ongoing].map((item) => (
               <li
                 key={item.slug}
@@ -457,27 +340,13 @@ export default define.page(function Infrastructure() {
               </li>
             ))}
           </ul>
-        </section>
-
-        <ClosingBand
-          promiseIds={["ownership", "first-milestone"]}
-          links={[
-            {
-              href: "/#audit-form",
-              label: BRIEF_LABEL,
-            },
-            {
-              href: "/how-i-work",
-              label: "How I work",
-            },
-          ]}
-        />
+        </ClosingBand>
       </div>
     </Layout>
   );
 });
 
-/** "This site": what the page you are reading is built with and where it runs. */
+/** "This site": what the page you are reading is built with and where it runs, then Book and the brief. */
 function ColophonCard({ commit }: { commit: string }) {
   return (
     <FactCard label="This site">
@@ -489,10 +358,7 @@ function ColophonCard({ commit }: { commit: string }) {
         </Fact>
         <Fact term="Checked by">Woodpecker runs the tests on every push</Fact>
         <Fact term="Analytics">Umami, self-hosted</Fact>
-        <Fact term="Backups">
-          A nightly restic job of the site's data, restored in a test on 30
-          September 2026
-        </Fact>
+        <Fact term="Backups">A nightly restic job of the site's data</Fact>
         <Fact term="Source">
           <a href={REPO} target="_blank" rel="noopener noreferrer" class={LINK}>
             spy4x/antonshubin.com
@@ -515,6 +381,22 @@ function ColophonCard({ commit }: { commit: string }) {
             : "a local build"}
         </Fact>
       </dl>
+      <div class="mt-5 flex flex-col gap-3">
+        <BookCallLink
+          url={BOOK_HREF}
+          event={eventAttrs("book", { place: "card" })}
+          class="justify-center px-6 py-3"
+        >
+          {BOOK_LABEL}
+        </BookCallLink>
+        <Button
+          href={WRITE_FALLBACK_HREF}
+          {...eventAttrs("brief", { place: "card" })}
+          class="justify-center px-6 py-3"
+        >
+          {BRIEF_LABEL}
+        </Button>
+      </div>
     </FactCard>
   );
 }

@@ -17,27 +17,10 @@ import { ciUrl, findTool, tool, toolRows } from "./tools.ts";
 
 const BASE = "https://antonshubin.com";
 
-export type InfraGroupId = "open" | "runs" | "deployed" | "know";
-
-export interface InfraGroup {
-  id: InfraGroupId;
-  /** The column heading. */
-  title: string;
-}
-
-/** The four columns, left to right at 1024px and above, top to bottom below. */
-export const infraGroups: InfraGroup[] = [
-  { id: "open", title: "What you can open" },
-  { id: "runs", title: "What runs it" },
-  { id: "deployed", title: "How it's deployed" },
-  { id: "know", title: "How I know" },
-];
-
 export interface InfraNode {
   id: string;
   /** What the box says: a hostname or a tool name. */
   label: string;
-  group: InfraGroupId;
   /** One short line: what the box does. */
   job: string;
   /** Where the box links. A public URL, or a `/tools/<slug>` page, or the tool's repository. */
@@ -101,11 +84,17 @@ export const liveLinks: LiveLink[] = [
   },
 ];
 
+/** A live link's URL by id, so the layers and the first screen never disagree. */
+export function liveHref(id: string): string {
+  const l = liveLinks.find((x) => x.id === id);
+  if (!l) throw new Error(`lib/infrastructure.ts: no live link "${id}"`);
+  return l.href;
+}
+
 export const infraNodes: InfraNode[] = [
   {
     id: "site",
     label: "antonshubin.com",
-    group: "open",
     job: "This site",
     href: "/",
     external: false,
@@ -113,7 +102,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "meet",
     label: "meet.antonshubin.com",
-    group: "open",
     job: "The booking page",
     href: "https://meet.antonshubin.com",
     external: true,
@@ -121,7 +109,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "dash",
     label: "dash.antonshubin.com",
-    group: "open",
     job: "The status page",
     href: "https://dash.antonshubin.com",
     external: true,
@@ -129,7 +116,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "ci",
     label: "ci.antonshubin.com",
-    group: "open",
     job: "The pipelines",
     href: ciUrl(tool("mig"))!,
     external: true,
@@ -137,7 +123,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "mig",
     label: "mig",
-    group: "runs",
     job: tool("mig").job,
     toolSlug: "mig",
     ...toolLink("mig"),
@@ -145,7 +130,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "oko",
     label: "oko",
-    group: "runs",
     job: "Homelab service dashboard",
     toolSlug: "oko",
     ...toolLink("oko"),
@@ -153,7 +137,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "woodpecker",
     label: "Woodpecker",
-    group: "runs",
     job: "CI server and Docker agent, with GitHub sign-in",
     href: "https://woodpecker-ci.org",
     external: true,
@@ -161,7 +144,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "rostok",
     label: "rostok",
-    group: "deployed",
     job: tool("rostok").job,
     toolSlug: "rostok",
     ...toolLink("rostok"),
@@ -169,7 +151,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "stacks",
     label: "Docker Compose stacks",
-    group: "deployed",
     job: "Docker Compose, with Traefik for TLS and routing",
     href: "https://docs.docker.com/compose/",
     external: true,
@@ -177,7 +158,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "repos",
     label: "GitHub repositories",
-    group: "deployed",
     job: "The code, on GitHub",
     href: "https://github.com/spy4x",
     external: true,
@@ -185,7 +165,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "zond",
     label: "Zond",
-    group: "know",
     job: tool("zond").job,
     toolSlug: "zond",
     ...toolLink("zond"),
@@ -193,7 +172,6 @@ export const infraNodes: InfraNode[] = [
   {
     id: "gatus",
     label: "Gatus",
-    group: "know",
     job: "Gatus checks service health",
     href: "https://github.com/TwiN/gatus",
     external: true,
@@ -207,8 +185,71 @@ export const infraEdges: InfraEdge[] = [
   { from: "oko", to: "gatus", verb: "reads" },
   { from: "zond", to: "gatus", verb: "feeds" },
   { from: "rostok", to: "stacks", verb: "holds" },
+  { from: "ci", to: "woodpecker", verb: "runs" },
   { from: "woodpecker", to: "repos", verb: "builds" },
 ];
+
+export interface InfraLane {
+  id: string;
+  /** The lane's heading. */
+  title: string;
+  /** Box ids in drawing order. Neighbours must share an arrow, in either direction. */
+  nodes: string[];
+  /** A post that covers the lane, linked under it. */
+  post?: { href: string; label: string };
+}
+
+/**
+ * The map's lanes (#344), each a chain of two to four boxes. Builds and
+ * Deploys are separate lanes because no arrow joins them: one lane would
+ * imply one.
+ */
+export const infraLanes: InfraLane[] = [
+  {
+    id: "booking",
+    title: "Booking",
+    nodes: ["site", "meet", "mig"],
+    post: {
+      href: "/blog/mig-tiny-self-hosted-scheduler",
+      label: "mig: the tiny scheduler behind the booking page",
+    },
+  },
+  {
+    id: "monitoring",
+    title: "Monitoring",
+    nodes: ["zond", "gatus", "oko", "dash"],
+  },
+  { id: "builds", title: "Builds", nodes: ["ci", "woodpecker", "repos"] },
+  { id: "deploys", title: "Deploys", nodes: ["rostok", "stacks"] },
+];
+
+/** The arrow between two boxes, whichever way it runs; undefined when none is listed. */
+export function edgeBetween(a: string, b: string): InfraEdge | undefined {
+  return infraEdges.find((e) =>
+    (e.from === a && e.to === b) || (e.from === b && e.to === a)
+  );
+}
+
+/**
+ * The connector between each pair of neighbouring boxes of a lane.
+ * `forward` is true when the arrow runs from the earlier box to the later
+ * one. Throws when two neighbours share no arrow, so a lane can never draw a
+ * connection that is not true.
+ */
+export function laneConnections(
+  lane: InfraLane,
+): { edge: InfraEdge; forward: boolean }[] {
+  return lane.nodes.slice(1).map((to, i) => {
+    const from = lane.nodes[i];
+    const edge = edgeBetween(from, to);
+    if (!edge) {
+      throw new Error(
+        `lib/infrastructure.ts: lane ${lane.id} has no arrow ${from} - ${to}`,
+      );
+    }
+    return { edge, forward: edge.from === from };
+  });
+}
 
 /** A node by id; throws on a typo. */
 export function infraNode(id: string): InfraNode {
@@ -221,6 +262,82 @@ export function infraNode(id: string): InfraNode {
 export function edgesFrom(id: string): InfraEdge[] {
   return infraEdges.filter((e) => e.from === id);
 }
+
+/** A place a visitor can check a layer: a link, or a sentence saying why there is none. */
+export type LayerCheck = string | {
+  label: string;
+  href: string;
+  external?: boolean;
+};
+
+export interface InfraLayer {
+  id: string;
+  /** The job a founder cares about. The tools go on their own line. */
+  title: string;
+  /** The tools behind it, so a search for a tool name still matches. */
+  tools: string;
+  text: string;
+  checks: LayerCheck[];
+  /** A post that covers the layer. */
+  post?: { href: string; label: string };
+}
+
+/** The four blocks of "How risk is controlled", in the order a founder fears them. */
+export const infraLayers: InfraLayer[] = [
+  {
+    id: "handover",
+    title: "Handing it over",
+    tools: "Docker Compose, Traefik, Authelia, versioned config in git",
+    text:
+      "Configuration and deployment logic stay versioned rather than living as undocumented server steps, so another team can take over without asking one operator. There are four machines: a Hetzner Cloud server in Germany for the public services, a home lab in Singapore, a mini PC that travels with me, and a Raspberry Pi in another country that keeps the offsite backups. Authelia provides centralized SSO and 2FA, and Traefik handles TLS and routing. Access stays explicit, with boundaries another team can read.",
+    checks: [
+      { label: "rostok, the scaffolder I deploy with", href: "/tools/rostok" },
+      "Not public: the configuration names internal services.",
+    ],
+    post: {
+      href: "/blog/rostok-self-hosted-scaffolder",
+      label: "rostok: scaffold a self-hosted homelab",
+    },
+  },
+  {
+    id: "backups",
+    title: "Backups I can restore",
+    tools: "restic",
+    text:
+      "Restic backups run with integrity checks, retention policies, and a written restore procedure. Recovery is part of the system's design, not a command to research for the first time during an incident.",
+    checks: [
+      "Not public: backups hold client and personal data. Restore last tested on 30 September 2026.",
+    ],
+  },
+  {
+    id: "monitoring",
+    title: "Knowing when it breaks",
+    tools: "Gatus, zond, VictoriaMetrics",
+    text:
+      "Gatus checks service health and VictoriaMetrics records operational signals. Zond lets Gatus check services that sit behind an SSO proxy. Customer-facing availability stays separate from the deeper measurements, so a failure arrives with diagnostic context.",
+    checks: [
+      { label: "The status page", href: liveHref("dash"), external: true },
+    ],
+    post: {
+      href: "/blog/zond-sso-probe-bridge",
+      label: "zond: a probe bridge so Gatus can see through your SSO proxy",
+    },
+  },
+  {
+    id: "deploys",
+    title: "Deploys and builds",
+    tools: "Woodpecker, Docker Compose",
+    text:
+      "A release follows a documented, repeatable path instead of one person's memory. Woodpecker builds the repositories, and the deploy is a versioned script.",
+    checks: [
+      { label: "The pipelines", href: liveHref("ci"), external: true },
+    ],
+  },
+];
+
+/** The sentence above the map: "my own servers", said before the boxes. */
+export const MAP_CAPTION =
+  "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing.";
 
 /** The `@id` of a tool page's `SoftwareSourceCode` node, for the `TechArticle`'s `mentions`. */
 export function toolNodeId(slug: string): string {
@@ -250,7 +367,18 @@ export function infrastructureLines(baseUrl: string): string {
   const arrows = infraEdges.map((e) =>
     `  - ${infraNode(e.from).label} ${e.verb} ${infraNode(e.to).label}`
   );
+  const layers = infraLayers.map((l) =>
+    `  - ${l.title} (${l.tools}): ${l.text} ${
+      l.checks.map((c) =>
+        typeof c === "string"
+          ? c
+          : `${c.label}: ${c.href.startsWith("/") ? baseUrl : ""}${c.href}`
+      ).join(" ")
+    }${l.post ? ` Post: ${baseUrl}${l.post.href}` : ""}`
+  );
   return [
+    "  Layers:",
+    ...layers,
     "  Boxes:",
     ...boxes,
     "  Connections:",

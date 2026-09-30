@@ -92,7 +92,7 @@ ${promisesList}
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide)
 - [Services and prices](${BASE_URL}/catalog)
 - [How I work](${BASE_URL}/how-i-work) — The five promises in the order a project meets them, prices, who does the work, my AI-agent setup and the questions clients ask
-- [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect, and how deploys, backups, monitoring and sign-in are handled
+- [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect in four lanes, and how handover, backups, monitoring and deploys are handled
 - [Contact](${BASE_URL}${BOOK_HREF}) — ${BOOK_LABEL} on the page, ${
       decapitalize(BRIEF_LABEL)
     } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email hello@antonshubin.com, or Telegram @spy4x
