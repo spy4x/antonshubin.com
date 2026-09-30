@@ -173,7 +173,7 @@ export default define.page(function Blog(ctx) {
           </section>
         )}
 
-        <NewsletterBlock event="blog-newsletter-index" />
+        <NewsletterBlock />
       </div>
     </Layout>
   );

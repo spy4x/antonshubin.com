@@ -275,7 +275,9 @@ Analytics (Umami) is configured via environment variables in `lib/config.ts`:
 the page for known crawlers and link-preview bots, so a bot that runs JavaScript
 does not inflate visitor counts. The bot list and the `isBot()` check live in
 `lib/bots.ts`; `_middleware.ts` no longer touches the response body (issue
-#179).
+#179). It also leaves them out on `/unsubscribe` and `/pay`
+(`lib/analytics.ts`'s `UNTRACKED_PATHS`, #318), and staging runs with an empty
+`UMAMI_ID` (`scripts/staging-env.ts`), so it reports nothing.
 
 Set these in `.env`. Never hardcode them in `_app.tsx`.
 

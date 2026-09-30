@@ -33,6 +33,7 @@ import {
 import { proof } from "../lib/proof.ts";
 import { repeatClientsLine } from "../lib/testimonials.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
+import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 /** The public repository the AI-agent setup's rules live in. */
 const DOTFILES_URL = "https://github.com/spy4x/dotfiles";
@@ -42,12 +43,10 @@ const promiseLinks: Record<string, PromiseLink> = {
   "first-milestone": {
     href: catalogPath("zero-to-production-saas-mvp"),
     label: catalogItem("zero-to-production-saas-mvp").shortTitle,
-    event: "how-i-work-promise-mvp",
   },
   "free-bugfixes": {
     href: catalogPath("cto-advisory-retainer"),
     label: catalogItem("cto-advisory-retainer").shortTitle,
-    event: "how-i-work-promise-ongoing",
   },
 };
 
@@ -117,7 +116,10 @@ export default define.page(function HowIWork() {
                   <li key={item.slug} class="border-t border-rule">
                     <a
                       href={catalogPath(item.slug)}
-                      data-umami-event={`how-i-work-offer-${item.slug}`}
+                      {...eventAttrs("cta", {
+                        place: "card",
+                        target: catalogPath(item.slug),
+                      })}
                       class="group block py-3"
                     >
                       <span class="block font-semibold text-parchment group-hover:text-accent">
@@ -133,14 +135,14 @@ export default define.page(function HowIWork() {
               <div class="mt-2 flex flex-col gap-3">
                 <BookCallLink
                   url={BOOK_HREF}
-                  data-umami-event="how-i-work-book-card"
+                  event={eventAttrs("book", { place: "card" })}
                   class="justify-center px-6 py-3"
                 >
                   Book a free intro call
                 </BookCallLink>
                 <Button
                   href={WRITE_FALLBACK_HREF}
-                  data-umami-event="how-i-work-brief-card"
+                  {...eventAttrs("brief", { place: "card" })}
                   class="justify-center px-6 py-3"
                 >
                   Send a written brief
@@ -149,7 +151,7 @@ export default define.page(function HowIWork() {
               <p class="mt-4 text-sm">
                 <a
                   href="/catalog"
-                  data-umami-event="how-i-work-services-card"
+                  {...eventAttrs("cta", { place: "card", target: "/catalog" })}
                   class={FACT_LINK}
                 >
                   Services and prices
@@ -204,7 +206,7 @@ export default define.page(function HowIWork() {
                   href={DOTFILES_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-umami-event="how-i-work-dotfiles"
+                  {...linkEvent(DOTFILES_URL)}
                   class={FACT_LINK}
                 >
                   spy4x/dotfiles
@@ -216,7 +218,10 @@ export default define.page(function HowIWork() {
                 Valkey/Redis, Docker/Podman, Traefik and MCP; see{" "}
                 <a
                   href="/infrastructure"
-                  data-umami-event="how-i-work-infrastructure"
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: "/infrastructure",
+                  })}
                   class={FACT_LINK}
                 >
                   how I run production
@@ -240,7 +245,7 @@ export default define.page(function HowIWork() {
                     {f.link && (
                       <a
                         href={f.link.href}
-                        data-umami-event={`how-i-work-faq-${f.id}`}
+                        {...linkEvent(f.link.href)}
                         class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
                       >
                         {f.link.label}
@@ -256,18 +261,15 @@ export default define.page(function HowIWork() {
 
         <ClosingBand
           bookHref={BOOK_HREF}
-          bookEvent="how-i-work-book-band"
           promiseIds={[]}
           links={[
             {
               href: WRITE_FALLBACK_HREF,
               label: "Send a written brief",
-              event: "how-i-work-brief-band",
             },
             {
               href: "/catalog",
               label: "Services and prices",
-              event: "how-i-work-services-band",
             },
           ]}
         />

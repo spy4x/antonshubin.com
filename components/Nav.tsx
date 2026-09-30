@@ -10,6 +10,7 @@ import {
   tabItemsBeforeBook,
   WRITE_FALLBACK_HREF,
 } from "../lib/nav.ts";
+import { eventAttrs } from "../lib/analytics.ts";
 
 interface NavProps {
   currentPath: string;
@@ -47,6 +48,11 @@ function bookLink(scheduleUrl: string) {
  */
 export function Nav({ currentPath, scheduleUrl }: NavProps) {
   const book = bookLink(scheduleUrl);
+  // With no calendar, the nav's Book reads "Write" and opens the brief.
+  const bookEvent = eventAttrs(
+    book.href === WRITE_FALLBACK_HREF ? "brief" : "book",
+    { place: "nav" },
+  );
 
   const tab = (item: NavItem) => (
     <li>
@@ -75,7 +81,7 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
               aria-current="false"
               data-primary-book
               data-nav-book
-              data-umami-event="nav-book"
+              {...bookEvent}
               class={`${STACKED} ${BOOK} ${FOCUS} h-14 rounded-full px-1`}
             >
               {book.icon}
@@ -117,7 +123,7 @@ export function Nav({ currentPath, scheduleUrl }: NavProps) {
           aria-current="false"
           data-primary-book
           data-nav-book
-          data-umami-event="nav-book"
+          {...bookEvent}
           class={`${STACKED} ${BOOK} ${FOCUS} rounded-xl px-1 py-2.5`}
         >
           {book.icon}

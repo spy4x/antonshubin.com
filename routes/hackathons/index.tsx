@@ -8,6 +8,7 @@ import { type Hackathon, hackathons } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
 import { CalendarIcon, CodeIcon, PersonIcon } from "../../components/Icons.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 function HackathonCard({ h }: { h: Hackathon }) {
   return (
@@ -207,6 +208,7 @@ export default define.page(function Hackathons(ctx) {
             <BookCallLink
               url={SCHEDULE_URL}
               target="_blank"
+              event={eventAttrs("book", { place: "band" })}
               class="gap-2 px-6 py-3"
             >
               Book a free intro call

@@ -303,9 +303,10 @@ so a refresh reaches visitors (`lib/cache-control.ts`). A tool's `posts` link
 each post to its page (the post header shows "The tool: <name>"); its
 `catalogSlug` picks the catalog item the "hire me" door names; `deployable` adds
 `SoftwareApplication` JSON-LD, whose `url` is only ever its running `live`
-instance. The hub carries `CollectionPage` and `ItemList` JSON-LD. Umami events
-are `tool-<slug>-<install-copy|github|issue|live|catalog|post>`,
-`tools-hub-<slug>` and `post-tool-<slug>`.
+instance. The hub carries `CollectionPage` and `ItemList` JSON-LD. A tool page's
+links send `outbound` (`to` `live` or `github`, `item` the slug), `cta` and
+`book` with `item`, and its copy button `tool-install-copy`; see "Analytics"
+below.
 
 ## Navigation
 
@@ -730,12 +731,12 @@ own before a build.
 ## Browser-driven tests
 
 Some behaviour only exists after client JS runs — hydration, focus, a
-`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for all
-twelve files below and fails loudly, naming the install command, if none is
-found. Playwright's version must match exactly across `deno.json`'s import map,
+`<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for every
+file below and fails loudly, naming the install command, if none is found.
+Playwright's version must match exactly across `deno.json`'s import map,
 `.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. All
-twelve call `startSite()` and run under `deno task test:browser` with `-A`, not
+— a mismatch downloads a different Chromium build than the one launched. Every
+one calls `startSite()` and run under `deno task test:browser` with `-A`, not
 the narrow `deno task test`.
 
 Two rules keep them stable on a busy machine (#219). Open a page with
@@ -863,6 +864,40 @@ page. Never retry a test on this error.
   then visible; `/`, a project page, `/privacy` and a not-found blog URL have no
   axe violations and no sideways scroll at 390 and 1440px, each with one footer;
   and at 390px the footer's last line clears the tab bar.
+- `test/analytics.browser.test.ts` (#318): `post-read` counts once, only when
+  the end of a post has been on screen and 15 s have passed (Playwright's fake
+  clock), and the not-found page counts `not-found`. It, `lead-form` (brief
+  events) and `meet-embed` (calendar and booking events) replace Umami with
+  `test/browser.ts`'s `recordUmami()` and read the calls with `trackedCalls()`.
+
+## Analytics
+
+`lib/analytics.ts` is the only list of Umami events (#318): `ANALYTICS_EVENTS`
+is a closed list, and detail goes into `data-umami-event-<key>` properties
+(`place`, `item`, `to`, `target`, `field`, `reason`, `service`), never into the
+name, so Umami can add up every Book click across pages. A link or button
+spreads `eventAttrs(name, props)`; `linkEvent(href, props)` picks `outbound`,
+`brief`, `book` or `cta` from the href (the closing band and the promise
+timeline use it); an island calls `track()`, which never throws. Never write a
+`data-umami-event` string or call `umami.track` by hand.
+`test/analytics.test.ts` fails on any event, property or `place` outside the
+list on every sitemap page, `/pay` and a not-found page.
+
+Outcomes are tracked where they happen: `islands/LeadForm.tsx` sends
+`brief-sent` (with `service`) only after `/api/lead` accepted the brief and
+`brief-error` (`reason` `invalid` or `server`) otherwise, the submit click is
+not an event; `islands/MeetEmbed.tsx` sends `calendar-shown` on the first valid
+`mig:height`, `calendar-failed` on the timeout and `call-booked` for each
+`{ type: "mig:booked" }` message under the same origin and `event.source` guard
+as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
+`islands/PostRead.tsx` sends `post-read`; `components/NotFound.tsx` sends
+`not-found` through `islands/TrackPageEvent.tsx`. Links to other sites inside a
+post get `outbound` from `lib/markdown.ts`.
+
+`routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
+(`/unsubscribe`, whose URL carries a working token, and `/pay`), and
+`scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
+`routes/privacy.tsx` describes exactly this; change it together with the code.
 
 ## Content-Security-Policy
 

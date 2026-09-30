@@ -39,6 +39,7 @@ import {
   CatalogIcon,
   CheckIcon,
 } from "../../components/Icons.tsx";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
   return catalogItems.find((i) => i.slug === slug);
@@ -313,7 +314,10 @@ export default define.page(function CatalogDetail(ctx) {
               <p data-service-next>
                 <a
                   href={`/catalog/${next.slug}`}
-                  data-umami-event={`service-cta-${item.slug}-next`}
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/catalog/${next.slug}`,
+                  })}
                   class={`inline-flex items-center gap-1 ${FACT_LINK}`}
                 >
                   Next step: {next.shortTitle} ·{" "}
@@ -329,13 +333,13 @@ export default define.page(function CatalogDetail(ctx) {
         </div>
 
         <ClosingBand
-          bookEvent={`service-cta-${item.slug}-book-band`}
+          bookItem={item.slug}
           bookLabel={BOOK_LABEL}
           promiseIds={bandPromises}
           catalogLink={
             <a
               href={briefPath(item.slug)}
-              data-umami-event={`service-cta-${item.slug}-brief-band`}
+              {...eventAttrs("brief", { place: "band", item: item.slug })}
               class={`text-sm ${FACT_LINK}`}
             >
               {BRIEF_LABEL}
@@ -344,7 +348,6 @@ export default define.page(function CatalogDetail(ctx) {
           links={[{
             href: "/how-i-work",
             label: "How I work",
-            event: `service-cta-${item.slug}-how-i-work`,
           }]}
         />
       </div>

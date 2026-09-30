@@ -1,6 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
 import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
+import type { EventAttrs } from "../lib/analytics.ts";
 
 interface CopyButtonProps {
   elementId: string;
@@ -11,12 +12,12 @@ interface CopyButtonProps {
   label?: string;
   class?: string;
   title?: string;
-  /** Umami event name, sent when the button is pressed. */
-  umamiEvent?: string;
+  /** The Umami event the press records (`eventAttrs()`), if any. */
+  analytics?: EventAttrs;
 }
 
 export default function CopyButton(
-  { elementId, label, class: className, title, umamiEvent }: CopyButtonProps,
+  { elementId, label, class: className, title, analytics }: CopyButtonProps,
 ) {
   const copied = useSignal(false);
   const failed = useSignal(false);
@@ -50,7 +51,7 @@ export default function CopyButton(
       onClick={handleCopy}
       class={`${className || ""} ${baseClass}`.trim()}
       aria-live="polite"
-      data-umami-event={umamiEvent}
+      {...analytics}
       {...(title && !copied.value && !failed.value
         ? { title, "aria-label": title }
         : {})}

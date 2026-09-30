@@ -12,6 +12,7 @@ import {
   type ToolStatus,
 } from "../../lib/tools.ts";
 import { checkedLabel, toolsLive } from "../../lib/tools-live.ts";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 /** The H1 #189 sets for the hub, reused as the page name. */
 const TITLE = "Tools I build and run myself";
@@ -72,7 +73,7 @@ export default define.page(async function ToolsIndex(ctx) {
           your team? That's my day job.{" "}
           <a
             href="/catalog"
-            data-umami-event="tools-hub-services"
+            {...eventAttrs("cta", { place: "body", target: "/catalog" })}
             class="text-accent underline underline-offset-4"
           >
             Services

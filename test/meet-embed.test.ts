@@ -24,6 +24,7 @@ import { startSite } from "./harness.ts";
 import { count } from "./html.ts";
 import {
   embedUrl,
+  isEmbedBookedMessage,
   isEmbedHeightMessage,
   MAX_EMBED_HEIGHT_PX,
 } from "../islands/MeetEmbed.tsx";
@@ -32,7 +33,8 @@ const SCHEDULER_ORIGIN = "https://meet.example.com";
 const SCHEDULER_HOST = "meet.example.com";
 /** The calendar's wrapper, `data-meet-embed="<state>"`; not the `-placeholder` child. */
 const EMBED_MARKER = /data-meet-embed="/g;
-const FALLBACK_EVENT = "meet-embed-fallback-click";
+/** Marks the calendar's new-tab link (its Umami event, `book`, is shared with every Book link). */
+const FALLBACK_MARKER = "data-calendar-newtab";
 
 /** Escapes regex metacharacters so a literal string can go inside a `RegExp`. */
 function escapeRegExp(value: string): string {
@@ -89,7 +91,7 @@ function fetchesFromOrigin(html: string, origin: string): boolean {
 }
 
 /**
- * Asserts the one fallback `<a>` (`data-umami-event="meet-embed-fallback-click"`)
+ * Asserts the one fallback `<a>` (`data-calendar-newtab`)
  * exists exactly once and opens the real scheduler URL safely. Doubles as the
  * "the scheduler origin actually reached this page" check that requirement 1
  * needs before the eager-fetch guard runs, since without it that guard would
@@ -97,12 +99,12 @@ function fetchesFromOrigin(html: string, origin: string): boolean {
  */
 function assertFallbackLink(html: string, path: string, expectedHref: string) {
   const anchors = openTags(html, "a").filter((tag) =>
-    attrValue(tag, "data-umami-event") === FALLBACK_EVENT
+    attrValue(tag, FALLBACK_MARKER) !== null
   );
   assertEquals(
     anchors.length,
     1,
-    `${path}: expected exactly one fallback link (data-umami-event="${FALLBACK_EVENT}")`,
+    `${path}: expected exactly one fallback link (${FALLBACK_MARKER})`,
   );
   const tag = anchors[0];
   assertEquals(
@@ -221,7 +223,7 @@ function assertNoBookingBlock(html: string, path: string) {
     `${path}: rendered an <iframe> with SCHEDULE_URL unset`,
   );
   assertEquals(
-    count(html, new RegExp(escapeRegExp(FALLBACK_EVENT), "g")),
+    count(html, new RegExp(escapeRegExp(FALLBACK_MARKER), "g")),
     0,
     `${path}: rendered the new-tab link with SCHEDULE_URL unset`,
   );
@@ -283,7 +285,7 @@ Deno.test("home page keeps the collapsed success panel out of the tab order", as
         "so its controls stay Tab-reachable while invisible",
     );
     assert(
-      wrapperHtml.includes(FALLBACK_EVENT),
+      wrapperHtml.includes(FALLBACK_MARKER),
       "/: the new-tab link was not found inside the success wrapper — " +
         "the inert check above would be guarding the wrong element",
     );
@@ -575,10 +577,38 @@ Deno.test("isEmbedHeightMessage returns a height exactly at the cap unchanged", 
 Deno.test("meet-embed guard allows the plain fallback link and serialized island props", () => {
   const html =
     `<a href="https://${SCHEDULER_HOST}" target="_blank" rel="noopener noreferrer" ` +
-    `data-umami-event="${FALLBACK_EVENT}">Open the calendar in a new tab</a>` +
+    `${FALLBACK_MARKER}="true" data-umami-event="book">Open the calendar in a new tab</a>` +
     `<script>boot({},"[[1],{\\"url\\":0},\\"https://${SCHEDULER_HOST}/embed\\"]")</script>`;
   assert(
     !fetchesFromOrigin(html, SCHEDULER_ORIGIN),
     "fetchesFromOrigin() must not flag a plain <a href> or a serialized island prop",
+  );
+});
+
+Deno.test("isEmbedBookedMessage accepts mig:booked only from the embed's own frame and origin", () => {
+  const booked = { type: "mig:booked" };
+  assert(isEmbedBookedMessage(validEvent({ data: booked }), ORIGIN, SOURCE));
+  assert(
+    !isEmbedBookedMessage(
+      validEvent({ data: booked, origin: "https://evil.example.com" }),
+      ORIGIN,
+      SOURCE,
+    ),
+    "a booking from another origin was accepted",
+  );
+  assert(
+    !isEmbedBookedMessage(
+      validEvent({ data: booked, source: OTHER_SOURCE }),
+      ORIGIN,
+      SOURCE,
+    ),
+    "a booking from another window was accepted",
+  );
+  assert(
+    !isEmbedBookedMessage(validEvent(), ORIGIN, SOURCE),
+    "a height message counted as a booking",
+  );
+  assert(
+    !isEmbedBookedMessage(validEvent({ data: "mig:booked" }), ORIGIN, SOURCE),
   );
 });

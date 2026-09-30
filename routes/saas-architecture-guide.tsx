@@ -8,6 +8,7 @@ import { SCHEDULE_URL } from "../lib/config.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import { proof } from "../lib/proof.ts";
 import { BookCallLink } from "../components/BookCallLink.tsx";
+import { eventAttrs } from "../lib/analytics.ts";
 
 const audit = catalogItem("codebase-health-audit");
 const build = catalogItem("zero-to-production-saas-mvp");
@@ -288,6 +289,7 @@ export default define.page(function SaasArchGuide() {
             <BookCallLink
               url={SCHEDULE_URL}
               target="_blank"
+              event={eventAttrs("book", { place: "end" })}
               class="gap-2 px-6 py-3"
             >
               Book a free intro call

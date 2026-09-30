@@ -1,6 +1,7 @@
 import type { ComponentChildren } from "preact";
 import { NewTabHint } from "./NewTabHint.tsx";
 import { buttonClass, type ButtonVariant } from "./Button.tsx";
+import { type EventAttrs, eventAttrs } from "../lib/analytics.ts";
 
 interface BookCallLinkProps {
   /**
@@ -12,7 +13,8 @@ interface BookCallLinkProps {
   url: string;
   target?: "_blank";
   rel?: string;
-  "data-umami-event"?: string;
+  /** The Umami event and its properties (`eventAttrs()`); a bare `book` when omitted. */
+  event?: EventAttrs;
   "data-e2e"?: string;
   /** Bare boolean attribute marking the home page's one primary CTA —
    * `test/structure.test.ts` counts it, separately from `data-primary-book`
@@ -49,7 +51,7 @@ export function BookCallLink({
   url,
   target,
   rel,
-  "data-umami-event": dataUmamiEvent,
+  event = eventAttrs("book"),
   "data-e2e": dataE2e,
   "data-primary-cta": dataPrimaryCta,
   variant = "primary",
@@ -62,7 +64,7 @@ export function BookCallLink({
       href={url}
       target={target}
       rel={rel}
-      data-umami-event={dataUmamiEvent}
+      {...event}
       data-e2e={dataE2e}
       data-primary-cta={dataPrimaryCta}
       {...(variant === "primary" ? { "data-primary-book": true } : {})}

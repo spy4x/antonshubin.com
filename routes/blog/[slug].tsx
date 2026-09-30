@@ -7,6 +7,7 @@ import { SCHEDULE_URL } from "../../lib/config.ts";
 import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
 import PostToc from "../../islands/PostToc.tsx";
+import PostRead from "../../islands/PostRead.tsx";
 import { NewsletterBlock } from "../../components/NewsletterBlock.tsx";
 import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
@@ -29,6 +30,7 @@ import {
   TOC_MIN_MINUTES,
   topic,
 } from "../../lib/blog.ts";
+import { eventAttrs, linkEvent } from "../../lib/analytics.ts";
 
 const SITE = "https://antonshubin.com";
 
@@ -107,7 +109,7 @@ function SecondaryLink(
     return (
       <Button
         href={serviceHref(service)}
-        data-umami-event={`blog-cta-${article.slug}-service-${place}`}
+        {...eventAttrs("cta", { place, target: serviceHref(service) })}
         class={extra}
       >
         <span class="price">{serviceLabel(service)}</span>
@@ -119,7 +121,7 @@ function SecondaryLink(
     return (
       <Button
         href={tool.href}
-        data-umami-event={`blog-cta-${article.slug}-tool-${place}`}
+        {...linkEvent(tool.href, { place })}
         class={extra}
       >
         The code: {tool.name}
@@ -129,7 +131,7 @@ function SecondaryLink(
   return (
     <Button
       href="/catalog"
-      data-umami-event={`blog-cta-${article.slug}-services-${place}`}
+      {...eventAttrs("cta", { place, target: "/catalog" })}
       class={extra}
     >
       Services
@@ -151,20 +153,18 @@ function AuthorBox({ article }: { article: BlogArticle }) {
       ? [{
         href: tool.href,
         label: `The code: ${tool.name}`,
-        event: `blog-cta-${article.slug}-tool-end`,
       }]
       : []),
     {
       href: "/how-i-work",
       label: "How I work",
-      event: `blog-cta-${article.slug}-how-i-work`,
     },
   ];
   return (
     <ClosingBand
       heading="Need this for your product?"
       promiseIds={[]}
-      bookEvent={`blog-cta-${article.slug}-book-end`}
+      bookItem={article.slug}
       catalogLink={
         <SecondaryLink article={article} place="end" class="px-5 py-3" />
       }
@@ -324,7 +324,7 @@ export default define.page(function BlogPost(ctx) {
                 The tool:{" "}
                 <a
                   href={tool.href}
-                  data-umami-event={`post-tool-${tool.slug}`}
+                  {...linkEvent(tool.href, { place: "top" })}
                   class="text-parchment underline underline-offset-4 hover:text-graphite"
                 >
                   {tool.name}
@@ -383,6 +383,7 @@ export default define.page(function BlogPost(ctx) {
                   class="blog-content mt-10 text-parchment"
                   dangerouslySetInnerHTML={{ __html: content }}
                 />
+                <PostRead slug={article.slug} />
                 <BlogImageEnhancer />
               </>
             )
@@ -393,7 +394,7 @@ export default define.page(function BlogPost(ctx) {
             )}
 
           <AuthorBox article={article} />
-          <NewsletterBlock event={`blog-newsletter-${article.slug}`} />
+          <NewsletterBlock />
 
           {related.length > 0 && (
             <section
@@ -459,7 +460,10 @@ export default define.page(function BlogPost(ctx) {
                   <BookCallLink
                     url={SCHEDULE_URL}
                     target="_blank"
-                    data-umami-event={`blog-cta-${article.slug}-book-side`}
+                    event={eventAttrs("book", {
+                      place: "side",
+                      item: article.slug,
+                    })}
                     class="justify-center px-4 py-2 text-sm"
                   >
                     Book a free intro call

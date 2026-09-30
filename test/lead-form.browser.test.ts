@@ -13,7 +13,12 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page, Route } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import {
+  launchChromium,
+  newPage,
+  recordUmami,
+  trackedCalls,
+} from "./browser.ts";
 import { catalogItem } from "../lib/catalog.ts";
 
 const FOCUS_TIMEOUT_MS = 5000;
@@ -370,6 +375,129 @@ Deno.test("the booking page's brief refuses to send only the prefilled About lin
         "true",
       );
       assertEquals(posts, 0, "a brief with only the prefill was sent");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+/** The brief events a page sent, in order; the calendar's own are left out. */
+async function briefEvents(page: Page) {
+  return (await trackedCalls(page)).filter(([name]) =>
+    name.startsWith("brief")
+  );
+}
+
+Deno.test("a brief counts as sent only once the server accepts it, with its service", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await recordUmami(page);
+      let answer = 500;
+      await page.route("**/api/lead", (route: Route) =>
+        route.fulfill({
+          status: answer,
+          contentType: "application/json",
+          body: JSON.stringify(answer === 200 ? { ok: true } : { error: "x" }),
+        }));
+      const slug = "codebase-health-audit";
+      await page.goto(`${site.origin}/contact-me?service=${slug}`, {
+        waitUntil: "networkidle",
+      });
+      // The submit button's click is not an event any more.
+      assertEquals(
+        await page.getAttribute(SUBMIT_SELECTOR, "data-umami-event"),
+        null,
+        "the submit click is still counted",
+      );
+
+      await page.fill("#lead-name", "Ada Lovelace");
+      await page.fill("#lead-email", "ada@example.com");
+      await page.locator("#lead-stack").pressSequentially("Deno + Fresh");
+      await clickSubmitButtonWithoutScrolling(page);
+      await page.locator("#lead-form-error").waitFor({ state: "visible" });
+      assertEquals(await briefEvents(page), [
+        ["brief-error", { reason: "server" }],
+      ]);
+
+      answer = 200;
+      await clickSubmitButtonWithoutScrolling(page);
+      await page.waitForFunction(
+        () => document.activeElement?.id === "lead-success-heading",
+        undefined,
+        { timeout: FOCUS_TIMEOUT_MS },
+      );
+      assertEquals(await briefEvents(page), [
+        ["brief-error", { reason: "server" }],
+        ["brief-sent", { service: slug }],
+      ]);
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("a brief the form refuses counts as invalid and never as sent", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await recordUmami(page);
+      let posts = 0;
+      await page.route("**/api/lead", (route: Route) => {
+        posts++;
+        return route.fulfill({
+          status: 400,
+          contentType: "application/json",
+          body: JSON.stringify({ error: "Invalid email" }),
+        });
+      });
+      // Only the prefilled About line: the browser lets it through, and the
+      // form's own check refuses it.
+      await page.goto(
+        `${site.origin}/contact-me?service=codebase-health-audit`,
+        { waitUntil: "networkidle" },
+      );
+      await page.fill("#lead-name", "Ada Lovelace");
+      await page.fill("#lead-email", "ada@example.com");
+      await clickSubmitButtonWithoutScrolling(page);
+      await page.locator("#lead-form-error").waitFor({ state: "visible" });
+      assertEquals(
+        posts,
+        0,
+        "a brief with only the prefill reached the server",
+      );
+      assertEquals(await briefEvents(page), [
+        ["brief-error", { reason: "invalid" }],
+      ]);
+
+      // The server refusing what was typed (400) is invalid too.
+      await page.locator("#lead-stack").pressSequentially("Deno + Fresh");
+      await clickSubmitButtonWithoutScrolling(page);
+      await page.waitForFunction(() =>
+        document.querySelector("#lead-form-error")?.textContent ===
+          "Invalid email"
+      );
+      assertEquals(posts, 1);
+      assertEquals(await briefEvents(page), [
+        ["brief-error", { reason: "invalid" }],
+        ["brief-error", { reason: "invalid" }],
+      ]);
     } finally {
       await page.close();
     }

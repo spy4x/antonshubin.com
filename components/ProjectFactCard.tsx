@@ -9,13 +9,14 @@ import { Fact, FACT_LINK, FactCard } from "./FactCard.tsx";
 import { NewTabHint } from "./NewTabHint.tsx";
 import StatusMark from "./StatusMark.tsx";
 import { WithNote } from "./WithNote.tsx";
+import { eventAttrs } from "../lib/analytics.ts";
 
 const LINK = FACT_LINK;
 
 /**
  * "Similar work today" link to the project's `catalogSlug` item, with its
  * title and price from `lib/catalog.ts`. Used in the fact card and again in
- * the closing band; `place` names the Umami event.
+ * the closing band; `place` becomes the Umami event's `place` (`card` or `band`).
  */
 export function SimilarWorkLink(
   { project, place, class: className = "" }: {
@@ -30,7 +31,10 @@ export function SimilarWorkLink(
     <a
       href={catalogPath(item.slug)}
       data-catalog-link={item.slug}
-      data-umami-event={`project-cta-${project.slug}-catalog-${place}`}
+      {...eventAttrs("cta", {
+        place: place === "bottom" ? "band" : "card",
+        target: catalogPath(item.slug),
+      })}
       class={`inline-block text-sm ${LINK} ${className}`}
     >
       Similar work today: {item.shortTitle} ·{" "}
@@ -55,7 +59,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
     <a
       href={live}
       target="_blank"
-      data-umami-event={`project-cta-${project.slug}-external`}
+      {...eventAttrs("outbound", { to: "live", item: project.slug })}
       class={`${LINK} break-words`}
     >
       {project.externalURLLabel ?? live.replace(/^https?:\/\//, "")}
@@ -112,7 +116,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
             <a
               href={`https://github.com/${project.ghRepo}`}
               target="_blank"
-              data-umami-event={`project-cta-${project.slug}-github`}
+              {...eventAttrs("outbound", { to: "github", item: project.slug })}
               class={`${LINK} inline-flex items-center gap-2`}
             >
               GitHub
@@ -126,7 +130,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
         <BookCallLink
           url={SCHEDULE_URL}
           target="_blank"
-          data-umami-event={`project-cta-${project.slug}-schedule-card`}
+          event={eventAttrs("book", { place: "card", item: project.slug })}
           class="w-full justify-center px-5 py-3"
         >
           Book a free intro call

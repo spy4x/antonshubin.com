@@ -1,5 +1,6 @@
 import { Marked, Parser, TextRenderer } from "marked";
 import type { Renderer, Tokens } from "marked";
+import { outboundTo } from "./analytics.ts";
 
 /** A fence's info string -> the name its code block's header shows. */
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -347,6 +348,25 @@ function addNewTabHints(html: string): string {
 }
 
 /**
+ * Tags every link to another site in a post with the `outbound` Umami event
+ * and its `to` property (#318), whether marked rendered it from markdown or
+ * the post wrote a raw `<a>`. Like the new-tab hint above, a link quoted in a
+ * code block is escaped by then and never matched. An anchor that already
+ * carries an event keeps it.
+ */
+function addOutboundEvents(html: string): string {
+  return html.replace(/<a\b[^>]*>/g, (tag) => {
+    if (tag.includes("data-umami-event")) return tag;
+    const href = /\bhref="([^"]*)"/.exec(tag)?.[1];
+    const to = href ? outboundTo(href.replaceAll("&amp;", "&")) : null;
+    if (!to) return tag;
+    return `${
+      tag.slice(0, -1)
+    } data-umami-event="outbound" data-umami-event-to="${escapeEncode(to)}">`;
+  });
+}
+
+/**
  * A `<pre>` wider than its container scrolls horizontally, but marked never
  * puts it in the tab order, so a keyboard user can't reach the scrolled part
  * at all (axe: scrollable-region-focusable). Every `<pre>` marked emits gets
@@ -389,7 +409,10 @@ export function renderBlogPost(markdown: string): Promise<RenderedPost> {
   headingIds = new Map();
   headings = [];
   const raw = blogMarked.parse(markdown, { async: false }) as string;
-  const result = { html: addPreTabIndex(addNewTabHints(raw)), headings };
+  const result = {
+    html: addPreTabIndex(addOutboundEvents(addNewTabHints(raw))),
+    headings,
+  };
   headings = [];
   return Promise.resolve(result);
 }

@@ -32,6 +32,7 @@ import {
   toolsLive,
   withLiveVersion,
 } from "../../lib/tools-live.ts";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 const SITE = "https://antonshubin.com";
 const linkClass = "text-accent underline underline-offset-4";
@@ -129,7 +130,8 @@ export default define.page(async function ToolPage(ctx) {
     return post;
   });
   const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null;
-  const event = (what: string) => `tool-${tool.slug}-${what}`;
+  const toolLink = (to: string) =>
+    eventAttrs("outbound", { to, item: tool.slug });
 
   head.value = {
     ...head.value,
@@ -195,7 +197,7 @@ export default define.page(async function ToolPage(ctx) {
               ? (
                 <Button
                   href={tool.live.href}
-                  data-umami-event={event("live")}
+                  {...toolLink("live")}
                   class="px-4 py-2.5 text-sm"
                 >
                   {tool.live.label}
@@ -204,7 +206,7 @@ export default define.page(async function ToolPage(ctx) {
               : repo && (
                 <Button
                   href={repo}
-                  data-umami-event={event("github")}
+                  {...toolLink("github")}
                   class="px-4 py-2.5 text-sm"
                 >
                   GitHub
@@ -247,7 +249,7 @@ export default define.page(async function ToolPage(ctx) {
                   <Fact term="Live">
                     <a
                       href={tool.live.href}
-                      data-umami-event={event("live")}
+                      {...toolLink("live")}
                       class={linkClass}
                     >
                       {tool.live.label}
@@ -280,7 +282,7 @@ export default define.page(async function ToolPage(ctx) {
                   <p>
                     <a
                       href={repo}
-                      data-umami-event={event("github")}
+                      {...toolLink("github")}
                       class={linkClass}
                     >
                       Star on GitHub
@@ -288,7 +290,7 @@ export default define.page(async function ToolPage(ctx) {
                     {" · "}
                     <a
                       href={`${repo}/issues`}
-                      data-umami-event={event("issue")}
+                      {...toolLink("github")}
                       class={linkClass}
                     >
                       Report an issue
@@ -418,7 +420,10 @@ export default define.page(async function ToolPage(ctx) {
                     <li key={p.slug}>
                       <a
                         href={`/blog/${p.slug}`}
-                        data-umami-event={event("post")}
+                        {...eventAttrs("cta", {
+                          place: "body",
+                          target: `/blog/${p.slug}`,
+                        })}
                         class={linkClass}
                       >
                         {p.title}
@@ -446,11 +451,14 @@ export default define.page(async function ToolPage(ctx) {
         {/* ── Closing band: two doors, one Book ─────────────────────── */}
         <ClosingBand
           promiseIds={[]}
-          bookEvent={event("book")}
+          bookItem={tool.slug}
           catalogLink={
             <a
               href={catalog ? catalogPath(catalog.slug) : "/catalog"}
-              data-umami-event={event("catalog")}
+              {...eventAttrs("cta", {
+                place: "band",
+                target: catalog ? catalogPath(catalog.slug) : "/catalog",
+              })}
               class={linkClass}
             >
               {catalog ? catalog.title : "Services"}
@@ -464,7 +472,7 @@ export default define.page(async function ToolPage(ctx) {
                 <p class="mt-1 text-graphite">Star it or open an issue.</p>
                 <a
                   href={`${repo}/issues`}
-                  data-umami-event={event("issue")}
+                  {...toolLink("github")}
                   class={linkClass}
                 >
                   {tool.repo} on GitHub

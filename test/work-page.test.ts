@@ -132,11 +132,13 @@ siteTest(
       assertEquals(count(card, /data-primary-book/), 1, `${p.slug} card`);
       assertEquals(count(band, /data-primary-book/), 1, `${p.slug} band`);
       assert(
-        card.includes(`data-umami-event="project-cta-${p.slug}-schedule-card"`),
+        card.includes(
+          `data-umami-event="book" data-umami-event-place="card" data-umami-event-item="${p.slug}"`,
+        ),
       );
       assert(
         band.includes(
-          `data-umami-event="project-cta-${p.slug}-schedule-bottom"`,
+          `data-umami-event="book" data-umami-event-place="band" data-umami-event-item="${p.slug}"`,
         ),
       );
     }

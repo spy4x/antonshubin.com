@@ -27,6 +27,7 @@ import {
 } from "../lib/testimonials.ts";
 import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
 import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
+import { eventAttrs } from "../lib/analytics.ts";
 
 /** The call, capitalised for a heading: "Book a free 30-minute intro call". */
 const BOOK_HEADING = `Book a ${INTRO_CALL}`;
@@ -90,7 +91,7 @@ export default define.page(function ContactMe(ctx) {
                   Rather write?{" "}
                   <a
                     href="#brief"
-                    data-umami-event="contact-brief-link"
+                    {...eventAttrs("brief", { place: "top" })}
                     class={FACT_LINK}
                   >
                     Send a written brief
@@ -124,7 +125,8 @@ export default define.page(function ContactMe(ctx) {
                       href={SCHEDULE_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      data-umami-event="meet-embed-fallback-click"
+                      data-calendar-newtab="true"
+                      {...eventAttrs("book", { place: "calendar" })}
                       class={FACT_LINK}
                     >
                       {NEW_TAB_LABEL}
@@ -141,7 +143,6 @@ export default define.page(function ContactMe(ctx) {
                   <LeadForm
                     scheduleUrl=""
                     service={service}
-                    submitEvent="contact-brief-submit"
                     intro={false}
                   />
                 </section>
@@ -175,7 +176,7 @@ export default define.page(function ContactMe(ctx) {
               <Fact term="Email">
                 <a
                   href={emailContact.href}
-                  data-umami-event="contact-email-click"
+                  {...eventAttrs("outbound", { to: "email" })}
                   class={`${FACT_LINK} break-all`}
                 >
                   {EMAIL_ADDRESS}
@@ -186,7 +187,7 @@ export default define.page(function ContactMe(ctx) {
                   href={telegramContact.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-umami-event="contact-telegram-click"
+                  {...eventAttrs("outbound", { to: "telegram" })}
                   class={FACT_LINK}
                 >
                   @spy4x
@@ -200,7 +201,7 @@ export default define.page(function ContactMe(ctx) {
                 href={profile("upwork").href}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="contact-upwork-click"
+                {...eventAttrs("outbound", { to: "upwork" })}
                 class={FACT_LINK}
               >
                 Hire me there
@@ -258,7 +259,6 @@ export default define.page(function ContactMe(ctx) {
                 calendarAbove="#book"
                 intro={false}
                 service={service}
-                submitEvent="contact-brief-submit"
               />
             </section>
           </div>

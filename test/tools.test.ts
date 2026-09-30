@@ -340,7 +340,9 @@ siteTest(
           `/blog/${slug} does not link /tools/${t.slug}`,
         );
         assert(
-          post.includes(`data-umami-event="post-tool-${t.slug}"`),
+          post.includes(
+            `href="/tools/${t.slug}" data-umami-event="cta" data-umami-event-place="top" data-umami-event-target="/tools/${t.slug}"`,
+          ),
           `/blog/${slug} link to /tools/${t.slug} carries no Umami event`,
         );
       }
@@ -380,18 +382,23 @@ siteTest(
       );
       assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
       assert(
-        html.includes(`data-umami-event="tool-${t.slug}-catalog"`),
+        /data-umami-event="cta" data-umami-event-place="band" data-umami-event-target="\/catalog/
+          .test(html),
         `${t.slug}: catalog event`,
       );
       if (t.repo) {
         assert(
-          html.includes(`data-umami-event="tool-${t.slug}-issue"`),
+          html.includes(
+            `href="https://github.com/${t.repo}/issues" data-umami-event="outbound" data-umami-event-to="github" data-umami-event-item="${t.slug}"`,
+          ),
           `${t.slug}: issue event`,
         );
       }
       if (t.registry?.published) {
         assert(
-          html.includes(`data-umami-event="tool-${t.slug}-install-copy"`),
+          html.includes(
+            `data-umami-event="tool-install-copy" data-umami-event-item="${t.slug}"`,
+          ),
           `${t.slug}: install copy event`,
         );
       }
@@ -672,7 +679,9 @@ Deno.test("a tool page's closing band carries a Book action", async () => {
       const band = html.slice(html.indexOf("data-closing-band"));
       assertEquals(count(band, /data-primary-book/g), 1, t.slug);
       assert(
-        band.includes(`data-umami-event="tool-${t.slug}-book"`),
+        band.includes(
+          `data-umami-event="book" data-umami-event-place="band" data-umami-event-item="${t.slug}"`,
+        ),
         `${t.slug}: Book event`,
       );
     }

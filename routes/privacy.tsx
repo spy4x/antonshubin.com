@@ -68,9 +68,15 @@ export default define.page(function Privacy(ctx) {
 
         <Section title="Analytics and cookies">
           <p>
-            The site counts page views and clicks on buttons such as Book with
-            Umami, an analytics tool I host myself and serve from this site's
-            own domain. It is not loaded for known search and AI crawlers.
+            The site counts page views, how fast pages load, and clicks on links
+            and buttons with Umami, an analytics tool I host myself and serve
+            from this site's own domain. It also counts whether a written brief
+            or a booking went through, and whether a post was read to the end.
+            None of these include what you typed.
+          </p>
+          <p>
+            Umami is not loaded for known search and AI crawlers, or on the
+            unsubscribe and payment pages.
           </p>
           <p>The site's own code sets no cookies.</p>
         </Section>

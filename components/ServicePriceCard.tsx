@@ -10,6 +10,7 @@ import { SCHEDULE_URL } from "../lib/config.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { buttonClass } from "./Button.tsx";
 import { Fact, FactCard } from "./FactCard.tsx";
+import { eventAttrs } from "../lib/analytics.ts";
 
 /** The one wording of the primary action on every service page (#271). */
 export const BOOK_LABEL = "Book a free 30-minute call";
@@ -57,14 +58,14 @@ export function ServicePriceCard({ item }: { item: CatalogItem }) {
           <BookCallLink
             url={SCHEDULE_URL}
             target="_blank"
-            data-umami-event={`service-cta-${item.slug}-book-card`}
+            event={eventAttrs("book", { place: "card", item: item.slug })}
             class="w-full justify-center px-5 py-3"
           >
             {BOOK_LABEL}
           </BookCallLink>
           <a
             href={briefPath(item.slug)}
-            data-umami-event={`service-cta-${item.slug}-brief-card`}
+            {...eventAttrs("brief", { place: "card", item: item.slug })}
             class={buttonClass("secondary", "w-full justify-center px-5 py-3")}
           >
             {BRIEF_LABEL}

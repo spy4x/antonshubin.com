@@ -20,6 +20,7 @@ import {
   CatalogIcon,
   CheckIcon,
 } from "../../components/Icons.tsx";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 const CANONICAL = "https://antonshubin.com/catalog";
 
@@ -122,7 +123,10 @@ export default define.page(function Catalog() {
                   )}
                   <a
                     href={`/catalog/${item.slug}`}
-                    data-umami-event={`service-cta-${item.slug}-details`}
+                    {...eventAttrs("cta", {
+                      place: "card",
+                      target: `/catalog/${item.slug}`,
+                    })}
                     class={`inline-flex items-center gap-1 ${FACT_LINK}`}
                   >
                     Scope, price and what's included
@@ -136,13 +140,12 @@ export default define.page(function Catalog() {
         </ul>
 
         <ClosingBand
-          bookEvent="services-cta-book-band"
           bookLabel={BOOK_LABEL}
           promiseIds={[]}
           catalogLink={
             <a
               href="/contact-me#brief"
-              data-umami-event="services-cta-brief-band"
+              {...eventAttrs("brief", { place: "band" })}
               class={`text-sm ${FACT_LINK}`}
             >
               {BRIEF_LABEL}
@@ -151,7 +154,6 @@ export default define.page(function Catalog() {
           links={[{
             href: "/how-i-work",
             label: "How I work",
-            event: "services-cta-how-i-work",
           }]}
         />
       </div>

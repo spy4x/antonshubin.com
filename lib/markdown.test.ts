@@ -14,6 +14,14 @@ function withoutAriaLabel(html: string): string {
   return html.replace(/<input aria-label="[^"]*" /g, "<input ");
 }
 
+/** Strips the outbound Umami event `addOutboundEvents` adds to a link to another site, for the same comparison. */
+function withoutOutboundEvent(html: string): string {
+  return html.replace(
+    / data-umami-event="outbound" data-umami-event-to="[^"]*"/g,
+    "",
+  );
+}
+
 /** Strips the sr-only new-tab hint `addNewTabHints` adds to a `target="_blank"` link, so what's left can be compared against plain marked's own output. */
 function withoutNewTabHint(html: string): string {
   return html.replace(
@@ -80,7 +88,7 @@ Deno.test("a nested list under a checklist item renders (doesn't throw) and labe
 
 Deno.test("a checklist item with inline markup gets a plain-text label", async () => {
   const md = "- [ ] **bold** and [a link](http://example.com)\n";
-  const ours = await renderBlogMarkdown(md);
+  const ours = withoutOutboundEvent(await renderBlogMarkdown(md));
   const plain = await marked(md);
   assertEquals(withoutAriaLabel(ours), plain);
   // The bug this guards: raw markdown syntax ("**bold** and [a
@@ -94,7 +102,7 @@ Deno.test("a checklist item with inline markup gets a plain-text label", async (
 
 Deno.test("a checklist item with inline HTML gets a tag-free label", async () => {
   const md = '- [ ] see <a href="https://e.example" target="_blank">site</a>\n';
-  const ours = await renderBlogMarkdown(md);
+  const ours = withoutOutboundEvent(await renderBlogMarkdown(md));
   const plain = await marked(md);
   // The new-tab hint is a separate, unrelated post-processing step (see
   // addNewTabHints) that plain marked never runs, so it's stripped here too.
@@ -150,7 +158,7 @@ Deno.test("text inside inline <kbd> cannot break out of the label", async () => 
 
 Deno.test("bold, italic, strikethrough and link text get an escaped label", async () => {
   const md = '- [ ] **a" b** *c `<d>`* ~~e"~~ [f "g"](https://e.example)\n';
-  const ours = await renderBlogMarkdown(md);
+  const ours = withoutOutboundEvent(await renderBlogMarkdown(md));
   assertEquals(withoutAriaLabel(ours), await marked(md));
   assertMatch(
     ours,
@@ -379,4 +387,32 @@ Deno.test("an image on its own line becomes a figure with a lightbox button and 
 Deno.test("an image inside a sentence stays a plain inline image", async () => {
   const html = await renderBlogMarkdown("See ![x](x.png) here.\n");
   assertEquals(html, '<p>See <img src="x.png" alt="x"> here.</p>\n');
+});
+
+Deno.test("links to other sites in a post carry the outbound event, internal links none", async () => {
+  const html = await renderBlogMarkdown(
+    [
+      "[mig](https://github.com/spy4x/mig) and [work](/work).",
+      "",
+      '<a href="https://www.upwork.com/freelancers/x" target="_blank">Upwork</a>',
+      "",
+      "```html",
+      '<a href="https://example.com/in-code">code</a>',
+      "```",
+    ].join("\n"),
+  );
+  assertMatch(
+    html,
+    /<a href="https:\/\/github\.com\/spy4x\/mig" data-umami-event="outbound" data-umami-event-to="github">/,
+  );
+  assertMatch(
+    html,
+    /<a href="https:\/\/www\.upwork\.com\/freelancers\/x" target="_blank" data-umami-event="outbound" data-umami-event-to="upwork">/,
+  );
+  assertMatch(html, /<a href="\/work">work<\/a>/);
+  assertEquals(
+    html.match(/data-umami-event=/g)?.length,
+    2,
+    "a link inside a code block or an internal link was tagged",
+  );
 });

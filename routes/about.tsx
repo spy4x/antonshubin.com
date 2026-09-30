@@ -35,6 +35,7 @@ import { WithNote } from "../components/WithNote.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { ArrowRightIcon } from "../components/Icons.tsx";
 import { profile } from "../lib/profiles.ts";
+import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 const LINK = FACT_LINK;
 
@@ -89,7 +90,7 @@ export default define.page(function About(ctx) {
             {ROLE} ·{" "}
             <a
               href="/catalog"
-              data-umami-event="about-catalog-top"
+              {...eventAttrs("cta", { place: "top", target: "/catalog" })}
               class={LINK}
             >
               What it costs
@@ -127,7 +128,7 @@ export default define.page(function About(ctx) {
                       href="https://neatsoft.dev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      data-umami-event="about-outbound-neatsoft"
+                      {...eventAttrs("outbound", { to: "neatsoft" })}
                       class={LINK}
                     >
                       {COMPANY.name}
@@ -141,7 +142,7 @@ export default define.page(function About(ctx) {
                         href={UPWORK_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        data-umami-event="about-outbound-upwork"
+                        {...eventAttrs("outbound", { to: "upwork" })}
                         class={LINK}
                       >
                         {proof("expert-vetted")} · {proof("job-success")}{" "}
@@ -155,14 +156,17 @@ export default define.page(function About(ctx) {
                   <BookCallLink
                     url={SCHEDULE_URL}
                     target="_blank"
-                    data-umami-event="about-book-top"
+                    event={eventAttrs("book", { place: "card" })}
                     class="w-full justify-center px-5 py-3"
                   >
                     Book a free intro call
                   </BookCallLink>
                   <a
                     href="/how-i-work"
-                    data-umami-event="about-how-i-work-card"
+                    {...eventAttrs("cta", {
+                      place: "card",
+                      target: "/how-i-work",
+                    })}
                     class={`${LINK} inline-flex items-center gap-1 text-sm`}
                   >
                     How I work
@@ -196,7 +200,10 @@ export default define.page(function About(ctx) {
                 The longer story, from 2022:{" "}
                 <a
                   href={`/blog/${STORY_POST}`}
-                  data-umami-event="about-story-post"
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/blog/${STORY_POST}`,
+                  })}
                   class={LINK}
                 >
                   My journey from an office job to freelance to my startups
@@ -231,19 +238,29 @@ export default define.page(function About(ctx) {
                 single sign-on.{" "}
                 <a
                   href="/infrastructure"
-                  data-umami-event="about-infrastructure"
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: "/infrastructure",
+                  })}
                   class={LINK}
                 >
                   How it's built and run
                 </a>
                 . I also build{" "}
-                <a href="/tools" data-umami-event="about-tools" class={LINK}>
+                <a
+                  href="/tools"
+                  {...eventAttrs("cta", { place: "body", target: "/tools" })}
+                  class={LINK}
+                >
                   open-source tools
                 </a>
                 , among them the finance tracker{" "}
                 <a
                   href={`/tools/${financy.slug}`}
-                  data-umami-event="about-financy"
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/tools/${financy.slug}`,
+                  })}
                   class={LINK}
                 >
                   {financy.name}
@@ -262,7 +279,7 @@ export default define.page(function About(ctx) {
                   href={VLOG_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-umami-event="about-outbound-vlog"
+                  {...linkEvent(VLOG_URL)}
                   class={LINK}
                 >
                   my vlog channel
@@ -278,7 +295,11 @@ export default define.page(function About(ctx) {
               </h2>
               <p class="max-w-2xl text-graphite leading-relaxed">
                 {INVOICE_NOTE} {paymentSentence()}{" "}
-                <a href="/pay" data-umami-event="about-pay" class={LINK}>
+                <a
+                  href="/pay"
+                  {...eventAttrs("cta", { place: "body", target: "/pay" })}
+                  class={LINK}
+                >
                   Payment details
                   <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
                 </a>
@@ -288,12 +309,10 @@ export default define.page(function About(ctx) {
         </div>
 
         <ClosingBand
-          bookEvent="about-book-bottom"
           promiseIds={["first-milestone", "ownership"]}
           links={[{
             href: "/how-i-work",
             label: "How I work",
-            event: "about-how-i-work-bottom",
           }]}
         />
       </div>

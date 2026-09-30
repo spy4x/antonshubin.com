@@ -9,6 +9,7 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { CalendarIcon, CodeIcon, StarIcon } from "../../components/Icons.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 function getHackathonBySlug(slug: string): Hackathon | undefined {
   return hackathons.find((h) => h.slug === slug);
@@ -179,6 +180,7 @@ export default define.page(function HackathonDetail(ctx) {
                     <BookCallLink
                       url={h.ctaLink || SCHEDULE_URL}
                       target={h.ctaLink ? undefined : "_blank"}
+                      event={eventAttrs("book", { place: "end", item: h.slug })}
                       class="gap-2 px-5 py-2.5 text-sm"
                     >
                       {h.ctaLabel || "Book a free intro call"}
@@ -187,6 +189,7 @@ export default define.page(function HackathonDetail(ctx) {
                       url={SCHEDULE_URL}
                       target="_blank"
                       variant="secondary"
+                      event={eventAttrs("book", { place: "end", item: h.slug })}
                       class="gap-2 px-5 py-2.5 text-sm"
                     >
                       Free intro call

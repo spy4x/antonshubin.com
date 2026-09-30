@@ -4,9 +4,9 @@ import { NEWSLETTER_LINE } from "../lib/blog.ts";
 /**
  * The Writing pages' newsletter block (#274, Mkt 5): a heading, the three
  * topics as the promise, the form and the RSS link. On every post and once
- * on `/blog`. `event` is the Umami event sent on a successful signup.
+ * on `/blog`. A successful signup counts as `newsletter-signup`.
  */
-export function NewsletterBlock({ event }: { event: string }) {
+export function NewsletterBlock() {
   return (
     <section
       aria-labelledby="newsletter-heading"
@@ -17,7 +17,7 @@ export function NewsletterBlock({ event }: { event: string }) {
       </h2>
       <p class="mt-2 text-graphite">{NEWSLETTER_LINE}</p>
       <div class="mt-4">
-        <NewsletterForm umamiEvent={event} />
+        <NewsletterForm />
       </div>
       <p class="mt-4 text-sm">
         <a

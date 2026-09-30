@@ -1,5 +1,6 @@
 import CopyButton from "../islands/CopyButton.tsx";
 import type { Tool } from "../lib/tools.ts";
+import { eventAttrs } from "../lib/analytics.ts";
 
 /**
  * A tool's one install command, pinned to a version, with the registry named
@@ -29,7 +30,7 @@ export function InstallLine(
             elementId={id}
             label="Copy"
             title={`Copy the install command for ${tool.name}`}
-            umamiEvent={`tool-${tool.slug}-install-copy`}
+            analytics={eventAttrs("tool-install-copy", { item: tool.slug })}
           />
         )}
       </div>
