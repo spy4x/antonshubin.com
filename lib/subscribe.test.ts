@@ -276,3 +276,22 @@ Deno.test("stores every one of ten concurrent confirmations", async () => {
     await Deno.remove(dir, { recursive: true });
   }
 });
+
+Deno.test("refuses a token signed for another purpose even when its payload and address match", async () => {
+  const { type } = await import("arktype");
+  const { createSignedPayloadCodec } = await import(
+    "@spy4x/platform/signed-payload"
+  );
+  const other = createSignedPayloadCodec({
+    secret: SECRET,
+    purpose: "unsubscribe",
+    version: 1,
+    schema: type({ email: "string" }),
+  });
+  const token = await other.sign({ email: "new@example.com" }, {
+    context: "new@example.com",
+  });
+  const { deps, saved } = confirmSetup();
+  assertEquals((await confirmSubscription(token, deps)).state, "invalid");
+  assertEquals(saved.length, 0);
+});

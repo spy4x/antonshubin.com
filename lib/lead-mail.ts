@@ -16,12 +16,17 @@ export interface LeadMailDeps {
   contactEmail: string;
   /** Shown in the "sending via" log line, as before. */
   relay: string;
+  /** Called with the lead when the relay refused or dropped the mail, so the
+   * lead can be kept (#266). Not called when SMTP is not configured: the lead
+   * is logged in that case. May throw; the failure is logged without the lead. */
+  keep?(lead: Lead): Promise<void>;
   log?: MailLog;
 }
 
 /**
  * Mails the lead to the owner. Never throws: without SMTP or a contact address
- * the lead is logged instead, and a failed send is logged as `[LEAD] failed:`.
+ * the lead is logged instead, and a failed send is logged as `[LEAD] failed:`
+ * and handed to `deps.keep`.
  * Resolves `true` only when the relay accepted the mail.
  */
 export async function notifyOwner(
@@ -38,6 +43,8 @@ export async function notifyOwner(
   const result = await deps.sender.send({
     to: deps.contactEmail,
     subject: `[Lead] Architecture audit request from ${subjectSafe(lead.name)}`,
+    // Replying to the notification reaches the visitor.
+    replyTo: lead.email,
     text: `New audit request from ${lead.name} (${lead.email}):\n\n` +
       (lead.service
         ? `Service: ${lead.service.shortTitle} (${lead.service.slug})\n\n`
@@ -46,6 +53,18 @@ export async function notifyOwner(
   });
   if (!result.ok) {
     log.error("[LEAD] failed:", result.error);
+    if (deps.keep) {
+      try {
+        await deps.keep(lead);
+        log.error("[LEAD] kept the lead for a retry");
+      } catch (err) {
+        // Never the lead itself: only the reason the file could not be written.
+        log.error(
+          "[LEAD] could not keep the lead:",
+          err instanceof Error ? err.message : String(err),
+        );
+      }
+    }
     return false;
   }
   log.log("[LEAD] sent OK");

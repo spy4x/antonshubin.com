@@ -895,8 +895,8 @@ as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
 `not-found` through `islands/TrackPageEvent.tsx`. Links to other sites inside a
 post get `outbound` from `lib/markdown.ts`.
 
-`routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
-(`/unsubscribe`, whose URL carries a working token, and `/pay`), and
+(`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`),
+and (`/unsubscribe`, whose URL carries a working token, and `/pay`), and
 `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
 `routes/privacy.tsx` describes exactly this; change it together with the code.
 
@@ -997,6 +997,22 @@ with `lib/subscribe-mail.ts` (`/api/subscribe`) and `lib/newsletter.ts`
 (`scripts/send-newsletter.ts`) build the messages and log a failed send instead
 of throwing; a send counts as done only when the relay accepted it. Their tests
 pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
+
+Replies (#266): lead mail sets `Reply-To` to the visitor, and the confirmation
+mail, the welcome mail and every newsletter set it to `CONTACT_EMAIL`, because
+the mailbox they are sent from is noreply. A lead whose send failed is appended
+to `data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that
+it was kept. The `noreply` password is shared with mig and must rotate in both
+places together (`docs/deploy.md` "Shared mail password").
+
+Sign-up is double opt-in (#253): `/api/subscribe` only mails a signed
+confirmation link (`lib/subscribe-token.ts`, purpose `subscribe-confirm`, valid
+three days) and stores nothing; `/subscribe/confirm` shows the address on GET
+and adds it on POST (`lib/subscribe.ts`'s `confirmSubscription`), then the
+welcome mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
+`/api/subscribe`, `/api/lead`, `/unsubscribe` and `/subscribe/confirm`, with the
+site's own `BASE_URL` as the allowed origin. `/subscribe/confirm` is in
+`UNTRACKED_PATHS` (its URL holds the address).
 
 ## Publishing a blog post
 

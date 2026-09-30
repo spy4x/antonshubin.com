@@ -101,3 +101,74 @@ for (const behaviour of ["refuse-recipient", "drop-connection"] as const) {
     assertStringIncludes(log.errors[0], "[LEAD] failed: SMTP send failed");
   });
 }
+
+Deno.test("sets Reply-To on the owner's mail to the visitor's address", async () => {
+  const relay = fakeRelay();
+  await notifyOwner(LEAD, {
+    sender: fakeSender(relay),
+    contactEmail: "owner@example.com",
+    relay: RELAY,
+    log: recordingLog(),
+  });
+  assertStringIncludes(
+    JSON.stringify(relay.mails[0].replyTo),
+    "jane@example.com",
+  );
+});
+
+Deno.test("hands a lead the relay refused to keep, and logs that it was kept without its contents", async () => {
+  const log = recordingLog();
+  const kept: Lead[] = [];
+  const sent = await notifyOwner(LEAD, {
+    sender: fakeSender(fakeRelay("drop-connection")),
+    contactEmail: "owner@example.com",
+    relay: RELAY,
+    keep: (lead) => {
+      kept.push(lead);
+      return Promise.resolve();
+    },
+    log,
+  });
+  assertEquals(sent, false);
+  assertEquals(kept, [LEAD]);
+  assertStringIncludes(
+    log.errors.join("\n"),
+    "[LEAD] kept the lead for a retry",
+  );
+  for (const line of [...log.lines, ...log.errors]) {
+    assert(!line.includes("jane@example.com"), line);
+    assert(!line.includes("single dot"), line);
+  }
+});
+
+Deno.test("keeps nothing for a lead that was sent", async () => {
+  const kept: Lead[] = [];
+  await notifyOwner(LEAD, {
+    sender: fakeSender(fakeRelay()),
+    contactEmail: "owner@example.com",
+    relay: RELAY,
+    keep: (lead) => {
+      kept.push(lead);
+      return Promise.resolve();
+    },
+    log: recordingLog(),
+  });
+  assertEquals(kept, []);
+});
+
+Deno.test("logs why a failed lead could not be kept, without the lead", async () => {
+  const log = recordingLog();
+  const sent = await notifyOwner(LEAD, {
+    sender: fakeSender(fakeRelay("drop-connection")),
+    contactEmail: "owner@example.com",
+    relay: RELAY,
+    keep: () => Promise.reject(new Error("read-only file system")),
+    log,
+  });
+  assertEquals(sent, false);
+  assertStringIncludes(
+    log.errors.join("\n"),
+    "[LEAD] could not keep the lead: read-only file system",
+  );
+  assert(!log.errors.join("\n").includes("jane@example.com"));
+});

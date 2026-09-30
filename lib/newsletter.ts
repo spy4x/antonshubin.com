@@ -13,6 +13,8 @@ export interface NewsletterIssue {
   baseUrl: string;
   unsubscribeLink(email: string): Promise<string>;
   sender: EmailSender;
+  /** Where a reader's reply goes (`CONTACT_EMAIL`); omitted when empty. */
+  replyTo?: string;
   log?: MailLog;
 }
 
@@ -51,6 +53,7 @@ export async function sendNewsletter(
         to,
         subject: issue.subject,
         html,
+        ...(issue.replyTo ? { replyTo: issue.replyTo } : {}),
       });
     } catch (err) {
       result = {

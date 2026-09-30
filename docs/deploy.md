@@ -95,6 +95,26 @@ Three things keep it there:
 The app runs as root inside the container, so the file on the host is owned by
 root. Read it with `sudo cat`.
 
+### Failed leads
+
+When the relay cannot send a lead's mail, `/api/lead` appends the lead to
+`data/leads-failed.jsonl` (one JSON object per line: `failedAt` and `lead`;
+`LEADS_FAILED_FILE` overrides the path) and logs
+`[LEAD] kept the lead for a
+retry`, never the lead's contents. The visitor still
+sees success. The file is in the same bind-mounted, backed-up directory as the
+list. Read it with `sudo
+cat`, answer the leads by hand, then delete the lines
+you handled. Nothing retries them.
+
+### Shared mail password
+
+The site sends from the `noreply@antonshubin.com` mailbox, and mig (the booking
+scheduler) sends from the same one: `SMTP_PASSWORD` here and the matching value
+in mig's env (rostok `servers/cloud/configs/mig.env`) are one password. Rotate
+it in both places together, or one of the two stops mailing. The site's value is
+the `SMTP_PASSWORD` of its production env.
+
 ### Backup
 
 cloudlab's nightly restic job (root's crontab, 19:00 UTC,
