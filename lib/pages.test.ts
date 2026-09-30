@@ -11,11 +11,6 @@ Deno.test("every core page is in each surface it is not excluded from", () => {
       `${page.path} in CORE_PAGES`,
     );
     assertEquals(
-      pagesFor("precache").some((p) => p.path === page.path),
-      !page.notIn?.includes("precache"),
-      `${page.path} in the precache list`,
-    );
-    assertEquals(
       pagesFor("sitemap").some((p) => p.path === page.path),
       !page.notIn?.includes("sitemap"),
       `${page.path} in the sitemap`,
@@ -33,7 +28,7 @@ Deno.test("core pages are listed once each and exclusions are the documented few
   assertEquals(new Set(paths).size, paths.length);
   assertEquals(
     corePages.filter((p) => p.notIn).map((p) => `${p.path}:${p.notIn}`),
-    ["/tools:edge", "/hackathons:precache", "/pay:sitemap"],
+    ["/tools:edge", "/pay:sitemap"],
   );
 });
 

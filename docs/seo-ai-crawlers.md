@@ -67,8 +67,7 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Dynamic page, project, catalog, and blog URLs with priorities; `/pay`
   excluded. The static pages come from `lib/pages.ts` (#293), the same list that
-  feeds the edge-cache `CORE_PAGES` and the service worker's precache;
-  `/privacy` is in it
+  feeds the edge-cache `CORE_PAGES`; `/privacy` is in it
 - AI-friendly XML comments describing the site and its purpose
 - All blog posts, projects, catalog items included; `/blog`'s `lastmod` is the
   newest current post's date, and an archived post has priority 0.3 (#274)
@@ -287,7 +286,7 @@ Whenever any of these change, update the corresponding AI crawler files:
 
 | What changed              | Files to update                                                                                                                                |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| New page added            | `lib/pages.ts` (sitemap, edge cache and precache), llms-full.txt.ts                                                                            |
+| New page added            | `lib/pages.ts` (sitemap and edge cache), llms-full.txt.ts                                                                                      |
 | Pricing/offerings change  | llms.txt.ts, llms-full.txt.ts                                                                                                                  |
 | Policies/terms change     | `lib/faqs.ts` (page, JSON-LD and llms-full read it), `lib/promises.ts`, llms.txt.ts                                                            |
 | Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                                        |

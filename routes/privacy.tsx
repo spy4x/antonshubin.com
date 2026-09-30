@@ -94,9 +94,7 @@ export default define.page(function Privacy(ctx) {
             newer one overwrites it.
           </p>
           <p>
-            A page with an embedded video loads it from YouTube. The site also
-            installs a service worker that keeps copies of its pages in your
-            browser so they open faster.
+            A page with an embedded video loads it from YouTube.
           </p>
         </Section>
 

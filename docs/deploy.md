@@ -7,9 +7,9 @@ deno task deploy
 ```
 
 The script reads the local commit hash and passes it to the remote build as
-`BUILD_ID`, which becomes the service worker's cache name (`routes/sw.js.ts`).
-Nothing is written back to a tracked file, so `git status` is clean before and
-after a deploy.
+`BUILD_ID`, which `routes/sw.js.ts` prints in the retired worker script, where
+the deploy reads it back (see "Cloudflare purge"). Nothing is written back to a
+tracked file, so `git status` is clean before and after a deploy.
 
 Decrypt env before deploy if needed (it writes `.env.prod` and `.env.deploy`):
 
@@ -23,6 +23,20 @@ Cloudflare sits in front of production. While the container restarts, Traefik
 answers 404 for a few seconds, and Cloudflare once cached that 404 for `/sw.js`
 for minutes (#268). Files under `static/` (`/img/*`, favicons, `/manifest.json`)
 are cached at the edge for days, so a replaced image kept showing the old one.
+
+There is no service worker (#285). `/sw.js` is a small script that deletes the
+caches of the old worker and unregisters itself; it stays for browsers that
+still hold that worker, until about January 2027, and is also what the deploy
+polls to learn which build is live.
+
+The 404 comes from Traefik, not from the app, so the app cannot label it
+uncacheable. Two guards cover it. The purge below removes `/sw.js` from the edge
+right after a deploy. And one Cloudflare rule outside the repo keeps the edge
+from storing it at all: Rules, Cache Rules, "URI Path equals `/sw.js`", cache
+eligibility "Bypass cache". Check with `curl -sI https://antonshubin.com/sw.js`
+right after a deploy: `cf-cache-status` must be `DYNAMIC` or absent, never a
+`HIT` on a 404. Order it after any existing Cache Rule that matches `*.js`, or
+that rule wins. The rule is a manual step; whoever sets it up ticks it here.
 
 So after `docker compose up` succeeds, `scripts/deploy.ts`:
 

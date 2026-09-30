@@ -2,7 +2,7 @@
 /**
  * Deploy to the cloud server: rsync source + env files, docker compose up --build
  *
- * Never edits a tracked file — the service-worker cache name (routes/sw.js.ts)
+ * Never edits a tracked file — the build id that routes/sw.js.ts prints
  * comes from BUILD_ID, set below to the local commit hash and passed to the
  * remote build, so `git status` stays clean before and after a deploy.
  *
@@ -113,7 +113,7 @@ async function git(args: string[]): Promise<{ code: number; stdout: string }> {
 // caller clean up the temp env file below instead of exiting mid-deploy.
 let failed = false;
 try {
-  // Build id for the service worker's cache name (routes/sw.js.ts). Computed
+  // Build id that routes/sw.js.ts prints, for the purge step to read. Computed
   // locally instead of writing it into a tracked file, so the working tree
   // stays clean.
   const buildIdResult = await run("git rev-parse --short HEAD");

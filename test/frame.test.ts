@@ -1,12 +1,12 @@
 // Guards for the site's frame (#293): the footer on every page, the phone
-// header, the 404, `/privacy`, and the one page list behind the sitemap, the
-// service worker and the edge cache. They read the built site through
+// header, the 404, `/privacy`, and the one page list behind the sitemap and
+// the edge cache. They read the built site through
 // test/harness.ts; see AGENTS.md "Rendered-page tests". Assert structure and
 // short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
-import { corePages, pagesFor } from "../lib/pages.ts";
+import { corePages } from "../lib/pages.ts";
 import { footerProfiles, sameAsUrls } from "../lib/profiles.ts";
 import { ROLE } from "../lib/head.ts";
 
@@ -110,7 +110,7 @@ siteTest(
 );
 
 siteTest(
-  "the Person's sameAs is the profile list, and every core page is in the sitemap, the service worker and the page list",
+  "the Person's sameAs is the profile list, and every core page is in the sitemap and the page list",
   async (site) => {
     const person = jsonLd(await site.html("/"))
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
@@ -125,10 +125,6 @@ siteTest(
         new URL(m[1]).pathname
       ),
     );
-    const sw = await site.html("/sw.js");
-    const precache: string[] = JSON.parse(
-      sw.match(/const PRECACHE_URLS = (\[[^\]]*\])/)![1],
-    );
     for (const page of corePages) {
       const hackathonsEmpty = page.path === "/hackathons";
       assertEquals(
@@ -136,17 +132,7 @@ siteTest(
         !page.notIn?.includes("sitemap") && !hackathonsEmpty,
         `sitemap: ${page.path}`,
       );
-      assertEquals(
-        precache.includes(page.path),
-        !page.notIn?.includes("precache"),
-        `precache: ${page.path}`,
-      );
     }
-    assert(precache.includes("/privacy"), "/privacy is not precached");
-    assertEquals(
-      pagesFor("precache").map((p) => p.path),
-      precache.filter((p) => p !== "/manifest.json"),
-    );
   },
 );
 

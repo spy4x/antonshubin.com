@@ -103,7 +103,7 @@ Constraints every review and spec keeps:
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see Rendered-page tests below)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -148,17 +148,21 @@ Order: review the pull request, merge it, then deploy from the default branch
 unreviewed or unmerged code.
 
 The deploy script passes the local commit hash to the remote build as
-`BUILD_ID`, which becomes the service worker's cache name (`routes/sw.js.ts`).
-Nothing is written back to a tracked file, so a deploy leaves `git status` clean
-— see `docs/deploy.md`.
+`BUILD_ID`, which `routes/sw.js.ts` prints in the retired worker (below), where
+the deploy reads it back. Nothing is written back to a tracked file, so a deploy
+leaves `git status` clean — see `docs/deploy.md`.
 
 After `docker compose up` the deploy waits for the new build and purges
 Cloudflare: `/sw.js` plus every `static/` file changed since the build that was
-live (#268, `scripts/cloudflare-purge.ts`). It fails open. Its token,
-`CLOUDFLARE_API_TOKEN`, lives in `.env.deploy` (gitignored, committed as
-`.env.deploy.age`, restored by `deno task env:decrypt`), which the deploy reads
-locally and never uploads; the container does not need it. See `docs/deploy.md`
-"Cloudflare purge after a deploy".
+live (#268, `scripts/cloudflare-purge.ts`). It fails open. The site has no
+service worker (#285): `/sw.js` is a script that clears the old worker's caches
+and unregisters itself, kept until about January 2027 for browsers that
+registered the old one, and the purge reads the build id from its
+`const CACHE = "antonshubin-<id>"` line. Its token, `CLOUDFLARE_API_TOKEN`,
+lives in `.env.deploy` (gitignored, committed as `.env.deploy.age`, restored by
+`deno task env:decrypt`), which the deploy reads locally and never uploads; the
+container does not need it. See `docs/deploy.md` "Cloudflare purge after a
+deploy".
 
 The newsletter subscriber list (`data/subscribers.json`) lives on the host:
 `compose.yml` bind-mounts the app directory's `data/`, and the deploy's
@@ -343,11 +347,10 @@ At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
   Upwork links and the Person JSON-LD's `sameAs` (`sameAsUrls`) read it;
   `profile(id)` throws on a typo. A new profile is one entry there.
 - `lib/pages.ts` is the only list of core pages: `CORE_PAGES`
-  (`lib/cache-control.ts`), the service worker's precache (`routes/sw.js.ts`)
-  and the sitemap's static entries read it through `pagesFor(surface)`. An entry
-  is in all three unless its `notIn` says why not (`/tools` has its own one-hour
-  cache tier, `/hackathons` answers 404 while there are none, `/pay` is not for
-  search). A new page is one entry there, not three edits.
+  (`lib/cache-control.ts`) and the sitemap's static entries read it through
+  `pagesFor(surface)`. An entry is in both unless its `notIn` says why not
+  (`/tools` has its own one-hour cache tier, `/pay` is not for search). A new
+  page is one entry there, not two edits.
 - `components/Breadcrumb.tsx` renders one "‹ Section" back link on a page two
   levels deep, first in the content column, under the nav's word for the section
   (`lib/nav.ts`'s `navLabel()`); the `BreadcrumbList` JSON-LD is unchanged.
@@ -742,12 +745,11 @@ the narrow `deno task test`.
 
 Two rules keep them stable on a busy machine (#219). Open a page with
 `test/browser.ts`'s `newPage(browser, options)`, never `browser.newPage()`: it
-blocks service workers. `islands/SWUpdater.tsx` used to reload the first page
-once the site's worker took control, which landed mid-test and failed the next
-`page.evaluate` with "Execution context was destroyed". It no longer does
-(#259), but a blocked worker also keeps its cache and its fetch handler out of
-tests that are not about it. Only `test/sw-cache.browser.test.ts` and
-`test/sw-updater.browser.test.ts`, which are about the worker, open a context
+blocks service workers. The site's old worker used to reload the first page,
+which landed mid-test and failed the next `page.evaluate` with "Execution
+context was destroyed"; the site registers none any more (#285), and blocking
+keeps any future one out of tests that are not about it. Only
+`test/sw-retired.browser.test.ts`, which is about the worker, opens a context
 without it. And when a click or a submit navigates, wait for that navigation
 itself (`Promise.all([page.waitForNavigation(), click])` or `page.waitForURL`)
 instead of a bare `waitForLoadState` after it, which can resolve on the old
@@ -796,22 +798,12 @@ page. Never retry a test on this error.
   policy has to cover both — a request failing (no such host) is fine, a CSP
   violation isn't. See the test file's own header for why it samples pages
   instead of crawling the whole sitemap.
-- `test/sw-cache.browser.test.ts` (#177 follow-up): the service worker
-  (`routes/sw.js.ts`) never stores a `no-store` response in the Cache API and
-  never serves one from it — a signed unsubscribe link opened, submitted and
-  reopened answers "Link not recognised", not the cached form. It opens the
-  pages under test in a second tab once `navigator.serviceWorker.ready`
-  resolves, because the tab that registers the worker is not controlled by it. A
-  third test pins `newPage()`: no worker activates on its page and the page
-  loads only once (#219).
-- `test/sw-updater.browser.test.ts` (#259): a first visit to `/contact-me` with
-  service workers allowed loads once and keeps a value set on `window` after the
-  worker takes control, because `islands/SWUpdater.tsx` reloads only when a
-  worker replaces one that already controlled the page. A second test deploys a
-  new worker by restarting the site on the same port with a new `BUILD_ID`
-  (`startSite()`'s `port` option), and checks the "Reload" button still reloads
-  the page onto it. A third does the same for a returning visitor, whose page a
-  worker already controls when the island mounts.
+- `test/sw-retired.browser.test.ts` (#285, #259): with service workers allowed,
+  a first visit to `/contact-me` loads once, requests no other page, never asks
+  for `/sw.js`, registers no worker and keeps a value set on `window`; and
+  `/sw.js` registered by hand deletes a cache the old worker left and
+  unregisters itself. `test/sw-retired.test.ts` pins the script's text and that
+  no server-rendered page mentions `serviceWorker`.
 - `test/visual-system.browser.test.ts` (#184): no heading, nav item or button
   renders in a monospace font; the accent colour is painted as a background only
   by the primary button and the Book action (scans computed `background-color`
@@ -1078,10 +1070,9 @@ Cache policy lives in `lib/cache-control.ts`'s `cacheControlFor()`, a pure
 function unit-tested in `lib/cache-control.test.ts`, applied to every response
 by `main.ts`'s cache middleware. `fetch()` drops a `Host` header, so
 `test/unsubscribe.test.ts` checks the staging wiring with a raw HTTP request
-instead. `/sw.js` sets its own header in `routes/sw.js.ts`. When adding or
-changing routes, add a new core page to `lib/pages.ts` (see "Site frame"): its
-`CORE_PAGES` set, the service worker's precache list and the sitemap all read
-that one list.
+instead. `/sw.js` (the retired worker) sets its own header in `routes/sw.js.ts`.
+When adding or changing routes, add a new core page to `lib/pages.ts` (see "Site
+frame"): its `CORE_PAGES` set and the sitemap both read that one list.
 
 Cache tiers:
 
@@ -1097,8 +1088,7 @@ Error responses (status ≥ 400) are never cached, regardless of which tier the
 path would otherwise fall into — a 404 must not survive in a browser or at the
 edge once the page comes back. A route that sets `no-store` itself (for example
 `routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it on
-staging and production alike, and the service worker never caches or serves such
-a response.
+staging and production alike.
 
 **A static-file tier always wins over Fresh's own default, even when `current`
 already says `no-store`** (#183 follow-up, fixed alongside #184): Fresh's
