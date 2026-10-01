@@ -67,7 +67,7 @@ export function repoSnapshot(
 /** How a CI status reads on the page: the word and the StatusMark shape behind it. */
 export interface CiReading {
   word: "Passing" | "Failing" | "Running" | "Unknown";
-  mark: "ready" | "issue" | "wip";
+  mark: "ready" | "known-issue" | "wip";
 }
 
 /**
@@ -83,7 +83,7 @@ export function ciReading(ci: CiSnapshot | null): CiReading {
     case "failure":
     case "error":
     case "killed":
-      return { word: "Failing", mark: "issue" };
+      return { word: "Failing", mark: "known-issue" };
     case "running":
     case "pending":
       return { word: "Running", mark: "wip" };

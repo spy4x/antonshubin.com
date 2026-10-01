@@ -1,8 +1,9 @@
+import { cn } from "@spy4x/preact-cn";
 import { firstSentence } from "../lib/llms.ts";
 import { liveRepo, type ToolsLive } from "../lib/tools-live.ts";
 import { ciUrl, type Tool, toolLicence, type ToolRow } from "../lib/tools.ts";
 import { CiPill } from "./CiPill.tsx";
-import StatusMark from "./StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 const linkClass = "text-accent underline underline-offset-4";
@@ -82,9 +83,10 @@ export function ToolCard(
   return (
     <li
       data-tool={tool.slug}
-      class={`relative bg-paper border border-rule rounded-xl p-5 transition-colors hover:border-rule-strong focus-within:border-rule-strong ${
-        variant === "wide" ? "sm:p-6" : ""
-      }`}
+      class={cn(
+        "relative bg-paper border border-rule rounded-xl p-5 transition-colors hover:border-rule-strong focus-within:border-rule-strong",
+        variant === "wide" && "sm:p-6",
+      )}
     >
       <h3 class="text-xl text-parchment">{title}</h3>
       <p class="mt-1 text-graphite">{tool.job}.</p>

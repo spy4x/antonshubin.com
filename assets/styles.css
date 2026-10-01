@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@spy4x/preact-theme/preset.css";
 
 /*
  * Visual system (#184). Semantic, dark-only tokens — see AGENTS.md "Visual
@@ -26,7 +27,64 @@
   --font-sans: "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
     monospace;
+
+  /* Plex Sans ships 400 and 600 only, so `font-medium` (the library's
+     components use it) draws 600 instead of falling back to 400. */
+  --font-weight-medium: 600;
 }
+
+/*
+ * @spy4x/preact-* theme tokens (#195). The library's components read these
+ * through `var()`; each points at a site token above, so the `@theme` block
+ * stays the only place a colour is written. Only the tokens the components on
+ * the site read are set; a later component that reads another adds it here.
+ * The package's own `tokens.css` is not imported: its `:root` would redefine
+ * `--color-accent` and `--font-sans` above this site's `@theme` layer, and it
+ * is about 2 KB the home page would load for nothing.
+ */
+:root {
+  --color-canvas: var(--color-ink);
+  --color-surface: var(--color-paper);
+  --color-hover: var(--color-lamp);
+  --color-track: var(--color-lamp);
+  --color-foreground: var(--color-parchment);
+  --color-muted-foreground: var(--color-graphite);
+
+  /* StatusMark's tones. The site has no amber, so warning (WIP) is Mist. */
+  --color-success: var(--color-sage);
+  --color-warning: var(--color-mist);
+  --color-danger: var(--color-brick);
+
+  /* The accent: the Book fill, Ink text on it, and the focus ring, which
+     reads step 900 unless --color-ring is set. */
+  --color-accent-900: var(--color-accent);
+  --color-accent-800: var(--color-accent-hover);
+  --color-accent-foreground: var(--color-ink);
+
+  /* What is chosen or current. These fall back to the accent, which stays
+     reserved for Book, so they are Lamp and Parchment instead. */
+  --color-selected: var(--color-lamp);
+  --color-selected-foreground: var(--color-parchment);
+  --color-selected-hover: var(--color-rule);
+  --color-selected-soft: var(--color-lamp);
+  --color-selected-soft-hover: var(--color-rule);
+  --color-selected-text: var(--color-parchment);
+}
+
+/*
+ * Classes the library's components render on this site, so Tailwind emits
+ * them: it never scans the library, which lives in Deno's cache. Not the
+ * package's `COMPONENT_CLASSES` (every component's classes, which more than
+ * doubled this stylesheet), and not a class the site's own wrappers replace
+ * (`CiPill.tsx` passes its own radius, padding and size). The button's
+ * classes are written out in `components/Button.tsx`, which Tailwind scans.
+ * `test/library-classes.test.tsx` fails when a rendered class has no rule;
+ * add a module's classes here when a page starts using it.
+ */
+/* @spy4x/preact-ui/status-mark: every status. */
+@source inline("inline-flex items-center gap-1 text-sm font-medium shrink-0 size-4 text-success text-muted text-warning text-danger text-foreground");
+/* @spy4x/preact-ui/badge: base and the filled `gray`. */
+@source inline("inline-flex items-center border py-1 whitespace-nowrap capitalize border-subtle bg-track text-foreground");
 
 /*
  * Self-hosted type (#184). Latin + Cyrillic subsets only (the site has no

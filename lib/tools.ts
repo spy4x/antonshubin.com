@@ -25,9 +25,9 @@ import type { RegistryPackage } from "./snapshot-fetch.ts";
 
 /**
  * Where a tool stands, shown as a shape plus a word by
- * `components/StatusMark.tsx`. A subset of that component's statuses: the
- * other two (`outcome`, `issue`) describe a client project or a problem, not a
- * tool.
+ * `@spy4x/preact-ui/status-mark`'s `StatusMark`. A subset of its statuses:
+ * the others (`known-issue`, `outcome`, `live`, `offline`) describe a client
+ * project, a problem or a running instance, not a tool.
  */
 export type ToolStatus =
   | "in-use"

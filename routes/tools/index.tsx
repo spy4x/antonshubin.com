@@ -3,7 +3,7 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
-import StatusMark from "../../components/StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { ToolCard, ToolRowCard } from "../../components/ToolCard.tsx";
 import { toJsonLd } from "../../lib/json-ld.ts";
 import {

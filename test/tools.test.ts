@@ -16,7 +16,7 @@ import {
 } from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
 
-/** The word components/StatusMark.tsx prints for each tool status. */
+/** The word `@spy4x/preact-ui/status-mark` prints for each tool status. */
 const STATUS_WORDS = {
   "in-use": "In use",
   ready: "Ready",
