@@ -8,7 +8,11 @@ import { SCHEDULE_URL } from "../../lib/config.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { CalendarIcon, CodeIcon, StarIcon } from "../../components/Icons.tsx";
+import {
+  IconCalendar as CalendarIcon,
+  IconCode as CodeIcon,
+} from "@spy4x/preact-icons";
+import { StarIcon } from "../../components/Icons.tsx";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
 

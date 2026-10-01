@@ -16,10 +16,10 @@ import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { FACT_LINK } from "../../components/FactCard.tsx";
 import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts";
 import {
-  ArrowRightIcon,
-  CatalogIcon,
-  CheckIcon,
-} from "../../components/Icons.tsx";
+  IconArrowRight as ArrowRightIcon,
+  IconCheck as CheckIcon,
+} from "@spy4x/preact-icons";
+import { CatalogIcon } from "../../components/Icons.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
 
 const CANONICAL = "https://antonshubin.com/catalog";

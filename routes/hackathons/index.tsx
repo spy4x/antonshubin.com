@@ -7,7 +7,11 @@ import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { type Hackathon, hackathons } from "../../lib/data.ts";
 import { SCHEDULE_URL } from "../../lib/config.ts";
-import { CalendarIcon, CodeIcon, PersonIcon } from "../../components/Icons.tsx";
+import {
+  IconCalendar as CalendarIcon,
+  IconCode as CodeIcon,
+  IconUser as PersonIcon,
+} from "@spy4x/preact-icons";
 import { BookCallLink } from "../../components/BookCallLink.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
 
