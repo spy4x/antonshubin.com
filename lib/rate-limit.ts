@@ -19,40 +19,14 @@ import {
   createMemoryRateLimiter,
   type MemoryRateLimiter,
 } from "@spy4x/platform/rate-limit/memory";
-import { ipInRanges } from "@spy4x/net/ip";
+import { CLOUDFLARE_IP_RANGES, ipInRanges } from "@spy4x/net/ip";
 
-/** Cloudflare's published edge ranges, from https://www.cloudflare.com/ips-v4
- * and https://www.cloudflare.com/ips-v6 as of 2026-09-26. They change rarely;
- * a range missing here makes those visitors share their edge's bucket, and
- * never lets anyone skip the limit. */
-export const CLOUDFLARE_RANGES: readonly string[] = [
-  "173.245.48.0/20",
-  "103.21.244.0/22",
-  "103.22.200.0/22",
-  "103.31.4.0/22",
-  "141.101.64.0/18",
-  "108.162.192.0/18",
-  "190.93.240.0/20",
-  "188.114.96.0/20",
-  "197.234.240.0/22",
-  "198.41.128.0/17",
-  "162.158.0.0/15",
-  "104.16.0.0/13",
-  "104.24.0.0/14",
-  "172.64.0.0/13",
-  "131.0.72.0/22",
-  "2400:cb00::/32",
-  "2606:4700::/32",
-  "2803:f800::/32",
-  "2405:b500::/32",
-  "2405:8100::/32",
-  "2a06:98c0::/29",
-  "2c0f:f248::/32",
-];
-
-/** True when `address` is one of Cloudflare's edge addresses. */
+/** True when `address` is one of Cloudflare's edge addresses
+ * (`@spy4x/net/ip`'s `CLOUDFLARE_IP_RANGES`). A range missing there makes
+ * those visitors share their edge's bucket, and never lets anyone skip the
+ * limit. */
 export function isCloudflareAddress(address: string): boolean {
-  return ipInRanges(address, CLOUDFLARE_RANGES);
+  return ipInRanges(address, CLOUDFLARE_IP_RANGES);
 }
 
 /**
@@ -75,7 +49,7 @@ export function requestClientIp(req: Request, socketAddress?: string): string {
   const peer = clientIp(req, socketAddress, "x-real-ip");
   return clientKey(
     clientIp(req, peer, "cf-connecting-ip", {
-      trustedProxies: CLOUDFLARE_RANGES,
+      trustedProxies: CLOUDFLARE_IP_RANGES,
     }),
   );
 }
