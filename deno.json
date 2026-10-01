@@ -17,6 +17,7 @@
     "publish:blog": "deno run -A scripts/publish-blog.ts",
     "launch-kit": "deno run -A scripts/launch-kit.ts",
     "video-kit": "deno run -A scripts/video-kit.ts",
+    "video-cut": "deno run -A scripts/video-cut.ts",
     "links": "deno run -R --allow-env scripts/links.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
     "umami-reports": "deno run --allow-env --allow-net scripts/umami-reports.ts",
