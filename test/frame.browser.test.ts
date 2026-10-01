@@ -166,3 +166,46 @@ Deno.test("at 390px the last footer line clears the tab bar", async () => {
     await site.stop();
   }
 });
+
+Deno.test("the back link sits at the same top offset on a tool page as on a case study", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    for (
+      const viewport of [MOBILE_VIEWPORT, { width: 1024, height: 900 }]
+    ) {
+      const page: Page = await newPage(browser, { viewport });
+      try {
+        const offsets: Record<string, { top: number; left: number }> = {};
+        for (const path of ["/work/foodrazor", "/tools/mig"]) {
+          await page.goto(`${site.origin}${path}`, { waitUntil: "load" });
+          const main = page.locator("main");
+          const link = page.locator('nav[aria-label="Breadcrumb"] a');
+          const [m, l] = [await main.boundingBox(), await link.boundingBox()];
+          assert(m && l, `${path}: no <main> or no back link on screen`);
+          offsets[path] = { top: l.y - m.y, left: l.x };
+        }
+        // The tool column is narrower and centred, so only the top offset (and,
+        // on a phone where both fill the screen, the left one) must match.
+        assertEquals(
+          offsets["/tools/mig"].top,
+          offsets["/work/foodrazor"].top,
+          `${viewport.width}px: the tool page's back link sits lower`,
+        );
+        if (viewport.width < 768) {
+          assertEquals(
+            offsets["/tools/mig"].left,
+            offsets["/work/foodrazor"].left,
+            `${viewport.width}px: the tool page's back link is inset further`,
+          );
+        }
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});

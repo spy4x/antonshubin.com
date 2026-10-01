@@ -167,7 +167,7 @@ export default define.page(async function ToolPage(ctx) {
           }}
         />
       )}
-      <div class="max-w-5xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-5xl mx-auto">
         <Breadcrumb items={getBreadcrumb(canonical, tool.name)} />
 
         <header class="max-w-3xl">
