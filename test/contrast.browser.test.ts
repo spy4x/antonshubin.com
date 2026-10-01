@@ -19,8 +19,7 @@
 // Coverage against the ten fixes in this PR, each confirmed to turn this
 // test red by reverting it locally and rerunning:
 //   1. --color-gray-500 (secondary text)          — every page below
-//   2. --color-gray-400 (tag pills, captions)      — the synthetic probe
-//      below, not any of the five real pages (see why there)
+//   2. (retired: its only probe guarded the GitHub stars pill, now deleted)
 //   3. --color-orange-600 (button/badge surfaces) — the active nav pill,
 //      present in <nav> on every page below
 //   4. bg-orange-500 -> bg-orange-600 on the active nav pill (islands/Menu.tsx)
@@ -51,24 +50,6 @@
 //      MeetEmbed facade, and the home and /pay gradient buttons made solid
 //      (bg-green-700, bg-blue-600) — /, /book, both blog posts, /pay
 //      and /catalog
-//
-// #2 needs its own probe: --color-gray-400 was already comfortably above AA
-// (5.78:1) against gray-800, the background most of its real uses sit on —
-// its one failing pairing pre-fix (4.06:1) is specifically text-gray-400 on
-// bg-gray-700, used by islands/GhStars.tsx's "no stars yet / fetch failed"
-// fallback badge (and, as plain placeholder text rather than a contrast
-// requirement, islands/LeadForm.tsx's placeholder-gray-400 inputs, which
-// also sit on bg-gray-700). Every other text-gray-400 use on these five
-// pages already sits on a background dark enough that even the pre-fix
-// value passed, so visiting real pages alone never exercises the pairing
-// that actually failed (confirmed: reverting the token alone left this test
-// green until the probe below was added). GhStars also fetches live star
-// counts from api.github.com client-side, so loading a page that renders it
-// for real would make this test's result depend on network conditions and
-// GitHub's API — not something to add to a deterministic suite. Instead,
-// the probe injects that one class combination directly onto an
-// already-loaded page (reusing its already-loaded stylesheet) and asks axe
-// to check only that element, which is deterministic and network-free.
 //
 // #6 and #7 need a manual ratio check instead of axe, for two different
 // reasons neither related to the actual colour: the breadcrumb "/" carries
@@ -397,38 +378,6 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
         catalogXRatio !== null && catalogXRatio >= 4.5,
         `service page "not included" x marker contrast ratio must be >= 4.5, got ${catalogXRatio}`,
       );
-
-      // Synthetic probe for the old --color-gray-400/gray-700 pairing: see
-      // the file header for why no real page exercises it deterministically.
-      // #184 renamed the tokens this probe guards (islands/GhStars.tsx's
-      // fallback badge now uses bg-lamp/text-graphite, not the raw Tailwind
-      // gray-*), and moved the site off Tailwind's default gray palette
-      // entirely, so the class names below were updated to match rather
-      // than left pinned to a palette the site no longer overrides.
-      // Reuses the already-loaded /catalog page's stylesheet.
-      await page.evaluate(() => {
-        const el = document.createElement("span");
-        el.id = "contrast-probe-graphite-on-lamp";
-        el.className = "bg-lamp text-graphite";
-        el.textContent = "GitHub";
-        document.body.appendChild(el);
-      });
-      try {
-        const probeResult = await colorContrastResult(
-          page,
-          "#contrast-probe-graphite-on-lamp",
-        );
-        assertEquals(
-          probeResult.violations.map((n) => n.html),
-          [],
-          "text-graphite on bg-lamp (islands/GhStars.tsx's fallback badge, #184 token rename) must pass AA",
-        );
-      } finally {
-        await page.evaluate(() => {
-          document.getElementById("contrast-probe-graphite-on-lamp")
-            ?.remove();
-        });
-      }
     } finally {
       await page.close();
     }

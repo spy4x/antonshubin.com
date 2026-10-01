@@ -142,8 +142,7 @@ Five entities in a `@graph` array (six on `/about`):
 
 ### 7. Project JSON-LD (routes/work/[slug].tsx)
 
-- One `SoftwareSourceCode` node when the project links a repo (`ghRepo`),
-  otherwise `CreativeWork`, built only from fields already on the `Project`
+- One `CreativeWork` node, built only from fields already on the `Project`
   record in `lib/data.ts` (issue #167) — no invented dates or ratings
 - `author` points at the site-wide Person node's `@id`
   (`https://antonshubin.com/#person`), same one the BlogPosting JSON-LD in
@@ -160,8 +159,7 @@ Five entities in a `@graph` array (six on `/about`):
 - The page's meta description is `clientSummary()` cut to 160 characters at a
   word boundary (`metaDescription()` in `lib/llms.ts`); the `<title>` stays
   `<project> — Anton Shubin`
-- `codeRepository` when `ghRepo` is set; `sameAs` when the project has a live,
-  non-dead `externalURL` that isn't already `codeRepository`;
+- `sameAs` when the project has a live, non-dead `externalURL`;
   `creativeWorkStatus: "Archived"` when `archived` is true
 - No `sourceOrganization`: `madeForName` is mostly a person (a LinkedIn
   profile), not an organization, and typing all of them as `Organization` would

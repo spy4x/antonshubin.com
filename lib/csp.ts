@@ -70,7 +70,7 @@ export function buildCsp(options: CspOptions = {}): string {
 
   const scriptSrc = ["'self'", nonce && `'nonce-${nonce}'`, umamiOrigin]
     .filter(Boolean).join(" ");
-  const connectSrc = ["'self'", "https://api.github.com", umamiOrigin]
+  const connectSrc = ["'self'", umamiOrigin]
     .filter(Boolean).join(" ");
   const frameSrc = [
     "https://www.youtube.com",
