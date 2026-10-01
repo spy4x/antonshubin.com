@@ -161,7 +161,7 @@ export default define.page(function Home(ctx) {
                     type="image/webp"
                   />
                   <img
-                    class="w-full h-auto aspect-[4/3] object-cover object-top rounded-lg"
+                    class="w-full h-auto aspect-[4/3] object-cover object-[50%_30%] rounded-lg"
                     src={BLANK_PIXEL}
                     alt="Anton Shubin"
                     width="640"

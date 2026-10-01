@@ -861,6 +861,12 @@ siteTest(
       `a phone would fetch the photo: ${img}`,
     );
     assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source");
+    // The photo is 2:3 cut to 4:3: the /about crop keeps the face and
+    // shoulders, a top crop cuts them off.
+    assert(
+      img.includes("object-[50%_30%]"),
+      `portrait crop differs from /about: ${img}`,
+    );
     const main = html.slice(html.indexOf('id="main-content"'));
     assertEquals(count(main, /fetchpriority="high"/g), 1);
   },
