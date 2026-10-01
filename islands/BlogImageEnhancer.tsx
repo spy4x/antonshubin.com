@@ -1,5 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
+import { IconXMark } from "@spy4x/preact-icons";
 import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
 
 /**
@@ -95,21 +96,7 @@ export default function BlogImageEnhancer() {
             class="lightbox-close z-10 p-2 text-parchment bg-desk border border-rule-strong rounded-full hover:bg-lamp transition-colors"
             aria-label="Close"
           >
-            <svg
-              aria-hidden="true"
-              focusable="false"
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <IconXMark class="w-8 h-8" />
           </button>
           <img
             src={activeImage.value.src}
