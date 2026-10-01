@@ -1,5 +1,5 @@
-import { Marked, Parser, TextRenderer } from "marked";
-import type { Renderer, Tokens } from "marked";
+import { Marked, Parser, Renderer, TextRenderer } from "marked";
+import type { Tokens } from "marked";
 import { outboundTo } from "./analytics.ts";
 
 /** A fence's info string -> the name its code block's header shows. */
@@ -36,6 +36,8 @@ export interface PostHeading {
  */
 let headingIds = new Map<string, number>();
 let headings: PostHeading[] = [];
+/** The latest h2/h3 text, the label of a table that follows it. */
+let lastHeading = "";
 
 const ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
@@ -221,9 +223,22 @@ blogMarked.use({
       ).replace(/\s+/g, " ").trim();
       const id = uniqueId(slugify(text) || "section");
       headings.push({ depth, id, text });
+      lastHeading = text;
       return `<div class="heading-row heading-row--${depth}"><h${depth} id="${id}">${html}</h${depth}><a class="heading-anchor" href="#${id}"><span aria-hidden="true">#</span><span class="sr-only">Link to section: ${
         escapeEncode(text)
       }</span></a></div>\n`;
+    },
+    /**
+     * A table sits in a labelled, focusable scroll box (#334): a wide one
+     * scrolls sideways on a phone, and without a tab stop a keyboard user
+     * cannot reach the clipped columns (axe: scrollable-region-focusable).
+     * The label is the nearest heading above it, or "Table".
+     */
+    table(token) {
+      const label = lastHeading || "Table";
+      return `<div class="table-scroll" tabindex="0" role="region" aria-label="${
+        escapeEncode(label)
+      }">${Renderer.prototype.table.call(this, token)}</div>\n`;
     },
     /**
      * A fenced code block (#274, UX 4): a header row with the language and a
@@ -408,6 +423,7 @@ export interface RenderedPost {
 export function renderBlogPost(markdown: string): Promise<RenderedPost> {
   headingIds = new Map();
   headings = [];
+  lastHeading = "";
   const raw = blogMarked.parse(markdown, { async: false }) as string;
   const result = {
     html: addPreTabIndex(addOutboundEvents(addNewTabHints(raw))),

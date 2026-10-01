@@ -724,18 +724,27 @@ kbd {
   margin-bottom: 2em;
 }
 
-.blog-content > table {
-  @apply block overflow-x-auto my-8 text-base;
+.blog-content > .table-scroll {
+  @apply overflow-x-auto my-8;
+}
+
+.blog-content > .table-scroll:focus-visible {
+  outline: 2px solid var(--color-parchment);
+  outline-offset: -2px;
+}
+
+.blog-content > .table-scroll > table {
+  @apply text-base;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
 }
 
-.blog-content > table th,
-.blog-content > table td {
+.blog-content > .table-scroll > table th,
+.blog-content > .table-scroll > table td {
   @apply px-4 py-2 text-left border-b border-rule whitespace-nowrap;
 }
 
-.blog-content > table th {
+.blog-content > .table-scroll > table th {
   @apply font-semibold text-graphite;
 }
 
