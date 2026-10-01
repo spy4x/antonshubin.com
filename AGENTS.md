@@ -1260,8 +1260,9 @@ the pinned Chromium, runs the optimizer and the metadata strip, and removes the
 container, the app process and its temp directory even when it fails. The
 screenshot list, viewports and demo data are the table at the top of
 `scripts/reshoot-caldav-demo-plan.ts`; `--shots`, `--viewport` and `--scale`
-change a run, and it needs Docker, so it is not part of `deno task check`. A
-brief that asks for new screenshots of a project names every screenshot in that
+change a run; `--app <dir>` clones that directory's committed HEAD, not its
+working tree. It needs Docker, so it is not part of `deno task check`. A brief
+that asks for new screenshots of a project names every screenshot in that
 project's folder, not only the ones the issue mentions, so the environment is
 built once.
 
