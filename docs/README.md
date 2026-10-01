@@ -1,46 +1,19 @@
 # Docs
 
-Project documentation for antonshubin.com.
+How antonshubin.com is built, deployed and published. `AGENTS.md` at the repo
+root holds the code structure, tasks and conventions.
 
-## Contents
-
-### [Dev](dev.md)
-
-Local dev setup, commands, code style, project structure.
-
-### [Deploy](deploy.md)
-
-Deploy to homelab via rsync + Docker.
-
-### [Infra](infra.md)
-
-Production infrastructure: Docker, Traefik, updates.
-
-### [AI Crawlers](seo-ai-crawlers.md)
-
-LLM-friendly surface: llms.txt, llms-full.txt, sitemap, robots, JSON-LD graph.
-Update rules when adding content or pages.
-
-### [SEO Optimization Roadmap](seo-optimization-roadmap.md)
-
-Post-implementation report of all SEO fixes shipped 2026-06-29. Covers 5 feature
-PRs + 2 production hotfixes, architecture decisions, live verification results,
-and ongoing maintenance procedures.
-
-### [Tagged links](utm.md)
-
-How every link posted elsewhere back to antonshubin.com is tagged: the channel
-table (source and medium) shared with `scripts/utm.ts`, how campaigns are named,
-the campaign log, and `deno task links`, which prints a page's tagged URL for
-every channel.
-
-### [Publishing a blog post](publishing.md)
-
-The end-to-end flow for a new post: draft, pull request, deploy,
-`deno task publish:blog <slug>`, channel texts and the newsletter on Anton's
-yes. The voice to write in is in [voice.md](voice.md).
-
-### [Video kit](video-kit.md)
-
-`deno task video-kit`: YouTube titles, description, chapters and a blog draft
-from a transcript.
+- [Deploy](deploy.md): deploy to the cloudlab host, the Cloudflare purge,
+  subscriber data, env files and the age key.
+- [Publishing a blog post](publishing.md): from idea to a live post, the Dev.to
+  draft and the newsletter on Anton's yes. The voice to write in is in
+  [voice.md](voice.md).
+- [Tagged links](utm.md): the UTM channel table shared with `scripts/utm.ts`,
+  campaign names and posting windows (`deno task links`).
+- [Analytics](analytics.md): the Umami events, properties and saved reports.
+- [Newsletter](newsletter.md): the subscriber data format and endpoints.
+- [Weekly numbers](weekly-numbers.md): the Sunday report and its env values.
+- [Video kit](video-kit.md): titles, description, chapters and a blog draft from
+  a transcript.
+- [AI crawlers](seo-ai-crawlers.md): llms.txt, llms-full.txt, sitemap, robots,
+  the JSON-LD graph, and what to update when a page changes.

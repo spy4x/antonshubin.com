@@ -918,6 +918,8 @@ post get `outbound` from `lib/markdown.ts`.
 (`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`),
 and `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
 `routes/privacy.tsx` describes exactly this; change it together with the code.
+`docs/analytics.md` holds the event names and properties and the saved reports
+`deno task umami-reports` keeps.
 
 ## Content-Security-Policy
 
@@ -1087,11 +1089,6 @@ Three hard rules:
   refuses a slug already in its sent log, `data/newsletter-log.json`.
 - **Dev.to gets an unpublished draft only.** Anton publishes it himself.
 
-## Analytics
-
-`docs/analytics.md` holds the Umami event names and properties, the saved
-reports `deno task umami-reports` keeps, and where nothing is sent.
-
 ## Tagged links
 
 Never hand-write a tagged (UTM) URL. `deno task links <path> [--campaign …]`
@@ -1106,15 +1103,15 @@ must match the code's (`scripts/utm.test.ts` checks it).
 This site uses an aggressive AI crawler strategy. When adding features or
 content, update the corresponding files:
 
-| Asset           | File                                 | Update when                                     |
-| --------------- | ------------------------------------ | ----------------------------------------------- |
-| AI summary      | `routes/llms.txt.ts`                 | Site positioning, offerings, or policies change |
-| AI full index   | `routes/llms-full.txt.ts`            | New pages, catalog items, or blog posts added   |
-| Site structure  | `routes/sitemap.xml.ts`              | New routes or pages added                       |
-| Crawler rules   | `routes/robots.txt.ts`               | Adding/removing crawler permissions             |
-| Structured data | `routes/_app.tsx` (JSON-LD)          | Identity, skills, or company info changes       |
-| FAQ data        | `routes/how-i-work.tsx` (FAQ schema) | Policies or terms change                        |
-| Docs reference  | `docs/seo-ai-crawlers.md`            | Any of the above changes                        |
+| Asset           | File                               | Update when                                     |
+| --------------- | ---------------------------------- | ----------------------------------------------- |
+| AI summary      | `routes/llms.txt.ts`               | Site positioning, offerings, or policies change |
+| AI full index   | `routes/llms-full.txt.ts`          | New pages, catalog items, or blog posts added   |
+| Site structure  | `routes/sitemap.xml.ts`            | New routes or pages added                       |
+| Crawler rules   | `routes/robots.txt.ts`             | Adding/removing crawler permissions             |
+| Structured data | `components/SEOHead.tsx` (JSON-LD) | Identity, skills, or company info changes       |
+| FAQ data        | `lib/faqs.ts` (FAQ schema)         | Policies or terms change                        |
+| Docs reference  | `docs/seo-ai-crawlers.md`          | Any of the above changes                        |
 
 Every PR that adds or modifies routes, content, or positioning must also update
 the matching crawler file(s). The `llms*.txt` files are parsed by GPTBot,
