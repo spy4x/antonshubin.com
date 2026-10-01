@@ -67,6 +67,7 @@ export const SITE_DESCRIPTION = DEFAULTS.description;
 
 export const head = signal<PageHead>({ ...DEFAULTS });
 
+/** Runs on every render: `head` is module-level, so without a reset one request's title and tags would leak into the next. */
 export function resetHead() {
   head.value = { ...DEFAULTS };
 }
