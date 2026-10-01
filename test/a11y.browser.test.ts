@@ -184,11 +184,13 @@ async function walk(page: Page, button: Locator, limit: number) {
   const strip = page.locator("[data-gallery-strip]");
   const seen = [await counterText(page)];
   for (let i = 0; i < limit && await button.isEnabled(); i++) {
-    const scrolled = strip.evaluate((el) =>
-      new Promise<boolean>((resolve) => {
-        el.addEventListener("scrollend", () => resolve(true), { once: true });
-        setTimeout(() => resolve(false), 5000);
-      })
+    const scrolled = strip.evaluate(
+      (el, ms) =>
+        new Promise<boolean>((resolve) => {
+          el.addEventListener("scrollend", () => resolve(true), { once: true });
+          setTimeout(() => resolve(false), ms);
+        }),
+      WAIT_MS,
     );
     await button.click();
     assert(await scrolled, `click ${i + 1} did not scroll the strip`);
