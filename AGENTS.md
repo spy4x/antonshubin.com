@@ -397,11 +397,16 @@ class string as a plain string, for the call sites that can't render `<Button>`
 directly: `components/BookCallLink.tsx` (every "Book a call" link on the site
 goes through it; it owns the `href`/`target`/empty-`url` behaviour
 `<Button href=…>` doesn't, and stamps `data-primary-book` itself for its default
-`variant="primary"`). It is built by the library's `buttonClasses()`, whose
-`cn()` (tailwind-merge) keeps the last class of each group in the attribute
-itself. The wrapper zeroes the library's padding, gap and text size, so every
-call site supplies its own sizing via `extra`, and a caller's class replaces the
-default instead of competing with it in the stylesheet.
+`variant="primary"`). It is the library's `buttonClasses()` output with the
+site's look, written out in `BUTTON_CLASSES` and joined plainly with `extra`:
+never call `cn()` (tailwind-merge, about 28 KB) from code an island imports,
+since `islands/ImageGallery.tsx` imports `buttonClass`; use `cn()` only in
+server-rendered components. `test/library-classes.test.tsx` fails when
+`BUTTON_CLASSES` drifts from the library or when tailwind-merge reaches a client
+chunk. The string carries no padding, gap or text-size utility — two Tailwind
+classes for the same property in one `class` attribute resolve by their order in
+the compiled stylesheet, not in the attribute — so every call site supplies its
+own sizing via `extra` instead of fighting a default.
 
 The library's components are coloured by the `:root` block under `@theme` in
 `assets/styles.css`: each library token (`--color-surface`, `--color-success`,
