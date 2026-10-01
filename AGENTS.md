@@ -383,29 +383,45 @@ uses these tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind
 palette colour (`slate-*`, `gray-*`, `orange-*`) showing up again is a
 regression, not a style choice.
 
-`components/Button.tsx` is the one button component. `variant` defaults to
-`secondary` (an outline button); `variant="primary"` (`bg-accent text-ink`) is
+`components/Button.tsx` is the one button component, a thin wrapper over
+`@spy4x/preact-ui/button` (#195). `variant` defaults to `secondary` (the
+library's `outline`); `variant="primary"` (the accent fill, Ink text) is
 reserved for the Book action, and a primary button carries `data-primary-book` —
 the marker `test/visual-system.browser.test.ts`'s "the accent colour is a
 background only on the primary button and the nav's Book" guard looks for,
-instead of guessing from text content or element shape.
+instead of guessing from text content or element shape. The wrapper exists
+because the library's button is a `<button>` only (the site's are mostly links),
+carries no such marker, and uses `font-medium`, `rounded-md` and a default size.
 `buttonClass(variant, extra)` (also exported from `Button.tsx`) is the same
-class string as a plain string, for the handful of call sites that can't render
-`<Button>` directly: `components/BookCallLink.tsx` (every "Book a call" link on
-the site goes through it; it owns the `href`/`target`/empty-`url` behaviour
-`<Button
-href=…>` doesn't, and stamps `data-primary-book` itself for its default
-`variant="primary"`). `buttonClass`'s base class string carries no padding, gap
-or text-size utility — two Tailwind classes for the same property don't reliably
-resolve by their order in one element's `class="..."` attribute, only by the
-order Tailwind happens to emit them in the compiled stylesheet, so every call
-site supplies its own sizing via `extra` instead of fighting a default.
+class string as a plain string, for the call sites that can't render `<Button>`
+directly: `components/BookCallLink.tsx` (every "Book a call" link on the site
+goes through it; it owns the `href`/`target`/empty-`url` behaviour
+`<Button href=…>` doesn't, and stamps `data-primary-book` itself for its default
+`variant="primary"`). It is built by the library's `buttonClasses()`, whose
+`cn()` (tailwind-merge) keeps the last class of each group in the attribute
+itself. The wrapper zeroes the library's padding, gap and text size, so every
+call site supplies its own sizing via `extra`, and a caller's class replaces the
+default instead of competing with it in the stylesheet.
 
-`components/StatusMark.tsx` renders a shape plus a word for a project or tool
-status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`, `outcome`,
-`issue`, `live`, `offline`) — never colour alone; used today on
-`routes/work/index.tsx` and in the project page's fact card
-(`components/ProjectFactCard.tsx`: live, offline or archived).
+The library's components are coloured by the `:root` block under `@theme` in
+`assets/styles.css`: each library token (`--color-surface`, `--color-success`,
+`--color-accent-900`, ...) points at a site token, so `@theme` stays the only
+place a colour is written. The selection tokens (`--color-selected*`) are Lamp
+and Parchment, never the accent. `vite.config.ts` splices the library's
+`preset.css` into the stylesheet; its `tokens.css` is not imported, because it
+would redefine `--color-accent` and `--font-sans`. Tailwind never scans the
+library, so `assets/styles.css` lists the classes of the modules the site uses
+in `@source inline(...)` lines; `test/library-classes.test.tsx` fails when a
+class a library component renders has no rule. `--font-weight-medium` is 600,
+since Plex Sans has no 500 file.
+
+`@spy4x/preact-ui/status-mark`'s `StatusMark` renders a shape plus a word for a
+project or tool status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`,
+`outcome`, `known-issue`, `live`, `offline`) — never colour alone; the tone
+colours the shape only, and the word keeps the surrounding text colour. Used on
+`routes/work/index.tsx`, the tools pages, the home page and in the project
+page's fact card (`components/ProjectFactCard.tsx`: live, offline or archived).
+`components/CiPill.tsx` draws it inside the library badge's grey pill.
 
 ### Work section
 
@@ -1264,5 +1280,7 @@ comment starting `<!-- agent -->`). Already imported from `@spy4x/platform`:
 `copyToClipboard` (`islands/CopyButton.tsx`, `islands/BlogImageEnhancer.tsx`),
 `sleep`, and the time constants; `lib/blog.ts` reads `@spy4x/time/locale`'s
 `dayLabel` and `monthLabel`. `toJsonLd` stays because `jsonLdText` escapes only
-`<`. The `@spy4x/preact-*` components are not adopted yet (part 2 of #195); do
-not add a second local copy of a component they hold.
+`<`. Part 2 of #195 moves the components to `@spy4x/preact-*` (all ten packages
+pinned together, exactly): `Button`, `StatusMark`, the CI pill's badge and `cn`
+so far (see "Visual system"); the rest follow. Do not add a second local copy of
+a component they hold.
