@@ -69,6 +69,11 @@ export function legacyLetter(body: string): Letter {
   });
 }
 
+/** The subject of the one copy `--test` sends to `CONTACT_EMAIL`. */
+export function testSubject(subject: string): string {
+  return `[Test] ${subject}`;
+}
+
 function fail(message: string): never {
   console.error(message);
   Deno.exit(1);
@@ -140,7 +145,7 @@ async function main() {
         email: CONTACT_EMAIL,
         subscribedAt: new Date().toISOString(),
       }],
-      subject: `[Test] ${subject}`,
+      subject: testSubject(subject),
       letter,
       unsubscribeLink,
       sender,

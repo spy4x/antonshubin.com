@@ -4,6 +4,7 @@
 // and the child may only reach 127.0.0.1, so a broken guard fails the test
 // instead of mailing anyone.
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
+import { testSubject } from "./send-newsletter.ts";
 
 const ANNOUNCEMENT = {
   slug: "a-post",
@@ -121,7 +122,7 @@ Deno.test("the container send refuses a slug whose log entry predates per-recipi
   }
 });
 
-Deno.test("--test sends only to CONTACT_EMAIL, with a [Test] subject, and writes no log", async () => {
+Deno.test("--test sends only to CONTACT_EMAIL and writes no log", async () => {
   const dir = await Deno.makeTempDir();
   try {
     const subscribers = JSON.stringify([
@@ -187,4 +188,8 @@ Deno.test("the container send exits 1 when the relay refuses the only mail, and 
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
+});
+
+Deno.test("the --test copy's subject starts with [Test] so it is not mistaken for the real issue", () => {
+  assertEquals(testSubject("A post"), "[Test] A post");
 });
