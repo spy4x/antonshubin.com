@@ -14,8 +14,7 @@
  * the arguments and the demo data are in the plan file, which has the tests.
  */
 import { join, relative, resolve } from "@std/path";
-import type { Browser } from "playwright";
-import { launchChromium } from "../test/browser.ts";
+import { type Browser, chromium } from "playwright";
 import {
   DEMO_SERVER,
   DEMO_TASKS,
@@ -27,8 +26,8 @@ import {
 } from "./reshoot-caldav-demo-plan.ts";
 
 const ROOT = resolve(new URL("../", import.meta.url).pathname);
-/** Pinned like the other images this repo runs; the tag is the one the prior shoots used. */
-const RADICALE_IMAGE = "tomsquest/docker-radicale:latest";
+/** A version tag, so a new Radicale release cannot change the pictures unnoticed. */
+const RADICALE_IMAGE = "tomsquest/docker-radicale:3.8.1.1";
 const READY_TIMEOUT_MS = 30_000;
 const BUILD_TIMEOUT_MS = 300_000;
 
@@ -37,25 +36,66 @@ interface RunResult {
   output: string;
 }
 
+/** Set by the signal handler; from then on no step may start a process, browser or file. */
+let interrupted = false;
+
+function assertNotInterrupted() {
+  if (interrupted) throw new Error("interrupted");
+}
+
+/** Every child `run()` started and has not seen exit; `Resources.cleanup()` kills them. */
+const liveChildren = new Set<Deno.ChildProcess>();
+
+/** Kills a child and everything it started: `setsid` made it a process group leader. */
+function killGroup(child: Deno.ChildProcess, signal: Deno.Signal) {
+  try {
+    Deno.kill(-child.pid, signal);
+  } catch {
+    try {
+      child.kill(signal);
+    } catch {
+      // already gone
+    }
+  }
+}
+
 /** Runs a command to the end under a deadline and returns its combined output. */
 async function run(
   cmd: string[],
-  opts: { cwd?: string; env?: Record<string, string>; timeoutMs?: number } = {},
+  opts: {
+    cwd?: string;
+    env?: Record<string, string>;
+    timeoutMs?: number;
+    /** Teardown commands run even after an interrupt. */
+    teardown?: boolean;
+  } = {},
 ): Promise<RunResult> {
-  const child = new Deno.Command(cmd[0], {
-    args: cmd.slice(1),
+  if (!opts.teardown) assertNotInterrupted();
+  // setsid gives the command its own process group, so an interrupt can kill
+  // `deno task` and the vite or optimizer processes under it together.
+  const child = new Deno.Command("setsid", {
+    args: cmd,
     cwd: opts.cwd,
     env: opts.env,
     stdout: "piped",
     stderr: "piped",
-    signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
-  });
-  const out = await child.output();
-  const text = new TextDecoder();
-  return {
-    success: out.success,
-    output: text.decode(out.stdout) + text.decode(out.stderr),
-  };
+  }).spawn();
+  liveChildren.add(child);
+  const timer = setTimeout(
+    () => killGroup(child, "SIGKILL"),
+    opts.timeoutMs ?? 120_000,
+  );
+  try {
+    const out = await child.output();
+    const text = new TextDecoder();
+    return {
+      success: out.success,
+      output: text.decode(out.stdout) + text.decode(out.stderr),
+    };
+  } finally {
+    clearTimeout(timer);
+    liveChildren.delete(child);
+  }
 }
 
 async function must(
@@ -91,7 +131,7 @@ function freePort(): number {
   return port;
 }
 
-/** What has to be torn down; `cleanup()` is safe to call twice. */
+/** What has to be torn down. Every caller of `cleanup()` awaits the same teardown. */
 class Resources {
   tmp: string | null = null;
   container: string | null = null;
@@ -99,30 +139,41 @@ class Resources {
   browser: Browser | null = null;
   /** Files this run wrote into the repository and removes again. */
   files: string[] = [];
-  private done = false;
+  /** [backup, target] pairs: a file the optimizer may overwrite, put back if it is cut short. */
+  restore: Array<[string, string]> = [];
+  private pending: Promise<void> | null = null;
 
-  async cleanup() {
-    if (this.done) return;
-    this.done = true;
-    await this.browser?.close().catch(() => {});
+  cleanup(): Promise<void> {
+    this.pending ??= this.#run();
+    return this.pending;
+  }
+
+  async #run() {
+    for (const child of liveChildren) killGroup(child, "SIGKILL");
+    // A close that waits on a page mid-navigation can hang; Chromium exits with us anyway.
+    await Promise.race([
+      this.browser?.close().catch(() => {}),
+      new Promise((resolve) => setTimeout(resolve, 3000)),
+    ]);
     if (this.app) {
-      try {
-        this.app.kill("SIGTERM");
-        const exited = await Promise.race([
-          this.app.status,
-          new Promise((r) => setTimeout(() => r(null), 5000)),
-        ]);
-        if (exited === null) {
-          this.app.kill("SIGKILL");
-          await this.app.status;
-        }
-      } catch {
-        // already gone
-      }
+      killGroup(this.app, "SIGTERM");
+      const exited = await Promise.race([
+        this.app.status,
+        new Promise((r) => setTimeout(() => r(null), 5000)),
+      ]);
+      if (exited === null) killGroup(this.app, "SIGKILL");
     }
     if (this.container) {
-      await run(["docker", "rm", "-f", this.container], { timeoutMs: 30_000 })
-        .catch(() => {});
+      const removed = await run(["docker", "rm", "-f", this.container], {
+        timeoutMs: 30_000,
+        teardown: true,
+      }).catch((e) => ({ success: false, output: String(e) }));
+      if (!removed.success) {
+        console.error(`docker rm failed: ${removed.output}`);
+      }
+    }
+    for (const [backup, target] of this.restore) {
+      await Deno.copyFile(backup, target).catch(() => {});
     }
     for (const file of this.files) await Deno.remove(file).catch(() => {});
     if (this.tmp) {
@@ -143,8 +194,12 @@ async function main(args: string[]) {
   }
 
   const res = new Resources();
+  // Tear down first, exit 130 only once it has settled.
   const onSignal = () => {
-    res.cleanup().finally(() => Deno.exit(130));
+    interrupted = true;
+    res.cleanup().catch((e) => console.error("cleanup failed:", e)).finally(
+      () => Deno.exit(130),
+    );
   };
   Deno.addSignalListener("SIGINT", onSignal);
   Deno.addSignalListener("SIGTERM", onSignal);
@@ -209,8 +264,9 @@ async function main(args: string[]) {
     });
 
     console.log("Starting the app");
-    res.app = new Deno.Command("deno", {
-      args: ["run", "-A", "--env-file=.env", "apps/api/index.ts"],
+    assertNotInterrupted();
+    res.app = new Deno.Command("setsid", {
+      args: ["deno", "run", "-A", "--env-file=.env", "apps/api/index.ts"],
       cwd: appDir,
       stdout: "null",
       stderr: "null",
@@ -221,7 +277,19 @@ async function main(args: string[]) {
       return r.ok;
     });
 
-    res.browser = await launchChromium();
+    assertNotInterrupted();
+    // Playwright's own SIGINT/SIGTERM handlers call process.exit before our teardown, so they
+    // are off; Chromium is closed by Resources.cleanup().
+    res.browser = await chromium.launch({
+      args: ["--no-sandbox"],
+      handleSIGINT: false,
+      handleSIGTERM: false,
+      handleSIGHUP: false,
+    }).catch((cause) => {
+      throw new Error(
+        `chromium.launch() failed; install it with \`deno run -A npm:playwright@1.63.0 install --with-deps chromium\`: ${cause}`,
+      );
+    });
     const taken = await takeShots({
       browser: res.browser,
       shots,
@@ -234,6 +302,14 @@ async function main(args: string[]) {
     console.log(`Took ${taken} screenshots`);
 
     console.log("Optimizing and stripping metadata");
+    // The optimizer and the strip rewrite the committed WebPs in place; keep
+    // copies so an interrupt in between puts them back.
+    for (const shot of shots) {
+      const target = join(outDir, `${shot.name}.webp`);
+      const backup = join(res.tmp, `${shot.name}.webp.bak`);
+      await Deno.copyFile(target, backup).catch(() => {});
+      res.restore.push([backup, target]);
+    }
     await must("deno task optimize:screenshots", [
       "deno",
       "task",
@@ -251,11 +327,13 @@ async function main(args: string[]) {
     ], {
       cwd: ROOT,
     });
+    res.restore = [];
     for (const webp of webps) console.log(`  ${relative(ROOT, webp)}`);
   } finally {
+    // Keep the listeners until teardown has finished: with none left, a second Ctrl-C kills us.
+    await res.cleanup();
     Deno.removeSignalListener("SIGINT", onSignal);
     Deno.removeSignalListener("SIGTERM", onSignal);
-    await res.cleanup();
   }
 }
 
@@ -332,6 +410,7 @@ async function takeShots(input: ShootInput): Promise<number> {
   await seedContext.close();
 
   for (const shot of shots) {
+    assertNotInterrupted();
     const context = await newContext(shot);
     try {
       const body = {
