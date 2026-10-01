@@ -73,6 +73,14 @@ Deno.test("keys a request through Cloudflare by CF-Connecting-IP", () => {
   );
 });
 
+Deno.test("never keys a request through Cloudflare by X-Forwarded-For", () => {
+  const req = request({
+    "x-real-ip": "104.16.0.1",
+    "x-forwarded-for": "203.0.113.9",
+  });
+  assertEquals(requestClientIp(req, "10.0.0.5"), "104.16.0.1");
+});
+
 Deno.test("keys a request without X-Real-IP by the socket address", () => {
   const req = request({
     "cf-connecting-ip": "198.51.100.7",

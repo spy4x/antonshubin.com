@@ -23,6 +23,7 @@
     "jsr:@spy4x/platform@1.19.0": "1.19.0",
     "jsr:@spy4x/platform@^1.19.0": "1.19.0",
     "jsr:@spy4x/server@1.19.0": "1.19.0",
+    "jsr:@spy4x/server@1.2.0": "1.2.0",
     "jsr:@spy4x/time@1.19.0": "1.19.0",
     "jsr:@spy4x/time@^1.19.0": "1.19.0",
     "jsr:@spy4x/validation@^1.19.0": "1.19.0",
@@ -228,6 +229,14 @@
         "jsr:@std/path@1.1.6",
         "jsr:@std/ulid",
         "npm:arktype"
+      ]
+    },
+    "@spy4x/server@1.2.0": {
+      "integrity": "4f4c7b7f40efbf48e3f65c844a8700a9f7807c7c5ebbe35d5cf3b698f169a74a",
+      "dependencies": [
+        "jsr:@age/age-encryption",
+        "jsr:@std/encoding@1.0.11",
+        "jsr:@std/path@1.1.6"
       ]
     },
     "@spy4x/server@1.19.0": {
