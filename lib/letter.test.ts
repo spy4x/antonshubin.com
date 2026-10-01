@@ -51,7 +51,15 @@ Deno.test("the P.S. links the booking page with its one wording, as the email ch
     `${BASE}/book?utm_source=email&utm_medium=email&utm_campaign=a-campaign`;
   assertStringIncludes(withPs.html, `href="${book.replaceAll("&", "&amp;")}"`);
   assertStringIncludes(withPs.html, `>${BOOK_LABEL}</a>`);
-  assertStringIncludes(withPs.text, `P.S. ${BOOK_LABEL}:\n${book}`);
+  assertStringIncludes(
+    withPs.text,
+    `P.S. Working on something like this? ${BOOK_LABEL}: ${book}`,
+  );
+  assertStringIncludes(
+    withPs.html,
+    "P.S. Working on something like this? <a ",
+  );
+  assertStringIncludes(withPs.html, `${BOOK_LABEL}</a>.</p>`);
   const without = render({ ps: false });
   assertEquals(without.html.includes("P.S."), false);
   assertEquals(without.text.includes("P.S."), false);

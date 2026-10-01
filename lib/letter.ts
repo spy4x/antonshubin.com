@@ -155,9 +155,9 @@ export function renderLetter(input: LetterInput): Letter {
 
   const ps = input.ps === false
     ? ""
-    : `<p style="margin:16px 0 0">P.S. <a href="${
+    : `<p style="margin:16px 0 0">P.S. Working on something like this? <a href="${
       escapeHtml(bookUrl)
-    }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a></p>`;
+    }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a>.</p>`;
   const reply = `<p style="margin:16px 0 0">${escapeHtml(replyLine)}</p>`;
 
   const unsubscribe = input.unsubscribeLink === undefined
@@ -192,7 +192,9 @@ export function renderLetter(input: LetterInput): Letter {
   const textParts = [
     `Anton Shubin\n${ROLE}`,
     ...input.blocks.map((b) => b.text).filter((t) => t !== ""),
-    ...(input.ps === false ? [] : [`P.S. ${BOOK_LABEL}:\n${bookUrl}`]),
+    ...(input.ps === false
+      ? []
+      : [`P.S. Working on something like this? ${BOOK_LABEL}: ${bookUrl}`]),
     replyLine,
     `--\n${input.reason}${
       input.unsubscribeLink === undefined
