@@ -331,10 +331,13 @@ body {
    paints outside the box (the timeline's dots sit 7px left of their line),
    and Safari has no `overflow-clip-margin`, so the box itself grows by 0.5rem
    on each side: the padding is cancelled by the negative margin, so nothing
-   moves. */
+   moves. The closing band is left out: it draws its own border and padding,
+   and nothing paints outside it. */
 [data-home-section]:not([data-home-section="hero"]) {
   content-visibility: auto;
   contain-intrinsic-size: auto 40rem;
+}
+[data-home-section]:not([data-home-section="hero"], [data-home-section="cta"]) {
   margin-inline: -0.5rem;
   padding-inline: 0.5rem;
 }

@@ -62,6 +62,24 @@ for (const width of [390, 1440]) {
         );
       }
       assertEquals(clipped, []);
+      // The closing band keeps its own box: it lines up with the hero's
+      // column and keeps its side padding (24px, 32px from 640px).
+      const band = await page.evaluate(() => {
+        const hero = document.querySelector('[data-home-section="hero"]')!
+          .getBoundingClientRect();
+        const cta = document.querySelector('[data-home-section="cta"]')!;
+        const r = cta.getBoundingClientRect();
+        return {
+          left: Math.round(r.left - hero.left),
+          right: Math.round(r.right - hero.right),
+          padding: getComputedStyle(cta).paddingLeft,
+        };
+      });
+      assertEquals(band, {
+        left: 0,
+        right: 0,
+        padding: width < 640 ? "24px" : "32px",
+      });
     } finally {
       await browser?.close();
       await site.stop();
