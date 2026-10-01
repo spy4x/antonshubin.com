@@ -1,6 +1,16 @@
-import type { ComponentChildren, JSX } from "preact";
+import type { ComponentChildren } from "preact";
+import {
+  Button as LibraryButton,
+  buttonClasses,
+  type ButtonLinkProps as LibraryLinkProps,
+  type ButtonProps as LibraryButtonProps,
+} from "@spy4x/preact-ui/button";
+import { join } from "@spy4x/preact-cn/join";
 
 export type ButtonVariant = "primary" | "secondary";
+
+/** What the site sets itself and never takes from a call site: the size. */
+type SiteOwned = "variant" | "size" | "class" | "children";
 
 interface SharedProps {
   variant?: ButtonVariant;
@@ -8,132 +18,97 @@ interface SharedProps {
   children: ComponentChildren;
 }
 
-type AnchorProps =
-  & SharedProps
-  & { href: string }
-  & Omit<
-    JSX.HTMLAttributes<HTMLAnchorElement>,
-    "class" | "href"
-  >;
+type AnchorProps = SharedProps & Omit<LibraryLinkProps, SiteOwned>;
 
 type ButtonProps =
   & SharedProps
   & { href?: undefined }
-  & Omit<
-    JSX.ButtonHTMLAttributes<HTMLButtonElement>,
-    "class"
-  >;
+  & Omit<LibraryButtonProps, SiteOwned>;
 
 /**
- * The `@spy4x/preact-ui/button` variant each site variant copies. The site's
- * secondary button is the library's `outline` (a control-coloured border), not
- * its `secondary` (a filled box).
+ * The `@spy4x/preact-ui/button` variant each site variant renders. The site's
+ * secondary button is the library's `ghost` (a transparent box) with a border
+ * added in `SITE_VARIANT`: the library's `outline` fills itself with Paper,
+ * which the site's outline button never had.
  */
 export const LIBRARY_VARIANT = {
   primary: "primary",
-  secondary: "outline",
+  secondary: "ghost",
 } as const;
 
-/** What the site adds to every button: Plex Sans, not the inherited font. */
-export const SITE_LOOK = "font-sans";
-
-/** The radius the site's buttons always had, and semibold: Plex Sans ships no 500. */
-const SHAPE = "rounded-lg font-semibold";
-
 /**
- * What the site puts in place of the classes in `SIZE_RESET`, per variant.
+ * What the site adds to the library's classes, per variant. Plex Sans, not
+ * the inherited font; the radius the site's buttons always had, marked
+ * important because the library appends a caller's classes after its own
+ * `rounded-md` instead of merging them (no call site sets a radius of its
+ * own). The library's `font-medium` already renders 600 here, since
+ * `--font-weight-medium` is 600 (Plex Sans ships no 500). The size is the
+ * library's `none`, so the call site's own padding, gap and text size decide.
  */
 export const SITE_VARIANT: Record<ButtonVariant, string> = {
   // A transparent border, so Book is the same size as an outline button beside it.
-  primary: `${SHAPE} border border-transparent`,
-  // The outline button sits on whatever surface is behind it, not on a Paper
-  // fill. Its border names Rule strong directly (the same colour as the
-  // library's control border token): test/frame.test.ts finds the
-  // not-found page's buttons by that class.
-  secondary: `${SHAPE} bg-transparent border-rule-strong`,
-};
-
-/**
- * The library button's classes the site leaves out: its `md` gap, padding
- * and text size, so a call site's own sizing decides, and the radius, weight,
- * fill and border that `SITE_VARIANT` replaces. Since 2.0.0 the library
- * appends a caller's classes instead of merging them, so leaving these out
- * is the only way to replace them without `!`, which would also beat a call
- * site's sizing.
- */
-export const SIZE_RESET =
-  "gap-2 px-3 py-2 text-sm rounded-md font-medium bg-surface border-control";
-
-/**
- * The class string the library's `buttonClasses()` gives each variant, less
- * `SIZE_RESET`, plus the site's look, written out. Copied rather than
- * computed, so an island that imports `buttonClass`, such as the project
- * gallery, ships no library code. No padding, gap or text size here, so a
- * call site's sizing never competes with a default.
- * `test/library-classes.test.tsx` fails when this drifts from the library.
- * The library's `dark:` classes are left out: the site has no `.dark`.
- */
-export const BUTTON_CLASSES: Record<ButtonVariant, string> = {
-  primary:
-    "inline-flex items-center justify-center transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 bg-accent-900 text-accent-foreground hover:bg-accent-800 rounded-lg font-semibold font-sans border border-transparent",
-  secondary:
-    "inline-flex items-center justify-center transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 border text-foreground hover:bg-hover rounded-lg font-semibold font-sans bg-transparent border-rule-strong",
+  primary: "font-sans rounded-lg! border border-transparent",
+  // Rule strong, the control border colour. test/frame.test.ts finds the
+  // not-found page's buttons by this class.
+  secondary: "font-sans rounded-lg! border border-rule-strong",
 };
 
 /**
  * The primary/secondary button classes as a plain string, for the call sites
- * that can't render a `<Button>` directly: `components/BookCallLink.tsx`
- * (it owns the `href`/`target`/empty-`url` behaviour `<Button href=…>`
- * doesn't), a few links and `islands/ImageGallery.tsx`. `extra` adds the
- * call site's sizing and layout, joined plainly (see `BUTTON_CLASSES`).
- * `variant="primary"` is reserved for the Book action — see `Button`'s own
- * doc comment.
+ * that style their own `<a>`: a link that needs its own `data-*` markers and
+ * `islands/ImageGallery.tsx`. `extra` adds the call site's sizing and layout,
+ * appended plainly by the library's `join` (no tailwind-merge reaches an
+ * island). `variant="primary"` is reserved for the Book action — see
+ * `Button`'s own doc comment.
  */
 export function buttonClass(
   variant: ButtonVariant = "secondary",
   extra = "",
 ): string {
-  return [BUTTON_CLASSES[variant], extra].filter(Boolean).join(" ");
+  return buttonClasses(
+    LIBRARY_VARIANT[variant],
+    "none",
+    join(SITE_VARIANT[variant], extra),
+  );
 }
 
 /**
- * The site's one button component (#184), drawn with the library button's
- * classes (`BUTTON_CLASSES`). `variant="primary"` is reserved for the booking
- * action — never use it for anything else, or the accent-is-only-for-Book
- * contrast test fails. Renders an `<a>` when `href` is given and a
- * `<button type="button">` otherwise, both with `buttonClass()`: the
- * library's `<Button>` appends a caller's classes since 2.0.0, so it cannot
- * leave out `SIZE_RESET`. Everything else (text, click handlers) passes
- * through unchanged. A primary button also gets `data-primary-book`, the
- * marker `test/visual-system.browser.test.ts`'s accent-usage guard looks for
+ * The site's one button component (#184): `@spy4x/preact-ui/button`'s
+ * `Button` with `size="none"`, the variant mapped by `LIBRARY_VARIANT` and the
+ * site's look from `SITE_VARIANT`. `variant` defaults to `secondary`.
+ * `variant="primary"` is reserved for the booking action — never use it for
+ * anything else, or the accent-is-only-for-Book contrast test fails. Renders
+ * an `<a>` when `href` is given and a `<button type="button">` otherwise.
+ * A primary button also gets `data-primary-book`, the marker
+ * `test/visual-system.browser.test.ts`'s accent-usage guard looks for
  * instead of guessing from text content or element shape.
  */
 export default function Button(
-  { variant = "secondary", class: className, children, href, ...rest }:
+  { variant = "secondary", class: className, href, ...rest }:
     | AnchorProps
     | ButtonProps,
 ) {
   const marker = variant === "primary" ? { "data-primary-book": true } : {};
+  const look = {
+    variant: LIBRARY_VARIANT[variant],
+    size: "none" as const,
+    class: join(SITE_VARIANT[variant], className),
+  };
   if (href !== undefined) {
     return (
-      <a
-        href={href}
-        class={buttonClass(variant, className)}
+      <LibraryButton
+        {...(rest as Omit<AnchorProps, "href" | keyof SharedProps>)}
         {...marker}
-        {...(rest as JSX.HTMLAttributes<HTMLAnchorElement>)}
-      >
-        {children}
-      </a>
+        {...look}
+        href={href}
+      />
     );
   }
   return (
-    <button
-      type="button"
-      class={buttonClass(variant, className)}
+    <LibraryButton
+      {...(rest as Omit<ButtonProps, "href" | keyof SharedProps>)}
       {...marker}
-      {...(rest as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}
-    >
-      {children}
-    </button>
+      {...look}
+    />
   );
 }

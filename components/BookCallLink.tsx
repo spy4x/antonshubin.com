@@ -1,6 +1,6 @@
 import type { ComponentChildren } from "preact";
 import { NewTabHint } from "./NewTabHint.tsx";
-import { buttonClass, type ButtonVariant } from "./Button.tsx";
+import Button, { type ButtonVariant } from "./Button.tsx";
 import { type EventAttrs, eventAttrs } from "../lib/analytics.ts";
 
 interface BookCallLinkProps {
@@ -40,12 +40,9 @@ interface BookCallLinkProps {
  * children, or nothing when `url` is empty. Every call site used to render
  * its own `<a href={SCHEDULE_URL}>` inline, which produced `href=""` — and a
  * click that just reloaded the page — whenever `SCHEDULE_URL` was unset and
- * there was no per-item override (#156). Styling goes through
- * `components/Button.tsx`'s `buttonClass()` (#184, over
- * `@spy4x/preact-ui/button` since #195) — the same source
- * `<Button>` itself uses — rather than each call site carrying its own copy
- * of the primary/secondary class string. A `variant="primary"` link also
- * carries `data-primary-book`, the marker
+ * there was no per-item override (#156). It renders the site's `Button`
+ * (`components/Button.tsx`, the library button since #371), which also
+ * stamps `data-primary-book` on a `variant="primary"` link, the marker
  * `test/visual-system.browser.test.ts`'s accent-usage guard looks for.
  */
 export function BookCallLink({
@@ -61,19 +58,19 @@ export function BookCallLink({
 }: BookCallLinkProps) {
   if (!url) return null;
   return (
-    <a
+    <Button
       href={url}
       target={target}
       rel={rel}
       {...event}
       data-e2e={dataE2e}
       data-primary-cta={dataPrimaryCta}
-      {...(variant === "primary" ? { "data-primary-book": true } : {})}
-      class={buttonClass(variant, extraClass)}
+      variant={variant}
+      class={extraClass}
     >
       {children}
       {target === "_blank" && <NewTabHint />}
-    </a>
+    </Button>
   );
 }
 
