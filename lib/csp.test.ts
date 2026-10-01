@@ -42,7 +42,7 @@ Deno.test("adds the Umami origin to script-src and connect-src only when given",
   );
   assertEquals(
     directive(withUmami, "connect-src"),
-    "connect-src 'self' https://api.github.com https://stats.antonshubin.com",
+    "connect-src 'self' https://stats.antonshubin.com",
   );
 
   const withoutUmami = buildCsp({ nonce: "n" });
@@ -52,7 +52,7 @@ Deno.test("adds the Umami origin to script-src and connect-src only when given",
   );
   assertEquals(
     directive(withoutUmami, "connect-src"),
-    "connect-src 'self' https://api.github.com",
+    "connect-src 'self'",
   );
 });
 

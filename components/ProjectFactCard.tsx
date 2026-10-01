@@ -3,7 +3,6 @@ import { formatPeriod, type Project } from "../lib/data.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { projectStatus } from "../lib/work.ts";
-import GhStars from "../islands/GhStars.tsx";
 import { BookCallLink } from "./BookCallLink.tsx";
 import {
   IconArrowRight as ArrowRightIcon,
@@ -114,20 +113,6 @@ export function ProjectFactCard({ project }: { project: Project }) {
                 </WithNote>
               )
               : liveLink}
-          </Fact>
-        )}
-        {project.ghRepo && (
-          <Fact term="Code">
-            <a
-              href={`https://github.com/${project.ghRepo}`}
-              target="_blank"
-              {...eventAttrs("outbound", { to: "github", item: project.slug })}
-              class={cn(LINK, "inline-flex items-center gap-2")}
-            >
-              GitHub
-              <GhStars repo={project.ghRepo} />
-              <NewTabHint />
-            </a>
           </Fact>
         )}
       </dl>

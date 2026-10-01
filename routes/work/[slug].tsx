@@ -53,10 +53,10 @@ function temporalCoverage(period: Period): string {
 
 /**
  * Build the project's JSON-LD node from fields the `Project` interface
- * already holds — no invented dates, ratings or facts. `SoftwareSourceCode`
- * when the project links a repo (`ghRepo`), otherwise `CreativeWork`. The
- * `author` and `creator` point at the site-wide Person node and `isPartOf` at
- * the WebSite node, both from `components/SEOHead.tsx` (issue #167). `image`
+ * already holds — no invented dates, ratings or facts. The node is a
+ * `CreativeWork`. The `author` and `creator` point at the site-wide Person
+ * node and `isPartOf` at the WebSite node, both from `components/SEOHead.tsx`
+ * (issue #167). `image`
  * lists the hero screenshot first, then the rest, then the logo; `abstract`
  * is the lead line under the page's `<h1>` (#246).
  *
@@ -77,20 +77,14 @@ function projectJsonLd(project: Project, canonical: string) {
       : []),
   ];
 
-  const codeRepository = project.ghRepo
-    ? `https://github.com/${project.ghRepo}`
-    : undefined;
-  // Financy's externalURL is its GitHub repo itself, so sameAs would just
-  // repeat codeRepository — only add it when it points somewhere else.
-  const sameAs = project.externalURL && !project.externalURLDead &&
-      project.externalURL !== codeRepository
+  const sameAs = project.externalURL && !project.externalURLDead
     ? [project.externalURL]
     : undefined;
   const person = { "@id": "https://antonshubin.com/#person" };
 
   return {
     "@context": "https://schema.org",
-    "@type": project.ghRepo ? "SoftwareSourceCode" : "CreativeWork",
+    "@type": "CreativeWork",
     "@id": `${canonical}#project`,
     "name": project.title,
     "description": project.description,
@@ -103,7 +97,6 @@ function projectJsonLd(project: Project, canonical: string) {
     ...(project.tags && project.tags.length > 0
       ? { "keywords": project.tags.join(", ") }
       : {}),
-    ...(codeRepository ? { "codeRepository": codeRepository } : {}),
     ...(sameAs ? { "sameAs": sameAs } : {}),
     ...(project.archived ? { "creativeWorkStatus": "Archived" } : {}),
     ...(project.period

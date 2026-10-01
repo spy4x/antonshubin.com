@@ -1,7 +1,6 @@
 // Guards the project JSON-LD added for issue #167: every /work/<slug>
-// page must carry exactly one project node (SoftwareSourceCode when the
-// project has a repo, CreativeWork otherwise) whose author points at the
-// site-wide Person node.
+// page must carry exactly one project node (a CreativeWork) whose author
+// points at the site-wide Person node.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { jsonLd } from "./html.ts";
@@ -27,7 +26,7 @@ const allProjects = projects.freelance.filter((p) => p.slug);
 function findProjectNode(blocks: unknown[]) {
   return blocks.find((d) => {
     const type = (d as { "@type"?: string })["@type"];
-    return type === "SoftwareSourceCode" || type === "CreativeWork";
+    return type === "CreativeWork";
   }) as
     | {
       "@type": string;
@@ -54,7 +53,7 @@ siteTest(
       const blocks = jsonLd(html);
       const projectNodes = blocks.filter((d) => {
         const type = (d as { "@type"?: string })["@type"];
-        return type === "SoftwareSourceCode" || type === "CreativeWork";
+        return type === "CreativeWork";
       });
       assertEquals(
         projectNodes.length,
@@ -73,11 +72,7 @@ siteTest(
         sourceOrganization?: unknown;
       };
 
-      assertEquals(
-        node["@type"],
-        project.ghRepo ? "SoftwareSourceCode" : "CreativeWork",
-        project.slug,
-      );
+      assertEquals(node["@type"], "CreativeWork", project.slug);
       assertEquals(node.author?.["@id"], PERSON_ID, project.slug);
       assertEquals(node.name, project.title, project.slug);
       assert(
@@ -100,15 +95,7 @@ siteTest(
         );
       }
 
-      if (project.ghRepo) {
-        assertEquals(
-          node.codeRepository,
-          `https://github.com/${project.ghRepo}`,
-          project.slug,
-        );
-      } else {
-        assertEquals(node.codeRepository, undefined, project.slug);
-      }
+      assertEquals(node.codeRepository, undefined, project.slug);
     }
   },
 );
@@ -125,6 +112,21 @@ siteTest(
     const node = findProjectNode(jsonLd(html));
     assert(node, "no project JSON-LD node found");
     assertEquals(node.sameAs, undefined, project.slug);
+  },
+);
+
+siteTest(
+  "a live external link becomes the project's sameAs",
+  async (site) => {
+    const project = allProjects.find((p) => p.slug === "foodrazor")!;
+    assert(
+      project.externalURL && !project.externalURLDead,
+      "fixture project has no live externalURL — pick another slug",
+    );
+    const html = await site.html(`/work/${project.slug}`);
+    const node = findProjectNode(jsonLd(html));
+    assert(node, "no project JSON-LD node found");
+    assertEquals(node.sameAs, [project.externalURL], project.slug);
   },
 );
 

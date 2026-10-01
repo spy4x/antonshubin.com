@@ -64,8 +64,6 @@ export interface Project {
    * project's /work archive row, worded as the company's outcome.
    */
   companyOutcome?: { text: string; href: string };
-  /** GitHub repo path like "spy4x/caldav-mcp" for star badge */
-  ghRepo?: string;
 }
 
 /** Years a project ran: `to` omitted means one year, `ongoing` means still running. */

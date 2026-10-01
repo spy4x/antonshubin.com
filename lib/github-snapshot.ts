@@ -92,5 +92,5 @@ export function ciReading(ci: CiSnapshot | null): CiReading {
   }
 }
 
-/** Stars are shown only from 25 up, as `islands/GhStars.tsx` does. */
+/** Stars are shown only from 25 up. */
 export const MIN_STARS_SHOWN = 25;
