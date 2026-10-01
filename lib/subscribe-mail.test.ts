@@ -13,7 +13,7 @@ const SUB: NewSubscriber = {
 };
 const BASE = "https://example.com";
 
-Deno.test("welcomes the subscriber and notifies the owner, both with the unsubscribe link", async () => {
+Deno.test("welcomes the subscriber in the letter layout and notifies the owner in plain text, both with the unsubscribe link", async () => {
   const relay = fakeRelay();
   const log = recordingLog();
   await sendSubscribeMails(SUB, {
@@ -30,8 +30,9 @@ Deno.test("welcomes the subscriber and notifies the owner, both with the unsubsc
   assertStringIncludes(String(welcome.text), `${BASE}/saas-architecture-guide`);
   assertStringIncludes(
     String(welcome.text),
-    `Unsubscribe anytime:\n${SUB.unsubscribeLink}`,
+    `Unsubscribe: ${SUB.unsubscribeLink}`,
   );
+  assertStringIncludes(String(welcome.html), `href="${SUB.unsubscribeLink}"`);
   assertEquals(
     notice.subject,
     "[Newsletter] New subscriber: reader@example.com",
@@ -88,7 +89,7 @@ Deno.test("logs a welcome to an address the mail library cannot parse as failed,
   assertStringIncludes(log.errors[0], "[SUBSCRIBE] welcome failed:");
 });
 
-Deno.test("mails the confirmation link to the address that asked, with replies to the owner", async () => {
+Deno.test("mails the confirmation link to the address that asked, in the letter layout and with no unsubscribe link", async () => {
   const relay = fakeRelay();
   const log = recordingLog();
   await sendConfirmationMail(
@@ -108,10 +109,16 @@ Deno.test("mails the confirmation link to the address that asked, with replies t
     String(relay.mails[0].text),
     `${BASE}/subscribe/confirm?token=abc`,
   );
+  const mail = relay.mails[0];
+  assertStringIncludes(String(mail.html), `${BASE}/img/email/anton-96.png`);
   assertStringIncludes(
-    JSON.stringify(relay.mails[0].replyTo),
-    "owner@example.com",
+    String(mail.html),
+    `href="${BASE}/subscribe/confirm?token=abc"`,
   );
+  assertEquals(String(mail.html).includes("Unsubscribe"), false);
+  assertEquals(String(mail.html).includes("P.S."), false);
+  assertEquals(mail.headers, undefined);
+  assertEquals(mail.replyTo, undefined);
   assertEquals(log.errors, []);
 });
 
@@ -136,7 +143,7 @@ Deno.test("logs a confirmation the relay refuses as failed, and says so when SMT
   ]);
 });
 
-Deno.test("sets Reply-To on the welcome to the owner's address, and not on the owner notice", async () => {
+Deno.test("the welcome carries a one-click List-Unsubscribe to the subscriber's own link, and neither subscriber mail sets Reply-To", async () => {
   const relay = fakeRelay();
   await sendSubscribeMails(SUB, {
     sender: fakeSender(relay),
@@ -144,11 +151,13 @@ Deno.test("sets Reply-To on the welcome to the owner's address, and not on the o
     baseUrl: BASE,
     log: recordingLog(),
   });
-  assertStringIncludes(
-    JSON.stringify(relay.mails[0].replyTo),
-    "owner@example.com",
-  );
+  const headers = relay.mails[0].headers as Record<string, string>;
+  assertEquals(headers["List-Unsubscribe"], `<${SUB.unsubscribeLink}>`);
+  assertEquals(headers["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
+  assertEquals(relay.mails[0].replyTo, undefined);
   assertEquals(relay.mails[1].replyTo, undefined);
+  assertEquals(relay.mails[1].headers, undefined);
+  assertEquals(relay.mails[1].html, undefined);
 });
 
 Deno.test("never logs the subscriber's address when the relay's error names it", async () => {
