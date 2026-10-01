@@ -269,12 +269,12 @@ Deno.test("parseBlogFrontMatter names the file and says what to do when front ma
 
 Deno.test("parseBlogFrontMatter fills a {proof:<id>} placeholder with the lib/proof.ts figure", () => {
   const blog = parseBlogFrontMatter(
-    '---\ntitle: "{proof:jobs}+ projects"\ndescription: "After {proof:jobs}+ jobs."\n---\nBody.\n',
+    '---\ntitle: "{proof:projects} projects"\ndescription: "After {proof:jobs} jobs."\n---\nBody.\n',
     "content/blog/x.md",
   );
   assertEquals(blog, {
-    title: `${proof("jobs")}+ projects`,
-    description: `After ${proof("jobs")}+ jobs.`,
+    title: `${proof("projects")} projects`,
+    description: `After ${proof("jobs")} jobs.`,
   });
 });
 

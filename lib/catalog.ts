@@ -6,8 +6,8 @@
  * a price by hand. `lib/catalog.test.ts` pins the four prices and the six
  * redirects; `test/structure.test.ts` fails when a dollar amount that is not in
  * this file shows up on a page listed in its `PRICE_PAGES`, or in an llms file.
- * The same list is used on Upwork and neatsoft.dev, so changing a number here
- * is the first of three edits, not the only one.
+ * The same list is used on Upwork, so changing a number here is the first of
+ * two edits, not the only one. neatsoft.dev shows no prices.
  *
  * This module reads no environment variable, so tests and scripts can load
  * it without environment access; its one import, `lib/promises.ts`, is the
