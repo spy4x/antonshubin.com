@@ -181,7 +181,7 @@ Deno.test("the booking page's side panel states who, time zone, email, Telegram,
         "Anton Shubin",
         ROLE,
         TIMEZONE_LABEL,
-        "hello@antonshubin.com",
+        "hi@antonshubin.com",
         "@spy4x",
         "Hire me there",
         "Invoices are issued by NeatSoft PTE LTD, Singapore (UEN 202300222R), where I'm co-founder and CEO.",
@@ -249,7 +249,7 @@ Deno.test("without SCHEDULE_URL the booking page leads with the written brief", 
     const text = visibleText(html);
     assertFalse(text.includes(BOOK_H1));
     assertFalse(text.includes("After the call"));
-    assert(text.includes("hello@antonshubin.com"));
+    assert(text.includes("hi@antonshubin.com"));
   } finally {
     await site.stop();
   }
@@ -310,7 +310,7 @@ Deno.test("the booking page carries a ContactPage node, and every page a contact
     assertEquals(person?.["contactPoint"], {
       "@type": "ContactPoint",
       "contactType": "sales",
-      "email": "hello@antonshubin.com",
+      "email": "hi@antonshubin.com",
       "url": "https://antonshubin.com/book",
       "availableLanguage": ["en", "ru"],
     });

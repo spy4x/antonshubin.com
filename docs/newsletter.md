@@ -49,7 +49,7 @@ Layout and sender (#364): the confirmation mail, the welcome mail and every
 newsletter use one letter layout (`lib/letter.ts`): Anton's portrait and name,
 the content, a P.S. with the booking link (not in the confirmation), a "reply to
 this email" line and a small footer. Each has an HTML and a plain-text part. The
-sender is `Anton Shubin <hello@antonshubin.com>` (the `SMTP_FROM` env value), a
+sender is `Anton Shubin <hi@antonshubin.com>` (the `SMTP_FROM` env value), a
 mailbox that reaches Anton, so none of these mails sets `Reply-To`; the lead
 mail still does (the visitor's address). The welcome mail and every newsletter
 carry `List-Unsubscribe` and `List-Unsubscribe-Post` (one-click, RFC 8058) for
