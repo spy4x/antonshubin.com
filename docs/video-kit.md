@@ -87,8 +87,10 @@ two commands.
    after the cuts.
 4. `deno task video-cut render <whisper.json> <media> <slug> <edit.json> [--burn]`
    checks the list first. A bad range stops the run, naming it and why:
-   `cuts[1] 5.5–8 s: overlaps with the range before it (5–6 s)`. Use the same
-   `--min-silence` as in step 2. Then it writes, in `videos/<slug>/cut/`:
+   `cuts[1] 5.5–8 s: overlaps with the range before it (5–6 s)`. It reads the
+   silences `prepare` wrote to `silences.json` (there is no `--min-silence` on
+   `render`), and stops with a message naming `prepare` if the file is missing.
+   Then it writes, in `videos/<slug>/cut/`:
    - `long.mp4`: the media with the silences and the listed cuts removed;
    - `long.srt`: captions on the cut timeline (`--burn` also writes
      `long-captioned.mp4`);
