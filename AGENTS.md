@@ -413,12 +413,12 @@ The library's components are coloured by the `:root` block under `@theme` in
 `--color-accent-900`, ...) points at a site token, so `@theme` stays the only
 place a colour is written. The selection tokens (`--color-selected*`) are Lamp
 and Parchment, never the accent. `vite.config.ts` splices the library's
-`preset.css` into the stylesheet; its `tokens.css` is not imported, because it
-would redefine `--color-accent` and `--font-sans`. Tailwind never scans the
-library, so `assets/styles.css` lists the classes of the modules the site uses
-in `@source inline(...)` lines; `test/library-classes.test.tsx` fails when a
-class a library component renders has no rule. `--font-weight-medium` is 600,
-since Plex Sans has no 500 file.
+`preset.css`'s "Colour atoms" section into the stylesheet (in reference mode);
+its `tokens.css` is not imported, because it would redefine `--color-accent` and
+`--font-sans`. Tailwind never scans the library, so `assets/styles.css` lists
+the classes of the modules the site uses in `@source inline(...)` lines;
+`test/library-classes.test.tsx` fails when a class a library component renders
+has no rule. `--font-weight-medium` is 600, since Plex Sans has no 500 file.
 
 `@spy4x/preact-ui/status-mark`'s `StatusMark` renders a shape plus a word for a
 project or tool status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`,
