@@ -212,18 +212,18 @@ reference.
   entries in `lib/proof.ts`: `jobs` ("80", always next to Upwork) and `projects`
   ("80+", the whole career).
 - `lib/proof.ts` is the only place an Upwork number or label (jobs, job success
-  rate, amount earned, hours, Expert-Vetted, Top 1%) is written. The home page,
-  `components/SEOHead.tsx`'s JSON-LD, the sitemap comment, both llms files,
-  `islands/LeadForm.tsx`, `routes/saas-architecture-guide.tsx`,
-  `lib/subscribe-mail.ts`'s welcome email and `lib/tools.ts`'s template entry
-  all read a value through `proof(id)`. A post's front matter writes a figure as
-  a `{proof:<id>}` placeholder (the template post's title uses `{proof:jobs}`),
-  which `lib/blog-posts.ts`'s `fillProof()` replaces.
-  `test/proof-promises-notes.test.ts`'s proof guard scans `routes/`,
-  `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and every
-  `*.test.ts`) for each figure's exact rendered text — including the
-  quoted-literal and case-insensitive forms a hand revert of the home proof
-  strip would take (with an explicit allowlist entry for
+  rate, amount earned, hours, Expert-Vetted, Top 1%) or the career project count
+  is written. The home page, `components/SEOHead.tsx`'s JSON-LD, the sitemap
+  comment, both llms files, `islands/LeadForm.tsx`,
+  `routes/saas-architecture-guide.tsx`, `lib/subscribe-mail.ts`'s welcome email
+  and `lib/tools.ts`'s template entry all read a value through `proof(id)`. A
+  post's front matter writes a figure as a `{proof:<id>}` placeholder (the
+  template post's title uses `{proof:projects}`), which `lib/blog-posts.ts`'s
+  `fillProof()` replaces. `test/proof-promises-notes.test.ts`'s proof guard
+  scans `routes/`, `components/`, `islands/` and `lib/` (excluding
+  `lib/proof.ts` and every `*.test.ts`) for each figure's exact rendered text —
+  including the quoted-literal and case-insensitive forms a hand revert of the
+  home proof strip would take (with an explicit allowlist entry for
   `islands/MeetEmbed.tsx`'s unrelated CSS `width: "100%"`) — and fails on a
   hand-written copy.
 - `lib/promises.ts` holds the five promises' title, description and "why this

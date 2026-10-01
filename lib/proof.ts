@@ -1,6 +1,6 @@
 /**
- * Every proof figure (the Upwork profile's, plus the career project count): the single source, like `lib/catalog.ts` is for
- * prices. The home page, `components/SEOHead.tsx`'s JSON-LD, the sitemap
+ * Every proof figure (the Upwork profile's, plus the career project count):
+ * the single source, like `lib/catalog.ts` is for prices. The home page, `components/SEOHead.tsx`'s JSON-LD, the sitemap
  * comment, both llms files, `islands/LeadForm.tsx`, `routes/blog/index.tsx`,
  * `routes/saas-architecture-guide.tsx`, `routes/api/subscribe.ts` and
  * `lib/data.ts` all read a value from here instead of writing a number or a
@@ -15,8 +15,8 @@
 export interface ProofFigure {
   id: string;
   /**
-   * The value exactly as the public Upwork profile shows it and as it is
-   * rendered, e.g. "80", "100%", "$300K+". A "+" belongs to the value; no
+   * The value exactly as it is rendered, e.g. "80", "100%", "$300K+". An
+   * Upwork figure matches the public profile; `projects` is Anton's own count. A "+" belongs to the value; no
    * caller appends one.
    */
   value: string;
