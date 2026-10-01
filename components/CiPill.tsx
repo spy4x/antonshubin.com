@@ -31,7 +31,7 @@ export function CiPill(
       class={badgeClasses(
         "gray",
         "filled",
-        "relative z-10 gap-1.5 px-2.5 border-0 rounded-full text-[length:inherit] font-normal hover:underline underline-offset-4",
+        "relative z-10 gap-1.5 px-2.5 border-0 rounded-full text-[length:inherit] hover:underline underline-offset-4",
       )}
     >
       <span class={labelHidden ? "sr-only" : "text-sm text-parchment"}>CI</span>

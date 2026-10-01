@@ -18,6 +18,11 @@ const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
  * classes (`COMPONENT_CLASSES`), which more than doubled the stylesheet.
  * `assets/styles.css` sets the tokens itself and lists, in its own
  * `@source inline(...)`, only the classes of the components the site uses.
+ *
+ * The text goes in as `@media reference { ... }`, Tailwind's form of
+ * `@import "…" reference`: its utilities can still be generated, but its own
+ * rules (the `.theme-base` document styles, the dark table and form chrome,
+ * map markers) are not emitted, since no element here uses them.
  */
 function preactPreset(): Plugin {
   return {
@@ -28,7 +33,10 @@ function preactPreset(): Plugin {
       if (!code.includes(PRESET_IMPORT)) {
         throw new Error(`${STYLESHEET} must contain ${PRESET_IMPORT}`);
       }
-      return code.replace(PRESET_IMPORT, () => PRESET_CSS);
+      return code.replace(
+        PRESET_IMPORT,
+        () => `@media reference {\n${PRESET_CSS}\n}`,
+      );
     },
   };
 }
