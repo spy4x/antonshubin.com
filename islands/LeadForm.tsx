@@ -4,6 +4,7 @@ import {
   IconArrowRight as ArrowRightIcon,
   IconCheck as CheckIcon,
 } from "@spy4x/preact-icons";
+import { honeypotField } from "@spy4x/preact-ui/honeypot";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { proof } from "../lib/proof.ts";
 import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
@@ -18,6 +19,9 @@ type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
 /** What the written brief promises; the form and `/book` without a scheduler both say it. */
 export const BRIEF_PROMISE =
   "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment. I reply by email myself, within one working day.";
+
+/** The field name `lib/lead.ts` reads back as the honeypot. */
+const HONEYPOT_FIELD = "_website";
 
 /** The catalog item a visitor came from (`/book?service=<slug>`), already checked against `lib/catalog.ts`. */
 export interface LeadService {
@@ -99,6 +103,10 @@ export default function LeadForm(
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
+    // Read before the first `await`: `currentTarget` is gone afterwards.
+    const trap = (e.currentTarget as HTMLFormElement).elements.namedItem(
+      HONEYPOT_FIELD,
+    ) as HTMLInputElement | null;
     const form: FormState = {
       name: name.value,
       email: email.value,
@@ -124,7 +132,7 @@ export default function LeadForm(
           ...form,
           ...(service ? { service: service.slug } : {}),
           _t: pageLoad.value,
-          _website: "",
+          [HONEYPOT_FIELD]: trap?.value ?? "",
         }),
       });
       if (!resp.ok) {
@@ -203,18 +211,8 @@ export default function LeadForm(
         )}
 
         <form onSubmit={handleSubmit} class="space-y-4">
-          {/* Honeypot — off-screen so bots fill it, humans never see */}
-          <div class="absolute -left-[9999px]" aria-hidden="true">
-            <label for="lead-website">Website</label>
-            <input
-              id="lead-website"
-              name="_website"
-              type="text"
-              tabIndex={-1}
-              autoComplete="off"
-              value=""
-            />
-          </div>
+          {/* Off-screen field bots fill and people never see. */}
+          {honeypotField(HONEYPOT_FIELD, "Website")}
 
           <div>
             <label for="lead-name" class="sr-only">Your name</label>

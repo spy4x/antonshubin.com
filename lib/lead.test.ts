@@ -1,5 +1,10 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
-import { acceptLead, type AcceptLeadDeps, leadService } from "./lead.ts";
+import {
+  acceptLead,
+  type AcceptLeadDeps,
+  leadService,
+  validateLead,
+} from "./lead.ts";
 import { catalogItem } from "./catalog.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
@@ -119,4 +124,16 @@ Deno.test("refuses a brief that holds only the service prefill, and mails nothin
   await outcome.mail;
   assertEquals(outcome.status, 200);
   assertEquals(relay.mails.length, 1);
+});
+
+Deno.test("refuses a filled honeypot and accepts an empty, missing or blank one", () => {
+  const now = Date.now();
+  const lead = { ...LEAD, email: "jane@example.com" };
+  assertEquals(
+    validateLead({ ...lead, _website: "https://spam.example.com" }, now).ok,
+    false,
+  );
+  assertEquals(validateLead({ ...lead, _website: "   " }, now).ok, true);
+  assertEquals(validateLead({ ...lead, _website: "" }, now).ok, true);
+  assertEquals(validateLead({ ...lead }, now).ok, true);
 });
