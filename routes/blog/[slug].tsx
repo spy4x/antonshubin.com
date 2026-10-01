@@ -248,7 +248,14 @@ export default define.page(function BlogPost(ctx) {
             "timeRequired": `PT${article.readTime}M`,
             "articleSection": postTopic.title,
             "inLanguage": "en-US",
-            "isPartOf": { "@id": `${SITE}/blog#blog` },
+            // Described, not only pointed at: the Blog node lives on /blog, so a
+            // bare @id here named a node this page does not contain.
+            "isPartOf": {
+              "@type": "Blog",
+              "@id": `${SITE}/blog#blog`,
+              "name": "Writing",
+              "url": `${SITE}/blog`,
+            },
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": canonical,

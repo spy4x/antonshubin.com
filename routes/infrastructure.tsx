@@ -89,6 +89,8 @@ function articleJsonLd(canonical: string) {
     "headline": "How I run production",
     "description": head.value.description,
     "url": canonical,
+    // The page's own link preview: Google's article guidance asks for an image.
+    "image": `${BASE}/img/og/infrastructure.png`,
     "author": { "@id": `${BASE}/#person` },
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
     "mentions": mentionedToolIds().map((id) => ({ "@id": id })),
