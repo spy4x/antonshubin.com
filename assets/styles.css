@@ -324,6 +324,14 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 32rem;
 }
+/* The home page's sections under the hero (#368): on a phone every one is
+   below the first screen, and their layout and style work, redone when the
+   web fonts swap in, delayed the lead paragraph's paint under CPU throttling.
+   The hero (the LCP element) is excluded. */
+[data-home-section]:not([data-home-section="hero"]) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 40rem;
+}
 .site-footer a {
   display: inline-flex;
   align-items: center;
