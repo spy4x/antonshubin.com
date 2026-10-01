@@ -13,6 +13,8 @@ relatedTool: "preact-components"
 catalogSlug: "zero-to-production-saas-mvp"
 seoTitle: "A Preact component library without shadcn or Radix"
 coverImage: "/img/blog/preact-component-library-without-shadcn/cover.png"
+coverAlt: "The demo dashboard from the live guide, built only from the library: a frame titled Orbit, four KPI tiles, a line chart of builds this week and a sortable table of projects with status badges"
+intro: "Every new app I start needs the same things: a button, a table, a dialog, a form field, a chart, a signed-in layout. I kept rebuilding them, or pulling in a component library and then working around it. This post is for developers who build with Preact and Tailwind and wonder whether owning the UI layer is worth it."
 ---
 
 ![A dashboard in the live guide built only from the library: a frame titled Orbit with Run checks and New project buttons, a filter column, four KPI tiles, a line chart of passed and failed builds this week, and a sortable table of five projects with status badges](/img/blog/preact-component-library-without-shadcn/dashboard-hero.webp "Every part of this demo dashboard is a component from the packages.")
