@@ -186,7 +186,9 @@ Five entities in a `@graph` array (six on `/about`):
 
 - `/blog` carries one `Blog` node (`https://antonshubin.com/blog#blog`, author
   and publisher the `#person` node) whose `blogPost` lists every post's `@id`;
-  each post's `BlogPosting` points back with `isPartOf` (#274, SEO 5)
+  each post's `BlogPosting` points back with `isPartOf`, which describes the
+  `Blog` (type, `@id`, name, url) instead of naming an `@id` the post's page
+  does not contain (#274, SEO 5; #350)
 - `BlogPosting.image` is an `ImageObject` of the post's 1200×630 PNG from
   `deno task og`, never an SVG cover; `articleSection` is the post's topic;
   `dateModified` is `updatedAt`, which the byline also shows as "Updated"
@@ -303,8 +305,26 @@ curl https://antonshubin.com/sitemap.xml
 curl https://antonshubin.com/infrastructure
 ```
 
-Validate structured data:
+Validate structured data. `test/structured-data.test.ts` (#350) runs in
+`deno task check` over `/`, `/about`, `/how-i-work`, a project, a tool, a post
+and the list, offer, `TechArticle` and `ContactPage` pages. It checks each
+JSON-LD type's required and recommended properties against Google's Rich Results
+documentation, that every bare `@id` reference resolves inside the page (a list
+entry's `item` and `mentions` may point at the page that describes the thing),
+absolute URLs, ISO dates, no `Review` or `AggregateRating`, and each page's
+preview tags: `og:url` equals the canonical, `og:title`, `og:description`,
+`twitter:card`, and an `og:image` that is a real 1200×630 PNG under `static/`.
+Add a type to its `KNOWN_TYPES` list when a page starts using one.
+
+The public Schema.org validator needs no account and is not part of `check` (it
+is a network call): per page,
 
 ```bash
-curl https://antonshubin.com/ | python3 -c "import sys,json; d=json.loads(sys.stdin.read().split('application/ld+json')[1].split('>')[0].rsplit('}',1)[0]+'}'); print(json.dumps(d,indent=2))"
+curl -s -X POST https://validator.schema.org/validate \
+  --data-urlencode "url=https://antonshubin.com/about" --data "html=" | tail -n +2 |
+  python3 -c "import sys,json; d=json.load(sys.stdin); print(d['totalNumErrors'], d['totalNumWarnings'])"
 ```
+
+Google's Rich Results test, Search Console, Bing Webmaster Tools and the
+link-preview debuggers need Anton's accounts: they are tracked in
+https://github.com/spy4x/antonshubin.com/issues/377.
