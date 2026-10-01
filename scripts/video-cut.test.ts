@@ -74,6 +74,47 @@ Deno.test("video-cut turns a clip and an edit list into the cut, two Shorts, cap
     );
 
     await t.step(
+      "render uses the silences prepare wrote, never a threshold of its own",
+      async () => {
+        const args = [
+          script("video-cut.ts"),
+          "render",
+          whisper,
+          clip,
+          "demo",
+          edit,
+        ];
+        const flag = await deno([
+          ...args,
+          "--min-silence",
+          "5",
+          "--out",
+          cutDir,
+        ]);
+        assertEquals(flag.code, 1);
+        assertStringIncludes(flag.err, '--min-silence belongs to "prepare"');
+
+        const missing = await deno([...args, "--out", join(dir, "no-prepare")]);
+        assertEquals(missing.code, 1);
+        assertStringIncludes(
+          missing.err,
+          'Run "deno task video-cut prepare" first',
+        );
+
+        // A silences.json that cuts most of Short 1 makes the same edit list invalid.
+        const other = join(dir, "other-silences");
+        await Deno.mkdir(other);
+        await Deno.writeTextFile(
+          join(other, "silences.json"),
+          JSON.stringify([{ start: 10, end: 40, reason: "silence" }]),
+        );
+        const changed = await deno([...args, "--out", other]);
+        assertEquals(changed.code, 1);
+        assertStringIncludes(changed.err, "shorts[0] 6–42 s");
+      },
+    );
+
+    await t.step(
       "render refuses a bad edit list and names the range",
       async () => {
         const bad = join(dir, "bad.json");
@@ -92,6 +133,8 @@ Deno.test("video-cut turns a clip and an edit list into the cut, two Shorts, cap
           clip,
           "demo",
           bad,
+          "--out",
+          cutDir,
         ]);
         assertEquals(r.code, 1);
         assertStringIncludes(r.err, "cuts[0] 70–99 s: outside the media");

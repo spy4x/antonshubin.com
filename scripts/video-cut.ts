@@ -5,7 +5,7 @@
  *
  *   deno task video-cut prepare <whisper.json> <media> <slug> [--min-silence 0.8]
  *   deno task video-cut render <whisper.json> <media> <slug> <edit-list.json>
- *     [--min-silence 0.8] [--burn] [--out <dir>] [--json]
+ *     [--burn] [--out <dir>] [--json]
  *
  * Output goes to `videos/<slug>/cut/` (gitignored). Nothing is uploaded and
  * no API is called: ffmpeg and ffprobe run on this machine.
@@ -215,7 +215,6 @@ export interface RenderOptions {
   mediaPath: string;
   slug: string;
   editListPath: string;
-  minSilence: number;
   burn: boolean;
   /** Directory for the cut files; the kit's drafts go to its parent. */
   outDir: string;
@@ -229,13 +228,46 @@ export interface RenderResult {
   chapters: Chapter[];
 }
 
+/**
+ * The silences `prepare` cut and showed to Claude. `render` reuses them rather
+ * than recomputing from a threshold, so the cut always matches the brief.
+ */
+async function readSilences(outDir: string): Promise<Cut[]> {
+  const path = join(outDir, "silences.json");
+  let text: string;
+  try {
+    text = await Deno.readTextFile(path);
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      throw new Error(
+        `"${path}" is missing. Run "deno task video-cut prepare" first: it decides the silences and writes the brief.`,
+      );
+    }
+    throw err;
+  }
+  const silences = JSON.parse(text) as Cut[];
+  if (!Array.isArray(silences)) {
+    throw new Error(`"${path}" must hold a list of cuts.`);
+  }
+  return silences;
+}
+
+/** A slug names a directory under `videos/`, so it may not point anywhere else. */
+export function assertSlug(slug: string): void {
+  if (slug === "" || /[\\/]/.test(slug) || slug.includes("..")) {
+    throw new Error(
+      `The slug "${slug}" must be one plain name: no "/", "\\" or "..".`,
+    );
+  }
+}
+
 /** Renders every output of the cut step and hands the edited transcript to the video kit. */
 export async function renderCut(options: RenderOptions): Promise<RenderResult> {
   const media = await probe(options.mediaPath);
   const { words } = parseWhisperJson(
     await Deno.readTextFile(options.whisperPath),
   );
-  const silences = silenceCuts(words, media.seconds, options.minSilence);
+  const silences = await readSilences(options.outDir);
 
   let rawList: unknown;
   try {
@@ -438,6 +470,12 @@ async function main() {
   try {
     const { positional, flags } = parseFlags(Deno.args);
     const [command, whisperPath, mediaPath, slug, editListPath] = positional;
+    if (slug !== undefined) assertSlug(slug);
+    if (command === "render" && flags["min-silence"] !== undefined) {
+      throw new Error(
+        `--min-silence belongs to "prepare"; render reuses the silences prepare wrote.`,
+      );
+    }
     const minSilence = flags["min-silence"] === undefined
       ? DEFAULT_MIN_SILENCE_SECONDS
       : Number(flags["min-silence"]);
@@ -468,7 +506,6 @@ async function main() {
         mediaPath,
         slug,
         editListPath,
-        minSilence,
         burn: flags.burn === true,
         outDir,
       });
