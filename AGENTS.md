@@ -1253,6 +1253,19 @@ so a 2500px shot lagged. `deno task optimize:screenshots` scales PNG sources and
 oversized WebP-only files down to it, and `test/screenshot-width.test.ts` fails
 on a wider one.
 
+The caldav-tasks-web screenshots in `static/img/tools/caldav-tasks-web/` come
+from one command, `deno task reshoot:caldav` (#223): it clones the app, starts a
+throwaway Radicale container, seeds generic demo tasks, takes the pictures with
+the pinned Chromium, runs the optimizer and the metadata strip, and removes the
+container, the app process and its temp directory even when it fails. The
+screenshot list, viewports and demo data are the table at the top of
+`scripts/reshoot-caldav-demo-plan.ts`; `--shots`, `--viewport` and `--scale`
+change a run; `--app <dir>` clones that directory's committed HEAD, not its
+working tree. It needs Docker, so it is not part of `deno task check`. A brief
+that asks for new screenshots of a project names every screenshot in that
+project's folder, not only the ones the issue mentions, so the environment is
+built once.
+
 ## Image metadata
 
 Every image committed under `static/` or `assets/` ships without metadata: no
