@@ -1000,12 +1000,12 @@ body.
 `clientIpBucket` and sweeping `createMemoryRateLimiter` (#310). Production is
 Cloudflare → Traefik (empty `forwardedHeaders.trustedIPs`) → app, so the client
 is `X-Real-IP` (Traefik writes it), or `CF-Connecting-IP` when `X-Real-IP` is a
-Cloudflare edge (`clientIp`'s `trustedProxies`, fed the module's Cloudflare
-range list); `X-Forwarded-For` is never read, and a header that is not exactly
-one IP address counts as absent. An IPv6 client is keyed on its /64. If
-Traefik's `trustedIPs` or the Cloudflare setup changes, revisit that module. A
-rendered-site test that posts to either form sends its own `X-Real-IP`, or every
-test shares one bucket.
+Cloudflare edge (`clientIp`'s `trustedProxies`, fed `@spy4x/net/ip`'s
+`CLOUDFLARE_IP_RANGES`); `X-Forwarded-For` is never read, and a header that is
+not exactly one IP address counts as absent. An IPv6 client is keyed on its /64.
+If Traefik's `trustedIPs` or the Cloudflare setup changes, revisit that module.
+A rendered-site test that posts to either form sends its own `X-Real-IP`, or
+every test shares one bucket.
 
 ## Outgoing mail
 
