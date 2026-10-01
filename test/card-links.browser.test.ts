@@ -6,7 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 
 const CARDS = [
   { path: "/work", card: "[data-archive-row]", link: "a[data-work-link]" },
@@ -35,7 +35,7 @@ Deno.test("a click anywhere on a card opens the card's page", async () => {
         const box = await first.boundingBox();
         assert(box, `${path}: ${card} is not on screen`);
         await Promise.all([
-          page.waitForURL(`${site.origin}${href}`, { timeout: 5000 }),
+          page.waitForURL(`${site.origin}${href}`, { timeout: WAIT_MS }),
           first.click({ position: { x: box.width - 8, y: 8 } }),
         ]);
       } finally {
@@ -70,7 +70,7 @@ Deno.test("links inside archive rows and tool cards stay above the card's link",
         const inner = page.locator(link).first();
         // A trial click runs Playwright's hit-target check without navigating:
         // it times out when the stretched card link sits on top.
-        await inner.click({ trial: true, timeout: 3000 });
+        await inner.click({ trial: true, timeout: WAIT_MS });
       } finally {
         await page.close();
       }

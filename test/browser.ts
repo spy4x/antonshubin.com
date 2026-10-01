@@ -57,6 +57,16 @@ export function newPage(
   return browser.newPage({ ...options, serviceWorkers: "block" });
 }
 
+/**
+ * How long a browser test waits for something that should happen: a navigation,
+ * a click that must hit its target, a focus move. Playwright's own default is
+ * 30 s, but a bare 2-5 s on one call is what failed under CPU load: the page
+ * was only slow, and the timeout threw, so the test's `finally` closed the
+ * browser mid-wait. Use this for any wait on an expected event; a wait that
+ * proves something does NOT happen is a fixed sleep, not a timeout.
+ */
+export const WAIT_MS = 30_000;
+
 /** One `umami.track()` call the page made: the event name and its data, if any. */
 export type TrackedCall = [string, Record<string, string>?];
 

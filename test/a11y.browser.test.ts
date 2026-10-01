@@ -18,7 +18,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import axeCore from "axe-core";
 import type { Browser, Locator, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 import { tools } from "../lib/tools.ts";
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
@@ -596,7 +596,7 @@ Deno.test("More opens the menu dialog, Escape closes it and focus returns to Mor
       // The dialog's `close` event, which resets More, is dispatched as a
       // separate task after the dialog hides.
       await page.locator('#tab-bar button[aria-expanded="false"]').waitFor({
-        timeout: 2000,
+        timeout: WAIT_MS,
       }).catch(() => {});
 
       assertEquals(
