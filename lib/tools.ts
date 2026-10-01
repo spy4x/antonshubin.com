@@ -559,8 +559,8 @@ export const tools: Tool[] = [
     job: "reusable repository baseline for SaaS products",
     summary:
       `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
-        proof("jobs")
-      }+ client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.`,
+        proof("projects")
+      } client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.`,
     kind: "template",
     status: "wip",
     group: "products",

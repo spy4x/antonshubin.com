@@ -107,8 +107,8 @@ export async function sendSubscribeMails(
       paragraph("Thanks for subscribing!"),
       paragraph(
         `You'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
-          proof("jobs")
-        }+ projects.`,
+          proof("projects")
+        } projects.`,
       ),
       button(
         emailLink(deps.baseUrl, "/saas-architecture-guide", SIGNUP_CAMPAIGN),

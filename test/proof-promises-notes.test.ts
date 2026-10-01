@@ -44,7 +44,8 @@ async function sourceFiles(exclude: string[]): Promise<string[]> {
 // proof figure id with the exact rendered substring a hand-written copy
 // would contain.
 const FIGURE_NEEDLES: Record<string, string> = {
-  "jobs": "80+",
+  "jobs": "80 jobs",
+  "projects": "80+",
   "job-success": "100% Job Success",
   "earned": "300K",
   "hours": "6,600",

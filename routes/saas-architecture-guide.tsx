@@ -21,8 +21,8 @@ export default define.page(function SaasArchGuide() {
     pageName: "SaaS Architecture Guide",
     description:
       `From idea to production: architecture patterns, infrastructure decisions, CI/CD, AI integration, and lessons learned building ${
-        proof("jobs")
-      }+ projects.`,
+        proof("projects")
+      } projects.`,
     canonical: "https://antonshubin.com/saas-architecture-guide",
     ogType: "article",
   };
@@ -51,7 +51,7 @@ export default define.page(function SaasArchGuide() {
         </h1>
         <p class="text-graphite text-lg mb-8 leading-relaxed">
           From idea to production — architecture patterns, infrastructure
-          decisions, and lessons learned from {proof("jobs")}+ projects.
+          decisions, and lessons learned from {proof("projects")} projects.
         </p>
 
         {/* 1. Architecture Design */}
@@ -258,7 +258,7 @@ export default define.page(function SaasArchGuide() {
             Production Patterns &amp; Lessons
           </h2>
           <p class="text-graphite mb-4">
-            Real-world lessons from shipping {proof("jobs")}+ projects.
+            Real-world lessons from shipping {proof("projects")} projects.
           </p>
           <ul class="space-y-3">
             {startupPosts.map((p) => (

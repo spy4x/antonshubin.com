@@ -171,8 +171,8 @@ Deno.test("every post's Dev.to cover is a 1000x420 PNG", () => {
 
 Deno.test("a {proof:<id>} placeholder reads the figure from lib/proof.ts", () => {
   assertEquals(
-    fillProof("from {proof:jobs}+ projects"),
-    `from ${proof("jobs")}+ projects`,
+    fillProof("from {proof:projects} projects"),
+    `from ${proof("projects")} projects`,
   );
   assertThrows(
     () => fillProof("{proof:nope}"),
@@ -191,8 +191,8 @@ Deno.test("every post in content/blog loads, newest first, with the template tit
   assertEquals(
     template?.title,
     `Deno Platform Template: distilling ${
-      proof("jobs")
-    }+ client projects into one repo`,
+      proof("projects")
+    } client projects into one repo`,
   );
 });
 
@@ -208,10 +208,10 @@ Deno.test("posts published the same day keep one order by slug", () => {
 Deno.test("a {proof:<id>} placeholder in a TL;DR line is filled with the figure", () => {
   const article = parseBlogArticle(
     "a-post",
-    variant('- "First point."', '- "Over {proof:jobs}+ projects."'),
+    variant('- "First point."', '- "Over {proof:projects} projects."'),
   );
   assertEquals(article.tldr, [
-    `Over ${proof("jobs")}+ projects.`,
+    `Over ${proof("projects")} projects.`,
     "Second point.",
   ]);
 });

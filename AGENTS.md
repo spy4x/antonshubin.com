@@ -191,8 +191,8 @@ Every client project page is on that list: its fact card and closing band link
 "Similar work today" to the item named by the project's `catalogSlug`
 (`lib/data.ts`, checked through `catalogItem()` by `lib/data.test.ts`). Retired
 slugs live in `catalogRedirects` there and answer 301 — never link to one. The
-same price list is used on Upwork and neatsoft.dev, so a price change is
-followed by a manual edit in both places.
+same price list is used on Upwork, so a price change is followed by a manual
+edit there; neatsoft.dev shows no prices (neatsoft.dev#5).
 
 The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
 Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
@@ -206,19 +206,24 @@ Four more `lib/*.ts` files hold the only written copy of a category of claim
 that throws on a typo, so a bad id fails the build instead of shipping a broken
 reference.
 
+- **"80+ projects" is true; never flag it.** Anton has shipped more than 80
+  projects across his career, on Upwork and outside it; Upwork's 80 jobs are
+  only part of them (Anton, 2 October 2026). The two figures are separate
+  entries in `lib/proof.ts`: `jobs` ("80", always next to Upwork) and `projects`
+  ("80+", the whole career).
 - `lib/proof.ts` is the only place an Upwork number or label (jobs, job success
-  rate, amount earned, hours, Expert-Vetted, Top 1%) is written. The home page,
-  `components/SEOHead.tsx`'s JSON-LD, the sitemap comment, both llms files,
-  `islands/LeadForm.tsx`, `routes/saas-architecture-guide.tsx`,
-  `lib/subscribe-mail.ts`'s welcome email and `lib/tools.ts`'s template entry
-  all read a value through `proof(id)`. A post's front matter writes a figure as
-  a `{proof:<id>}` placeholder (the template post's title uses `{proof:jobs}`),
-  which `lib/blog-posts.ts`'s `fillProof()` replaces.
-  `test/proof-promises-notes.test.ts`'s proof guard scans `routes/`,
-  `components/`, `islands/` and `lib/` (excluding `lib/proof.ts` and every
-  `*.test.ts`) for each figure's exact rendered text — including the
-  quoted-literal and case-insensitive forms a hand revert of the home proof
-  strip would take (with an explicit allowlist entry for
+  rate, amount earned, hours, Expert-Vetted, Top 1%) or the career project count
+  is written. The home page, `components/SEOHead.tsx`'s JSON-LD, the sitemap
+  comment, both llms files, `islands/LeadForm.tsx`,
+  `routes/saas-architecture-guide.tsx`, `lib/subscribe-mail.ts`'s welcome email
+  and `lib/tools.ts`'s template entry all read a value through `proof(id)`. A
+  post's front matter writes a figure as a `{proof:<id>}` placeholder (the
+  template post's title uses `{proof:projects}`), which `lib/blog-posts.ts`'s
+  `fillProof()` replaces. `test/proof-promises-notes.test.ts`'s proof guard
+  scans `routes/`, `components/`, `islands/` and `lib/` (excluding
+  `lib/proof.ts` and every `*.test.ts`) for each figure's exact rendered text —
+  including the quoted-literal and case-insensitive forms a hand revert of the
+  home proof strip would take (with an explicit allowlist entry for
   `islands/MeetEmbed.tsx`'s unrelated CSS `width: "100%"`) — and fails on a
   hand-written copy.
 - `lib/promises.ts` holds the five promises' title, description and "why this

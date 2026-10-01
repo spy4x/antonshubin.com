@@ -1,5 +1,5 @@
 ---
-title: "Deno Platform Template: distilling {proof:jobs}+ client projects into one repo"
+title: "Deno Platform Template: distilling {proof:projects} client projects into one repo"
 description: "What I learned shipping the same SaaS skeleton over and over for paying clients. Group core, personal groups, REST + CQRS, offline sync, an outbox processor — and a deliberate decision to ship it as a template, not a framework."
 tldr:
   - "This template is the SaaS skeleton I kept rebuilding for clients: a multi-tenant API, an offline-first Preact client and a worker that drains an outbox."
