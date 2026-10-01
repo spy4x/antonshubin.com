@@ -327,10 +327,16 @@ body {
 /* The home page's sections under the hero (#368): on a phone every one is
    below the first screen, and their layout and style work, redone when the
    web fonts swap in, delayed the lead paragraph's paint under CPU throttling.
-   The hero (the LCP element) is excluded. */
+   The hero (the LCP element) is excluded. Paint containment clips whatever
+   paints outside the box (the timeline's dots sit 7px left of their line),
+   and Safari has no `overflow-clip-margin`, so the box itself grows by 0.5rem
+   on each side: the padding is cancelled by the negative margin, so nothing
+   moves. */
 [data-home-section]:not([data-home-section="hero"]) {
   content-visibility: auto;
   contain-intrinsic-size: auto 40rem;
+  margin-inline: -0.5rem;
+  padding-inline: 0.5rem;
 }
 .site-footer a {
   display: inline-flex;
