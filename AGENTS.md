@@ -120,6 +120,7 @@ deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NT
 deno task umami-reports         # create, update or retire the Umami goals and funnels (--dry-run to preview)
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
+deno task social-preview        # build, then regenerate docs/social-preview.png (1280x640, GitHub)
 deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B, --path for another page)
 deno task strip-metadata        # strip EXIF/XMP/text chunks from every image under static/ and assets/
 ```
@@ -1178,14 +1179,21 @@ SVGs, through the Chromium already pinned for the browser-driven tests
 (`test/browser.ts`'s `launchChromium()`) instead of adding a new image-rendering
 dependency.
 
-Regeneration is one command: `deno task og`. Run it whenever a post or project
-title or description changes, then commit the changed PNGs — for example after
-#201 renames the mig post from "200-line" to "lightweight". This script is
-dev-machine only: the production Docker build (`denoland/deno:2.9.0`, no
-Chromium) never runs it, it only serves the PNGs already committed.
+Regeneration is one command: `deno task og` (no build needed). Run it whenever a
+post or project title or description changes, then commit the changed PNGs — for
+example after #201 renames the mig post from "200-line" to "lightweight". This
+script is dev-machine only: the production Docker build (`denoland/deno:2.9.0`,
+no Chromium) never runs it, it only serves the PNGs already committed.
 `test/og-images.test.ts` guards that every post and project has its PNG at
 exactly 1200×630, reading each file's PNG header directly — deterministic and
 offline, no browser needed to run the check itself.
+
+The repository's GitHub social preview, `docs/social-preview.png` (1280×640,
+#291), is a separate task because its screenshot comes from the built home page:
+`deno task social-preview` builds first, boots the site with `startSite()`,
+writes the PNG and strips its metadata. `deno task og` never touches it, so a
+stale build cannot rewrite it. GitHub has no API for it: after the file changes,
+Anton uploads it in Settings → General → Social preview.
 
 ## Project screenshots
 

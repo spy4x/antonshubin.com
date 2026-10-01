@@ -148,3 +148,22 @@ Deno.test("the /how-i-work page has a 1200x630 OG preview PNG", async () => {
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
   );
 });
+
+Deno.test("the GitHub social preview is a 1280x640 PNG", async () => {
+  const relative = "docs/social-preview.png";
+  let data: Uint8Array;
+  try {
+    data = await Deno.readFile(new URL(`../${relative}`, import.meta.url));
+  } catch {
+    throw new Error(
+      `missing ${relative}: run deno task build, then deno task og`,
+    );
+  }
+  assert(
+    PNG_SIGNATURE.every((byte, i) => data[i] === byte),
+    `${relative} is not a valid PNG file`,
+  );
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  assertEquals(view.getUint32(16), 1280, `${relative}: width`);
+  assertEquals(view.getUint32(20), 640, `${relative}: height`);
+});

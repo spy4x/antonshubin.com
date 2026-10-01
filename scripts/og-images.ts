@@ -7,7 +7,8 @@
  * landscape default for the site (#193).
  *
  * Run with:
- *   deno task og
+ *   deno task og              # the cards; no build needed
+ *   deno task social-preview  # docs/social-preview.png (#291); builds first
  *
  * Dev-machine only. The production Docker build (`denoland/deno:2.9.0`, no
  * Chromium) never runs this script — it only serves the PNGs this script
@@ -22,7 +23,7 @@
  * edit (see AGENTS.md's note in this file's own docs section) is this one
  * command.
  */
-import { launchChromium } from "../test/browser.ts";
+import { launchChromium, newPage } from "../test/browser.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { ROLE } from "../lib/head.ts";
 import { tools } from "../lib/tools.ts";
@@ -33,6 +34,8 @@ import { HOW_I_WORK_NAME, howIWorkDescription } from "../lib/how-i-work.ts";
 import { LOCATION } from "../lib/config.ts";
 import type { Browser } from "playwright";
 import { fromFileUrl } from "@std/path";
+import { stripFile } from "./strip-metadata.ts";
+import { startSite } from "../test/harness.ts";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
@@ -118,8 +121,119 @@ async function render(
   }
 }
 
+const SOCIAL_WIDTH = 1280;
+const SOCIAL_HEIGHT = 640;
+const SOCIAL_FILE = new URL("docs/social-preview.png", ROOT);
+const FONT_DIR = new URL("assets/fonts/", ROOT);
+
+async function fontFace(
+  family: string,
+  file: string,
+  weight: number,
+  style = "normal",
+): Promise<string> {
+  const data = await Deno.readFile(new URL(file, FONT_DIR));
+  return `@font-face { font-family: "${family}"; font-weight: ${weight}; font-style: ${style};
+    src: url(data:font/woff2;base64,${data.toBase64()}) format("woff2"); }`;
+}
+
+/**
+ * Card for the repository's GitHub social preview (#291): the site's name and
+ * role on the left, a dark screenshot of the built home page bleeding off the
+ * right edge. Colours and fonts are the `@theme` ones in `assets/styles.css`.
+ */
+function socialHtml(shotBase64: string, fonts: string): string {
+  return `<!doctype html>
+<html><head><meta charset="utf-8"><style>
+  ${fonts}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: ${SOCIAL_WIDTH}px; height: ${SOCIAL_HEIGHT}px; background: ${BG}; overflow: hidden;
+  }
+  body { position: relative; font-family: "IBM Plex Sans", sans-serif; }
+  .text { position: absolute; left: 72px; top: 0; bottom: 0; width: 470px;
+    display: flex; flex-direction: column; justify-content: center; }
+  .bar { width: 64px; height: 6px; background: ${ACCENT}; margin-bottom: 36px; }
+  h1 { font-family: "Literata", serif; font-weight: 600; color: ${TITLE_COLOR};
+    font-size: 64px; line-height: 1.1; }
+  p { color: ${SUB_COLOR}; font-size: 30px; line-height: 1.35; margin-top: 28px;
+    text-wrap: balance; }
+  .shot { position: absolute; left: 600px; top: 96px; width: 800px; height: 500px;
+    border: 1px solid #413c38; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); }
+  .shot img { display: block; width: 800px; height: 500px; }
+</style></head>
+<body>
+  <div class="text">
+    <div class="bar"></div>
+    <h1>Anton Shubin</h1>
+    <p>${escapeHtml(ROLE)}</p>
+  </div>
+  <div class="shot"><img src="data:image/png;base64,${shotBase64}" alt=""></div>
+</body></html>`;
+}
+
+/** Writes `docs/social-preview.png`: needs a built site (`deno task build`). */
+async function socialPreview(browser: Browser): Promise<number> {
+  // Placeholder booking URL only so the Book button shows as on production;
+  // the home page loads no calendar and nothing leaves the machine.
+  const site = await startSite({
+    env: {
+      SCHEDULE_URL: "https://meet.example.com/",
+      UMAMI_URL: "",
+      UMAMI_ID: "",
+    },
+  });
+  let shot: Uint8Array;
+  try {
+    const page = await newPage(browser, {
+      viewport: { width: 1280, height: 800 },
+      colorScheme: "dark",
+    });
+    try {
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      shot = await page.screenshot({ type: "png", animations: "disabled" });
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await site.stop();
+  }
+  const fonts = (await Promise.all([
+    fontFace("Literata", "literata-latin-600-normal.woff2", 600),
+    fontFace("IBM Plex Sans", "ibm-plex-sans-latin-400-normal.woff2", 400),
+  ])).join("\n");
+  const page = await newPage(browser, {
+    viewport: { width: SOCIAL_WIDTH, height: SOCIAL_HEIGHT },
+  });
+  try {
+    await page.setContent(socialHtml(shot.toBase64(), fonts), {
+      waitUntil: "load",
+    });
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: fromFileUrl(SOCIAL_FILE), type: "png" });
+  } finally {
+    await page.close();
+  }
+  const bytes = await stripFile(fromFileUrl(SOCIAL_FILE));
+  console.log(`docs/social-preview.png  (metadata stripped: ${bytes} B)`);
+  return (await Deno.stat(SOCIAL_FILE)).size;
+}
+
 function fmtBytes(n: number): string {
   return n < 1024 ? `${n}B` : `${(n / 1024).toFixed(1)}KB`;
+}
+
+/** `deno task social-preview`: only `docs/social-preview.png`, after a fresh build. */
+async function mainSocial() {
+  const browser = await launchChromium();
+  try {
+    const bytes = await socialPreview(browser);
+    console.log(`\nWrote docs/social-preview.png (${fmtBytes(bytes)}).`);
+  } finally {
+    await browser.close();
+  }
 }
 
 async function main() {
@@ -221,5 +335,6 @@ async function main() {
 }
 
 if (import.meta.main) {
-  await main();
+  if (Deno.args.includes("--social")) await mainSocial();
+  else await main();
 }

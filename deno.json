@@ -23,6 +23,7 @@
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
     "lcp": "deno run -A scripts/lcp.ts",
     "og": "deno run -A scripts/og-images.ts",
+    "social-preview": "deno task build && deno run -A scripts/og-images.ts --social",
     "strip-metadata": "deno run --allow-read --allow-write --allow-run=git scripts/strip-metadata.ts"
   },
   "lint": {
