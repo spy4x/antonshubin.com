@@ -236,10 +236,11 @@ in `data/newsletter-log.json`: it records the post before the first mail and
 each subscriber, as a keyed hash of the address, right after their mail is
 accepted. A post whose run finished with no failure is refused, so a second run
 cannot mail anyone twice. A run that crashed or had a failure is resumed by
-running the same command again, and mails only the subscribers who were missed.
-To resend on purpose, remove the post's entry from the log on the server by
-hand. An empty subscriber list is refused before anything is recorded, and the
-command exits non-zero when any mail failed or none went out.
+running the same command again, and mails only the people the first run meant it
+for who were missed, never a later subscriber. A second run started while one is
+going is refused. To resend on purpose, remove the post's entry from the log on
+the server by hand. An empty subscriber list is refused before anything is
+recorded, and the command exits non-zero when any mail failed or none went out.
 
 Report the result to Anton in chat: the `Sent`, `Failed` and `Skipped` counts
 the command printed, or its refusal. A non-zero exit is not a success, whatever

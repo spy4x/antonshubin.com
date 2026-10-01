@@ -196,6 +196,12 @@ async function main() {
         `(started ${result.entry.startedAt}, ${logFile}). Nothing was sent.`,
     );
   }
+  if (result.status === "in-progress") {
+    fail(
+      `Refused: another send is in progress (${logFile}.lock is held). ` +
+        `Nothing was sent. Wait for it to finish, then run the same command again.`,
+    );
+  }
   if (result.status === "no-subscribers") {
     fail(
       `Refused: no subscribers loaded (is ${

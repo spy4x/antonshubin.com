@@ -40,8 +40,8 @@ export default define.page(function Privacy(ctx) {
         <h1 class="text-3xl sm:text-4xl text-parchment">Privacy</h1>
         <p class="mt-4">
           This page lists what this site collects and where it goes. It was
-          checked against the site's code on 30 September 2026. How long things
-          are kept is my own rule, stated below.
+          checked against the site's code on 2 October 2026. How long things are
+          kept is my own rule, stated below.
         </p>
 
         <Section title="The brief form">
@@ -75,12 +75,25 @@ export default define.page(function Privacy(ctx) {
             of such a link, is cleared the next time anyone unsubscribes.
           </p>
           <p>
+            Your mail program or provider may also offer its own Unsubscribe
+            button on a newsletter. Using it removes your address at once,
+            without opening a page, the same as the link in the mail.
+          </p>
+          <p>
+            The newsletter shows my portrait and, for a post, its cover image.
+            Both load from antonshubin.com when you open the mail (unless your
+            mail program blocks images), so this site's server sees that
+            request, like any page view.
+          </p>
+          <p>
             When I announce a post, the server also writes down, for each
-            subscriber the mail reached, a scrambled fingerprint of the address
-            (not the address itself) in a file next to the list. It lets a send
-            that stopped halfway be finished without mailing anyone the same
-            post twice. The fingerprints stay in that file; nothing clears them
-            on its own.
+            subscriber the mail server accepted the mail for, a scrambled
+            fingerprint of the address (not the address itself) in a file next
+            to the list, and one for everyone who was on the list that day. They
+            let a send that stopped halfway be finished without mailing anyone
+            the same post twice and without sending an old post to someone who
+            joined later. The fingerprints stay in that file; nothing clears
+            them on its own.
           </p>
         </Section>
 

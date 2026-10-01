@@ -114,6 +114,8 @@ export interface LetterInput {
   blocks: readonly Block[];
   /** Show the P.S. with the booking link; the confirmation mail has none. */
   ps?: boolean;
+  /** The question or sentence before the booking link in the P.S. */
+  psLead?: string;
   /** Why the reader gets this mail, one sentence. */
   reason: string;
   /**
@@ -144,6 +146,7 @@ export function renderLetter(input: LetterInput): Letter {
   const bookUrl = emailLink(baseUrl, "/book", campaign);
   const siteUrl = emailLink(baseUrl, "/", campaign);
   const site = new URL(baseUrl).host;
+  const psLead = input.psLead ?? "Working on something like this?";
   const replyLine = "Reply to this email: it comes straight to me.";
 
   const top =
@@ -155,7 +158,7 @@ export function renderLetter(input: LetterInput): Letter {
 
   const ps = input.ps === false
     ? ""
-    : `<p style="margin:16px 0 0">P.S. Working on something like this? <a href="${
+    : `<p style="margin:16px 0 0">P.S. ${escapeHtml(psLead)} <a href="${
       escapeHtml(bookUrl)
     }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a>.</p>`;
   const reply = `<p style="margin:16px 0 0">${escapeHtml(replyLine)}</p>`;
@@ -192,11 +195,9 @@ export function renderLetter(input: LetterInput): Letter {
   const textParts = [
     `Anton Shubin\n${ROLE}`,
     ...input.blocks.map((b) => b.text).filter((t) => t !== ""),
-    ...(input.ps === false
-      ? []
-      : [`P.S. Working on something like this? ${BOOK_LABEL}: ${bookUrl}`]),
+    ...(input.ps === false ? [] : [`P.S. ${psLead} ${BOOK_LABEL}: ${bookUrl}`]),
     replyLine,
-    `--\n${input.reason}${
+    `-- \n${input.reason}${
       input.unsubscribeLink === undefined
         ? ""
         : `\nUnsubscribe: ${input.unsubscribeLink}`

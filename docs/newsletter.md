@@ -100,20 +100,28 @@ container. The whole flow is in [publishing.md](publishing.md).
 The guard is a per-recipient sent log, `data/newsletter-log.json`, next to
 `subscribers.json` in the same bind-mounted directory, so it survives deploys
 and is backed up with the list. An entry is
-`{ slug, subject, startedAt, recipients, sent, failed, completedAt? }`.
-`recipients` holds one keyed hash per subscriber the relay accepted
-(`lib/newsletter-log.ts`'s `sentMark()`: HMAC-SHA256 under `UNSUBSCRIBE_SECRET`
-of the slug and the lowercased address), never an address. The entry is written
-before the first mail and each hash right after that mail is accepted.
-`completedAt` is set by a run that finished with no failure, and such a post is
-refused on any later run, so a subscriber who joins afterwards does not get an
-old post. A run that crashed or had a failure has no `completedAt`: running the
-same command again mails only the subscribers whose hash is missing. An entry
-from before #364 has no `recipients` and is refused as sent. To resend a post to
-everyone on purpose, remove its entry from the file by hand. The script also
-refuses an empty subscriber list (a missing or unreadable `subscribers.json`)
-before recording anything, and exits non-zero when any mail failed or none went
-out. To read the log:
+`{ slug, subject, startedAt, audience, recipients, sent, failed, completedAt? }`.
+`audience` holds the keyed hashes of everyone on the list when the first run
+started, and a resumed run mails only its missing members, so a subscriber who
+joins later never gets an old post, even when one stored row can never be mailed
+and keeps the post from completing. `recipients` holds one keyed hash per
+subscriber the mail server accepted (`lib/newsletter-log.ts`'s `sentMark()`:
+HMAC-SHA256 under `UNSUBSCRIBE_SECRET` of the slug and the lowercased address),
+never an address. The entry is written before the first mail and each hash right
+after that mail is accepted, through a temp file and a rename, as
+`subscribers.json` is written. The whole send holds the lock
+`newsletter-log.json.lock`: a second run that starts while one is going is
+refused ("another send is in progress") and mails nobody. The OS frees the lock
+when a process dies, so a crashed run leaves nothing to clean up. `completedAt`
+is set by a run that finished with no failure, and such a post is refused on any
+later run, so a subscriber who joins afterwards does not get an old post. A run
+that crashed or had a failure has no `completedAt`: running the same command
+again mails only the subscribers whose hash is missing. An entry from before
+#364 has no `recipients` and is refused as sent. To resend a post to everyone on
+purpose, remove its entry from the file by hand. The script also refuses an
+empty subscriber list (a missing or unreadable `subscribers.json`) before
+recording anything, and exits non-zero when any mail failed or none went out. To
+read the log:
 
 ```bash
 ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/newsletter-log.json'

@@ -11,6 +11,9 @@
  * `data/` directory, so it survives deploys and is backed up with the list
  * (docs/deploy.md "Subscriber data").
  */
+import { atomicWriteJson } from "@spy4x/platform/server/atomic-json";
+import { denoFileSystem } from "@spy4x/platform/server/deno-fs";
+import { FileLock } from "@spy4x/platform/server/file-lock";
 import { type NewsletterIssue, sendNewsletter } from "./newsletter.ts";
 
 const encoder = new TextEncoder();
@@ -49,7 +52,13 @@ export interface NewsletterLogEntry {
   subject: string;
   /** When the send was claimed, before the first mail went out. */
   startedAt: string;
-  /** Sent marks of everyone the relay accepted. Missing in an entry written before #364. */
+  /**
+   * Sent marks of everyone who was on the list when the first run started:
+   * the people this post is meant for. A later run mails only their missing
+   * members, so a subscriber who joined afterwards never gets an old post.
+   */
+  audience?: string[];
+  /** Sent marks of everyone the mail server accepted. Missing in an entry written before #364. */
   recipients?: string[];
   /** How many mails the relay accepted in total. */
   sent?: number;
@@ -83,16 +92,26 @@ export function loadNewsletterLog(file: string): NewsletterLogEntry[] {
   return parsed as NewsletterLogEntry[];
 }
 
-function saveNewsletterLog(file: string, entries: NewsletterLogEntry[]): void {
+let writeSequence = 0;
+
+/** Writes through a temp file and a rename, like `subscribers.json`, so a crash or full disk never leaves a torn log. */
+async function saveNewsletterLog(
+  file: string,
+  entries: NewsletterLogEntry[],
+): Promise<void> {
   const slash = file.lastIndexOf("/");
   if (slash !== -1) Deno.mkdirSync(file.slice(0, slash), { recursive: true });
-  Deno.writeTextFileSync(file, `${JSON.stringify(entries, null, 2)}\n`);
+  await atomicWriteJson(denoFileSystem, file, entries, {
+    pid: Deno.pid,
+    sequence: ++writeSequence,
+  });
 }
 
 /** What {@linkcode sendNewsletterOnce} did. */
 export type SendOnceResult =
   | { status: "already-sent"; entry: NewsletterLogEntry }
   | { status: "no-subscribers" }
+  | { status: "in-progress" }
   | { status: "sent"; sent: number; failed: number; skipped: number };
 
 /**
@@ -112,20 +131,27 @@ export function sendExitCode(
 }
 
 /**
- * Sends `issue` for the post `slug` to everyone the log does not already list
- * for it. A post whose earlier run finished with no failure (`completedAt`),
- * and an entry written before #364 (no recipient list), is refused: a late
- * subscriber must not get an old post. A post whose run crashed or had a
- * failure is resumed, and mails only the subscribers who were missed.
+ * Sends `issue` for the post `slug` to the people the log says it is for and
+ * has not yet reached. A post whose earlier run finished with no failure
+ * (`completedAt`), and an entry written before #364 (no recipient list), is
+ * refused: nobody gets an old post twice. A post whose run crashed or had a
+ * failure is resumed, and mails only the missing members of the audience the
+ * first run recorded (everyone on the list then), never a later subscriber,
+ * so one row that can never be mailed does not open the post to newcomers.
+ *
+ * The whole send holds the lock file `<logFile>.lock`, and a second call that
+ * finds it held is refused as `in-progress` instead of waiting, so two
+ * overlapping runs cannot mail the same people twice.
  *
  * An empty subscriber list is refused before anything is recorded: on the
  * server it means `subscribers.json` is missing or unreadable, and recording
  * the slug would block the real send later.
  *
  * The entry is written before the first mail, and each recipient's mark right
- * after the relay accepts that mail, so a crash costs at most the one mail in
- * flight a second time. To resend to everyone on purpose, remove the entry by
- * hand.
+ * after the mail server accepts that mail, so a crash costs at most the one
+ * mail in flight a second time. The lock is held by the OS on the open
+ * file, so a crashed process frees it. To resend to everyone on purpose,
+ * remove the entry by hand.
  */
 export async function sendNewsletterOnce(
   { slug, logFile, issue, secret, now = () => new Date(), onStart }: {
@@ -139,43 +165,68 @@ export async function sendNewsletterOnce(
     onStart?: (counts: { total: number; pending: number }) => void;
   },
 ): Promise<SendOnceResult> {
-  const entries = loadNewsletterLog(logFile);
-  const previous = entries.find((e) => e.slug === slug);
-  if (previous && (previous.recipients === undefined || previous.completedAt)) {
-    return { status: "already-sent", entry: previous };
+  const slash = logFile.lastIndexOf("/");
+  if (slash !== -1) {
+    Deno.mkdirSync(logFile.slice(0, slash), { recursive: true });
   }
-  if (issue.subscribers.length === 0) return { status: "no-subscribers" };
-
-  const entry: NewsletterLogEntry = previous ?? {
-    slug,
-    subject: issue.subject,
-    startedAt: now().toISOString(),
-    recipients: [],
-  };
-  const recipients = new Set(entry.recipients);
-  const save = () =>
-    saveNewsletterLog(logFile, previous ? entries : [...entries, entry]);
-  save();
-
-  let pending = 0;
-  for (const sub of issue.subscribers) {
-    if (!recipients.has(await sentMark(sub.email, slug, secret))) pending++;
+  const lock = new FileLock({ fs: denoFileSystem, path: `${logFile}.lock` });
+  if (!(await lock.tryAcquire())) return { status: "in-progress" };
+  try {
+    return await sendLocked();
+  } finally {
+    await lock.release();
   }
-  onStart?.({ total: issue.subscribers.length, pending });
 
-  const counts = await sendNewsletter({
-    ...issue,
-    alreadySent: async (email) =>
-      recipients.has(await sentMark(email, slug, secret)),
-    onSent: async (email) => {
-      recipients.add(await sentMark(email, slug, secret));
-      entry.recipients = [...recipients];
-      save();
-    },
-  });
-  entry.sent = recipients.size;
-  entry.failed = counts.failed;
-  if (counts.failed === 0) entry.completedAt = now().toISOString();
-  save();
-  return { status: "sent", ...counts };
+  async function sendLocked(): Promise<SendOnceResult> {
+    const entries = loadNewsletterLog(logFile);
+    const previous = entries.find((e) => e.slug === slug);
+    if (
+      previous && (previous.recipients === undefined || previous.completedAt)
+    ) {
+      return { status: "already-sent", entry: previous };
+    }
+    if (issue.subscribers.length === 0) return { status: "no-subscribers" };
+
+    const entry: NewsletterLogEntry = previous ?? {
+      slug,
+      subject: issue.subject,
+      startedAt: now().toISOString(),
+      recipients: [],
+    };
+    if (entry.audience === undefined) {
+      entry.audience = await Promise.all(
+        issue.subscribers.map((s) => sentMark(s.email, slug, secret)),
+      );
+    }
+    const audience = new Set(entry.audience);
+    const recipients = new Set(entry.recipients);
+    const save = () =>
+      saveNewsletterLog(logFile, previous ? entries : [...entries, entry]);
+    await save();
+
+    let pending = 0;
+    for (const sub of issue.subscribers) {
+      const mark = await sentMark(sub.email, slug, secret);
+      if (audience.has(mark) && !recipients.has(mark)) pending++;
+    }
+    onStart?.({ total: issue.subscribers.length, pending });
+
+    const counts = await sendNewsletter({
+      ...issue,
+      alreadySent: async (email) => {
+        const mark = await sentMark(email, slug, secret);
+        return recipients.has(mark) || !audience.has(mark);
+      },
+      onSent: async (email) => {
+        recipients.add(await sentMark(email, slug, secret));
+        entry.recipients = [...recipients];
+        await save();
+      },
+    });
+    entry.sent = recipients.size;
+    entry.failed = counts.failed;
+    if (counts.failed === 0) entry.completedAt = now().toISOString();
+    await save();
+    return { status: "sent", ...counts };
+  }
 }

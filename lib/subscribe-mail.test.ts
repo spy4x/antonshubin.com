@@ -188,3 +188,32 @@ Deno.test("never logs the subscriber's address when the relay's error names it",
   assertStringIncludes(logged, "[SUBSCRIBE] welcome failed:");
   assertEquals(logged.includes("reader@example.com"), false, logged);
 });
+
+Deno.test("the confirmation's preview line says what to do, and the welcome's P.S. fits a new subscriber", async () => {
+  const relay = fakeRelay();
+  const deps = {
+    sender: fakeSender(relay),
+    contactEmail: "owner@example.com",
+    baseUrl: BASE,
+    log: recordingLog(),
+  };
+  await sendConfirmationMail(
+    { email: "reader@example.com", confirmLink: `${BASE}/x` },
+    deps,
+  );
+  await sendSubscribeMails(SUB, deps);
+  const [confirmation, welcome] = relay.mails;
+  assertStringIncludes(
+    String(confirmation.html),
+    "Open the link and press the button to confirm.",
+  );
+  assertEquals(String(confirmation.html).includes("One click"), false);
+  assertStringIncludes(
+    String(welcome.html),
+    "P.S. If you&#39;re working on something I could help with: <a ",
+  );
+  assertStringIncludes(
+    String(welcome.text),
+    "P.S. If you're working on something I could help with: Book a free",
+  );
+});

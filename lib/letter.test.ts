@@ -138,3 +138,10 @@ Deno.test("a post's letter is 600px wide with the cover first, then the intro, t
   assertEquals(letter.html.split("Read the article · 5 min").length - 1, 1);
   assertStringIncludes(letter.html, "#f97316");
 });
+
+Deno.test("the plain-text footer is separated by dash, dash, space, and a P.S. lead can be changed", () => {
+  const { text, html } = render({ psLead: "If you need <me>:" });
+  assertStringIncludes(text, "\n\n-- \nYou get this because you asked.");
+  assertStringIncludes(text, `P.S. If you need <me>: ${BOOK_LABEL}: `);
+  assertStringIncludes(html, "P.S. If you need &lt;me&gt;: <a ");
+});

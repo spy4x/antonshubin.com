@@ -68,6 +68,7 @@ Deno.test("sendNewsletterOnce mails every subscriber and records each one by a k
       slug: "a-post",
       subject: "A post",
       startedAt: "2026-09-26T10:00:00.000Z",
+      audience: marks,
       recipients: marks,
       sent: 2,
       failed: 0,
@@ -231,4 +232,107 @@ Deno.test("sendExitCode is 0 only when a mail went out or a rerun had nobody lef
   assertEquals(sendExitCode({ sent: 0, failed: 0 }), 1);
   assertEquals(sendExitCode({ sent: 0, failed: 0, skipped: 2 }), 0);
   assertEquals(sendExitCode({ sent: 0, failed: 1, skipped: 2 }), 1);
+});
+
+const SUBSCRIBERS = issue(fakeRelay()).subscribers;
+const BAD_ROW = {
+  email: "a<b@example.com",
+  subscribedAt: "2026-01-03T00:00:00.000Z",
+};
+const LATE = {
+  email: "late@example.com",
+  subscribedAt: "2026-09-27T00:00:00.000Z",
+};
+
+Deno.test("a post that can never complete does not reach a subscriber who joined after the first run", async () => {
+  await withLog(async (logFile) => {
+    const first = fakeRelay();
+    const result = await sendNewsletterOnce({
+      slug: "a-post",
+      logFile,
+      issue: { ...issue(first), subscribers: [...SUBSCRIBERS, BAD_ROW] },
+      secret: SECRET,
+      now: NOW,
+    });
+    assertEquals(result, { status: "sent", sent: 2, failed: 1, skipped: 0 });
+    assertEquals(loadNewsletterLog(logFile)[0].completedAt, undefined);
+
+    const second = fakeRelay();
+    const rerun = await sendNewsletterOnce({
+      slug: "a-post",
+      logFile,
+      issue: { ...issue(second), subscribers: [...SUBSCRIBERS, BAD_ROW, LATE] },
+      secret: SECRET,
+      now: NOW,
+    });
+    assertEquals(rerun, { status: "sent", sent: 0, failed: 1, skipped: 3 });
+    assertEquals(second.mails.length, 0);
+    const lateMark = await sentMark(LATE.email, "a-post", SECRET);
+    const entry = loadNewsletterLog(logFile)[0];
+    assertEquals(entry.audience?.includes(lateMark), false);
+    assertEquals(entry.recipients?.includes(lateMark), false);
+  });
+});
+
+Deno.test("a resumed run mails only the missing members of the recorded audience", async () => {
+  await withLog(async (logFile) => {
+    const refusing = fakeRelay((to) =>
+      to.includes("two@example.com") ? "refuse-recipient" : "accept"
+    );
+    await sendNewsletterOnce({
+      slug: "a-post",
+      logFile,
+      issue: issue(refusing),
+      secret: SECRET,
+      now: NOW,
+    });
+    const relay = fakeRelay();
+    await sendNewsletterOnce({
+      slug: "a-post",
+      logFile,
+      issue: { ...issue(relay), subscribers: [...SUBSCRIBERS, LATE] },
+      secret: SECRET,
+      now: NOW,
+    });
+    assertEquals(relay.mails.map((m) => m.to), [["two@example.com"]]);
+  });
+});
+
+Deno.test("two overlapping calls mail each address exactly once and refuse the second as in progress", async () => {
+  await withLog(async (logFile) => {
+    const relay = fakeRelay();
+    const call = () =>
+      sendNewsletterOnce({
+        slug: "a-post",
+        logFile,
+        issue: issue(relay),
+        secret: SECRET,
+        now: NOW,
+      });
+    const results = await Promise.all([call(), call()]);
+    assertEquals(results.map((r) => r.status).sort(), ["in-progress", "sent"]);
+    const to = relay.mails.map((m) => String(m.to)).sort();
+    assertEquals(to, ["one@example.com", "two@example.com"]);
+    // The lock is released afterwards, so the finished post is now refused as sent.
+    assertEquals((await call()).status, "already-sent");
+  });
+});
+
+Deno.test("the log directory holds only the log and its lock file while a mail is out and after the send", async () => {
+  await withLog(async (logFile) => {
+    const seen: string[][] = [];
+    const dir = logFile.replace(/\/[^/]+$/, "");
+    const relay = fakeRelay(() => {
+      seen.push([...Deno.readDirSync(dir)].map((e) => e.name).sort());
+      return "accept";
+    });
+    await once(logFile, relay);
+    // While a mail is out, only the log and the lock file exist, and no temp file stays behind.
+    const expected = ["newsletter-log.json", "newsletter-log.json.lock"];
+    assertEquals(seen, [expected, expected]);
+    assertEquals(
+      [...Deno.readDirSync(dir)].map((e) => e.name).sort(),
+      expected,
+    );
+  });
 });

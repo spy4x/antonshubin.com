@@ -60,7 +60,7 @@ export async function sendConfirmationMail(
   const letter = renderLetter({
     baseUrl: deps.baseUrl,
     campaign: SIGNUP_CAMPAIGN,
-    preheader: "One click and you are on the list.",
+    preheader: "Open the link and press the button to confirm.",
     blocks: [
       paragraph(
         `Someone asked to send this address the newsletter on ${
@@ -115,6 +115,7 @@ export async function sendSubscribeMails(
         "Start with the SaaS architecture guide",
       ),
     ],
+    psLead: "If you're working on something I could help with:",
     reason: SUBSCRIBED_REASON,
     unsubscribeLink: sub.unsubscribeLink,
   });
