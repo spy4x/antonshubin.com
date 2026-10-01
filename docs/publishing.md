@@ -110,7 +110,9 @@ draft against the brief before the pull request opens.
    its text.
 6. Add any figures the post uses under `static/img/blog/<slug>/` as WebP, run
    `deno task strip-metadata` on them, then run `deno task og` for the 1200×630
-   preview and commit the PNG. The preview PNG stays the link and search image.
+   preview and commit the PNG (`deno task og` needs no build and leaves the
+   repo's `docs/social-preview.png` alone; that one is
+   `deno task social-preview`). The preview PNG stays the link and search image.
    A post about something you can see (a tool, a UI, a chart) opens with a real
    screenshot as the first thing in its Markdown, right under the TL;DR. Like
    every post image it stays lazy: on a phone it sits below the first screen,

@@ -7,7 +7,8 @@
  * landscape default for the site (#193).
  *
  * Run with:
- *   deno task og
+ *   deno task og              # the cards; no build needed
+ *   deno task social-preview  # docs/social-preview.png (#291); builds first
  *
  * Dev-machine only. The production Docker build (`denoland/deno:2.9.0`, no
  * Chromium) never runs this script — it only serves the PNGs this script
@@ -22,7 +23,7 @@
  * edit (see AGENTS.md's note in this file's own docs section) is this one
  * command.
  */
-import { launchChromium } from "../test/browser.ts";
+import { launchChromium, newPage } from "../test/browser.ts";
 import { blogArticles, projects } from "../lib/data.ts";
 import { ROLE } from "../lib/head.ts";
 import { tools } from "../lib/tools.ts";
@@ -185,7 +186,7 @@ async function socialPreview(browser: Browser): Promise<number> {
   });
   let shot: Uint8Array;
   try {
-    const page = await browser.newPage({
+    const page = await newPage(browser, {
       viewport: { width: 1280, height: 800 },
       colorScheme: "dark",
     });
@@ -203,7 +204,7 @@ async function socialPreview(browser: Browser): Promise<number> {
     fontFace("Literata", "literata-latin-600-normal.woff2", 600),
     fontFace("IBM Plex Sans", "ibm-plex-sans-latin-400-normal.woff2", 400),
   ])).join("\n");
-  const page = await browser.newPage({
+  const page = await newPage(browser, {
     viewport: { width: SOCIAL_WIDTH, height: SOCIAL_HEIGHT },
   });
   try {
@@ -222,6 +223,17 @@ async function socialPreview(browser: Browser): Promise<number> {
 
 function fmtBytes(n: number): string {
   return n < 1024 ? `${n}B` : `${(n / 1024).toFixed(1)}KB`;
+}
+
+/** `deno task social-preview`: only `docs/social-preview.png`, after a fresh build. */
+async function mainSocial() {
+  const browser = await launchChromium();
+  try {
+    const bytes = await socialPreview(browser);
+    console.log(`\nWrote docs/social-preview.png (${fmtBytes(bytes)}).`);
+  } finally {
+    await browser.close();
+  }
 }
 
 async function main() {
@@ -316,11 +328,6 @@ async function main() {
     );
     console.log(`default.png  ${fmtBytes(defaultBytes)}`);
     count++;
-
-    // The repository's GitHub social preview (#291), 1280×640.
-    console.log(
-      `social-preview.png  ${fmtBytes(await socialPreview(browser))}`,
-    );
   } finally {
     await browser.close();
   }
@@ -328,5 +335,6 @@ async function main() {
 }
 
 if (import.meta.main) {
-  await main();
+  if (Deno.args.includes("--social")) await mainSocial();
+  else await main();
 }
