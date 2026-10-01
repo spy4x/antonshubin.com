@@ -38,9 +38,10 @@
  * through `var()`; each points at a site token above, so the `@theme` block
  * stays the only place a colour is written. Only the tokens the components on
  * the site read are set; a later component that reads another adds it here.
- * The package's own `tokens.css` is not imported: its `:root` would redefine
- * `--color-accent` and `--font-sans` above this site's `@theme` layer, and it
- * is about 2 KB the home page would load for nothing.
+ * The package's own `tokens.css` is not imported. Since 2.0.0 it sits in a
+ * layer under this `@theme`, so it no longer overrides the site, but its
+ * defaults (a purple accent, gray surfaces) would still need every mapping
+ * below, and it added 10.6 KB to the built stylesheet for nothing.
  */
 :root {
   --color-canvas: var(--color-ink);
