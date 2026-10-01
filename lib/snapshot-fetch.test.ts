@@ -20,6 +20,8 @@ Deno.test("the highest versioned tag wins by number, never by text or by `latest
     "v0.12.0",
   );
   assertEquals(highestVersionTag(["latest", "ee63ebd"]), undefined);
+  assertEquals(highestVersionTag(["v0.12.0", "v0.12.1"]), "v0.12.1");
+  assertEquals(highestVersionTag(["v0.12.1", "v0.12.0"]), "v0.12.1");
 });
 
 Deno.test("Docker Hub's latest version is its highest versioned tag", async () => {

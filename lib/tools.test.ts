@@ -175,3 +175,11 @@ Deno.test("a runnable tool names its schema.org category, and a tool never names
     if (t.deployable) assert(t.appCategory, `${t.slug}: no appCategory`);
   }
 });
+
+Deno.test('no archived tool is listed in the "tools" group', () => {
+  for (const t of [...tools, ...toolRows]) {
+    if (t.status === "archived") {
+      assertEquals(t.group, "archive", t.slug);
+    }
+  }
+});

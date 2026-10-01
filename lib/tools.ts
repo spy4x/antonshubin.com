@@ -528,7 +528,7 @@ export const tools: Tool[] = [
       "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
     kind: "device",
     status: "archived",
-    group: "tools",
+    group: "archive",
     repo: "spy4x/air-quality-sensor",
     runtime: "An ESP32 microcontroller",
     programmingLanguage: "C++",

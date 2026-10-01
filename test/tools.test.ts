@@ -387,9 +387,11 @@ siteTest(
         `${t.slug}: catalog event`,
       );
       if (t.repo) {
+        // An archived repository takes no issues, so its door links the repository.
+        const door = t.status === "archived" ? t.repo : `${t.repo}/issues`;
         assert(
           html.includes(
-            `href="https://github.com/${t.repo}/issues" data-umami-event="outbound" data-umami-event-to="github" data-umami-event-item="${t.slug}"`,
+            `href="https://github.com/${door}" data-umami-event="outbound" data-umami-event-to="github" data-umami-event-item="${t.slug}"`,
           ),
           `${t.slug}: issue event`,
         );
@@ -688,4 +690,27 @@ Deno.test("a tool page's closing band carries a Book action", async () => {
   } finally {
     await site.stop();
   }
+});
+
+siteTest(
+  "an archived tool's page offers no way to open an issue",
+  async (site) => {
+    const archived = tools.filter((t) => t.status === "archived" && t.repo);
+    assert(archived.length > 0, "no archived tool with a repository");
+    for (const t of archived) {
+      const html = await site.html(`/tools/${t.slug}`);
+      assert(!html.includes("Report an issue"), `${t.slug}: Report an issue`);
+      assert(!html.includes("open an issue"), `${t.slug}: open an issue`);
+      assert(!html.includes(`${t.repo}/issues`), `${t.slug}: issues link`);
+      assert(
+        html.includes(`https://github.com/${t.repo}"`),
+        `${t.slug}: repo link`,
+      );
+    }
+  },
+);
+
+siteTest("a live tool's page still offers Report an issue", async (site) => {
+  const html = await site.html("/tools/ts-libs");
+  assert(html.includes("Report an issue"));
 });
