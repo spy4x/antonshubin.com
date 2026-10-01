@@ -3,11 +3,11 @@ import { Layout } from "../components/Layout.tsx";
 import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import {
-  ArrowRightIcon,
-  BuildingIcon,
-  CardIcon,
-  WalletIcon,
-} from "../components/Icons.tsx";
+  IconArrowRight as ArrowRightIcon,
+  IconBuilding as BuildingIcon,
+  IconCreditCard as CardIcon,
+  IconWallet as WalletIcon,
+} from "@spy4x/preact-icons";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import CopyButton from "../islands/CopyButton.tsx";
 import { INTERNATIONAL_BANK_LINE } from "../lib/about.ts";

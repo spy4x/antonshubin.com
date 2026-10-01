@@ -31,7 +31,7 @@ import { toJsonLd } from "../../lib/json-ld.ts";
 import { NewTabHint } from "../../components/NewTabHint.tsx";
 import { ReviewSource } from "../../components/ReviewSource.tsx";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { ArrowRightIcon } from "../../components/Icons.tsx";
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { eventAttrs } from "../../lib/analytics.ts";
 

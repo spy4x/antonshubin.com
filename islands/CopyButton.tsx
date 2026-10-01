@@ -1,6 +1,9 @@
 import { useSignal } from "@preact/signals";
 import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
-import { CheckIcon, CopyIcon } from "../components/Icons.tsx";
+import {
+  IconCheck as CheckIcon,
+  IconClipboardCopy as CopyIcon,
+} from "@spy4x/preact-icons";
 import type { EventAttrs } from "../lib/analytics.ts";
 
 interface CopyButtonProps {

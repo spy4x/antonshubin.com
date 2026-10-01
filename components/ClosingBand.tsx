@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 import { promise } from "../lib/promises.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
-import { ArrowRightIcon } from "./Icons.tsx";
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 import { BOOK_LABEL } from "../lib/nav.ts";
 

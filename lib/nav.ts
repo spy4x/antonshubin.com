@@ -7,7 +7,7 @@
  * feeds are not destinations: they live in `lib/profiles.ts` and the footer.
  */
 
-/** The item icons; each names a glyph in `components/Icons.tsx`'s `NavGlyph`. */
+/** The item icons; each names a glyph in `components/NavParts.tsx`'s `NavGlyph`. */
 export type NavIcon =
   | "work"
   | "services"

@@ -3,7 +3,7 @@ import { getBreadcrumb, head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { Breadcrumb } from "../components/Breadcrumb.tsx";
 import { Layout } from "../components/Layout.tsx";
-import { ArrowRightIcon } from "../components/Icons.tsx";
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import Button from "../components/Button.tsx";
 import {

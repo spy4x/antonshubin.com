@@ -34,7 +34,7 @@ import { ClosingBand } from "../components/ClosingBand.tsx";
 import { TestimonialCard } from "../components/TestimonialCard.tsx";
 import { WithNote } from "../components/WithNote.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
-import { ArrowRightIcon } from "../components/Icons.tsx";
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
 import { profile } from "../lib/profiles.ts";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 

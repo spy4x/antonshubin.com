@@ -5,7 +5,10 @@ import { SCHEDULE_URL } from "../lib/config.ts";
 import { projectStatus } from "../lib/work.ts";
 import GhStars from "../islands/GhStars.tsx";
 import { BookCallLink } from "./BookCallLink.tsx";
-import { ArrowRightIcon, ExternalLinkIcon } from "./Icons.tsx";
+import {
+  IconArrowRight as ArrowRightIcon,
+  IconExternalLink as ExternalLinkIcon,
+} from "@spy4x/preact-icons";
 import { Fact, FACT_LINK, FactCard } from "./FactCard.tsx";
 import { NewTabHint } from "./NewTabHint.tsx";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";

@@ -1,5 +1,5 @@
 import { type PromiseItem, promises } from "../lib/promises.ts";
-import { ArrowRightIcon } from "./Icons.tsx";
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
 /** A quiet link under one promise of the `full` timeline: a catalog item or a page. */

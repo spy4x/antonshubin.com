@@ -1,6 +1,6 @@
 import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
-import { WrenchIcon } from "../components/Icons.tsx";
+import { IconWrench as WrenchIcon } from "@spy4x/preact-icons";
 
 export default define.page(function ServerError() {
   return (

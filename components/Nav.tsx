@@ -1,5 +1,11 @@
-import { NavGlyph } from "./Icons.tsx";
-import { BOOK, FOCUS, navIcon, STACKED, STATES } from "./NavParts.tsx";
+import {
+  BOOK,
+  FOCUS,
+  NavGlyph,
+  navIcon,
+  STACKED,
+  STATES,
+} from "./NavParts.tsx";
 import NavMore from "../islands/NavMore.tsx";
 import {
   BOOK_HREF,

@@ -1,6 +1,9 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { ArrowRightIcon, CheckIcon } from "../components/Icons.tsx";
+import {
+  IconArrowRight as ArrowRightIcon,
+  IconCheck as CheckIcon,
+} from "@spy4x/preact-icons";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { proof } from "../lib/proof.ts";
 import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
