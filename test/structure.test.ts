@@ -571,6 +571,20 @@ siteTest(
 );
 
 siteTest(
+  "no head tag on a page carries a Fresh data-key (#195)",
+  async (site) => {
+    for (const path of ["/", "/book", "/work"]) {
+      const head = (await site.html(path)).split("</head>")[0];
+      assertEquals(
+        count(head, /data-key=/),
+        0,
+        `${path}: a head tag has a data-key`,
+      );
+    }
+  },
+);
+
+siteTest(
   "the breadcrumb's last item is the bare page name, not the full <title>",
   async (site) => {
     async function lastBreadcrumbName(path: string): Promise<string> {
