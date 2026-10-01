@@ -18,7 +18,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import axeCore from "axe-core";
 import type { Browser, Locator, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 import { tools } from "../lib/tools.ts";
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 };
@@ -184,11 +184,13 @@ async function walk(page: Page, button: Locator, limit: number) {
   const strip = page.locator("[data-gallery-strip]");
   const seen = [await counterText(page)];
   for (let i = 0; i < limit && await button.isEnabled(); i++) {
-    const scrolled = strip.evaluate((el) =>
-      new Promise<boolean>((resolve) => {
-        el.addEventListener("scrollend", () => resolve(true), { once: true });
-        setTimeout(() => resolve(false), 5000);
-      })
+    const scrolled = strip.evaluate(
+      (el, ms) =>
+        new Promise<boolean>((resolve) => {
+          el.addEventListener("scrollend", () => resolve(true), { once: true });
+          setTimeout(() => resolve(false), ms);
+        }),
+      WAIT_MS,
     );
     await button.click();
     assert(await scrolled, `click ${i + 1} did not scroll the strip`);
@@ -596,7 +598,7 @@ Deno.test("More opens the menu dialog, Escape closes it and focus returns to Mor
       // The dialog's `close` event, which resets More, is dispatched as a
       // separate task after the dialog hides.
       await page.locator('#tab-bar button[aria-expanded="false"]').waitFor({
-        timeout: 2000,
+        timeout: WAIT_MS,
       }).catch(() => {});
 
       assertEquals(

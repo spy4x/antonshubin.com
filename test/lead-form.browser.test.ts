@@ -18,10 +18,11 @@ import {
   newPage,
   recordUmami,
   trackedCalls,
+  WAIT_MS,
 } from "./browser.ts";
 import { catalogItem } from "../lib/catalog.ts";
 
-const FOCUS_TIMEOUT_MS = 5000;
+const FOCUS_TIMEOUT_MS = WAIT_MS;
 // Longer than the panels' 500ms CSS transition, so the scroll sampler below
 // keeps recording past the point where a scroll jump would show up.
 const SCROLL_SAMPLE_WINDOW_MS = 700;

@@ -32,7 +32,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { type Site, startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
 import { createConfirmToken } from "../lib/subscribe-token.ts";
 
@@ -466,7 +466,7 @@ Deno.test("negative controls: an unnonced inline script is blocked and reported,
           (globalThis as unknown as { __cspViolations: Violation[] })
             .__cspViolations.some((v) => v.directive.startsWith("frame-src")),
         undefined,
-        { timeout: 5000 },
+        { timeout: WAIT_MS },
       ).catch(() => {});
       const afterFrame = await violationsOn(page);
       assert(

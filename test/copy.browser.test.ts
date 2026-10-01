@@ -7,7 +7,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 import { blogArticles } from "../lib/data.ts";
 
 type Mode = "async-ok" | "legacy-ok" | "fails";
@@ -60,7 +60,7 @@ Deno.test("the /pay copy button says Copied! after the clipboard takes the addre
   await withPage("async-ok", "/pay", async (page) => {
     const button = page.getByRole("button", { name: "Copy EVM address" });
     await button.click();
-    await page.getByText("Copied!").first().waitFor({ timeout: 5000 });
+    await page.getByText("Copied!").first().waitFor({ timeout: WAIT_MS });
     const [text] = await copied(page);
     assert(/^0x[0-9a-fA-F]{40}$/.test(text), `copied ${text}`);
   });
@@ -69,7 +69,7 @@ Deno.test("the /pay copy button says Copied! after the clipboard takes the addre
 Deno.test("the /pay copy button still copies through the textarea fallback when the clipboard API rejects", async () => {
   await withPage("legacy-ok", "/pay", async (page) => {
     await page.getByRole("button", { name: "Copy EVM address" }).click();
-    await page.getByText("Copied!").first().waitFor({ timeout: 5000 });
+    await page.getByText("Copied!").first().waitFor({ timeout: WAIT_MS });
     assertEquals((await copied(page)).length, 1);
   });
 });
@@ -78,7 +78,7 @@ Deno.test("the /pay copy button says Copy failed, not Copied!, when nothing coul
   await withPage("fails", "/pay", async (page) => {
     await page.getByRole("button", { name: "Copy EVM address" }).click();
     const failed = page.getByRole("button", { name: "Copy failed" });
-    await failed.waitFor({ timeout: 5000 });
+    await failed.waitFor({ timeout: WAIT_MS });
     assertEquals(await page.getByText("Copied!").count(), 0);
     // The failure reads in the error colour, resolved live so a token edit can't desync the check.
     // Polled, because the button's colour transition takes a moment to settle.
@@ -97,7 +97,7 @@ Deno.test("the /pay copy button says Copy failed, not Copied!, when nothing coul
           getComputedStyle(b).color === brick
         ),
       probe,
-      { timeout: 2000 },
+      { timeout: WAIT_MS },
     ).then(() => true, () => false);
     assert(settled, "Copy failed is not in the error colour");
   });

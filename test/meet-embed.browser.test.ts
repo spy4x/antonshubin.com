@@ -45,6 +45,7 @@ import {
   newPage,
   recordUmami,
   trackedCalls,
+  WAIT_MS,
 } from "./browser.ts";
 import { EMBED_TIMEOUT_MS } from "../islands/MeetEmbed.tsx";
 
@@ -489,7 +490,7 @@ Deno.test("a refused frame turns the placeholder into a message with the new-tab
         "loading",
       );
       await page.waitForSelector('[data-meet-embed="failed"]', {
-        timeout: EMBED_TIMEOUT_MS + 5000,
+        timeout: EMBED_TIMEOUT_MS + WAIT_MS,
       });
       const box = page.locator("[data-meet-embed-placeholder]");
       assert(
@@ -542,10 +543,10 @@ Deno.test("a height that arrives after the timeout still turns the failure messa
         waitUntil: "networkidle",
       });
       await page.waitForSelector('[data-meet-embed="failed"]', {
-        timeout: EMBED_TIMEOUT_MS + 5000,
+        timeout: EMBED_TIMEOUT_MS + WAIT_MS,
       });
       await page.waitForSelector('[data-meet-embed="ready"]', {
-        timeout: 10000,
+        timeout: WAIT_MS,
       });
       const frame = page.locator(
         'iframe[title="Schedule a call with Anton Shubin"]',
