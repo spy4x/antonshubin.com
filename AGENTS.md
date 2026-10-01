@@ -1135,8 +1135,9 @@ its HTML and text locally and `--test-newsletter` sends one copy to
   --send-newsletter`. The production container
   keeps a per-recipient sent log, `data/newsletter-log.json` (a keyed hash of
   each address, never the address): it refuses a post whose run finished with no
-  failure, and a rerun after a partial failure mails only the subscribers who
-  were missed.
+  failure, a rerun after a partial failure mails only the people the first run
+  meant it for who were missed (never a later subscriber), and a second run
+  started while one is going is refused by a lock file.
 - **Dev.to gets an unpublished draft only.** Anton publishes it himself.
 
 ## Tagged links
