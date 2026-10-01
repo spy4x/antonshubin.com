@@ -1,3 +1,4 @@
+import { cn } from "@spy4x/preact-cn";
 import { type ComponentChildren, Fragment } from "preact";
 import { define } from "../../lib/utils.ts";
 import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
@@ -127,7 +128,7 @@ function Excerpt(
 ) {
   return (
     <figure
-      class={`pl-3 border-l-2 border-rule-strong text-sm ${className}`}
+      class={cn("pl-3 border-l-2 border-rule-strong text-sm", className)}
     >
       <blockquote class="inline text-parchment italic">“{excerpt}”</blockquote>
       <figcaption class="inline text-graphite">
@@ -171,9 +172,10 @@ function CardPicture({ project, eager }: { project: Project; eager: boolean }) {
             width={96}
             height={96}
             loading={eager ? "eager" : "lazy"}
-            class={`w-24 h-24 object-contain${
-              project.logoPlate ? " bg-parchment rounded-lg p-2" : ""
-            }`}
+            class={cn(
+              "w-24 h-24 object-contain",
+              project.logoPlate && "bg-parchment rounded-lg p-2",
+            )}
           />
         )}
     </div>
@@ -210,9 +212,10 @@ function HighlightCard(
               width={28}
               height={28}
               loading="lazy"
-              class={`w-7 h-7 shrink-0 object-contain${
-                project.logoPlate ? " bg-parchment rounded p-0.5" : ""
-              }`}
+              class={cn(
+                "w-7 h-7 shrink-0 object-contain",
+                project.logoPlate && "bg-parchment rounded p-0.5",
+              )}
             />
           )}
           <a
@@ -222,7 +225,10 @@ function HighlightCard(
               place: "body",
               target: workHref(project.slug ?? ""),
             })}
-            class={`${TITLE_LINK} after:absolute after:inset-0 after:rounded-xl`}
+            class={cn(
+              TITLE_LINK,
+              "after:absolute after:inset-0 after:rounded-xl",
+            )}
           >
             {project.title}
           </a>
@@ -284,7 +290,7 @@ function ArchiveRow(
               place: "body",
               target: workHref(project.slug ?? ""),
             })}
-            class={`${TITLE_LINK} after:absolute after:inset-0`}
+            class={cn(TITLE_LINK, "after:absolute after:inset-0")}
           >
             {project.title}
           </a>

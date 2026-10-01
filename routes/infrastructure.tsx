@@ -1,3 +1,4 @@
+import { cn } from "@spy4x/preact-cn";
 import {
   BOOK_HREF,
   BOOK_LABEL,
@@ -332,7 +333,10 @@ export default define.page(function Infrastructure() {
                     place: "card",
                     target: catalogPath(item.slug),
                   })}
-                  class={`mt-3 inline-flex items-center gap-1 text-sm ${LINK}`}
+                  class={cn(
+                    "mt-3 inline-flex items-center gap-1 text-sm",
+                    LINK,
+                  )}
                 >
                   See what is included
                   <ArrowRightIcon class="w-3.5 h-3.5" />
@@ -372,7 +376,7 @@ function ColophonCard({ commit }: { commit: string }) {
                 href={`${REPO}/commit/${commit}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                class={`${LINK} break-all`}
+                class={cn(LINK, "break-all")}
               >
                 {commit.slice(0, 7)}
                 <NewTabHint />

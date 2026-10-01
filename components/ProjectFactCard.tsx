@@ -1,3 +1,4 @@
+import { cn } from "@spy4x/preact-cn";
 import { formatPeriod, type Project } from "../lib/data.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import { SCHEDULE_URL } from "../lib/config.ts";
@@ -36,7 +37,7 @@ export function SimilarWorkLink(
         place: place === "bottom" ? "band" : "card",
         target: catalogPath(item.slug),
       })}
-      class={`inline-block text-sm ${LINK} ${className}`}
+      class={cn("inline-block text-sm", LINK, className)}
     >
       Similar work today: {item.shortTitle} ·{" "}
       <span class="price">{priceLabel(item)}</span>
@@ -61,7 +62,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
       href={live}
       target="_blank"
       {...eventAttrs("outbound", { to: "live", item: project.slug })}
-      class={`${LINK} break-words`}
+      class={cn(LINK, "break-words")}
     >
       {project.externalURLLabel ?? live.replace(/^https?:\/\//, "")}
       <ExternalLinkIcon class="inline w-3.5 h-3.5 ml-1" />
@@ -118,7 +119,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
               href={`https://github.com/${project.ghRepo}`}
               target="_blank"
               {...eventAttrs("outbound", { to: "github", item: project.slug })}
-              class={`${LINK} inline-flex items-center gap-2`}
+              class={cn(LINK, "inline-flex items-center gap-2")}
             >
               GitHub
               <GhStars repo={project.ghRepo} />

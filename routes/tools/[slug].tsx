@@ -1,3 +1,4 @@
+import { cn } from "@spy4x/preact-cn";
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
@@ -390,11 +391,12 @@ export default define.page(async function ToolPage(ctx) {
                     <li
                       key={f.text}
                       data-relation={f.planned ? "planned" : "true"}
-                      class={`pl-4 border-l-2 ${
+                      class={cn(
+                        "pl-4 border-l-2",
                         f.planned
                           ? "border-dashed border-rule-strong"
-                          : "border-solid border-sage"
-                      }`}
+                          : "border-solid border-sage",
+                      )}
                     >
                       <span class="text-xs uppercase tracking-wider text-graphite">
                         {f.planned ? "Planned" : "Today"}
