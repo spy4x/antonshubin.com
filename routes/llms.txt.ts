@@ -1,4 +1,5 @@
 import { define } from "../lib/utils.ts";
+import { EMAIL_ADDRESS } from "../lib/profiles.ts";
 import { BASE_URL, LOCATION } from "../lib/config.ts";
 import { COMPANY, COMPANY_LINE } from "../lib/company.ts";
 import { ABOUT_PATH } from "../lib/about.ts";
@@ -95,7 +96,7 @@ ${promisesList}
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect in four lanes, and how handover, backups, monitoring and deploys are handled
 - [Contact](${BASE_URL}${BOOK_HREF}) — ${BOOK_LABEL} on the page, ${
       decapitalize(BRIEF_LABEL)
-    } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email hi@antonshubin.com, or Telegram @spy4x
+    } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email ${EMAIL_ADDRESS}, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting
 - [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install

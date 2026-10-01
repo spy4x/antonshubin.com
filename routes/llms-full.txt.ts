@@ -1,4 +1,5 @@
 import { define } from "../lib/utils.ts";
+import { EMAIL_ADDRESS } from "../lib/profiles.ts";
 import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
 import { COMPANY, COMPANY_LINE } from "../lib/company.ts";
 import {
@@ -134,7 +135,7 @@ export const handler = define.handlers({
 - **Name:** Anton Shubin
 - **Title:** ${ROLE}
 - **Company:** ${COMPANY_LINE} — Anton is co-founder and CEO
-- **Email:** hi@antonshubin.com
+- **Email:** ${EMAIL_ADDRESS}
 - **GitHub:** https://github.com/spy4x
 - **LinkedIn:** https://www.linkedin.com/in/anton-shubin
 - **YouTube:** https://www.youtube.com/@anton-shubin
@@ -202,7 +203,7 @@ ${catalogList}
 - **How I work:** ${BASE_URL}/how-i-work — The five promises in the order a project meets them, prices, who I build for, my AI-agent setup and ${faqs.length} answered questions
 - **Contact:** ${BASE_URL}${BOOK_HREF} — ${BOOK_LABEL} in the calendar on the page, or ${
       decapitalize(BRIEF_LABEL)
-    } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email hi@antonshubin.com, or Telegram @spy4x. Invoices are issued by ${COMPANY_LINE}
+    } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email ${EMAIL_ADDRESS}, or Telegram @spy4x. Invoices are issued by ${COMPANY_LINE}
 - **Work:** ${BASE_URL}/work — ${workDescription(ROLE)}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how risk is controlled in four blocks: handover (with sign-in), backups, monitoring, deploys and builds. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.

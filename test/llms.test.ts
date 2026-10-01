@@ -6,6 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 import { formatPeriod, projects } from "../lib/data.ts";
+import { EMAIL_ADDRESS } from "../lib/profiles.ts";
 
 /** Extracts the `/blog/<slug>` hrefs inside the "Read next" section, in order. */
 function readNextSlugs(html: string): string[] {
@@ -15,6 +16,21 @@ function readNextSlugs(html: string): string[] {
   const matches = [...section.matchAll(/href="\/blog\/([^"]+)"/g)];
   return matches.map((m) => m[1]);
 }
+
+Deno.test("both llms files give the email address from lib/profiles.ts", async () => {
+  const site = await startSite();
+  try {
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const text = await site.html(llmsPath);
+      assert(
+        text.includes(EMAIL_ADDRESS),
+        `${llmsPath} does not give ${EMAIL_ADDRESS}`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});
 
 Deno.test("neither llms file lists the YouTube channel as an open-source project", async () => {
   const site = await startSite();

@@ -10,7 +10,7 @@ import {
 import { breadcrumbListJsonLd } from "@spy4x/platform/universal/seo";
 import { LOCATION, X_HANDLE } from "../lib/config.ts";
 import { COMPANY } from "../lib/company.ts";
-import { sameAsUrls } from "../lib/profiles.ts";
+import { EMAIL_ADDRESS, sameAsUrls } from "../lib/profiles.ts";
 import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts";
 import { proof } from "../lib/proof.ts";
 import { toJsonLd } from "../lib/json-ld.ts";
@@ -140,11 +140,11 @@ export function SEOHead() {
                   "I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one. I work fixed price when the scope is fixed and hourly when it's open-ended.",
                 "url": "https://antonshubin.com",
                 "image": "https://antonshubin.com/img/photo-big.webp",
-                "email": "mailto:hi@antonshubin.com",
+                "email": `mailto:${EMAIL_ADDRESS}`,
                 "contactPoint": {
                   "@type": "ContactPoint",
                   "contactType": "sales",
-                  "email": "hi@antonshubin.com",
+                  "email": EMAIL_ADDRESS,
                   "url": "https://antonshubin.com/book",
                   "availableLanguage": ["en", "ru"],
                 },
