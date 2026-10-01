@@ -342,7 +342,12 @@ siteTest(
         "width": 1200,
         "height": 630,
       });
-      assertEquals(posting.isPartOf, { "@id": `${SITE}/blog#blog` });
+      assertEquals(posting.isPartOf, {
+        "@type": "Blog",
+        "@id": `${SITE}/blog#blog`,
+        "name": "Writing",
+        "url": `${SITE}/blog`,
+      });
       assertEquals(
         posting.dateModified,
         article.updatedAt ?? article.publishedAt,
