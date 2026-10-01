@@ -207,3 +207,16 @@ export const AUTHOR_LINE =
 /** The newsletter's promise (#274, Mkt 5): the three topics and how often (Anton, #301). */
 export const NEWSLETTER_LINE =
   "New posts on decisions for founders, AI and MCP, and self-hosting, about once a week at most, and only when there is one. Unsubscribe with one click.";
+
+/**
+ * The `Blog` JSON-LD node's identity: the `/blog` page describes it in full and
+ * each post describes it again inside `isPartOf`, so the two must agree.
+ */
+export function blogNode(site: string) {
+  return {
+    "@type": "Blog",
+    "@id": `${site}/blog#blog`,
+    "name": "Writing",
+    "url": `${site}/blog`,
+  };
+}

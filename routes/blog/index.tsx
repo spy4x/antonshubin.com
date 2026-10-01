@@ -8,6 +8,7 @@ import { NewsletterBlock } from "../../components/NewsletterBlock.tsx";
 import { type BlogArticle, blogArticles } from "../../lib/data.ts";
 import {
   archivedPosts,
+  blogNode,
   postDate,
   postHref,
   topicPosts,
@@ -80,10 +81,7 @@ export default define.page(function Blog(ctx) {
         dangerouslySetInnerHTML={{
           __html: toJsonLd({
             "@context": "https://schema.org",
-            "@type": "Blog",
-            "@id": `${SITE}/blog#blog`,
-            "name": "Writing",
-            "url": `${SITE}/blog`,
+            ...blogNode(SITE),
             "inLanguage": "en-US",
             "author": { "@id": `${SITE}/#person` },
             "publisher": { "@id": `${SITE}/#person` },
