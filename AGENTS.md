@@ -383,34 +383,34 @@ uses these tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind
 palette colour (`slate-*`, `gray-*`, `orange-*`) showing up again is a
 regression, not a style choice.
 
-`components/Button.tsx` is the one button component, drawn with
-`@spy4x/preact-ui/button`'s classes (#195). `variant` defaults to `secondary`
-(the library's `outline`); `variant="primary"` (the accent fill, Ink text) is
-reserved for the Book action, and a primary button carries `data-primary-book` —
-the marker `test/visual-system.browser.test.ts`'s "the accent colour is a
-background only on the primary button and the nav's Book" guard looks for,
-instead of guessing from text content or element shape. It renders an `<a>` with
-`href` and a `<button type="button">` without, never the library's `<Button>`:
-since 2.0.0 that one appends a caller's classes instead of merging them, so it
-cannot drop its 500 weight, smaller radius, Paper fill and default size, which
-the site's look replaces (`SIZE_RESET` names them).
-`buttonClass(variant,
-extra)` (also exported from `Button.tsx`) is the same
-class string as a plain string, for the call sites that can't render `<Button>`
-directly: `components/BookCallLink.tsx` (every "Book a call" link on the site
-goes through it; it owns the `href`/`target`/empty-`url` behaviour
-`<Button href=…>` doesn't, and stamps `data-primary-book` itself for its default
-`variant="primary"`). It is the library's `buttonClasses()` output less
-`SIZE_RESET`, with the site's look, written out in `BUTTON_CLASSES` and joined
-plainly with `extra`, so an island that imports it (`islands/ImageGallery.tsx`)
-ships no library code. Never call `cn()` (tailwind-merge, about 28 KB) from code
-an island imports; use it only in server-rendered components.
-`test/library-classes.test.tsx` fails when `BUTTON_CLASSES` drifts from the
-library or when tailwind-merge reaches a client chunk. The string carries no
-padding, gap or text-size utility — two Tailwind classes for the same property
-in one `class` attribute resolve by their order in the compiled stylesheet, not
-in the attribute — so every call site supplies its own sizing via `extra`
-instead of fighting a default.
+`components/Button.tsx` is the one button component: a thin adapter over
+`@spy4x/preact-ui/button`'s `Button` (#371), rendered with `size="none"`, so the
+library adds no padding, gap or text size and every call site sizes its own
+button through `class`. `variant` defaults to `secondary` (the library's `ghost`
+plus a Rule strong border: the library's `outline` fills itself with Paper);
+`variant="primary"` (the accent fill, Ink text) is reserved for the Book action,
+and a primary button carries `data-primary-book` — the marker
+`test/visual-system.browser.test.ts`'s "the accent colour is a background only
+on the primary button and the nav's Book" guard looks for, instead of guessing
+from text content or element shape. With `href` it renders an `<a>`, without one
+a `<button type="button">`. The library appends a caller's classes after its own
+instead of merging them, so `SITE_VARIANT` replaces the library's `rounded-md`
+with `rounded-lg!` (important; no call site sets a radius), and the library's
+`font-medium` already renders 600 here (below). Never add a second class for a
+property the library sets without `!`: two Tailwind classes for the same
+property in one `class` attribute resolve by their order in the compiled
+stylesheet, not in the attribute. `components/BookCallLink.tsx` (every "Book a
+call" link on the site) renders this `Button` and adds the empty-`url` and
+new-tab behaviour. `buttonClass(variant, extra)` is the same class string for an
+element that is not a `Button`: a few plain links and
+`islands/ImageGallery.tsx`. The library composes classes with `join`, not
+`cn()`, so an island that renders or imports it ships no tailwind-merge. Never
+call `cn()` (tailwind-merge, about 28 KB) from code an island imports; use it
+only in server-rendered components. `test/library-classes.test.tsx` fails when a
+site button carries the library's default size or fill, when one of the
+library's `dark:` classes gets a rule (Tailwind's `dark:` follows the system
+theme and the site maps no accent step 600 or 700), or when tailwind-merge
+reaches a client chunk.
 
 The library's components are coloured by the `:root` block under `@theme` in
 `assets/styles.css`: each library token (`--color-surface`, `--color-success`,

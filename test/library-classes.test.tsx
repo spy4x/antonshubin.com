@@ -10,16 +10,7 @@ import {
   type StatusMarkStatus,
 } from "@spy4x/preact-ui/status-mark";
 import { honeypotField } from "@spy4x/preact-ui/honeypot";
-import { cn } from "@spy4x/preact-cn";
-import { buttonClasses } from "@spy4x/preact-ui/button";
-import Button, {
-  buttonClass,
-  type ButtonVariant,
-  LIBRARY_VARIANT,
-  SITE_LOOK,
-  SITE_VARIANT,
-  SIZE_RESET,
-} from "../components/Button.tsx";
+import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
 import type { CiSnapshot } from "../lib/github-snapshot.ts";
@@ -68,59 +59,104 @@ function renderedLibraryMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.\[\]\/]/g, (c) => `\\${c}`);
+  return "." + className.replace(/[:.!\[\]\/]/g, (c) => `\\${c}`);
 }
 
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-Deno.test("every class a library component renders on the site has a rule in the built stylesheet", async () => {
-  const classes = new Set<string>();
-  for (const [, list] of renderedLibraryMarkup().matchAll(/class="([^"]*)"/g)) {
-    for (const c of list.split(/\s+/)) {
-      // The site has no `.dark` ancestor, so the library's dark variants
-      // never apply and need no rule.
-      if (c && !c.startsWith("dark:")) classes.add(c);
-    }
-  }
-  assert(classes.size > 20, `only ${classes.size} classes rendered`);
-
+/** The client stylesheet of the built site, read off the home page. */
+async function builtCss(): Promise<string> {
   const site = await startSite();
   try {
     const html = await site.html("/");
     const cssHref = html.match(/href="(\/assets\/client-entry-[^"?]+\.css)/)
       ?.[1];
     assert(cssHref, "could not find the client CSS href in / 's HTML");
-    const css = await site.html(cssHref);
-
-    const missing = [...classes].filter((c) =>
-      !new RegExp(`${escapeRegExp(selectorFor(c))}(?![\\w\\\\-])`).test(css)
-    );
-    assert(
-      missing.length === 0,
-      `no rule in the built CSS for: ${missing.join(", ")} — add them to ` +
-        `assets/styles.css's @source inline(...) lines`,
-    );
+    return await site.html(cssHref);
   } finally {
     await site.stop();
   }
+}
+
+/** Every class in the rendered library markup, `dark:` ones apart. */
+function renderedClasses(): { light: Set<string>; dark: Set<string> } {
+  const light = new Set<string>();
+  const dark = new Set<string>();
+  for (const [, list] of renderedLibraryMarkup().matchAll(/class="([^"]*)"/g)) {
+    for (const c of list.split(/\s+/)) {
+      if (c) (c.startsWith("dark:") ? dark : light).add(c);
+    }
+  }
+  return { light, dark };
+}
+
+function hasRule(css: string, className: string): boolean {
+  return new RegExp(`${escapeRegExp(selectorFor(className))}(?![\\w\\\\-])`)
+    .test(css);
+}
+
+Deno.test("every class a library component renders on the site has a rule in the built stylesheet", async () => {
+  const { light: classes } = renderedClasses();
+  assert(classes.size > 20, `only ${classes.size} classes rendered`);
+  const css = await builtCss();
+  const missing = [...classes].filter((c) => !hasRule(css, c));
+  assert(
+    missing.length === 0,
+    `no rule in the built CSS for: ${missing.join(", ")} — add them to ` +
+      `assets/styles.css's @source inline(...) lines`,
+  );
 });
 
-Deno.test("buttonClass gives each variant the library button's classes with the site's look", () => {
-  const reset = new Set(SIZE_RESET.split(" "));
-  for (const variant of ["primary", "secondary"] as ButtonVariant[]) {
-    const expected = buttonClasses(
-      LIBRARY_VARIANT[variant],
-      "md",
-      cn(SITE_LOOK, SIZE_RESET, SITE_VARIANT[variant]),
-    ).split(" ").filter((c) => !reset.has(c) && !c.startsWith("dark:"));
-    assertEquals(
-      new Set(buttonClass(variant).split(" ")),
-      new Set(expected),
-      `buttonClass("${variant}") drifted from @spy4x/preact-ui/button`,
-    );
+// The library button carries `dark:` fills for an app with a dark theme.
+// Tailwind's `dark:` follows the visitor's system theme and the site maps no
+// accent step 600 or 700, so a rule for one would turn Book see-through for
+// every visitor whose system is dark.
+Deno.test("no dark: class a library component renders has a rule in the built stylesheet", async () => {
+  const { dark } = renderedClasses();
+  assert(dark.size > 0, "the library button rendered no dark: class");
+  const css = await builtCss();
+  const ruled = [...dark].filter((c) => hasRule(css, c));
+  assertEquals(ruled, [], "a dark: class reached the built CSS");
+});
+
+// The library's `md` size and its `outline` variant's Paper fill are what
+// the site's buttons replace; the call site sizes every button itself.
+Deno.test("a site button carries no library size or fill and the site's radius", () => {
+  const forbidden = [
+    "gap-2",
+    "px-3",
+    "py-2",
+    "text-sm",
+    "bg-surface",
+    "border-control",
+  ];
+  const html = renderedLibraryMarkup();
+  const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
+    .map(([, list]) => list.split(" "))
+    .filter((list) => list.includes("transition-colors"));
+  assertEquals(buttons.length, 6, html);
+  for (const list of buttons) {
+    assertEquals(list.filter((c) => forbidden.includes(c)), [], list.join(" "));
+    assert(list.includes("rounded-lg!"), list.join(" "));
   }
+});
+
+Deno.test("a primary Button or BookCallLink carries data-primary-book and a secondary one does not", () => {
+  assert(
+    render(<Button variant="primary">x</Button>).includes("data-primary-book"),
+  );
+  assert(
+    render(<BookCallLink url="/book">x</BookCallLink>).includes(
+      "data-primary-book",
+    ),
+  );
+  assert(!render(<Button href="/a">x</Button>).includes("data-primary-book"));
+  assert(
+    !render(<BookCallLink url="/book" variant="secondary">x</BookCallLink>)
+      .includes("data-primary-book"),
+  );
 });
 
 Deno.test("a Button without href is a type=button with the secondary button's classes", () => {
