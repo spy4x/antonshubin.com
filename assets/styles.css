@@ -86,6 +86,8 @@
 @source inline("inline-flex items-center gap-1 text-sm font-medium shrink-0 size-4 text-success text-muted text-warning text-danger text-foreground");
 /* @spy4x/preact-ui/badge: base and the filled `gray`. */
 @source inline("inline-flex items-center border py-1 whitespace-nowrap capitalize border-subtle bg-track text-foreground");
+/* @spy4x/preact-ui/honeypot: the off-screen box. */
+@source inline("absolute h-px w-px overflow-hidden");
 /* The library button classes `components/Button.tsx`'s `SIZE_RESET` names
    only to leave them out; no element renders them. */
 @source not inline("rounded-md bg-surface border-control");

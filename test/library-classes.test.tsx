@@ -9,6 +9,7 @@ import {
   StatusMark,
   type StatusMarkStatus,
 } from "@spy4x/preact-ui/status-mark";
+import { honeypotField } from "@spy4x/preact-ui/honeypot";
 import { cn } from "@spy4x/preact-cn";
 import { buttonClasses } from "@spy4x/preact-ui/button";
 import Button, {
@@ -48,6 +49,7 @@ const CI_STATES: (CiSnapshot | null)[] = [
 function renderedLibraryMarkup(): string {
   return [
     ...STATUSES.map((s) => render(<StatusMark status={s} />)),
+    render(honeypotField("_website", "Website")),
     render(<Button href="/a">Link</Button>),
     render(<Button href="/a" variant="primary">Book</Button>),
     render(<Button>Button</Button>),

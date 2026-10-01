@@ -506,3 +506,45 @@ Deno.test("a brief the form refuses counts as invalid and never as sent", async 
     await site.stop();
   }
 });
+
+Deno.test("a brief posts what a bot typed into the off-screen website field, and an empty one for a person", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      const posted: Record<string, unknown>[] = [];
+      await page.route("**/api/lead", (route: Route) => {
+        posted.push(route.request().postDataJSON());
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ok: true }),
+        });
+      });
+      await page.goto(`${site.origin}/book`, { waitUntil: "networkidle" });
+      await page.fill("#lead-name", "Ada Lovelace");
+      await page.fill("#lead-email", "ada@example.com");
+      await page.locator("#lead-stack").pressSequentially("Deno + Fresh");
+      await page.locator("input[name=_website]").fill(
+        "https://spam.example.com",
+      );
+      await clickSubmitButtonWithoutScrolling(page);
+      await page.waitForFunction(() =>
+        document.activeElement?.id === "lead-success-heading"
+      );
+      assertEquals(posted.length, 1);
+      assertEquals(posted[0]._website, "https://spam.example.com");
+
+      await page.goto(`${site.origin}/book`, { waitUntil: "networkidle" });
+      await submitBrief(page);
+      assertEquals(posted[1]._website, "");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
