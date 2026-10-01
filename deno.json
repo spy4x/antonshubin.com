@@ -21,6 +21,7 @@
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
     "umami-reports": "deno run --allow-env --allow-net scripts/umami-reports.ts",
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
+    "reshoot:caldav": "deno run -A scripts/reshoot-caldav-demo.ts",
     "lcp": "deno run -A scripts/lcp.ts",
     "og": "deno run -A scripts/og-images.ts",
     "social-preview": "deno task build && deno run -A scripts/og-images.ts --social",
