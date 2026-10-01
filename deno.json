@@ -35,7 +35,7 @@
   "exclude": ["**/_fresh/*", "launches/**", "videos/**"],
   "imports": {
     "@/": "./",
-    "@spy4x/email": "jsr:@spy4x/email@1.19.0",
+    "@spy4x/email": "jsr:@spy4x/email@1.26.0",
     "@spy4x/integrations": "jsr:@spy4x/integrations@1.19.0",
     "@spy4x/net": "jsr:@spy4x/net@1.19.0",
     "@spy4x/platform": "jsr:@spy4x/platform@1.19.0",
