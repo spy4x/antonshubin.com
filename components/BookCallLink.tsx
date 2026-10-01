@@ -41,7 +41,8 @@ interface BookCallLinkProps {
  * its own `<a href={SCHEDULE_URL}>` inline, which produced `href=""` — and a
  * click that just reloaded the page — whenever `SCHEDULE_URL` was unset and
  * there was no per-item override (#156). Styling goes through
- * `components/Button.tsx`'s `buttonClass()` (#184) — the same source
+ * `components/Button.tsx`'s `buttonClass()` (#184, over
+ * `@spy4x/preact-ui/button` since #195) — the same source
  * `<Button>` itself uses — rather than each call site carrying its own copy
  * of the primary/secondary class string. A `variant="primary"` link also
  * carries `data-primary-book`, the marker
