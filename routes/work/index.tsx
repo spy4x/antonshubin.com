@@ -31,7 +31,7 @@ import { NewTabHint } from "../../components/NewTabHint.tsx";
 import { ReviewSource } from "../../components/ReviewSource.tsx";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
 import { ArrowRightIcon } from "../../components/Icons.tsx";
-import StatusMark from "../../components/StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { eventAttrs } from "../../lib/analytics.ts";
 
 const BASE = "https://antonshubin.com";

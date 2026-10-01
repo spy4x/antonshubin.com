@@ -26,7 +26,7 @@ import Button from "../components/Button.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
 import { TestimonialCard } from "../components/TestimonialCard.tsx";
 import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
-import StatusMark from "../components/StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { ArrowRightIcon, CalendarIcon } from "../components/Icons.tsx";
 import { eventAttrs } from "../lib/analytics.ts";
 

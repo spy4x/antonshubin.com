@@ -5,7 +5,7 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { NotFound } from "../../components/NotFound.tsx";
-import StatusMark from "../../components/StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import Button from "../../components/Button.tsx";
 import { CiPill } from "../../components/CiPill.tsx";
 import { Fact, FactCard } from "../../components/FactCard.tsx";

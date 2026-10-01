@@ -1,4 +1,5 @@
-import StatusMark from "./StatusMark.tsx";
+import { badgeClasses } from "@spy4x/preact-ui/badge";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
 
 /**
@@ -9,6 +10,10 @@ import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
  * next push. `data-ci-status` carries the word
  * for tests. Rendered from `lib/github-snapshot.json`, not from Woodpecker's
  * live badge image, so the page is the same on every request.
+ *
+ * The pill is `@spy4x/preact-ui/badge`'s grey badge (`bg-track`, Lamp through
+ * the theme tokens) drawn on a link, since the library's `Badge` is a plain
+ * `<span>` of text: no border, a full round, and the site's padding.
  */
 export function CiPill(
   { ci, pipelinesUrl, labelHidden = false }: {
@@ -23,7 +28,11 @@ export function CiPill(
     <a
       href={pipelinesUrl}
       data-ci-status={word}
-      class="relative z-10 inline-flex items-center gap-1.5 px-2.5 py-1 bg-lamp rounded-full hover:underline underline-offset-4"
+      class={badgeClasses(
+        "gray",
+        "filled",
+        "relative z-10 gap-1.5 px-2.5 border-0 rounded-full text-[length:inherit] font-normal hover:underline underline-offset-4",
+      )}
     >
       <span class={labelHidden ? "sr-only" : "text-sm text-parchment"}>CI</span>
       {

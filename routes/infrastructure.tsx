@@ -14,7 +14,7 @@ import { ClosingBand } from "../components/ClosingBand.tsx";
 import { Fact, FactCard } from "../components/FactCard.tsx";
 import { InfraMap } from "../components/InfraMap.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
-import StatusMark from "../components/StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { WithNote } from "../components/WithNote.tsx";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
 import { projects } from "../lib/data.ts";

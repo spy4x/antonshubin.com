@@ -7,7 +7,7 @@ import { BookCallLink } from "./BookCallLink.tsx";
 import { ArrowRightIcon, ExternalLinkIcon } from "./Icons.tsx";
 import { Fact, FACT_LINK, FactCard } from "./FactCard.tsx";
 import { NewTabHint } from "./NewTabHint.tsx";
-import StatusMark from "./StatusMark.tsx";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { WithNote } from "./WithNote.tsx";
 import { eventAttrs } from "../lib/analytics.ts";
 import { BOOK_LABEL } from "../lib/nav.ts";
