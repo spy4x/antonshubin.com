@@ -10,9 +10,9 @@
  *   - `cpu`: 4x CPU throttling only, no network shaping — isolates
  *     rendering/paint cost from network variance.
  *   - `network`: CDP `Network.emulateNetworkConditions` (150ms latency,
- *     200 KB/s down/up — a slow-3G-ish profile) plus `serviceWorkers:
- *     "block"` on the browser context, so a repeat visit's cached service
- *     worker never masks a real first-load regression.
+ *     200 KB/s down/up — a slow-3G-ish profile).
+ * Both block service workers on the browser context, so a cached worker
+ * never masks a real first-load regression.
  * Default runs both and reports each separately — a fix that only shows up
  * under one of the two (font preloads competing for a slow connection's
  * limited bandwidth, for instance) would otherwise hide in the other.
@@ -39,6 +39,7 @@
 import { type Site, startSite } from "../test/harness.ts";
 import { launchChromium } from "../test/browser.ts";
 import type { Browser } from "playwright";
+import { resolve } from "@std/path";
 
 type Mode = "cpu" | "network";
 
@@ -86,7 +87,9 @@ const MOBILE_UA =
  * `_fresh/server.js`), for `--ab` mode. Mirrors `test/harness.ts`'s
  * `startSite()` but against an arbitrary directory instead of always the
  * current worktree. */
-async function startSiteAt(dir: string): Promise<Site> {
+async function startSiteAt(relativeDir: string): Promise<Site> {
+  // The server runs with `cwd: dir`, so a relative entry path would resolve twice.
+  const dir = resolve(relativeDir);
   const serverEntry = `${dir}/_fresh/server.js`;
   try {
     await Deno.stat(serverEntry);
@@ -145,9 +148,10 @@ async function sampleOnce(
     const context = await browser.newContext({
       viewport: MOBILE_VIEWPORT,
       userAgent: MOBILE_UA,
-      // network mode only: a blocked service worker means every sample is a
-      // genuine first load, not a warm-cache repeat visit.
-      serviceWorkers: mode === "network" ? "block" : "allow",
+      // Both modes: a build that still registers a service worker (before
+      // #285) reloads the page from the worker's cache, and the reload's LCP
+      // is a warm repeat visit (0 or ~200 ms), not a first load.
+      serviceWorkers: "block",
     });
     const page = await context.newPage();
     const cdp = await context.newCDPSession(page);
