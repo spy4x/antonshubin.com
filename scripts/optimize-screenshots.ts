@@ -23,7 +23,10 @@ import resize from "https://esm.sh/@jsquash/resize@2.1.0?target=denonext&pin=v13
 import { MAX_SCREENSHOT_WIDTH as MAX_WIDTH } from "../lib/image-path.ts";
 
 const PROJECT_ROOT = new URL("../", import.meta.url).pathname;
-const SCREENSHOTS_DIR = `${PROJECT_ROOT}static/img/projects`;
+// Client projects keep their shots under projects/, my own tools under tools/ (#273).
+const SCREENSHOT_DIRS = ["projects", "tools"].map((d) =>
+  `${PROJECT_ROOT}static/img/${d}`
+);
 
 const WEBP_QUALITY = 75;
 
@@ -109,19 +112,21 @@ async function shrinkWebp(webpPath: string): Promise<ProcessedFile | null> {
 }
 
 const pngs: string[] = [];
-for await (
-  const entry of walk(SCREENSHOTS_DIR, {
-    includeDirs: false,
-    exts: [".png"],
-    // Project logos live as `logo.svg` already; any `logo.png` is a leftover
-    // and shouldn't get a webp variant.
-    skip: [/\/logo\.png$/],
-  })
-) {
-  pngs.push(entry.path);
+for (const dir of SCREENSHOT_DIRS) {
+  for await (
+    const entry of walk(dir, {
+      includeDirs: false,
+      exts: [".png"],
+      // Project logos live as `logo.svg` already; any `logo.png` is a leftover
+      // and shouldn't get a webp variant.
+      skip: [/\/logo\.png$/],
+    })
+  ) {
+    pngs.push(entry.path);
+  }
 }
 
-console.log(`Found ${pngs.length} PNG files in ${SCREENSHOTS_DIR}`);
+console.log(`Found ${pngs.length} PNG files in ${SCREENSHOT_DIRS.join(", ")}`);
 let totalSrc = 0;
 let totalOut = 0;
 
@@ -140,8 +145,12 @@ for (const png of pngs) {
 }
 
 const webps: string[] = [];
+// Only projects/ has PNG-less WebPs that #336 capped; the tools' ones stay as they are.
 for await (
-  const entry of walk(SCREENSHOTS_DIR, { includeDirs: false, exts: [".webp"] })
+  const entry of walk(SCREENSHOT_DIRS[0], {
+    includeDirs: false,
+    exts: [".webp"],
+  })
 ) {
   webps.push(entry.path);
 }
