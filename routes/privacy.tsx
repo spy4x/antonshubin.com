@@ -80,9 +80,10 @@ export default define.page(function Privacy(ctx) {
             without opening a page, the same as the link in the mail.
           </p>
           <p>
-            The newsletter shows my portrait and, for a post, its cover image.
-            Both load from antonshubin.com when you open the mail (unless your
-            mail program blocks images), so this site's server sees that
+            Every mail about the newsletter, the confirmation and the welcome
+            included, shows my portrait, and a post announcement shows its cover
+            image. Both load from antonshubin.com when you open the mail (unless
+            your mail program blocks images), so this site's server sees that
             request, like any page view.
           </p>
           <p>
