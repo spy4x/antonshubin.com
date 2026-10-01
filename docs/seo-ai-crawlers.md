@@ -237,6 +237,11 @@ Five entities in a `@graph` array (six on `/about`):
   reads the PNG's IHDR chunk, no image library and no browser needed)
 - Regenerate after any post/project title changes with the one command above,
   then commit the changed PNGs
+- The same script writes `docs/social-preview.png` (1280×640, #291): the repo's
+  GitHub social preview, with the name and `ROLE` beside a dark screenshot of
+  the built home page. Unlike the OG cards it needs `deno task build` first (it
+  boots the site with `startSite()`). GitHub has no API for it: upload the file
+  by hand in Settings → General → Social preview after it changes.
 
 ### 9. Meta Tags and Robots Directives
 
