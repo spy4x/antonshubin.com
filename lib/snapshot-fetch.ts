@@ -101,12 +101,30 @@ export async function snapshotRepo(
 
 /** Which registry a package is published on, and under what name. */
 export interface RegistryPackage {
-  registry: "jsr" | "npm";
-  /** `@scope/name` on JSR, the package name on npm. */
+  registry: "jsr" | "npm" | "docker";
+  /** `@scope/name` on JSR, the package name on npm, `owner/image` on Docker Hub. */
   name: string;
 }
 
-/** The latest published version of a package on JSR or npm. */
+/** `1.2.3` or `v1.2.3`, nothing else: Docker Hub tags such as `latest` or a commit hash are no version. */
+const VERSION_TAG = /^v?(\d+)\.(\d+)\.(\d+)$/;
+
+/** The highest versioned tag in `names`, as written, or undefined when none is versioned. */
+export function highestVersionTag(names: string[]): string | undefined {
+  const versioned = names.flatMap((tag) => {
+    const m = VERSION_TAG.exec(tag);
+    return m
+      ? [{ tag, parts: [Number(m[1]), Number(m[2]), Number(m[3])] }]
+      : [];
+  });
+  versioned.sort((a, b) =>
+    b.parts[0] - a.parts[0] || b.parts[1] - a.parts[1] ||
+    b.parts[2] - a.parts[2]
+  );
+  return versioned[0]?.tag;
+}
+
+/** The latest published version of a package on JSR or npm, or of an image's versioned tags on Docker Hub. */
 export async function latestVersion(
   fetcher: Fetcher,
   pkg: RegistryPackage,
@@ -118,6 +136,15 @@ export async function latestVersion(
     );
     if (!meta.latest) throw new Error(`${pkg.name}: JSR lists no latest`);
     return meta.latest;
+  }
+  if (pkg.registry === "docker") {
+    const page = await getJson<{ results?: { name: string }[] }>(
+      fetcher,
+      `https://hub.docker.com/v2/repositories/${pkg.name}/tags?page_size=100`,
+    );
+    const tag = highestVersionTag((page.results ?? []).map((r) => r.name));
+    if (!tag) throw new Error(`${pkg.name}: Docker Hub lists no versioned tag`);
+    return tag;
   }
   const meta = await getJson<{ version?: string }>(
     fetcher,

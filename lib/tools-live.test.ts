@@ -253,3 +253,24 @@ Deno.test("a stalled call is dropped after 5 seconds, not longer", async () => {
     AbortSignal.timeout = original;
   }
 });
+
+Deno.test("a live version replaces the tag in a Docker install line", () => {
+  const t = tool("mig");
+  const shown = withLiveVersion(t, {
+    ...committedToolsLive(),
+    versions: { mig: "v9.9.9" },
+  });
+  assertEquals(shown.registry!.version, "v9.9.9");
+  assertEquals(shown.registry!.install, "docker pull antonshubin/mig:v9.9.9");
+});
+
+Deno.test("a live version replaces the version in the rostok install line", () => {
+  const shown = withLiveVersion(tool("rostok"), {
+    ...committedToolsLive(),
+    versions: { rostok: "9.9.9" },
+  });
+  assertEquals(
+    shown.registry!.install,
+    "deno install -g -A -n rostok jsr:@rostok/cli@9.9.9",
+  );
+});

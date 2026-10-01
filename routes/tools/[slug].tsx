@@ -288,14 +288,18 @@ export default define.page(async function ToolPage(ctx) {
                     >
                       Star on GitHub
                     </a>
-                    {" · "}
-                    <a
-                      href={`${repo}/issues`}
-                      {...toolLink("github")}
-                      class={linkClass}
-                    >
-                      Report an issue
-                    </a>
+                    {tool.status !== "archived" && (
+                      <>
+                        {" · "}
+                        <a
+                          href={`${repo}/issues`}
+                          {...toolLink("github")}
+                          class={linkClass}
+                        >
+                          Report an issue
+                        </a>
+                      </>
+                    )}
                   </p>
                 </div>
               )}
@@ -471,9 +475,13 @@ export default define.page(async function ToolPage(ctx) {
             {repo && (
               <div>
                 <h2 class="text-xl text-parchment">Use it</h2>
-                <p class="mt-1 text-graphite">Star it or open an issue.</p>
+                <p class="mt-1 text-graphite">
+                  {tool.status === "archived"
+                    ? "The repository is archived, kept for reference."
+                    : "Star it or open an issue."}
+                </p>
                 <a
-                  href={`${repo}/issues`}
+                  href={tool.status === "archived" ? repo : `${repo}/issues`}
                   {...toolLink("github")}
                   class={linkClass}
                 >

@@ -41,7 +41,9 @@ Deno.test("every install command pins the registry version it names", () => {
   for (const t of tools) {
     if (!t.registry) continue;
     assert(
-      t.registry.install.endsWith(`@${t.registry.version}`),
+      [`@${t.registry.version}`, `:${t.registry.version}`].some((s) =>
+        t.registry!.install.endsWith(s)
+      ),
       `${t.slug}: "${t.registry.install}" is not pinned to ${t.registry.version}`,
     );
   }
@@ -90,7 +92,7 @@ Deno.test("every status is written down: in use, ready, beta, WIP, paused or arc
     "oko": "in-use",
     "caldav-mcp": "in-use",
     "rostok": "in-use",
-    "air-quality-sensor": "in-use",
+    "air-quality-sensor": "archived",
     "ts-libs": "ready",
     "preact-components": "beta",
     "financy": "wip",
@@ -171,5 +173,13 @@ Deno.test("toolsForPost finds the tool that names a post, and none for another",
 Deno.test("a runnable tool names its schema.org category, and a tool never names a rating", () => {
   for (const t of tools) {
     if (t.deployable) assert(t.appCategory, `${t.slug}: no appCategory`);
+  }
+});
+
+Deno.test('no archived tool is listed in the "tools" group', () => {
+  for (const t of [...tools, ...toolRows]) {
+    if (t.status === "archived") {
+      assertEquals(t.group, "archive", t.slug);
+    }
   }
 });

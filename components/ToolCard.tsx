@@ -1,6 +1,10 @@
 import { cn } from "@spy4x/preact-cn";
 import { firstSentence } from "../lib/llms.ts";
-import { liveRepo, type ToolsLive } from "../lib/tools-live.ts";
+import {
+  liveRepo,
+  type ToolsLive,
+  withLiveVersion,
+} from "../lib/tools-live.ts";
 import { ciUrl, type Tool, toolLicence, type ToolRow } from "../lib/tools.ts";
 import { CiPill } from "./CiPill.tsx";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";
@@ -58,7 +62,7 @@ export function ToolCard(
   const snap = liveRepo(tool, live);
   const version = variant === "compact" || variant === "more"
     ? null
-    : versionText(tool);
+    : versionText(withLiveVersion(tool, live));
   const title = (
     <a
       href={`/tools/${tool.slug}`}
