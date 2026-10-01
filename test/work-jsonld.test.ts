@@ -116,6 +116,21 @@ siteTest(
 );
 
 siteTest(
+  "a live external link becomes the project's sameAs",
+  async (site) => {
+    const project = allProjects.find((p) => p.slug === "foodrazor")!;
+    assert(
+      project.externalURL && !project.externalURLDead,
+      "fixture project has no live externalURL — pick another slug",
+    );
+    const html = await site.html(`/work/${project.slug}`);
+    const node = findProjectNode(jsonLd(html));
+    assert(node, "no project JSON-LD node found");
+    assertEquals(node.sameAs, [project.externalURL], project.slug);
+  },
+);
+
+siteTest(
   "a project page's JSON-LD carries the required schema.org fields",
   async (site) => {
     const project = allProjects.find((p) => p.slug === "smartlite")!;

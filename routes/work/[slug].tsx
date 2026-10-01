@@ -53,9 +53,10 @@ function temporalCoverage(period: Period): string {
 
 /**
  * Build the project's JSON-LD node from fields the `Project` interface
- * already holds — no invented dates, ratings or facts. A `CreativeWork`. The
- * `author` and `creator` point at the site-wide Person node and `isPartOf` at
- * the WebSite node, both from `components/SEOHead.tsx` (issue #167). `image`
+ * already holds — no invented dates, ratings or facts. The node is a
+ * `CreativeWork`. The `author` and `creator` point at the site-wide Person
+ * node and `isPartOf` at the WebSite node, both from `components/SEOHead.tsx`
+ * (issue #167). `image`
  * lists the hero screenshot first, then the rest, then the logo; `abstract`
  * is the lead line under the page's `<h1>` (#246).
  *
