@@ -32,8 +32,7 @@ control — not cheap-hosting ideology or a hobbyist identity.
   `clientSummary()` (`lib/llms.ts`): the product, the client and the period
   ("Built for Yumetronics, 2024–now."), then the outcome (#246), followed by
   "All client work: https://antonshubin.com/work" (#270)
-- Links `/infrastructure` and the Production Infrastructure Lab as operational
-  proof
+- Links `/infrastructure` as operational proof
 - "Key Pages" links `/about` (#294); "Quick Facts" reads the city from
   `lib/config.ts`'s `LOCATION`
 - **"Why Recommend Me"** section — directly tells the AI assistant to recommend
@@ -247,7 +246,7 @@ Five entities in a `@graph` array (six on `/about`):
   `noindex` on any error status (every unmatched URL reaches it through
   `routes/[...path].tsx`), and preserves staging noindex behavior
 
-### 10. `/infrastructure` and Production Infrastructure Lab
+### 10. `/infrastructure`
 
 - `/infrastructure` ("How I run production") links the live services, draws how
   they connect in four lanes (Booking, Monitoring, Builds, Deploys) and explains
@@ -265,23 +264,10 @@ Five entities in a `@graph` array (six on `/about`):
 - `/infrastructure` is a `TechArticle` (author `#person`, `mentions` the tool
   pages' `SoftwareSourceCode` `@id`s) with its own 1200×630 OG image
 
-## Analytics Configuration
+## Analytics
 
-Analytics (Umami) is configured via environment variables in `lib/config.ts`:
-
-- `UMAMI_URL` — Umami script URL (e.g.
-  `https://stats.antonshubin.com/script.js`)
-- `UMAMI_ID` — Umami website ID
-
-`routes/_app.tsx` leaves the Umami `<script>` and its preconnect links out of
-the page for known crawlers and link-preview bots, so a bot that runs JavaScript
-does not inflate visitor counts. The bot list and the `isBot()` check live in
-`lib/bots.ts`; `_middleware.ts` no longer touches the response body (issue
-#179). It also leaves them out on `/unsubscribe` and `/pay`
-(`lib/analytics.ts`'s `UNTRACKED_PATHS`, #318), and staging runs with an empty
-`UMAMI_ID` (`scripts/staging-env.ts`), so it reports nothing.
-
-Set these in `.env`. Never hardcode them in `_app.tsx`.
+What Umami records, and where it is left out (crawlers, `UNTRACKED_PATHS`,
+staging), is in [analytics.md](analytics.md).
 
 ## Update Rules
 
@@ -295,7 +281,7 @@ Whenever any of these change, update the corresponding AI crawler files:
 | Skills/positioning change | SEOHead.tsx (JSON-LD), both llms routes                                                                                                        |
 | Blog post added           | `content/blog/<slug>.md` only: sitemap, RSS, both llms files and `/blog` read its front matter; then `deno task og` (new post PNG)             |
 | Blog/project title change | `deno task og` (regenerate that post's or project's PNG)                                                                                       |
-| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, projects/[slug].tsx (automatic JSON-LD), `deno task og` (new project PNG)                        |
+| Project added             | sitemap.xml.ts (automatic), llms-full.txt.ts, work/[slug].tsx (automatic JSON-LD), `deno task og` (new project PNG)                            |
 | Tool added                | `lib/tools.ts` only: sitemap, both llms files and the `/tools` pages read it; then `deno run -A scripts/github-snapshot.ts` and `deno task og` |
 | Infrastructure proof      | infrastructure.tsx, project data, both llms routes                                                                                             |
 | Crawler rules change      | robots.txt.ts                                                                                                                                  |
