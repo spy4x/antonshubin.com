@@ -95,7 +95,7 @@ ${promisesList}
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect in four lanes, and how handover, backups, monitoring and deploys are handled
 - [Contact](${BASE_URL}${BOOK_HREF}) — ${BOOK_LABEL} on the page, ${
       decapitalize(BRIEF_LABEL)
-    } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email hello@antonshubin.com, or Telegram @spy4x
+    } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email hi@antonshubin.com, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, and self-hosting
 - [Work](${BASE_URL}/work)
 - [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install

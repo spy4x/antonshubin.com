@@ -107,7 +107,7 @@ Five entities in a `@graph` array (six on `/about`):
   review cards. The home meta description comes from `lib/home.ts`.
 - **ContactPage** — on `/book` only (#272): `about` the Person, `isPartOf` the
   WebSite, `breadcrumb` the page's BreadcrumbList. The Person carries a
-  `contactPoint` (sales, `hello@antonshubin.com`, `/book`, en and ru) on every
+  `contactPoint` (sales, `hi@antonshubin.com`, `/book`, en and ru) on every
   page. No `ScheduleAction` and no review markup: the calendar is an iframe from
   the `noindex` scheduler, so the page states the call's facts in its own HTML.
 - **BreadcrumbList** — on every page but `/`, built from `head.value.pageName`

@@ -62,7 +62,7 @@ export const footerProfiles: Profile[] = pick([
 export const sameAsUrls: string[] = profiles.map((p) => p.href);
 
 /** Direct contact channels, shown in the footer's "Contact" group. */
-export const EMAIL_ADDRESS = "hello@antonshubin.com";
+export const EMAIL_ADDRESS = "hi@antonshubin.com";
 export const emailContact: Profile = {
   id: "email",
   label: "Email",

@@ -1055,9 +1055,9 @@ and name, the content, a P.S. with the booking link, a reply line, a small
 footer), as HTML built on `@spy4x/email/html`'s `htmlWrap` and `emailButton`
 plus a plain-text part, with every value escaped and every link into the site
 the `email` channel's tagged URL (`scripts/utm.ts`). They are sent as
-`Anton Shubin <hello@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox
-that reaches Anton, so they set no `Reply-To`; the welcome and every newsletter
-carry the subscriber's own one-click `List-Unsubscribe` (`listUnsubscribe` on
+`Anton Shubin <hi@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox that
+reaches Anton, so they set no `Reply-To`; the welcome and every newsletter carry
+the subscriber's own one-click `List-Unsubscribe` (`listUnsubscribe` on
 `EmailMessage`). Lead mail still sets `Reply-To` to the visitor (#266), and the
 owner notice stays plain text. A lead whose send failed is appended to
 `data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that it

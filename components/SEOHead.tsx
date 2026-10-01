@@ -140,11 +140,11 @@ export function SEOHead() {
                   "I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one. I work fixed price when the scope is fixed and hourly when it's open-ended.",
                 "url": "https://antonshubin.com",
                 "image": "https://antonshubin.com/img/photo-big.webp",
-                "email": "mailto:hello@antonshubin.com",
+                "email": "mailto:hi@antonshubin.com",
                 "contactPoint": {
                   "@type": "ContactPoint",
                   "contactType": "sales",
-                  "email": "hello@antonshubin.com",
+                  "email": "hi@antonshubin.com",
                   "url": "https://antonshubin.com/book",
                   "availableLanguage": ["en", "ru"],
                 },
