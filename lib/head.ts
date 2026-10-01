@@ -1,10 +1,17 @@
 import { signal } from "@preact/signals";
+import type { PageHead as LibraryPageHead } from "@spy4x/preact-system/head";
 
-export interface PageHead {
-  title: string;
-  description: string;
-  canonical: string;
-  ogImage: string;
+/**
+ * The fields of `@spy4x/preact-system`'s page head this site sets (#195),
+ * with `ogImage` and `ogType` required, plus three of its own. The library's
+ * `jsonLd`, `crumbs`, `siteName`, `twitterSite`, `twitterCard` and `locale`
+ * are left out:
+ * components/SEOHead.tsx builds the graph and passes the fixed values itself.
+ */
+export interface PageHead
+  extends
+    Pick<LibraryPageHead, "title" | "description" | "canonical" | "noindex">,
+    Required<Pick<LibraryPageHead, "ogImage" | "ogType">> {
   /**
    * `ogImage`'s pixel size, when known — printed as `og:image:width`/
    * `og:image:height` (components/SEOHead.tsx). Every generated OG PNG
@@ -17,8 +24,6 @@ export interface PageHead {
    */
   ogImageWidth?: number;
   ogImageHeight?: number;
-  ogType: "profile" | "article" | "website" | "service";
-  noindex?: boolean;
   /**
    * The bare page name for the breadcrumb (visible nav and JSON-LD
    * BreadcrumbList) — "Ship It Today", not "Ship It Today — Anton Shubin".
