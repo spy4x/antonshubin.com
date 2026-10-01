@@ -1,7 +1,12 @@
 import { useSignal } from "@preact/signals";
 import { useRef } from "preact/hooks";
-import { NavGlyph } from "../components/Icons.tsx";
-import { FOCUS, navIcon, STACKED, STATES } from "../components/NavParts.tsx";
+import {
+  FOCUS,
+  NavGlyph,
+  navIcon,
+  STACKED,
+  STATES,
+} from "../components/NavParts.tsx";
 import { moreItems, navCurrent } from "../lib/nav.ts";
 
 /**

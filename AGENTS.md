@@ -324,7 +324,7 @@ renders the rail and the tab bar on the server; only More
 (`islands/NavMore.tsx`, its dialog's contents rendered when it opens) ships JS.
 There is no Links control (#293): More lists pages only (Home, About, How I
 work, Writing, Infrastructure), and the profiles and feeds live in the footer.
-The nav's icons are `components/Icons.tsx`'s `NavGlyph` (one short path each,
+The nav's icons are `components/NavParts.tsx`'s `NavGlyph` (one short path each,
 styled by `.nav-icon`) and its states are the `.nav-*` classes in
 `assets/styles.css`: keep its markup small, because under `scripts/lcp.ts`'s
 network profile every extra KB on every page measurably delays the home page's
