@@ -2,7 +2,7 @@
 // is wider than the screen, and no "Read next" row ends past its right edge
 // (the old Previous/Next cards once ran 335px past it while an ancestor
 // clipped them, so only each row's own box shows such an overflow). #274:
-// /blog and three sample posts have no horizontal scroll and no axe
+// /blog and five sample posts have no horizontal scroll and no axe
 // violations at 390 and 1440px, and the image lightbox closes on a tap
 // beside the image. Runs under `deno task test:browser`, sharing
 // test/browser.ts's Chromium launch.
@@ -78,13 +78,16 @@ Deno.test("no blog post or its Read next rows run past the screen at 390px", asy
   }
 });
 
-Deno.test("/blog and three sample posts have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+Deno.test("/blog and five sample posts have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
   // A long post with code and a contents list, a short one, one with images.
   const paths = [
     "/blog",
     "/blog/building-mcp-servers-with-deno",
     "/blog/zond-sso-probe-bridge",
     "/blog/ship-it-today",
+    // The two posts with wide tables (#334).
+    "/blog/opus-5-5-vs-sonnet-5-agent-costs",
+    "/blog/preact-component-library-without-shadcn",
   ];
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com" },

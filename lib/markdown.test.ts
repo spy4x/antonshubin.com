@@ -416,3 +416,25 @@ Deno.test("links to other sites in a post carry the outbound event, internal lin
     "a link inside a code block or an internal link was tagged",
   );
 });
+
+Deno.test("a table sits in a focusable region named after the heading above it", async () => {
+  const md =
+    "## Cost per run & more\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n| c |\n|---|\n| 3 |\n";
+  const html = await renderBlogMarkdown(md);
+  const boxes = html.match(/<div class="table-scroll"[^>]*>/g) ?? [];
+  assertEquals(boxes.length, 2);
+  for (const box of boxes) {
+    assertMatch(box, /tabindex="0"/);
+    assertMatch(box, /role="region"/);
+    assertMatch(box, /aria-label="Cost per run &amp; more"/);
+  }
+  assertMatch(
+    html,
+    /<div class="table-scroll"[^>]*><table>[\s\S]*?<\/table>\n?<\/div>/,
+  );
+});
+
+Deno.test("a table with no heading above it is labelled Table", async () => {
+  const html = await renderBlogMarkdown("| a |\n|---|\n| 1 |\n");
+  assertMatch(html, /aria-label="Table"/);
+});
