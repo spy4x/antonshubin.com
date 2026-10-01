@@ -121,6 +121,12 @@ Deno.test("buttonClass gives each variant the library button's classes with the 
   }
 });
 
+Deno.test("a Button without href is a type=button with the secondary button's classes", () => {
+  const html = render(<Button>x</Button>);
+  assert(html.includes(`type="button"`), html);
+  assert(html.includes(`class="${buttonClass("secondary")}"`), html);
+});
+
 // tailwind-merge (behind the library's `cn()`) is about 28 KB minified. An
 // island that imports a helper calling `cn()` ships all of it, as the project
 // gallery did through `buttonClass`. "fvn-normal" is one of its class-group
