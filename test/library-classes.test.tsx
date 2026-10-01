@@ -3,13 +3,22 @@
 // assets/styles.css lists their classes in `@source inline(...)` by hand. A
 // class missing from that list still renders in the HTML and the build still
 // passes; only the built stylesheet shows it has no rule.
-import { assert } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { render } from "npm:preact-render-to-string@^6.6.3";
 import {
   StatusMark,
   type StatusMarkStatus,
 } from "@spy4x/preact-ui/status-mark";
-import Button from "../components/Button.tsx";
+import { cn } from "@spy4x/preact-cn";
+import { buttonClasses } from "@spy4x/preact-ui/button";
+import Button, {
+  buttonClass,
+  type ButtonVariant,
+  LIBRARY_VARIANT,
+  SITE_LOOK,
+  SITE_VARIANT,
+  SIZE_RESET,
+} from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
 import type { CiSnapshot } from "../lib/github-snapshot.ts";
@@ -94,4 +103,42 @@ Deno.test("every class a library component renders on the site has a rule in the
   } finally {
     await site.stop();
   }
+});
+
+Deno.test("buttonClass gives each variant the library button's classes with the site's look", () => {
+  const reset = new Set(SIZE_RESET.split(" "));
+  for (const variant of ["primary", "secondary"] as ButtonVariant[]) {
+    const expected = buttonClasses(
+      LIBRARY_VARIANT[variant],
+      "md",
+      cn(SITE_LOOK, SIZE_RESET, SITE_VARIANT[variant]),
+    ).split(" ").filter((c) => !reset.has(c) && !c.startsWith("dark:"));
+    assertEquals(
+      new Set(buttonClass(variant).split(" ")),
+      new Set(expected),
+      `buttonClass("${variant}") drifted from @spy4x/preact-ui/button`,
+    );
+  }
+});
+
+// tailwind-merge (behind the library's `cn()`) is about 28 KB minified. An
+// island that imports a helper calling `cn()` ships all of it, as the project
+// gallery did through `buttonClass`. "fvn-normal" is one of its class-group
+// names, a string minification keeps.
+Deno.test("no client JS chunk carries tailwind-merge", async () => {
+  const dir = new URL("../_fresh/client/assets/", import.meta.url);
+  const chunks: string[] = [];
+  for await (const entry of Deno.readDir(dir)) {
+    if (entry.name.endsWith(".js")) chunks.push(entry.name);
+  }
+  assert(
+    chunks.some((name) => name.startsWith("fresh-island__")),
+    "no island chunk in _fresh/client/assets — run `deno task build` first",
+  );
+  const withMerge: string[] = [];
+  for (const name of chunks) {
+    const code = await Deno.readTextFile(new URL(name, dir));
+    if (code.includes("fvn-normal")) withMerge.push(name);
+  }
+  assertEquals(withMerge, [], "tailwind-merge reached the browser");
 });

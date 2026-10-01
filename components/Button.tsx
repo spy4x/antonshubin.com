@@ -1,9 +1,6 @@
 import type { ComponentChildren, JSX } from "preact";
 import { cn } from "@spy4x/preact-cn";
-import {
-  Button as LibraryButton,
-  buttonClasses,
-} from "@spy4x/preact-ui/button";
+import { Button as LibraryButton } from "@spy4x/preact-ui/button";
 
 export type ButtonVariant = "primary" | "secondary";
 
@@ -34,24 +31,18 @@ type ButtonProps =
  * button is the library's `outline` (a control-coloured border), not its
  * `secondary` (a filled box).
  */
-const LIBRARY_VARIANT = {
+export const LIBRARY_VARIANT = {
   primary: "primary",
   secondary: "outline",
 } as const;
 
 /**
- * What the site changes on the library's button. Plex Sans ships no 500
- * weight, so `font-semibold`; `rounded-lg`, as before; and no padding, gap or
- * text size of its own (`px-0 py-0 gap-0`, and a font size inherited from
- * the parent instead of the `md` size's `text-sm`): every call site passes
- * its own through `extra`. `cn()` (tailwind-merge) keeps the last class of
- * each group, so a caller's `px-6` replaces `px-0` in the class attribute
- * itself instead of competing with it in the stylesheet.
+ * What the site changes on the library's button: Plex Sans ships no 500
+ * weight, so semibold, and the radius the site's buttons always had.
  */
-const SITE =
-  "rounded-lg font-semibold font-sans gap-0 px-0 py-0 text-[length:inherit]";
+export const SITE_LOOK = "rounded-lg font-semibold font-sans";
 
-const SITE_VARIANT: Record<ButtonVariant, string> = {
+export const SITE_VARIANT: Record<ButtonVariant, string> = {
   // A transparent border, so Book is the same size as an outline button beside it.
   primary: "border border-transparent",
   // The outline button sits on whatever surface is behind it, not on a Paper
@@ -62,12 +53,34 @@ const SITE_VARIANT: Record<ButtonVariant, string> = {
 };
 
 /**
+ * Removes the library's `md` padding, gap and text size, so a call site's
+ * own sizing decides. Only for the library `<Button>` below, whose `cn()`
+ * keeps the caller's class of each group.
+ */
+export const SIZE_RESET = "gap-0 px-0 py-0 text-[length:inherit]";
+
+/**
+ * The class string the library's `buttonClasses()` gives each variant with
+ * the site's look, written out. `buttonClass()` must not call the library:
+ * its `cn()` brings tailwind-merge (about 28 KB) into every island that
+ * imports `buttonClass`, such as the project gallery. No padding, gap or text
+ * size here, so a call site's sizing never competes with a default.
+ * `test/library-classes.test.tsx` fails when this drifts from the library.
+ * The library's `dark:` classes are left out: the site has no `.dark`.
+ */
+export const BUTTON_CLASSES: Record<ButtonVariant, string> = {
+  primary:
+    "inline-flex items-center justify-center transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 bg-accent-900 text-accent-foreground hover:bg-accent-800 rounded-lg font-semibold font-sans border border-transparent",
+  secondary:
+    "inline-flex items-center justify-center transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 border text-foreground hover:bg-hover rounded-lg font-semibold font-sans bg-transparent border-rule-strong",
+};
+
+/**
  * The primary/secondary button classes as a plain string, for the call sites
  * that can't render a `<Button>` directly: `components/BookCallLink.tsx`
  * (it owns the `href`/`target`/empty-`url` behaviour `<Button href=…>`
- * doesn't) and a few links and islands. Built by `@spy4x/preact-ui/button`'s
- * `buttonClasses()`, coloured by the theme tokens in `assets/styles.css`.
- * `extra` adds the call site's sizing and layout and wins over the defaults.
+ * doesn't), a few links and `islands/ImageGallery.tsx`. `extra` adds the
+ * call site's sizing and layout, joined plainly (see `BUTTON_CLASSES`).
  * `variant="primary"` is reserved for the Book action — see `Button`'s own
  * doc comment.
  */
@@ -75,11 +88,7 @@ export function buttonClass(
   variant: ButtonVariant = "secondary",
   extra = "",
 ): string {
-  return buttonClasses(
-    LIBRARY_VARIANT[variant],
-    "md",
-    cn(SITE, SITE_VARIANT[variant], extra),
-  );
+  return [BUTTON_CLASSES[variant], extra].filter(Boolean).join(" ");
 }
 
 /**
@@ -113,7 +122,7 @@ export default function Button(
   return (
     <LibraryButton
       variant={LIBRARY_VARIANT[variant]}
-      class={cn(SITE, SITE_VARIANT[variant], className)}
+      class={cn(SITE_LOOK, SIZE_RESET, SITE_VARIANT[variant], className)}
       {...marker}
       {...(rest as Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, "class">)}
     >
