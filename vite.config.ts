@@ -32,16 +32,16 @@ function presetRegion(css: string, name: string): string {
  * file, so the package exports its text instead.
  *
  * Not the package's own `preactThemeCss()` plugin: that one also requires
- * `tokens.css`, whose `:root` redefines this site's `--color-accent` and
- * `--font-sans` above the `@theme` layer, and appends every component's
- * classes (`COMPONENT_CLASSES`), which more than doubled the stylesheet.
- * `assets/styles.css` sets the tokens itself and lists, in its own
- * `@source inline(...)`, only the classes of the components the site uses.
+ * `tokens.css`, whose defaults this site maps over anyway (see the `:root`
+ * block in `assets/styles.css`), and appends every component's classes
+ * (`COMPONENT_CLASSES`), which more than doubled the stylesheet.
+ * `assets/styles.css` lists, in its own `@source inline(...)`, only the
+ * classes of the components the site uses.
  *
- * Only `PRESET_REGIONS` go in: the other regions define utilities named after
- * plain words (`input`, `select`, `label`, `card`, `link`), which Tailwind
- * would emit from the site's own text, and the head of the file holds the
- * `.theme-base` document rules. The text goes in as `@media reference`,
+ * Only `PRESET_REGIONS` go in: the other regions define utilities the site
+ * already names for itself (`font-heading` from its `@theme`, `page-layout`
+ * in a code comment, which Tailwind scans too), and the head of the file holds the `.theme-base`
+ * document rules. The text goes in as `@media reference`,
  * Tailwind's form of `@import "…" reference`, so nothing in it is emitted
  * unless a class asks for it.
  */
