@@ -125,17 +125,20 @@ you handled. Nothing retries them.
 
 ### Shared mail password
 
-Four senders share the `noreply@antonshubin.com` mailbox and its one password:
+Three senders share the `noreply@antonshubin.com` mailbox and its one password:
 
-- this site: `SMTP_PASSWORD` in its production env;
 - mig, the booking scheduler: `SMTP_PASSWORD` in rostok's
   `servers/cloud/configs/mig.env`;
 - Healthchecks: `HEALTHCHECKS_SMTP_PASSWORD` in rostok's `servers/cloud/.env`;
 - Vaultwarden: `VAULTWARDEN_SMTP_PASSWORD` in rostok's `servers/cloud/.env`.
 
-Rotate it in all four places together, or the ones left behind stop mailing.
-Rostok's `stacks/mig/README.md`, "Rotate the SMTP password", holds the full list
-and the steps.
+This site left that login (#364): it sends as
+`Anton Shubin <hello@antonshubin.com>` with that mailbox's own credentials
+(`SMTP_FROM`, `SMTP_USERNAME`, `SMTP_PASSWORD` in its production env), so
+replies reach Anton and a rotation of the noreply password no longer touches it.
+Rotate the noreply password in the three places above together, or the ones left
+behind stop mailing. Rostok's `stacks/mig/README.md`, "Rotate the SMTP
+password", holds the full list and the steps.
 
 ### Backup
 

@@ -11,6 +11,7 @@
 import { channelUrl } from "./utm.ts";
 import { envValue } from "./cloudflare-purge.ts";
 import type { BlogArticle } from "@/lib/data.ts";
+import { postIntro } from "@/lib/blog-posts.ts";
 import { relatedToolLink } from "@/lib/blog.ts";
 
 // Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
@@ -27,14 +28,16 @@ export function firstPublishedLine(taggedUrl: string): string {
 }
 
 /**
- * What a Dev.to draft opens with, the same two things the post's page opens
- * with: the TL;DR list and, for a post with `relatedTool`, the project's live
- * and repository links. Both come from the data the page reads (`tldr`,
+ * What a Dev.to draft opens with: the post's intro (`postIntro()`: why the
+ * post exists and who it is for), then what the post's page opens with, the
+ * TL;DR list and, for a post with `relatedTool`, the project's live and
+ * repository links. All come from the data the page reads (`intro`, `tldr`,
  * `relatedToolLink()`), and the links go straight to the project, not through
  * antonshubin.com.
  */
 export function devToOpening(article: BlogArticle): string {
   const parts = [
+    postIntro(article),
     `**TL;DR**\n\n${article.tldr.map((line) => `- ${line}`).join("\n")}`,
   ];
   const tool = relatedToolLink(article);

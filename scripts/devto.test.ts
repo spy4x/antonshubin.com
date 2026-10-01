@@ -546,10 +546,17 @@ const OPENING_ARTICLE: BlogArticle = {
   topic: "founders",
 };
 
-Deno.test("the Dev.to opening lists the TL;DR lines and, for a post without a project, nothing else", () => {
+Deno.test("the Dev.to opening is the intro, then the TL;DR lines and, for a post without a project, nothing else", () => {
+  assertEquals(
+    devToOpening({ ...OPENING_ARTICLE, intro: "Why I wrote it." }),
+    "Why I wrote it.\n\n**TL;DR**\n\n- First point.\n- Second point.",
+  );
+});
+
+Deno.test("the Dev.to opening of an older post, with no intro, opens with its description", () => {
   assertEquals(
     devToOpening(OPENING_ARTICLE),
-    "**TL;DR**\n\n- First point.\n- Second point.",
+    "About it\n\n**TL;DR**\n\n- First point.\n- Second point.",
   );
 });
 
@@ -560,10 +567,10 @@ Deno.test("the Dev.to opening for a project post adds its live and repository li
     relatedTool: "preact-components",
   });
   const parts = opening.split("\n\n");
-  assertEquals(parts.length, 3);
-  assertEquals(parts[0], "**TL;DR**");
+  assertEquals(parts.length, 4);
+  assertEquals(parts[1], "**TL;DR**");
   assertEquals(
-    parts[2],
+    parts[3],
     `**${tool.name}**: Live: [${tool.live!.label}](${
       tool.live!.href
     }) · Code: [${repoUrl(tool)!.replace("https://", "")}](${repoUrl(tool)})`,

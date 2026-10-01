@@ -2,7 +2,11 @@ import { assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
 import {
   byNewest,
   fillProof,
+  LETTER_FIELDS_FROM,
   parseBlogArticle,
+  postCover,
+  postCoverAlt,
+  postIntro,
   TLDR_MAX_CHARS,
 } from "./blog-posts.ts";
 import { blogArticles } from "./data.ts";
@@ -210,4 +214,55 @@ Deno.test("a {proof:<id>} placeholder in a TL;DR line is filled with the figure"
     `Over ${proof("jobs")}+ projects.`,
     "Second point.",
   ]);
+});
+
+Deno.test("a post published on or after the cutoff needs intro, coverImage and coverAlt, naming the one missing", () => {
+  const dir = Deno.makeTempDirSync();
+  try {
+    Deno.mkdirSync(`${dir}/img/blog`, { recursive: true });
+    Deno.writeFileSync(`${dir}/img/blog/cover.png`, new Uint8Array([1]));
+    const dated = (extra: string) =>
+      variant(
+        'publishedAt: "2026-09-26"',
+        `publishedAt: "${LETTER_FIELDS_FROM}"\n${extra}`,
+      );
+    const all = [
+      'intro: "Why I wrote it."',
+      'coverImage: "/img/blog/cover.png"',
+      'coverAlt: "A screenshot."',
+    ];
+    const post = parseBlogArticle("a-post", dated(all.join("\n")), dir);
+    assertEquals(post.intro, "Why I wrote it.");
+    assertEquals(post.coverAlt, "A screenshot.");
+    for (const [i, key] of ["intro", "coverImage", "coverAlt"].entries()) {
+      const without = all.filter((_, j) => j !== i).join("\n");
+      assertThrows(
+        () => parseBlogArticle("a-post", dated(without), dir),
+        Error,
+        `"${key}" is missing`,
+      );
+    }
+    // The day before the cutoff, none of the three is needed.
+    parseBlogArticle("a-post", VALID, dir);
+  } finally {
+    Deno.removeSync(dir, { recursive: true });
+  }
+});
+
+Deno.test("an older post falls back to its description, its OG preview and its title", () => {
+  const post = parseBlogArticle("a-post", VALID);
+  assertEquals(postIntro(post), "What it is about");
+  assertEquals(postCover(post), "/img/og/blog/a-post.png");
+  assertEquals(postCoverAlt(post), "A post");
+  const set = { ...post, intro: "I", coverImage: "/img/x.png", coverAlt: "A" };
+  assertEquals(
+    [postIntro(set), postCover(set), postCoverAlt(set)],
+    ["I", "/img/x.png", "A"],
+  );
+});
+
+Deno.test("every post's OG fallback cover exists as a file", () => {
+  for (const a of blogArticles) {
+    Deno.statSync(`static${postCover({ ...a, coverImage: undefined })}`);
+  }
 });

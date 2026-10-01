@@ -1,8 +1,20 @@
 // The mails of a newsletter sign-up (#253): a confirmation link to the address
 // that asked, then, once it is confirmed, a welcome to the subscriber and a
-// notice to the owner.
+// notice to the owner. The first two use the letter layout (`lib/letter.ts`);
+// the notice stays plain text. A reply to either goes to the site's sender
+// address, which is Anton's own mailbox, so none sets `Reply-To`.
 import type { EmailMessage, EmailSender, MailLog } from "./mail.ts";
 import { proof } from "./proof.ts";
+import {
+  button,
+  emailLink,
+  paragraph,
+  renderLetter,
+  SUBSCRIBED_REASON,
+} from "./letter.ts";
+
+/** The `utm_campaign` of the links in the sign-up mails (docs/utm.md). */
+export const SIGNUP_CAMPAIGN = "newsletter";
 
 /** What {@link sendSubscribeMails} sends with; `sender` is `null` when SMTP is not configured. */
 export interface SubscribeMailDeps {
@@ -34,8 +46,7 @@ export interface ConfirmationRequest {
 /**
  * Mails the confirmation link. Never throws: without SMTP it is skipped with a
  * log line (the visitor then never gets the link, so the log says so), and a
- * failure is logged as `[SUBSCRIBE] confirmation failed:`. Replies go to the
- * contact address.
+ * failure is logged as `[SUBSCRIBE] confirmation failed:`.
  */
 export async function sendConfirmationMail(
   request: ConfirmationRequest,
@@ -46,12 +57,28 @@ export async function sendConfirmationMail(
     log.log("[SUBSCRIBE] SMTP not configured, confirmation not sent");
     return;
   }
+  const letter = renderLetter({
+    baseUrl: deps.baseUrl,
+    campaign: SIGNUP_CAMPAIGN,
+    preheader: "Open the link and press the button to confirm.",
+    blocks: [
+      paragraph(
+        `Someone asked to send this address the newsletter on ${
+          new URL(deps.baseUrl).host
+        }. If that was you, confirm it:`,
+      ),
+      button(request.confirmLink, "Confirm my subscription"),
+      paragraph(
+        "The link works for three days. If it was not you, ignore this mail and nothing happens.",
+      ),
+    ],
+    ps: false,
+    reason: "You get this once, because this address was entered on the site.",
+  });
   const result = await deps.sender.send({
     to: request.email,
     subject: "Confirm your subscription to Anton Shubin's newsletter",
-    text:
-      `Someone asked to send this address the newsletter on ${deps.baseUrl}. If that was you, confirm here:\n${request.confirmLink}\n\nThe link works for three days. If it was not you, ignore this mail and nothing happens.\n\n— Anton`,
-    ...(deps.contactEmail ? { replyTo: deps.contactEmail } : {}),
+    ...letter,
   });
   if (!result.ok) {
     log.error(
@@ -72,14 +99,31 @@ export async function sendSubscribeMails(
   deps: SubscribeMailDeps,
 ): Promise<void> {
   const log = deps.log ?? console;
+  const letter = renderLetter({
+    baseUrl: deps.baseUrl,
+    campaign: SIGNUP_CAMPAIGN,
+    preheader: "What you will get, and a good place to start.",
+    blocks: [
+      paragraph("Thanks for subscribing!"),
+      paragraph(
+        `You'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
+          proof("jobs")
+        }+ projects.`,
+      ),
+      button(
+        emailLink(deps.baseUrl, "/saas-architecture-guide", SIGNUP_CAMPAIGN),
+        "Start with the SaaS architecture guide",
+      ),
+    ],
+    psLead: "If you're working on something I could help with:",
+    reason: SUBSCRIBED_REASON,
+    unsubscribeLink: sub.unsubscribeLink,
+  });
   const welcome: EmailMessage = {
     to: sub.email,
     subject: "Welcome to Anton Shubin's newsletter",
-    text:
-      `Thanks for subscribing!\n\nYou'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
-        proof("jobs")
-      }+ projects.\n\nHere's a good place to start:\n${deps.baseUrl}/saas-architecture-guide\n\nUnsubscribe anytime:\n${sub.unsubscribeLink}\n\n— Anton`,
-    ...(deps.contactEmail ? { replyTo: deps.contactEmail } : {}),
+    ...letter,
+    listUnsubscribe: { url: sub.unsubscribeLink, oneClick: true },
   };
   const notice: EmailMessage = {
     to: deps.contactEmail,

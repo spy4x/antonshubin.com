@@ -19,6 +19,8 @@ export interface CapturedMail {
   subject?: string;
   text?: unknown;
   html?: unknown;
+  /** Extra headers, such as `List-Unsubscribe`. */
+  headers?: unknown;
 }
 
 /** A fake relay: the factory to hand the sender, and what it saw. */

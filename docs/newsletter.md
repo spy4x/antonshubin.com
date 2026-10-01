@@ -45,8 +45,19 @@ origin is the site's own `BASE_URL`, so staging accepts its own forms. A request
 with neither `Origin` nor `Sec-Fetch-Site`, such as a mail client's one-click
 unsubscribe (RFC 8058), passes.
 
-Replies: the confirmation mail, the welcome mail and every newsletter carry
-`Reply-To: CONTACT_EMAIL`, since they are sent from the noreply mailbox.
+Layout and sender (#364): the confirmation mail, the welcome mail and every
+newsletter use one letter layout (`lib/letter.ts`): Anton's portrait and name,
+the content, a P.S. with the booking link (not in the confirmation), a "reply to
+this email" line and a small footer. Each has an HTML and a plain-text part. The
+sender is `Anton Shubin <hello@antonshubin.com>` (the `SMTP_FROM` env value), a
+mailbox that reaches Anton, so none of these mails sets `Reply-To`; the lead
+mail still does (the visitor's address). The welcome mail and every newsletter
+carry `List-Unsubscribe` and `List-Unsubscribe-Post` (one-click, RFC 8058) for
+the subscriber's own `/unsubscribe?token=...`, so Gmail and Apple Mail show
+their own Unsubscribe button. The confirmation has no such header, since its
+reader has not subscribed. Every link into the site in these mails is the
+`email` channel's tagged URL (`scripts/utm.ts`); a confirmation or unsubscribe
+link carries a token and is left untagged. The owner notice stays plain text.
 
 ## Sending a newsletter
 
@@ -60,7 +71,8 @@ mounted and the SMTP settings in its environment. Your machine has neither, so
 running the script locally reaches nobody.
 
 ```bash
-# Write your content as HTML (unsubscribe link auto-appended)
+# Write your content as HTML (it goes into the letter layout; each
+# subscriber's unsubscribe link is in its footer)
 cat > /tmp/newsletter.html << 'EOF'
 <h2>A short update</h2>
 <p>Content...</p>
@@ -77,20 +89,39 @@ Any link to the site in it is a tagged `email` link from
 ## Announcing a new blog post
 
 Do not hand-write a post announcement. After the post is merged, deployed and
-live, `deno task publish:blog <slug>` prints the announcement's subject and body
-with the tagged `email` link, and sends nothing. Only after Anton says yes in
-chat to that post, `deno task publish:blog <slug> --send-newsletter` sends it
-from the production container, at most once per slug. The whole flow is in
-[publishing.md](publishing.md).
+live, `deno task publish:blog <slug>` prints the announcement's subject (the
+post's title) and plain-text part, with the tagged `email` links, and sends
+nothing. `--preview <file>` writes the rendered HTML and text locally,
+`--test-newsletter` sends one copy to `CONTACT_EMAIL` only (a "[Test]" subject,
+no log), and only after Anton says yes in chat to that post,
+`deno task publish:blog <slug> --send-newsletter` sends it from the production
+container. The whole flow is in [publishing.md](publishing.md).
 
-The once-per-slug guard is a sent log, `data/newsletter-log.json`, next to
+The guard is a per-recipient sent log, `data/newsletter-log.json`, next to
 `subscribers.json` in the same bind-mounted directory, so it survives deploys
-and is backed up with the list. `scripts/send-newsletter.ts --stdin-json` writes
-the slug there before the first mail goes out and refuses a slug that is already
-listed. A run that crashed partway is listed too. To resend a post on purpose,
-remove its entry from the file by hand. It also refuses an empty subscriber list
-(a missing or unreadable `subscribers.json`) before recording anything, and
-exits non-zero when any mail failed or none went out. To read the log:
+and is backed up with the list. An entry is
+`{ slug, subject, startedAt, audience, recipients, sent, failed, completedAt? }`.
+`audience` holds the keyed hashes of everyone on the list when the first run
+started, and a resumed run mails only its missing members, so a subscriber who
+joins later never gets an old post, even when one stored row can never be mailed
+and keeps the post from completing. `recipients` holds one keyed hash per
+subscriber the mail server accepted (`lib/newsletter-log.ts`'s `sentMark()`:
+HMAC-SHA256 under `UNSUBSCRIBE_SECRET` of the slug and the lowercased address),
+never an address. The entry is written before the first mail and each hash right
+after that mail is accepted, through a temp file and a rename, as
+`subscribers.json` is written. The whole send holds the lock
+`newsletter-log.json.lock`: a second run that starts while one is going is
+refused ("another send is in progress") and mails nobody. The OS frees the lock
+when a process dies, so a crashed run leaves nothing to clean up. `completedAt`
+is set by a run that finished with no failure, and such a post is refused on any
+later run, so a subscriber who joins afterwards does not get an old post. A run
+that crashed or had a failure has no `completedAt`: running the same command
+again mails only the subscribers whose hash is missing. An entry from before
+#364 has no `recipients` and is refused as sent. To resend a post to everyone on
+purpose, remove its entry from the file by hand. The script also refuses an
+empty subscriber list (a missing or unreadable `subscribers.json`) before
+recording anything, and exits non-zero when any mail failed or none went out. To
+read the log:
 
 ```bash
 ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/newsletter-log.json'

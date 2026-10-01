@@ -6,9 +6,11 @@
  *
  * Usage:
  *   deno task publish:blog <slug>                     # Dev.to draft + links + newsletter preview
+ *   deno task publish:blog <slug> --preview mail.html # write the mail's HTML (and mail.txt), nothing else
+ *   deno task publish:blog <slug> --test-newsletter   # one copy to CONTACT_EMAIL, no log
  *   deno task publish:blog <slug> --send-newsletter   # only after Anton says yes in chat
  *
- * Both runs first check that `https://antonshubin.com/blog/<slug>` answers
+ * `--preview` needs no live post. The other runs first check that `https://antonshubin.com/blog/<slug>` answers
  * 200 and stop otherwise. The default run creates or updates the Dev.to draft, prints
  * every channel's tagged link and the newsletter's subject and body, and sends
  * nothing. `--send-newsletter` sends the announcement from the production
@@ -21,7 +23,8 @@ import { test as hasFrontMatter } from "@std/front-matter/test";
 import { type BlogArticle, blogArticles } from "@/lib/data.ts";
 import { createDevToDraft, devToOpening } from "./devto.ts";
 import { linkLines } from "./links.ts";
-import { articleCampaign, channelUrl } from "./utm.ts";
+import { articleCampaign } from "./utm.ts";
+import { postLetter } from "@/lib/letter.ts";
 import type { PostAnnouncement } from "./send-newsletter.ts";
 
 /** Production, hardcoded like `scripts/devto.ts`: the live check and every link point here. */
@@ -34,26 +37,52 @@ export const REMOTE_SEND_COMMAND =
 /** How long the live check waits for production before counting it as not live. */
 export const LIVE_CHECK_TIMEOUT_MS = 10_000;
 
-const USAGE = "Usage: deno task publish:blog <slug> [--send-newsletter]";
+const USAGE =
+  "Usage: deno task publish:blog <slug> [--send-newsletter | --test-newsletter | --preview <file>]";
 
 export interface PublishArgs {
   slug: string;
   sendNewsletter: boolean;
+  /** Send one copy to `CONTACT_EMAIL` from the container; no log. */
+  testNewsletter?: boolean;
+  /** Write the mail's HTML to this file and its plain text beside it. */
+  preview?: string;
 }
 
-/** Parses `<slug> [--send-newsletter]`. */
+/** Parses `<slug>` and at most one of `--send-newsletter`, `--test-newsletter`, `--preview <file>`. */
 export function parsePublishArgs(args: string[]): PublishArgs {
   let slug: string | undefined;
   let sendNewsletter = false;
-  for (const arg of args) {
+  let testNewsletter = false;
+  let preview: string | undefined;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
     if (arg === "--send-newsletter") sendNewsletter = true;
-    else if (arg.startsWith("-")) {
+    else if (arg === "--test-newsletter") testNewsletter = true;
+    else if (arg === "--preview") {
+      preview = args[++i];
+      if (!preview || preview.startsWith("-")) {
+        throw new Error(`--preview needs a file name. ${USAGE}`);
+      }
+    } else if (arg.startsWith("-")) {
       throw new Error(`Unknown option ${arg}. ${USAGE}`);
     } else if (slug === undefined) slug = arg;
     else throw new Error(`Unexpected argument ${arg}. ${USAGE}`);
   }
   if (!slug) throw new Error(USAGE);
-  return { slug, sendNewsletter };
+  const modes = [sendNewsletter, testNewsletter, preview !== undefined]
+    .filter(Boolean).length;
+  if (modes > 1) {
+    throw new Error(
+      `Pick one of --send-newsletter, --test-newsletter and --preview. ${USAGE}`,
+    );
+  }
+  return {
+    slug,
+    sendNewsletter,
+    ...(testNewsletter ? { testNewsletter } : {}),
+    ...(preview !== undefined ? { preview } : {}),
+  };
 }
 
 /** A post as both the repo and the live site should have it. */
@@ -96,38 +125,19 @@ export async function readPost(
   return { article, body: body.trim(), campaign: articleCampaign(slug, attrs) };
 }
 
-function escapeHtml(text: string): string {
-  return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(
-    ">",
-    "&gt;",
-  )
-    .replaceAll('"', "&quot;");
-}
-
 /**
- * The announcement mail. Its only link to the post is the `email` channel's
- * tagged URL (docs/utm.md), so Umami counts the visits it brings.
+ * The announcement mail, rendered once here and sent as it is by the
+ * container (`lib/letter.ts` `postLetter()`): the post's title is the subject
+ * and the first TL;DR line the preheader. Its only links into the site are the
+ * `email` channel's tagged URLs (docs/utm.md), so Umami counts the visits it
+ * brings.
  */
 export function newsletterFor(post: Post): PostAnnouncement {
   const { article } = post;
-  const link = channelUrl(
-    SITE,
-    `/blog/${article.slug}`,
-    "email",
-    post.campaign,
-  );
   return {
     slug: article.slug,
-    subject: `New article: ${article.title}`,
-    body: [
-      `<h2>${escapeHtml(article.title)}</h2>`,
-      `<p>${escapeHtml(article.description)}</p>`,
-      `<p><strong>TL;DR</strong></p>`,
-      `<ul>${
-        article.tldr.map((line) => `<li>${escapeHtml(line)}</li>`).join("")
-      }</ul>`,
-      `<p><a href="${link}">Read the article</a></p>`,
-    ].join("\n"),
+    subject: article.title,
+    ...postLetter(article, { baseUrl: SITE, campaign: post.campaign }),
   };
 }
 
@@ -144,6 +154,8 @@ export interface PublishDeps {
   /** Runs `command` on the server with `stdin`; resolves to its exit code. */
   runRemote: (command: string, stdin: string) => Promise<number>;
   readPost: (slug: string) => Promise<Post>;
+  /** Writes a local file for `--preview`. */
+  writeFile: (path: string, content: string) => Promise<void>;
   log: (line: string) => void;
   error: (line: string) => void;
 }
@@ -181,6 +193,15 @@ export async function publishBlog(
     return 1;
   }
 
+  if (args.preview !== undefined) {
+    const mail = newsletterFor(post);
+    const textFile = `${args.preview.replace(/\.html?$/, "")}.txt`;
+    await deps.writeFile(args.preview, mail.html);
+    await deps.writeFile(textFile, mail.text);
+    deps.log(`Subject: ${mail.subject}\nWrote ${args.preview} and ${textFile}`);
+    return 0;
+  }
+
   const url = `${SITE}/blog/${args.slug}`;
   const status = await liveStatus(deps, url);
   if (status !== "200") {
@@ -194,12 +215,16 @@ export async function publishBlog(
 
   const newsletter = newsletterFor(post);
 
-  if (args.sendNewsletter) {
+  if (args.sendNewsletter || args.testNewsletter) {
     deps.log(
-      `Sending the newsletter for "${args.slug}" from the production container...`,
+      args.testNewsletter
+        ? `Sending one test copy of "${args.slug}" to CONTACT_EMAIL from the production container...`
+        : `Sending the newsletter for "${args.slug}" from the production container...`,
     );
     const code = await deps.runRemote(
-      REMOTE_SEND_COMMAND,
+      args.testNewsletter
+        ? `${REMOTE_SEND_COMMAND} --test`
+        : REMOTE_SEND_COMMAND,
       JSON.stringify(newsletter),
     );
     if (code !== 0) deps.error(`The remote send exited with ${code}.`);
@@ -223,9 +248,11 @@ export async function publishBlog(
   );
 
   deps.log(`\nNewsletter subject: ${newsletter.subject}`);
-  deps.log(`Newsletter body:\n${newsletter.body}`);
+  deps.log(`Newsletter text part:\n${newsletter.text}`);
   deps.log(
-    `\nNothing was sent. Only after Anton says yes in chat for this post:\n` +
+    `\nNothing was sent. See it first: deno task publish:blog ${args.slug} --preview mail.html\n` +
+      `One copy to CONTACT_EMAIL: deno task publish:blog ${args.slug} --test-newsletter\n` +
+      `Only after Anton says yes in chat for this post:\n` +
       `  deno task publish:blog ${args.slug} --send-newsletter`,
   );
   return 0;
@@ -259,6 +286,7 @@ if (import.meta.main) {
       createDraft: createDevToDraft,
       runRemote: sshRun,
       readPost: (slug) => readPost(slug),
+      writeFile: (path, content) => Deno.writeTextFile(path, content),
       log: console.log,
       error: console.error,
     }),

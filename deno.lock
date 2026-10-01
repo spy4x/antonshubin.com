@@ -15,8 +15,8 @@
     "jsr:@libs/qrcode@3.1.0": "3.1.0",
     "jsr:@negrel/http-ece@0.7.0": "0.7.0",
     "jsr:@negrel/webpush@0.5.0": "0.5.0",
-    "jsr:@spy4x/email@1.19.0": "1.19.0",
-    "jsr:@spy4x/email@^1.19.0": "1.19.0",
+    "jsr:@spy4x/email@1.26.0": "1.26.0",
+    "jsr:@spy4x/email@^1.19.0": "1.26.0",
     "jsr:@spy4x/integrations@1.19.0": "1.19.0",
     "jsr:@spy4x/net@1.19.0": "1.19.0",
     "jsr:@spy4x/net@^1.19.0": "1.19.0",
@@ -43,17 +43,17 @@
     "jsr:@spy4x/preact-ui@2": "2.0.0",
     "jsr:@spy4x/preact-ui@2.0.0": "2.0.0",
     "jsr:@spy4x/server@1.19.0": "1.19.0",
-    "jsr:@spy4x/server@1.2.0": "1.2.0",
     "jsr:@spy4x/time@1.10.0": "1.10.0",
     "jsr:@spy4x/time@1.19.0": "1.19.0",
     "jsr:@spy4x/time@^1.19.0": "1.19.0",
+    "jsr:@spy4x/time@^1.26.0": "1.26.0",
     "jsr:@spy4x/validation@1.10.0": "1.10.0",
-    "jsr:@spy4x/validation@^1.10.0": "1.20.0",
-    "jsr:@spy4x/validation@^1.19.0": "1.20.0",
+    "jsr:@spy4x/validation@^1.10.0": "1.26.0",
+    "jsr:@spy4x/validation@^1.19.0": "1.26.0",
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/bytes@1": "1.0.6",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
-    "jsr:@std/collections@^1.1.3": "1.1.3",
+    "jsr:@std/collections@^1.1.3": "1.4.0",
     "jsr:@std/crypto@1.1.0": "1.1.0",
     "jsr:@std/dotenv@~0.225.5": "0.225.8",
     "jsr:@std/encoding@1": "1.0.11",
@@ -84,7 +84,7 @@
     "jsr:@std/toml@^1.0.3": "1.0.11",
     "jsr:@std/ulid@1.0.0": "1.0.0",
     "jsr:@std/uuid@^1.0.9": "1.1.2",
-    "jsr:@std/yaml@^1.0.5": "1.0.10",
+    "jsr:@std/yaml@^1.0.5": "1.3.0",
     "npm:@babel/core@^7.28.0": "7.29.7",
     "npm:@babel/preset-react@^7.27.1": "7.29.7_@babel+core@7.29.7",
     "npm:@noble/ciphers@^2.1.1": "2.4.0",
@@ -93,8 +93,8 @@
     "npm:@noble/post-quantum@~0.5.3": "0.5.4",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@preact/signals-core@^1.12.1": "1.14.4",
-    "npm:@preact/signals@^2.5.1": "2.11.2_preact@10.29.8_preact-render-to-string@6.7.0",
-    "npm:@preact/signals@^2.9.0": "2.11.2_preact@10.29.8_preact-render-to-string@6.7.0",
+    "npm:@preact/signals@^2.5.1": "2.11.3_preact@10.29.8_preact-render-to-string@6.7.0",
+    "npm:@preact/signals@^2.9.0": "2.11.3_preact@10.29.8_preact-render-to-string@6.7.0",
     "npm:@prefresh/vite@^2.4.8": "2.4.12_preact@10.29.8_vite@7.3.1_preact-render-to-string@6.7.0",
     "npm:@remix-run/node-fetch-server@0.12": "0.12.0",
     "npm:@scure/base@2": "2.4.0",
@@ -224,10 +224,10 @@
         "jsr:@std/encoding@1"
       ]
     },
-    "@spy4x/email@1.19.0": {
-      "integrity": "9b4e4bfb2dfcfb49e4dfc690ddadebf92834d8f3f0c7359d879a25f74e012dbc",
+    "@spy4x/email@1.26.0": {
+      "integrity": "60e44ac63cde489a24cc77bb6c2a0f279a18ce98b03623735f471048804bb312",
       "dependencies": [
-        "jsr:@spy4x/time@^1.19.0",
+        "jsr:@spy4x/time@^1.26.0",
         "jsr:@std/encoding@1.0.11",
         "npm:nodemailer"
       ]
@@ -373,14 +373,6 @@
         "npm:preact@^10.29.8"
       ]
     },
-    "@spy4x/server@1.2.0": {
-      "integrity": "4f4c7b7f40efbf48e3f65c844a8700a9f7807c7c5ebbe35d5cf3b698f169a74a",
-      "dependencies": [
-        "jsr:@age/age-encryption",
-        "jsr:@std/encoding@1.0.11",
-        "jsr:@std/path@1.1.6"
-      ]
-    },
     "@spy4x/server@1.19.0": {
       "integrity": "d39d917a171de4076c042010c9ccbf766057239276af2e9af676d1247ab7b906",
       "dependencies": [
@@ -405,14 +397,17 @@
     "@spy4x/time@1.19.0": {
       "integrity": "e2bd8b51910f72308ca34a4e233100408a709fafedf984112a5c9703bc9fb017"
     },
+    "@spy4x/time@1.26.0": {
+      "integrity": "784b831576878f1d71cf7421dfe2f09ca1d0accd8e3e99671a973ea5bad1be63"
+    },
     "@spy4x/validation@1.10.0": {
       "integrity": "255e6c78f08149fb1b073ad76bf437ad7e15958ccd13a2630fd96e7b2df8f95b",
       "dependencies": [
         "npm:arktype"
       ]
     },
-    "@spy4x/validation@1.20.0": {
-      "integrity": "4e644c1f63c1069301ec8a0b02ecab85ad7abe3098c45125dfcc4ccce96320dd",
+    "@spy4x/validation@1.26.0": {
+      "integrity": "ccd110d8ab8aa93bc63ff67211efa84bcb3dd01ce617504b9a1ab7defec8ab28",
       "dependencies": [
         "npm:arktype"
       ]
@@ -428,6 +423,9 @@
     },
     "@std/collections@1.1.3": {
       "integrity": "bf8b0818886df6a32b64c7d3b037a425111f28278d69fd0995aeb62777c986b0"
+    },
+    "@std/collections@1.4.0": {
+      "integrity": "bd7f74966e11de11b1f0420b7e8cb7bb381d8af7872b738443b92050db28c9c0"
     },
     "@std/crypto@1.1.0": {
       "integrity": "b8d6d0a6377a32b213af2661ed7bf1062d94feac0c57def5526a8e74a95c3ec8"
@@ -510,6 +508,9 @@
     },
     "@std/yaml@1.0.10": {
       "integrity": "245706ea3511cc50c8c6d00339c23ea2ffa27bd2c7ea5445338f8feff31fa58e"
+    },
+    "@std/yaml@1.3.0": {
+      "integrity": "b250103854378b8b36cbff0fe95aec017d3d9ce86b489c67605180c602fb4922"
     }
   },
   "npm": {
@@ -1145,8 +1146,8 @@
     "@preact/signals-core@1.14.4": {
       "integrity": "sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA=="
     },
-    "@preact/signals@2.11.2_preact@10.29.8_preact-render-to-string@6.7.0": {
-      "integrity": "sha512-rVTRTt/T0HIRgbugwS5FigbfF/kfdEFYFtiqxa+lbpqTajepqnR0firuAS2iNdHyejWB7Yc9p9QePkVNBtTAwg==",
+    "@preact/signals@2.11.3_preact@10.29.8_preact-render-to-string@6.7.0": {
+      "integrity": "sha512-mttwFM98G/JiriTgMwU+UWygL6sfVmYEiNcPSKkUnv4PxPpZhmP2ugGC4qi360+ZIHyQ8NY05bfJT3b4RUIGlw==",
       "dependencies": [
         "@preact/signals-core",
         "preact"
@@ -1502,8 +1503,8 @@
     "detect-libc@2.1.2": {
       "integrity": "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="
     },
-    "electron-to-chromium@1.5.442": {
-      "integrity": "sha512-najZYZ3+ZpjN1z3VOsrBiv5ej18vQgfV2lvEmxWzfmKrk4bdm3Owseyud4yGU6DfFn9pyunoAHDDyM4KmP78Ew=="
+    "electron-to-chromium@1.5.443": {
+      "integrity": "sha512-TDJG36L9A3CWWwZ97HKaE+Iz1sW80pNp6sAU0owzCIV3Zc9eVyRqZK8Vz6NKuMIU8WjP0pIkoqCa0VRf/yFD0Q=="
     },
     "enhanced-resolve@5.18.4": {
       "integrity": "sha512-LgQMM4WXU3QI+SYgEc2liRgznaD5ojbmY3sb8LxyguVkIg5FxdpTkvk72te2R38/TGKxH634oLxXRGY6d7AP+Q==",
@@ -1929,7 +1930,7 @@
     "dependencies": [
       "jsr:@fresh/core@^2.3.3",
       "jsr:@fresh/plugin-vite@^1.0.8",
-      "jsr:@spy4x/email@1.19.0",
+      "jsr:@spy4x/email@1.26.0",
       "jsr:@spy4x/integrations@1.19.0",
       "jsr:@spy4x/net@1.19.0",
       "jsr:@spy4x/platform@1.19.0",

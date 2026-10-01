@@ -77,6 +77,7 @@ The campaign names the thing the link promotes.
 | An article          | its blog slug, or the post's `utmCampaign` front-matter field when set |
 | A video             | `<topic>-yt`, set by `deno task video-kit` (default `<slug>-yt`)       |
 | A standing link     | `evergreen`: a business card, an email signature, a profile            |
+| A sign-up mail      | `newsletter`: the welcome and confirmation mails (`lib/letter.ts`)     |
 
 `deno task links` picks the campaign by itself only for an article: for a
 `/blog/<slug>` path with no `--campaign`, it reads `utmCampaign` from

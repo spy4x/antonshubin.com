@@ -42,6 +42,7 @@ interface Recorder {
     coverImage?: string;
   }[];
   remote: { command: string; stdin: string }[];
+  writes: Record<string, string>;
   out: string[];
   err: string[];
 }
@@ -62,6 +63,7 @@ function fakes(
     inits: [],
     drafts: [],
     remote: [],
+    writes: {},
     out: [],
     err: [],
     deps: {} as PublishDeps,
@@ -84,6 +86,10 @@ function fakes(
       return Promise.resolve(remoteCode);
     },
     readPost: read,
+    writeFile: (path, content) => {
+      r.writes[path] = content;
+      return Promise.resolve();
+    },
     log: (line) => r.out.push(line),
     error: (line) => r.err.push(line),
   };
@@ -137,7 +143,8 @@ Deno.test("a live post without --send-newsletter creates the draft and sends not
   assertEquals(r.drafts, [{
     title: "A <test> post",
     slug: "a-test-post",
-    body: "**TL;DR**\n\n- One point.\n- Another point.\n\nBody text.",
+    body:
+      "What the post is about\n\n**TL;DR**\n\n- One point.\n- Another point.\n\nBody text.",
     campaign: "a-campaign",
     coverImage: undefined,
   }]);
@@ -159,41 +166,95 @@ Deno.test("the default run prints every channel's tagged link with the post's ca
   }
 });
 
-Deno.test("the newsletter body shows the TL;DR under the description, with its text escaped", async () => {
-  const post: Post = {
-    ...POST,
-    article: { ...ARTICLE, tldr: ["Use <b> & more.", "Second."] },
-  };
-  const r = fakes({ readPost: () => Promise.resolve(post) });
-  await publishBlog(DEFAULT_RUN, r.deps);
-  const out = r.out.join("\n");
-  const body = out.slice(
-    out.indexOf("Newsletter body:"),
-    out.indexOf("Nothing was sent"),
-  );
+/** The announcement `--send-newsletter` pipes to the container, for `article`. */
+async function announcementFor(article: BlogArticle) {
+  const r = fakes({ readPost: () => Promise.resolve({ ...POST, article }) });
+  await publishBlog(SEND_RUN, r.deps);
+  return parsePostAnnouncement(r.remote[0].stdin);
+}
+
+Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the TL;DR escaped, one button, P.S., unsubscribe", async () => {
+  const mail = await announcementFor({
+    ...ARTICLE,
+    intro: "Why I wrote <this>.",
+    coverAlt: "A dashboard",
+    tldr: ["Use <b> & more.", "Second."],
+  });
+  const { html } = mail;
+  assertStringIncludes(html, "https://antonshubin.com/img/email/anton-96.png");
+  assertStringIncludes(html, ">Anton Shubin<");
   assertStringIncludes(
-    body,
-    "<p><strong>TL;DR</strong></p>\n<ul><li>Use &lt;b&gt; &amp; more.</li><li>Second.</li></ul>",
+    html,
+    'src="https://antonshubin.com/img/og/blog/a-test-post.png" alt="A dashboard"',
   );
-  assertEquals(body.includes("<b>"), false);
-  assertEquals(
-    body.indexOf("What the post is about") < body.indexOf("TL;DR") &&
-      body.indexOf("TL;DR") < body.indexOf("Read the article"),
-    true,
-  );
+  assertStringIncludes(html, "Why I wrote &lt;this&gt;.");
+  assertStringIncludes(html, ">In short<");
+  assertStringIncludes(html, "<li");
+  assertStringIncludes(html, "Use &lt;b&gt; &amp; more.");
+  assertEquals(html.includes("<b>"), false);
+  assertStringIncludes(html, "Read the article · 3 min");
+  assertStringIncludes(html, "P.S.");
+  assertStringIncludes(html, "Book a free 30-minute call");
+  assertStringIncludes(html, "{{unsubscribe-link}}");
+  assertEquals(html.split("Read the article").length - 1, 1);
+  const order = [
+    "<img",
+    "Anton Shubin",
+    "Why I wrote",
+    "In short",
+    "Read the article",
+    "P.S.",
+  ]
+    .map((needle) => html.indexOf(needle));
+  assertEquals(order, [...order].sort((x, y) => x - y));
+  assertEquals(order.includes(-1), false);
 });
 
-Deno.test("the Dev.to draft body starts with the TL;DR, then the project's links, then the post", async () => {
+Deno.test("the newsletter subject is the post title alone and the body never repeats it as a heading", async () => {
+  const mail = await announcementFor(ARTICLE);
+  assertEquals(mail.subject, "A <test> post");
+  assertEquals(/<h[1-6][^>]*>[^<]*A &lt;test&gt; post/.test(mail.html), false);
+  assertEquals(mail.text.includes("A <test> post"), false);
+});
+
+Deno.test("the newsletter's hidden preview line is the first TL;DR line, and the plain-text part holds the same letter", async () => {
+  const mail = await announcementFor(ARTICLE);
+  assertEquals(
+    mail.html.indexOf("One point.") < mail.html.indexOf("Anton Shubin"),
+    true,
+  );
+  assertStringIncludes(mail.html, "display:none");
+  assertStringIncludes(mail.text, "IN SHORT");
+  assertStringIncludes(mail.text, "- One point.\n- Another point.");
+  assertStringIncludes(
+    mail.text,
+    "Read the article · 3 min:\nhttps://antonshubin.com/blog/a-test-post?",
+  );
+  assertStringIncludes(
+    mail.text,
+    "Reply to this email: it comes straight to me.",
+  );
+  assertStringIncludes(mail.text, "Unsubscribe: {{unsubscribe-link}}");
+});
+
+Deno.test("the Dev.to draft body starts with the intro, then the TL;DR, then the project's links, then the post", async () => {
   const post: Post = {
     ...POST,
-    article: { ...ARTICLE, relatedTool: "preact-components" },
+    article: {
+      ...ARTICLE,
+      intro: "Why this exists.",
+      relatedTool: "preact-components",
+    },
   };
   const r = fakes({ readPost: () => Promise.resolve(post) });
   await publishBlog(DEFAULT_RUN, r.deps);
   const body = r.drafts[0].body;
   const tldr = body.indexOf("- Another point.");
   const links = body.indexOf("https://github.com/");
-  assertEquals(body.startsWith("**TL;DR**\n\n- One point."), true);
+  assertEquals(
+    body.startsWith("Why this exists.\n\n**TL;DR**\n\n- One point."),
+    true,
+  );
   assertEquals(
     tldr > 0 && tldr < links && links < body.indexOf("Body text."),
     true,
@@ -210,22 +271,30 @@ Deno.test("the Dev.to draft gets the post's coverImage", async () => {
   assertEquals(r.drafts[0].coverImage, "/img/blog/a-test-post/cover.png");
 });
 
-Deno.test("the newsletter body links to the post only through the email channel's tagged url", async () => {
-  const r = fakes();
-  await publishBlog(DEFAULT_RUN, r.deps);
-  const out = r.out.join("\n");
-  const body = out.slice(
-    out.indexOf("Newsletter body:"),
-    out.indexOf("Nothing was sent"),
-  );
-  const tagged =
-    "https://antonshubin.com/blog/a-test-post?utm_source=email&utm_medium=email&utm_campaign=a-campaign";
-  assertStringIncludes(body, `<a href="${tagged}">`);
+Deno.test("every link the newsletter makes into the site is the email channel's tagged url", async () => {
+  const { html, text } = await announcementFor(ARTICLE);
+  const hrefs = [...html.matchAll(/href="(https:\/\/antonshubin\.com[^"]*)"/g)]
+    .map((m) => m[1].replaceAll("&amp;", "&"));
+  assertEquals(hrefs.length >= 4, true, hrefs.join("\n"));
+  for (const href of hrefs) {
+    assertStringIncludes(
+      href,
+      "utm_source=email&utm_medium=email&utm_campaign=a-campaign",
+    );
+  }
   assertEquals(
-    body.split("https://antonshubin.com/blog/a-test-post").length - 1,
-    1,
+    hrefs.some((h) =>
+      h.startsWith("https://antonshubin.com/blog/a-test-post?")
+    ),
+    true,
   );
-  assertStringIncludes(body, "A &lt;test&gt; post");
+  assertEquals(
+    hrefs.some((h) => h.startsWith("https://antonshubin.com/book?")),
+    true,
+  );
+  for (const m of text.matchAll(/https:\/\/antonshubin\.com\S*/g)) {
+    assertStringIncludes(m[0], "utm_source=email");
+  }
 });
 
 Deno.test("--send-newsletter pipes the tagged announcement to the container's send and makes no second draft", async () => {
@@ -239,11 +308,40 @@ Deno.test("--send-newsletter pipes the tagged announcement to the container's se
   );
   const sent = parsePostAnnouncement(r.remote[0].stdin);
   assertEquals(sent.slug, "a-test-post");
-  assertEquals(sent.subject, "New article: A <test> post");
+  assertEquals(sent.subject, "A <test> post");
   assertStringIncludes(
-    sent.body,
-    "utm_source=email&utm_medium=email&utm_campaign=a-campaign",
+    sent.html,
+    "utm_source=email&amp;utm_medium=email&amp;utm_campaign=a-campaign",
   );
+});
+
+Deno.test("--test-newsletter asks the container for one test copy with --test and makes no draft", async () => {
+  const r = fakes();
+  assertEquals(
+    await publishBlog({ ...DEFAULT_RUN, testNewsletter: true }, r.deps),
+    0,
+  );
+  assertEquals(r.drafts.length, 0);
+  assertEquals(r.remote.length, 1);
+  assertEquals(
+    r.remote[0].command,
+    "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json --test",
+  );
+  assertEquals(parsePostAnnouncement(r.remote[0].stdin).slug, "a-test-post");
+});
+
+Deno.test("--preview writes the HTML and the plain text beside it, needs no live post and sends nothing", async () => {
+  const r = fakes({ status: 404 });
+  assertEquals(
+    await publishBlog({ ...DEFAULT_RUN, preview: "out/mail.html" }, r.deps),
+    0,
+  );
+  assertEquals(Object.keys(r.writes).sort(), ["out/mail.html", "out/mail.txt"]);
+  assertStringIncludes(r.writes["out/mail.html"], "<!doctype html>");
+  assertStringIncludes(r.writes["out/mail.txt"], "IN SHORT");
+  assertEquals(r.fetched, []);
+  assertEquals(r.drafts.length, 0);
+  assertEquals(r.remote.length, 0);
 });
 
 Deno.test("a refused or failed remote send exits with the remote's code", async () => {
@@ -328,7 +426,7 @@ Deno.test("a full run writes nothing to lib/data.ts or content/blog", async () =
   assertEquals(await snapshot("content/blog"), before.blog);
 });
 
-Deno.test("parsePublishArgs takes a slug and the --send-newsletter flag, and rejects anything else", () => {
+Deno.test("parsePublishArgs takes a slug and one of --send-newsletter, --test-newsletter and --preview <file>, and rejects anything else", () => {
   assertEquals(parsePublishArgs(["a-post"]), {
     slug: "a-post",
     sendNewsletter: false,
@@ -336,6 +434,16 @@ Deno.test("parsePublishArgs takes a slug and the --send-newsletter flag, and rej
   assertEquals(parsePublishArgs(["a-post", "--send-newsletter"]), {
     slug: "a-post",
     sendNewsletter: true,
+  });
+  assertEquals(parsePublishArgs(["a-post", "--test-newsletter"]), {
+    slug: "a-post",
+    sendNewsletter: false,
+    testNewsletter: true,
+  });
+  assertEquals(parsePublishArgs(["--preview", "m.html", "a-post"]), {
+    slug: "a-post",
+    sendNewsletter: false,
+    preview: "m.html",
   });
   assertThrows(() => parsePublishArgs([]), Error, "Usage");
   assertThrows(
@@ -348,18 +456,32 @@ Deno.test("parsePublishArgs takes a slug and the --send-newsletter flag, and rej
     Error,
     "Unexpected argument b-post",
   );
+  assertThrows(
+    () => parsePublishArgs(["a-post", "--preview"]),
+    Error,
+    "--preview needs a file name",
+  );
+  assertThrows(
+    () =>
+      parsePublishArgs(["a-post", "--send-newsletter", "--test-newsletter"]),
+    Error,
+    "Pick one",
+  );
 });
 
-Deno.test("parsePostAnnouncement rejects a missing body, an empty subject and a slug that is not kebab-case", () => {
+Deno.test("parsePostAnnouncement rejects a missing html part, an empty subject and a slug that is not kebab-case", () => {
   assertThrows(
-    () => parsePostAnnouncement(JSON.stringify({ slug: "a", subject: "s" })),
+    () =>
+      parsePostAnnouncement(
+        JSON.stringify({ slug: "a", subject: "s", text: "t" }),
+      ),
     Error,
-    `"body"`,
+    `"html"`,
   );
   assertThrows(
     () =>
       parsePostAnnouncement(
-        JSON.stringify({ slug: "a", subject: "", body: "b" }),
+        JSON.stringify({ slug: "a", subject: "", html: "h", text: "t" }),
       ),
     Error,
     `"subject"`,
@@ -367,7 +489,7 @@ Deno.test("parsePostAnnouncement rejects a missing body, an empty subject and a 
   assertThrows(
     () =>
       parsePostAnnouncement(
-        JSON.stringify({ slug: "../x", subject: "s", body: "b" }),
+        JSON.stringify({ slug: "../x", subject: "s", html: "h", text: "t" }),
       ),
     Error,
     "kebab-case",

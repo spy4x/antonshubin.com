@@ -71,11 +71,45 @@ export interface BlogArticle {
   catalogSlug?: string;
   youtubeVideoId?: string;
   /**
-   * The Dev.to cover (`main_image`), a site path to a 1000×420 PNG under
-   * `static/img/`, cut from a real screenshot in the post. The page
-   * itself never shows it; `scripts/devto.ts` sends it as a full URL.
+   * The cover, a site path to a 1000×420 PNG under `static/img/`, cut from a
+   * real screenshot in the post. The page itself never shows it;
+   * `scripts/devto.ts` sends it as the Dev.to `main_image` and the newsletter
+   * mail shows it. Required for a post published on or after
+   * {@linkcode LETTER_FIELDS_FROM}; see {@linkcode postCover}.
    */
   coverImage?: string;
+  /**
+   * Two or three sentences in Anton's voice on why the post exists and who it
+   * is for (docs/publishing.md). It opens the newsletter mail and the Dev.to
+   * draft, and can open a LinkedIn post. Required from
+   * {@linkcode LETTER_FIELDS_FROM}; see {@linkcode postIntro}.
+   */
+  intro?: string;
+  /** The cover's alt text. Required from {@linkcode LETTER_FIELDS_FROM}. */
+  coverAlt?: string;
+}
+
+/**
+ * The day #364 merged. A post published on or after it must carry `intro`,
+ * `coverImage` and `coverAlt` or the build fails; an older post falls back
+ * (`postIntro()`, `postCover()`, `postCoverAlt()`), so no old post is edited
+ * just to keep building.
+ */
+export const LETTER_FIELDS_FROM = "2026-10-02";
+
+/** The post's intro: its `intro`, else its `description`. */
+export function postIntro(article: BlogArticle): string {
+  return article.intro ?? article.description;
+}
+
+/** The post's cover: its `coverImage`, else its OG preview PNG (1200×630). */
+export function postCover(article: BlogArticle): string {
+  return article.coverImage ?? `/img/og/blog/${article.slug}.png`;
+}
+
+/** The cover's alt text: its `coverAlt`, else the post's title. */
+export function postCoverAlt(article: BlogArticle): string {
+  return article.coverAlt ?? article.title;
 }
 
 const TOPIC_IDS = new Set<string>(topics.map((t) => t.id));
@@ -105,6 +139,8 @@ const KNOWN_KEYS = new Set([
   "catalogSlug",
   "youtubeVideoId",
   "coverImage",
+  "intro",
+  "coverAlt",
   // The post's UTM campaign, read by scripts/utm.ts (docs/utm.md).
   "utmCampaign",
 ]);
@@ -225,13 +261,28 @@ export function parseBlogArticle(
     }
   }
 
+  const publishedAt = date("publishedAt", true)!;
+  const intro = text("intro", false);
+  const coverAlt = text("coverAlt", false);
+  if (publishedAt >= LETTER_FIELDS_FROM) {
+    for (
+      const [key, value] of Object.entries({ intro, coverImage, coverAlt })
+    ) {
+      if (value === undefined) {
+        throw new Error(
+          `${where}: "${key}" is missing; a post published on or after ${LETTER_FIELDS_FROM} needs it`,
+        );
+      }
+    }
+  }
+
   const article: BlogArticle = {
     slug,
     title: fillProof(text("title", true)!),
     description: fillProof(text("description", true)!),
     tldr: tldr.map((line: string) => fillProof(line.trim())),
     readTime,
-    publishedAt: date("publishedAt", true)!,
+    publishedAt,
     topic: topicId as TopicId,
   };
   const optional = {
@@ -242,6 +293,8 @@ export function parseBlogArticle(
     catalogSlug: text("catalogSlug", false),
     youtubeVideoId: text("youtubeVideoId", false),
     coverImage,
+    intro: intro === undefined ? undefined : fillProof(intro),
+    coverAlt,
   };
   for (const [key, value] of Object.entries(optional)) {
     if (value !== undefined) {
