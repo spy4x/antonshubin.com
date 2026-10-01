@@ -1,6 +1,11 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 import { webpForPng } from "../lib/image-path.ts";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconXMark,
+} from "@spy4x/preact-icons";
 import { buttonClass } from "../components/Button.tsx";
 
 interface GalleryImageData {
@@ -49,29 +54,6 @@ function GalleryImage(
         decoding={priority ? undefined : "async"}
       />
     </picture>
-  );
-}
-
-const ARROW_LEFT = "M15 19l-7-7 7-7";
-const ARROW_RIGHT = "M9 5l7 7-7 7";
-
-function Arrow({ d, class: className }: { d: string; class: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      class={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d={d}
-      />
-    </svg>
   );
 }
 
@@ -258,7 +240,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
             hidden={!overflows.value}
             class={`${ROUND} max-lg:hidden disabled:opacity-50`}
           >
-            <Arrow d={ARROW_LEFT} class="w-5 h-5" />
+            <IconChevronLeft class="w-5 h-5" />
           </button>
           <p
             data-gallery-counter
@@ -274,7 +256,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
             hidden={!overflows.value}
             class={`${ROUND} max-lg:hidden disabled:opacity-50`}
           >
-            <Arrow d={ARROW_RIGHT} class="w-5 h-5" />
+            <IconChevronRight class="w-5 h-5" />
           </button>
         </div>
       )}
@@ -299,21 +281,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
                 class={ROUND}
                 aria-label="Close"
               >
-                <svg
-                  aria-hidden="true"
-                  focusable="false"
-                  class="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <IconXMark class="w-6 h-6" />
               </button>
             </div>
 
@@ -351,7 +319,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
                     class={ROUND}
                     aria-label="Previous image"
                   >
-                    <Arrow d={ARROW_LEFT} class="w-6 h-6" />
+                    <IconChevronLeft class="w-6 h-6" />
                   </button>
                 )
                 : <span />}
@@ -375,7 +343,7 @@ export default function ImageGallery({ images, hero }: ImageGalleryProps) {
                     class={ROUND}
                     aria-label="Next image"
                   >
-                    <Arrow d={ARROW_RIGHT} class="w-6 h-6" />
+                    <IconChevronRight class="w-6 h-6" />
                   </button>
                 )
                 : <span />}
