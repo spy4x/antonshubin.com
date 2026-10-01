@@ -383,30 +383,34 @@ uses these tokens (`bg-ink`, `text-parchment`, and so on) — a raw Tailwind
 palette colour (`slate-*`, `gray-*`, `orange-*`) showing up again is a
 regression, not a style choice.
 
-`components/Button.tsx` is the one button component, a thin wrapper over
-`@spy4x/preact-ui/button` (#195). `variant` defaults to `secondary` (the
-library's `outline`); `variant="primary"` (the accent fill, Ink text) is
+`components/Button.tsx` is the one button component, drawn with
+`@spy4x/preact-ui/button`'s classes (#195). `variant` defaults to `secondary`
+(the library's `outline`); `variant="primary"` (the accent fill, Ink text) is
 reserved for the Book action, and a primary button carries `data-primary-book` —
 the marker `test/visual-system.browser.test.ts`'s "the accent colour is a
 background only on the primary button and the nav's Book" guard looks for,
-instead of guessing from text content or element shape. The wrapper exists
-because the library's button is a `<button>` only (the site's are mostly links),
-carries no such marker, and uses a 500 weight, a smaller radius and a default
-size. `buttonClass(variant, extra)` (also exported from `Button.tsx`) is the
-same class string as a plain string, for the call sites that can't render
-`<Button>` directly: `components/BookCallLink.tsx` (every "Book a call" link on
-the site goes through it; it owns the `href`/`target`/empty-`url` behaviour
+instead of guessing from text content or element shape. It renders an `<a>` with
+`href` and a `<button type="button">` without, never the library's `<Button>`:
+since 2.0.0 that one appends a caller's classes instead of merging them, so it
+cannot drop its 500 weight, smaller radius, Paper fill and default size, which
+the site's look replaces (`SIZE_RESET` names them).
+`buttonClass(variant,
+extra)` (also exported from `Button.tsx`) is the same
+class string as a plain string, for the call sites that can't render `<Button>`
+directly: `components/BookCallLink.tsx` (every "Book a call" link on the site
+goes through it; it owns the `href`/`target`/empty-`url` behaviour
 `<Button href=…>` doesn't, and stamps `data-primary-book` itself for its default
-`variant="primary"`). It is the library's `buttonClasses()` output with the
-site's look, written out in `BUTTON_CLASSES` and joined plainly with `extra`:
-never call `cn()` (tailwind-merge, about 28 KB) from code an island imports,
-since `islands/ImageGallery.tsx` imports `buttonClass`; use `cn()` only in
-server-rendered components. `test/library-classes.test.tsx` fails when
-`BUTTON_CLASSES` drifts from the library or when tailwind-merge reaches a client
-chunk. The string carries no padding, gap or text-size utility — two Tailwind
-classes for the same property in one `class` attribute resolve by their order in
-the compiled stylesheet, not in the attribute — so every call site supplies its
-own sizing via `extra` instead of fighting a default.
+`variant="primary"`). It is the library's `buttonClasses()` output less
+`SIZE_RESET`, with the site's look, written out in `BUTTON_CLASSES` and joined
+plainly with `extra`, so an island that imports it (`islands/ImageGallery.tsx`)
+ships no library code. Never call `cn()` (tailwind-merge, about 28 KB) from code
+an island imports; use it only in server-rendered components.
+`test/library-classes.test.tsx` fails when `BUTTON_CLASSES` drifts from the
+library or when tailwind-merge reaches a client chunk. The string carries no
+padding, gap or text-size utility — two Tailwind classes for the same property
+in one `class` attribute resolve by their order in the compiled stylesheet, not
+in the attribute — so every call site supplies its own sizing via `extra`
+instead of fighting a default.
 
 The library's components are coloured by the `:root` block under `@theme` in
 `assets/styles.css`: each library token (`--color-surface`, `--color-success`,
@@ -414,11 +418,13 @@ The library's components are coloured by the `:root` block under `@theme` in
 place a colour is written. The selection tokens (`--color-selected*`) are Lamp
 and Parchment, never the accent. `vite.config.ts` splices the library's
 `preset.css`'s "Colour atoms" section into the stylesheet (in reference mode);
-its `tokens.css` is not imported, because it would redefine `--color-accent` and
-`--font-sans`. Tailwind never scans the library, so `assets/styles.css` lists
-the classes of the modules the site uses in `@source inline(...)` lines;
-`test/library-classes.test.tsx` fails when a class a library component renders
-has no rule. `--font-weight-medium` is 600, since Plex Sans has no 500 file.
+its `tokens.css` is not imported: since 2.0.0 it sits in a layer under `@theme`
+and no longer overrides the site, but the site maps every token it reads anyway,
+and the file added 10.6 KB to the built stylesheet. Tailwind never scans the
+library, so `assets/styles.css` lists the classes of the modules the site uses
+in `@source inline(...)` lines; `test/library-classes.test.tsx` fails when a
+class a library component renders has no rule. `--font-weight-medium` is 600,
+since Plex Sans has no 500 file.
 
 `@spy4x/preact-ui/status-mark`'s `StatusMark` renders a shape plus a word for a
 project or tool status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`,
