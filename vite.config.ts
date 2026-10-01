@@ -7,8 +7,27 @@ const STYLESHEET = "/assets/styles.css";
 const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
 
 /**
- * Splices `@spy4x/preact-theme`'s `preset.css` (the utilities the library's
- * components render, coloured by the site's tokens) into
+ * The `#region` blocks of the preset the site takes. "Colour atoms" holds
+ * every colour, focus and selection utility the components used here read.
+ * Add a region (Typography, Buttons, Forms, Surfaces, ...) when a component
+ * that needs it is adopted.
+ */
+const PRESET_REGIONS = ["Colour atoms"];
+
+/** One `#region` block of the preset's text, or a thrown error naming it. */
+function presetRegion(css: string, name: string): string {
+  const start = `/* #region ${name} */`;
+  const end = `/* #endregion ${name} */`;
+  const from = css.indexOf(start);
+  const to = css.indexOf(end);
+  if (from === -1 || to < from) {
+    throw new Error(`@spy4x/preact-theme's preset has no "${name}" region`);
+  }
+  return css.slice(from, to + end.length);
+}
+
+/**
+ * Splices the needed regions of `@spy4x/preact-theme`'s `preset.css` into
  * `assets/styles.css` before Tailwind compiles it. JSR cannot export a CSS
  * file, so the package exports its text instead.
  *
@@ -19,12 +38,16 @@ const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
  * `assets/styles.css` sets the tokens itself and lists, in its own
  * `@source inline(...)`, only the classes of the components the site uses.
  *
- * The text goes in as `@media reference { ... }`, Tailwind's form of
- * `@import "…" reference`: its utilities can still be generated, but its own
- * rules (the `.theme-base` document styles, the dark table and form chrome,
- * map markers) are not emitted, since no element here uses them.
+ * Only `PRESET_REGIONS` go in: the other regions define utilities named after
+ * plain words (`input`, `select`, `label`, `card`, `link`), which Tailwind
+ * would emit from the site's own text, and the head of the file holds the
+ * `.theme-base` document rules. The text goes in as `@media reference`,
+ * Tailwind's form of `@import "…" reference`, so nothing in it is emitted
+ * unless a class asks for it.
  */
 function preactPreset(): Plugin {
+  const preset = PRESET_REGIONS.map((name) => presetRegion(PRESET_CSS, name))
+    .join("\n");
   return {
     name: "preact-preset",
     enforce: "pre",
@@ -35,7 +58,7 @@ function preactPreset(): Plugin {
       }
       return code.replace(
         PRESET_IMPORT,
-        () => `@media reference {\n${PRESET_CSS}\n}`,
+        () => `@media reference {\n${preset}\n}`,
       );
     },
   };

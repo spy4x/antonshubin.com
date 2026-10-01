@@ -391,11 +391,11 @@ the marker `test/visual-system.browser.test.ts`'s "the accent colour is a
 background only on the primary button and the nav's Book" guard looks for,
 instead of guessing from text content or element shape. The wrapper exists
 because the library's button is a `<button>` only (the site's are mostly links),
-carries no such marker, and uses `font-medium`, `rounded-md` and a default size.
-`buttonClass(variant, extra)` (also exported from `Button.tsx`) is the same
-class string as a plain string, for the call sites that can't render `<Button>`
-directly: `components/BookCallLink.tsx` (every "Book a call" link on the site
-goes through it; it owns the `href`/`target`/empty-`url` behaviour
+carries no such marker, and uses a 500 weight, a smaller radius and a default
+size. `buttonClass(variant, extra)` (also exported from `Button.tsx`) is the
+same class string as a plain string, for the call sites that can't render
+`<Button>` directly: `components/BookCallLink.tsx` (every "Book a call" link on
+the site goes through it; it owns the `href`/`target`/empty-`url` behaviour
 `<Button href=…>` doesn't, and stamps `data-primary-book` itself for its default
 `variant="primary"`). It is the library's `buttonClasses()` output with the
 site's look, written out in `BUTTON_CLASSES` and joined plainly with `extra`:

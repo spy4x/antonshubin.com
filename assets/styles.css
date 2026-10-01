@@ -85,15 +85,6 @@
 @source inline("inline-flex items-center gap-1 text-sm font-medium shrink-0 size-4 text-success text-muted text-warning text-danger text-foreground");
 /* @spy4x/preact-ui/badge: base and the filled `gray`. */
 @source inline("inline-flex items-center border py-1 whitespace-nowrap capitalize border-subtle bg-track text-foreground");
-/*
- * The preset names some utilities after plain words (`card`, `link`,
- * `label`, `input`, ...). Tailwind finds those words in the site's text and
- * would emit the rules, though no element here carries them; this keeps them
- * out. Remove a name when a library component that renders it is adopted.
- * `input` cannot be listed: the preset's `select` applies it.
- */
-@source not
-  inline("h1 h2 h3 h4 h5 link page-layout list-ul btn select textarea label checkbox radio card card-header card-body card-footer scrollbar num kpi kpi-label kpi-value bar");
 
 /*
  * Self-hosted type (#184). Latin + Cyrillic subsets only (the site has no
