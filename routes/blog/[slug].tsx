@@ -20,6 +20,7 @@ import { toJsonLd } from "../../lib/json-ld.ts";
 import {
   archiveNoteText,
   AUTHOR_LINE,
+  blogNode,
   postDate,
   postHref,
   postTitleTag,
@@ -250,12 +251,7 @@ export default define.page(function BlogPost(ctx) {
             "inLanguage": "en-US",
             // Described, not only pointed at: the Blog node lives on /blog, so a
             // bare @id here named a node this page does not contain.
-            "isPartOf": {
-              "@type": "Blog",
-              "@id": `${SITE}/blog#blog`,
-              "name": "Writing",
-              "url": `${SITE}/blog`,
-            },
+            "isPartOf": blogNode(SITE),
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": canonical,

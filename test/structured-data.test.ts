@@ -46,58 +46,41 @@ const URL_KEYS = [
 ];
 const DATE_KEYS = ["datePublished", "dateModified", "dateCreated"];
 const FORBIDDEN_TYPES = ["Review", "AggregateRating", "Rating"];
+/**
+ * Every type the site renders today (all 53 sitemap pages and `/pay`: 29 types).
+ * A page that starts using another one fails here until the type is listed, and
+ * a type Google gives a rich result needs a case in `checkType()` first.
+ */
 const KNOWN_TYPES = new Set([
-  "Person",
-  "Organization",
-  "WebSite",
-  "WebPage",
-  "ProfilePage",
-  "ContactPage",
-  "CollectionPage",
-  "BreadcrumbList",
-  "ListItem",
-  "ItemList",
-  "FAQPage",
-  "Question",
   "Answer",
-  "BlogPosting",
   "Blog",
-  "TechArticle",
+  "BlogPosting",
+  "BreadcrumbList",
+  "CollectionPage",
+  "ContactPage",
+  "ContactPoint",
   "CreativeWork",
+  "FAQPage",
+  "ImageObject",
+  "ItemList",
+  "ListItem",
+  "Offer",
+  "OfferCatalog",
+  "Organization",
+  "Person",
+  "Place",
+  "PriceSpecification",
+  "ProfilePage",
+  "PropertyValue",
+  "Question",
+  "Role",
+  "Service",
   "SoftwareApplication",
   "SoftwareSourceCode",
-  "OfferCatalog",
-  "Service",
-  "Offer",
-  "PriceSpecification",
+  "TechArticle",
   "UnitPriceSpecification",
-  "ContactPoint",
-  "ImageObject",
-  "PropertyValue",
-  "Place",
-  "Role",
-  "Thing",
-  "ReadAction",
-  "SearchAction",
-  "EntryPoint",
-  "Brand",
-  "QuantitativeValue",
-  "HowTo",
-  "HowToStep",
-  "DefinedTerm",
-  "Article",
-  "Dataset",
-  "VideoObject",
-  "Course",
-  "Product",
-  "ProfessionalService",
-  "WebApplication",
-  "SoftwareSourceCode",
-  "MonetaryAmount",
-  "PostalAddress",
-  "Country",
-  "AdministrativeArea",
-  "City",
+  "WebPage",
+  "WebSite",
 ]);
 
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -170,7 +153,12 @@ function nonEmpty(node: Node, key: string, where: string) {
 }
 
 /** What Google's documentation lists as required (and the recommended ones this site can state). */
-function checkType(node: Node, type: string, where: string) {
+function checkType(
+  node: Node,
+  type: string,
+  where: string,
+  resolve: (id: string) => Node | undefined,
+) {
   switch (type) {
     case "Person":
     case "Organization":
@@ -220,7 +208,7 @@ function checkType(node: Node, type: string, where: string) {
       nonEmpty(node, "headline", where);
       assert(
         String(node["headline"]).length <= 110,
-        `${where}: headline over 110 characters`,
+        `${where}: headline over 110 characters (a site rule: Google truncates longer ones)`,
       );
       nonEmpty(node, "image", where);
       // A post has a publication date; the infrastructure write-up is a living page with none.
@@ -236,13 +224,23 @@ function checkType(node: Node, type: string, where: string) {
       );
       break;
     }
-    case "ProfilePage":
-      // Google: mainEntity is required and must be a Person (or Organization).
+    case "ProfilePage": {
+      // Google's required property: mainEntity, a Person or Organization with a name.
+      const ref = node["mainEntity"];
+      assert(isNode(ref), `${where}: ProfilePage has no mainEntity`);
+      const entity = typeof ref["@id"] === "string" && isReference(ref)
+        ? resolve(ref["@id"])
+        : ref;
+      assert(entity, `${where}: mainEntity points at a node the page lacks`);
       assert(
-        isNode(node["mainEntity"]),
-        `${where}: ProfilePage has no mainEntity`,
+        typesOf(entity).some((t) => t === "Person" || t === "Organization"),
+        `${where}: mainEntity is ${
+          typesOf(entity).join("/")
+        }, not a Person or Organization`,
       );
+      nonEmpty(entity, "name", `${where} mainEntity`);
       break;
+    }
     case "CollectionPage":
       assert(
         isNode(node["mainEntity"]),
@@ -283,9 +281,22 @@ function checkType(node: Node, type: string, where: string) {
       );
       break;
     case "SoftwareApplication":
+      // Google's software rich result needs name, offers.price and an
+      // aggregateRating or review. The site never marks up its own reviews, so
+      // this node is entity data and can never earn that rich result; the test
+      // holds it to name and, as a site rule, an author.
+      nonEmpty(node, "name", where);
+      assert(
+        node["author"] || node["creator"],
+        `${where}: no author (site rule)`,
+      );
+      break;
     case "SoftwareSourceCode":
       nonEmpty(node, "name", where);
-      assert(node["author"] || node["creator"], `${where}: no author`);
+      assert(
+        node["author"] || node["creator"],
+        `${where}: no author (site rule)`,
+      );
       break;
     case "ContactPage":
     case "WebPage":
@@ -328,12 +339,12 @@ export function checkGraph(html: string, page: string) {
     const where = `${page} ${path}`;
     const types = typesOf(node);
     for (const type of types) {
-      assert(KNOWN_TYPES.has(type), `${where}: unexpected type ${type}`);
       assert(
         !FORBIDDEN_TYPES.includes(type),
         `${where}: ${type} is not allowed (self-serving)`,
       );
-      checkType(node, type, where);
+      assert(KNOWN_TYPES.has(type), `${where}: unexpected type ${type}`);
+      checkType(node, type, where, (id) => first.get(id));
     }
     assert(
       !("review" in node) && !("aggregateRating" in node),
@@ -407,7 +418,7 @@ function pngSize(bytes: Uint8Array): [number, number] {
   return [view.getUint32(16), view.getUint32(20)];
 }
 
-Deno.test("the checker rejects a graph with a dangling @id, a bad date and a Review", () => {
+Deno.test("the checker rejects a dangling @id, a bad date, a Review, review markup and a bad ProfilePage", () => {
   const page = (graph: unknown) =>
     `<script type="application/ld+json">${
       JSON.stringify({ "@context": "https://schema.org", "@graph": graph })
@@ -425,12 +436,12 @@ Deno.test("the checker rejects a graph with a dangling @id, a bad date and a Rev
     }]),
     "ok",
   );
-  const failing: [string, unknown][] = [
+  const failing: [string, unknown, RegExp][] = [
     ["dangling", [person, {
       "@type": "WebPage",
       "url": "https://example.com/",
       "about": { "@id": "https://example.com/#x" },
-    }]],
+    }], /no node on the page defines/],
     ["date", [{
       "@type": "BlogPosting",
       "headline": "h",
@@ -438,18 +449,29 @@ Deno.test("the checker rejects a graph with a dangling @id, a bad date and a Rev
       "datePublished": "June 2026",
       "dateModified": "2026-06-01",
       "author": { "@id": "https://example.com/#p" },
-    }, person]],
-    ["review", [person, { "@type": "Review", "name": "x" }]],
-    ["relative url", [{ "@type": "WebPage", "url": "/about" }]],
+    }, person], /datePublished/],
+    ["review", [person, { "@type": "Review", "name": "x" }], /not allowed/],
+    ["rating property", [{
+      ...person,
+      "aggregateRating": { "ratingValue": "5" },
+    }], /review markup/],
+    ["relative url", [{ "@type": "WebPage", "url": "/about" }], /absolute/],
+    ["profile of a site", [
+      { "@type": "WebSite", "@id": "https://example.com/#w", "name": "S" },
+      {
+        "@type": "ProfilePage",
+        "mainEntity": { "@id": "https://example.com/#w" },
+      },
+    ], /not a Person or Organization/],
   ];
-  for (const [name, graph] of failing) {
-    let threw = false;
+  for (const [name, graph, message] of failing) {
+    let error = "";
     try {
       checkGraph(page(graph), name);
-    } catch {
-      threw = true;
+    } catch (e) {
+      error = (e as Error).message;
     }
-    assert(threw, `the checker accepted the ${name} case`);
+    assertMatch(error, message, `the ${name} case failed for another reason`);
   }
 });
 
