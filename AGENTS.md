@@ -1049,14 +1049,23 @@ with `lib/subscribe-mail.ts` (`/api/subscribe`) and `lib/newsletter.ts`
 of throwing; a send counts as done only when the relay accepted it. Their tests
 pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 
-Replies (#266): lead mail sets `Reply-To` to the visitor, and the confirmation
-mail, the welcome mail and every newsletter set it to `CONTACT_EMAIL`, because
-the mailbox they are sent from is noreply. A lead whose send failed is appended
-to `data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that
-it was kept; at 10 MB (`LEADS_FAILED_MAX_BYTES` overrides, #327) a lead is not
-kept and one log line without its contents says so. The `noreply` password is
-shared by four senders (this site, mig, Healthchecks and Vaultwarden) and must
-rotate in all four together (`docs/deploy.md` "Shared mail password").
+The subscriber mails are one letter (#364): `lib/letter.ts` renders the
+confirmation, the welcome and every newsletter in one layout (Anton's portrait
+and name, the content, a P.S. with the booking link, a reply line, a small
+footer), as HTML built on `@spy4x/email/html`'s `htmlWrap` and `emailButton`
+plus a plain-text part, with every value escaped and every link into the site
+the `email` channel's tagged URL (`scripts/utm.ts`). They are sent as
+`Anton Shubin <hello@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox
+that reaches Anton, so they set no `Reply-To`; the welcome and every newsletter
+carry the subscriber's own one-click `List-Unsubscribe` (`listUnsubscribe` on
+`EmailMessage`). Lead mail still sets `Reply-To` to the visitor (#266), and the
+owner notice stays plain text. A lead whose send failed is appended to
+`data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that it
+was kept; at 10 MB (`LEADS_FAILED_MAX_BYTES` overrides, #327) a lead is not kept
+and one log line without its contents says so. The `noreply` password is shared
+by three senders (mig, Healthchecks and Vaultwarden) and must rotate in all
+three together; this site left that login in #364 (`docs/deploy.md` "Shared mail
+password").
 
 Sign-up is double opt-in (#253): `/api/subscribe` only mails a signed
 confirmation link (`lib/subscribe-token.ts`, purpose `subscribe-confirm`, valid
@@ -1104,9 +1113,19 @@ build without it, and `llms-full.txt` lists it), and a post about a project sets
 checks both on every post. A post about something visual opens with a real
 screenshot right under its TL;DR (lazy like every post image: eager, it made the
 post's phone LCP slower), and its `coverImage` (a 1000×420 PNG under
-`static/img/`) becomes the Dev.to cover; `publish:blog` updates an existing
-unpublished draft with the same `canonical_url` instead of adding a second.
-Three hard rules:
+`static/img/`) becomes the Dev.to cover and the newsletter's picture;
+`publish:blog` updates an existing unpublished draft with the same
+`canonical_url` instead of adding a second. Since #364 a post published on or
+after 2026-10-02 (`LETTER_FIELDS_FROM` in `lib/blog-posts.ts`) must also carry
+`intro` (two or three sentences in Anton's voice on why the post exists and who
+it is for, written by the agent last, from the finished post; it opens the
+newsletter and the Dev.to draft and can open a LinkedIn post) and `coverAlt`,
+and the build fails without any of the three; older posts fall back to their
+`description`, their OG preview PNG and their title. The newsletter is that
+letter with the cover, the intro, "In short", one button and the P.S.; its
+subject is the post's title alone. `publish:blog <slug> --preview <file>` writes
+its HTML and text locally and `--test-newsletter` sends one copy to
+`CONTACT_EMAIL` with no log. Three hard rules:
 
 - **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
   text per channel with its tagged link and show it in chat; Anton pastes it.
@@ -1114,7 +1133,10 @@ Three hard rules:
   yes in chat to that post** —
   `deno task publish:blog <slug>
   --send-newsletter`. The production container
-  refuses a slug already in its sent log, `data/newsletter-log.json`.
+  keeps a per-recipient sent log, `data/newsletter-log.json` (a keyed hash of
+  each address, never the address): it refuses a post whose run finished with no
+  failure, and a rerun after a partial failure mails only the subscribers who
+  were missed.
 - **Dev.to gets an unpublished draft only.** Anton publishes it himself.
 
 ## Tagged links

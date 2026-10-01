@@ -74,6 +74,14 @@ export default define.page(function Privacy(ctx) {
             subscribe you again. A fingerprint older than three days, the life
             of such a link, is cleared the next time anyone unsubscribes.
           </p>
+          <p>
+            When I announce a post, the server also writes down, for each
+            subscriber the mail reached, a scrambled fingerprint of the address
+            (not the address itself) in a file next to the list. It lets a send
+            that stopped halfway be finished without mailing anyone the same
+            post twice. The fingerprints stay in that file; nothing clears them
+            on its own.
+          </p>
         </Section>
 
         <Section title="How long things are kept">
