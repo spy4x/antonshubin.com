@@ -18,7 +18,7 @@ import {
   validateEditList,
   type Word,
 } from "./video-cut-lib.ts";
-import { trimConcatGraph } from "./video-cut.ts";
+import { assertSlug, trimConcatGraph } from "./video-cut.ts";
 
 const tok = (text: string, from: number, to: number) => ({
   text,
@@ -361,4 +361,11 @@ Deno.test("editBrief lists numbered segments and the four reasons, and asks for 
   assertStringIncludes(brief, "`off-topic`");
   assertStringIncludes(brief, "30–55 s");
   assertStringIncludes(brief, "one JSON object");
+});
+
+Deno.test("assertSlug rejects a slug that would leave videos/", () => {
+  for (const bad of ["", "../x", "a/b", "a\\b", "..", "x..y"]) {
+    assertThrows(() => assertSlug(bad), Error, "must be one plain name");
+  }
+  assertSlug("my-video-2");
 });
