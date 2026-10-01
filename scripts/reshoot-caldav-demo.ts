@@ -15,6 +15,7 @@
  */
 import { join, relative, resolve } from "@std/path";
 import { type Browser, chromium } from "playwright";
+import { PLAYWRIGHT_VERSION } from "../test/browser.ts";
 import {
   DEMO_SERVER,
   DEMO_TASKS,
@@ -287,7 +288,7 @@ async function main(args: string[]) {
       handleSIGHUP: false,
     }).catch((cause) => {
       throw new Error(
-        `chromium.launch() failed; install it with \`deno run -A npm:playwright@1.63.0 install --with-deps chromium\`: ${cause}`,
+        `chromium.launch() failed; install it with \`deno run -A npm:playwright@${PLAYWRIGHT_VERSION} install --with-deps chromium\`: ${cause}`,
       );
     });
     const taken = await takeShots({
