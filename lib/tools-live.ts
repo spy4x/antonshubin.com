@@ -165,7 +165,10 @@ export function toolsLive(): Promise<ToolsLive> {
 export function withLiveVersion(t: Tool, live: ToolsLive): Tool {
   const version = live.versions[t.slug];
   if (!t.registry || !version || version === t.registry.version) return t;
-  const install = t.registry.install.endsWith(`@${t.registry.version}`)
+  const pinned = [`@${t.registry.version}`, `:${t.registry.version}`].some(
+    (suffix) => t.registry!.install.endsWith(suffix),
+  );
+  const install = pinned
     ? `${t.registry.install.slice(0, -t.registry.version.length)}${version}`
     : t.registry.install;
   return { ...t, registry: { ...t.registry, version, install } };

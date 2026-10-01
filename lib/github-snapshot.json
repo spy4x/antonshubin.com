@@ -1,21 +1,21 @@
 {
-  "checkedOn": "2026-09-29",
+  "checkedOn": "2026-10-01",
   "repos": {
     "spy4x/mig": {
       "stars": 0,
       "licence": "AGPL-3.0",
-      "pushedAt": "2026-09-26T18:42:53Z",
+      "pushedAt": "2026-10-01T14:03:17Z",
       "ci": {
         "status": "success",
-        "pipeline": 264,
-        "at": "2026-09-26T18:43:45.000Z",
-        "url": "https://ci.antonshubin.com/repos/12/pipeline/264"
+        "pipeline": 302,
+        "at": "2026-10-01T14:04:24.000Z",
+        "url": "https://ci.antonshubin.com/repos/12/pipeline/302"
       }
     },
     "spy4x/zond": {
       "stars": 0,
       "licence": "MIT",
-      "pushedAt": "2026-09-26T17:57:40Z",
+      "pushedAt": "2026-10-01T18:18:42Z",
       "ci": {
         "status": "success",
         "pipeline": 19,
@@ -26,7 +26,7 @@
     "spy4x/caldav-mcp": {
       "stars": 0,
       "licence": "MIT",
-      "pushedAt": "2026-09-26T17:56:08Z",
+      "pushedAt": "2026-10-01T18:18:50Z",
       "ci": {
         "status": "success",
         "pipeline": 17,
@@ -35,36 +35,36 @@
       }
     },
     "spy4x/rostok": {
-      "stars": 4,
+      "stars": 3,
       "licence": "MIT",
-      "pushedAt": "2026-09-29T19:15:54Z",
+      "pushedAt": "2026-10-01T17:33:35Z",
       "ci": {
         "status": "success",
-        "pipeline": 745,
-        "at": "2026-09-26T18:50:13.000Z",
-        "url": "https://ci.antonshubin.com/repos/2/pipeline/745"
+        "pipeline": 870,
+        "at": "2026-10-01T17:35:01.000Z",
+        "url": "https://ci.antonshubin.com/repos/2/pipeline/870"
       }
     },
     "spy4x/ts-libs": {
       "stars": 0,
       "licence": "MIT",
-      "pushedAt": "2026-09-29T19:14:47Z",
+      "pushedAt": "2026-10-01T18:15:57Z",
       "ci": {
         "status": "success",
-        "pipeline": 507,
-        "at": "2026-09-29T19:12:21.000Z",
-        "url": "https://ci.antonshubin.com/repos/10/pipeline/507"
+        "pipeline": 763,
+        "at": "2026-10-01T18:14:06.000Z",
+        "url": "https://ci.antonshubin.com/repos/10/pipeline/763"
       }
     },
     "spy4x/preact-components": {
       "stars": 0,
       "licence": "MIT",
-      "pushedAt": "2026-09-29T19:17:04Z",
+      "pushedAt": "2026-10-01T17:31:03Z",
       "ci": {
         "status": "success",
-        "pipeline": 1177,
-        "at": "2026-09-28T15:50:52.000Z",
-        "url": "https://ci.antonshubin.com/repos/9/pipeline/1177"
+        "pipeline": 1400,
+        "at": "2026-10-01T17:29:34.000Z",
+        "url": "https://ci.antonshubin.com/repos/9/pipeline/1400"
       }
     },
     "spy4x/air-quality-sensor": {
@@ -87,8 +87,13 @@
     "spy4x/template": {
       "stars": 0,
       "licence": "MIT",
-      "pushedAt": "2026-09-26T17:58:38Z",
-      "ci": null
+      "pushedAt": "2026-10-01T18:15:40Z",
+      "ci": {
+        "status": "success",
+        "pipeline": 138,
+        "at": "2026-10-01T17:47:34.000Z",
+        "url": "https://ci.antonshubin.com/repos/11/pipeline/138"
+      }
     },
     "spy4x/caldav-tasks-web": {
       "stars": 2,

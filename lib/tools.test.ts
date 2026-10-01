@@ -41,7 +41,9 @@ Deno.test("every install command pins the registry version it names", () => {
   for (const t of tools) {
     if (!t.registry) continue;
     assert(
-      t.registry.install.endsWith(`@${t.registry.version}`),
+      [`@${t.registry.version}`, `:${t.registry.version}`].some((s) =>
+        t.registry!.install.endsWith(s)
+      ),
       `${t.slug}: "${t.registry.install}" is not pinned to ${t.registry.version}`,
     );
   }
@@ -90,7 +92,7 @@ Deno.test("every status is written down: in use, ready, beta, WIP, paused or arc
     "oko": "in-use",
     "caldav-mcp": "in-use",
     "rostok": "in-use",
-    "air-quality-sensor": "in-use",
+    "air-quality-sensor": "archived",
     "ts-libs": "ready",
     "preact-components": "beta",
     "financy": "wip",

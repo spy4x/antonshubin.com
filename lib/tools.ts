@@ -248,6 +248,14 @@ export const tools: Tool[] = [
       "You need a database: storage is a JSON file.",
     ],
     repo: "spy4x/mig",
+    registry: {
+      name: "Docker Hub",
+      url: "https://hub.docker.com/r/antonshubin/mig",
+      version: "v0.12.0",
+      published: true,
+      install: "docker pull antonshubin/mig:v0.12.0",
+      latestFrom: { registry: "docker", name: "antonshubin/mig" },
+    },
     runtime: "Deno, as a single binary",
     programmingLanguage: "TypeScript",
     usedFor:
@@ -310,6 +318,14 @@ export const tools: Tool[] = [
     group: "tools",
     posts: ["rostok-self-hosted-scaffolder"],
     repo: "spy4x/rostok",
+    registry: {
+      name: "JSR",
+      url: "https://jsr.io/@rostok/cli",
+      version: "1.7.0",
+      published: true,
+      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.7.0",
+      latestFrom: { registry: "jsr", name: "@rostok/cli" },
+    },
     programmingLanguage: "TypeScript",
     usedFor:
       "Deploys my own servers: four instances in different regions, each running a different set of services.",
@@ -329,9 +345,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "1.3.0",
+      version: "1.27.0",
       published: true,
-      install: "deno add jsr:@spy4x/server@1.3.0",
+      install: "deno add jsr:@spy4x/server@1.27.0",
       latestFrom: { registry: "jsr", name: "@spy4x/server" },
     },
     licence: "MIT",
@@ -411,9 +427,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "1.2.0",
+      version: "2.2.0",
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@1.2.0",
+      install: "deno add jsr:@spy4x/preact-ui@2.2.0",
       latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
     },
     licence: "MIT",
@@ -511,7 +527,7 @@ export const tools: Tool[] = [
     summary:
       "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
     kind: "device",
-    status: "in-use",
+    status: "archived",
     group: "tools",
     repo: "spy4x/air-quality-sensor",
     runtime: "An ESP32 microcontroller",
