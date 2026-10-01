@@ -11,8 +11,8 @@ import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
  * for tests. Rendered from `lib/github-snapshot.json`, not from Woodpecker's
  * live badge image, so the page is the same on every request.
  *
- * The pill is `@spy4x/preact-ui/badge`'s grey badge (`bg-track`, Lamp through
- * the theme tokens) drawn on a link, since the library's `Badge` is a plain
+ * The pill is `@spy4x/preact-ui/badge`'s grey badge (its track colour is Lamp
+ * through the theme tokens) drawn on a link, since the library's `Badge` is a plain
  * `<span>` of text: no border, a full round, and the site's padding.
  */
 export function CiPill(

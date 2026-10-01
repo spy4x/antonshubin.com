@@ -8,7 +8,7 @@ const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
 
 /**
  * Splices `@spy4x/preact-theme`'s `preset.css` (the utilities the library's
- * components render, such as `text-success` and `ring-focus`) into
+ * components render, coloured by the site's tokens) into
  * `assets/styles.css` before Tailwind compiles it. JSR cannot export a CSS
  * file, so the package exports its text instead.
  *

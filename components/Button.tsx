@@ -31,8 +31,8 @@ type ButtonProps =
 
 /**
  * The library variant each site variant draws with. The site's secondary
- * button is the library's `outline` (a `border-control` border), not its
- * `secondary` (a filled `bg-hover` box).
+ * button is the library's `outline` (a control-coloured border), not its
+ * `secondary` (a filled box).
  */
 const LIBRARY_VARIANT = {
   primary: "primary",
@@ -56,7 +56,7 @@ const SITE_VARIANT: Record<ButtonVariant, string> = {
   primary: "border border-transparent",
   // The outline button sits on whatever surface is behind it, not on a Paper
   // fill. Its border names Rule strong directly (the same colour as the
-  // library's `border-control` token): test/frame.test.ts finds the
+  // library's control border token): test/frame.test.ts finds the
   // not-found page's buttons by that class.
   secondary: "bg-transparent border-rule-strong",
 };
