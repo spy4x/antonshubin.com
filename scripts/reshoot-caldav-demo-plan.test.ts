@@ -22,6 +22,7 @@ Deno.test("takes every screenshot of the table when no argument names one", () =
 
 Deno.test("--shots keeps table order and drops the rest", () => {
   const options = parseArgs(["--shots", "mobile-dashboard,desktop-kanban"]);
+  assertEquals(options.shots, ["desktop-kanban", "mobile-dashboard"]);
   assertEquals(selectShots(options).map((s) => s.name), [
     "desktop-kanban",
     "mobile-dashboard",
