@@ -346,7 +346,14 @@ import lighthouse from "npm:lighthouse@12";
 import { chromium } from "playwright";
 import { startSite } from "<repo>/test/harness.ts";
 
-const PAGES = ["/", "/about", "/how-i-work", "/work/smartlite", "/tools/mig"];
+const PAGES = [
+  "/",
+  "/about",
+  "/how-i-work",
+  "/work/smartlite",
+  "/tools/mig",
+  "/blog/zond-sso-probe-bridge",
+];
 const site = await startSite();
 const chrome = new Deno.Command(chromium.executablePath(), {
   args: [
