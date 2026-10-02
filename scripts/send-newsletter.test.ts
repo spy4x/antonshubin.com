@@ -136,8 +136,9 @@ Deno.test("--test sends only to CONTACT_EMAIL and writes no log", async () => {
     // proves one mail was tried, and only that one.
     assertEquals(r.code, 1);
     assertStringIncludes(r.stdout, "Test copy done. Sent: 0, Failed: 1");
-    assertStringIncludes(r.stderr, "✗ owner@example.com:");
+    assertStringIncludes(r.stderr, "✗ row 1:");
     assertEquals((r.stdout + r.stderr).includes("one@example.com"), false);
+    assertEquals((r.stdout + r.stderr).includes("owner@example.com"), false);
     assertEquals(r.log, undefined);
   } finally {
     await Deno.remove(dir, { recursive: true });
