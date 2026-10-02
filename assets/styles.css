@@ -70,6 +70,25 @@
   --color-selected-soft: var(--color-lamp);
   --color-selected-soft-hover: var(--color-rule);
   --color-selected-text: var(--color-parchment);
+
+  /* The gallery strip and its lightbox: hairline and control borders, and the
+     dark scrim over a photo (Ink at an alpha, text on it Parchment). */
+  --color-border-subtle: var(--color-rule);
+  --color-border-control: var(--color-rule-strong);
+  --color-scrim: color-mix(in oklab, var(--color-ink) 70%, transparent);
+  --color-scrim-strong: color-mix(in oklab, var(--color-ink) 95%, transparent);
+  --color-scrim-foreground: var(--color-parchment);
+}
+
+/* The gallery's Previous/Next row: the counter and the buttons sit in one
+   row. It is 40px (the buttons' height) from first paint, so the buttons
+   arriving after hydration move nothing, and the buttons take the site's
+   radius (the library gives them rounded-md and no prop reaches them). */
+div:has(> [data-gallery-counter]) {
+  min-height: 2.5rem;
+}
+div:has(> [data-gallery-counter]) > button {
+  border-radius: 0.5rem;
 }
 
 /*
