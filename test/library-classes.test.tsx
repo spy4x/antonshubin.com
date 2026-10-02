@@ -10,6 +10,8 @@ import {
   type StatusMarkStatus,
 } from "@spy4x/preact-ui/status-mark";
 import { honeypotField } from "@spy4x/preact-ui/honeypot";
+import { ImageGallery } from "@spy4x/preact-ui/image-gallery";
+import { Lightbox } from "@spy4x/preact-ui/lightbox";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -36,6 +38,54 @@ const CI_STATES: (CiSnapshot | null)[] = [
   { status: "running" } as CiSnapshot,
 ];
 
+const GALLERY_IMAGES = [
+  { src: "/a.png", alt: "One", width: 600, height: 1200, webpSrc: "/a.webp" },
+  { src: "/b.png", alt: "Two", width: 600, height: 1200 },
+];
+
+/**
+ * The project gallery: a portrait strip (the narrow slide) and a landscape
+ * one, plus the lightbox it opens, which renders its markup only while open.
+ * Apart from `renderedLibraryMarkup()`: the lightbox's round buttons are not
+ * the site's `Button`.
+ */
+function renderedGalleryMarkup(): string {
+  return [
+    render(
+      <ImageGallery
+        layout="strip"
+        hero
+        captions
+        navigation
+        snap="center"
+        slideWidth="orientation"
+        images={GALLERY_IMAGES}
+      />,
+    ),
+    render(
+      <ImageGallery
+        layout="strip"
+        captions
+        navigation
+        slideWidth="orientation"
+        images={GALLERY_IMAGES.map((i) => ({ ...i, width: 1200, height: 600 }))}
+      />,
+    ),
+    ...(["below", "overlay"] as const).map((controls) =>
+      render(
+        <Lightbox
+          images={GALLERY_IMAGES}
+          index={0}
+          open
+          onClose={() => {}}
+          onIndexChange={() => {}}
+          controls={controls}
+        />,
+      )
+    ),
+  ].join("\n");
+}
+
 /** Every library-backed piece the site renders, in each of its forms. */
 function renderedLibraryMarkup(): string {
   return [
@@ -59,7 +109,7 @@ function renderedLibraryMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/]/g, (c) => `\\${c}`);
+  return "." + className.replace(/[:.!\[\]\/(),+]/g, (c) => `\\${c}`);
 }
 
 function escapeRegExp(text: string): string {
@@ -84,7 +134,12 @@ async function builtCss(): Promise<string> {
 function renderedClasses(): { light: Set<string>; dark: Set<string> } {
   const light = new Set<string>();
   const dark = new Set<string>();
-  for (const [, list] of renderedLibraryMarkup().matchAll(/class="([^"]*)"/g)) {
+  for (
+    const [, list] of [renderedLibraryMarkup(), renderedGalleryMarkup()].join(
+      "\n",
+    )
+      .matchAll(/class="([^"]*)"/g)
+  ) {
     for (const c of list.split(/\s+/)) {
       if (c) (c.startsWith("dark:") ? dark : light).add(c);
     }

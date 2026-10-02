@@ -89,6 +89,13 @@
 @source inline("inline-flex items-center justify-center rounded-md font-medium transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 bg-accent-900 text-accent-foreground hover:bg-accent-800 bg-transparent text-foreground hover:bg-hover");
 /* @spy4x/preact-ui/badge: base and the filled `gray`. */
 @source inline("inline-flex items-center border py-1 whitespace-nowrap capitalize border-subtle bg-track text-foreground");
+/* @spy4x/preact-ui/image-gallery: the strip's row, slides (landscape and
+   portrait, start and centre snap) and thumbnail hover, and
+   navigation buttons (islands/ImageGallery.tsx). */
+@source inline("snap-x snap-mandatory snap-start snap-center scroll-px-1 overflow-x-auto w-5/6 sm:w-2/3 w-11/20 sm:w-7/20 lg:w-2/7 transition-opacity hover:opacity-90 size-5 size-8 size-10 aria-disabled:pointer-events-none aria-disabled:opacity-50");
+/* @spy4x/preact-ui/lightbox: the dialog, its controls and the image stage
+   (controls="below"). The safe-area offsets are arbitrary values. */
+@source inline("bg-scrim bg-scrim-strong backdrop:bg-scrim-strong text-on-scrim-muted hover:text-scrim-foreground focus-visible:ring-(--color-scrim-foreground) top-[max(--spacing(4),env(safe-area-inset-top,0px))] right-[max(--spacing(4),env(safe-area-inset-right,0px))] bottom-[max(--spacing(4),env(safe-area-inset-bottom,0px))] left-[max(--spacing(4),env(safe-area-inset-left,0px))] top-[calc(max(--spacing(4),env(safe-area-inset-top,0px))+--spacing(12))] pointer-events-none pointer-events-auto m-auto max-h-full max-w-[90vw] max-h-[90vh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-fit");
 /* @spy4x/preact-ui/honeypot: the off-screen box. */
 @source inline("absolute h-px w-px overflow-hidden");
 

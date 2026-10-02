@@ -60,10 +60,10 @@ bug, a wording change or one element, skip it.
 4. **One implementer, one PR.** The PR traces every adopted recommendation to
    its review (UX 3, SEO 1, …) and lists what was dropped. It reuses existing
    components (`FactCard`, `PromiseTimeline`, `ClosingBand`, `ProjectFactCard`,
-   `ImageGallery`, `ProjectReviews`, `StatusMark`, `Button`) rather than making
-   a second copy. Tests guard the structure: the H1, the first-screen elements,
-   the JSON-LD, and axe plus no horizontal scroll at 390px and 1440px in a
-   browser test.
+   `ImageGallery` (the library's strip, below), `ProjectReviews`, `StatusMark`,
+   `Button`) rather than making a second copy. Tests guard the structure: the
+   H1, the first-screen elements, the JSON-LD, and axe plus no horizontal scroll
+   at 390px and 1440px in a browser test.
 5. **Review, merge, deploy** as usual. The reviewer also does a browser pass on
    every page the change touches, not only the samples.
 
@@ -410,15 +410,14 @@ the page passes its own `href` (#387: never the scheduler, never
 `target="_blank"`), and renders nothing while `SCHEDULE_URL` is unset unless a
 page passes its own `href` (`test/action-wording.test.ts` checks every
 `data-primary-book` link). `buttonClass(variant, extra)` is the same class
-string for an element that is not a `Button`: a few plain links and
-`islands/ImageGallery.tsx`. The library composes classes with `join`, not
-`cn()`, so an island that renders or imports it ships no tailwind-merge. Never
-call `cn()` (tailwind-merge, about 28 KB) from code an island imports; use it
-only in server-rendered components. `test/library-classes.test.tsx` fails when a
-site button carries the library's default size or fill, when one of the
-library's `dark:` classes gets a rule (Tailwind's `dark:` follows the system
-theme and the site maps no accent step 600 or 700), or when tailwind-merge
-reaches a client chunk.
+string for an element that is not a `Button`: a few plain links. The library
+composes classes with `join`, not `cn()`, so an island that renders or imports
+it ships no tailwind-merge. Never call `cn()` (tailwind-merge, about 28 KB) from
+code an island imports; use it only in server-rendered components.
+`test/library-classes.test.tsx` fails when a site button carries the library's
+default size or fill, when one of the library's `dark:` classes gets a rule
+(Tailwind's `dark:` follows the system theme and the site maps no accent step
+600 or 700), or when tailwind-merge reaches a client chunk.
 
 The library's components are coloured by the `:root` block under `@theme` in
 `assets/styles.css`: each library token (`--color-surface`, `--color-success`,
@@ -565,12 +564,19 @@ shared tags). A closing band on Desk ends the page with two promises through
 `components/ClosingBand.tsx`, shared with `/work`, which passes `/catalog` as
 its catalog link and adds Infrastructure. Book appears twice, once in the card
 and once in the band, and nowhere else on the page. `islands/ImageGallery.tsx`
-renders the strip: slides sized by width with centre snap, captions from the
-file names (`screenshotCaption()`, the same text as the `alt`), a "n / N"
-counter, Previous/Next buttons from 1024px, and only the first image eager with
-`fetchpriority="high"`. A margin note inside the narrow fact card uses
-`WithNote`'s `note-stack` class, which keeps the note under its claim at every
-width. `test/work-page.test.ts` checks the built pages.
+is a thin wrapper over `@spy4x/preact-ui/image-gallery`'s
+`ImageGallery layout="strip"` (#396), which holds all the gallery behaviour:
+slides sized by width (narrower for a portrait first image) with centre snap,
+visible captions that equal the `alt` (`screenshotCaption()`), a "n / N"
+counter, named Previous/Next buttons that show only while the row overflows,
+`width`/`height` on every image so nothing shifts, and only the first image
+eager with `fetchpriority="high"`. The wrapper exists because function props
+(`label`, `counterLabel`) cannot cross an island boundary; it also maps `.png`
+sources to their WebP. The strip's classes are in `assets/styles.css`'s
+`@source inline` lines, and `test/library-classes.test.tsx` renders the strip
+and its lightbox. A margin note inside the narrow fact card uses `WithNote`'s
+`note-stack` class, which keeps the note under its claim at every width.
+`test/work-page.test.ts` checks the built pages.
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
 gets `logoPlate: true` in `lib/data.ts`: the /work card and the project page

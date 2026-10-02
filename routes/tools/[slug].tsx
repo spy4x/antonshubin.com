@@ -310,7 +310,7 @@ export default define.page(async function ToolPage(ctx) {
             {tool.screenshots && (
               <section aria-labelledby="screenshots">
                 <h2 id="screenshots" class="sr-only">Screenshots</h2>
-                <ImageGallery images={tool.screenshots} hero />
+                <ImageGallery images={tool.screenshots} />
               </section>
             )}
 
