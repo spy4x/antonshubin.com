@@ -253,5 +253,4 @@ model, and phased roadmap.
 
 If you want a smaller starting point, send your current setup or product idea as
 a [written brief](/book#brief). I'll write back with 3 concrete architectural
-improvements, free, without assuming that managed cloud, self-hosting, or hybrid
-is automatically correct.
+improvements, free.

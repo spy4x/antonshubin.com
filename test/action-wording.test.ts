@@ -218,3 +218,25 @@ Deno.test("every primary Book link goes to /book in the same tab, on every page"
     }
   }
 });
+
+Deno.test("no page or llms file calls the free offer an audit or links /#audit-form", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } });
+  try {
+    const stray: string[] = [];
+    const paths = [...await pagePaths(site), "/llms.txt", "/llms-full.txt"];
+    for (const path of paths) {
+      const html = await (await site.get(path)).text();
+      // The home page's own in-page `#audit-form` anchor is fine; a link to
+      // the home page's form from anywhere else is not.
+      if (/(?:^|[("'\s])(?:https?:\/\/[^/\s"')]+)?\/#audit-form/.test(html)) {
+        stray.push(`${path}: links /#audit-form`);
+      }
+      if (/free architecture audit/i.test(html)) {
+        stray.push(`${path}: says "free architecture audit"`);
+      }
+    }
+    assertEquals(stray, [], "the free offer has one name, the written brief");
+  } finally {
+    await site.stop();
+  }
+});

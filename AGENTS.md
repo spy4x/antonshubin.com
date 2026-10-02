@@ -405,19 +405,20 @@ with `rounded-lg!` (important; no call site sets a radius), and the library's
 property the library sets without `!`: two Tailwind classes for the same
 property in one `class` attribute resolve by their order in the compiled
 stylesheet, not in the attribute. `components/BookCallLink.tsx` (every "Book a
-call" link on the site) renders this `Button`, always to `/book` in the same tab
-(#387: never the scheduler, never `target="_blank"`), and renders nothing while
-`SCHEDULE_URL` is unset unless a page passes its own `href`
-(`test/action-wording.test.ts` checks every `data-primary-book` link).
-`buttonClass(variant, extra)` is the same class string for an element that is
-not a `Button`: a few plain links and `islands/ImageGallery.tsx`. The library
-composes classes with `join`, not `cn()`, so an island that renders or imports
-it ships no tailwind-merge. Never call `cn()` (tailwind-merge, about 28 KB) from
-code an island imports; use it only in server-rendered components.
-`test/library-classes.test.tsx` fails when a site button carries the library's
-default size or fill, when one of the library's `dark:` classes gets a rule
-(Tailwind's `dark:` follows the system theme and the site maps no accent step
-600 or 700), or when tailwind-merge reaches a client chunk.
+call" link on the site) renders this `Button`, to `/book` in the same tab unless
+the page passes its own `href` (#387: never the scheduler, never
+`target="_blank"`), and renders nothing while `SCHEDULE_URL` is unset unless a
+page passes its own `href` (`test/action-wording.test.ts` checks every
+`data-primary-book` link). `buttonClass(variant, extra)` is the same class
+string for an element that is not a `Button`: a few plain links and
+`islands/ImageGallery.tsx`. The library composes classes with `join`, not
+`cn()`, so an island that renders or imports it ships no tailwind-merge. Never
+call `cn()` (tailwind-merge, about 28 KB) from code an island imports; use it
+only in server-rendered components. `test/library-classes.test.tsx` fails when a
+site button carries the library's default size or fill, when one of the
+library's `dark:` classes gets a rule (Tailwind's `dark:` follows the system
+theme and the site maps no accent step 600 or 700), or when tailwind-merge
+reaches a client chunk.
 
 The library's components are coloured by the `:root` block under `@theme` in
 `assets/styles.css`: each library token (`--color-surface`, `--color-success`,
