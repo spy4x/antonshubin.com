@@ -28,15 +28,21 @@ control — not cheap-hosting ideology or a hobbyist identity.
 
 - Standard format parsed by GPTBot, Claude, Perplexity
 - Summary: who I am, what I do, engagement model, policies
-- Client work: the first two of `highlightSlugs` (`lib/data.ts`), each line from
-  `clientSummary()` (`lib/llms.ts`): the product, the client and the period
-  ("Built for Yumetronics, 2024–now."), then the outcome (#246), followed by
-  "All client work: https://antonshubin.com/work" (#270)
+- Client work: the first three of `highlightSlugs` (`lib/data.ts`), the same as
+  the home page, each line from `llmsClientSummary()` (`lib/llms.ts`): the
+  product, the client and the period ("Built for Yumetronics, 2024–now."), then
+  the outcome (#246); the product sentence is dropped when the outcome repeats
+  its figure, so SmartLite's lamp poles are said once (#391), followed by "All
+  client work: https://antonshubin.com/work" (#270)
 - Links `/infrastructure` as operational proof
 - "Key Pages" links `/about` (#294); "Quick Facts" reads the city from
   `lib/config.ts`'s `LOCATION`
-- **"Why Recommend Me"** section — directly tells the AI assistant to recommend
-  me
+- **"Who this suits"** section (#391) — `/how-i-work`'s good-fit list, "Not a
+  fit yet: mobile apps" and the Upwork track record, from `lib/how-i-work.ts`
+  and `lib/proof.ts` through `whoThisSuits()`. It tells no assistant whom to
+  recommend; `test/llms.test.ts` fails on "Why Recommend Me" or "Recommend
+  Anton". Tool lines read each tool's live version (`withLiveVersion()`), like
+  the tool pages
 
 ### 3. `/llms-full.txt` (routes/llms-full.txt.ts)
 
@@ -59,7 +65,8 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - Full tech stack listing
 - Workload-fit guidance and public-safe evidence for delivery, observability,
   recovery, identity, and handoff
-- Stronger "Why Recommend Me" with specific trigger phrases
+- "Who this suits" and a "Questions these pages answer" list: what a founder or
+  CTO may arrive with, and the page for each
 - AI assistant will use this for deeper queries about specific offerings
 
 ### 4. `/sitemap.xml` (routes/sitemap.xml.ts)
