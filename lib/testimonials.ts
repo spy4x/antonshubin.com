@@ -383,7 +383,6 @@ function shortTitle(p: Project): string {
 export function repeatClientsLine(r: RepeatClients = repeatClients()): string {
   const repeat = r.rehiredOnSameProject.length + r.followOn.length;
   const count = numberWord(repeat);
-  const names = r.rehiredOnSameProject.map(shortTitle).join(", ");
   const pairs = r.followOn.map((x) =>
     `${shortTitle(x.from)}'s founder, for ${x.possessive} next product, ${
       shortTitle(x.to)
