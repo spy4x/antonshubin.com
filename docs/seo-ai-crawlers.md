@@ -328,3 +328,85 @@ curl -s -X POST https://validator.schema.org/validate \
 Google's Rich Results test, Search Console, Bing Webmaster Tools and the
 link-preview debuggers need Anton's accounts: they are tracked in
 https://github.com/spy4x/antonshubin.com/issues/377.
+
+## Lighthouse SEO
+
+Checked on 2026-10-02 with Lighthouse 12.8.2 against a production build served
+locally by `test/harness.ts`'s `startSite()`, in the pinned Playwright Chromium
+(1.63.0): SEO 100, and accessibility and best practices 100 too, at the mobile
+and the desktop form factor, on `/`, `/about`, `/how-i-work`, `/work/smartlite`,
+`/tools/mig` and `/blog/zond-sso-probe-bridge`. Lighthouse is not a dependency
+of this repo; to re-run, put a script like this in a scratch directory with a
+`deno.json` that copies this repo's `imports` and sets
+`"nodeModulesDir": "auto"`, run `deno task build` here first, then
+`deno run -A --config <scratch>/deno.json lh.ts <scratch>`:
+
+```ts
+import lighthouse from "npm:lighthouse@12";
+import { chromium } from "playwright";
+import { startSite } from "<repo>/test/harness.ts";
+
+const PAGES = ["/", "/about", "/how-i-work", "/work/smartlite", "/tools/mig"];
+const site = await startSite();
+const chrome = new Deno.Command(chromium.executablePath(), {
+  args: [
+    "--headless=new",
+    "--no-sandbox",
+    "--remote-debugging-port=9333",
+    `--user-data-dir=${Deno.args[0]}/profile`,
+    "about:blank",
+  ],
+  stdout: "null",
+  stderr: "null",
+}).spawn();
+try {
+  await new Promise((r) => setTimeout(r, 2500));
+  for (const p of PAGES) {
+    for (const mode of ["mobile", "desktop"]) {
+      const config = mode === "desktop"
+        ? {
+          extends: "lighthouse:default",
+          settings: {
+            formFactor: "desktop",
+            screenEmulation: {
+              mobile: false,
+              width: 1350,
+              height: 940,
+              deviceScaleFactor: 1,
+              disabled: false,
+            },
+          },
+        }
+        : undefined;
+      const r = await lighthouse(site.origin + p, {
+        port: 9333,
+        output: "json",
+        onlyCategories: ["seo", "accessibility", "best-practices"],
+      }, config);
+      const { categories, audits } = r!.lhr;
+      console.log(
+        p,
+        mode,
+        Object.entries(categories).map(([k, v]) =>
+          `${k}=${Math.round((v.score ?? 0) * 100)}`
+        ).join(" "),
+      );
+      for (const c of Object.values(categories)) {
+        for (const a of c.auditRefs) {
+          if (
+            audits[a.id].score !== null && audits[a.id].score! < 1 &&
+            audits[a.id].scoreDisplayMode !== "informative"
+          ) console.log("  FAIL", a.id);
+        }
+      }
+    }
+  }
+} finally {
+  chrome.kill();
+  await chrome.status;
+  await site.stop();
+}
+```
+
+A local run sends no production headers, so run the same pages against the live
+site after a deploy if the `is-crawlable` or `http-status-code` audit matters.
