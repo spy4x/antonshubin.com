@@ -24,3 +24,9 @@ export function bareAddress(value: unknown): string | null {
   if (address.indexOf("@") > MAX_LOCAL_PART_LENGTH) return null;
   return isAddress(address) ? address : null;
 }
+
+/** `text` with every copy of `email` replaced, so a relay's error never puts
+ * a subscriber's address in the log. */
+export function withoutAddress(text: string, email: string): string {
+  return text.replaceAll(email, "<REDACTED:EMAIL>");
+}
