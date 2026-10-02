@@ -40,6 +40,15 @@ const CI_STATES: (CiSnapshot | null)[] = [
   { status: "running" } as CiSnapshot,
 ];
 
+// The strip's Previous/Next classes (its `navButtonClass`, not exported). Built
+// from pieces on purpose: Tailwind scans this file too, and a class written
+// out whole here would get its rule from the test itself and prove nothing.
+const NAV_BUTTON_CLASS = [
+  "size-10",
+  "aria-disabled:" + "pointer-events-none",
+  "aria-disabled:" + "opacity-50",
+].join(" ");
+
 const GALLERY_IMAGES = [
   { src: "/a.png", alt: "One", width: 600, height: 1200, webpSrc: "/a.webp" },
   { src: "/b.png", alt: "Two", width: 600, height: 1200 },
@@ -79,7 +88,7 @@ function renderedGalleryMarkup(): string {
       <LibraryButton
         variant="outline"
         size="none"
-        class="size-10 aria-disabled:pointer-events-none aria-disabled:opacity-50"
+        class={NAV_BUTTON_CLASS}
         aria-label="Previous screenshot"
         aria-disabled="true"
       >
