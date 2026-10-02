@@ -309,7 +309,8 @@ siteTest(
   async (site) => {
     for (const slug of ["calltrack", "sajari"]) {
       const html = await site.html(`/work/${slug}`);
-      const lead = visibleText(region(html, "data-project-lead", "p"));
+      const project = clients.find((p) => p.slug === slug)!;
+      const lead = firstSentence(project.description.replace(/\s+/g, " "));
       const built = visibleText(region(html, `id="project-built"`, "section"));
       assert(
         built.includes("I built the"),
