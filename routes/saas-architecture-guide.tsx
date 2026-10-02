@@ -288,8 +288,6 @@ export default define.page(function SaasArchGuide() {
               Book a free 30-minute intro call. No pitch, just advice.
             </p>
             <BookCallLink
-              url={SCHEDULE_URL}
-              target="_blank"
               event={eventAttrs("book", { place: "end" })}
               class="gap-2 px-6 py-3"
             >

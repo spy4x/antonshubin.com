@@ -6,7 +6,6 @@ import {
   priceRows,
 } from "../lib/catalog.ts";
 import { promise } from "../lib/promises.ts";
-import { SCHEDULE_URL } from "../lib/config.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { buttonClass } from "./Button.tsx";
 import { Fact, FactCard } from "./FactCard.tsx";
@@ -51,8 +50,6 @@ export function ServicePriceCard({ item }: { item: CatalogItem }) {
         </dl>
         <div class="mt-5 space-y-3">
           <BookCallLink
-            url={SCHEDULE_URL}
-            target="_blank"
             event={eventAttrs("book", { place: "card", item: item.slug })}
             class="w-full justify-center px-5 py-3"
           >

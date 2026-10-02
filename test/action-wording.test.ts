@@ -5,7 +5,7 @@
 // "Send me your idea") fails here, named with its page. The allowed
 // exceptions are listed below with their reason, and each must still be on
 // its page, so the list cannot go stale.
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 import { visibleText } from "./html.ts";
 import {
@@ -44,8 +44,8 @@ const EXCEPTIONS: Record<string, string> = {
     "mig's running instance, the post's live link read from lib/tools.ts",
   "/tools/mig | The booking page on this site":
     "mig's running instance, in the tool's link list",
-  "/blog/cost-optimization-laboratory | free architecture audit":
-    "a post's own prose, which names what the brief returns",
+  "/blog/cost-optimization-laboratory | written brief":
+    "a post's own prose, in the words the brief's form uses",
   "/blog/mig-tiny-self-hosted-scheduler | /book":
     "a post's own prose, which prints the path",
 };
@@ -177,6 +177,65 @@ Deno.test("both llms files book the call and send the brief in the two wordings 
       }
     }
     assertEquals(stray, [], "a third booking or brief wording in an llms file");
+  } finally {
+    await site.stop();
+  }
+});
+
+/** The opening tag of every anchor that carries `data-primary-book`. */
+function primaryBookTags(html: string): string[] {
+  return [...html.matchAll(/<a\b[^>]*>/g)].map((m) => m[0])
+    .filter((tag) => tag.includes("data-primary-book"));
+}
+
+Deno.test("every primary Book link goes to /book in the same tab, on every page", async () => {
+  for (
+    const [scheduleUrl, hrefs] of [[SCHEDULE, ["/book"]], ["", [
+      "/book",
+      "/book#brief",
+    ]]] as const
+  ) {
+    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
+    try {
+      let seen = 0;
+      for (const path of await pagePaths(site)) {
+        const res = await site.get(path);
+        for (const tag of primaryBookTags(await res.text())) {
+          seen++;
+          assert(
+            hrefs.some((href) => tag.includes(`href="${href}"`)),
+            `${path} (SCHEDULE_URL "${scheduleUrl}"): Book does not go to /book: ${tag}`,
+          );
+          assert(
+            !tag.includes("target="),
+            `${path}: Book opens a new tab: ${tag}`,
+          );
+        }
+      }
+      assert(seen > 20, `only ${seen} primary Book links found`);
+    } finally {
+      await site.stop();
+    }
+  }
+});
+
+Deno.test("no page or llms file calls the free offer an audit or links /#audit-form", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } });
+  try {
+    const stray: string[] = [];
+    const paths = [...await pagePaths(site), "/llms.txt", "/llms-full.txt"];
+    for (const path of paths) {
+      const html = await (await site.get(path)).text();
+      // The home page's own in-page `#audit-form` anchor is fine; a link to
+      // the home page's form from anywhere else is not.
+      if (/(?:^|[("'\s])(?:https?:\/\/[^/\s"')]+)?\/#audit-form/.test(html)) {
+        stray.push(`${path}: links /#audit-form`);
+      }
+      if (/free architecture audit/i.test(html)) {
+        stray.push(`${path}: says "free architecture audit"`);
+      }
+    }
+    assertEquals(stray, [], "the free offer has one name, the written brief");
   } finally {
     await site.stop();
   }

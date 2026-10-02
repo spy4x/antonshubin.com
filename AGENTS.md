@@ -405,9 +405,12 @@ with `rounded-lg!` (important; no call site sets a radius), and the library's
 property the library sets without `!`: two Tailwind classes for the same
 property in one `class` attribute resolve by their order in the compiled
 stylesheet, not in the attribute. `components/BookCallLink.tsx` (every "Book a
-call" link on the site) renders this `Button` and adds the empty-`url` and
-new-tab behaviour. `buttonClass(variant, extra)` is the same class string for an
-element that is not a `Button`: a few plain links and
+call" link on the site) renders this `Button`, to `/book` in the same tab unless
+the page passes its own `href` (#387: never the scheduler, never
+`target="_blank"`), and renders nothing while `SCHEDULE_URL` is unset unless a
+page passes its own `href` (`test/action-wording.test.ts` checks every
+`data-primary-book` link). `buttonClass(variant, extra)` is the same class
+string for an element that is not a `Button`: a few plain links and
 `islands/ImageGallery.tsx`. The library composes classes with `join`, not
 `cn()`, so an island that renders or imports it ships no tailwind-merge. Never
 call `cn()` (tailwind-merge, about 28 KB) from code an island imports; use it

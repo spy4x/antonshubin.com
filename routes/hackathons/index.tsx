@@ -6,7 +6,6 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { type Hackathon, hackathons } from "../../lib/data.ts";
-import { SCHEDULE_URL } from "../../lib/config.ts";
 import {
   IconCalendar as CalendarIcon,
   IconCode as CodeIcon,
@@ -211,8 +210,6 @@ export default define.page(function Hackathons(ctx) {
           </p>
           <div class="flex flex-wrap justify-center gap-4">
             <BookCallLink
-              url={SCHEDULE_URL}
-              target="_blank"
               event={eventAttrs("book", { place: "band" })}
               class="gap-2 px-6 py-3"
             >

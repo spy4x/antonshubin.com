@@ -1,7 +1,6 @@
 import { cn } from "@spy4x/preact-cn";
 import { formatPeriod, type Project } from "../lib/data.ts";
 import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
-import { SCHEDULE_URL } from "../lib/config.ts";
 import { projectStatus } from "../lib/work.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
 import {
@@ -118,8 +117,6 @@ export function ProjectFactCard({ project }: { project: Project }) {
       </dl>
       <div class="mt-5 space-y-3">
         <BookCallLink
-          url={SCHEDULE_URL}
-          target="_blank"
           event={eventAttrs("book", { place: "card", item: project.slug })}
           class="w-full justify-center px-5 py-3"
         >

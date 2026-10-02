@@ -6,7 +6,6 @@ import { head, ROLE } from "../lib/head.ts";
 import {
   INVOICE_NOTE,
   LOCATION,
-  SCHEDULE_URL,
   TIMEZONE_LABEL,
   UPWORK_URL,
 } from "../lib/config.ts";
@@ -155,8 +154,6 @@ export default define.page(function About(ctx) {
                 </dl>
                 <div class="mt-5 space-y-3">
                   <BookCallLink
-                    url={SCHEDULE_URL}
-                    target="_blank"
                     event={eventAttrs("book", { place: "card" })}
                     class="w-full justify-center px-5 py-3"
                   >

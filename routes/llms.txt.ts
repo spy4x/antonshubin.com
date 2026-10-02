@@ -76,7 +76,7 @@ export const handler = define.handlers({
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the form on the home page for a free written brief (${BASE_URL}/#audit-form).
+Start with a ${INTRO_CALL}, or send a written brief (${BASE_URL}/book#brief): I write back with 3 concrete architectural improvements, free, within one working day.
 
 ${services}
 

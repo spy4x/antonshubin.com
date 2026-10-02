@@ -114,9 +114,6 @@ export default define.page(function Home(ctx) {
             </p>
             <div class="mt-6 flex flex-wrap items-center gap-3">
               <BookCallLink
-                url={SCHEDULE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
                 event={eventAttrs("book", { place: "hero" })}
                 data-e2e="hero-book-call"
                 class="gap-2 px-6 py-3 text-base"

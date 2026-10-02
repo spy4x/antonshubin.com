@@ -4,7 +4,6 @@ import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { NotFound } from "../../components/NotFound.tsx";
 import { type BlogArticle, blogArticles } from "../../lib/data.ts";
-import { SCHEDULE_URL } from "../../lib/config.ts";
 import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
 import PostToc from "../../islands/PostToc.tsx";
@@ -497,8 +496,6 @@ export default define.page(function BlogPost(ctx) {
                 </div>
                 <div class="mt-4 flex flex-col gap-3">
                   <BookCallLink
-                    url={SCHEDULE_URL}
-                    target="_blank"
                     event={eventAttrs("book", {
                       place: "side",
                       item: article.slug,

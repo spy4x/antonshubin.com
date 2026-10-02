@@ -4,7 +4,6 @@ import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { NotFound } from "../../components/NotFound.tsx";
 import { type Hackathon, hackathons } from "../../lib/data.ts";
-import { SCHEDULE_URL } from "../../lib/config.ts";
 import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
@@ -183,8 +182,7 @@ export default define.page(function HackathonDetail(ctx) {
                   </p>
                   <div class="flex flex-wrap gap-3">
                     <BookCallLink
-                      url={h.ctaLink || SCHEDULE_URL}
-                      target={h.ctaLink ? undefined : "_blank"}
+                      href={h.ctaLink || undefined}
                       event={eventAttrs("book", { place: "end", item: h.slug })}
                       class="gap-2 px-5 py-2.5 text-sm"
                     >
@@ -192,8 +190,6 @@ export default define.page(function HackathonDetail(ctx) {
                     </BookCallLink>
                     {h.ctaLink && (
                       <BookCallLink
-                        url={SCHEDULE_URL}
-                        target="_blank"
                         variant="secondary"
                         event={eventAttrs("book", {
                           place: "end",

@@ -1,6 +1,5 @@
 import type { ComponentChildren } from "preact";
 import { promise } from "../lib/promises.ts";
-import { SCHEDULE_URL } from "../lib/config.ts";
 import { BookCallLink } from "./BookCallLink.tsx";
 import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
@@ -42,8 +41,8 @@ export interface ClosingBandProps {
   book?: boolean;
   /**
    * Where Book goes when it is an on-site page (`/book`) instead of the
-   * calendar: it then opens in the same tab and shows even when
-   * `SCHEDULE_URL` is unset. Omitted, Book opens `SCHEDULE_URL` in a new tab.
+   * calendar: it then shows even when `SCHEDULE_URL` is
+   * unset. Omitted, Book goes to `/book` and shows only when it is set.
    */
   bookHref?: string;
   /** Book's text. */
@@ -102,8 +101,7 @@ export function ClosingBand(
       <div class="flex flex-wrap items-center gap-4">
         {book && (
           <BookCallLink
-            url={bookHref ?? SCHEDULE_URL}
-            target={bookHref ? undefined : "_blank"}
+            href={bookHref}
             event={eventAttrs("book", { place: "band", item: bookItem })}
             data-primary-cta={primaryCta}
             class="justify-center px-6 py-3"

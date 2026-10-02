@@ -135,6 +135,6 @@ is at `ghcr.io/spy4x/mig:latest`. The README has the full env var reference.
 I use mig for my own booking link at
 [meet.antonshubin.com](https://meet.antonshubin.com). It also exposes an
 iframe-friendly page at [/embed](https://meet.antonshubin.com/embed) if you want
-to inline the scheduler on another site. If you want a strategy call to talk
-through whether you need a custom build, the link is on
+to inline the scheduler on another site. If you want to talk through whether you
+need a custom build, book a free 30-minute call on
 [/book](https://antonshubin.com/book).

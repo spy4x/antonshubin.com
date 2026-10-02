@@ -280,21 +280,15 @@ siteTest(
   },
 );
 
-Deno.test("a closing band with no bookHref still opens the calendar in a new tab", async () => {
+Deno.test("a closing band with no bookHref sends Book to /book in the same tab", async () => {
   const url = "https://meet.example.com/book";
   const site = await startSite({ env: { SCHEDULE_URL: url } });
   try {
     const html = await site.html("/work");
     const band = slice(html, "<section data-closing-band", "</section>");
     const book = band.match(/<a [^>]*data-primary-book[^>]*>/)?.[0] ?? "";
-    assert(
-      book.includes(`href="${url}"`),
-      `Book does not open the calendar: ${book}`,
-    );
-    assert(
-      book.includes('target="_blank"'),
-      `Book has no new-tab target: ${book}`,
-    );
+    assert(book.includes('href="/book"'), `Book does not go to /book: ${book}`);
+    assert(!book.includes("target="), `Book opens a new tab: ${book}`);
   } finally {
     await site.stop();
   }
