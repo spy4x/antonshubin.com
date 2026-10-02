@@ -78,7 +78,7 @@ const EXPECTED_REDIRECTS: Record<string, string> = {
     "/catalog/zero-to-production-saas-mvp#ai-integration",
   "mcp-server-development": "/catalog/zero-to-production-saas-mvp#mcp-servers",
   "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
-  "free-architecture-audit": "/#audit-form",
+  "free-architecture-audit": "/book#brief",
 };
 
 siteTest(
@@ -100,7 +100,7 @@ siteTest("a redirect keeps the query string", async (site) => {
   await res.body?.cancel();
   assertEquals(
     (res.headers.get("location") ?? "").replace(site.origin, ""),
-    "/?utm_source=x#audit-form",
+    "/book?utm_source=x#brief",
   );
 });
 

@@ -113,7 +113,6 @@ Source: [github.com/spy4x/zond](https://github.com/spy4x/zond). The Docker image
 is at `ghcr.io/spy4x/zond:latest`. The README has a five-minute setup with
 Gatus.
 
-If you want me to wire the same monitoring pattern into a production SaaS
-deployment (with sensible alerts, on-call rotation, and a status page), the
-engagement model is on
-[/catalog/codebase-health-audit](https://antonshubin.com/catalog/codebase-health-audit).
+If you want this kind of monitoring set up and watched for your product, that is
+part of [Ongoing](https://antonshubin.com/catalog/cto-advisory-retainer): server
+health and performance monitoring, and triage for production incidents.

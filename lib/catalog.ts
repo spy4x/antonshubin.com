@@ -275,7 +275,7 @@ export const catalogRedirects: Record<string, string> = {
     "/catalog/zero-to-production-saas-mvp#ai-integration",
   "mcp-server-development": "/catalog/zero-to-production-saas-mvp#mcp-servers",
   "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
-  "free-architecture-audit": "/#audit-form",
+  "free-architecture-audit": "/book#brief",
 };
 
 const usdFormat = new Intl.NumberFormat("en-US");

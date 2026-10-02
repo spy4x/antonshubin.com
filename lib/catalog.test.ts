@@ -35,7 +35,7 @@ Deno.test("the six retired slugs redirect to the items that absorbed them", () =
     "mcp-server-development":
       "/catalog/zero-to-production-saas-mvp#mcp-servers",
     "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
-    "free-architecture-audit": "/#audit-form",
+    "free-architecture-audit": "/book#brief",
   });
   for (const slug of Object.keys(catalogRedirects)) {
     assertEquals(
