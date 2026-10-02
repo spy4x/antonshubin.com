@@ -108,7 +108,7 @@ export const projects = {
       role: "Full-stack (web app + backend + infrastructure)",
       logoImageURL: "/img/projects/smartlite/logo.svg",
       description:
-        "Real-time IoT control platform running in production at Gardens by the Bay, Singapore — about 200 lamp poles managed across the public-facing park, live since 2024 and still under my maintenance. Yumetronics handled the hardware and on-site pole integrations; I built the software side end-to-end: the operator web app, the backend services, the AWS infrastructure, and the deploy pipeline. Three months from kickoff to production, no prior code.\n\nThe platform bridges MQTT-driven hardware control with an operator-friendly web dashboard. Pole state, sensor readings, and command acknowledgements flow over MQTT for low-latency control; database changes propagate to connected clients via PostgreSQL LISTEN/NOTIFY for a live multi-user dashboard without polling. Operators see a geographic map of every pole, scheduled automation (time-of-day, sensor-triggered, manual override), motion and ambient-light triggers, failure detection with automatic alerts through PWA push, Telegram, and WhatsApp — plus CSV and Excel exports, charts for incident reporting, role-based access (admin / operator / viewer), TOTP 2FA, and a mobile PWA so on-site staff can act from the field.\n\nWhat this demonstrates: shipping a full real-time control system solo — web app, backend, MQTT broker, relational store, AWS deployment, observability stack — in three months, then keeping it running for a venue where downtime is not an option. The screenshots below cover every operator page: the dashboard with the per-device detail panel, the lamp, gateway, sensor, zone, region, and lamp-profile management tables, the schedule editor, the alerts feed, and the admin views.",
+        "Real-time IoT control platform running in production at Gardens by the Bay, Singapore — about 200 lamp poles managed across the public-facing park, live since 2024 and still under my maintenance. Yumetronics handled the hardware and on-site pole integrations; I built the software side end-to-end: the operator web app, the backend services, the AWS infrastructure, and the deploy pipeline. Three months from kickoff to production, no prior code.\n\nThe platform bridges MQTT-driven hardware control with an operator-friendly web dashboard. Pole state, sensor readings, and command acknowledgements flow over MQTT for low-latency control; database changes propagate to connected clients via PostgreSQL LISTEN/NOTIFY for a live multi-user dashboard without polling. Operators see a geographic map of every pole, scheduled automation (time-of-day, sensor-triggered, manual override), motion and ambient-light triggers, failure detection with automatic alerts through PWA push, Telegram, and WhatsApp — plus CSV and Excel exports, charts for incident reporting, role-based access (admin / operator / viewer), TOTP 2FA, and a mobile PWA so on-site staff can act from the field.\n\nThe screenshots above cover every operator page.",
       tags: [
         "IoT",
         "Real-time",
@@ -275,8 +275,9 @@ export const projects = {
       },
       catalogSlug: "zero-to-production-saas-mvp",
       externalURL: "https://makearoley.com",
+      externalURLLabel: "Client's site",
       description:
-        "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Postgres, AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The visuals below are a portfolio re-imagination I built later — the original client's branding wasn't mine to share.",
+        "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Postgres, AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The screenshots above are a portfolio re-imagination I built later; the original client's branding wasn't mine to share.",
       role: "Full-stack",
       tags: [
         "SvelteKit",
@@ -420,7 +421,7 @@ export const projects = {
       externalURL: "https://ctrk.net",
       externalURLDead: true,
       description:
-        "Analyze calls data from your call center and manage phone numbers based on various rules.",
+        "Analyze calls data from your call center and manage phone numbers based on various rules.\n\nI built the frontend of this call-analytics SaaS in AngularJS: the screens for call data and for managing phone numbers by rules.",
       role: "Frontend",
       tags: ["AngularJS"],
       logoImageURL: "/img/projects/calltrack/logo.svg",
@@ -444,7 +445,7 @@ export const projects = {
       externalURL: "https://sajari.com",
       externalURLDead: true,
       description:
-        "Dashboard single-page application for search and recommendations engine as a service.",
+        "Dashboard single-page application for search and recommendations engine as a service.\n\nI built the dashboard, a single-page AngularJS app for Sajari's search and recommendations service.",
       tags: ["AngularJS"],
       logoImageURL: "/img/projects/sajari/logo.svg",
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp"],
@@ -464,7 +465,7 @@ export const projects = {
       externalURL: "https://spy4x.github.io/pb-code-review",
       externalURLLabel: "Read the audit report",
       description:
-        "Code review report for a Node.js REST API codebase. Callback hell, code inconsistency and fun. After the report I interviewed seven Node.js developers in two weeks and hired the one who took the code forward.",
+        "Code review report for a Node.js REST API codebase. The report covered deeply nested callbacks and inconsistent code style. After the report I interviewed seven Node.js developers in two weeks and hired the one who took the code forward.",
       role: "Audit and hiring",
       period: { from: 2017 },
       tags: ["Node.js", "Express.js"],

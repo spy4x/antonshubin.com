@@ -163,7 +163,7 @@ Deno.test("four of the eight reviewing clients hired Anton again, counted from t
   ]);
   assertEquals(
     repeatClientsLine(r),
-    "Four of the eight clients who reviewed me hired me again (FoodRazor, Roley, Microwork), and Connectful's founder hired me again for her next product, Corecircle.",
+    "Four of the eight clients who reviewed me hired me again: FoodRazor, Roley, Microwork, and Connectful's founder, for her next product, Corecircle.",
   );
 });
 

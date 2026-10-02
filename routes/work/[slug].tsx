@@ -147,10 +147,12 @@ export default define.page(function ProjectDetail(ctx) {
   }
 
   const isClientProject = isClientWork(slug);
-  const paragraphs = splitParagraphs(project.description);
+  const lead = projectLead(project);
+  // The lead already says the description's first paragraph: print it once.
+  const all = splitParagraphs(project.description);
+  const paragraphs = all.length > 1 && all[0] === lead ? all.slice(1) : all;
   const reviews = projectTestimonials(slug);
   const screenshots = projectScreenshots(project);
-  const lead = projectLead(project);
   const related = isClientProject ? relatedProjects(project) : [];
 
   head.value = {
