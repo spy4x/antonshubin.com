@@ -55,8 +55,8 @@ export const SITE_VARIANT: Record<ButtonVariant, string> = {
 
 /**
  * The primary/secondary button classes as a plain string, for the call sites
- * that style their own `<a>`: a link that needs its own `data-*` markers and
- * `islands/ImageGallery.tsx`. `extra` adds the call site's sizing and layout,
+ * that style their own `<a>`: a link that needs its own `data-*` markers.
+ * `extra` adds the call site's sizing and layout,
  * appended plainly by the library's `join` (no tailwind-merge reaches an
  * island). `variant="primary"` is reserved for the Book action — see
  * `Button`'s own doc comment.

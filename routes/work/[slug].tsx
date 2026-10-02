@@ -219,7 +219,7 @@ export default define.page(function ProjectDetail(ctx) {
             {screenshots.length > 0 && (
               <section aria-labelledby="project-screenshots">
                 <h2 id="project-screenshots" class="sr-only">Screenshots</h2>
-                <ImageGallery images={screenshots} hero />
+                <ImageGallery images={screenshots} />
               </section>
             )}
 

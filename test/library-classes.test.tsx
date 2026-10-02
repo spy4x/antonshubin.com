@@ -10,6 +10,10 @@ import {
   type StatusMarkStatus,
 } from "@spy4x/preact-ui/status-mark";
 import { honeypotField } from "@spy4x/preact-ui/honeypot";
+import { ImageGallery } from "@spy4x/preact-ui/image-gallery";
+import { Button as LibraryButton } from "@spy4x/preact-ui/button";
+import { IconChevronLeft } from "@spy4x/preact-icons";
+import { Lightbox } from "@spy4x/preact-ui/lightbox";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -36,6 +40,76 @@ const CI_STATES: (CiSnapshot | null)[] = [
   { status: "running" } as CiSnapshot,
 ];
 
+// The strip's Previous/Next classes (its `navButtonClass`, not exported). Built
+// from pieces on purpose: Tailwind scans this file too, and a class written
+// out whole here would get its rule from the test itself and prove nothing.
+const NAV_BUTTON_CLASS = [
+  "size-10",
+  "aria-disabled:" + "pointer-events-none",
+  "aria-disabled:" + "opacity-50",
+].join(" ");
+
+const GALLERY_IMAGES = [
+  { src: "/a.png", alt: "One", width: 600, height: 1200, webpSrc: "/a.webp" },
+  { src: "/b.png", alt: "Two", width: 600, height: 1200 },
+];
+
+/**
+ * The project gallery: a portrait strip (the narrow slide) and a landscape
+ * one, plus the lightbox it opens, which renders its markup only while open.
+ * Apart from `renderedLibraryMarkup()`: the lightbox's round buttons are not
+ * the site's `Button`.
+ */
+function renderedGalleryMarkup(): string {
+  return [
+    render(
+      <ImageGallery
+        layout="strip"
+        hero
+        captions
+        navigation
+        snap="center"
+        slideWidth="orientation"
+        images={GALLERY_IMAGES}
+      />,
+    ),
+    render(
+      <ImageGallery
+        layout="strip"
+        captions
+        navigation
+        slideWidth="orientation"
+        images={GALLERY_IMAGES.map((i) => ({ ...i, width: 1200, height: 600 }))}
+      />,
+    ),
+    // Previous/Next exist only after hydration (the strip measures its row
+    // first), so the server render has none: render them as the strip does.
+    render(
+      <LibraryButton
+        variant="outline"
+        size="none"
+        class={NAV_BUTTON_CLASS}
+        aria-label="Previous screenshot"
+        aria-disabled="true"
+      >
+        <IconChevronLeft class="size-5" />
+      </LibraryButton>,
+    ),
+    ...(["below", "overlay"] as const).map((controls) =>
+      render(
+        <Lightbox
+          images={GALLERY_IMAGES}
+          index={0}
+          open
+          onClose={() => {}}
+          onIndexChange={() => {}}
+          controls={controls}
+        />,
+      )
+    ),
+  ].join("\n");
+}
+
 /** Every library-backed piece the site renders, in each of its forms. */
 function renderedLibraryMarkup(): string {
   return [
@@ -59,7 +133,7 @@ function renderedLibraryMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/]/g, (c) => `\\${c}`);
+  return "." + className.replace(/[:.!\[\]\/(),+]/g, (c) => `\\${c}`);
 }
 
 function escapeRegExp(text: string): string {
@@ -84,7 +158,12 @@ async function builtCss(): Promise<string> {
 function renderedClasses(): { light: Set<string>; dark: Set<string> } {
   const light = new Set<string>();
   const dark = new Set<string>();
-  for (const [, list] of renderedLibraryMarkup().matchAll(/class="([^"]*)"/g)) {
+  for (
+    const [, list] of [renderedLibraryMarkup(), renderedGalleryMarkup()].join(
+      "\n",
+    )
+      .matchAll(/class="([^"]*)"/g)
+  ) {
     for (const c of list.split(/\s+/)) {
       if (c) (c.startsWith("dark:") ? dark : light).add(c);
     }
@@ -106,6 +185,53 @@ Deno.test("every class a library component renders on the site has a rule in the
     missing.length === 0,
     `no rule in the built CSS for: ${missing.join(", ")} — add them to ` +
       `assets/styles.css's @source inline(...) lines`,
+  );
+});
+
+/** The `--color-*` names a rule for `className` reads through `var()`. */
+function colourVars(css: string, className: string): string[] {
+  const rule = new RegExp(
+    `${escapeRegExp(selectorFor(className))}[^{}]*\\{([^}]*)\\}`,
+    "g",
+  );
+  const names = new Set<string>();
+  for (const [, body] of css.matchAll(rule)) {
+    // A name whose fallback is another token (`--color-ring`, then the
+    // accent) is optional by design; one with a literal fallback is not.
+    for (
+      const [, name] of body.matchAll(
+        /var\((--color-[\w-]+)(?![\w-])(?!,\s*var\()/g,
+      )
+    ) {
+      names.add(name);
+    }
+  }
+  return [...names];
+}
+
+// A library class reads its colours through `var(--color-*)` with a light
+// default as the fallback. A token the site never sets renders that default:
+// a near-white border on every screenshot, a black backdrop. `:root` in
+// assets/styles.css must map every colour the rendered classes read.
+Deno.test("every colour a library class reads is a token the site's stylesheet sets", async () => {
+  const { light: classes } = renderedClasses();
+  const css = await builtCss();
+  const unset = new Map<string, string[]>();
+  for (const className of classes) {
+    for (const name of colourVars(css, className)) {
+      if (!new RegExp(`${escapeRegExp(name)}\\s*:`).test(css)) {
+        unset.set(name, [...(unset.get(name) ?? []), className]);
+      }
+    }
+  }
+  assert(
+    [...classes].some((c) => colourVars(css, c).length > 0),
+    "no rendered class reads a colour token: the guard finds nothing",
+  );
+  assertEquals(
+    [...unset].map(([name, by]) => `${name} (${by[0]})`),
+    [],
+    "set these in assets/styles.css's :root block",
   );
 });
 
