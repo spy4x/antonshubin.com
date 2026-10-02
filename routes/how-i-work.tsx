@@ -139,7 +139,7 @@ export default define.page(function HowIWork() {
               </ul>
               <div class="mt-2 flex flex-col gap-3">
                 <BookCallLink
-                  url={BOOK_HREF}
+                  href={BOOK_HREF}
                   event={eventAttrs("book", { place: "card" })}
                   class="justify-center px-6 py-3"
                 >

@@ -315,14 +315,16 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       }
 
       // Every page in the loop above except /pay carries a booking button
-      // (the home CTA, the contact page's new-tab link, the blog post
-      // footer). Without this, a server that never received the placeholder
-      // would pass the loop above vacuously.
+      // (the home CTA, the blog post footer: both go to /book since #387;
+      // the booking page's own new-tab link goes to the scheduler). Without
+      // this, a server that never received the placeholder would pass the
+      // loop above vacuously.
       for (const path of ["/", "/book", "/blog/ship-it-today"]) {
         await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-        const bookingLinks = await page.locator(
-          `a[href="${PLACEHOLDER_SCHEDULE_URL}"]`,
-        ).count();
+        const selector = path === "/book"
+          ? `a[href="${PLACEHOLDER_SCHEDULE_URL}"]`
+          : `main a[data-primary-book][href="/book"]`;
+        const bookingLinks = await page.locator(selector).count();
         assert(
           bookingLinks > 0,
           `${path} must render a booking link with SCHEDULE_URL set`,

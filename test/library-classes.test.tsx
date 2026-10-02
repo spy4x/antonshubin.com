@@ -45,9 +45,9 @@ function renderedLibraryMarkup(): string {
     render(<Button href="/a" variant="primary">Book</Button>),
     render(<Button>Button</Button>),
     render(<Button variant="primary">Book</Button>),
-    render(<BookCallLink url="/book">Book</BookCallLink>),
+    render(<BookCallLink href="/book">Book</BookCallLink>),
     render(
-      <BookCallLink url="/book" variant="secondary" target="_blank">
+      <BookCallLink href="/book" variant="secondary">
         Book
       </BookCallLink>,
     ),
@@ -148,13 +148,13 @@ Deno.test("a primary Button or BookCallLink carries data-primary-book and a seco
     render(<Button variant="primary">x</Button>).includes("data-primary-book"),
   );
   assert(
-    render(<BookCallLink url="/book">x</BookCallLink>).includes(
+    render(<BookCallLink href="/book">x</BookCallLink>).includes(
       "data-primary-book",
     ),
   );
   assert(!render(<Button href="/a">x</Button>).includes("data-primary-book"));
   assert(
-    !render(<BookCallLink url="/book" variant="secondary">x</BookCallLink>)
+    !render(<BookCallLink href="/book" variant="secondary">x</BookCallLink>)
       .includes("data-primary-book"),
   );
 });
