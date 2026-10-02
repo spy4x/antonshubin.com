@@ -258,8 +258,7 @@ export const tools: Tool[] = [
     },
     runtime: "Deno, as a single binary",
     programmingLanguage: "TypeScript",
-    usedFor:
-      "Powers my own booking link at meet.antonshubin.com — dogfooded daily for client intros.",
+    usedFor: "Powers my own booking link at meet.antonshubin.com.",
     proofLinks: [
       { label: "The booking page on this site", href: "/book" },
     ],
@@ -345,9 +344,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "1.27.0",
+      version: "1.31.0",
       published: true,
-      install: "deno add jsr:@spy4x/server@1.27.0",
+      install: "deno add jsr:@spy4x/server@1.31.0",
       latestFrom: { registry: "jsr", name: "@spy4x/server" },
     },
     licence: "MIT",
