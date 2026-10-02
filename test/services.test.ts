@@ -335,3 +335,22 @@ siteTest(
     }
   },
 );
+
+siteTest(
+  "the home price card names each service once, never doubled by its time",
+  async (site) => {
+    const html = await site.html("/");
+    for (const item of catalogItems) {
+      const row = html.match(
+        new RegExp(`<a[^>]*href="/catalog/${item.slug}"[\\s\\S]*?</a>`),
+      );
+      assert(row, `${item.slug}: no row in the home price card`);
+      const text = visibleText(row[0]);
+      assertEquals(
+        text.split(item.shortTitle).length - 1,
+        1,
+        `${item.slug}: "${text}"`,
+      );
+    }
+  },
+);

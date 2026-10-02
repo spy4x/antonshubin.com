@@ -249,9 +249,11 @@ export default define.page(function Home(ctx) {
                       <span class="block font-semibold text-parchment group-hover:text-accent">
                         {item.shortTitle}
                       </span>
-                      <span class="block text-sm text-graphite">
-                        {item.delivery}
-                      </span>
+                      {item.delivery !== item.shortTitle && (
+                        <span class="block text-sm text-graphite">
+                          {item.delivery}
+                        </span>
+                      )}
                     </span>
                     <span class="price text-parchment whitespace-nowrap">
                       {priceLabel(item)}
