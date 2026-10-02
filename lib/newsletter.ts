@@ -2,7 +2,7 @@
 // a test can run it against a fake sender.
 import type { EmailSender, MailLog, SendResult } from "./mail.ts";
 import type { Subscriber } from "./subscribers.ts";
-import { bareAddress } from "./email-field.ts";
+import { bareAddress, withoutAddress } from "./email-field.ts";
 import { fillUnsubscribe, type Letter } from "./letter.ts";
 
 /** One newsletter issue and where it goes. */
@@ -40,8 +40,9 @@ export interface SendCounts {
  *
  * A row that is not a bare address, such as one stored before #255 with a
  * display name, is skipped and counted as failed: sent as it is, its display
- * name would reach the recipient's `To:` line. The log names it by row number
- * only, never by the stored value.
+ * name would reach the recipient's `To:` line. The log names every row by its
+ * number only, never by its address, and a relay's error has the address
+ * redacted (#393): the container's log is not the subscriber list.
  */
 export async function sendNewsletter(
   issue: NewsletterIssue,
@@ -86,11 +87,11 @@ export async function sendNewsletter(
     }
     if (result.ok) {
       sent++;
-      log.log(`  ✓ ${to}`);
+      log.log(`  ✓ row ${index + 1}`);
       await issue.onSent?.(to);
     } else {
       failed++;
-      log.error(`  ✗ ${to}:`, result.error);
+      log.error(`  ✗ row ${index + 1}: ${withoutAddress(result.error, to)}`);
     }
   }
 

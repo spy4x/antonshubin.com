@@ -5,6 +5,7 @@
 // address, which is Anton's own mailbox, so none sets `Reply-To`.
 import type { EmailMessage, EmailSender, MailLog } from "./mail.ts";
 import { proof } from "./proof.ts";
+import { withoutAddress } from "./email-field.ts";
 import {
   button,
   emailLink,
@@ -29,12 +30,6 @@ export interface NewSubscriber {
   email: string;
   total: number;
   unsubscribeLink: string;
-}
-
-/** `text` with every copy of `email` replaced, so a relay's error never puts
- * the subscriber's address in the log. */
-function withoutAddress(text: string, email: string): string {
-  return text.replaceAll(email, "<REDACTED:EMAIL>");
 }
 
 /** The address that asked to subscribe, and the link that confirms it. */

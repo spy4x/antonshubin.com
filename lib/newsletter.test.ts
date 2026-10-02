@@ -60,8 +60,27 @@ Deno.test("counts a send the relay refuses as failed, not sent", async () => {
     log,
   });
   assertEquals(result, { sent: 1, failed: 1, skipped: 0 });
-  assertEquals(log.lines, ["  ✓ one@example.com"]);
-  assertStringIncludes(log.errors[0], "  ✗ two@example.com:");
+  assertEquals(log.lines, ["  ✓ row 1"]);
+  assertStringIncludes(log.errors[0], "  ✗ row 2: ");
+});
+
+Deno.test("never logs a subscriber's address, on success or on a relay error that quotes it", async () => {
+  const relay = fakeRelay((to) =>
+    to.includes("two@example.com") ? "refuse-recipient" : "accept"
+  );
+  const log = recordingLog();
+  await sendNewsletter({
+    subscribers: SUBSCRIBERS,
+    subject: "Issue 1",
+    letter: LETTER,
+    unsubscribeLink: link,
+    sender: fakeSender(relay),
+    log,
+  });
+  const all = [...log.lines, ...log.errors].join("\n");
+  assertStringIncludes(all, "row 1");
+  assertStringIncludes(all, "row 2");
+  assertEquals(all.includes("@example.com"), false, all);
 });
 
 Deno.test("a subscriber whose unsubscribe link cannot be built costs one mail, not the run", async () => {
@@ -88,7 +107,7 @@ Deno.test("a subscriber whose unsubscribe link cannot be built costs one mail, n
     "two@example.com",
   ]]);
   assertEquals(log.errors.length, 1);
-  assertStringIncludes(log.errors[0], "  ✗ three@example.com: cannot sign");
+  assertEquals(log.errors[0], "  ✗ row 2: cannot sign");
 });
 
 Deno.test("skips a stored row that is not a bare address, counts it as failed and never logs it", async () => {
