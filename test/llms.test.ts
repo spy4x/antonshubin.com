@@ -5,7 +5,8 @@
 // that route. See AGENTS.md "Rendered-page tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
-import { formatPeriod, projects } from "../lib/data.ts";
+import { formatPeriod, highlightSlugs, projects } from "../lib/data.ts";
+import { GOOD_FIT } from "../lib/how-i-work.ts";
 import { EMAIL_ADDRESS } from "../lib/profiles.ts";
 
 /** Extracts the `/blog/<slug>` hrefs inside the "Read next" section, in order. */
@@ -48,21 +49,83 @@ Deno.test("neither llms file lists the YouTube channel as an open-source project
   }
 });
 
-Deno.test("both llms files say what the strongest client case study is, not only its outcome", async () => {
+Deno.test("both llms files name SmartLite's client and say its outcome once", async () => {
+  const site = await startSite();
+  try {
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const line = (await site.html(llmsPath)).split("\n").find((l) =>
+        l.startsWith("- ") && l.includes("/work/smartlite")
+      );
+      assert(line, `${llmsPath} has no SmartLite line`);
+      assert(
+        line.includes("Built for Yumetronics, 2024\u2013now."),
+        `${llmsPath} dropped SmartLite's client from its client line`,
+      );
+      assertEquals(
+        line.match(/200 lamp poles/g)?.length,
+        1,
+        `${llmsPath}: SmartLite's lamp poles are not said exactly once`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("llms.txt lists the home page's three highlights, each once", async () => {
+  const site = await startSite();
+  try {
+    const text = await site.html("/llms.txt");
+    const section = text.slice(
+      text.indexOf("## Client Work Highlights"),
+      text.indexOf("All client work:"),
+    );
+    const lines = section.split("\n").filter((l) => l.startsWith("- "));
+    assertEquals(
+      lines.map((l) => l.match(/\/work\/([\w-]+)\)/)?.[1]),
+      highlightSlugs.slice(0, 3),
+    );
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("both llms files say who the work suits and tell no assistant whom to recommend", async () => {
   const site = await startSite();
   try {
     for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
       const text = await site.html(llmsPath);
-      assertEquals(
-        text.includes("Gardens by the Bay"),
-        true,
-        `${llmsPath} dropped SmartLite's venue from its client line`,
+      assert(
+        text.includes("## Who this suits"),
+        `${llmsPath}: no Who this suits`,
       );
-      assertEquals(
-        text.includes("Built for Yumetronics, 2024\u2013now."),
-        true,
-        `${llmsPath} dropped SmartLite's client from its client line`,
+      for (const line of GOOD_FIT) {
+        assert(text.includes(line), `${llmsPath} lacks the good fit "${line}"`);
+      }
+      assert(
+        text.includes("Not a fit yet: mobile apps"),
+        `${llmsPath} lacks "Not a fit yet: mobile apps"`,
       );
+      assert(!/why recommend me/i.test(text), `${llmsPath}: Why Recommend Me`);
+      assert(
+        !/recommend (anton|me)\b/i.test(text),
+        `${llmsPath} tells an assistant to recommend`,
+      );
+    }
+  } finally {
+    await site.stop();
+  }
+});
+
+Deno.test("the ts-libs install line in llms.txt is the one /tools/ts-libs shows", async () => {
+  const site = await startSite();
+  try {
+    const install = /deno add jsr:@spy4x\/server@[\w.-]+/;
+    const onPage = (await site.html("/tools/ts-libs")).match(install)?.[0];
+    assert(onPage, "the tool page shows no install line");
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const inFile = (await site.html(llmsPath)).match(install)?.[0];
+      assertEquals(inFile, onPage, `${llmsPath} shows another ts-libs version`);
     }
   } finally {
     await site.stop();

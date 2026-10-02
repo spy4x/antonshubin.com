@@ -1,6 +1,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import {
   clientSummary,
+  llmsClientSummary,
   metaDescription,
   projectLead,
   toolSummary,
@@ -98,4 +99,22 @@ Deno.test("a meta description is cut at a word boundary to at most 160 character
   assert(cut.length <= 160, `${cut.length} characters`);
   assert(cut.endsWith("word…"), cut.slice(-12));
   assert(!cut.includes("\n"));
+});
+
+Deno.test("an llms summary drops the product sentence when the outcome repeats its figure", () => {
+  const repeating: Project = {
+    ...base,
+    description: "A platform at a venue, about 200 lamp poles. More.",
+    madeForName: "Acme",
+    period: { from: 2024, ongoing: true },
+    outcome: "Built solo; about 200 lamp poles in production.",
+  };
+  assertEquals(
+    llmsClientSummary(repeating),
+    "Built for Acme, 2024\u2013now. Built solo; about 200 lamp poles in production.",
+  );
+  assertEquals(
+    llmsClientSummary({ ...repeating, outcome: "Acquired in 2023" }),
+    "A platform at a venue, about 200 lamp poles. Built for Acme, 2024\u2013now. Acquired in 2023.",
+  );
 });

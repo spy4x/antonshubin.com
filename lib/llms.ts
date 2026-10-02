@@ -5,6 +5,8 @@
 import type { Project } from "./data.ts";
 import { formatPeriod, projects } from "./data.ts";
 import { type Tool, tools } from "./tools.ts";
+import { GOOD_FIT, NOT_A_FIT } from "./how-i-work.ts";
+import { proof } from "./proof.ts";
 
 /** Text up to and including the first ". " — a one-line summary for a longer description. */
 export function firstSentence(text: string): string {
@@ -36,14 +38,32 @@ export function withOutcome(text: string, outcome?: string): string {
  * AI crawlers read.
  */
 export function clientSummary(p: Project): string {
+  return summaryOf(p, firstSentence(p.description));
+}
+
+/** A figure with its noun: "200 lamp poles", "10 countries", "200K+ users". */
+const FIGURE = /\d[\d.,]*[Kk]?\+?\s+\p{L}+(?:\s\p{L}+)?/gu;
+
+/**
+ * `clientSummary` for the llms files: when the product sentence and the
+ * outcome state the same figure (SmartLite's "200 lamp poles" twice), the
+ * outcome stands alone, so each fact is said once (#391).
+ */
+export function llmsClientSummary(p: Project): string {
   const product = firstSentence(p.description);
+  const figures = p.outcome?.match(FIGURE) ?? [];
+  const repeated = figures.some((f) => product.includes(f));
+  return summaryOf(p, repeated ? "" : product);
+}
+
+function summaryOf(p: Project, product: string): string {
   const when = p.period ? formatPeriod(p.period) : "";
   const client = p.madeForName
     ? ` Built for ${p.madeForName}${when ? `, ${when}` : ""}.`
     : when
     ? ` ${when}.`
     : "";
-  return withOutcome(`${product}${client}`, p.outcome);
+  return withOutcome(`${product}${client}`.trim(), p.outcome);
 }
 
 /**
@@ -113,4 +133,27 @@ export function toolLines(baseUrl: string, list: Tool[] = tools): string {
   return list
     .map((t) => `- [${t.name}](${baseUrl}/tools/${t.slug}) — ${toolSummary(t)}`)
     .join("\n");
+}
+
+/** A sentence's first letter in lower case, to follow a label ("Not a fit yet: mobile apps."). */
+function lowerFirst(text: string): string {
+  return `${text.charAt(0).toLowerCase()}${text.slice(1)}`;
+}
+
+/**
+ * The "Who this suits" section body for both llms files: `/how-i-work`'s
+ * good-fit and not-a-fit lists, then the Upwork track record, all read from
+ * `lib/how-i-work.ts` and `lib/proof.ts` (#391).
+ */
+export function whoThisSuits(): string {
+  return [
+    "A good fit:",
+    ...GOOD_FIT.map((g) => `- ${g}`),
+    "",
+    ...NOT_A_FIT.map((n) => `Not a fit yet: ${lowerFirst(n)}`),
+    "",
+    `Track record: ${proof("jobs")} jobs on Upwork, ${
+      proof("job-success")
+    } Job Success, ${proof("expert-vetted")}, ${proof("top-percent")}.`,
+  ].join("\n");
 }
