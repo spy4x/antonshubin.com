@@ -82,8 +82,8 @@ export type ProjectStatus = "live" | "offline" | "archived";
 export function projectStatus(project: Project): ProjectStatus | null {
   if (project.archived) return "archived";
   if (project.externalURL && project.externalURLDead) return "offline";
-  // A link with its own label is a document (the code review's published
-  // report), not a product that can be live.
+  // A link with its own label is not a running product: the code review's
+  // published report, or Roley's "Client's site" (a coming-soon page).
   if (project.externalURL && !project.externalURLLabel) return "live";
   return null;
 }

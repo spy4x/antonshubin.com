@@ -384,18 +384,16 @@ export function repeatClientsLine(r: RepeatClients = repeatClients()): string {
   const repeat = r.rehiredOnSameProject.length + r.followOn.length;
   const count = numberWord(repeat);
   const names = r.rehiredOnSameProject.map(shortTitle).join(", ");
-  const pairs = r.followOn
-    .map((x) =>
-      `${
-        shortTitle(x.from)
-      }'s founder hired me again for ${x.possessive} next product, ${
-        shortTitle(x.to)
-      }`
-    )
-    .join(", and ");
+  const pairs = r.followOn.map((x) =>
+    `${shortTitle(x.from)}'s founder, for ${x.possessive} next product, ${
+      shortTitle(x.to)
+    }`
+  );
+  const items = [...r.rehiredOnSameProject.map(shortTitle), ...pairs];
+  const list = items.length > 1
+    ? `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`
+    : items.join("");
   return `${count[0].toUpperCase()}${count.slice(1)} of the ${
     numberWord(r.reviewed)
-  } clients who reviewed me hired me again${names ? ` (${names})` : ""}${
-    pairs ? `, and ${pairs}` : ""
-  }.`;
+  } clients who reviewed me hired me again: ${list}.`;
 }

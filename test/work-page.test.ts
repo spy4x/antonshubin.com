@@ -274,3 +274,60 @@ siteTest(
     }
   },
 );
+
+siteTest(
+  "Roley's page and /work card show no Live mark and name the link the client's site",
+  async (site) => {
+    const page = visibleText(await site.html("/work/roley"));
+    assert(!page.includes("Live"), "Roley's page says Live");
+    assert(page.includes("Client's site"), "Roley's link is not labelled");
+    const index = await site.html("/work");
+    const card = region(index, `data-highlight="roley"`, "li");
+    assert(!visibleText(card).includes("Live"), "Roley's card says Live");
+  },
+);
+
+siteTest(
+  "no project page says its screenshots are below, and /saas-architecture-guide does not either",
+  async (site) => {
+    const pages = [
+      ...clients.map((p) => `/work/${p.slug}`),
+      "/saas-architecture-guide",
+    ];
+    for (const path of pages) {
+      const text = visibleText(await site.html(path));
+      assert(
+        !/\b(screenshots?|visuals?)\b[^.]{0,40}\bbelow\b/i.test(text),
+        `${path}: screenshots said to be below`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "CallTrack and Sajari print what Anton built once, apart from the lead line",
+  async (site) => {
+    for (const slug of ["calltrack", "sajari"]) {
+      const html = await site.html(`/work/${slug}`);
+      const lead = visibleText(region(html, "data-project-lead", "p"));
+      const built = visibleText(region(html, `id="project-built"`, "section"));
+      assert(
+        built.includes("I built the"),
+        `${slug}: no sentence on what I built`,
+      );
+      assert(
+        !built.includes(lead),
+        `${slug}: the lead is printed again under What I built`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "the code review page does not joke about the client's code",
+  async (site) => {
+    const text = visibleText(await site.html("/work/code-review"));
+    assert(!text.includes("Callback hell"), "the joke is back");
+    assert(text.includes("deeply nested callbacks"), "the rewrite is missing");
+  },
+);
