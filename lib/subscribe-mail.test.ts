@@ -159,3 +159,13 @@ Deno.test("the confirmation's preview line says what to do, and the welcome's P.
     "P.S. If you're working on something I could help with: Book a free",
   );
 });
+
+Deno.test("no footer puts the separator dot right after a full stop", async () => {
+  const relay = fakeRelay();
+  const send = mailer(relay);
+  await send(CONFIRM);
+  await send(WELCOME);
+  for (const mail of relay.mails.filter((m) => m.html)) {
+    assertEquals(String(mail.html).includes(". · "), false, mail.subject);
+  }
+});

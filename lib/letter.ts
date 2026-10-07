@@ -151,9 +151,13 @@ export function renderLetter(input: LetterInput): Letter {
   });
 }
 
-/** Why a newsletter reader gets the mail; the welcome mail says the same. */
+/**
+ * Why a newsletter reader gets the mail; the welcome mail says the same. No
+ * full stop: `@spy4x/email/letter` joins the footer's reason and links with
+ * " · ", and a dot before that separator reads as a typo.
+ */
 export const SUBSCRIBED_REASON =
-  "You get this because you subscribed to Anton Shubin's newsletter.";
+  "You get this because you subscribed to Anton Shubin's newsletter";
 
 /**
  * The announcement of a blog post: the cover (linked to the post), the intro,

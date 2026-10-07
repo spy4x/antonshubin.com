@@ -86,7 +86,7 @@ function confirmationMessage(
       ),
     ],
     ps: false,
-    reason: "You get this once, because this address was entered on the site.",
+    reason: "You get this once, because this address was entered on the site",
   });
   return {
     to: mail.email,
