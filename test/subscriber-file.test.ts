@@ -4,8 +4,10 @@
 // UNSUBSCRIBE_SECRET and SMTP switched off, so nothing is mailed.
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
-import { createConfirmToken } from "../lib/subscribe-token.ts";
+import {
+  createConfirmToken,
+  createUnsubscribeToken,
+} from "./subscription-tokens.ts";
 import { denoFileSystem } from "@spy4x/platform/server/deno-fs";
 import { FileLock } from "@spy4x/platform/server/file-lock";
 

@@ -4,8 +4,10 @@
 // unsubscribe (RFC 8058, no Origin) still work.
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
-import { createConfirmToken } from "../lib/subscribe-token.ts";
+import {
+  createConfirmToken,
+  createUnsubscribeToken,
+} from "./subscription-tokens.ts";
 
 const SECRET = "t".repeat(32);
 const AT = "2026-01-01T00:00:00.000Z";

@@ -5,8 +5,18 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, visibleText } from "./html.ts";
-import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
-import type { Subscriber } from "../lib/subscribers.ts";
+import { createSubscriptionCrypto } from "@spy4x/server/subscribers";
+import {
+  createUnsubscribeToken,
+  LEGACY_TOKEN_FIXTURE,
+} from "./subscription-tokens.ts";
+
+/** One row as `data/subscribers.json` holds it. */
+interface Subscriber {
+  email: string;
+  subscribedAt: string;
+  key?: string;
+}
 
 const TEST_SECRET = "t".repeat(32);
 const FOREIGN_SECRET = "f".repeat(32);
@@ -16,13 +26,14 @@ const FOREIGN_SECRET = "f".repeat(32);
 async function withSubscribers(
   subs: Subscriber[],
   fn: (site: Site, file: string) => Promise<void>,
+  secret = TEST_SECRET,
 ): Promise<void> {
   const dir = await Deno.makeTempDir();
   const file = `${dir}/subscribers.json`;
   try {
     await Deno.writeTextFile(file, JSON.stringify(subs, null, 2));
     const site = await startSite({
-      env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: TEST_SECRET },
+      env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: secret },
     });
     try {
       await fn(site, file);
@@ -33,6 +44,45 @@ async function withSubscribers(
     await Deno.remove(dir, { recursive: true });
   }
 }
+
+Deno.test("a version 1 link mailed before #405 still unsubscribes its row", async () => {
+  const { email, secret, token } = LEGACY_TOKEN_FIXTURE;
+  assertEquals(await createUnsubscribeToken(email, secret), token);
+  const subs: Subscriber[] = [
+    { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+    { email, subscribedAt: "2026-01-02T00:00:00.000Z" },
+  ];
+  await withSubscribers(subs, async (site, file) => {
+    const url = `/unsubscribe?token=${encodeURIComponent(token)}`;
+    assert(visibleText(await site.html(url)).includes(email));
+    const res = await site.get(url, { method: "POST" });
+    assertEquals(res.status, 200);
+    assert(visibleText(await res.text()).includes("unsubscribed"));
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
+    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
+  }, secret);
+});
+
+Deno.test("a version 2 link finds its row by key and unsubscribes it", async () => {
+  const crypto = createSubscriptionCrypto({ secret: TEST_SECRET });
+  const email = "keyed@example.com";
+  const key = await crypto.subscriberKey(email);
+  const subs: Subscriber[] = [
+    { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+    { email, subscribedAt: "2026-01-02T00:00:00.000Z", key },
+  ];
+  await withSubscribers(subs, async (site, file) => {
+    const token = await crypto.unsubscribeToken(email, key);
+    const res = await site.get(
+      `/unsubscribe?token=${encodeURIComponent(token)}`,
+      { method: "POST" },
+    );
+    assertEquals(res.status, 200);
+    await res.body?.cancel();
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
+    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
+  });
+});
 
 Deno.test("renders a markup-containing address escaped, and a GET never removes it", async () => {
   const email = "<b>x</b>@example.com";

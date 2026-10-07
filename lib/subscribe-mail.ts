@@ -1,11 +1,13 @@
-// The mails of a newsletter sign-up (#253): a confirmation link to the address
-// that asked, then, once it is confirmed, a welcome to the subscriber and a
-// notice to the owner. The first two use the letter layout (`lib/letter.ts`);
-// the notice stays plain text. A reply to either goes to the site's sender
-// address, which is Anton's own mailbox, so none sets `Reply-To`.
+// The words of a newsletter sign-up (#253, #405). `@spy4x/server/subscribers`
+// decides when a mail goes out and to whom; this module says what it says: a
+// confirmation link to the address that asked, then, once it is confirmed, a
+// welcome to the subscriber and a notice to the owner. The first two use the
+// letter layout (`lib/letter.ts`); the notice stays plain text. A reply to
+// either goes to the site's sender address, which is Anton's own mailbox, so
+// none sets `Reply-To`.
+import type { MailOutcome, SubscriberMail } from "@spy4x/server/subscribers";
 import type { EmailMessage, EmailSender, MailLog } from "./mail.ts";
 import { proof } from "./proof.ts";
-import { withoutAddress } from "./email-field.ts";
 import {
   button,
   emailLink,
@@ -17,7 +19,7 @@ import {
 /** The `utm_campaign` of the links in the sign-up mails (docs/utm.md). */
 export const SIGNUP_CAMPAIGN = "newsletter";
 
-/** What {@link sendSubscribeMails} sends with; `sender` is `null` when SMTP is not configured. */
+/** What the sign-up mails are sent with; `sender` is `null` when SMTP is not configured. */
 export interface SubscribeMailDeps {
   sender: EmailSender | null;
   contactEmail: string;
@@ -25,77 +27,81 @@ export interface SubscribeMailDeps {
   log?: MailLog;
 }
 
-/** The new subscriber, the list size after saving, and their unsubscribe link. */
-export interface NewSubscriber {
-  email: string;
-  total: number;
-  unsubscribeLink: string;
-}
-
-/** The address that asked to subscribe, and the link that confirms it. */
-export interface ConfirmationRequest {
-  email: string;
-  confirmLink: string;
-}
-
 /**
- * Mails the confirmation link. Never throws: without SMTP it is skipped with a
- * log line (the visitor then never gets the link, so the log says so), and a
- * failure is logged as `[SUBSCRIBE] confirmation failed:`.
+ * The package's `sendMail` callback for this site. Never throws. Without SMTP
+ * a mail is skipped with a log line and counts as handed over (the visitor
+ * then never gets the link, so the log says so). A relay failure comes back as
+ * `{ ok: false }`, which the package logs with the subscriber's address
+ * redacted; for the welcome, the welcome and the owner notice are sent side by
+ * side and each failure is named in that one error.
  */
-export async function sendConfirmationMail(
-  request: ConfirmationRequest,
+export function subscriberMailer(
   deps: SubscribeMailDeps,
-): Promise<void> {
+): (mail: SubscriberMail) => Promise<MailOutcome> {
   const log = deps.log ?? console;
-  if (!deps.sender) {
-    log.log("[SUBSCRIBE] SMTP not configured, confirmation not sent");
-    return;
-  }
+  return async (mail) => {
+    if (!deps.sender) {
+      log.log(
+        mail.kind === "confirm"
+          ? "[SUBSCRIBE] SMTP not configured, confirmation not sent"
+          : "[SUBSCRIBE] SMTP not configured, welcome and notice not sent",
+      );
+      return;
+    }
+    const sender = deps.sender;
+    if (mail.kind === "confirm") {
+      return await sender.send(confirmationMessage(mail, deps.baseUrl));
+    }
+    const sent = await Promise.all([
+      sender.send(welcomeMessage(mail, deps.baseUrl)),
+      sender.send(ownerNotice(mail, deps.contactEmail)),
+    ]);
+    const failures = sent.flatMap((result, i) =>
+      result.ok ? [] : [`${i === 0 ? "welcome" : "notify"}: ${result.error}`]
+    );
+    return failures.length === 0
+      ? { ok: true }
+      : { ok: false, error: failures.join("; ") };
+  };
+}
+
+/** The double opt-in mail: one button, no unsubscribe link, no P.S. */
+function confirmationMessage(
+  mail: Extract<SubscriberMail, { kind: "confirm" }>,
+  baseUrl: string,
+): EmailMessage {
   const letter = renderLetter({
-    baseUrl: deps.baseUrl,
+    baseUrl,
     campaign: SIGNUP_CAMPAIGN,
     preheader: "Open the link and press the button to confirm.",
     blocks: [
       paragraph(
         `Someone asked to send this address the newsletter on ${
-          new URL(deps.baseUrl).host
+          new URL(baseUrl).host
         }. If that was you, confirm it:`,
       ),
-      button(request.confirmLink, "Confirm my subscription"),
+      button(mail.confirmLink, "Confirm my subscription"),
       paragraph(
         "The link works for three days. If it was not you, ignore this mail and nothing happens.",
       ),
     ],
     ps: false,
-    reason: "You get this once, because this address was entered on the site.",
+    reason: "You get this once, because this address was entered on the site",
   });
-  const result = await deps.sender.send({
-    to: request.email,
+  return {
+    to: mail.email,
     subject: "Confirm your subscription to Anton Shubin's newsletter",
     ...letter,
-  });
-  if (!result.ok) {
-    log.error(
-      "[SUBSCRIBE] confirmation failed:",
-      withoutAddress(result.error, request.email),
-    );
-  }
+  };
 }
 
-/**
- * Sends the welcome and the owner notice side by side, once the address is confirmed. Never throws: each
- * failure is logged on its own (`[SUBSCRIBE] welcome failed:` /
- * `[SUBSCRIBE] notify failed:`), and without SMTP both are skipped with a log
- * line each, as the hand-written client did.
- */
-export async function sendSubscribeMails(
-  sub: NewSubscriber,
-  deps: SubscribeMailDeps,
-): Promise<void> {
-  const log = deps.log ?? console;
+/** The welcome, with the subscriber's own one-click `List-Unsubscribe`. */
+function welcomeMessage(
+  mail: Extract<SubscriberMail, { kind: "welcome" }>,
+  baseUrl: string,
+): EmailMessage {
   const letter = renderLetter({
-    baseUrl: deps.baseUrl,
+    baseUrl,
     campaign: SIGNUP_CAMPAIGN,
     preheader: "What you will get, and a good place to start.",
     blocks: [
@@ -106,40 +112,32 @@ export async function sendSubscribeMails(
         } projects.`,
       ),
       button(
-        emailLink(deps.baseUrl, "/saas-architecture-guide", SIGNUP_CAMPAIGN),
+        emailLink(baseUrl, "/saas-architecture-guide", SIGNUP_CAMPAIGN),
         "Start with the SaaS architecture guide",
       ),
     ],
     psLead: "If you're working on something I could help with:",
     reason: SUBSCRIBED_REASON,
-    unsubscribeLink: sub.unsubscribeLink,
+    unsubscribeLink: mail.unsubscribeLink,
   });
-  const welcome: EmailMessage = {
-    to: sub.email,
+  return {
+    to: mail.email,
     subject: "Welcome to Anton Shubin's newsletter",
     ...letter,
-    listUnsubscribe: { url: sub.unsubscribeLink, oneClick: true },
+    listUnsubscribe: { url: mail.unsubscribeLink, oneClick: true },
   };
-  const notice: EmailMessage = {
-    to: deps.contactEmail,
-    subject: `[Newsletter] New subscriber: ${sub.email}`,
-    text:
-      `${sub.email} subscribed.\nTotal subscribers: ${sub.total}\n\nUnsubscribe: ${sub.unsubscribeLink}`,
+}
+
+/** The owner's plain-text notice. The list size reads "unknown" when it could not be counted. */
+function ownerNotice(
+  mail: Extract<SubscriberMail, { kind: "welcome" }>,
+  contactEmail: string,
+): EmailMessage {
+  return {
+    to: contactEmail,
+    subject: `[Newsletter] New subscriber: ${mail.email}`,
+    text: `${mail.email} subscribed.\nTotal subscribers: ${
+      mail.total ?? "unknown"
+    }\n\nUnsubscribe: ${mail.unsubscribeLink}`,
   };
-
-  async function send(message: EmailMessage, what: string): Promise<void> {
-    if (!deps.sender) {
-      log.log("[SUBSCRIBE] SMTP not configured, skipping mail");
-      return;
-    }
-    const result = await deps.sender.send(message);
-    if (!result.ok) {
-      log.error(
-        `[SUBSCRIBE] ${what} failed:`,
-        withoutAddress(result.error, sub.email),
-      );
-    }
-  }
-
-  await Promise.all([send(welcome, "welcome"), send(notice, "notify")]);
 }

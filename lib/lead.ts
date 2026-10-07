@@ -3,7 +3,7 @@
 // mail relay.
 import { catalogItem } from "./catalog.ts";
 import { isEmptyBrief } from "./brief-prefill.ts";
-import { bareAddress } from "./email-field.ts";
+import { parseBareAddress } from "@spy4x/email/address";
 import { type Lead, type LeadMailDeps, notifyOwner } from "./lead-mail.ts";
 
 /** The HTTP answer, plus the owner's mail still in flight (the route does not
@@ -69,7 +69,7 @@ export function validateLead(
   if (typeof body.name !== "string" || !body.name.trim()) {
     return { ok: false, error: "Name is required" };
   }
-  const email = bareAddress(body.email);
+  const email = parseBareAddress(body.email);
   if (!email) {
     return { ok: false, error: "Valid email is required" };
   }

@@ -16,15 +16,20 @@
  * --send-newsletter` pipes in over SSH: `{ "slug", "subject", "html", "text"
  * }`, already rendered, with `UNSUBSCRIBE_PLACEHOLDER` where each link goes.
  * It sends at most once per slug, to each subscriber at most once, guarded by
- * the sent log in `lib/newsletter-log.ts`. With `--test` it sends one copy to
+ * the sent log (`@spy4x/server/subscribers`'s `sendIssue` over
+ * `data/newsletter-log.json`). With `--test` it sends one copy to
  * `CONTACT_EMAIL` only, with a "[Test]" subject, and writes no log.
+ *
+ * Every mail carries a version 2 unsubscribe link, which names the row by its
+ * `key`. A row stored before #405 has none, and its link would not work, so
+ * the script refuses to send while any row lacks one: run
+ * `scripts/backfill-subscriber-keys.ts` first (docs/newsletter.md).
  */
 
-import { loadSubscribers } from "@/lib/subscribers.ts";
-import { BASE_URL, CONTACT_EMAIL, getUnsubscribeSecret } from "@/lib/config.ts";
-import { unsubscribeLink } from "@/lib/unsubscribe.ts";
+import { sendIssue, type Subscriber } from "@spy4x/server/subscribers";
+import { createMemorySendLog } from "@spy4x/server/subscribers/memory";
+import { BASE_URL, CONTACT_EMAIL } from "@/lib/config.ts";
 import { createSiteSender, smtpSettings } from "@/lib/mail.ts";
-import { type NewsletterIssue, sendNewsletter } from "@/lib/newsletter.ts";
 import {
   type Letter,
   renderLetter,
@@ -32,10 +37,13 @@ import {
   UNSUBSCRIBE_PLACEHOLDER,
 } from "@/lib/letter.ts";
 import {
-  NEWSLETTER_LOG_FILE,
-  sendExitCode,
-  sendNewsletterOnce,
-} from "@/lib/newsletter-log.ts";
+  newsletterLog,
+  newsletterLogFile,
+  subscribersFile,
+  subscriberStore,
+  subscriptionCrypto,
+  unsubscribeUrl,
+} from "@/lib/mailing-list.ts";
 import { assertKebab } from "./utm.ts";
 
 /** A blog post announcement, as `publish:blog --send-newsletter` sends it. */
@@ -67,6 +75,27 @@ export function legacyLetter(body: string): Letter {
     reason: SUBSCRIBED_REASON,
     unsubscribeLink: UNSUBSCRIBE_PLACEHOLDER,
   });
+}
+
+/**
+ * The exit code for a finished send: 0 only when none failed and the run
+ * either sent a mail or had nobody left to send to (a rerun that only
+ * completes the log), so a run that reached nobody or missed someone is not
+ * reported as a success.
+ */
+export function sendExitCode(
+  { sent, failed, skipped = 0 }: {
+    sent: number;
+    failed: number;
+    skipped?: number;
+  },
+): number {
+  return failed > 0 || (sent === 0 && skipped === 0) ? 1 : 0;
+}
+
+/** How many rows carry no `key`, so their unsubscribe link would not work. */
+export function rowsWithoutKey(rows: readonly Subscriber[]): number {
+  return rows.filter((row) => !row.key).length;
 }
 
 /** The subject of the one copy `--test` sends to `CONTACT_EMAIL`. */
@@ -128,72 +157,85 @@ async function main() {
 
   // Fail before sending anything rather than partway through the list —
   // every unsubscribe link needs this to build.
+  let crypto;
   try {
-    getUnsubscribeSecret();
+    crypto = subscriptionCrypto();
   } catch (err) {
     fail(err instanceof Error ? err.message : String(err));
   }
 
   const sender = createSiteSender(smtp);
+  const common = {
+    letter,
+    crypto,
+    unsubscribeLink: unsubscribeUrl,
+    sender,
+  };
 
   if (testOnly) {
     if (!CONTACT_EMAIL) {
       fail("--test needs CONTACT_EMAIL, the address it sends to.");
     }
-    const counts = await sendNewsletter({
+    // One row, with its key, into a log that lives only in this process.
+    const result = await sendIssue({
+      ...common,
+      issue: "test-copy",
+      subject: testSubject(subject),
       subscribers: [{
         email: CONTACT_EMAIL,
-        subscribedAt: new Date().toISOString(),
+        subscribedAt: new Date(),
+        key: await crypto.subscriberKey(CONTACT_EMAIL),
       }],
-      subject: testSubject(subject),
-      letter,
-      unsubscribeLink,
-      sender,
-    });
+    }, createMemorySendLog());
+    const counts = result.status === "sent"
+      ? result
+      : { sent: 0, failed: 0, skipped: 0 };
     console.log(
       `\nTest copy done. Sent: ${counts.sent}, Failed: ${counts.failed}`,
     );
     Deno.exit(sendExitCode(counts));
   }
 
-  let subs;
+  let subs: Subscriber[];
   try {
-    subs = await loadSubscribers();
+    subs = await subscriberStore().list();
   } catch (err) {
     fail(err instanceof Error ? err.message : String(err));
   }
-  const issue: NewsletterIssue = {
-    subscribers: subs,
-    subject,
-    letter,
-    unsubscribeLink,
-    sender,
-  };
+  const keyless = rowsWithoutKey(subs);
+  if (keyless > 0) {
+    fail(
+      `Refused: ${keyless} of ${subs.length} subscribers have no key yet, so ` +
+        `their unsubscribe link would not work. Nothing was sent or recorded. ` +
+        `Run scripts/backfill-subscriber-keys.ts first (docs/newsletter.md).`,
+    );
+  }
 
   if (!announcement) {
+    // The legacy arguments have no slug, so no sent log: one run, one issue.
     console.log(`Sending to ${subs.length} subscribers...`);
-    const { sent, failed } = await sendNewsletter(issue);
-    console.log(`\nDone. Sent: ${sent}, Failed: ${failed}`);
+    const result = await sendIssue({
+      ...common,
+      issue: `manual-${Date.now()}`,
+      subject,
+      subscribers: subs,
+    }, createMemorySendLog());
+    const counts = result.status === "sent" ? result : { sent: 0, failed: 0 };
+    console.log(`\nDone. Sent: ${counts.sent}, Failed: ${counts.failed}`);
     return;
   }
 
-  const logFile = Deno.env.get("NEWSLETTER_LOG_FILE") || NEWSLETTER_LOG_FILE;
-  const result = await sendNewsletterOnce({
-    slug: announcement.slug,
-    logFile,
-    issue,
-    secret: getUnsubscribeSecret(),
-    onStart: ({ total, pending }) =>
-      console.log(
-        `Sending "${announcement.slug}" to ${pending} of ${total} subscribers` +
-          (pending < total ? ` (${total - pending} already got it)` : "") +
-          `...`,
-      ),
-  });
+  const logFile = newsletterLogFile();
+  const result = await sendIssue({
+    ...common,
+    issue: announcement.slug,
+    subject,
+    subscribers: subs,
+  }, newsletterLog());
   if (result.status === "already-sent") {
     fail(
       `Refused: the newsletter for "${announcement.slug}" was already sent ` +
-        `(started ${result.entry.startedAt}, ${logFile}). Nothing was sent.`,
+        `(started ${result.entry.startedAt.toISOString()}, ${logFile}). Nothing was sent.`,
     );
   }
   if (result.status === "in-progress") {
@@ -204,9 +246,8 @@ async function main() {
   }
   if (result.status === "no-subscribers") {
     fail(
-      `Refused: no subscribers loaded (is ${
-        Deno.env.get("SUBSCRIBERS_FILE") || "data/subscribers.json"
-      } missing or unreadable?). Nothing was sent or recorded.`,
+      `Refused: no subscribers loaded (is ${subscribersFile()} missing or ` +
+        `unreadable?). Nothing was sent or recorded.`,
     );
   }
   console.log(

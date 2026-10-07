@@ -7,8 +7,10 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { BASE_URL } from "../lib/config.ts";
 import { count, visibleText } from "./html.ts";
-import { createConfirmToken } from "../lib/subscribe-token.ts";
-import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
+import {
+  createConfirmToken,
+  createUnsubscribeToken,
+} from "./subscription-tokens.ts";
 
 const SECRET = "t".repeat(32);
 const DAY_MS = 24 * 60 * 60 * 1000;

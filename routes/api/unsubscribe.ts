@@ -1,7 +1,7 @@
 import { define } from "../../lib/utils.ts";
 
 // Legacy redirect target (see #177). New mail links straight to
-// `/unsubscribe?token=...` (see lib/unsubscribe.ts's `unsubscribeLink`
+// `/unsubscribe?token=...` (see lib/mailing-list.ts's `unsubscribeUrl`
 // helper); an older link still points here. This 301 forwards only
 // `?token=`, dropping every other query param — with no token to keep, an
 // older link lands on routes/unsubscribe.tsx's "outdated link" page instead.

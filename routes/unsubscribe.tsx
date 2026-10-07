@@ -3,10 +3,12 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { head } from "../lib/head.ts";
 import { SEOHead } from "../components/SEOHead.tsx";
-import { loadSubscribers, updateSubscribers } from "../lib/subscribers.ts";
-import { findSubscriberByToken } from "../lib/unsubscribe.ts";
-import { recordUnsubscribe } from "../lib/unsubscribed.ts";
-import { getUnsubscribeSecret } from "../lib/config.ts";
+import {
+  type FlowDeps,
+  previewUnsubscribe,
+  unsubscribe,
+} from "@spy4x/server/subscribers";
+import { flowDeps } from "../lib/mailing-list.ts";
 import { readFormBody, SMALL_FORM_MAX_BYTES } from "../lib/request-body.ts";
 
 // Never cached: the confirm state renders one visitor's address, and a
@@ -20,52 +22,52 @@ type PageData =
   | { state: "outdated" }
   | { state: "error" };
 
-/** `UNSUBSCRIBE_SECRET`, or `undefined` when it is missing or unusable: that
- * answers "not recognised" the same as a bad token, so a misconfiguration
- * does not leak as a different response (see lib/unsubscribe.ts's
- * `findSubscriberByToken`). */
-function unsubscribeSecret(): string | undefined {
+/** The package's flow dependencies, or `undefined` when `UNSUBSCRIBE_SECRET`
+ * is missing or unusable: that answers "not recognised" the same as a bad
+ * token, so a misconfiguration does not leak as a different response. No mail
+ * goes out from this page. */
+function deps(): FlowDeps | undefined {
   try {
-    return getUnsubscribeSecret();
+    return flowDeps(() => Promise.resolve());
   } catch (err) {
-    console.error("[UNSUBSCRIBE]", err);
+    console.error(
+      "[UNSUBSCRIBE]",
+      err instanceof Error ? err.message : String(err),
+    );
     return undefined;
   }
+}
+
+/** The page for a state, with its status and no caching. */
+function answer(data: PageData) {
+  const status = data.state === "error"
+    ? 500
+    : data.state === "confirm" || data.state === "done"
+    ? 200
+    : 400;
+  return page<PageData>(data, { status, headers: NO_STORE });
 }
 
 // GET shows the confirm/not-recognised/outdated states; POST is the only
 // thing that ever removes an address (see #177). A link with no `token` at
 // all gets its own "outdated" wording — see routes/api/unsubscribe.ts, the
-// redirect target it still hits.
+// redirect target it still hits. Both read and change the list through
+// `@spy4x/server/subscribers` (#405): a version 1 link (the only kind mailed
+// before #405) is matched by scanning the list, a version 2 link by its key.
+// No package rate limit is passed: a mail provider's one-click POSTs share a
+// few IP addresses, and a limit there would refuse real unsubscribes.
 export const handler = define.handlers({
   async GET(ctx) {
     const token = ctx.url.searchParams.get("token");
-    if (token === null) {
-      return page<PageData>({ state: "outdated" }, {
-        status: 400,
-        headers: NO_STORE,
-      });
+    if (token === null) return answer({ state: "outdated" });
+    const flow = deps();
+    if (!flow) return answer({ state: "not-recognised" });
+    const found = await previewUnsubscribe(token, flow);
+    if (found.state === "confirm") {
+      return answer({ state: "confirm", email: found.email, token });
     }
-    const secret = unsubscribeSecret();
-    let match;
-    try {
-      match = secret &&
-        await findSubscriberByToken(await loadSubscribers(), token, secret);
-    } catch (err) {
-      console.error("[UNSUBSCRIBE] cannot read the list:", err);
-      return page<PageData>({ state: "error" }, {
-        status: 500,
-        headers: NO_STORE,
-      });
-    }
-    if (!match) {
-      return page<PageData>({ state: "not-recognised" }, {
-        status: 400,
-        headers: NO_STORE,
-      });
-    }
-    return page<PageData>({ state: "confirm", email: match.email, token }, {
-      headers: NO_STORE,
+    return answer({
+      state: found.state === "not-recognised" ? "not-recognised" : "error",
     });
   },
 
@@ -86,45 +88,18 @@ export const handler = define.handlers({
       }
       token = (read.ok && read.value.get("token")?.toString()) || null;
     }
-    if (!token) {
-      return page<PageData>({ state: "not-recognised" }, {
-        status: 400,
-        headers: NO_STORE,
-      });
-    }
-    const secret = unsubscribeSecret();
-    let match;
-    try {
-      // The token is checked against a plain read, outside the lock, so a
-      // flood of bad tokens never holds the lock (#254). Only the removal of
-      // the matched address runs under it, as one change, so a subscribe
-      // landing in between cannot write the address back.
-      match = secret &&
-        await findSubscriberByToken(await loadSubscribers(), token, secret);
-      if (match) {
-        const email = match.email;
-        // The record of this unsubscribe goes in the same change, so a
-        // confirmation link issued earlier cannot bring the address back.
-        await updateSubscribers(async (list, marks) => ({
-          list: list.filter((s) => s.email !== email),
-          unsubscribed: await recordUnsubscribe(marks, email, secret!),
-          result: null,
-        }));
-      }
-    } catch (err) {
-      console.error("[UNSUBSCRIBE] failed to save:", err);
-      return page<PageData>({ state: "error" }, {
-        status: 500,
-        headers: NO_STORE,
-      });
-    }
-    if (!match) {
-      return page<PageData>({ state: "not-recognised" }, {
-        status: 400,
-        headers: NO_STORE,
-      });
-    }
-    return page<PageData>({ state: "done" }, { headers: NO_STORE });
+    if (!token) return answer({ state: "not-recognised" });
+    const flow = deps();
+    if (!flow) return answer({ state: "not-recognised" });
+    // The package checks the token against a plain read and removes the
+    // address and records the unsubscribe in one locked change, so a
+    // confirmation link issued earlier cannot bring the address back.
+    const outcome = await unsubscribe(token, flow);
+    return answer({
+      state: outcome.state === "done" || outcome.state === "not-recognised"
+        ? outcome.state
+        : "error",
+    });
   },
 });
 
