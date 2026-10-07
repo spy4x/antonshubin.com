@@ -255,3 +255,125 @@ Deno.test("Literata and IBM Plex Sans load from self with no CSP violation (#184
     await site.stop();
   }
 });
+
+/** The project gallery's counter row: the counter plus Previous and Next. */
+const GALLERY_NAV_ROW = "div:has(> [data-gallery-counter])";
+const GALLERY_NAV_BUTTONS = `${GALLERY_NAV_ROW} > button`;
+
+/** The painted value of a site colour token, read through a hidden probe. */
+function tokenColour(page: Page, className: string): Promise<string> {
+  return page.evaluate((name) => {
+    const probe = document.createElement("div");
+    probe.style.display = "none";
+    probe.className = name;
+    document.body.appendChild(probe);
+    const colour = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return colour;
+  }, className);
+}
+
+// The strip renders the library's `navigationVariant="ghost"` (#571): the
+// site's secondary look, a transparent button inside a Rule strong border,
+// instead of the `outline` variant's Paper fill. Hover still fills it.
+Deno.test("the project gallery's Previous and Next are transparent inside a Rule strong border and fill on hover (#571)", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    });
+    try {
+      await page.goto(`${site.origin}/work/smartlite`, {
+        waitUntil: "networkidle",
+      });
+      const buttons = page.locator(GALLERY_NAV_BUTTONS);
+      await buttons.first().waitFor({ state: "visible" });
+      const ruleStrong = await tokenColour(page, "bg-rule-strong");
+      const lamp = await tokenColour(page, "bg-lamp");
+      const look = await buttons.evaluateAll((list) =>
+        list.map((el) => {
+          const style = getComputedStyle(el);
+          return {
+            background: style.backgroundColor,
+            border:
+              `${style.borderTopWidth} ${style.borderTopStyle} ${style.borderTopColor}`,
+          };
+        })
+      );
+      assertEquals(
+        look,
+        [0, 1].map(() => ({
+          background: "rgba(0, 0, 0, 0)",
+          border: `1px solid ${ruleStrong}`,
+        })),
+      );
+
+      // Next is enabled at the first slide; the pointer over it fills it Lamp.
+      const next = page.locator(
+        `${GALLERY_NAV_BUTTONS}[aria-label="Next screenshot"]`,
+      );
+      await next.hover();
+      await page.waitForFunction(
+        ([selector, colour]) => {
+          const el = document.querySelector(selector);
+          return el !== null && getComputedStyle(el).backgroundColor === colour;
+        },
+        [`${GALLERY_NAV_BUTTONS}[aria-label="Next screenshot"]`, lamp],
+        { timeout: 2_000 },
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+// assets/styles.css reserves the row's 40px (the buttons' height) from first
+// paint, so the buttons the strip adds after hydration move nothing below
+// it. Checked without JavaScript (the server render: no buttons) and after
+// hydration, at both widths.
+Deno.test("the project gallery's counter row is 40px tall with and without Previous and Next", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const seen: string[] = [];
+    for (const width of [390, 1440]) {
+      for (const javaScriptEnabled of [false, true]) {
+        const page: Page = await newPage(browser, {
+          viewport: { width, height: 900 },
+          javaScriptEnabled,
+        });
+        try {
+          await page.goto(`${site.origin}/work/smartlite`, {
+            waitUntil: "networkidle",
+          });
+          if (javaScriptEnabled && width === 390) {
+            await page.locator(GALLERY_NAV_BUTTONS).first().waitFor({
+              state: "visible",
+            });
+          }
+          const row = await page.locator(GALLERY_NAV_ROW).evaluate((el) => ({
+            height: el.getBoundingClientRect().height,
+            buttons: el.querySelectorAll(":scope > button").length,
+          }));
+          const label = `${width}px, JS ${javaScriptEnabled ? "on" : "off"}`;
+          seen.push(`${label}: ${row.buttons} buttons`);
+          assertEquals(row.height, 40, `${label}: ${JSON.stringify(row)}`);
+        } finally {
+          await page.close();
+        }
+      }
+    }
+    // Both cases this test is named after must have happened.
+    assert(seen.some((s) => s.endsWith(": 0 buttons")), seen.join("; "));
+    assert(seen.some((s) => s.endsWith(": 2 buttons")), seen.join("; "));
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
