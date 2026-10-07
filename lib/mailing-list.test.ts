@@ -5,12 +5,22 @@
 // prove the package reads exactly what that code wrote.
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { copy } from "jsr:@std/fs@^1.0.0/copy";
-import { createSubscriptionCrypto, sendIssue } from "@spy4x/server/subscribers";
+import {
+  confirmSubscription,
+  createSubscriptionCrypto,
+  previewConfirmation,
+  requestSubscription,
+  sendIssue,
+  type SubscriberMail,
+  unsubscribe,
+} from "@spy4x/server/subscribers";
 import {
   createFileSendLog,
   createFileSubscriberStore,
 } from "@spy4x/server/subscribers/file";
 import { fakeRelay, fakeSender } from "../test/fake-mail.ts";
+import { BASE_URL } from "./config.ts";
+import { flowDeps } from "./mailing-list.ts";
 
 const SECRET = "f".repeat(32);
 const CRYPTO = createSubscriptionCrypto({ secret: SECRET });
@@ -124,4 +134,59 @@ Deno.test("a rerun on a log written before #405 mails only the audience member i
     }
     assertEquals(relay.mails.length, 1);
   });
+});
+
+Deno.test("the site's links: the confirmation mail points at /subscribe/confirm and confirms, the welcome points at /unsubscribe and unsubscribes", async () => {
+  const dir = await Deno.makeTempDir();
+  const saved = {
+    SUBSCRIBERS_FILE: Deno.env.get("SUBSCRIBERS_FILE"),
+    UNSUBSCRIBE_SECRET: Deno.env.get("UNSUBSCRIBE_SECRET"),
+  };
+  try {
+    const list = `${dir}/subscribers.json`;
+    Deno.env.set("SUBSCRIBERS_FILE", list);
+    Deno.env.set("UNSUBSCRIBE_SECRET", SECRET);
+    const mails: SubscriberMail[] = [];
+    const deps = flowDeps((mail) => {
+      mails.push(mail);
+      return Promise.resolve({ ok: true });
+    });
+    const tokenOf = (link: string, path: string) => {
+      const prefix = `${BASE_URL}${path}?token=`;
+      assertEquals(link.startsWith(prefix), true, link);
+      return decodeURIComponent(link.slice(prefix.length));
+    };
+
+    const asked = await requestSubscription("reader@example.com", deps);
+    assertEquals(asked.status, 200);
+    await asked.mails;
+    const confirm = mails.find((m) => m.kind === "confirm");
+    if (confirm?.kind !== "confirm") throw new Error("no confirmation mail");
+    const confirmToken = tokenOf(confirm.confirmLink, "/subscribe/confirm");
+    assertEquals(
+      (await previewConfirmation(confirmToken, deps)).state,
+      "confirm",
+    );
+    const confirmed = await confirmSubscription(confirmToken, deps);
+    assertEquals(confirmed.state, "confirmed");
+    if (confirmed.state === "confirmed") await confirmed.mails;
+    assertEquals(
+      JSON.parse(await Deno.readTextFile(list)).map((r: { email: string }) =>
+        r.email
+      ),
+      ["reader@example.com"],
+    );
+
+    const welcome = mails.find((m) => m.kind === "welcome");
+    if (welcome?.kind !== "welcome") throw new Error("no welcome mail");
+    const leaveToken = tokenOf(welcome.unsubscribeLink, "/unsubscribe");
+    assertEquals((await unsubscribe(leaveToken, deps)).state, "done");
+    assertEquals(JSON.parse(await Deno.readTextFile(list)), []);
+  } finally {
+    for (const [name, value] of Object.entries(saved)) {
+      if (value === undefined) Deno.env.delete(name);
+      else Deno.env.set(name, value);
+    }
+    await Deno.remove(dir, { recursive: true });
+  }
 });
