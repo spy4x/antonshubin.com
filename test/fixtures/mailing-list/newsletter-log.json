@@ -24,11 +24,11 @@
     "slug": "done-post",
     "subject": "New article: Done post",
     "startedAt": "2026-09-05T10:00:00.000Z",
-    "audience": [
-      "70215db4b0d5c5052e4f4e062350ab6e2b1459d977af5e0fbaabc955298411b6"
-    ],
     "recipients": [
-      "70215db4b0d5c5052e4f4e062350ab6e2b1459d977af5e0fbaabc955298411b6"
+      "404585a7fcfba0759b8bc7e9ccf1e527d5e6b1dac95086048ee18fc5bd82e61c"
+    ],
+    "audience": [
+      "404585a7fcfba0759b8bc7e9ccf1e527d5e6b1dac95086048ee18fc5bd82e61c"
     ],
     "sent": 1,
     "failed": 0,
