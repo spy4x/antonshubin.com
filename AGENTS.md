@@ -131,7 +131,7 @@ test blocks the merge exactly like a red lint.
 ## Environment setup for a new worktree
 
 The age decrypt key is not part of this repo. Encryption is
-`@spy4x/server/env-age64` (jsr:@spy4x/server@1.2.0/env-age64), per-value age64
+`@spy4x/server/env-age64` (jsr:@spy4x/server@1.37.0/env-age64), per-value age64
 in TypeScript — no `sops` binary, no `.sops.yaml`. It reads `.age/key.txt`,
 which lives only in the main checkout: Syncthing replicates it as part of
 `~/sync/code`; keep an offline copy as well. A linked git worktree needs no copy
@@ -995,38 +995,49 @@ just present and internally consistent.
 
 ## Newsletter subscribers & unsubscribe links
 
-`lib/subscribers.ts` owns the subscriber list (`SUBSCRIBERS_FILE`, default
-`data/subscribers.json`) — `routes/api/subscribe.ts`, `routes/unsubscribe.tsx`
-and `scripts/send-newsletter.ts` all read and write through it, never the file
-directly. Every change is `updateSubscribers(change)`: one read-change-write
-under an in-process queue and the lock file `subscribers.json.lock`, written by
-temp file and `rename` (#254), so a full disk or a crash never leaves a torn
-list. A file that does not parse as a list is an error, never an empty list: its
-text is copied to `subscribers.json.invalid`, every read and write fails with
-500, and nothing overwrites it until a person repairs the file.
-`lib/unsubscribe.ts` signs and verifies unsubscribe tokens with the ts-libs
-signed payload codec (`jsr:@spy4x/platform/signed-payload`: purpose
-`unsubscribe`, version 1, empty payload, the normalized address as bound
-context, so the token holds no address); the pre-#233 bare-signature format is
-no longer accepted (#237). The key is `UNSUBSCRIBE_SECRET` (`lib/config.ts`'s
-`getUnsubscribeSecret()` throws if it's unset, under 32 characters or not
-printable ASCII — generate one with `openssl rand -base64 48`, see
-`.env.example`) and its `unsubscribeLink()` is the one helper every outgoing
-email uses to build `${BASE_URL}/unsubscribe?token=...`.
+The mailing list is `@spy4x/server/subscribers` (#405): the subscribe, confirm
+and unsubscribe flows, the signed links, the replay rule and the newsletter send
+all live in the package, and the site keeps only its wording, pages and wiring.
+`lib/mailing-list.ts` is that wiring: `subscriberStore()` (the package's
+`createFileSubscriberStore` on `SUBSCRIBERS_FILE`, default
+`data/subscribers.json`), `newsletterLog()` (`createFileSendLog` on
+`NEWSLETTER_LOG_FILE`, default `data/newsletter-log.json`),
+`subscriptionCrypto()` (`createSubscriptionCrypto` under `UNSUBSCRIBE_SECRET`),
+`unsubscribeUrl()`/`confirmUrl()` (`${BASE_URL}/unsubscribe?token=...` and
+`/subscribe/confirm?token=...`) and `flowDeps()`, which the three routes and
+`scripts/send-newsletter.ts` pass to the package. Nothing reads or writes the
+files directly. The store writes under an in-process queue and the lock file
+`subscribers.json.lock`, through a temp file and `rename`; a file that does not
+parse is copied to `subscribers.json.invalid` and every read and write fails
+until a person repairs it. The file formats did not change: a row is
+`{ email, subscribedAt, key? }`, and `lib/mailing-list.test.ts` loads fixtures
+the pre-#405 code wrote (`test/fixtures/mailing-list/`).
+
+`UNSUBSCRIBE_SECRET` (`lib/config.ts`'s `getUnsubscribeSecret()` throws if it's
+unset, under 32 characters or not printable ASCII — generate one with
+`openssl rand -base64 48`, see `.env.example`) signs every link. A version 1
+unsubscribe link (every link mailed before #405: purpose `unsubscribe`, an empty
+payload, the address as bound context) still works, by a scan of the list;
+`test/unsubscribe.test.ts` pins one such token. New links are version 2 and
+carry the row's `key`, a keyed hash of the address. A row stored before #405 has
+no key until `scripts/backfill-subscriber-keys.ts` gives it one (run once in the
+production container, docs/newsletter.md), and `scripts/send-newsletter.ts`
+refuses to send while any row lacks one, because its link would not work. A
+confirm link minted before #405 is refused as invalid; it lived three days at
+most. The pre-#233 bare-signature format stays refused (#237).
 `routes/api/unsubscribe.ts` only redirects old `?email=...` links (sent before
 #177) to `/unsubscribe`, dropping the address; opening a link never removes
 anyone — only a `POST` to `/unsubscribe` with a verified token does. See
 docs/newsletter.md for the full data format and endpoint list.
 
 The email field of `/api/subscribe` and `/api/lead` goes through
-`lib/email-field.ts`'s `bareAddress()` (`@spy4x/email`'s `isAddress()`, #255):
-only a bare address of at most 254 characters, with a local part of at most 64,
-passes, so a display name, `<`, `>` or `"` answers 400, and only the bare
-address is stored or mailed. `lib/newsletter.ts` applies the same check to every
-stored row before it mails it: a row that fails (one stored before #255) is
-skipped, counted as failed and logged by row number only. `/api/subscribe`
-answers a known address exactly as a new one, so it cannot test who is on the
-list.
+`@spy4x/email/address`'s `parseBareAddress()` (#255): only a bare address of at
+most 254 characters, with a local part of at most 64, passes, lowercased, so a
+display name, `<`, `>` or `"` answers 400, and only the bare address is stored
+or mailed. The newsletter send applies the same check to every stored row: a row
+that fails is skipped, counted as failed and logged by row number only.
+`/api/subscribe` answers a known address exactly as a new one, so it cannot test
+who is on the list.
 
 Every POST route reads its body through `lib/request-body.ts` (#251), which
 wraps `@spy4x/net/bounded-body` (forms: `@spy4x/server/http/bounded-body`'s
@@ -1057,18 +1068,20 @@ pinned exactly in `deno.json`); nothing in the repo talks SMTP by hand.
 only when `SMTP_HOST`, `SMTP_USERNAME` and `SMTP_PASSWORD` are all set,
 `SMTP_FROM` falls back to `SMTP_USERNAME`, and the connection is implicit TLS on
 every port, as the old hand-written client was. EHLO announces the site's own
-hostname (from `DOMAIN`). `lib/lead-mail.ts` (`/api/lead`), `lib/subscribe.ts`
-with `lib/subscribe-mail.ts` (`/api/subscribe`) and `lib/newsletter.ts`
-(`scripts/send-newsletter.ts`) build the messages and log a failed send instead
-of throwing; a send counts as done only when the relay accepted it. Their tests
+hostname (from `DOMAIN`). `lib/lead-mail.ts` (`/api/lead`) and
+`lib/subscribe-mail.ts`'s `subscriberMailer()` (the package's `sendMail` for the
+confirmation, the welcome and the owner notice) build the messages; a failed
+send is logged instead of thrown, with the subscriber's address redacted by the
+package, and counts as done only when the relay accepted it. The newsletter
+itself is the package's `sendIssue` (`scripts/send-newsletter.ts`). Their tests
 pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 
 The subscriber mails are one letter (#364): `lib/letter.ts` renders the
 confirmation, the welcome and every newsletter in one layout (Anton's portrait
 and name, the content, a P.S. with the booking link, a reply line, a small
-footer), as HTML built on `@spy4x/email/html`'s `htmlWrap` and `emailButton`
-plus a plain-text part, with every value escaped and every link into the site
-the `email` channel's tagged URL (`scripts/utm.ts`). They are sent as
+footer), built on `@spy4x/email/letter`'s `renderLetter` (#405), as HTML plus a
+plain-text part, with every value escaped and every link into the site the
+`email` channel's tagged URL (`scripts/utm.ts`). They are sent as
 `Anton Shubin <hi@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox that
 reaches Anton, so they set no `Reply-To`; the welcome and every newsletter carry
 the subscriber's own one-click `List-Unsubscribe` (`listUnsubscribe` on
@@ -1082,13 +1095,18 @@ three together; this site left that login in #364 (`docs/deploy.md` "Shared mail
 password").
 
 Sign-up is double opt-in (#253): `/api/subscribe` only mails a signed
-confirmation link (`lib/subscribe-token.ts`, purpose `subscribe-confirm`, valid
-three days) and stores nothing; `/subscribe/confirm` shows the address on GET
-and adds it on POST (`lib/subscribe.ts`'s `confirmSubscription`), then the
-welcome mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
+confirmation link (the package's confirm token, valid three days) and stores
+nothing; `/subscribe/confirm` shows the address on GET (`previewConfirmation`)
+and adds it, with its key, on POST (`confirmSubscription`), then the welcome
+mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
 `/api/subscribe`, `/api/lead`, `/unsubscribe` and `/subscribe/confirm`, with the
-site's own `BASE_URL` as the allowed origin. `/subscribe/confirm` is in
-`UNTRACKED_PATHS` (its URL holds the address). Both it and `/unsubscribe` send
+site's own `BASE_URL` as the allowed origin, through Fresh's `csrf()`, which
+also passes a request with neither `Origin` nor `Sec-Fetch-Site` (a mail
+client's one-click unsubscribe, RFC 8058). `/unsubscribe` keeps it rather than
+`@spy4x/server/http/same-origin`'s check, because that check refuses the page's
+own form on Safari before 16.4 (an `Origin` with no `Sec-Fetch-Site`; see
+`test/subscribe-confirm.test.ts`). `/subscribe/confirm` is in `UNTRACKED_PATHS`
+(its URL holds the address). Both it and `/unsubscribe` send
 `Referrer-Policy: strict-origin` and carry
 `<meta name="referrer"
 content="strict-origin">` (`lib/referrer.ts`, read by
@@ -1102,11 +1120,10 @@ With `strict-origin` the next page's referrer is `https://antonshubin.com/`, no
 path or token, and the POST carries the real Origin. The confirming POST answers
 303 to `/subscribe/confirm?done=1`, so the done page's own URL holds no token.
 The site's router does not use `allow-index@file`: it forces `X-Robots-Tag: all`
-over the app's per-path value (#327). An unsubscribe writes a mark
-(`lib/unsubscribed.ts`: an HMAC of the address and the time, no address) to
-`subscribers.json.unsubscribed` in the same locked change as the removal;
-`confirmSubscription` refuses, as "invalid", a link issued (`issuedAt`, from the
-token's expiry) before that time, and marks older than the three-day token life
+over the app's per-path value (#327). An unsubscribe writes a mark (an HMAC of
+the address and the time, no address) to `subscribers.json.unsubscribed` in the
+same locked change as the removal; `confirmSubscription` refuses, as "invalid",
+a link issued before that time, and marks older than the three-day token life
 are dropped on the next write.
 
 ## Publishing a blog post
