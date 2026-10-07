@@ -273,10 +273,10 @@ function tokenColour(page: Page, className: string): Promise<string> {
   }, className);
 }
 
-// The strip renders the library's `navigationVariant="ghost"` (#571): the
+// The strip renders the library's `navigationVariant="ghost"` (preact-components#571): the
 // site's secondary look, a transparent button inside a Rule strong border,
 // instead of the `outline` variant's Paper fill. Hover still fills it.
-Deno.test("the project gallery's Previous and Next are transparent inside a Rule strong border and fill on hover (#571)", async () => {
+Deno.test("the project gallery's Previous and Next are transparent inside a Rule strong border and fill on hover (preact-components#571)", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {

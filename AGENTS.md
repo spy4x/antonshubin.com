@@ -874,10 +874,10 @@ page. Never retry a test on this error.
   on representative pages against a live-resolved `bg-accent` probe, so a token
   edit can't desync the check from `assets/styles.css`); Literata and IBM Plex
   Sans show up in `document.fonts` and every font request is same-origin, with
-  no CSP violation. Since #571 it also checks that the project gallery's
-  Previous/Next (`navigationVariant="ghost"`) are transparent inside a Rule
-  strong border and fill on hover, and that their row stays 40px tall with and
-  without them. `test/no-emoji.test.ts` (not browser-driven — a plain
+  no CSP violation. Since preact-components#571 it also checks that the project
+  gallery's Previous/Next (`navigationVariant="ghost"`) are transparent inside a
+  Rule strong border and fill on hover, and that their row stays 40px tall with
+  and without them. `test/no-emoji.test.ts` (not browser-driven — a plain
   `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
   every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
   characters, excluding `©`/`®`/`™` and plain digits.
