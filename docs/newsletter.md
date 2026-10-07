@@ -54,8 +54,8 @@ It gives each row without a key its key, under the list's lock and in one write,
 and prints counts only, such as
 `data/subscribers.json: 12 of 12 rows got a key; 0 already had one.` A second
 run changes nothing. Links mailed before the backfill (version 1) keep working
-either way. If `UNSUBSCRIBE_SECRET` ever changes, every key must be rebuilt with
-it.
+either way. Stored keys stay valid if `UNSUBSCRIBE_SECRET` ever changes, so the
+backfill never needs to run again for that.
 
 ## Endpoints
 
