@@ -5,18 +5,28 @@
  * reply and a small grey footer. The owner notice and the lead mail stay
  * plain text and do not use it.
  *
- * Callers build the content from {@linkcode Block}s, each an HTML and a
- * plain-text rendering of the same thing, and {@linkcode renderLetter} wraps
- * both. Every value reaches the HTML through `escapeHtml`, never by hand.
- * Every link into the site is the `email` channel's tagged URL
- * (`scripts/utm.ts`, docs/utm.md), so Umami counts the visits a mail brings;
- * only a link that does a job (a confirmation or unsubscribe link) is left as
- * it is, because its URL carries a token.
- *
- * Light background, inline styles, Georgia headings and Arial body, so a
- * client that inverts the colours for dark mode still shows it readably.
+ * The shell, the block helpers and the per-recipient unsubscribe link are
+ * `@spy4x/email/letter`'s (#405). This module builds what is Anton's: the
+ * portrait header, the P.S. and reply line (the letter's afterword), the
+ * accent button and the footer's link to the site. Every value reaches the
+ * HTML through `escapeHtml`, never by hand. Every link into the site is the
+ * `email` channel's tagged URL (`scripts/utm.ts`, docs/utm.md), so Umami
+ * counts the visits a mail brings; only a link that does a job (a
+ * confirmation or unsubscribe link) is left as it is, because its URL carries
+ * a token.
  */
-import { emailButton, escapeHtml, htmlWrap } from "@spy4x/email/html";
+import { escapeHtml } from "@spy4x/email/html";
+import {
+  bulletList,
+  button as letterButton,
+  heading,
+  type Letter,
+  type LetterBlock,
+  linkedImage,
+  paragraph,
+  renderLetter as renderShell,
+  UNSUBSCRIBE_PLACEHOLDER,
+} from "@spy4x/email/letter";
 import { channelUrl } from "@/scripts/utm.ts";
 import {
   type BlogArticle,
@@ -27,80 +37,32 @@ import {
 import { ROLE } from "./head.ts";
 import { BOOK_LABEL } from "./nav.ts";
 
+export {
+  bulletList,
+  heading,
+  type Letter,
+  linkedImage,
+  paragraph,
+  UNSUBSCRIBE_PLACEHOLDER,
+};
+export { fillUnsubscribe } from "@spy4x/email/letter";
+
 /** Anton's portrait for mail: 96×96 PNG, shown at 48×48. */
 export const PORTRAIT_PATH = "/img/email/anton-96.png";
 
 /** The accent filled button: Accent with Ink text (`assets/styles.css`'s `@theme`). */
 export const BUTTON_COLORS = { background: "#f97316", color: "#0b0d10" };
 
-/**
- * Stands where a subscriber's own unsubscribe link goes in an issue that is
- * rendered once and sent many times (`publish:blog` renders it, the container
- * fills it in per recipient with {@linkcode fillUnsubscribe}).
- */
-export const UNSUBSCRIBE_PLACEHOLDER = "{{unsubscribe-link}}";
-
 const HEADING_FONT = "Georgia,'Times New Roman',serif";
 const BODY_FONT = "Arial,Helvetica,sans-serif";
 const MUTED = "#6b7280";
 const LINK = "#b45309";
 
-/** The mail's content: the same thing as HTML (already escaped) and as plain text. */
-export interface Block {
-  html: string;
-  text: string;
-}
-
-/** A paragraph of plain prose. */
-export function paragraph(text: string): Block {
-  return {
-    html: `<p style="margin:0 0 16px">${escapeHtml(text)}</p>`,
-    text,
-  };
-}
-
-/** A small heading, such as "In short". */
-export function heading(text: string): Block {
-  return {
-    html:
-      `<h2 style="margin:24px 0 8px;font-family:${HEADING_FONT};font-size:20px;line-height:1.3">${
-        escapeHtml(text)
-      }</h2>`,
-    text: text.toUpperCase(),
-  };
-}
-
-/** A bulleted list. */
-export function bulletList(lines: readonly string[]): Block {
-  const items = lines.map((l) =>
-    `<li style="margin:0 0 6px">${escapeHtml(l)}</li>`
-  ).join("");
-  return {
-    html: `<ul style="margin:0 0 16px;padding-left:20px">${items}</ul>`,
-    text: lines.map((l) => `- ${l}`).join("\n"),
-  };
-}
-
-/** The accent button; the plain-text version is its label and link on two lines. */
-export function button(href: string, label: string): Block {
-  return {
-    html: emailButton({ href, label, ...BUTTON_COLORS }),
-    text: `${label}:\n${href}`,
-  };
-}
-
-/** A picture linked to `href`, as wide as the letter column (600px). */
-export function linkedImage(
-  { src, alt, href }: { src: string; alt: string; href: string },
-): Block {
-  return {
-    html: `<p style="margin:0 0 16px"><a href="${escapeHtml(href)}"><img src="${
-      escapeHtml(src)
-    }" alt="${
-      escapeHtml(alt)
-    }" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;border-radius:6px"></a></p>`,
-    text: "",
-  };
+/** The accent button; the plain-text version is its label and link on two
+ * lines. Throws a `TypeError` for a link that is not `https:`, `http:` or
+ * `mailto:`. */
+export function button(href: string, label: string): LetterBlock {
+  return letterButton(href, label, BUTTON_COLORS);
 }
 
 /** What {@linkcode renderLetter} needs. */
@@ -111,7 +73,7 @@ export interface LetterInput {
   campaign: string;
   /** The hidden preview line the inbox shows next to the subject. */
   preheader?: string;
-  blocks: readonly Block[];
+  blocks: readonly LetterBlock[];
   /** Show the P.S. with the booking link; the confirmation mail has none. */
   ps?: boolean;
   /** The question or sentence before the booking link in the P.S. */
@@ -125,12 +87,6 @@ export interface LetterInput {
   unsubscribeLink?: string;
 }
 
-/** A finished mail: the HTML part and the plain-text part. */
-export interface Letter {
-  html: string;
-  text: string;
-}
-
 /** `path` on the site as the `email` channel's tagged URL. */
 export function emailLink(
   baseUrl: string,
@@ -140,84 +96,59 @@ export function emailLink(
   return channelUrl(baseUrl, path, "email", campaign);
 }
 
+/** Anton's portrait, name and role above the content. */
+function portraitHeader(baseUrl: string): LetterBlock {
+  return {
+    html:
+      `<table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td width="56" valign="middle"><img src="${
+        escapeHtml(`${baseUrl}${PORTRAIT_PATH}`)
+      }" alt="" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:24px;border:0"></td><td valign="middle" style="font-family:${BODY_FONT}"><div style="font-family:${HEADING_FONT};font-size:18px;font-weight:bold;line-height:1.3">Anton Shubin</div><div style="font-size:13px;line-height:1.4;color:${MUTED}">${
+        escapeHtml(ROLE)
+      }</div></td></tr></table>`,
+    text: `Anton Shubin\n${ROLE}`,
+  };
+}
+
 /** Wraps `blocks` in the letter layout and returns both parts. */
 export function renderLetter(input: LetterInput): Letter {
   const { baseUrl, campaign } = input;
   const bookUrl = emailLink(baseUrl, "/book", campaign);
-  const siteUrl = emailLink(baseUrl, "/", campaign);
-  const site = new URL(baseUrl).host;
   const psLead = input.psLead ?? "Working on something like this?";
   const replyLine = "Reply to this email: it comes straight to me.";
 
-  const top =
-    `<table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td width="56" valign="middle"><img src="${
-      escapeHtml(`${baseUrl}${PORTRAIT_PATH}`)
-    }" alt="" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:24px;border:0"></td><td valign="middle" style="font-family:${BODY_FONT}"><div style="font-family:${HEADING_FONT};font-size:18px;font-weight:bold;line-height:1.3">Anton Shubin</div><div style="font-size:13px;line-height:1.4;color:${MUTED}">${
-      escapeHtml(ROLE)
-    }</div></td></tr></table>`;
-
-  const ps = input.ps === false
-    ? ""
-    : `<p style="margin:16px 0 0">P.S. ${escapeHtml(psLead)} <a href="${
+  const ps: LetterBlock = {
+    html: `<p style="margin:16px 0 0">P.S. ${escapeHtml(psLead)} <a href="${
       escapeHtml(bookUrl)
-    }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a>.</p>`;
-  const reply = `<p style="margin:16px 0 0">${escapeHtml(replyLine)}</p>`;
+    }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a>.</p>`,
+    text: `P.S. ${psLead} ${BOOK_LABEL}: ${bookUrl}`,
+  };
+  const reply: LetterBlock = {
+    html: `<p style="margin:16px 0 0">${escapeHtml(replyLine)}</p>`,
+    text: replyLine,
+  };
 
-  const unsubscribe = input.unsubscribeLink === undefined
-    ? ""
-    : ` <a href="${
-      escapeHtml(input.unsubscribeLink)
-    }" style="color:${MUTED}">Unsubscribe</a> ·`;
-  const footer =
-    `<p style="margin:32px 0 0;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;line-height:1.5;color:${MUTED}">${
-      escapeHtml(input.reason)
-    }${unsubscribe} <a href="${escapeHtml(siteUrl)}" style="color:${MUTED}">${
-      escapeHtml(site)
-    }</a></p>`;
-
-  const content = `<div style="font-family:${BODY_FONT}">\n${top}\n${
-    input.blocks.map((b) => b.html).join("\n")
-  }\n${ps}\n${reply}\n${footer}\n</div>`;
-
-  const html = htmlWrap({
-    body: content,
-    maxWidth: 600,
-    signaturePrefix: null,
+  return renderShell({
+    header: portraitHeader(baseUrl),
+    blocks: input.blocks,
+    afterword: input.ps === false ? [reply] : [ps, reply],
+    footer: {
+      reason: input.reason,
+      ...(input.unsubscribeLink === undefined
+        ? {}
+        : { unsubscribeLink: input.unsubscribeLink }),
+      links: [{
+        href: emailLink(baseUrl, "/", campaign),
+        label: new URL(baseUrl).host,
+      }],
+    },
     theme: {
       background: "#ffffff",
       color: "#1f2937",
       mutedColor: MUTED,
-      linkColor: LINK,
+      linkColor: MUTED,
     },
     ...(input.preheader ? { preheader: input.preheader } : {}),
   });
-
-  const textParts = [
-    `Anton Shubin\n${ROLE}`,
-    ...input.blocks.map((b) => b.text).filter((t) => t !== ""),
-    ...(input.ps === false ? [] : [`P.S. ${psLead} ${BOOK_LABEL}: ${bookUrl}`]),
-    replyLine,
-    `-- \n${input.reason}${
-      input.unsubscribeLink === undefined
-        ? ""
-        : `\nUnsubscribe: ${input.unsubscribeLink}`
-    }\n${siteUrl}`,
-  ];
-  return { html, text: `${textParts.join("\n\n")}\n` };
-}
-
-/**
- * Puts a subscriber's own link where {@linkcode UNSUBSCRIBE_PLACEHOLDER}
- * stands, escaped for the HTML part.
- */
-export function fillUnsubscribe(
-  letter: Letter,
-  link: string,
-): Letter {
-  return {
-    html: letter.html.replaceAll(UNSUBSCRIBE_PLACEHOLDER, escapeHtml(link)),
-    text: letter.text.replaceAll(UNSUBSCRIBE_PLACEHOLDER, link),
-  };
 }
 
 /** Why a newsletter reader gets the mail; the welcome mail says the same. */
