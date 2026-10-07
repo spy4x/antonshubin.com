@@ -13,7 +13,8 @@ interface GalleryImageData {
  * A project's screenshots as `@spy4x/preact-ui`'s strip: the first image is
  * the page's eager, high-priority hero, every slide shows its caption (the
  * `alt`), a "3 / 12" counter sits under the row with Previous and Next
- * buttons while it overflows, and a click opens the lightbox. This island
+ * buttons while it overflows (`ghost`: transparent inside a Rule strong
+ * border, like the site's secondary Button), and a click opens the lightbox. This island
  * only maps the site's data (WebP sources, wording) onto the library's props:
  * function props cannot cross an island boundary, so they are set here.
  */
@@ -26,6 +27,7 @@ export default function ImageGallery(
       hero
       captions
       navigation
+      navigationVariant="ghost"
       snap="center"
       slideWidth="orientation"
       controls="below"

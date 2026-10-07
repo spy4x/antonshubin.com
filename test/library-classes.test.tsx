@@ -10,8 +10,10 @@ import {
   type StatusMarkStatus,
 } from "@spy4x/preact-ui/status-mark";
 import { honeypotField } from "@spy4x/preact-ui/honeypot";
-import { ImageGallery } from "@spy4x/preact-ui/image-gallery";
-import { Button as LibraryButton } from "@spy4x/preact-ui/button";
+import {
+  ImageGallery,
+  stripNavigationClasses,
+} from "@spy4x/preact-ui/image-gallery";
 import { IconChevronLeft } from "@spy4x/preact-icons";
 import { Lightbox } from "@spy4x/preact-ui/lightbox";
 import Button, { buttonClass } from "../components/Button.tsx";
@@ -40,14 +42,8 @@ const CI_STATES: (CiSnapshot | null)[] = [
   { status: "running" } as CiSnapshot,
 ];
 
-// The strip's Previous/Next classes (its `navButtonClass`, not exported). Built
-// from pieces on purpose: Tailwind scans this file too, and a class written
-// out whole here would get its rule from the test itself and prove nothing.
-const NAV_BUTTON_CLASS = [
-  "size-10",
-  "aria-disabled:" + "pointer-events-none",
-  "aria-disabled:" + "opacity-50",
-].join(" ");
+/** The strip's `navigationVariant` in islands/ImageGallery.tsx. */
+const SITE_NAV_VARIANT = "ghost";
 
 const GALLERY_IMAGES = [
   { src: "/a.png", alt: "One", width: 600, height: 1200, webpSrc: "/a.webp" },
@@ -83,17 +79,17 @@ function renderedGalleryMarkup(): string {
       />,
     ),
     // Previous/Next exist only after hydration (the strip measures its row
-    // first), so the server render has none: render them as the strip does.
+    // first), so the server render has none: render them with the class list
+    // the library exports for the variant islands/ImageGallery.tsx passes.
     render(
-      <LibraryButton
-        variant="outline"
-        size="none"
-        class={NAV_BUTTON_CLASS}
+      <button
+        type="button"
+        class={stripNavigationClasses(SITE_NAV_VARIANT)}
         aria-label="Previous screenshot"
         aria-disabled="true"
       >
         <IconChevronLeft class="size-5" />
-      </LibraryButton>,
+      </button>,
     ),
     ...(["below", "overlay"] as const).map((controls) =>
       render(
