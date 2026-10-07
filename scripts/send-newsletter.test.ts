@@ -1,10 +1,23 @@
 // Runs `scripts/send-newsletter.ts --stdin-json` as the production container
 // does, against temp files, to prove the refusals hold at the script level and
-// not only in `lib/newsletter-log.ts`. SMTP points at 127.0.0.1's discard port
+// not only in `@spy4x/server/subscribers`'s `sendIssue`. SMTP points at 127.0.0.1's discard port
 // and the child may only reach 127.0.0.1, so a broken guard fails the test
 // instead of mailing anyone.
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
+import { createSubscriptionCrypto } from "@spy4x/server/subscribers";
 import { testSubject } from "./send-newsletter.ts";
+
+const SECRET = "t".repeat(32);
+const CRYPTO = createSubscriptionCrypto({ secret: SECRET });
+
+/** One subscriber row as the file holds it, with the key the backfill writes. */
+async function keyedRow(email: string) {
+  return {
+    email,
+    subscribedAt: "2026-01-01T00:00:00.000Z",
+    key: await CRYPTO.subscriberKey(email),
+  };
+}
 
 const ANNOUNCEMENT = {
   slug: "a-post",
@@ -64,7 +77,7 @@ async function runSend(
       SMTP_USERNAME: "site@example.com",
       SMTP_PASSWORD: "not-a-real-password",
       SMTP_FROM: "",
-      UNSUBSCRIBE_SECRET: "t".repeat(32),
+      UNSUBSCRIBE_SECRET: SECRET,
       ...env,
     },
     stdin: "piped",
@@ -93,9 +106,7 @@ Deno.test("the container send refuses a slug already in the log, exits 1, prints
   const dir = await Deno.makeTempDir();
   try {
     const log = JSON.stringify([EARLIER]);
-    const subscribers = JSON.stringify([
-      { email: "one@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
-    ]);
+    const subscribers = JSON.stringify([await keyedRow("one@example.com")]);
     const r = await runSend(dir, subscribers, log);
     assertEquals(r.code, 1);
     assertStringIncludes(r.stderr, `Refused: the newsletter for "a-post"`);
@@ -110,9 +121,7 @@ Deno.test("the container send refuses a slug whose log entry predates per-recipi
   const dir = await Deno.makeTempDir();
   try {
     const log = JSON.stringify([LEGACY]);
-    const subscribers = JSON.stringify([
-      { email: "one@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
-    ]);
+    const subscribers = JSON.stringify([await keyedRow("one@example.com")]);
     const r = await runSend(dir, subscribers, log);
     assertEquals(r.code, 1);
     assertStringIncludes(r.stderr, `Refused: the newsletter for "a-post"`);
@@ -125,9 +134,7 @@ Deno.test("the container send refuses a slug whose log entry predates per-recipi
 Deno.test("--test sends only to CONTACT_EMAIL and writes no log", async () => {
   const dir = await Deno.makeTempDir();
   try {
-    const subscribers = JSON.stringify([
-      { email: "one@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
-    ]);
+    const subscribers = JSON.stringify([await keyedRow("one@example.com")]);
     const r = await runSend(dir, subscribers, undefined, {
       extraArgs: ["--test"],
       env: { CONTACT_EMAIL: "owner@example.com" },
@@ -176,9 +183,7 @@ Deno.test("the container send refuses an empty subscriber list, exits 1 and reco
 Deno.test("the container send exits 1 when the relay refuses the only mail, and keeps the post open for a rerun", async () => {
   const dir = await Deno.makeTempDir();
   try {
-    const subscribers = JSON.stringify([
-      { email: "one@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
-    ]);
+    const subscribers = JSON.stringify([await keyedRow("one@example.com")]);
     const r = await runSend(dir, subscribers, undefined);
     assertEquals(r.code, 1);
     assertStringIncludes(r.stdout, "Sent: 0, Failed: 1");
@@ -186,6 +191,24 @@ Deno.test("the container send exits 1 when the relay refuses the only mail, and 
     assertEquals([entry?.slug, entry?.sent, entry?.failed], ["a-post", 0, 1]);
     assertEquals(entry?.recipients, []);
     assertEquals(entry?.completedAt, undefined);
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test("the container send refuses while a row has no key, exits 1 and records nothing", async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    const subscribers = JSON.stringify([
+      await keyedRow("one@example.com"),
+      { email: "two@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
+    ]);
+    const r = await runSend(dir, subscribers, undefined);
+    assertEquals(r.code, 1);
+    assertStringIncludes(r.stderr, "Refused: 1 of 2 subscribers have no key");
+    assertStringIncludes(r.stderr, "backfill-subscriber-keys.ts");
+    assertEquals(r.stderr.includes("✗ row"), false, r.stderr);
+    assertEquals(r.log, undefined);
   } finally {
     await Deno.remove(dir, { recursive: true });
   }

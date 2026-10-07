@@ -3,17 +3,15 @@ import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
 import { head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
-import { updateSubscribers } from "../../lib/subscribers.ts";
-import { unsubscribeLink } from "../../lib/unsubscribe.ts";
-import { unsubscribedSince } from "../../lib/unsubscribed.ts";
-import { verifyConfirmToken } from "../../lib/subscribe-token.ts";
-import { confirmSubscription } from "../../lib/subscribe.ts";
-import { SITE_SENDER } from "../../lib/site-sender.ts";
 import {
-  BASE_URL,
-  CONTACT_EMAIL,
-  getUnsubscribeSecret,
-} from "../../lib/config.ts";
+  confirmSubscription,
+  type FlowDeps,
+  previewConfirmation,
+} from "@spy4x/server/subscribers";
+import { flowDeps } from "../../lib/mailing-list.ts";
+import { SITE_SENDER } from "../../lib/site-sender.ts";
+import { subscriberMailer } from "../../lib/subscribe-mail.ts";
+import { BASE_URL, CONTACT_EMAIL } from "../../lib/config.ts";
 import { readFormBody, SMALL_FORM_MAX_BYTES } from "../../lib/request-body.ts";
 
 // Never cached: the page shows one visitor's address, and its URL carries a
@@ -27,22 +25,26 @@ type PageData =
   | { state: "invalid" }
   | { state: "error" };
 
-/** `UNSUBSCRIBE_SECRET`, or `undefined` when it is missing or unusable: that
- * answers "invalid" like a bad token, so a misconfiguration does not leak as
- * a different response (same rule as `routes/unsubscribe.tsx`). */
-function secret(): string | undefined {
+const SEND_MAIL = subscriberMailer({
+  sender: SITE_SENDER,
+  contactEmail: CONTACT_EMAIL,
+  baseUrl: BASE_URL,
+});
+
+/** The package's flow dependencies, or `undefined` when `UNSUBSCRIBE_SECRET`
+ * is missing or unusable: that answers "invalid" like a bad token, so a
+ * misconfiguration does not leak as a different response (same rule as
+ * `routes/unsubscribe.tsx`). */
+function deps(): FlowDeps | undefined {
   try {
-    return getUnsubscribeSecret();
+    return flowDeps(SEND_MAIL);
   } catch (err) {
-    console.error("[SUBSCRIBE-CONFIRM]", err);
+    console.error(
+      "[SUBSCRIBE-CONFIRM]",
+      err instanceof Error ? err.message : String(err),
+    );
     return undefined;
   }
-}
-
-async function check(token: string) {
-  const key = secret();
-  if (!key) return { ok: false, reason: "invalid" } as const;
-  return await verifyConfirmToken(token, key);
 }
 
 // GET only shows the address and a button: a mail scanner or a link preview
@@ -61,9 +63,12 @@ export const handler = define.handlers({
         headers: NO_STORE,
       });
     }
-    const checked = await check(token);
-    if (!checked.ok) {
-      return page<PageData>({ state: checked.reason }, {
+    const flow = deps();
+    const checked = flow
+      ? await previewConfirmation(token, flow)
+      : { state: "invalid" as const };
+    if (checked.state !== "confirm") {
+      return page<PageData>({ state: checked.state }, {
         status: 400,
         headers: NO_STORE,
       });
@@ -92,18 +97,13 @@ export const handler = define.handlers({
         headers: NO_STORE,
       });
     }
-    const outcome = await confirmSubscription(token, {
-      update: updateSubscribers,
-      verify: check,
-      unsubscribedSince: (marks, email, issuedAt) =>
-        unsubscribedSince(marks, email, getUnsubscribeSecret(), issuedAt),
-      unsubscribeLink,
-      mail: {
-        sender: SITE_SENDER,
-        contactEmail: CONTACT_EMAIL,
-        baseUrl: BASE_URL,
-      },
-    });
+    const flow = deps();
+    // The package adds the address and its key in one locked change, refuses
+    // a link issued before the address last unsubscribed (#327), and mails
+    // the welcome and the owner notice only for a new address.
+    const outcome = flow
+      ? await confirmSubscription(token, flow)
+      : { state: "invalid" as const };
     switch (outcome.state) {
       case "confirmed":
         // 303 to a URL without the token, so the done page's address bar,

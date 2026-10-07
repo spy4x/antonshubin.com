@@ -62,8 +62,10 @@ export default define.page(function Privacy(ctx) {
             link, and stores nothing yet. The link works for three days. Your
             address and the time you subscribed go into a list file on the
             server only when you open the link and press the button on the page
-            it shows. Then the site emails you a welcome message and emails me a
-            notice. The list is backed up nightly.
+            it shows, together with a scrambled fingerprint of the address. Your
+            unsubscribe link carries that fingerprint, never the address, so the
+            site can find your entry. Then the site emails you a welcome message
+            and emails me a notice. The list is backed up nightly.
           </p>
           <p>
             Every newsletter carries an unsubscribe link. Opening it shows a

@@ -33,8 +33,10 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { type Site, startSite } from "./harness.ts";
 import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
-import { createUnsubscribeToken } from "../lib/unsubscribe.ts";
-import { createConfirmToken } from "../lib/subscribe-token.ts";
+import {
+  createConfirmToken,
+  createUnsubscribeToken,
+} from "./subscription-tokens.ts";
 
 // RFC 2606 reserved hosts: a real DNS lookup for these either fails or hits
 // no server this test controls, which is fine — a network failure is not a

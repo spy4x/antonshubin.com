@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "old-post",
+    "subject": "New article: Old post",
+    "startedAt": "2026-08-01T10:00:00.000Z",
+    "sent": 2,
+    "failed": 0
+  },
+  {
+    "slug": "a-post",
+    "subject": "New article: A post",
+    "startedAt": "2026-09-10T10:00:00.000Z",
+    "audience": [
+      "70215db4b0d5c5052e4f4e062350ab6e2b1459d977af5e0fbaabc955298411b6",
+      "f7234e93c06a5cbceb5dc022990b630f3b9a39af1a1c49e87d89073e9ff7bfc6"
+    ],
+    "recipients": [
+      "70215db4b0d5c5052e4f4e062350ab6e2b1459d977af5e0fbaabc955298411b6"
+    ],
+    "sent": 1,
+    "failed": 1
+  },
+  {
+    "slug": "done-post",
+    "subject": "New article: Done post",
+    "startedAt": "2026-09-05T10:00:00.000Z",
+    "audience": [
+      "70215db4b0d5c5052e4f4e062350ab6e2b1459d977af5e0fbaabc955298411b6"
+    ],
+    "recipients": [
+      "70215db4b0d5c5052e4f4e062350ab6e2b1459d977af5e0fbaabc955298411b6"
+    ],
+    "sent": 1,
+    "failed": 0,
+    "completedAt": "2026-09-05T10:01:00.000Z"
+  }
+]
