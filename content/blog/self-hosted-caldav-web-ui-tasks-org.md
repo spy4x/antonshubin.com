@@ -46,9 +46,9 @@ Nextcloud and Baikal are untested.
 
 ## Architecture: CalDAV as the only source of truth
 
-VTODO files live on the CalDAV server. The web app is a client. SQLite in the
-API container holds user accounts and AES-GCM-encrypted server credentials and
-nothing else. Switch CalDAV servers and no todos move.
+VTODO files live on the CalDAV server. The web app is a client. In the current
+version, SQLite in the API container holds user accounts and AES-GCM-encrypted
+server credentials and nothing else. Switch CalDAV servers and no todos move.
 
 That property is the design goal. The current version did not meet it: it does
 not work with Stalwart, and it can lose data when you save a task. The rewrite
@@ -109,11 +109,9 @@ I built it for myself. The rewrite is for the same reason.
 
 ## What would help
 
-A second pair of eyes on the CalDAV adapter against Nextcloud Tasks and Baikal.
-They speak the standard but emit different propstat shapes for properties
-Radicale and Stalwart happily skip. UI feedback, especially on tablets — I have
-tested on phone and desktop but not on a 10-inch iPad. If you run Tasks.org on
-Android, open an issue if anything breaks.
+Nothing to test yet. The rewrite is not ready, and I will not promise features
+or dates. If you want to follow it, watch the
+[repository](https://github.com/spy4x/caldav-tasks-web).
 
 ## Closing
 

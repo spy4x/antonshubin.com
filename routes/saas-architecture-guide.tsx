@@ -86,8 +86,8 @@ export default define.page(function SaasArchGuide() {
               </a>
               <p class="text-graphite text-sm mt-0.5">
                 Tasks.org syncs Android tasks to CalDAV cleanly. There is no web
-                UI for that data. The fix is a stateless PWA on top of the
-                CalDAV server you already run.
+                UI for that data. I built a web app for it; it is now being
+                rewritten.
               </p>
             </li>
             <li>

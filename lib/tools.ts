@@ -581,7 +581,7 @@ export const tools: Tool[] = [
   {
     slug: "caldav-tasks-web",
     name: "caldav-tasks-web",
-    job: "touch-first PWA for editing CalDAV VTODO tasks",
+    job: "web UI for CalDAV VTODO tasks, being rewritten",
     summary:
       "Touch-first web app for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org, which syncs them to CalDAV; I wanted a web UI over the same task files. The current version is being rewritten from scratch, with a new design on spy4x/preact-components and the shared CalDAV libraries @spy4x/caldav and @spy4x/time/ical. Do not install the current version: it does not work with Stalwart, it can lose data when you save a task, and it has no service worker. The screenshots show the current version. There is no public demo.",
     kind: "app",
