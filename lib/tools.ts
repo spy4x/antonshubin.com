@@ -75,7 +75,7 @@ export const toolGroups: ToolGroup[] = [
     id: "products",
     layout: "wide",
     title: "Products",
-    intro: "Products I am building. Both are work in progress.",
+    intro: "Products I am building. All are work in progress.",
   },
   {
     id: "archive",
@@ -583,22 +583,24 @@ export const tools: Tool[] = [
     name: "caldav-tasks-web",
     job: "touch-first PWA for editing CalDAV VTODO tasks",
     summary:
-      "Touch-first PWA for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org. Tasks.org syncs them to CalDAV. Every desktop client I tried either pulled its own backend or fought Tasks.org for ownership of the data — I needed a thin UI on top of the same VTODO files. Built it on Deno + Hono + Preact Signals: a CQRS layer over a CalDAV adapter (one PROPFIND/PROPPATCH/PUT/DELETE interface with a Radicale and a Stalwart implementation), AES-GCM at rest for server credentials, SQLite holding only user accounts and encryption keys — never for todos.",
+      "Touch-first web app for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org, which syncs them to CalDAV; I wanted a web UI over the same task files. The current version is being rewritten from scratch, with a new design on spy4x/preact-components and the shared CalDAV libraries @spy4x/caldav and @spy4x/time/ical. Do not install the current version: it does not work with Stalwart, it can lose data when you save a task, and it has no service worker. The screenshots show the current version. There is no public demo.",
     kind: "app",
-    status: "paused",
-    group: "archive",
+    status: "wip",
+    group: "products",
     posts: ["self-hosted-caldav-web-ui-tasks-org"],
     deployable: true,
     appCategory: "ProductivityApplication",
     useIf: [
-      "You keep your tasks in Tasks.org and want a web UI over the same CalDAV VTODO files.",
+      "You want to follow the rewrite of a web UI for Tasks.org tasks on CalDAV.",
     ],
-    dontUseIf: ["You use Stalwart: support is currently broken."],
+    dontUseIf: [
+      "You want to use it today: the current version does not work with Stalwart and can lose data when saving a task.",
+    ],
     repo: "spy4x/caldav-tasks-web",
     runtime: "Deno, with Hono and Preact",
     programmingLanguage: "TypeScript",
     standing:
-      "Tested in production against Radicale; Nextcloud and Baikal are expected to work but untested; Stalwart support is currently broken (README has the details).",
+      "Being rewritten. The current version was used against Radicale, does not work with Stalwart, can lose data when saving a task, and has no service worker.",
     screenshots: [
       {
         src: "/img/tools/caldav-tasks-web/desktop-dashboard.webp",

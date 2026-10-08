@@ -97,7 +97,7 @@ Deno.test("every status is written down: in use, ready, beta, WIP, paused or arc
     "preact-components": "beta",
     "financy": "wip",
     "template": "wip",
-    "caldav-tasks-web": "paused",
+    "caldav-tasks-web": "wip",
     "toread-today": "archived",
     "seed": "archived",
   });
