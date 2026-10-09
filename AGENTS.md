@@ -1161,8 +1161,9 @@ subject is the post's title alone. `publish:blog <slug> --preview <file>` writes
 its HTML and text locally and `--test-newsletter` sends one copy to
 `CONTACT_EMAIL` with no log. Three hard rules:
 
-- **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write one
-  text per channel with its tagged link and show it in chat; Anton pastes it.
+- **Agents never post to X, LinkedIn, Reddit, Hacker News or Telegram.** They
+  write one text per channel with its tagged link and show it in chat; Anton
+  pastes it.
 - **The newsletter is sent only after the post is live and only when Anton says
   yes in chat to that post** —
   `deno task publish:blog <slug>

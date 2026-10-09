@@ -4,8 +4,8 @@ The whole flow from "I want a blog post about X" to a live post, a Dev.to draft,
 tagged links and channel texts (#260). An agent follows it in order. Three rules
 hold throughout:
 
-1. **Agents never post to X, LinkedIn, Reddit or Hacker News.** They write the
-   text; Anton pastes it.
+1. **Agents never post to X, LinkedIn, Reddit, Hacker News or Telegram.** They
+   write the text; Anton pastes it.
 2. **The newsletter goes out only after the post is live, and only when Anton
    says yes in chat to that post.** A newsletter cannot be unsent.
 3. **Dev.to gets an unpublished draft only.** Anton publishes it with one click.
@@ -192,7 +192,9 @@ The agent writes one text per channel in Anton's voice ([voice.md](voice.md)
 - a LinkedIn post (`linkedin` link);
 - a Reddit title and body, with two or three suggested subreddits, each with its
   own link from `deno task links /blog/<slug> --content r-<subreddit>`;
-- a Hacker News title (`hn` link).
+- a Hacker News title (`hn` link);
+- a Telegram channel post (`telegram` link). Every set of channel texts includes
+  it.
 
 The brief from step 0 picks the reader and the one result each text carries;
 [voice.md](voice.md) "Channel texts" decides each channel's shape and how it
