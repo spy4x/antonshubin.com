@@ -70,9 +70,9 @@ The contributor was polite, and the fix was correct. The problem was mine.
 
 That week I gave my agent runs merge authority in the session: merge once the
 reviewer passes. I meant the agents' own pull requests, and that was so obvious
-to me that I never said it. Five days later I wrote the rule into my agent
-rules, still without saying whose pull requests it covered. The agent did what I
-said, not what I meant, and applied it to everyone.
+to me that I never said it. The next day I wrote the rule into my agent rules,
+still without saying whose pull requests it covered. The agent did what I said,
+not what I meant, and applied it to everyone.
 
 ### The stranger's pull request looked like the agent's own
 
@@ -128,7 +128,7 @@ The full rule is public, in the "Outside authors" section of my
 
 Then I checked the rest. Across all my repositories, one other pull request from
 an outside account came in this year, in January, and was closed without a
-merge. #85 is the only one an agent acted on.
+merge. #85 is the only one that was merged.
 
 ## If you run agents on public repositories
 
