@@ -244,7 +244,7 @@ description: ${JSON.stringify(ctx.summary)}
 tldr: []
 publishedAt: "YYYY-MM-DD"
 readTime: 0
-topic: "founders | ai-mcp | self-hosting"
+topic: "founders | ai-mcp | self-hosting | scars"
 ---
 
 ${ctx.summary}

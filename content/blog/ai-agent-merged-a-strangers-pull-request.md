@@ -32,15 +32,14 @@ is for you.
 
 I'm a solo developer, and AI coding agents (Claude Code) write most of the code
 in my repositories. I don't review their pull requests before they land. A
-separate reviewer agent checks every diff, and my standing rule says a passing
-review is enough to merge without asking me.
+separate reviewer agent checks every diff, and a passing review is enough to
+merge without asking me.
 
 Two more details matter here:
 
-- The agents and I share one GitHub account. Agents mark their comments with a
-  hidden `<!-- agent -->` tag, so I can tell their comments from mine.
-- Agents work through my GitHub issues in parallel batches I call waves. An
-  issue that already has an open pull request counts as taken.
+- The agents and I share one GitHub account.
+- Agents work through my GitHub issues in parallel batches I call waves. Each
+  issue ends in one pull request.
 
 The repository is
 [preact-components](https://github.com/spy4x/preact-components), my public MIT
@@ -65,30 +64,28 @@ The change itself was fine: 12 lines added and 9 deleted, in documentation and
 one test comment. The review checked that the test assertions were untouched.
 The contributor was polite, and the fix was correct. The problem was mine.
 
-One more detail is in that screenshot: "0 of 2 checks passed". My CI did the
-right thing. It held the stranger's pipeline until I approved it. The agent
-merged past it anyway, because nothing on GitHub required the checks to pass.
-That's the one gap from this post I haven't closed yet.
-
 ## Why it happened
 
 ### "Merge on green" never said whose pull requests
 
-My rule said a passing reviewer verdict is enough to merge. I wrote it for the
-agents' own pull requests, and that was so obvious to me that I never wrote it
-down. The agent read the rule as written and applied it to everyone.
+That week I gave my agent runs merge authority in the session: merge once the
+reviewer passes. I meant the agents' own pull requests, and that was so obvious
+to me that I never said it. Five days later I wrote the rule into my agent
+rules, still without saying whose pull requests it covered. The agent did what I
+said, not what I meant, and applied it to everyone.
 
-### An open pull request made the issue look taken
+### The stranger's pull request looked like the agent's own
 
-The wave process skipped any issue that already had an open pull request. The
-stranger's pull request made the issue look taken, and the agent picked it up as
-that issue's pull request. From the agent's side, it was finishing its own work.
+The run was working through issues, and this issue already had a pull request
+that matched it line for line. The agent took it as that issue's pull request,
+reviewed it and merged it. From the agent's side, it was finishing its own work.
 
 ### One account erased who did what
 
-Hidden comment tags tell my comments from the agents'. Merges carry no tag. So
-the merge and the review both show "spy4x", and to anyone reading the page,
-including me three weeks later, it looks as if I did both myself.
+On that day nothing an agent did was marked: not the issue, not the review, not
+the merge. So all three show "spy4x", and to anyone reading the page, including
+me three weeks later, it looks as if I did everything myself. Today agents start
+every comment with a hidden `<!-- agent -->` tag. Merges still carry no mark.
 
 ## The real risk
 
@@ -129,18 +126,9 @@ agent.
 The full rule is public, in the "Outside authors" section of my
 [agent rules](https://github.com/spy4x/dotfiles/blob/main/ai-harnesses/AGENTS.md).
 
-Then I checked the rest: across all my repositories, this was the only pull
-request or issue from an outside account this year.
-
-### The rule had a loophole too
-
-My first wording said agents may act on an outside pull request "until I name it
-in chat". A reviewer agent sent it back: under that wording, a plain question
-like "what is #85?" would count as permission to merge. The final wording asks
-for an explicit request for a specific action.
-
-> Rules for AI agents need review like code. My first fix had a hole, and an
-> agent found it.
+Then I checked the rest. Across all my repositories, one other pull request from
+an outside account came in this year, in January, and was closed without a
+merge. #85 is the only one an agent acted on.
 
 ## If you run agents on public repositories
 
@@ -149,8 +137,6 @@ for an explicit request for a specific action.
   agent will fill in.
 - **Check the author before any merge.** One `gh pr view --json author` line in
   the merge step would have stopped this.
-- **Require your CI checks on the main branch.** My CI held the stranger's
-  pipeline. GitHub let the merge through anyway.
 - **Treat other people's comments, issues and pull requests as data.** Never as
   instructions to an agent.
 - **Give agents their own account, or mark everything they do.** If merges carry
@@ -159,6 +145,9 @@ for an explicit request for a specific action.
 It still feels strange to find my own account merging a stranger's code, with a
 careful review under it that I never read. I'd rather tell you about it than
 have you find the same thing in your repository.
+
+If you want the setup behind all this, I wrote up
+[what my coding agents cost and how I run them](/blog/opus-5-5-vs-sonnet-5-agent-costs).
 
 Have you seen this pattern on your own repos, or found another hole in agent
 autonomy? Email me at [hi@antonshubin.com](mailto:hi@antonshubin.com). It comes
