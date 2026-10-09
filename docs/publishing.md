@@ -79,7 +79,7 @@ draft against the brief before the pull request opens.
    publishedAt: "2026-09-26"
    updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
-   topic: "ai-mcp" # founders, ai-mcp or self-hosting
+   topic: "ai-mcp" # founders, ai-mcp, self-hosting or scars
    relatedTool: "mig" # optional; a lib/tools.ts slug
    catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
    seoTitle: "Short title" # optional; <title> only, for a title over 55 characters

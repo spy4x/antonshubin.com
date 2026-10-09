@@ -199,9 +199,9 @@ Five entities in a `@graph` array (six on `/about`):
 - `BlogPosting.image` is an `ImageObject` of the post's 1200×630 PNG from
   `deno task og`, never an SVG cover; `articleSection` is the post's topic;
   `dateModified` is `updatedAt`, which the byline also shows as "Updated"
-- `/blog`'s title names the three topics; a post's `<title>` is its `seoTitle`,
-  or its title with " — Anton Shubin" only when that fits in 55 characters
-  (`postTitleTag()` in `lib/blog.ts`)
+- `/blog`'s title names the three subject topics (Scars, the fourth, is not in
+  it); a post's `<title>` is its `seoTitle`, or its title with " — Anton Shubin"
+  only when that fits in 55 characters (`postTitleTag()` in `lib/blog.ts`)
 - Every `h2` and `h3` in a post has a stable id from its text, so a section can
   be linked; posts of 8 minutes or more list their `h2`s under "Contents"
 - Every post opens with a "TL;DR" `h2` (id `tldr`) and its front matter's `tldr`

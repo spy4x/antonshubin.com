@@ -68,7 +68,7 @@ export default define.page(function Blog(ctx) {
       "Writing on SaaS architecture, AI agents and self-hosting — Anton Shubin",
     pageName: "Writing",
     description:
-      `Anton Shubin, ${ROLE}, writes about decisions for founders, AI and MCP, and self-hosting, from the work and the tools he builds.`,
+      `Anton Shubin, ${ROLE}, writes about decisions for founders, AI and MCP, self-hosting, and his own mistakes, from the work and the tools he builds.`,
     canonical: `${SITE}/blog`,
     ogType: "website",
   };

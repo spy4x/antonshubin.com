@@ -16,8 +16,12 @@
 import { extract as extractYaml } from "@std/front-matter/yaml";
 import { proof } from "./proof.ts";
 
-/** The three topics #191 decided, in the order `/blog` lists them. */
-export type TopicId = "founders" | "ai-mcp" | "self-hosting";
+/**
+ * The topics, in the order `/blog` lists them: the three #191 decided, plus
+ * Scars (Anton, 9 October 2026), posts about a mistake of mine and what I
+ * changed after it.
+ */
+export type TopicId = "founders" | "ai-mcp" | "self-hosting" | "scars";
 
 export interface Topic {
   id: TopicId;
@@ -28,6 +32,7 @@ export const topics: Topic[] = [
   { id: "founders", title: "For founders" },
   { id: "ai-mcp", title: "AI and MCP" },
   { id: "self-hosting", title: "Self-hosting" },
+  { id: "scars", title: "Scars" },
 ];
 
 /** Looks a topic up by id and throws on a typo. */
