@@ -214,7 +214,7 @@ ${catalogList}
 - **Tools:** ${BASE_URL}/tools — Open-source tools I build and use, each with its status, CI status, a pinned install command and live proof
 - **How I run production:** ${BASE_URL}/infrastructure — The live services I run (status page, CI pipelines, booking page), a map of how they connect, and how risk is controlled in four blocks: handover (with sign-in), backups, monitoring, deploys and builds. Managed cloud and dedicated infrastructure choices follow workload, team, compliance, recovery, and budget constraints.
 ${infrastructureLines(BASE_URL)}
-- **Writing:** ${BASE_URL}/blog — Posts on decisions for founders, AI and MCP, and self-hosting, grouped by topic, with an Archive of older posts kept as written
+- **Writing:** ${BASE_URL}/blog — Posts on decisions for founders, AI and MCP, self-hosting, and Scars (my own mistakes and what I changed after them), grouped by topic, with an Archive of older posts kept as written
 - **Privacy:** ${BASE_URL}/privacy — What the brief form, the newsletter and analytics collect, where it is stored, and how to unsubscribe
 ${hackathonsSection}
 ### Writing
