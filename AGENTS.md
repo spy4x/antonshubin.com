@@ -962,6 +962,10 @@ post get `outbound` from `lib/markdown.ts`.
 `routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
 (`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`),
 and `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
+`/privacy` also holds a button (`islands/AnalyticsOptOut.tsx`) that sets
+`umami.disabled` in the browser's local storage, the flag Umami's tracker checks
+before it sends anything: Anton presses it once in each of his own browsers, so
+his visits stay out of the numbers, and any visitor can do the same.
 `routes/privacy.tsx` describes exactly this; change it together with the code.
 `docs/analytics.md` holds the event names and properties and the saved reports
 `deno task umami-reports` keeps.

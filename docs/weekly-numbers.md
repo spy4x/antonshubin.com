@@ -31,6 +31,10 @@ for both weeks. The event names are the ones in `docs/analytics.md`.
 - **Book clicks by place** and **posts read to the end**: the `book` event by
   its `place` property and `post-read` by its `item` (the post slug), from
   Umami's event-data values endpoint.
+- **Pages not found**: the addresses that showed the not-found page, counted
+  from the `not-found` events in Umami's event list (`/events`, at most 100 a
+  week). An address that keeps appearing is a broken link or an old URL that
+  needs an entry in `lib/redirects.ts`.
 - **Top pages, referrers and campaigns**: the top ten of this week.
 - **What brought conversions (30 days)**: Umami's Attribution for `brief-sent`
   and `call-booked`, by first and by last click: how many visitors converted

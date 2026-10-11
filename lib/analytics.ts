@@ -203,6 +203,37 @@ export function trackWhenReady(
 }
 
 /**
+ * The local-storage key Umami's tracker checks before every page view and
+ * event: while it holds any value, the tracker sends nothing from this
+ * browser. `/privacy` offers it as a button (`islands/AnalyticsOptOut.tsx`).
+ */
+export const ANALYTICS_OPT_OUT_KEY = "umami.disabled";
+
+/** True when this browser has switched the counting off. False when storage is blocked. */
+export function analyticsOptedOut(): boolean {
+  try {
+    return localStorage.getItem(ANALYTICS_OPT_OUT_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Switches the counting off or back on for this browser. Returns false when
+ * the browser refused to store the choice (a private window, blocked site
+ * data), in which case nothing changed.
+ */
+export function setAnalyticsOptOut(off: boolean): boolean {
+  try {
+    if (off) localStorage.setItem(ANALYTICS_OPT_OUT_KEY, "1");
+    else localStorage.removeItem(ANALYTICS_OPT_OUT_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Pages that never load the tracker: `/unsubscribe` carries a working
  * unsubscribe token in its URL, `/subscribe/confirm` a confirmation token that
  * holds the address, and `/pay` holds bank details. Umami stores the full URL
