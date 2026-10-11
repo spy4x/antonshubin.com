@@ -3,6 +3,7 @@ import { define } from "../lib/utils.ts";
 import { Layout } from "../components/Layout.tsx";
 import { SEOHead } from "../components/SEOHead.tsx";
 import { head } from "../lib/head.ts";
+import AnalyticsOptOut from "../islands/AnalyticsOptOut.tsx";
 import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
 
 /**
@@ -40,8 +41,8 @@ export default define.page(function Privacy(ctx) {
         <h1 class="text-3xl sm:text-4xl text-parchment">Privacy</h1>
         <p class="mt-4">
           This page lists what this site collects and where it goes. It was
-          checked against the site's code on 2 October 2026. How long things are
-          kept is my own rule, stated below.
+          checked against the site's code on 12 October 2026. How long things
+          are kept is my own rule, stated below.
         </p>
 
         <Section title="The brief form">
@@ -128,6 +129,14 @@ export default define.page(function Privacy(ctx) {
             unsubscribe, subscription-confirmation and payment pages.
           </p>
           <p>The site's own code sets no cookies.</p>
+          <p>
+            You can switch the counting off for the browser you are reading this
+            in. The choice is saved in this browser's local storage, so it lasts
+            until this browser clears the site's data, and every other browser
+            or device needs its own. Views counted before you press the button
+            stay counted.
+          </p>
+          <AnalyticsOptOut />
         </Section>
 
         <Section title="What your browser does">

@@ -16,6 +16,7 @@ import {
   trackedCalls,
 } from "./browser.ts";
 import { blogArticles } from "../lib/data.ts";
+import { ANALYTICS_OPT_OUT_KEY } from "../lib/analytics.ts";
 import { POST_READ_MIN_MS } from "../islands/PostRead.tsx";
 
 Deno.test("a post counts as read once, only after its end was on screen and 15 s passed", async () => {
@@ -132,6 +133,56 @@ Deno.test("the not-found page counts one not-found event", async () => {
       // A page that exists sends nothing on its own.
       await page.goto(`${site.origin}/work`, { waitUntil: "networkidle" });
       assertEquals(await trackedCalls(page), []);
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("the privacy page's button switches Umami off for this browser and back on", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      const stored = () =>
+        page.evaluate(
+          (key) => localStorage.getItem(key),
+          ANALYTICS_OPT_OUT_KEY,
+        );
+      const box = page.locator("[data-analytics-opt-out]");
+      await page.goto(`${site.origin}/privacy`, { waitUntil: "networkidle" });
+      assertEquals(await stored(), null);
+
+      await box.getByRole("button", { name: "Stop counting my visits" })
+        .click();
+      await box.getByText("Visits from this browser are not counted.")
+        .waitFor();
+      assert(await stored() !== null, "the choice was not stored");
+
+      // The choice survives a reload, and the button offers the way back.
+      await page.reload({ waitUntil: "networkidle" });
+      await box.getByRole("button", { name: "Count my visits again" }).click();
+      await box.getByText("Visits from this browser are counted.").waitFor();
+      assertEquals(await stored(), null);
+
+      // A browser that refuses to store the choice is told so, and the
+      // button keeps offering to switch off.
+      await page.evaluate(() => {
+        Storage.prototype.setItem = () => {
+          throw new Error("storage is blocked");
+        };
+      });
+      await box.getByRole("button", { name: "Stop counting my visits" })
+        .click();
+      await box.getByText("This browser refused to save the choice").waitFor();
+      await box.getByRole("button", { name: "Stop counting my visits" })
+        .waitFor();
+      assertEquals(await stored(), null);
     } finally {
       await page.close();
     }

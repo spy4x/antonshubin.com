@@ -14,6 +14,15 @@ that was booked, and a post that was read to the end. Issue #318 set this up.
   link's token is a working credential, a confirmation link's token holds the
   address, and Umami stores the full query string of every page view.
 - **Crawlers.** `lib/bots.ts`'s `isBot()` decides at render time.
+- **A browser that opted out.** The button on `/privacy`
+  (`islands/AnalyticsOptOut.tsx`) sets `umami.disabled` in local storage, and
+  Umami's tracker sends no page view or event while that key holds a value.
+  Anton presses it once in every browser and device he uses, so his own visits
+  stay out of the numbers; clearing the site's data switches counting back on.
+  Visits counted before the press stay in Umami. Safari is documented to delete
+  a site's script-written local storage after seven days without a visit to it
+  (not tested here), so on an iPhone or in Safari the press may need repeating;
+  `/privacy` shows the current state.
 
 ## Events
 

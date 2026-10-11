@@ -403,6 +403,52 @@ export function fetchUmamiPostReadsSection(
   );
 }
 
+/** Rows Umami's event list is asked for: more not-found views than a week has had. */
+const NOT_FOUND_PAGE_SIZE = 100;
+
+/** How many `not-found` events each address had in `window`, most hit first. */
+async function notFoundCounts(
+  source: UmamiSource,
+  window: TimeWindow,
+): Promise<Count[]> {
+  const answer = await source.get("/events", {
+    search: "not-found",
+    pageSize: NOT_FOUND_PAGE_SIZE,
+    ...window,
+  }) as { data: { eventName: string; urlPath?: string }[] };
+  const totals = new Map<string, number>();
+  for (const row of answer.data) {
+    // `search` also matches an address or a title that contains the words.
+    if (row.eventName !== "not-found") continue;
+    const address = row.urlPath ?? "(unknown)";
+    totals.set(address, (totals.get(address) ?? 0) + 1);
+  }
+  return [...totals]
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count || a.key.localeCompare(b.key));
+}
+
+/**
+ * The addresses that showed the not-found page: a broken link somewhere, or
+ * an old URL that needs an entry in `lib/redirects.ts`.
+ */
+export function fetchUmamiNotFoundSection(
+  source = umamiSource(),
+): Promise<Section> {
+  return umamiSection(
+    source,
+    "Umami — pages not found (7 days)",
+    ["address", ...WEEK_HEADERS],
+    async (s) => {
+      const { current, previous } = await bothWindows(
+        s,
+        (w) => notFoundCounts(s, w),
+      );
+      return compareRows(current, previous);
+    },
+  );
+}
+
 /**
  * Days the attribution and journey sections look back over. A week holds a
  * handful of conversions at most, too few to say where they came from.
@@ -688,6 +734,7 @@ async function main() {
     fetchUmamiEventsSection(umami),
     fetchUmamiBookPlacesSection(umami),
     fetchUmamiPostReadsSection(umami),
+    fetchUmamiNotFoundSection(umami),
     fetchUmamiTopPagesSection(umami),
     fetchUmamiReferrersSection(umami),
     fetchUmamiCampaignsSection(umami),

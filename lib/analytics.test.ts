@@ -1,5 +1,6 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import {
+  ANALYTICS_OPT_OUT_KEY,
   analyticsAllowed,
   eventAttrs,
   linkEvent,
@@ -90,4 +91,10 @@ Deno.test("track sends properties to Umami and never throws when Umami does", ()
   } finally {
     delete g.umami;
   }
+});
+
+Deno.test("the opt-out key is the one Umami's tracker reads", () => {
+  // The tracker script is not ours and no test loads it: a different key
+  // would store the choice and keep counting.
+  assertEquals(ANALYTICS_OPT_OUT_KEY, "umami.disabled");
 });

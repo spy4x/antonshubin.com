@@ -11,6 +11,7 @@ import {
   fetchUmamiEventsSection,
   fetchUmamiGoalsSection,
   fetchUmamiJourneySection,
+  fetchUmamiNotFoundSection,
   fetchUmamiPostReadsSection,
   fetchUmamiStatsSection,
   fetchUmamiTopPagesSection,
@@ -383,6 +384,31 @@ Deno.test("fetchUmamiPostReadsSection ranks posts by post-read, keyed by the ite
   assertEquals(urls[0].searchParams.get("eventName"), "post-read");
   assertEquals(urls[0].searchParams.get("propertyName"), "item");
   assertEquals(result.rows, [["mig", "5", "0"], ["zond", "2", "0"]]);
+});
+
+Deno.test("fetchUmamiNotFoundSection counts not-found events by address, most hit first", async () => {
+  const { result, urls } = await withUmamiStub(
+    (url) => ({
+      data: isThisWeek(url)
+        ? [
+          { eventName: "not-found", urlPath: "/works" },
+          { eventName: "not-found", urlPath: "/old-post" },
+          // A click on a link whose target contains the words is not a miss.
+          { eventName: "cta", urlPath: "/blog/not-found-pages" },
+          { eventName: "not-found", urlPath: "/old-post" },
+        ]
+        : [{ eventName: "not-found", urlPath: "/works" }],
+    }),
+    fetchUmamiNotFoundSection,
+  );
+  assertEquals(urls.length, 2);
+  for (const u of urls) {
+    assertEquals(u.pathname, "/umami/api/websites/site-id/events");
+    assertEquals(u.searchParams.get("search"), "not-found");
+    // Umami's default page is 20 rows; without this a busy week undercounts.
+    assertEquals(u.searchParams.get("pageSize"), "100");
+  }
+  assertEquals(result.rows, [["/old-post", "2", "0"], ["/works", "1", "1"]]);
 });
 
 Deno.test("fetchUmamiCampaignsSection asks Umami for utmCampaign metrics in both weeks", async () => {
