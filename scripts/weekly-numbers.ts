@@ -415,12 +415,13 @@ async function notFoundCounts(
     search: "not-found",
     pageSize: NOT_FOUND_PAGE_SIZE,
     ...window,
-  }) as { data: { eventName: string; urlPath: string }[] };
+  }) as { data: { eventName: string; urlPath?: string }[] };
   const totals = new Map<string, number>();
   for (const row of answer.data) {
     // `search` also matches an address or a title that contains the words.
     if (row.eventName !== "not-found") continue;
-    totals.set(row.urlPath, (totals.get(row.urlPath) ?? 0) + 1);
+    const address = row.urlPath ?? "(unknown)";
+    totals.set(address, (totals.get(address) ?? 0) + 1);
   }
   return [...totals]
     .map(([key, count]) => ({ key, count }))

@@ -132,9 +132,9 @@ export default define.page(function Privacy(ctx) {
           <p>
             You can switch the counting off for the browser you are reading this
             in. The choice is saved in this browser's local storage, so it lasts
-            until you clear the site's data, and every other browser or device
-            needs its own. The view of this page that brought you here was
-            already counted.
+            until this browser clears the site's data, and every other browser
+            or device needs its own. Views counted before you press the button
+            stay counted.
           </p>
           <AnalyticsOptOut />
         </Section>

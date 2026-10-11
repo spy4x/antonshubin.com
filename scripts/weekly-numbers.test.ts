@@ -405,6 +405,8 @@ Deno.test("fetchUmamiNotFoundSection counts not-found events by address, most hi
   for (const u of urls) {
     assertEquals(u.pathname, "/umami/api/websites/site-id/events");
     assertEquals(u.searchParams.get("search"), "not-found");
+    // Umami's default page is 20 rows; without this a busy week undercounts.
+    assertEquals(u.searchParams.get("pageSize"), "100");
   }
   assertEquals(result.rows, [["/old-post", "2", "0"], ["/works", "1", "1"]]);
 });

@@ -169,6 +169,20 @@ Deno.test("the privacy page's button switches Umami off for this browser and bac
       await box.getByRole("button", { name: "Count my visits again" }).click();
       await box.getByText("Visits from this browser are counted.").waitFor();
       assertEquals(await stored(), null);
+
+      // A browser that refuses to store the choice is told so, and the
+      // button keeps offering to switch off.
+      await page.evaluate(() => {
+        Storage.prototype.setItem = () => {
+          throw new Error("storage is blocked");
+        };
+      });
+      await box.getByRole("button", { name: "Stop counting my visits" })
+        .click();
+      await box.getByText("This browser refused to save the choice").waitFor();
+      await box.getByRole("button", { name: "Stop counting my visits" })
+        .waitFor();
+      assertEquals(await stored(), null);
     } finally {
       await page.close();
     }

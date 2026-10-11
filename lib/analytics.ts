@@ -209,10 +209,13 @@ export function trackWhenReady(
  */
 export const ANALYTICS_OPT_OUT_KEY = "umami.disabled";
 
-/** True when this browser has switched the counting off. False when storage is blocked. */
+/**
+ * True when this browser has switched the counting off: the key holds a
+ * non-empty value, the tracker's own test. False when storage is blocked.
+ */
 export function analyticsOptedOut(): boolean {
   try {
-    return localStorage.getItem(ANALYTICS_OPT_OUT_KEY) !== null;
+    return Boolean(localStorage.getItem(ANALYTICS_OPT_OUT_KEY));
   } catch {
     return false;
   }
