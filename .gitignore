@@ -14,8 +14,8 @@ data/newsletter-log.json
 .env.age
 .env.*.local.age
 # dev .env's own encrypted form was never tracked before age64 either; only
-# .env.prod.age is committed. deploy:stag writes .env.staging.local, so
-# env:encrypt would turn it into a committable .env.staging.local.age too.
+# .env.prod.age is committed. env:encrypt would turn any .env.*.local into a
+# committable .env.*.local.age too.
 _fresh/
 # Fresh build directory
 launches/

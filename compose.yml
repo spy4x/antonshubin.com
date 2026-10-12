@@ -10,7 +10,7 @@ services:
       context: .
       args:
         BUILD_ID: ${BUILD_ID:-dev}
-    container_name: ${PROJECT:-antonshubincom}-web
+    container_name: antonshubincom-web
     restart: unless-stopped
     # Env vars for container: loaded from file at runtime
     # YAML substitution (${DOMAIN}) comes from `--env-file .env.prod` CLI flag
@@ -32,21 +32,21 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.services.${PROJECT:-antonshubincom}.loadbalancer.server.port=8000"
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.rule=(Host(`${DOMAIN}`) || Host(`${WWW_DOMAIN:-www.antonshubin.com}`)) && !PathPrefix(`/umami/`)"
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.entrypoints=websecure"
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.tls=true"
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.tls.certresolver=myresolver"
+      - "traefik.http.services.antonshubincom.loadbalancer.server.port=8000"
+      - "traefik.http.routers.antonshubincom.rule=(Host(`${DOMAIN}`) || Host(`${WWW_DOMAIN:-www.antonshubin.com}`)) && !PathPrefix(`/umami/`)"
+      - "traefik.http.routers.antonshubincom.entrypoints=websecure"
+      - "traefik.http.routers.antonshubincom.tls=true"
+      - "traefik.http.routers.antonshubincom.tls.certresolver=myresolver"
       # Redirect www to non-www
-      - "traefik.http.middlewares.${PROJECT:-antonshubincom}-redirect.redirectregex.regex=^https://www\\.${DOMAIN}/(.*)"
-      - "traefik.http.middlewares.${PROJECT:-antonshubincom}-redirect.redirectregex.replacement=https://${DOMAIN}/$${1}"
-      - "traefik.http.middlewares.${PROJECT:-antonshubincom}-redirect.redirectregex.permanent=true"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.regex=^https://www\\.${DOMAIN}/(.*)"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.replacement=https://${DOMAIN}/$${1}"
+      - "traefik.http.middlewares.antonshubincom-redirect.redirectregex.permanent=true"
       # No `allow-index@file` here: it forces `X-Robots-Tag: all` on every
       # response and would overwrite the per-path value the app sets in
       # routes/_middleware.ts (noindex for /pay, /unsubscribe,
       # /subscribe/confirm and every error page). rostok's `security-headers`
       # no longer carries an X-Robots-Tag, so the app's header is what ships.
-      - "traefik.http.routers.${PROJECT:-antonshubincom}.middlewares=${PROJECT:-antonshubincom}-redirect"
+      - "traefik.http.routers.antonshubincom.middlewares=antonshubincom-redirect"
     deploy:
       resources:
         limits:

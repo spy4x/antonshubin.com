@@ -255,9 +255,9 @@ Five entities in a `@graph` array (six on `/about`):
 
 - `components/SEOHead.tsx` emits route-specific title, description, canonical,
   and index/noindex meta directives
-- `routes/_middleware.ts` emits extended `X-Robots-Tag` directives, sends
+- `routes/_middleware.ts` emits extended `X-Robots-Tag` directives and sends
   `noindex` on any error status (every unmatched URL reaches it through
-  `routes/[...path].tsx`), and preserves staging noindex behavior
+  `routes/[...path].tsx`)
 
 ### 10. `/infrastructure`
 
@@ -279,8 +279,8 @@ Five entities in a `@graph` array (six on `/about`):
 
 ## Analytics
 
-What Umami records, and where it is left out (crawlers, `UNTRACKED_PATHS`,
-staging), is in [analytics.md](analytics.md).
+What Umami records, and where it is left out (crawlers, `UNTRACKED_PATHS`), is
+in [analytics.md](analytics.md).
 
 ## Update Rules
 

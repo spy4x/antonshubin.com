@@ -70,10 +70,10 @@ backfill never needs to run again for that.
 
 Cross-site POSTs to `/api/subscribe`, `/api/lead`, `/unsubscribe` and
 `/subscribe/confirm` answer 403 (`lib/csrf.ts`, Fresh's `csrf()`): the allowed
-origin is the site's own `BASE_URL`, so staging accepts its own forms. A request
-with neither `Origin` nor `Sec-Fetch-Site`, such as a mail client's one-click
-unsubscribe (RFC 8058), passes, and so does the site's own form on Safari before
-16.4, which sends `Origin` without `Sec-Fetch-Site`.
+origin is the site's own `BASE_URL`. A request with neither `Origin` nor
+`Sec-Fetch-Site`, such as a mail client's one-click unsubscribe (RFC 8058),
+passes, and so does the site's own form on Safari before 16.4, which sends
+`Origin` without `Sec-Fetch-Site`.
 
 Layout and sender (#364): the confirmation mail, the welcome mail and every
 newsletter use one letter layout (`lib/letter.ts`, built on

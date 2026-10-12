@@ -1,7 +1,6 @@
 // Cache-Control policy per response, applied by main.ts's cache middleware.
-// A pure function of the request's path, the response's status and header,
-// and whether the request came in on the staging host, so a unit test can
-// cover the staging branch: a test's fetch cannot set a Host header.
+// A pure function of the request's path and the response's status and
+// header, so a unit test can cover every tier.
 
 import { pagesFor } from "./pages.ts";
 
@@ -23,16 +22,10 @@ const isStaticRootFile = (pathname: string) =>
   pathname === "/manifest.json" ||
   /^\/(favicon|apple-icon)[\w.-]*\.(png|ico)$/.test(pathname);
 
-/** True when the host is the staging site (website-stag.*). */
-export const isStagingHost = (hostname: string) =>
-  hostname.startsWith("website-stag.");
-
 /** What {@link cacheControlFor} decides from. */
 export interface CacheInput {
   pathname: string;
   status: number;
-  /** Request came in on the staging host (see {@link isStagingHost}). */
-  staging: boolean;
   /** The Cache-Control header the route already set, if any. */
   current: string | null;
 }
@@ -50,11 +43,10 @@ export interface CacheInput {
  * below it, on `/fonts/*`, `/img/*`, favicons and unstamped JS chunks alike).
  * A error is never cached, then assets/images/static files, then a route's
  * own deliberate `no-store` (routes/unsubscribe.tsx shows one subscriber's
- * address), then staging's blanket "revalidate every HTML page", then
- * production's core pages.
+ * address), then the tools pages and the core pages.
  */
 export function cacheControlFor(
-  { pathname, status, staging, current }: CacheInput,
+  { pathname, status, current }: CacheInput,
 ): string | undefined {
   // Never cache an error. A 404 for a core page (for example /hackathons
   // while its list is empty) would otherwise stay in browsers and at the edge
@@ -78,10 +70,7 @@ export function cacheControlFor(
   // status >= 400 response already returned above) wins from here down.
   if (current?.includes("no-store")) return undefined;
 
-  // Staging: cache assets but NOT HTML (instant feedback on deploys)
-  if (staging) return "no-cache, must-revalidate";
-
-  // ── Production caching strategy ──────────────────────────────
+  // ── Caching strategy ─────────────────────────────────────────
   //
   // Cloudflare (orange-cloud) accepts these Cache-Control headers
   // for static assets and caches them at the edge automatically.

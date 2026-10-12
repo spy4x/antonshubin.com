@@ -17,7 +17,7 @@
 
 import { purgeUrls } from "@spy4x/integrations/cloudflare";
 
-/** The zone every deploy target lives in (production and staging alike). */
+/** The Cloudflare zone the site lives in. */
 export const ZONE_NAME = "antonshubin.com";
 
 /**

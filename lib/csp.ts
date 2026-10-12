@@ -56,7 +56,7 @@ export function originOf(url: string): string {
  * Builds the `Content-Security-Policy` header value. Directives (#177's
  * design decision D-007):
  * - `script-src`/`connect-src` add the Umami origin only when it's
- *   cross-origin (staging reuses the production `UMAMI_URL`).
+ *   cross-origin.
  * - `style-src` keeps `'unsafe-inline'` — 14 server-rendered `style="..."`
  *   attributes exist, and a nonce only covers `<style>` elements, not
  *   attributes.

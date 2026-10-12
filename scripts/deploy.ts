@@ -8,7 +8,6 @@
  *
  * Usage:
  *   deno task deploy           # production → antonshubin.com
- *   deno task deploy:stag      # staging   → website-stag.antonshubin.com
  *
  * Steps:
  *  1. Rsync source (excluding .git, .age, node_modules, _fresh, data, and .dockerignore patterns)
@@ -26,46 +25,23 @@
  */
 
 import { envValue, liveBuildId, purgeAfterDeploy } from "./cloudflare-purge.ts";
-import { stagingEnv } from "./staging-env.ts";
 
 // Cloud server (23.88.101.28). antonshubin.com used to run on the home server
 // as well; it was consolidated onto cloud, where Umami also lives — which is
 // what lets the first-party /umami/ proxy work from Traefik labels alone.
 const SERVER = "cloudlab";
-const isStaging = Deno.env.get("DEPLOY_ENV") === "staging";
 
-const TARGET = isStaging
-  ? {
-    name: "staging",
-    project: "antonshubincom-stag",
-    envFile: ".env.staging.local",
-    domain: "website-stag.antonshubin.com",
-  }
-  : {
-    name: "production",
-    project: "antonshubincom",
-    envFile: ".env.prod",
-    domain: "antonshubin.com",
-  };
+const TARGET = {
+  name: "production",
+  project: "antonshubincom",
+  envFile: ".env.prod",
+  domain: "antonshubin.com",
+};
 
-const REMOTE_PATH = isStaging
-  ? "~/cloudlab/apps/antonshubin.com-stag/"
-  : "~/cloudlab/apps/antonshubin.com/";
+const REMOTE_PATH = "~/cloudlab/apps/antonshubin.com/";
 const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 
 console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);
-
-if (isStaging) {
-  // Create .env.staging.local on the fly (used for docker compose
-  // --env-file). The .local suffix keeps it matched by the .gitignore rule
-  // .env.*.local, so a deploy that fails midway leaves no untracked,
-  // un-ignored copy of the environment values behind.
-  const stagEnv = stagingEnv(
-    Deno.readTextFileSync(".env.prod"),
-    TARGET.domain,
-  );
-  Deno.writeTextFileSync(TARGET.envFile, stagEnv);
-}
 
 async function run(
   cmd: string,
@@ -109,9 +85,6 @@ async function git(args: string[]): Promise<{ code: number; stdout: string }> {
   return { code: o.code, stdout: new TextDecoder().decode(o.stdout) };
 }
 
-// Runs every deploy step, wrapped so a failure at any point still lets the
-// caller clean up the temp env file below instead of exiting mid-deploy.
-let failed = false;
 try {
   // Build id that routes/sw.js.ts prints, for the purge step to read. Computed
   // locally instead of writing it into a tracked file, so the working tree
@@ -149,11 +122,8 @@ try {
 
   // Step 3: build and restart on remote
   console.log("  docker compose...");
-  const composeCmd = isStaging
-    // Staging: cp .env.staging.local → .env.prod for compose.yml's env_file,
-    // and set PROJECT for the container_name variable in compose.yml
-    ? `cd ${REMOTE_PATH} && mkdir -p data && cp -f ${TARGET.envFile} .env.prod && PROJECT=${TARGET.project} BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`
-    : `cd ${REMOTE_PATH} && mkdir -p data && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
+  const composeCmd =
+    `cd ${REMOTE_PATH} && mkdir -p data && BUILD_ID=${BUILD_ID} docker compose -p ${TARGET.project} --env-file ${TARGET.envFile} up -d --build`;
   const r3 = await run(
     `ssh ${SERVER} '${composeCmd}'`,
   );
@@ -174,16 +144,5 @@ try {
   console.log(`✅ Deploy to ${TARGET.name} complete`);
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
-  failed = true;
-} finally {
-  // Clean up temp env file, including on a failed/early-exiting deploy.
-  if (isStaging) {
-    try {
-      Deno.removeSync(TARGET.envFile);
-    } catch { /* already gone */ }
-  }
-}
-
-if (failed) {
   Deno.exit(1);
 }

@@ -1,7 +1,7 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { isCsrfPath, siteCsrf } from "./csrf.ts";
 
-const guard = siteCsrf("https://staging.example.com");
+const guard = siteCsrf("https://site.example.com");
 
 /** Runs the guard on a request; returns "next" when it passed, else the status. */
 async function run(
@@ -51,7 +51,7 @@ Deno.test("refuses a cross-site POST to each guarded route with 403", async () =
 
 Deno.test("lets the site's own forms through, on the configured origin", async () => {
   assertEquals(
-    await run("/api/subscribe", { origin: "https://staging.example.com" }),
+    await run("/api/subscribe", { origin: "https://site.example.com" }),
     "next",
   );
   assertEquals(
@@ -61,7 +61,7 @@ Deno.test("lets the site's own forms through, on the configured origin", async (
   assertEquals(
     await run("/api/lead", { origin: "https://antonshubin.com" }),
     403,
-    "production's origin is not staging's",
+    "another site's origin is not the configured one",
   );
 });
 
