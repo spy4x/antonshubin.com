@@ -10,7 +10,6 @@
     "start": "deno serve -A _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update .",
     "deploy": "deno run -A scripts/deploy.ts",
-    "deploy:stag": "DEPLOY_ENV=staging deno run -A scripts/deploy.ts",
     "env:encrypt": "deno run --node-modules-dir=none --no-prompt -R -W=. jsr:@spy4x/server@1.37.0/env-age64/cli encrypt",
     "env:decrypt": "deno run --node-modules-dir=none --no-prompt -R -W=. jsr:@spy4x/server@1.37.0/env-age64/cli decrypt",
     "env:status": "deno run --node-modules-dir=none --no-prompt -R -W=. jsr:@spy4x/server@1.37.0/env-age64/cli status",

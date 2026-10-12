@@ -6,8 +6,8 @@
  * neither `Origin` nor `Sec-Fetch-Site` passes too. That last case is what a
  * mail client's one-click unsubscribe (RFC 8058) sends.
  *
- * The allowed origin is the configured base URL's, not a fixed host, so
- * staging (`website-stag.antonshubin.com`) accepts its own forms.
+ * The allowed origin is the configured base URL's, not a fixed host, so a
+ * local or test server accepts its own forms.
  */
 import { csrf } from "fresh";
 import type { Middleware } from "fresh";

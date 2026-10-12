@@ -10,7 +10,6 @@ export async function handler(
   // "/unsubscribe/" serves the same page as "/unsubscribe", so it gets the
   // same headers.
   const page = pathname.replace(/\/+$/, "") || "/";
-  const isStaging = ctx.url.hostname.startsWith("website-stag.");
 
   const res = await ctx.next();
 
@@ -20,9 +19,7 @@ export async function handler(
   if (referrer) res.headers.set("Referrer-Policy", referrer);
 
   // ── X-Robots-Tag per path ────────────────────────────
-  if (isStaging) {
-    // Already set by main.ts cache middleware — preserve noindex
-  } else if (
+  if (
     pathname === "/pay" || pathname.startsWith("/pay/") ||
     page === "/unsubscribe" || page === "/subscribe/confirm"
   ) {

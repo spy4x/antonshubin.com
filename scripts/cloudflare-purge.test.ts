@@ -56,8 +56,8 @@ Deno.test("staticUrls maps static/ paths to public URLs and ignores the rest", (
 });
 
 Deno.test("purgeList always starts with sw.js on the target's own domain, without duplicates", () => {
-  assertEquals(purgeList("website-stag.antonshubin.com", []), [
-    "https://website-stag.antonshubin.com/sw.js",
+  assertEquals(purgeList("other.example.com", []), [
+    "https://other.example.com/sw.js",
   ]);
   assertEquals(
     purgeList("antonshubin.com", ["static/sw.js", "static/manifest.json"]),
@@ -366,7 +366,7 @@ Deno.test("purgeAfterDeploy asks purgeUrls for the antonshubin.com zone with a 1
   const { fetch, purge, purgeCalls } = deployFetch("bee5678");
   const logs: string[] = [];
   await purgeAfterDeploy({
-    domain: "website-stag.antonshubin.com",
+    domain: "sub.antonshubin.com",
     buildId: "bee5678",
     previousBuildId: undefined,
     git: () => Promise.resolve({ code: 0, stdout: "" }),
@@ -382,7 +382,7 @@ Deno.test("purgeAfterDeploy asks purgeUrls for the antonshubin.com zone with a 1
   assertEquals(call.token, TOKEN);
   assertEquals(call.zoneName, "antonshubin.com");
   assertEquals(call.zoneId, undefined);
-  assertEquals(call.urls, ["https://website-stag.antonshubin.com/sw.js"]);
+  assertEquals(call.urls, ["https://sub.antonshubin.com/sw.js"]);
   assertEquals(call.requestTimeoutMs, API_TIMEOUT_MS);
   assertEquals(API_TIMEOUT_MS, 10_000);
   assertEquals(call.fetch, fetch);

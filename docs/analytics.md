@@ -7,8 +7,6 @@ that was booked, and a post that was read to the end. Issue #318 set this up.
 
 ## Where nothing is sent
 
-- **Staging.** `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging never
-  reports into the production website.
 - **`/unsubscribe`, `/subscribe/confirm` and `/pay`.** `routes/_app.tsx` leaves
   the Umami script out on these pages, as it does for crawlers. An unsubscribe
   link's token is a working credential, a confirmation link's token holds the

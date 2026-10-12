@@ -2,7 +2,7 @@ import { App, staticFiles } from "fresh";
 import type { State } from "./lib/utils.ts";
 import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
 import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
-import { cacheControlFor, isStagingHost } from "./lib/cache-control.ts";
+import { cacheControlFor } from "./lib/cache-control.ts";
 import { redirectTarget } from "./lib/redirects.ts";
 import { siteCsrf } from "./lib/csrf.ts";
 
@@ -38,17 +38,13 @@ app.use(async (ctx) => {
   return res;
 });
 
-// Cache middleware: Cache-Control per response (lib/cache-control.ts), and
-// noindex on every staging response.
+// Cache middleware: Cache-Control per response (lib/cache-control.ts).
 app.use(async (ctx) => {
   const resp = await ctx.next();
-  const staging = isStagingHost(ctx.url.hostname);
-  if (staging) resp.headers.set("X-Robots-Tag", "noindex, nofollow");
 
   const cacheControl = cacheControlFor({
     pathname: ctx.url.pathname,
     status: resp.status,
-    staging,
     current: resp.headers.get("Cache-Control"),
   });
   if (cacheControl) resp.headers.set("Cache-Control", cacheControl);

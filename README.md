@@ -40,7 +40,6 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | `deno task start`                | Run the production server                                                  |
 | `deno task update`               | Update Fresh                                                               |
 | `deno task deploy`               | Deploy production → antonshubin.com                                        |
-| `deno task deploy:stag`          | Deploy staging → website-stag.antonshubin.com                              |
 | `deno task env:encrypt`          | Every `.env*` → its `.env*.age` (age64)                                    |
 | `deno task env:decrypt`          | Every `.env*.age` → its plaintext (age64)                                  |
 | `deno task env:status`           | Key presence + which env/age files exist                                   |

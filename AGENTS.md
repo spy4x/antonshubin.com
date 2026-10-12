@@ -109,7 +109,6 @@ deno task build                 # production build (Vite)
 deno task start                 # run the production server
 deno task update                # update Fresh
 deno task deploy                # production → antonshubin.com
-deno task deploy:stag           # staging   → website-stag.antonshubin.com
 deno task env:encrypt           # every .env* → its .env*.age (age64)
 deno task env:decrypt           # every .env*.age → its plaintext (age64)
 deno task env:status            # key presence + which env/age files exist
@@ -960,8 +959,7 @@ as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
 post get `outbound` from `lib/markdown.ts`.
 
 `routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
-(`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`),
-and `scripts/staging-env.ts` blanks `UMAMI_ID`, so staging reports nothing.
+(`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`).
 `/privacy` also holds a button (`islands/AnalyticsOptOut.tsx`) that sets
 `umami.disabled` in the browser's local storage, the flag Umami's tracker checks
 before it sends anything: Anton presses it once in each of his own browsers, so
@@ -1211,11 +1209,10 @@ Claude, Perplexity, and other AI crawlers — a primary traffic source.
 
 Cache policy lives in `lib/cache-control.ts`'s `cacheControlFor()`, a pure
 function unit-tested in `lib/cache-control.test.ts`, applied to every response
-by `main.ts`'s cache middleware. `fetch()` drops a `Host` header, so
-`test/unsubscribe.test.ts` checks the staging wiring with a raw HTTP request
-instead. `/sw.js` (the retired worker) sets its own header in `routes/sw.js.ts`.
-When adding or changing routes, add a new core page to `lib/pages.ts` (see "Site
-frame"): its `CORE_PAGES` set and the sitemap both read that one list.
+by `main.ts`'s cache middleware. `/sw.js` (the retired worker) sets its own
+header in `routes/sw.js.ts`. When adding or changing routes, add a new core page
+to `lib/pages.ts` (see "Site frame"): its `CORE_PAGES` set and the sitemap both
+read that one list.
 
 Cache tiers:
 
@@ -1230,8 +1227,7 @@ Cache tiers:
 Error responses (status ≥ 400) are never cached, regardless of which tier the
 path would otherwise fall into — a 404 must not survive in a browser or at the
 edge once the page comes back. A route that sets `no-store` itself (for example
-`routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it on
-staging and production alike.
+`routes/unsubscribe.tsx`, which shows one subscriber's address) keeps it.
 
 **A static-file tier always wins over Fresh's own default, even when `current`
 already says `no-store`** (#183 follow-up, fixed alongside #184): Fresh's
@@ -1249,10 +1245,9 @@ keeps winning). `lib/cache-control.test.ts` pins both directions: a hashed
 font/image/favicon/JS chunk gets its tier even when `current` is already
 `"no-store"`, and `/unsubscribe` keeps `no-store` regardless.
 
-Staging answers every response with `X-Robots-Tag: noindex,
-nofollow`;
-production sends `noindex` for any status ≥ 400 and `noindex, nofollow` for
-`/pay` and `/unsubscribe` (`routes/_middleware.ts`).
+The site sends `X-Robots-Tag: noindex` for any status ≥ 400 and
+`noindex, nofollow` for `/pay`, `/unsubscribe` and `/subscribe/confirm`
+(`routes/_middleware.ts`).
 
 ## OG link-preview images
 

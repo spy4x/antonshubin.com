@@ -48,13 +48,6 @@ Deno.test("the image never carries a local data/ directory", () => {
   );
 });
 
-Deno.test("the staging deploy builds its env with stagingEnv", () => {
-  assert(
-    read("scripts/deploy.ts").includes("stagingEnv("),
-    "scripts/deploy.ts must build .env.staging.local with stagingEnv",
-  );
-});
-
 // .env.deploy holds the Cloudflare token (#268). It stays on the deploying
 // machine: git ignores it, and neither rsync step may carry it to the server.
 Deno.test("the Cloudflare token file is never committed or uploaded", () => {
