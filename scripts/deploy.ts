@@ -38,7 +38,7 @@ const TARGET = {
   domain: "antonshubin.com",
 };
 
-const REMOTE_PATH = "~/cloudlab/apps/antonshubin.com/";
+const REMOTE_PATH = "~/apps/antonshubin.com/";
 const REMOTE = `${SERVER}:${REMOTE_PATH}`;
 
 console.log(`\n  🎯 Deploying to ${TARGET.name} (${TARGET.domain})\n`);

@@ -85,7 +85,7 @@ not in the container: `compose.yml` bind-mounts the app directory's `data/` at
 copy. The newsletter's per-post sent log, `data/newsletter-log.json`, sits in
 the same directory and is kept and backed up the same way (docs/newsletter.md).
 
-On cloudlab the file is `~/cloudlab/apps/antonshubin.com/data/subscribers.json`.
+On cloudlab the file is `~/apps/antonshubin.com/data/subscribers.json`.
 
 Next to it the site keeps `subscribers.json.lock` (the write lock; harmless,
 leave it) and, only after it found the list unparseable,
@@ -137,10 +137,12 @@ password", holds the full list and the steps.
 
 ### Backup
 
-cloudlab's nightly restic job (root's crontab, 19:00 UTC,
-`~/cloudlab/apps/scripts/backup/+main.ts`) backs up production's `data/` into
-the `antonshubin` repository under `~/cloudlab/sync/cloud-light-backups/`, and
-keeps 7 daily, 4 weekly and 3 monthly snapshots.
+cloudlab's nightly restic job (root's crontab, 19:00 UTC) runs
+`/home/spy4x/rostok/backup-runner/scripts/backup/+main.ts` with the env files
+`/home/spy4x/apps/rostok/.env.root` and `/home/spy4x/apps/rostok/.env`. It backs
+up `~/apps/antonshubin.com/data` into the `antonshubin` repository under
+`~/cloudlab/sync/cloud-light-backups/`, and keeps 7 daily, 4 weekly and 3
+monthly snapshots.
 
 The job's config is `servers/cloud/configs/backup/antonshubin.backup.ts` in the
 rostok checkout (untracked, per-server state), which rostok's deploy copies to
@@ -159,12 +161,14 @@ a root shell with `ssh -t cloudlab sudo -i`, then:
 
 ```bash
 # .env.root is not valid shell, so read the one value instead of sourcing it
-export RESTIC_PASSWORD="$(grep '^BACKUPS_PASSWORD=' ~spy4x/cloudlab/apps/.env.root | cut -d= -f2-)"
+export RESTIC_PASSWORD="$(grep '^BACKUPS_PASSWORD=' ~spy4x/apps/rostok/.env.root | cut -d= -f2-)"
 REPO=~spy4x/cloudlab/sync/cloud-light-backups/antonshubin
 restic -r "$REPO" snapshots
 restic -r "$REPO" restore latest --target /tmp/antonshubin-restore
-SRC=/tmp/antonshubin-restore/home/spy4x/cloudlab/apps/antonshubin.com/data
-DST=~spy4x/cloudlab/apps/antonshubin.com/data
+# A snapshot taken before 2026-10-12 holds the data under the old path:
+# SRC=/tmp/antonshubin-restore/home/spy4x/cloudlab/apps/antonshubin.com/data
+SRC=/tmp/antonshubin-restore/home/spy4x/apps/antonshubin.com/data
+DST=~spy4x/apps/antonshubin.com/data
 # Copy next to the list first, then swap it in under the site's own write lock,
 # so no sign-up can write an older list over the restored one.
 cp "$SRC/subscribers.json" "$DST/subscribers.json.restore"

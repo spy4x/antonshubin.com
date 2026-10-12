@@ -155,7 +155,7 @@ above) before recording anything, and exits non-zero when any mail failed or
 none went out. To read the log:
 
 ```bash
-ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/newsletter-log.json'
+ssh cloudlab 'sudo cat ~/apps/antonshubin.com/data/newsletter-log.json'
 ```
 
 ## Viewing subscribers
@@ -163,7 +163,7 @@ ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/newsletter-log.json'
 The file is on cloudlab and owned by root:
 
 ```bash
-ssh cloudlab 'sudo cat ~/cloudlab/apps/antonshubin.com/data/subscribers.json'
+ssh cloudlab 'sudo cat ~/apps/antonshubin.com/data/subscribers.json'
 ```
 
 ## Unsubscribe handling
