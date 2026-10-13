@@ -75,11 +75,23 @@ export interface CatalogItem {
   priceNote?: string;
   /** The item a buyer usually looks at after this one (a `slug`). */
   next?: string;
+  /**
+   * True when `summary` already says what `outcome` says, so a card that
+   * would show both (the index) shows the summary alone (#388).
+   */
+  summaryStatesOutcome?: boolean;
 }
 
 /** Under a single "from" price: nothing is charged before the buyer has a number. */
 export const QUOTE_NOTE =
   "You get a quote for your scope before any work starts.";
+
+/**
+ * What happens after the strategy session's brief: Anton's answer on #301.
+ * Step 2 of "How it starts" and the line under the price (#388) both use it.
+ */
+const SESSION_INVOICE =
+  "I reply with a Stripe invoice and times for the 60-minute call.";
 
 /** The free intro call is a call to action, not a catalog item. */
 export const INTRO_CALL = "free 30-minute intro call";
@@ -94,6 +106,8 @@ export const catalogItems: CatalogItem[] = [
     next: "codebase-health-audit",
     shortTitle: "Strategy session",
     prices: [{ usd: 150, from: false }],
+    priceNote:
+      `To book it, send a written brief with the topic. ${SESSION_INVOICE}`,
     delivery: "60 minutes",
     summary:
       "A 60-minute working call about your project or idea, with notes afterwards.",
@@ -112,9 +126,9 @@ export const catalogItems: CatalogItem[] = [
     audience:
       "Founders with an idea who need guidance, teams weighing a technical choice, or anyone who wants a second opinion from a senior engineer.",
     examples: [
-      "I have a business idea but I do not know where to start with the technology — what should I build first?",
-      "I need someone to look at my current setup and tell me if I am on the right track before I invest more money",
-      "I want to build a web app for my business but I do not understand the technical terms — can you explain what I actually need?",
+      "You have a business idea and don't know what to build first.",
+      "You want someone to check your current setup before you invest more.",
+      "You want a web app for your business and need the technical terms explained.",
     ],
   },
   {
@@ -126,9 +140,11 @@ export const catalogItems: CatalogItem[] = [
     next: "zero-to-production-saas-mvp",
     shortTitle: "Code audit",
     prices: [{ usd: 1500, from: true }],
+    priceNote: QUOTE_NOTE,
     delivery: "3 days",
     summary:
       "I review your codebase and tell you what to fix, what to rewrite and what to leave alone.",
+    summaryStatesOutcome: true,
     desc:
       "I review your existing codebase over three days. You get a written report covering architecture, security gaps and performance bottlenecks, with a prioritized refactoring roadmap, and we walk through it together on a call.",
     outcome:
@@ -384,7 +400,7 @@ export function startSteps(slug: string): StartStep[] | undefined {
       },
       {
         title: "You get an invoice and a time",
-        desc: "I reply with a Stripe invoice and times for the 60-minute call.",
+        desc: SESSION_INVOICE,
       },
       { title: "We talk", desc: item.includes[0] },
       { title: "You get notes", desc: item.includes[4] },
