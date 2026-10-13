@@ -520,6 +520,39 @@ export const tools: Tool[] = [
     },
   },
   {
+    slug: "dotfiles",
+    name: "dotfiles",
+    job: "my AI-agent setup and Linux workstation, as code",
+    summary:
+      "I run several AI coding agents at once, in Claude Code, OpenCode and DSH (a DeepSeek harness). Their rules, skills, agents and settings are written once, in ai-harnesses/, and deno task ai renders them into the format each harness reads. The rest of the repository is the workstation those agents run on: the apps, the shell, the config files synced into my home directory, and the kernel and systemd limits a dozen parallel agent sessions need.",
+    kind: "cli",
+    status: "in-use",
+    group: "tools",
+    repo: "spy4x/dotfiles",
+    usedFor:
+      "This is how I run AI agents on real work, on my own machine. It is that machine's live config: a merged change is not done until it is applied there.",
+    proofLinks: [
+      {
+        label: "The global agent rules",
+        href:
+          "https://github.com/spy4x/dotfiles/blob/main/ai-harnesses/AGENTS.md",
+      },
+      {
+        label: "How the rendering works",
+        href:
+          "https://github.com/spy4x/dotfiles/blob/main/ai-harnesses/README.md",
+      },
+    ],
+    ci: { provider: "woodpecker", repoId: 13 },
+    useIf: [
+      "You want a working example of one rules source driving several AI coding agents.",
+      "You want a Linux workstation set up by script.",
+    ],
+    dontUseIf: [
+      "You want a framework: these are my own settings, not a configurable product.",
+    ],
+  },
+  {
     slug: "air-quality-sensor",
     name: "Air Quality Sensor",
     job: "DIY ESP32-based air quality monitoring system",
