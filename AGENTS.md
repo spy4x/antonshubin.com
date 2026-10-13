@@ -422,15 +422,16 @@ The library's components are coloured by the `:root` block under `@theme` in
 `assets/styles.css`: each library token (`--color-surface`, `--color-success`,
 `--color-accent-900`, ...) points at a site token, so `@theme` stays the only
 place a colour is written. The selection tokens (`--color-selected*`) are Lamp
-and Parchment, never the accent. `vite.config.ts` splices the library's
-`preset.css`'s "Colour atoms" section into the stylesheet (in reference mode);
-its `tokens.css` is not imported: since 2.0.0 it sits in a layer under `@theme`
-and no longer overrides the site, but the site maps every token it reads anyway,
-and the file added 10.6 KB to the built stylesheet. Tailwind never scans the
-library, so `assets/styles.css` lists the classes of the modules the site uses
-in `@source inline(...)` lines; `test/library-classes.test.tsx` fails when a
-class a library component renders has no rule. `--font-weight-medium` is 600,
-since Plex Sans has no 500 file.
+and Parchment, never the accent, and the focus ring (`--color-ring`) is
+Parchment. `vite.config.ts` splices the library's `preset.css`'s "Colour atoms"
+section into the stylesheet (in reference mode); its `tokens.css` is not
+imported: since 2.0.0 it sits in a layer under `@theme` and no longer overrides
+the site, but the site maps every token it reads anyway, and the file added 10.6
+KB to the built stylesheet. Tailwind never scans the library, so
+`assets/styles.css` lists the classes of the modules the site uses in
+`@source inline(...)` lines; `test/library-classes.test.tsx` fails when a class
+a library component renders has no rule. `--font-weight-medium` is 600, since
+Plex Sans has no 500 file.
 
 `@spy4x/preact-ui/status-mark`'s `StatusMark` renders a shape plus a word for a
 project or tool status (`in-use`, `ready`, `beta`, `wip`, `paused`, `archived`,
@@ -873,12 +874,18 @@ page. Never retry a test on this error.
   on representative pages against a live-resolved `bg-accent` probe, so a token
   edit can't desync the check from `assets/styles.css`); Literata and IBM Plex
   Sans show up in `document.fonts` and every font request is same-origin, with
-  no CSP violation. Since preact-components#571 it also checks that the project
-  gallery's Previous/Next (`navigationVariant="ghost"`) are transparent inside a
-  Rule strong border and fill on hover, and that their row stays 40px tall with
-  and without them. `test/no-emoji.test.ts` (not browser-driven — a plain
-  `startSite()` + `visibleText()` check, like `test/rendered.test.ts`) walks
-  every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
+  no CSP violation. Since #365 it also scans every sitemap page plus `/pay`, a
+  not-found URL, `/unsubscribe` and `/subscribe/confirm` at 1440px for the
+  accent (and its hover shade) as text, border, outline, underline, ring or SVG
+  fill or stroke outside `[data-primary-book]`, checks sample links, form fields
+  and a secondary button while hovered and focused, and fails on a source class
+  in `routes/`, `components/` or `islands/` that uses an accent token for
+  anything but a background. Since preact-components#571 it also checks that the
+  project gallery's Previous/Next (`navigationVariant="ghost"`) are transparent
+  inside a Rule strong border and fill on hover, and that their row stays 40px
+  tall with and without them. `test/no-emoji.test.ts` (not browser-driven — a
+  plain `startSite()` + `visibleText()` check, like `test/rendered.test.ts`)
+  walks every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
   characters, excluding `©`/`®`/`™` and plain digits.
 - `test/notes.browser.test.ts` (#186): the margin note next to a project page's
   outcome line (`/work/foodrazor`) sits beside its claim with no horizontal
