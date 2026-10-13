@@ -57,7 +57,8 @@ export const handler = define.handlers({
       );
       return Response.json(BODIES[500], { status: 500 });
     }
-    // The site's own limiter above counts requests; the package's is unused.
+    // The site's own limiter above counts requests per client. The package's
+    // per-recipient limit (flowDeps) holds a mail back and still answers 200.
     const outcome = await requestSubscription(body?.email, deps);
     return Response.json(BODIES[outcome.status] ?? BODIES[500], {
       status: outcome.status,

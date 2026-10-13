@@ -21,6 +21,7 @@ import {
   type FileSubscriberStore,
 } from "@spy4x/server/subscribers/file";
 import type { SendLog } from "@spy4x/server/subscribers";
+import { createMemoryRateLimiter } from "@spy4x/platform/rate-limit/memory";
 import { BASE_URL, getUnsubscribeSecret } from "./config.ts";
 
 /** The subscriber list unless `SUBSCRIBERS_FILE` says otherwise. Its
@@ -77,8 +78,25 @@ export function confirmUrl(token: string): string {
   return `${BASE_URL}/subscribe/confirm?token=${encodeURIComponent(token)}`;
 }
 
+/** Confirmation mails one address may be sent per {@link CONFIRM_MAIL_WINDOW_MS}. */
+export const CONFIRM_MAILS_PER_RECIPIENT = 3;
+export const CONFIRM_MAIL_WINDOW_MS = 3600_000;
+
+// One limiter for the whole process, because `flowDeps` runs on every request.
+// It lives in memory like the per-client one (lib/rate-limit.ts): the site is
+// one process, and a restart only starts the hour again. The package keys it
+// on the address's keyed hash, so no address is held here, and the limiter
+// sweeps idle keys, so rotating addresses cannot grow memory without bound.
+const RECIPIENT_LIMITER = createMemoryRateLimiter({
+  limit: CONFIRM_MAILS_PER_RECIPIENT,
+  windowMs: CONFIRM_MAIL_WINDOW_MS,
+});
+
 /**
- * Everything the package's flows need. Throws when `UNSUBSCRIBE_SECRET` is
+ * Everything the package's flows need, with the limit per recipient (#428):
+ * whoever asks and from wherever, one address is sent at most
+ * {@link CONFIRM_MAILS_PER_RECIPIENT} confirmation mails an hour. A request
+ * over it gets the same answer and no mail. Throws when `UNSUBSCRIBE_SECRET` is
  * unusable; each route turns that into the answer it gave before.
  */
 export function flowDeps(
@@ -89,5 +107,6 @@ export function flowDeps(
     store: subscriberStore(),
     links: { confirm: confirmUrl, unsubscribe: unsubscribeUrl },
     sendMail,
+    limits: { recipient: RECIPIENT_LIMITER },
   };
 }
