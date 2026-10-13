@@ -8,6 +8,7 @@ import {
   catalogRedirects,
   priceLabel,
   priceRows,
+  QUOTE_NOTE,
   startSteps,
 } from "./catalog.ts";
 import { promise } from "./promises.ts";
@@ -157,4 +158,38 @@ Deno.test("the free call and the paid session are two different things side by s
     !catalogItems[0].desc.includes(paid.desc),
     "the card must not repeat the description above it",
   );
+});
+
+Deno.test("the strategy price says how to book the paid hour: a brief, then an invoice and times", () => {
+  const [row] = priceRows(catalogItems[0]);
+  assert(row.note?.includes("written brief"), "the note names the brief");
+  assert(
+    row.note?.endsWith(startSteps("strategy-call")![1].desc),
+    "the note ends with the invoice step's own sentence",
+  );
+});
+
+Deno.test("every single 'from' price says a quote comes before any work", () => {
+  const single = catalogItems.filter((i) =>
+    i.prices.length === 1 && i.prices[0].from
+  );
+  assertEquals(single.map((i) => i.slug), [
+    "codebase-health-audit",
+    "zero-to-production-saas-mvp",
+  ]);
+  for (const item of single) {
+    assertEquals(priceRows(item)[0].note, QUOTE_NOTE, item.slug);
+  }
+});
+
+Deno.test("no 'Projects this fits' line is written in the first person", () => {
+  for (const item of catalogItems) {
+    for (const example of item.examples) {
+      assertEquals(
+        example.match(/\b(I|me|my)\b/),
+        null,
+        `${item.slug}: "${example}"`,
+      );
+    }
+  }
 });
