@@ -51,6 +51,8 @@ export interface ClosingBandProps {
   catalogLink?: ComponentChildren;
   /** Quiet links after the catalog link. */
   links?: BandLink[];
+  /** Page-specific content under Book and the links: the blog's quiet links and reply line. */
+  after?: ComponentChildren;
   /** Marks Book as the page's one primary call to action (`data-primary-cta`). */
   primaryCta?: boolean;
   /** Extra attributes for the `<section>`: an anchor `id`, or the home page's section marker. */
@@ -74,6 +76,7 @@ export function ClosingBand(
     bookHref,
     catalogLink,
     links = [],
+    after,
     primaryCta,
     sectionAttrs,
   }: ClosingBandProps,
@@ -122,6 +125,7 @@ export function ClosingBand(
           </a>
         ))}
       </div>
+      {after}
     </section>
   );
 }

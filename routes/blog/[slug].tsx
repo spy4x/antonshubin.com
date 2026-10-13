@@ -1,4 +1,4 @@
-import { BOOK_LABEL } from "../../lib/nav.ts";
+import { BOOK_HREF, BOOK_LABEL } from "../../lib/nav.ts";
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
 import { Layout } from "../../components/Layout.tsx";
@@ -8,18 +8,21 @@ import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts";
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
 import PostToc from "../../islands/PostToc.tsx";
 import PostRead from "../../islands/PostRead.tsx";
-import { NewsletterBlock } from "../../components/NewsletterBlock.tsx";
+import { NewsletterAsk } from "../../components/NewsletterBlock.tsx";
 import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { BookCallLink } from "../../components/BookCallLink.tsx";
-import Button from "../../components/Button.tsx";
-import { type BandLink, ClosingBand } from "../../components/ClosingBand.tsx";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
+import { SCHEDULE_URL } from "../../lib/config.ts";
+import { EMAIL_ADDRESS, emailContact } from "../../lib/profiles.ts";
 import { toJsonLd } from "../../lib/json-ld.ts";
 import {
   archiveNoteText,
   AUTHOR_LINE,
   blogNode,
+  NEWSLETTER_HEADING,
+  NEWSLETTER_HREF,
+  postAsk,
   postDate,
   postHref,
   postTitleTag,
@@ -93,83 +96,84 @@ function PostTime({ iso }: { iso: string }) {
   return <time datetime={iso}>{postDate(iso)}</time>;
 }
 
-/**
- * The secondary link of the author box and the side card: the post's service
- * ("The same work for you: …"), else its tool ("The code: …"), else the
- * catalog (#274, Mkt 1 and 3).
- */
-function SecondaryLink(
-  { article, place, class: extra }: {
-    article: BlogArticle;
-    place: "side" | "end";
-    class: string;
-  },
-) {
-  const service = relatedService(article);
-  if (service) {
-    return (
-      <Button
-        href={serviceHref(service)}
-        {...eventAttrs("cta", { place, target: serviceHref(service) })}
-        class={extra}
-      >
-        <span class="price">{serviceLabel(service)}</span>
-      </Button>
-    );
-  }
-  const tool = relatedToolLink(article);
-  if (tool) {
-    return (
-      <Button
-        href={tool.href}
-        {...linkEvent(tool.href, { place })}
-        class={extra}
-      >
-        The code: {tool.name}
-      </Button>
-    );
-  }
-  return (
-    <Button
-      href="/catalog"
-      {...eventAttrs("cta", { place, target: "/catalog" })}
-      class={extra}
-    >
-      Services
-    </Button>
-  );
-}
+const QUIET_LINK =
+  "text-parchment underline underline-offset-4 hover:text-graphite";
 
 /**
- * The author box at the end of every post (#191, #274: Mkt 1, Psych 6,
- * UX 9), built on the shared closing band (#270): the band's heading, then
- * who wrote the post and the #249 positioning line in its `children` slot,
- * then Book, the post's own next step and quiet links. No promise line.
+ * The author box at the end of every post (#191, #274, #390), built on the
+ * shared closing band (#270): the band's heading, who wrote the post and the
+ * #249 positioning line, then exactly one button, chosen by `postAsk()`:
+ * Book on a "For founders" post, the newsletter form on every other. The
+ * other ask and the post's service follow as plain text links, then one line
+ * that invites a reply by email. Without a booking URL there is no Book, so
+ * the newsletter is the ask on every post.
  */
 function AuthorBox({ article }: { article: BlogArticle }) {
-  const tool = relatedToolLink(article);
+  const ask = SCHEDULE_URL ? postAsk(article) : "newsletter";
   const service = relatedService(article);
-  const links: BandLink[] = [
-    ...(service && tool
-      ? [{
-        href: tool.href,
-        label: `The code: ${tool.name}`,
-      }]
-      : []),
-    {
-      href: "/how-i-work",
-      label: "How I work",
-    },
-  ];
   return (
     <ClosingBand
-      heading="Need this for your product?"
+      heading={ask === "book"
+        ? "Need this for your product?"
+        : NEWSLETTER_HEADING}
       promiseIds={[]}
+      book={ask === "book"}
       bookItem={article.slug}
-      catalogLink={
-        <SecondaryLink article={article} place="end" class="px-5 py-3" />
+      after={
+        <>
+          <p
+            data-quiet-links
+            class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm empty:hidden"
+          >
+            {service && (
+              <a
+                href={serviceHref(service)}
+                {...eventAttrs("cta", {
+                  place: "end",
+                  target: serviceHref(service),
+                })}
+                class={`price ${QUIET_LINK}`}
+              >
+                {serviceLabel(service)}
+              </a>
+            )}
+            {ask === "book"
+              ? (
+                <a
+                  href={NEWSLETTER_HREF}
+                  // Fresh marks every link under /blog as the current section.
+                  aria-current="false"
+                  {...eventAttrs("cta", {
+                    place: "end",
+                    target: NEWSLETTER_HREF,
+                  })}
+                  class={QUIET_LINK}
+                >
+                  {NEWSLETTER_HEADING}
+                </a>
+              )
+              : SCHEDULE_URL && (
+                <a
+                  href={BOOK_HREF}
+                  {...eventAttrs("book", { place: "end", item: article.slug })}
+                  class={QUIET_LINK}
+                >
+                  {BOOK_LABEL}
+                </a>
+              )}
+          </p>
+          <p data-reply-line class="mt-4 text-sm text-graphite">
+            Questions, or a different result? Reply by email:{" "}
+            <a
+              href={emailContact.href}
+              {...eventAttrs("outbound", { to: "email", item: article.slug })}
+              class={QUIET_LINK}
+            >
+              {EMAIL_ADDRESS}
+            </a>. It comes straight to me.
+          </p>
+        </>
       }
-      links={links}
     >
       <div data-author-box class="mb-6">
         <div class="flex items-center gap-4">
@@ -189,6 +193,7 @@ function AuthorBox({ article }: { article: BlogArticle }) {
         </div>
         <p class="mt-4 text-graphite">{AUTHOR_LINE}</p>
       </div>
+      {ask === "newsletter" && <NewsletterAsk />}
     </ClosingBand>
   );
 }
@@ -432,7 +437,6 @@ export default define.page(function BlogPost(ctx) {
             )}
 
           <AuthorBox article={article} />
-          <NewsletterBlock />
 
           {related.length > 0 && (
             <section
@@ -476,41 +480,6 @@ export default define.page(function BlogPost(ctx) {
                 </p>
                 <PostToc items={tocItems} />
               </nav>
-              <div class="mt-8 border-t border-rule pt-6">
-                <div class="flex items-center gap-3">
-                  <img
-                    src="/img/photo-64.webp"
-                    aria-hidden="true"
-                    alt=""
-                    width="40"
-                    height="40"
-                    loading="lazy"
-                    class="h-10 w-10 rounded-full border border-rule-strong"
-                  />
-                  <div>
-                    <p class="text-sm font-semibold text-parchment">
-                      Anton Shubin
-                    </p>
-                    <p class="text-xs text-graphite">{ROLE}</p>
-                  </div>
-                </div>
-                <div class="mt-4 flex flex-col gap-3">
-                  <BookCallLink
-                    event={eventAttrs("book", {
-                      place: "side",
-                      item: article.slug,
-                    })}
-                    class="justify-center px-4 py-2 text-sm"
-                  >
-                    {BOOK_LABEL}
-                  </BookCallLink>
-                  <SecondaryLink
-                    article={article}
-                    place="side"
-                    class="justify-center px-4 py-2 text-sm text-center"
-                  />
-                </div>
-              </div>
             </div>
           </aside>
         )}
