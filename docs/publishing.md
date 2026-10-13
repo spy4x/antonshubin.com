@@ -97,8 +97,9 @@ draft against the brief before the pull request opens.
    `{proof:projects}`), never the number itself. Link the post's tool with
    `relatedTool` and the service it sells with `catalogSlug` (#191's writing
    standard): the post shows the tool's page, demo and repository under the
-   byline and both links in the author box. A post with a `catalogSlug` shows a
-   price, so `test/structure.test.ts` adds it to `PRICE_PAGES` on its own.
+   byline, and the service as a text link in the author box. A post with a
+   `catalogSlug` shows a price, so `test/structure.test.ts` adds it to
+   `PRICE_PAGES` on its own.
 3. **Every post opens with a TL;DR** (Anton, 30 September 2026): the `tldr`
    list, rendered as a "TL;DR" heading and a list above the body, and listed
    under the post in `llms-full.txt`. Write it last, from the finished draft, as

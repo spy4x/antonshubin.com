@@ -113,7 +113,7 @@ function portraitHeader(baseUrl: string): LetterBlock {
 export function renderLetter(input: LetterInput): Letter {
   const { baseUrl, campaign } = input;
   const bookUrl = emailLink(baseUrl, "/book", campaign);
-  const psLead = input.psLead ?? "Working on something like this?";
+  const psLead = input.psLead ?? "Building a product?";
   const replyLine = "Reply to this email: it comes straight to me.";
 
   const ps: LetterBlock = {

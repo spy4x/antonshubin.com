@@ -10,7 +10,8 @@ import {
   catalogRedirects,
   formatPrice,
 } from "../lib/catalog.ts";
-import { blogArticles, projects } from "../lib/data.ts";
+import { blogArticles, highlightProjects, projects } from "../lib/data.ts";
+import { firstSentence, projectLead } from "../lib/llms.ts";
 import { tools } from "../lib/tools.ts";
 import { visibleTestimonials } from "../lib/testimonials.ts";
 import { MAX_FAQS } from "../lib/faqs.ts";
@@ -181,8 +182,7 @@ const PRICE_PAGES: Record<string, string[]> = {
       .filter((p) => p.catalogSlug)
       .map((p) => [`/work/${p.slug}`, []]),
   ),
-  // "a $10 VPS" in a blog post summary.
-  "/saas-architecture-guide": ["$10"],
+  "/saas-architecture-guide": [],
   // A post with a catalogSlug names its service's price in the author box
   // and the side card (#274). None of their texts states another amount.
   ...Object.fromEntries(
@@ -719,31 +719,72 @@ siteTest(
   },
 );
 
+/** One step of the guide's reading order, by its `data-guide-step` id. */
+function guideStep(html: string, id: string): string {
+  const start = html.indexOf(`data-guide-step="${id}"`);
+  assert(start > 0, `the guide has no "${id}" step`);
+  const next = html.indexOf("data-guide-step=", start + 1);
+  return html.slice(start, next === -1 ? html.indexOf("</ol>", start) : next);
+}
+
 siteTest(
-  "/saas-architecture-guide's 'Building the MVP' section lists real case studies, not tools",
+  "/saas-architecture-guide's project step lists the highlight case studies with their one-line lead only, and no tool",
   async (site) => {
     const html = await site.html("/saas-architecture-guide");
-    // Scoped to the "Building the MVP" section: /tools/rostok is also
-    // linked, on purpose, from the unrelated "Infrastructure & Cost
-    // Optimization" section further down as infra proof, not a case study.
-    const start = html.indexOf("Building the MVP");
-    const end = html.indexOf("CI/CD &amp; DevOps");
-    assert(start > 0 && end > start, "could not find the MVP section");
-    const section = html.slice(start, end);
-    for (const project of projects.freelance) {
-      if (!project.slug || project.archived) continue;
+    const step = guideStep(html, "projects");
+    const text = visibleText(step);
+    const flat = (t: string) => t.replace(/\s+/g, " ");
+    for (const project of highlightProjects()) {
       assert(
-        section.includes(`href="/work/${project.slug}"`),
-        `the MVP section does not link case study ${project.slug}`,
+        step.includes(`href="/work/${project.slug}"`),
+        `the step does not link case study ${project.slug}`,
       );
+      const lead = projectLead(project);
+      assert(text.includes(lead), `${project.slug}: no lead "${lead}"`);
+      // What follows the first sentence of the description is never printed.
+      const rest = flat(project.description).slice(
+        firstSentence(flat(project.description)).length,
+      ).trim();
+      if (rest) {
+        assert(
+          !text.includes(firstSentence(rest)),
+          `${project.slug}: the step prints the whole description`,
+        );
+      }
     }
     for (const t of tools) {
       assert(
-        !section.includes(`href="/work/${t.slug}"`) &&
-          !section.includes(`href="/tools/${t.slug}"`),
-        `the MVP section links tool ${t.slug}, expected only client work`,
+        !step.includes(`href="/work/${t.slug}"`) &&
+          !step.includes(`href="/tools/${t.slug}"`),
+        `the step links tool ${t.slug}, expected only client work`,
       );
     }
+  },
+);
+
+siteTest(
+  "/saas-architecture-guide links current posts only, each with a line on why to read it, and never an archived one",
+  async (site) => {
+    const html = await site.html("/saas-architecture-guide");
+    const main = html.slice(html.indexOf("<h1"), html.indexOf("<footer"));
+    const linked = [...main.matchAll(/href="\/blog\/([^"#?]+)"/g)]
+      .map((m) => m[1]);
+    assert(linked.length > 0, "the guide links no post");
+    for (const slug of linked) {
+      const article = blogArticles.find((a) => a.slug === slug);
+      assert(article, `the guide links unknown post ${slug}`);
+      assert(!article.archived, `the guide links archived post ${slug}`);
+    }
+    const archived = blogArticles.filter((a) => a.archived);
+    assert(archived.length > 0, "no archived post to check");
+    // Each post's link is followed, inside its list item, by its own line.
+    for (const slug of linked) {
+      const from = main.indexOf(`href="/blog/${slug}"`);
+      const item = main.slice(from, main.indexOf("</li>", from));
+      const why = visibleText(item.slice(item.indexOf("</a>")));
+      assert(why.length > 20, `no reason to read under ${slug}: "${why}"`);
+    }
+    assertEquals(count(html, /<h1\b/g), 1);
   },
 );
 

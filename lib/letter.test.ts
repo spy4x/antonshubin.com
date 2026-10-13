@@ -53,11 +53,11 @@ Deno.test("the P.S. links the booking page with its one wording, as the email ch
   assertStringIncludes(withPs.html, `>${BOOK_LABEL}</a>`);
   assertStringIncludes(
     withPs.text,
-    `P.S. Working on something like this? ${BOOK_LABEL}: ${book}`,
+    `P.S. Building a product? ${BOOK_LABEL}: ${book}`,
   );
   assertStringIncludes(
     withPs.html,
-    "P.S. Working on something like this? <a ",
+    "P.S. Building a product? <a ",
   );
   assertStringIncludes(withPs.html, `${BOOK_LABEL}</a>.</p>`);
   const without = render({ ps: false });

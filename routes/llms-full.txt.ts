@@ -202,7 +202,7 @@ ${faqs.map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}
 - **Home:** ${BASE_URL}/ — Who I am, the Upwork figures, the four services with prices, client work, client reviews, how a project runs, the tools I build, and how to ${
       decapitalize(BOOK_LABEL)
     } or ${decapitalize(BRIEF_LABEL)}
-- **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
+- **SaaS Architecture Guide:** ${BASE_URL}/saas-architecture-guide — A short reading order from idea to production: current posts, client projects with their outcomes, infrastructure and AI, each with one line on why to read it
 - **Services:** ${BASE_URL}/catalog — ${catalogItems.length} services, each with its price
 ${catalogList}
 - **About:** ${BASE_URL}${ABOUT_PATH} — Who I am, since 2010: the career story, two client reviews about working with me, what I run myself and how to pay

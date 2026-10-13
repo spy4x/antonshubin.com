@@ -1,6 +1,11 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1.0.0";
 import type { SubscriberMail } from "@spy4x/server/subscribers";
 import { subscriberMailer } from "./subscribe-mail.ts";
+import {
+  NEWSLETTER_CADENCE,
+  NEWSLETTER_LINE,
+  NEWSLETTER_TOPICS,
+} from "./blog.ts";
 import { fakeRelay, fakeSender, recordingLog } from "../test/fake-mail.ts";
 
 const BASE = "https://example.com";
@@ -46,6 +51,31 @@ Deno.test("welcomes the subscriber in the letter layout and notifies the owner i
     notice.text,
     `reader@example.com subscribed.\nTotal subscribers: 7\n\nUnsubscribe: ${UNSUBSCRIBE}`,
   );
+});
+
+Deno.test("the welcome opens by saying what the subscriber will get: the sign-up box's topics and how often, in both parts", async () => {
+  const relay = fakeRelay();
+  await mailer(relay)(WELCOME);
+  const text = String(relay.mails[0].text);
+  const opening = text.split("\n\n")[1];
+  assertEquals(opening.startsWith("You're in. You'll get a mail when"), true);
+  for (
+    const topic of ["decisions for founders", "AI and MCP", "self-hosting"]
+  ) {
+    assertStringIncludes(opening, topic);
+  }
+  for (const topic of NEWSLETTER_TOPICS) {
+    assertStringIncludes(opening, topic);
+    assertStringIncludes(NEWSLETTER_LINE, topic);
+  }
+  assertStringIncludes(opening, NEWSLETTER_CADENCE);
+  assertStringIncludes(NEWSLETTER_LINE, NEWSLETTER_CADENCE);
+  const html = String(relay.mails[0].html);
+  assertStringIncludes(
+    html,
+    opening.slice(opening.indexOf("ll get a mail")),
+  );
+  assertEquals(text.includes("Thanks for subscribing"), false);
 });
 
 Deno.test("the owner notice says the list size is unknown when it could not be counted", async () => {
