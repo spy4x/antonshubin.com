@@ -354,3 +354,11 @@ siteTest(
     }
   },
 );
+
+siteTest(
+  "the index says the audit's outcome once, not in two lines in a row",
+  async (site) => {
+    const text = visibleText(await site.html("/catalog"));
+    assertEquals(count(text, /what to leave alone/g), 1);
+  },
+);

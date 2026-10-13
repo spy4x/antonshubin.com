@@ -75,6 +75,11 @@ export interface CatalogItem {
   priceNote?: string;
   /** The item a buyer usually looks at after this one (a `slug`). */
   next?: string;
+  /**
+   * True when `summary` already says what `outcome` says, so a card that
+   * would show both (the index) shows the summary alone (#388).
+   */
+  summaryStatesOutcome?: boolean;
 }
 
 /** Under a single "from" price: nothing is charged before the buyer has a number. */
@@ -139,6 +144,7 @@ export const catalogItems: CatalogItem[] = [
     delivery: "3 days",
     summary:
       "I review your codebase and tell you what to fix, what to rewrite and what to leave alone.",
+    summaryStatesOutcome: true,
     desc:
       "I review your existing codebase over three days. You get a written report covering architecture, security gaps and performance bottlenecks, with a prioritized refactoring roadmap, and we walk through it together on a call.",
     outcome:

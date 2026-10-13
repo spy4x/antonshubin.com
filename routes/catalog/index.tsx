@@ -99,7 +99,9 @@ export default define.page(function Catalog() {
                   </span>
                 </p>
                 <p class="mt-4 text-parchment">{item.summary}</p>
-                <p class="mt-2 text-graphite">{item.outcome}</p>
+                {!item.summaryStatesOutcome && (
+                  <p class="mt-2 text-graphite">{item.outcome}</p>
+                )}
                 <ul class="mt-4 space-y-1.5">
                   {item.includes.slice(0, 3).map((inc) => (
                     <li
