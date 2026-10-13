@@ -147,7 +147,7 @@ export const testimonials: Testimonial[] = [
     quote:
       "Anton is a highly skilled full-stack engineer and consultant. We hired Anton to help us to hire a back end engineer to work with us. Anton is organised, communicates constantly, and kept us updated on progress on a daily basis. He worked within our budget, and executed the contract perfectly. Anton is also extremely honest and hardworking. He has been a pleasure to work with and we look forward to working with him again!",
     excerpt:
-      "We hired Anton to help us to hire a back end engineer to work with us. … He worked within our budget, and executed the contract perfectly.",
+      "Anton is a highly skilled full-stack engineer and consultant. … Anton is organised, communicates constantly, and kept us updated on progress on a daily basis.",
     sourceHref: UPWORK_URL,
     permission: true,
   },
