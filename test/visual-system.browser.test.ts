@@ -462,7 +462,7 @@ function accentPaint(root: Element): string[] {
   return found;
 }
 
-Deno.test("nothing outside the Book action paints the accent as text, border, outline, underline or icon colour on any sitemap page (#365)", async () => {
+Deno.test("nothing outside the Book action paints the accent as text, border, underline or icon colour on any sitemap page (#365)", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   });
