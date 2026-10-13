@@ -37,9 +37,9 @@ import { eventAttrs } from "../../lib/analytics.ts";
 
 const BASE = "https://antonshubin.com";
 
-/** A project title as a link: Parchment, underlined, accent on hover. */
+/** A project title as a link: Parchment, underlined, the underline brightens on hover. */
 const TITLE_LINK =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-accent focus-visible:decoration-accent";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment";
 
 /**
  * The `CollectionPage` and its `ItemList` (SEO 1 on #270): every client
@@ -319,7 +319,7 @@ function ArchiveRow(
               href={project.companyOutcome.href}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-accent hover:text-accent underline underline-offset-4"
+              class="text-graphite underline underline-offset-4 hover:text-parchment"
             >
               {project.companyOutcome.text}
               <NewTabHint />
@@ -345,7 +345,7 @@ function RepeatClientsLead() {
             <a
               key={i}
               href={workHref(s.slug)}
-              class="underline decoration-rule-strong underline-offset-4 hover:decoration-accent"
+              class="underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
             >
               {s.text}
             </a>
@@ -463,7 +463,7 @@ export default define.page(function Work(ctx) {
             <a
               href="/catalog"
               {...eventAttrs("cta", { place: "band", target: "/catalog" })}
-              class="inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
+              class="inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
             >
               Services and prices
               <ArrowRightIcon class="w-3.5 h-3.5" />
@@ -483,7 +483,7 @@ export default define.page(function Work(ctx) {
         <p data-tools-line class="mt-8 text-sm text-graphite">
           <a
             href="/tools"
-            class="inline-flex items-center gap-1 underline underline-offset-4 hover:text-accent"
+            class="inline-flex items-center gap-1 underline underline-offset-4 hover:text-parchment"
           >
             My own open-source tools
             <ArrowRightIcon class="w-3.5 h-3.5" />

@@ -18,7 +18,7 @@ function HackathonCard({ h }: { h: Hackathon }) {
   return (
     <a
       href={`/hackathons/${h.slug}`}
-      class="block bg-paper rounded-xl border-2 border-rule hover:border-accent transition-all group"
+      class="block bg-paper rounded-xl border-2 border-rule hover:border-rule-strong transition-all group"
     >
       {/* Photo header */}
       <div class="aspect-[16/9] bg-lamp rounded-t-xl overflow-hidden relative">
@@ -58,7 +58,7 @@ function HackathonCard({ h }: { h: Hackathon }) {
           <span>{h.event} &middot; {h.date}</span>
         </div>
 
-        <h3 class="text-lg font-semibold text-parchment group-hover:text-accent transition-colors mb-2">
+        <h3 class="text-lg font-semibold text-parchment underline-offset-4 group-hover:underline transition-colors mb-2">
           {h.title}
         </h3>
 
@@ -151,7 +151,7 @@ export default define.page(function Hackathons(ctx) {
         {/* Stats bar */}
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
           <div class="bg-paper rounded-xl border border-rule p-4 text-center">
-            <div class="text-2xl font-bold text-accent">
+            <div class="text-2xl font-bold text-parchment">
               {hackathons.length}
             </div>
             <div class="text-xs text-graphite mt-1">Hackathons Competed</div>
@@ -177,7 +177,7 @@ export default define.page(function Hackathons(ctx) {
         {/* Why this matters — marketing injection */}
         <div class="bg-paper border border-rule rounded-xl p-5 mb-12">
           <div class="flex items-start gap-3">
-            <PersonIcon class="w-6 h-6 text-accent shrink-0 mt-0.5" />
+            <PersonIcon class="w-6 h-6 text-graphite shrink-0 mt-0.5" />
             <div>
               <h2 class="text-parchment font-semibold mb-1">
                 Why hackathons matter for your project
@@ -200,7 +200,7 @@ export default define.page(function Hackathons(ctx) {
 
         {/* Bottom CTA — convert interest into action */}
         <div class="text-center bg-paper rounded-xl border border-rule p-8">
-          <CodeIcon class="w-10 h-10 text-accent mx-auto mb-4" />
+          <CodeIcon class="w-10 h-10 text-graphite mx-auto mb-4" />
           <h2 class="text-2xl font-bold text-parchment mb-3">
             Ready to build something that wins?
           </h2>

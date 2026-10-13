@@ -6,7 +6,7 @@ import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 import { BOOK_LABEL } from "../lib/nav.ts";
 
 const LINK =
-  "inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent";
+  "inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
 
 /** One quiet text link in the band, after Book and the catalog link. */
 export interface BandLink {

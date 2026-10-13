@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 
 /** Link style shared by the fact cards' rows. */
 export const FACT_LINK =
-  "text-parchment underline underline-offset-4 hover:text-accent";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
 
 /** One `<dt>`/`<dd>` pair of a fact card, wrapped in a `<div>` as `<dl>` allows. */
 export function Fact(

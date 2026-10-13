@@ -18,7 +18,7 @@ export function Rating(
         (_, i) => (
           <StarIcon
             key={i}
-            class="text-accent w-4 h-4"
+            class="text-parchment w-4 h-4"
             filled={i < Math.round(value)}
           />
         ),

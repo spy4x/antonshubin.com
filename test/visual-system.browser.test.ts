@@ -7,7 +7,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 
 /** Booking buttons only render when SCHEDULE_URL is set (#175) — same
  * placeholder test/contrast.browser.test.ts uses. */
@@ -376,4 +376,294 @@ Deno.test("the project gallery's counter row is 40px tall with and without Previ
     await browser?.close();
     await site.stop();
   }
+});
+
+/** Pages outside the sitemap that the accent scan also visits: the payment
+ * page, a not-found URL, and the two mailing-list pages (opened without a
+ * token, so they render their "this link is not valid" state). */
+const ACCENT_EXTRA_PAGES = [
+  "/pay",
+  "/no-such-page",
+  "/unsubscribe",
+  "/subscribe/confirm",
+];
+
+/**
+ * Runs in the page. Lists what paints the accent (or its hover shade) inside
+ * `root` anywhere but its background: text, a border side that has a width,
+ * an outline that has a width, an underline, a focus ring (a box shadow) or
+ * an SVG fill or stroke. Elements inside `[data-primary-book]` are skipped,
+ * and so are elements that are not rendered. The two colours are read from
+ * the `--color-accent` tokens through a probe, so a token edit cannot desync
+ * this from `assets/styles.css`.
+ */
+function accentPaint(root: Element): string[] {
+  const probe = document.createElement("div");
+  probe.style.display = "none";
+  document.body.appendChild(probe);
+  const accents = ["--color-accent", "--color-accent-hover"].map((token) => {
+    probe.style.color = `var(${token})`;
+    return getComputedStyle(probe).color;
+  });
+  probe.remove();
+  const isAccent = (colour: string) => accents.includes(colour);
+
+  const found: string[] = [];
+  for (const el of [root, ...root.querySelectorAll("*")]) {
+    if (el.closest("[data-primary-book]")) continue;
+    if (el.getClientRects().length === 0) continue;
+    const style = getComputedStyle(el);
+    const painted: string[] = [];
+    // An inherited text colour is reported once, on the element that sets it.
+    const parent = el.parentElement;
+    if (
+      isAccent(style.color) &&
+      !(parent && isAccent(getComputedStyle(parent).color))
+    ) {
+      painted.push("text");
+    }
+    for (const side of ["Top", "Right", "Bottom", "Left"] as const) {
+      if (
+        parseFloat(style[`border${side}Width`]) > 0 &&
+        isAccent(style[`border${side}Color`])
+      ) {
+        painted.push(`border-${side.toLowerCase()}`);
+      }
+    }
+    if (parseFloat(style.outlineWidth) > 0 && style.outlineStyle !== "none") {
+      if (isAccent(style.outlineColor)) painted.push("outline");
+    }
+    if (
+      style.textDecorationLine !== "none" &&
+      isAccent(style.textDecorationColor) && !isAccent(style.color)
+    ) {
+      painted.push("underline");
+    }
+    if (accents.some((accent) => style.boxShadow.includes(accent))) {
+      painted.push("ring");
+    }
+    if (el instanceof SVGElement) {
+      if (isAccent(style.fill)) painted.push("fill");
+      if (isAccent(style.stroke)) painted.push("stroke");
+    }
+    if (painted.length > 0) {
+      const classes = Array.from(el.classList).join(".");
+      const text = (el.textContent ?? "").trim().replace(/\s+/g, " ").slice(
+        0,
+        30,
+      );
+      found.push(
+        `${el.tagName.toLowerCase()}${classes && "." + classes} "${text}": ${
+          painted.join(", ")
+        }`,
+      );
+    }
+  }
+  return found;
+}
+
+Deno.test("nothing outside the Book action paints the accent as text, border, underline or icon colour on any sitemap page (#365)", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    const sitemap = await site.html("/sitemap.xml");
+    const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => {
+      const url = new URL(m[1]);
+      return url.pathname + url.search;
+    });
+    assert(paths.length > 20, `the sitemap lists ${paths.length} pages`);
+    assert(paths.includes("/"), "the sitemap lists the home page");
+
+    browser = await launchChromium();
+    const page: Page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      const offenders: string[] = [];
+      let bookActions = 0;
+      for (const path of [...paths, ...ACCENT_EXTRA_PAGES]) {
+        await page.goto(`${site.origin}${path}`, { waitUntil: "load" });
+        const found = await page.locator("body").evaluate(accentPaint);
+        offenders.push(...found.map((line) => `${path}: ${line}`));
+        bookActions += await page.locator("[data-primary-book]").count();
+      }
+      // The scan skips the Book action, so prove it was there to skip.
+      assert(bookActions > 0, "no page rendered a [data-primary-book] action");
+      assertEquals(
+        offenders,
+        [],
+        `the accent is painted outside the Book action:\n${
+          offenders.join("\n")
+        }`,
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+/** A sample element per kind of link or control, with the states to check. */
+const ACCENT_STATE_SAMPLES: {
+  name: string;
+  path: string;
+  selector: string;
+  states: ("hover" | "focus")[];
+}[] = [
+  {
+    name: "review attribution link",
+    path: "/",
+    selector: "[data-review-source] a",
+    states: ["hover", "focus"],
+  },
+  {
+    name: "tool page link",
+    path: "/tools/mig",
+    selector: 'main a[href^="https://github.com/"]',
+    states: ["hover", "focus"],
+  },
+  {
+    name: "tool card title",
+    path: "/tools",
+    selector: "main h3 a",
+    states: ["hover", "focus"],
+  },
+  {
+    name: "client work title",
+    path: "/work",
+    selector: "main h3 a",
+    states: ["hover", "focus"],
+  },
+  {
+    name: "post prose link",
+    path: "/blog/ship-it-today",
+    selector: ".blog-content p a",
+    states: ["hover", "focus"],
+  },
+  {
+    name: "brief form field",
+    path: "/",
+    selector: "form textarea",
+    states: ["focus"],
+  },
+  {
+    name: "newsletter field",
+    path: "/blog",
+    selector: 'input[type="email"]',
+    states: ["focus"],
+  },
+  {
+    name: "nav item",
+    path: "/",
+    selector: "nav a.nav-focus:not([data-primary-book]):visible",
+    states: ["hover", "focus"],
+  },
+  {
+    name: "secondary button",
+    path: "/",
+    selector: "main a.rounded-lg\\!:not([data-primary-book])",
+    states: ["hover", "focus"],
+  },
+];
+
+Deno.test("a link, a form field and a secondary button show no accent while hovered or focused (#365)", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      const offenders: string[] = [];
+      let path = "";
+      for (const sample of ACCENT_STATE_SAMPLES) {
+        if (sample.path !== path) {
+          path = sample.path;
+          await page.goto(`${site.origin}${path}`, {
+            waitUntil: "networkidle",
+          });
+          // A colour transition would be read half-way; draw states at once.
+          await page.addStyleTag({
+            content: "*, *::before, *::after { transition: none !important; }",
+          });
+        }
+        const target = page.locator(sample.selector).first();
+        await target.waitFor({ state: "visible", timeout: WAIT_MS });
+        for (const state of sample.states) {
+          if (state === "hover") {
+            await target.hover();
+          } else {
+            // Tab away and back, so the focus is a keyboard focus and
+            // `:focus-visible` rules apply to links and buttons too.
+            await target.focus();
+            await page.keyboard.press("Tab");
+            await page.keyboard.press("Shift+Tab");
+          }
+          const pseudo = state === "hover" ? ":hover" : ":focus-visible";
+          assert(
+            await target.evaluate((el, p) => el.matches(p), pseudo),
+            `${sample.name} on ${path} is not in its ${state} state`,
+          );
+          const found = await target.evaluate(accentPaint);
+          offenders.push(
+            ...found.map((line) =>
+              `${sample.name}, ${state}, ${path}: ${line}`
+            ),
+          );
+          await page.mouse.move(0, 0);
+        }
+      }
+      assertEquals(offenders, [], offenders.join("\n"));
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+/** Every `.ts`/`.tsx` file under a directory that is not a test. */
+async function sourceFiles(dir: URL): Promise<URL[]> {
+  const files: URL[] = [];
+  for await (const entry of Deno.readDir(dir)) {
+    const url = new URL(entry.name + (entry.isDirectory ? "/" : ""), dir);
+    if (entry.isDirectory) files.push(...await sourceFiles(url));
+    else if (/\.tsx?$/.test(entry.name) && !/\.test\.tsx?$/.test(entry.name)) {
+      files.push(url);
+    }
+  }
+  return files;
+}
+
+Deno.test("no class in routes, components or islands uses the accent except as a background (#365)", async () => {
+  const offenders: string[] = [];
+  let scanned = 0;
+  for (const dir of ["routes/", "components/", "islands/"]) {
+    for (
+      const file of await sourceFiles(new URL(`../${dir}`, import.meta.url))
+    ) {
+      scanned++;
+      const text = await Deno.readTextFile(file);
+      // A Tailwind class, with any variants, whose colour is an accent token.
+      const classes = text.matchAll(
+        /(?<=^|[\s"'`])(?:[\w\-\[\]&>*]+:)*([a-z]+)-accent(?:-hover|-foreground|-\d+)?(?:\/\d+)?(?=$|[\s"'`])/gm,
+      );
+      for (const match of classes) {
+        if (match[1] === "bg") continue;
+        offenders.push(
+          `${file.pathname.split(`/${dir}`)[1]} in ${dir}: ${match[0]}`,
+        );
+      }
+    }
+  }
+  assert(scanned > 50, `only ${scanned} source files were scanned`);
+  assertEquals(offenders, [], offenders.join("\n"));
 });

@@ -205,7 +205,7 @@ export default function MeetEmbed(
   const ready = state.value === "ready";
   const failed = state.value === "failed";
   const linkClass =
-    "text-parchment underline underline-offset-4 hover:text-accent";
+    "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
 
   return (
     <div data-meet-embed={state.value} class="relative w-full max-w-[36rem]">

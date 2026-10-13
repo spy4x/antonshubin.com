@@ -127,7 +127,7 @@ export default define.page(function HowIWork() {
                       })}
                       class="group block py-3"
                     >
-                      <span class="block font-semibold text-parchment group-hover:text-accent">
+                      <span class="block font-semibold text-parchment underline-offset-4 group-hover:underline">
                         {item.shortTitle}
                       </span>
                       <span class="price block text-graphite">
@@ -254,7 +254,7 @@ export default define.page(function HowIWork() {
                       <a
                         href={f.link.href}
                         {...linkEvent(f.link.href)}
-                        class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
+                        class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
                       >
                         {f.link.label}
                         <ArrowRightIcon class="w-3.5 h-3.5" />

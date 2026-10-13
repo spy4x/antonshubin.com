@@ -74,7 +74,7 @@ export default define.page(async function ToolsIndex(ctx) {
           <a
             href="/catalog"
             {...eventAttrs("cta", { place: "body", target: "/catalog" })}
-            class="text-accent underline underline-offset-4"
+            class="text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
           >
             Services
           </a>

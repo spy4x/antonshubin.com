@@ -72,7 +72,7 @@ export function PromiseTimeline(
               <a
                 href={links[p.id].href}
                 {...linkEvent(links[p.id].href, { place: "body" })}
-                class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 hover:text-accent"
+                class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
               >
                 {links[p.id].label}
                 <ArrowRightIcon class="w-3.5 h-3.5" />

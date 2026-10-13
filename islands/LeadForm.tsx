@@ -227,7 +227,7 @@ export default function LeadForm(
               aria-describedby={errorField === "lead-name"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent disabled:opacity-50"
               required
             />
           </div>
@@ -246,7 +246,7 @@ export default function LeadForm(
               aria-describedby={errorField === "lead-email"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent disabled:opacity-50"
               required
             />
           </div>
@@ -267,7 +267,7 @@ export default function LeadForm(
                 ? "lead-form-error"
                 : undefined}
               rows={4}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-y disabled:opacity-50"
+              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent resize-y disabled:opacity-50"
               required
             />
           </div>
@@ -411,7 +411,7 @@ export default function LeadForm(
               {" If you'd rather talk it through, "}
               <a
                 href={calendarAbove}
-                class="text-parchment underline underline-offset-4 hover:text-accent"
+                class="text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
               >
                 {decapitalize(BOOK_LABEL)}
               </a>{" "}
@@ -442,7 +442,7 @@ export default function LeadForm(
                 rel="noopener noreferrer"
                 data-calendar-newtab="true"
                 {...eventAttrs("book", { place: "calendar" })}
-                class="text-graphite hover:text-accent underline underline-offset-4 text-sm"
+                class="text-graphite hover:text-parchment underline underline-offset-4 text-sm"
               >
                 {NEW_TAB_LABEL}
                 <NewTabHint />
