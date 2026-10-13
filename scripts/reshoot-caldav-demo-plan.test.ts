@@ -4,6 +4,7 @@ import {
   DEFAULT_RADICALE_PORT,
   DEMO_SERVER,
   DEMO_TASKS,
+  demoSecret,
   parseArgs,
   selectShots,
   SHOTS,
@@ -84,4 +85,12 @@ Deno.test("demo tasks carry no price, address or company name", () => {
     !/[$€£@]|\d+\s?(usd|eur)|invoice|neatsoft|\.com|\.dev/i.test(text),
     text,
   );
+});
+
+Deno.test("a demo secret is 32 random bytes as base64url, new on every call", () => {
+  const secrets = [demoSecret(), demoSecret()];
+  for (const secret of secrets) {
+    assert(/^[A-Za-z0-9_-]{43}$/.test(secret), secret);
+  }
+  assert(secrets[0] !== secrets[1]);
 });

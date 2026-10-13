@@ -13,12 +13,13 @@
  * check`: it needs Docker, network and several minutes. The screenshot table,
  * the arguments and the demo data are in the plan file, which has the tests.
  */
-import { join, relative, resolve } from "@std/path";
+import { basename, join, relative, resolve } from "@std/path";
 import { type Browser, chromium } from "playwright";
 import { PLAYWRIGHT_VERSION } from "../test/browser.ts";
 import {
   DEMO_SERVER,
   DEMO_TASKS,
+  demoSecret,
   parseArgs,
   selectShots,
   type Shot,
@@ -211,7 +212,7 @@ async function main(args: string[]) {
     const appUrl = `http://127.0.0.1:${appPort}`;
     const caldavUrl = `http://localhost:${options.radicalePort}`;
     // Fresh per run: nothing in the app database or on the CalDAV server outlives it.
-    const demoPassword = crypto.randomUUID();
+    const demoPassword = demoSecret();
 
     console.log(`Cloning ${options.app}`);
     await must("git clone", ["git", "clone", "--quiet", options.app, appDir], {
@@ -224,9 +225,9 @@ async function main(args: string[]) {
         "ENV=prod",
         `PORT=${appPort}`,
         "DB_PATH=./data/todoapp.db",
-        `AUTH_PEPPER=${crypto.randomUUID()}`,
-        `AUTH_COOKIE_SECRET=${crypto.randomUUID()}`,
-        `ENCRYPTION_SECRET=${crypto.randomUUID()}`,
+        `AUTH_PEPPER=${demoSecret()}`,
+        `AUTH_COOKIE_SECRET=${demoSecret()}`,
+        `ENCRYPTION_SECRET=${demoSecret()}`,
         `CORS_ORIGIN=${appUrl}`,
         // The app is served over plain http on localhost.
         "COOKIE_INSECURE=1",
@@ -244,7 +245,8 @@ async function main(args: string[]) {
     });
 
     console.log("Starting CalDAV container");
-    res.container = `reshoot-caldav-${crypto.randomUUID().slice(0, 8)}`;
+    // The temp directory's name: `Deno.makeTempDir` made it unique to this run.
+    res.container = basename(res.tmp);
     await must("docker run", [
       "docker",
       "run",
