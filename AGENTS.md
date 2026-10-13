@@ -1072,6 +1072,11 @@ If Traefik's `trustedIPs` or the Cloudflare setup changes, revisit that module.
 A rendered-site test that posts to either form sends its own `X-Real-IP`, or
 every test shares one bucket.
 
+One address is sent at most three confirmation mails an hour, whichever client
+asks (#428): `flowDeps()` passes the package's `limits.recipient` an in-memory
+limiter, keyed by the package on the address's keyed hash. A request over it
+answers 200 like any other and no mail goes out.
+
 ## Outgoing mail
 
 Every mail the site sends goes through `@spy4x/email` (`jsr:@spy4x/email`,
