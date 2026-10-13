@@ -26,7 +26,7 @@ export function TestimonialCard(
       <figcaption class="text-sm">
         <a
           href={`/work/${project.slug}`}
-          class="font-semibold text-parchment hover:text-accent underline underline-offset-4"
+          class="font-semibold text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
         >
           {project.title}
         </a>

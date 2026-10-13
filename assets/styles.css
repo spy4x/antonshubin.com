@@ -56,11 +56,12 @@
   --color-warning: var(--color-mist);
   --color-danger: var(--color-brick);
 
-  /* The accent: the Book fill, Ink text on it, and the focus ring, which
-     reads step 900 unless --color-ring is set. */
+  /* The accent: the Book fill and Ink text on it. The focus ring would read
+     step 900 too, so --color-ring makes it Parchment, like the nav's. */
   --color-accent-900: var(--color-accent);
   --color-accent-800: var(--color-accent-hover);
   --color-accent-foreground: var(--color-ink);
+  --color-ring: var(--color-parchment);
 
   /* What is chosen or current. These fall back to the accent, which stays
      reserved for Book, so they are Lamp and Parchment instead. */

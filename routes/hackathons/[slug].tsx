@@ -170,7 +170,7 @@ export default define.page(function HackathonDetail(ctx) {
             {/* CTA — convert interest into service */}
             <div class="bg-ink/50 rounded-xl p-6 border border-rule">
               <div class="flex items-start gap-4">
-                <CodeIcon class="w-8 h-8 text-accent shrink-0" />
+                <CodeIcon class="w-8 h-8 text-graphite shrink-0" />
                 <div>
                   <h3 class="text-lg font-semibold text-parchment mb-2">
                     {h.ctaLabel || "Let's build something similar for you"}
@@ -209,7 +209,7 @@ export default define.page(function HackathonDetail(ctx) {
             <div class="mt-6">
               <a
                 href="/hackathons"
-                class="inline-flex items-center gap-2 text-accent hover:text-accent hover:underline transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment transition-colors font-medium text-sm"
               >
                 <svg
                   aria-hidden="true"

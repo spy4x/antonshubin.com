@@ -1,7 +1,7 @@
 import type { Project } from "../lib/data.ts";
 import { NewTabHint } from "./NewTabHint.tsx";
 
-const LINK = "text-accent hover:text-accent underline underline-offset-4";
+const LINK = "text-graphite underline underline-offset-4 hover:text-parchment";
 
 /**
  * Who wrote a review and where: "<client> reviewed on Upwork", with the

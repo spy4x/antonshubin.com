@@ -33,7 +33,7 @@ import {
 } from "@spy4x/preact-icons";
 import { eventAttrs } from "../lib/analytics.ts";
 
-/** The section link style: Parchment, underlined, accent on hover. */
+/** The section link style: Parchment, underlined, the underline brightens on hover. */
 const LINK = FACT_LINK;
 
 /** The four Upwork figures of the fact card, in reading order. */
@@ -246,7 +246,7 @@ export default define.page(function Home(ctx) {
                     class="group flex items-baseline justify-between gap-4 py-3"
                   >
                     <span class="min-w-0">
-                      <span class="block font-semibold text-parchment group-hover:text-accent">
+                      <span class="block font-semibold text-parchment underline-offset-4 group-hover:underline">
                         {item.shortTitle}
                       </span>
                       {item.delivery !== item.shortTitle && (
@@ -305,7 +305,7 @@ export default define.page(function Home(ctx) {
                       </span>
                     )}
                   </span>
-                  <span class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline underline-offset-4 group-hover:text-accent">
+                  <span class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 group-hover:decoration-parchment">
                     Read the case study
                     <ArrowRightIcon class="w-3.5 h-3.5" />
                   </span>
@@ -410,7 +410,7 @@ export default define.page(function Home(ctx) {
                   class="group flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3"
                 >
                   <span class="min-w-0">
-                    <span class="font-semibold text-parchment group-hover:text-accent">
+                    <span class="font-semibold text-parchment underline-offset-4 group-hover:underline">
                       {t.name}
                     </span>
                     <span class="block text-sm text-graphite">{t.job}</span>

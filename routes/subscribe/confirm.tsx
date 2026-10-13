@@ -156,7 +156,7 @@ function Body(data: PageData) {
           </p>
           <a
             href="/"
-            class="text-accent hover:text-accent hover:underline font-medium"
+            class="text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment font-medium"
           >
             ← Back to home
           </a>

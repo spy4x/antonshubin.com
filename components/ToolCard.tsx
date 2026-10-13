@@ -10,7 +10,8 @@ import { CiPill } from "./CiPill.tsx";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { eventAttrs, linkEvent } from "../lib/analytics.ts";
 
-const linkClass = "text-accent underline underline-offset-4";
+const linkClass =
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
 
 /** The version line of a card: "1.3.0 on JSR", or the honest "publishing" wording. */
 function versionText(tool: Tool): string | null {
@@ -67,7 +68,7 @@ export function ToolCard(
     <a
       href={`/tools/${tool.slug}`}
       {...eventAttrs("cta", { place: "body", target: `/tools/${tool.slug}` })}
-      class="hover:text-accent underline-offset-4 hover:underline after:absolute after:inset-0 after:rounded-xl"
+      class="underline-offset-4 hover:underline after:absolute after:inset-0 after:rounded-xl"
     >
       {tool.name}
     </a>

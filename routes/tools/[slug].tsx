@@ -36,7 +36,8 @@ import {
 import { eventAttrs } from "../../lib/analytics.ts";
 
 const SITE = "https://antonshubin.com";
-const linkClass = "text-accent underline underline-offset-4";
+const linkClass =
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
 
 /**
  * The tool's `SoftwareSourceCode` JSON-LD node, from registry fields only.

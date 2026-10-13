@@ -37,7 +37,7 @@ export default define.page(function Pay() {
           {/* --- Crypto Card --- */}
           <div class="bg-paper rounded-xl border border-rule flex flex-col">
             <div class="p-4 sm:p-6 flex flex-col items-center text-center">
-              <WalletIcon class="w-9 h-9 mb-3 text-accent" />
+              <WalletIcon class="w-9 h-9 mb-3 text-graphite" />
               <h2 class="text-xl font-semibold text-parchment mb-1">Crypto</h2>
               <p class="text-graphite text-sm mb-5">
                 Instant. No fees. Send from any wallet.
@@ -112,7 +112,7 @@ export default define.page(function Pay() {
           {/* --- SWIFT / Bank Transfer Card --- */}
           <div class="bg-paper rounded-xl border border-rule flex flex-col">
             <div class="p-4 sm:p-6 flex flex-col items-center text-center">
-              <BuildingIcon class="w-9 h-9 mb-3 text-accent" />
+              <BuildingIcon class="w-9 h-9 mb-3 text-graphite" />
               <h2 class="text-xl font-semibold text-parchment mb-1">
                 Bank Transfer
               </h2>
@@ -200,7 +200,7 @@ export default define.page(function Pay() {
             <div class="mt-auto px-5 sm:px-6 pb-5 sm:pb-6">
               <a
                 href="/book"
-                class="inline-flex items-center gap-1 text-accent hover:text-accent hover:underline text-sm transition-colors"
+                class="inline-flex items-center gap-1 text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment text-sm transition-colors"
               >
                 From outside US? Contact me
                 <ArrowRightIcon class="w-4 h-4" />
@@ -211,7 +211,7 @@ export default define.page(function Pay() {
           {/* --- Stripe / Card Payment Card --- */}
           <div class="bg-paper rounded-xl border border-rule flex flex-col">
             <div class="p-4 sm:p-6 flex flex-col items-center text-center">
-              <CardIcon class="w-9 h-9 mb-3 text-accent" />
+              <CardIcon class="w-9 h-9 mb-3 text-graphite" />
               <h2 class="text-xl font-semibold text-parchment mb-1">
                 Card Payment
               </h2>

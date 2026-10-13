@@ -9,7 +9,7 @@ import {
 } from "../lib/infrastructure.ts";
 
 const LINK =
-  "text-parchment underline underline-offset-4 hover:text-accent focus-visible:text-accent";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment";
 
 /**
  * A connector's arrow, drawn in CSS and one triangle, never read aloud: the
