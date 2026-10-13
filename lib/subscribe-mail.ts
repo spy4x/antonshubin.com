@@ -7,7 +7,7 @@
 // none sets `Reply-To`.
 import type { MailOutcome, SubscriberMail } from "@spy4x/server/subscribers";
 import type { EmailMessage, EmailSender, MailLog } from "./mail.ts";
-import { proof } from "./proof.ts";
+import { WELCOME_LINE } from "./blog.ts";
 import {
   button,
   emailLink,
@@ -105,12 +105,7 @@ function welcomeMessage(
     campaign: SIGNUP_CAMPAIGN,
     preheader: "What you will get, and a good place to start.",
     blocks: [
-      paragraph("Thanks for subscribing!"),
-      paragraph(
-        `You'll get notified when I publish new articles about SaaS architecture, self-hosting, AI integration, and lessons from ${
-          proof("projects")
-        } projects.`,
-      ),
+      paragraph(WELCOME_LINE),
       button(
         emailLink(baseUrl, "/saas-architecture-guide", SIGNUP_CAMPAIGN),
         "Start with the SaaS architecture guide",
