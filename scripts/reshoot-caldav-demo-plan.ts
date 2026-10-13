@@ -4,6 +4,7 @@
  * here starts a process, so `reshoot-caldav-demo-plan.test.ts` can run it in
  * `deno task check`.
  */
+import { randomBase64Url } from "@spy4x/platform/tokens";
 
 /** One screenshot of caldav-tasks-web. `name` is the file's name without `.webp`. */
 export interface Shot {
@@ -206,6 +207,14 @@ export function selectShots(
       viewport: options.viewport ?? s.viewport,
       scale: options.scale ?? s.scale,
     }));
+}
+
+/** The app refuses a key shorter than 32 characters; 32 random bytes print as 43. */
+const DEMO_SECRET_BYTES = 32;
+
+/** A fresh password or key for one run: a random token, never an id. */
+export function demoSecret(): string {
+  return randomBase64Url(DEMO_SECRET_BYTES);
 }
 
 /** CalDAV status values the app's API takes (`TodoStatus` in caldav-tasks-web). */
