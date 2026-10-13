@@ -3,6 +3,7 @@ import {
   archiveNoteText,
   latestPostDate,
   llmsBlogSections,
+  postAsk,
   postDate,
   postTitleTag,
   readNext,
@@ -186,5 +187,12 @@ Deno.test("the full llms list carries every post's TL;DR, the short list none", 
     for (const line of article.tldr) {
       assert(entry.includes(`  - ${line}`), `${article.slug}: no "${line}"`);
     }
+  }
+});
+
+Deno.test("a founder post ends with Book and a post of any other topic with the newsletter", () => {
+  assertEquals(postAsk(post("x", { topic: "founders" })), "book");
+  for (const topic of ["ai-mcp", "self-hosting", "scars"] as const) {
+    assertEquals(postAsk(post("x", { topic })), "newsletter");
   }
 });

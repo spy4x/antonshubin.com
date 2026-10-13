@@ -204,9 +204,53 @@ export function postDate(iso: string): string {
 export const AUTHOR_LINE =
   "I build greenfield SaaS on a modern, lightweight stack, alone or with a team of senior developers from my own pool, and I cover full-stack, DevOps and architecture.";
 
-/** The newsletter's promise (#274, Mkt 5): the topics and how often (Anton, #301). */
-export const NEWSLETTER_LINE =
-  "New posts on decisions for founders, AI and MCP, self-hosting, and my own mistakes, about once a week at most, and only when there is one. Unsubscribe with one click.";
+/**
+ * What the newsletter covers (Anton, #301): the blog's topics in a reader's
+ * words. The sign-up box and the welcome mail both read this list.
+ */
+export const NEWSLETTER_TOPICS = [
+  "decisions for founders",
+  "AI and MCP",
+  "self-hosting",
+  "my own mistakes",
+];
+
+/** How often the newsletter comes (Anton, #301). */
+export const NEWSLETTER_CADENCE =
+  "about once a week at most, and only when there is one";
+
+/** `items` as "a, b, c, <word> d". */
+function listed(items: readonly string[], word: "and" | "or"): string {
+  return `${items.slice(0, -1).join(", ")}, ${word} ${items.at(-1)}`;
+}
+
+/** The sign-up box's promise (#274, Mkt 5): the topics and how often. */
+export const NEWSLETTER_LINE = `New posts on ${
+  listed(NEWSLETTER_TOPICS, "and")
+}, ${NEWSLETTER_CADENCE}. Unsubscribe with one click.`;
+
+/** The welcome mail's opening (#390): the same topics and cadence, said to a new subscriber. */
+export const WELCOME_LINE =
+  `You're in. You'll get a mail when I publish a post on ${
+    listed(NEWSLETTER_TOPICS, "or")
+  }: ${NEWSLETTER_CADENCE}.`;
+
+/** The heading of the newsletter ask, and the words of a text link to it. */
+export const NEWSLETTER_HEADING = "Get the next post by email";
+
+/** Where a text link to the newsletter ask goes: the sign-up box on `/blog`. */
+export const NEWSLETTER_HREF = "/blog#newsletter-heading";
+
+/** The one ask a post ends with (#390). */
+export type PostAsk = "book" | "newsletter";
+
+/**
+ * Which ask ends a post (#390): Book on a "For founders" post; the
+ * newsletter on every other topic, whose readers are mostly developers.
+ */
+export function postAsk(article: BlogArticle): PostAsk {
+  return article.topic === "founders" ? "book" : "newsletter";
+}
 
 /**
  * The `Blog` JSON-LD node's identity: the `/blog` page describes it in full and

@@ -6,7 +6,9 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, visibleText } from "./html.ts";
 import { blogArticles } from "../lib/data.ts";
-import { TOC_MIN_MINUTES } from "../lib/blog.ts";
+import { NEWSLETTER_HREF, TOC_MIN_MINUTES } from "../lib/blog.ts";
+import { BOOK_LABEL } from "../lib/nav.ts";
+import { EMAIL_ADDRESS } from "../lib/profiles.ts";
 import { findTool } from "../lib/tools.ts";
 
 const SITE = "https://antonshubin.com";
@@ -174,12 +176,25 @@ siteTest(
   },
 );
 
+/** Button-styled controls in `html`: every `<button>` and every link drawn by `Button`. */
+function buttons(html: string): string[] {
+  return [...html.matchAll(/<(?:button|a)\b[^>]*>/g)]
+    .map((m) => m[0])
+    .filter((tag) => tag.startsWith("<button") || tag.includes("rounded-lg!"));
+}
+
 siteTest(
-  "every post ends with the author box in the closing band: author, Book and the post's own next step",
+  "after the article a post has exactly one button, Book on a founder post and Subscribe on any other, with the other ask as a plain link",
   async (site) => {
+    const asks = { book: 0, newsletter: 0 };
     for (const article of blogArticles) {
       const html = await site.html(`/blog/${article.slug}`);
-      // The shared band (#270), with the author in its children slot.
+      // Everything a reader meets after the article: the band, "Read next"
+      // and the side column.
+      const after = html.slice(
+        html.indexOf("data-closing-band"),
+        html.indexOf("<footer"),
+      );
       const box = section(html, "data-closing-band");
       assert(box, `${article.slug} has no closing band`);
       const author = block(box, "data-author-box", "div");
@@ -187,24 +202,42 @@ siteTest(
         visibleText(author).includes("Anton Shubin"),
         `${article.slug}: the band's children slot holds no author`,
       );
-      assertEquals(count(box, /data-primary-book/), 1, article.slug);
+      assert(visibleText(box).includes("I build greenfield SaaS"), box);
+      const found = buttons(after);
+      assertEquals(found.length, 1, `${article.slug}: ${found.join("\n")}`);
       assert(
-        box.indexOf("data-author-box") < box.indexOf("data-primary-book"),
-        `${article.slug}: the author must come before Book`,
+        box.indexOf("data-author-box") < box.indexOf(found[0]),
+        `${article.slug}: the author must come before the ask`,
       );
-      const text = visibleText(box);
-      assert(text.includes("Need this for your product?"), text);
-      assert(text.includes("I build greenfield SaaS"), text);
+      const bookLinks = [...after.matchAll(/<a\b[^>]*href="\/book"[^>]*>/g)];
+      assertEquals(bookLinks.length, 1, `${article.slug}: Book links`);
+      if (article.topic === "founders") {
+        asks.book++;
+        assert(found[0].includes("data-primary-book"), found[0]);
+        assertEquals(count(after, /<form\b/), 0, article.slug);
+        assert(
+          box.includes(`href="${NEWSLETTER_HREF}"`),
+          `${article.slug} has no plain link to the newsletter`,
+        );
+      } else {
+        asks.newsletter++;
+        assert(found[0].includes('type="submit"'), found[0]);
+        assert(
+          block(box, "data-newsletter-ask", "form").includes(found[0]),
+          `${article.slug}: the button is not the newsletter form's`,
+        );
+        assertEquals(count(after, /data-primary-book/), 0, article.slug);
+        assert(
+          box.includes(`>${BOOK_LABEL}</a>`),
+          `${article.slug}: Book is not a plain link`,
+        );
+      }
       if (article.catalogSlug) {
         assert(
           box.includes(`href="/catalog/${article.catalogSlug}"`),
           `${article.slug} does not link its service`,
         );
-        assert(text.includes("The same work for you:"), text);
-      } else if (article.relatedTool) {
-        assert(text.includes("The code:"), `${article.slug}: ${text}`);
-      } else {
-        assert(box.includes('href="/catalog"'), `${article.slug}: ${text}`);
+        assert(visibleText(box).includes("The same work for you:"), box);
       }
       // One set of links after the post, not five (Mkt 1, 8, 9).
       assert(
@@ -216,8 +249,54 @@ siteTest(
         `${article.slug} keeps Share`,
       );
     }
+    assert(asks.book > 0, "no founder post to check");
+    assert(asks.newsletter > 0, "no developer post to check");
   },
 );
+
+siteTest(
+  "every post invites a reply by email under its ask, at the site's contact address",
+  async (site) => {
+    for (const article of blogArticles) {
+      const html = await site.html(`/blog/${article.slug}`);
+      const box = section(html, "data-closing-band");
+      const line = block(box, "data-reply-line", "p");
+      assert(line, `${article.slug} has no reply line`);
+      assert(
+        line.includes(`href="mailto:${EMAIL_ADDRESS}"`),
+        `${article.slug}: ${line}`,
+      );
+      const text = visibleText(line);
+      assert(text.includes(`Reply by email: ${EMAIL_ADDRESS}`), text);
+      const ask = Math.max(
+        box.indexOf("data-primary-book"),
+        box.indexOf("<form"),
+      );
+      assert(
+        ask > 0 && ask < box.indexOf("data-reply-line"),
+        `${article.slug}: the reply line is not under the ask`,
+      );
+    }
+  },
+);
+
+Deno.test("without a booking URL a founder post's one button is the newsletter form and nothing offers Book", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL: "" } });
+  try {
+    const founder = blogArticles.find((a) => a.topic === "founders")!;
+    const html = await site.html(`/blog/${founder.slug}`);
+    const after = html.slice(
+      html.indexOf("data-closing-band"),
+      html.indexOf("<footer"),
+    );
+    const found = buttons(after);
+    assertEquals(found.length, 1, found.join("\n"));
+    assert(found[0].includes('type="submit"'), found[0]);
+    assertEquals(count(after, /href="\/book"/), 0);
+  } finally {
+    await site.stop();
+  }
+});
 
 siteTest(
   "every post in the sitemap opens with its TL;DR heading and list before any other heading",

@@ -1,21 +1,16 @@
 import NewsletterForm from "../islands/NewsletterForm.tsx";
-import { NEWSLETTER_LINE } from "../lib/blog.ts";
+import { NEWSLETTER_HEADING, NEWSLETTER_LINE } from "../lib/blog.ts";
 
 /**
- * The Writing pages' newsletter block (#274, Mkt 5): a heading, the three
- * topics as the promise, the form and the RSS link. On every post and once
- * on `/blog`. A successful signup counts as `newsletter-signup`.
+ * The newsletter ask itself: the topics as the promise, the form and the RSS
+ * link. Inside `NewsletterBlock` on `/blog`, and inside the author box of a
+ * post whose one ask is the newsletter (#390). A successful signup counts as
+ * `newsletter-signup`.
  */
-export function NewsletterBlock() {
+export function NewsletterAsk() {
   return (
-    <section
-      aria-labelledby="newsletter-heading"
-      class="mt-12 border-t border-rule pt-8"
-    >
-      <h2 id="newsletter-heading" class="text-xl text-parchment">
-        Get the next post by email
-      </h2>
-      <p class="mt-2 text-graphite">{NEWSLETTER_LINE}</p>
+    <div data-newsletter-ask>
+      <p class="text-graphite">{NEWSLETTER_LINE}</p>
       <div class="mt-4">
         <NewsletterForm />
       </div>
@@ -27,6 +22,21 @@ export function NewsletterBlock() {
           Or follow the RSS feed
         </a>
       </p>
+    </div>
+  );
+}
+
+/** The newsletter block of `/blog` (#274, Mkt 5): a heading over the ask. */
+export function NewsletterBlock() {
+  return (
+    <section
+      aria-labelledby="newsletter-heading"
+      class="mt-12 border-t border-rule pt-8"
+    >
+      <h2 id="newsletter-heading" class="text-xl text-parchment mb-2">
+        {NEWSLETTER_HEADING}
+      </h2>
+      <NewsletterAsk />
     </section>
   );
 }

@@ -113,7 +113,7 @@ ${promisesList}
 
 - [Home](${BASE_URL}/) — Who I am, the Upwork figures, prices, client work, reviews and how to book
 - [About](${BASE_URL}${ABOUT_PATH}) — Who I am, since 2010: the career story, what I run myself and how to pay
-- [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide) — Pillar page linking all blog posts and projects by topic: architecture, MVP, CI/CD, infrastructure, AI
+- [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide) — A short reading order from idea to production: current posts, client projects with their outcomes, infrastructure and AI, each with one line on why to read it
 - [Services and prices](${BASE_URL}/catalog) — the four services with their prices and what each includes
 - [How I work](${BASE_URL}/how-i-work) — The five promises in the order a project meets them, prices, who does the work, my AI-agent setup and the questions clients ask
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect in four lanes, and how handover, backups, monitoring and deploys are handled
