@@ -592,7 +592,7 @@ export const tools: Tool[] = [
     summary:
       `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
         proof("projects")
-      } client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno.`,
+      } client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno. Its website is seedsaas.com and its live demo is app.seedsaas.com.`,
     kind: "template",
     status: "wip",
     group: "products",
@@ -605,6 +605,7 @@ export const tools: Tool[] = [
       "You want product-specific business logic: it has none.",
     ],
     repo: "spy4x/template",
+    live: { label: "Open the live demo", href: "https://app.seedsaas.com" },
     runtime: "Deno",
     programmingLanguage: "TypeScript",
     usedFor:
