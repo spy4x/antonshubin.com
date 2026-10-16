@@ -30,11 +30,20 @@ Every new page, and every redesign of a page a visitor uses to decide (home,
 work, services, booking, tools, writing, how I work), goes through the global
 `design` skill before any code: the expert roles in parallel, one merged spec
 with wireframes at 390px and 1440px on the issue, then one implementer and the
-design gate. #246 and PR #258 are the worked example. Small fixes, such as a
-bug, a wording change or one element, skip it.
+design gate. #246 and PR #258 are the worked example. A small fix, such as a
+bug, a wording change or one element, follows the skill's rule for small
+changes.
 
 What this site adds to that flow:
 
+- **The page's issue.** It holds the page's job (what a visitor must believe and
+  then do), the sample URLs to review, and its order against any feature issue
+  that touches the same route. That feature issue keeps its content bullets; its
+  layout bullets are input for the design roles, not decisions.
+- **The designer's brief** frames the role as a senior product designer of
+  modern developer portfolios and SaaS case-study pages.
+- **Facts only Anton can supply** go into a separate content issue, and the page
+  ships with today's wording meanwhile.
 - **Serving the site for screenshots.** `deno task build` in a throwaway
   worktree, then a throwaway script that uses `test/harness.ts`'s `startSite()`
   and `test/browser.ts`'s `launchChromium()` to capture the pages at 390px and
