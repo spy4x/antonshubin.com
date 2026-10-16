@@ -1,5 +1,5 @@
 // Rendered-page test harness: boots the production build and hands tests a
-// running server to fetch pages from. See AGENTS.md § "Rendered-page tests"
+// running server to fetch pages from. See docs/testing.md "Rendered-page tests"
 // for the design this implements (build-before-test, design A) and why.
 import { getAvailablePort } from "@std/net";
 
@@ -35,7 +35,7 @@ async function assertBuilt(): Promise<void> {
   } catch {
     throw new Error(
       `_fresh/server.js not found at ${urlToPath(SERVER_ENTRY_URL)}. ` +
-        `startSite() never builds on its own (see AGENTS.md "Rendered-page tests") ` +
+        `startSite() never builds on its own (see docs/testing.md "Rendered-page tests") ` +
         `— run "deno task build" first, or "deno task test"/"deno task check", ` +
         `both of which build before testing.`,
     );
@@ -68,7 +68,7 @@ export interface StartSiteOptions {
  * on a free port and waits until it answers, for a guard test to fetch pages
  * from.
  *
- * Design choice (A — see AGENTS.md "Rendered-page tests" for the full
+ * Design choice (A — see docs/testing.md "Rendered-page tests" for the full
  * reasoning): the build step lives in the `test` task
  * (`deno task build && deno test ...`), not in this function, so the site is
  * built once per `deno task check` run no matter how many test files call

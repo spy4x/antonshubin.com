@@ -56,7 +56,7 @@ app.use(async (ctx) => {
 // their headers: returning here without calling ctx.next() still lets those
 // two middlewares' post-ctx.next() code run, since they already called
 // ctx.next() and are waiting on it to resolve (see main.ts's own header rule
-// in AGENTS.md — change headers on the response ctx.next() returned, never
+// in docs/csp.md — change headers on the response ctx.next() returned, never
 // rebuild it; this middleware is the thing ctx.next() resolves to for them).
 app.use(async (ctx) => {
   const target = redirectTarget(ctx.url.pathname);

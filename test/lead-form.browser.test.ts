@@ -7,7 +7,7 @@
 // a real browser driving real hydrated JS.
 //
 // Runs under its own task, `deno task test:browser`, with its own permission
-// set — see AGENTS.md "Rendered-page tests" for why this file is excluded
+// set — see docs/testing.md "Rendered-page tests" for why this file is excluded
 // from the plain `deno task test` glob instead of widening that task's
 // permissions for every test file.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";

@@ -170,8 +170,8 @@ ssh cloudlab 'sudo cat ~/apps/antonshubin.com/data/subscribers.json'
 
 Every automated email links to `/unsubscribe?token=...` — a signed token built
 by `@spy4x/server/subscribers` and `lib/mailing-list.ts`'s `unsubscribeUrl()`,
-never the address itself (see AGENTS.md "Newsletter subscribers & unsubscribe
-links"). Opening the link only shows a confirm page with the address; removal
+never the address itself (see "Newsletter subscribers & unsubscribe links"
+below). Opening the link only shows a confirm page with the address; removal
 needs a `POST` (the on-page form, or a mail client's one-click unsubscribe) with
 a token that verifies. A forged token and an address that's already been removed
 both answer "link not recognised" — the same response either way, on purpose. An
@@ -192,3 +192,142 @@ it expired within three days anyway.
 
 Backed up nightly by cloudlab's restic job. Where it runs, what it keeps and how
 to restore: [deploy.md "Backup"](deploy.md#backup).
+
+## Newsletter subscribers & unsubscribe links
+
+The mailing list is `@spy4x/server/subscribers` (#405): the subscribe, confirm
+and unsubscribe flows, the signed links, the replay rule and the newsletter send
+all live in the package, and the site keeps only its wording, pages and wiring.
+`lib/mailing-list.ts` is that wiring: `subscriberStore()` (the package's
+`createFileSubscriberStore` on `SUBSCRIBERS_FILE`, default
+`data/subscribers.json`), `newsletterLog()` (`createFileSendLog` on
+`NEWSLETTER_LOG_FILE`, default `data/newsletter-log.json`),
+`subscriptionCrypto()` (`createSubscriptionCrypto` under `UNSUBSCRIBE_SECRET`),
+`unsubscribeUrl()`/`confirmUrl()` (`${BASE_URL}/unsubscribe?token=...` and
+`/subscribe/confirm?token=...`) and `flowDeps()`, which the three routes and
+`scripts/send-newsletter.ts` pass to the package. Nothing reads or writes the
+files directly. The store writes under an in-process queue and the lock file
+`subscribers.json.lock`, through a temp file and `rename`; a file that does not
+parse is copied to `subscribers.json.invalid` and every read and write fails
+until a person repairs it. The file formats did not change: a row is
+`{ email, subscribedAt, key? }`, and `lib/mailing-list.test.ts` loads fixtures
+the pre-#405 code wrote (`test/fixtures/mailing-list/`).
+
+`UNSUBSCRIBE_SECRET` (`lib/config.ts`'s `getUnsubscribeSecret()` throws if it's
+unset, under 32 characters or not printable ASCII — generate one with
+`openssl rand -base64 48`, see `.env.example`) signs every link. A version 1
+unsubscribe link (every link mailed before #405: purpose `unsubscribe`, an empty
+payload, the address as bound context) still works, by a scan of the list;
+`test/unsubscribe.test.ts` pins one such token. New links are version 2 and
+carry the row's `key`, a keyed hash of the address. A row stored before #405 has
+no key until `scripts/backfill-subscriber-keys.ts` gives it one (run once in the
+production container, "Backfilling subscriber keys" above), and
+`scripts/send-newsletter.ts` refuses to send while any row lacks one, because
+its link would not work. A confirm link minted before #405 is refused as
+invalid; it lived three days at most. The pre-#233 bare-signature format stays
+refused (#237). `routes/api/unsubscribe.ts` only redirects old `?email=...`
+links (sent before #177) to `/unsubscribe`, dropping the address; opening a link
+never removes anyone — only a `POST` to `/unsubscribe` with a verified token
+does. See "Data format" and "Endpoints" above for the full data format and
+endpoint list.
+
+The email field of `/api/subscribe` and `/api/lead` goes through
+`@spy4x/email/address`'s `parseBareAddress()` (#255): only a bare address of at
+most 254 characters, with a local part of at most 64, passes, lowercased, so a
+display name, `<`, `>` or `"` answers 400, and only the bare address is stored
+or mailed. The newsletter send applies the same check to every stored row: a row
+that fails is skipped, counted as failed and logged by row number only.
+`/api/subscribe` answers a known address exactly as a new one, so it cannot test
+who is on the list.
+
+Every POST route reads its body through `lib/request-body.ts` (#251), which
+wraps `@spy4x/net/bounded-body` (forms: `@spy4x/server/http/bounded-body`'s
+`parseBoundedFormData`): never call `req.json()` or `req.formData()` directly,
+since they buffer the whole body. The caps are 4 KiB for `/api/subscribe` and
+`/unsubscribe` and 64 KiB for `/api/lead`; a larger body gets 413 and a body
+that stalls for 10 s gets 408. `/unsubscribe` reads no body at all when the
+token is in the query, so a one-click unsubscribe (RFC 8058) works with any
+body.
+
+`/api/subscribe` and `/api/lead` allow three posts per client per hour through
+`lib/rate-limit.ts` (#252), which uses `@spy4x/platform`'s `clientIp`,
+`clientIpBucket` and sweeping `createMemoryRateLimiter` (#310). Production is
+Cloudflare → Traefik (empty `forwardedHeaders.trustedIPs`) → app, so the client
+is `X-Real-IP` (Traefik writes it), or `CF-Connecting-IP` when `X-Real-IP` is a
+Cloudflare edge (`clientIp`'s `trustedProxies`, fed `@spy4x/net/ip`'s
+`CLOUDFLARE_IP_RANGES`); `X-Forwarded-For` is never read, and a header that is
+not exactly one IP address counts as absent. An IPv6 client is keyed on its /64.
+If Traefik's `trustedIPs` or the Cloudflare setup changes, revisit that module.
+A rendered-site test that posts to either form sends its own `X-Real-IP`, or
+every test shares one bucket.
+
+One address is sent at most three confirmation mails an hour, whichever client
+asks (#428): `flowDeps()` passes the package's `limits.recipient` an in-memory
+limiter, keyed by the package on the address's keyed hash. A request over it
+answers 200 like any other and no mail goes out.
+
+## Outgoing mail
+
+Every mail the site sends goes through `@spy4x/email` (`jsr:@spy4x/email`,
+pinned exactly in `deno.json`); nothing in the repo talks SMTP by hand.
+`lib/mail.ts` maps the `SMTP_*` env values onto it: SMTP counts as configured
+only when `SMTP_HOST`, `SMTP_USERNAME` and `SMTP_PASSWORD` are all set,
+`SMTP_FROM` falls back to `SMTP_USERNAME`, and the connection is implicit TLS on
+every port, as the old hand-written client was. EHLO announces the site's own
+hostname (from `DOMAIN`). `lib/lead-mail.ts` (`/api/lead`) and
+`lib/subscribe-mail.ts`'s `subscriberMailer()` (the package's `sendMail` for the
+confirmation, the welcome and the owner notice) build the messages; a failed
+send is logged instead of thrown, with the subscriber's address redacted by the
+package, and counts as done only when the relay accepted it. The newsletter
+itself is the package's `sendIssue` (`scripts/send-newsletter.ts`). Their tests
+pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
+
+The subscriber mails are one letter (#364): `lib/letter.ts` renders the
+confirmation, the welcome and every newsletter in one layout (Anton's portrait
+and name, the content, a P.S. with the booking link, a reply line, a small
+footer), built on `@spy4x/email/letter`'s `renderLetter` (#405), as HTML plus a
+plain-text part, with every value escaped and every link into the site the
+`email` channel's tagged URL (`scripts/utm.ts`). They are sent as
+`Anton Shubin <hi@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox that
+reaches Anton, so they set no `Reply-To`; the welcome and every newsletter carry
+the subscriber's own one-click `List-Unsubscribe` (`listUnsubscribe` on
+`EmailMessage`). Lead mail still sets `Reply-To` to the visitor (#266), and the
+owner notice stays plain text. A lead whose send failed is appended to
+`data/leads-failed.jsonl` (`lib/failed-leads.ts`) and the log says only that it
+was kept; at 10 MB (`LEADS_FAILED_MAX_BYTES` overrides, #327) a lead is not kept
+and one log line without its contents says so. The `noreply` password is shared
+by three senders (mig, Healthchecks and Vaultwarden) and must rotate in all
+three together; this site left that login in #364 (`docs/deploy.md` "Shared mail
+password").
+
+Sign-up is double opt-in (#253): `/api/subscribe` only mails a signed
+confirmation link (the package's confirm token, valid three days) and stores
+nothing; `/subscribe/confirm` shows the address on GET (`previewConfirmation`)
+and adds it, with its key, on POST (`confirmSubscription`), then the welcome
+mail goes out. `lib/csrf.ts` answers 403 to a cross-site POST on
+`/api/subscribe`, `/api/lead`, `/unsubscribe` and `/subscribe/confirm`, with the
+site's own `BASE_URL` as the allowed origin, through Fresh's `csrf()`, which
+also passes a request with neither `Origin` nor `Sec-Fetch-Site` (a mail
+client's one-click unsubscribe, RFC 8058). `/unsubscribe` keeps it rather than
+`@spy4x/server/http/same-origin`'s check, because that check refuses the page's
+own form on Safari before 16.4 (an `Origin` with no `Sec-Fetch-Site`; see
+`test/subscribe-confirm.test.ts`). `/subscribe/confirm` is in `UNTRACKED_PATHS`
+(its URL holds the address). Both it and `/unsubscribe` send
+`Referrer-Policy: strict-origin` and carry
+`<meta name="referrer"
+content="strict-origin">` (`lib/referrer.ts`, read by
+`routes/_middleware.ts` and `routes/_app.tsx`, the meta first in `<head>`),
+because rostok's Traefik `security-headers` overwrites the header and a meta
+policy wins for the document (#327). Not `no-referrer`: that makes the page's
+own form POST send `Origin:
+null`, which Fresh's `csrf()` passes only with
+`Sec-Fetch-Site: same-origin`, and Safari before 16.4 does not send that header.
+With `strict-origin` the next page's referrer is `https://antonshubin.com/`, no
+path or token, and the POST carries the real Origin. The confirming POST answers
+303 to `/subscribe/confirm?done=1`, so the done page's own URL holds no token.
+The site's router does not use `allow-index@file`: it forces `X-Robots-Tag: all`
+over the app's per-path value (#327). An unsubscribe writes a mark (an HMAC of
+the address and the time, no address) to `subscribers.json.unsubscribed` in the
+same locked change as the removal; `confirmSubscription` refuses, as "invalid",
+a link issued before that time, and marks older than the three-day token life
+are dropped on the next write.

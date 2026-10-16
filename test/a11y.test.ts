@@ -1,7 +1,7 @@
 // Guards for issue #160: the nav's active-page marker (which
 // components/Nav.tsx leaves to Fresh's own framework behavior — see the first
 // test's docs) and icon-only controls keeping an accessible name. Reads the
-// built site through test/harness.ts — see AGENTS.md "Rendered-page tests".
+// built site through test/harness.ts — see docs/testing.md "Rendered-page tests".
 // Assert on structure only, never on prose (same rule as
 // test/structure.test.ts and test/rendered.test.ts).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";

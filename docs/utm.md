@@ -156,3 +156,12 @@ Campaign results are reviewed weekly in the Sunday `deno task weekly-numbers`
 report. Its "Umami — top campaigns (7 days)" section ranks the week's
 `utm_campaign` values by visitors (see
 [`docs/weekly-numbers.md`](./weekly-numbers.md)).
+
+## Never hand-write a tagged link
+
+Never hand-write a tagged (UTM) URL. `deno task links <path> [--campaign …]`
+(optionally `--content …`) prints a page's tagged URL for every channel, and
+`launch-kit`, `video-kit` and `publish:blog`'s Dev.to draft build theirs from
+the same channel table in `scripts/utm.ts`. The convention, the campaign names
+and the log of campaigns already used are in this file; its channel table must
+match the code's (`scripts/utm.test.ts` checks it).

@@ -77,7 +77,6 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - AI-friendly XML comments describing the site and its purpose
 - All blog posts, projects, catalog items included; `/blog`'s `lastmod` is the
   newest current post's date, and an archived post has priority 0.3 (#274)
-- All blog posts, projects, catalog items included
 - Catalog pages (#271): `/catalog` is "Services" in the breadcrumb and carries
   an `OfferCatalog` that lists the four `Service` nodes by `@id`; each
   `/catalog/<slug>` page has one `Service` (`serviceType` from the item's
@@ -281,6 +280,25 @@ Five entities in a `@graph` array (six on `/about`):
 
 What Umami records, and where it is left out (crawlers, `UNTRACKED_PATHS`), is
 in [analytics.md](analytics.md).
+
+## AI crawler optimization (SEO)
+
+This site uses an aggressive AI crawler strategy. When adding features or
+content, update the corresponding files:
+
+| Asset           | File                               | Update when                                     |
+| --------------- | ---------------------------------- | ----------------------------------------------- |
+| AI summary      | `routes/llms.txt.ts`               | Site positioning, offerings, or policies change |
+| AI full index   | `routes/llms-full.txt.ts`          | New pages, catalog items, or blog posts added   |
+| Site structure  | `routes/sitemap.xml.ts`            | New routes or pages added                       |
+| Crawler rules   | `routes/robots.txt.ts`             | Adding/removing crawler permissions             |
+| Structured data | `components/SEOHead.tsx` (JSON-LD) | Identity, skills, or company info changes       |
+| FAQ data        | `lib/faqs.ts` (FAQ schema)         | Policies or terms change                        |
+| Docs reference  | `docs/seo-ai-crawlers.md`          | Any of the above changes                        |
+
+Every PR that adds or modifies routes, content, or positioning must also update
+the matching crawler file(s). The `llms*.txt` files are parsed by GPTBot,
+Claude, Perplexity, and other AI crawlers — a primary traffic source.
 
 ## Update Rules
 

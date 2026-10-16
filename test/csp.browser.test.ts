@@ -27,7 +27,7 @@
 //   `<script>` with no nonce is blocked (its side effect never runs) and
 //   reported, and an iframe to a disallowed origin is reported.
 //
-// Runs under `deno task test:browser` (its own -A task) — see AGENTS.md
+// Runs under `deno task test:browser` (its own -A task) — see docs/testing.md
 // "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";

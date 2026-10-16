@@ -10,7 +10,7 @@
 // test/lead-form.browser.test.ts.
 //
 // Runs under `deno task test:browser`, with the same -A permission set as
-// that file — see AGENTS.md "Rendered-page tests" for why browser-driven
+// that file — see docs/testing.md "Rendered-page tests" for why browser-driven
 // tests are excluded from the plain `deno task test` glob instead of
 // widening that task's permissions. Chromium launch/version handling is
 // shared with that file via test/browser.ts.

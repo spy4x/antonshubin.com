@@ -6,7 +6,7 @@
 // `X-Frame-Options: DENY`, and a refused frame ends in the failure message. A plain
 // rendered-page test (test/meet-embed.test.ts) can't reach this — it's
 // client-JS runtime behaviour, exactly like the CSP enforcement and focus
-// tests in the other *.browser.test.ts files (see AGENTS.md "Browser-driven
+// tests in the other *.browser.test.ts files (see docs/testing.md "Browser-driven
 // tests").
 //
 // Rather than depend on a real mig instance, this frames a tiny stub server

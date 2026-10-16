@@ -1,6 +1,6 @@
 // Guards for the About page (#294): its search structure, the one ProfilePage
 // on the site, and the links in and out that the merged spec adopted. They
-// read the built site through test/harness.ts; see AGENTS.md "Rendered-page
+// read the built site through test/harness.ts; see docs/testing.md "Rendered-page
 // tests". Assert structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
