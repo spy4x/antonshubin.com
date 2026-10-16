@@ -24,47 +24,35 @@ In short, as of September 2026:
   build the reputation he sells on, so the posts add up to one recognisable body
   of work instead of scattered pieces.
 
-## Designing a page: four expert reviews first
+## Designing a page
 
 Every new page, and every redesign of a page a visitor uses to decide (home,
-work, services, booking, tools, writing, how I work), goes through this flow
-before any code. Anton asked for it on 26 September 2026 after #246 used it to
-rebuild the project page. #246 and PR #258 are the worked example: the four
-reviews and the merged spec are comments on the issue. Small fixes, such as a
-bug, a wording change or one element, skip it.
+work, services, booking, tools, writing, how I work), goes through the global
+`design` skill before any code: the expert roles in parallel, one merged spec
+with wireframes at 390px and 1440px on the issue, then one implementer and the
+design gate. #246 and PR #258 are the worked example. A small fix, such as a
+bug, a wording change or one element, follows the rule for small changes in the
+global `AGENTS.md` section "Design".
 
-1. **An issue per page.** It holds the page's job (what a visitor must believe
-   and then do), the sample URLs to review, and the order against any feature
-   issue that touches the same route. The feature issue keeps its content
-   bullets. Its layout bullets become input for the experts, not decisions.
-2. **Four expert reviews, no code, in parallel.** A UI/UX designer (the `claude`
-   agent, briefed as a senior product designer of modern developer portfolios
-   and SaaS case-study pages), SEO and marketing (both `marketing-seo`, one with
-   a search lens and one with a conversion lens) and a psychologist
-   (`psychologist`: trust, cognitive load, ethical persuasion only, no invented
-   urgency or scarcity). One shared brief: the issue, the constraints below, and
-   how to serve the site. That means `deno task build` in a throwaway worktree,
-   then a throwaway script that uses `test/harness.ts`'s `startSite()` and
-   `test/browser.ts`'s `launchChromium()` to capture the sample pages at 390px
-   and 1440px, closing the browser and server in a `finally`. A page that
-   doesn't exist yet is reviewed as the nearest existing page plus the issue's
-   plan. Each expert posts at most ten recommendations on the issue, most
-   important first, each with its reason and what a visitor notices.
-3. **One merged spec, by the lead.** A wireframe at 390px and 1440px, the
-   component list, and a table of what each recommendation became or why it was
-   dropped. Where the experts disagree, the lead decides and says why. It is
-   posted on the issue before any code. A sensible default wins; the spec
-   doesn't wait for Anton's approval. Facts only Anton can supply go into a
-   separate content issue, and the page ships with today's wording meanwhile.
-4. **One implementer, one PR.** The PR traces every adopted recommendation to
-   its review (UX 3, SEO 1, …) and lists what was dropped. It reuses existing
-   components (`FactCard`, `PromiseTimeline`, `ClosingBand`, `ProjectFactCard`,
-   `ImageGallery` (the library's strip, below), `ProjectReviews`, `StatusMark`,
-   `Button`) rather than making a second copy. Tests guard the structure: the
-   H1, the first-screen elements, the JSON-LD, and axe plus no horizontal scroll
-   at 390px and 1440px in a browser test.
-5. **Review, merge, deploy** as usual. The reviewer also does a browser pass on
-   every page the change touches, not only the samples.
+What this site adds to that flow:
+
+- **The page's issue.** It holds the page's job (what a visitor must believe and
+  then do), the sample URLs to review, and its order against any feature issue
+  that touches the same route. That feature issue keeps its content bullets; its
+  layout bullets are input for the design roles, not decisions.
+- **The designer's brief** frames the role as a senior product designer of
+  modern developer portfolios and SaaS case-study pages.
+- **Facts only Anton can supply** go into a separate content issue, and the page
+  ships with today's wording meanwhile.
+- **Serving the site for screenshots.** `deno task build` in a throwaway
+  worktree, then a throwaway script that uses `test/harness.ts`'s `startSite()`
+  and `test/browser.ts`'s `launchChromium()` to capture the pages at 390px and
+  1440px, closing the browser and server in a `finally`.
+- **Reuse before drawing.** `FactCard`, `PromiseTimeline`, `ClosingBand`,
+  `ProjectFactCard`, `ImageGallery` (the library's strip, below),
+  `ProjectReviews`, `StatusMark` and `Button` come before a second copy.
+- **Tests guard the structure:** the H1, the first-screen elements, the JSON-LD,
+  and axe plus no horizontal scroll at 390px and 1440px in a browser test.
 
 Constraints every review and spec keeps:
 
