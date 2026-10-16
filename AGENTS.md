@@ -31,8 +31,8 @@ work, services, booking, tools, writing, how I work), goes through the global
 `design` skill before any code: the expert roles in parallel, one merged spec
 with wireframes at 390px and 1440px on the issue, then one implementer and the
 design gate. #246 and PR #258 are the worked example. A small fix, such as a
-bug, a wording change or one element, follows the skill's rule for small
-changes.
+bug, a wording change or one element, follows the rule for small changes in the
+global `AGENTS.md` section "Design".
 
 What this site adds to that flow:
 
