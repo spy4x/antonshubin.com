@@ -1,9 +1,10 @@
 // Shared setup for the browser-driven tests (test/*.browser.test.ts, listed in
 // deno.json's test:browser task) — every one launches Chromium through the
 // same pinned Playwright version. An upgrade changes that version here, in
-// deno.json's import map and in .woodpecker.yml's install command (AGENTS.md
-// cites it too). See AGENTS.md "Browser-driven tests" for why these tests need
-// Chromium and their own `-A` task instead of the plain `deno task test` glob.
+// deno.json's import map and in .woodpecker.yml's install command
+// (docs/testing.md cites it too). See docs/testing.md "Browser-driven tests"
+// for why these tests need Chromium and their own `-A` task instead of the
+// plain `deno task test` glob.
 import { chromium } from "playwright";
 import type { Browser, BrowserContextOptions, Page } from "playwright";
 
@@ -33,7 +34,7 @@ export async function launchChromium(): Promise<Browser> {
     throw new Error(
       `chromium.launch() failed — no compatible Chromium build found. ` +
         `Install one with \`${installCmd}\` ` +
-        `(see AGENTS.md "Rendered-page tests" for why this test needs its ` +
+        `(see docs/testing.md "Rendered-page tests" for why this test needs its ` +
         `own task). Original error: ${reason}`,
       { cause },
     );

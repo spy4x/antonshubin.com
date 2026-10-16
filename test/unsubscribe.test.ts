@@ -1,5 +1,5 @@
 // Rendered-page guards for the unsubscribe flow (see #177). Reads the built
-// site through test/harness.ts — see AGENTS.md "Rendered-page tests". Each
+// site through test/harness.ts — see docs/testing.md "Rendered-page tests". Each
 // test gets its own temp SUBSCRIBERS_FILE and a throwaway
 // UNSUBSCRIBE_SECRET, never the repo's data/subscribers.json.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";

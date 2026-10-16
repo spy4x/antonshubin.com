@@ -6,7 +6,7 @@
 // service workers allowed (`browser.newContext()`), unlike test/browser.ts's
 // `newPage()`.
 //
-// Runs under `deno task test:browser` (its own -A task) — see AGENTS.md
+// Runs under `deno task test:browser` (its own -A task) — see docs/testing.md
 // "Browser-driven tests".
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser } from "playwright";

@@ -1,4 +1,4 @@
-// Guard for #233: every mail goes through `@spy4x/email` (see AGENTS.md
+// Guard for #233: every mail goes through `@spy4x/email` (see docs/newsletter.md
 // "Outgoing mail"). A raw socket or an SMTP verb in the site's own code means
 // a hand-written client came back, with the header-injection and
 // dot-stuffing bugs the library exists to prevent.

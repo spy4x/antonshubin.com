@@ -2,7 +2,7 @@
 // the /work archive rows, the /tools cards and the /catalog cards. A click in
 // a card's top-right corner, away from any text, must land on the page its
 // one link names, and a link inside the card must keep its own target. Needs a
-// built site and Chromium; see AGENTS.md "Browser-driven tests".
+// built site and Chromium; see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
 import { startSite } from "./harness.ts";

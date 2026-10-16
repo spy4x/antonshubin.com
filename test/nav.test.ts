@@ -1,7 +1,7 @@
 // Guards for issue #185: the nav's Book action is on every page, in both the
 // desktop rail and the phone tab bar, and falls back to "Write" when there is
 // no booking link. Reads the built site through test/harness.ts — see
-// AGENTS.md "Rendered-page tests".
+// docs/testing.md "Rendered-page tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { visibleText } from "./html.ts";

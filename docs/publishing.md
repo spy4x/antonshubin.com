@@ -143,9 +143,10 @@ draft against the brief before the pull request opens.
    `lib/blog-posts.ts` fails on a path outside `/img/`, a non-PNG or a missing
    file, and `lib/blog-posts.test.ts` on a cover that is not 1000×420. It is
    required for a new post; an older post's mail uses its OG preview PNG.
-8. Check the "AI crawler optimization" table in AGENTS.md. The sitemap, the RSS
-   feed and both llms files read `blogArticles`, so they update themselves; the
-   doc rows may still need a line.
+8. Check the "AI crawler optimization (SEO)" table in
+   [seo-ai-crawlers.md](seo-ai-crawlers.md). The sitemap, the RSS feed and both
+   llms files read `blogArticles`, so they update themselves; the doc rows may
+   still need a line.
 
 **Archiving a post.** Set `archived: true`. The post moves under Archive on
 `/blog`, leaves "Read next" and the RSS feed, drops to sitemap priority 0.3 and
@@ -248,3 +249,49 @@ recorded, and the command exits non-zero when any mail failed or none went out.
 Report the result to Anton in chat: the `Sent`, `Failed` and `Skipped` counts
 the command printed, or its refusal. A non-zero exit is not a success, whatever
 it printed.
+
+## The flow in short, and its hard rules
+
+This file is the whole flow, from "I want a blog post about X" to a live post: a
+brief that judges the post as an SEO specialist, a marketer, a psychologist and
+a personal-brand adviser against the goals in AGENTS.md "Anton's goals and this
+site's role", a draft in Anton's voice (`docs/voice.md`, learned from the five
+oldest posts), a pull request with the post file and its front matter (no
+`lib/data.ts` entry: the metadata is read from the file), review, merge, deploy,
+then `deno task publish:blog <slug>`. That script writes no file: it checks the
+post answers 200 live, creates the Dev.to draft and prints every channel's
+tagged link and the newsletter preview. Every post opens with a TL;DR, two to
+four short lines in its required `tldr` front matter (`lib/blog-posts.ts` fails
+the build without it, and `llms-full.txt` lists it), and a post about a project
+sets `relatedTool`, so its header shows that tool's demo (`live`) and repository
+(`repo`) from `lib/tools.ts`, never hand-written links; `test/blog.test.ts`
+checks both on every post. A post about something visual opens with a real
+screenshot right under its TL;DR (lazy like every post image: eager, it made the
+post's phone LCP slower), and its `coverImage` (a 1000×420 PNG under
+`static/img/`) becomes the Dev.to cover and the newsletter's picture;
+`publish:blog` updates an existing unpublished draft with the same
+`canonical_url` instead of adding a second. Since #364 a post published on or
+after 2026-10-02 (`LETTER_FIELDS_FROM` in `lib/blog-posts.ts`) must also carry
+`intro` (two or three sentences in Anton's voice on why the post exists and who
+it is for, written by the agent last, from the finished post; it opens the
+newsletter and the Dev.to draft and can open a LinkedIn post) and `coverAlt`,
+and the build fails without any of the three; older posts fall back to their
+`description`, their OG preview PNG and their title. The newsletter is that
+letter with the cover, the intro, "In short", one button and the P.S.; its
+subject is the post's title alone. `publish:blog <slug> --preview <file>` writes
+its HTML and text locally and `--test-newsletter` sends one copy to
+`CONTACT_EMAIL` with no log. Three hard rules:
+
+- **Agents never post to X, LinkedIn, Reddit, Hacker News or Telegram.** They
+  write one text per channel with its tagged link and show it in chat; Anton
+  pastes it.
+- **The newsletter is sent only after the post is live and only when Anton says
+  yes in chat to that post** —
+  `deno task publish:blog <slug>
+  --send-newsletter`. The production container
+  keeps a per-recipient sent log, `data/newsletter-log.json` (a keyed hash of
+  each address, never the address): it refuses a post whose run finished with no
+  failure, a rerun after a partial failure mails only the people the first run
+  meant it for who were missed (never a later subscriber), and a second run
+  started while one is going is refused by a lock file.
+- **Dev.to gets an unpublished draft only.** Anton publishes it himself.

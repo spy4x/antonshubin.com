@@ -2,7 +2,7 @@
 // `blogArticles.sort()`: since `blogArticles` is a module-level array shared
 // by every request in the process, sorting it in place in either route used
 // to reorder "Read next" on every blog post page after the first fetch of
-// that route. See AGENTS.md "Rendered-page tests".
+// that route. See docs/testing.md "Rendered-page tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
 import { formatPeriod, highlightSlugs, projects } from "../lib/data.ts";

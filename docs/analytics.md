@@ -24,9 +24,9 @@ that was booked, and a post that was read to the end. Issue #318 set this up.
 
 ## Events
 
-This table is the canonical list. Once `lib/analytics.ts` lands, it is the
-code's copy of the same list, and a name not in it fails type checking. Umami
-stores the page URL with every event, so no event has a `page` property.
+This table is the canonical list. `lib/analytics.ts` is the code's copy of the
+same list, and a name not in it fails type checking. Umami stores the page URL
+with every event, so no event has a `page` property.
 
 | Event                                | When                                                                                                          | Properties                                                                                                                 |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -133,3 +133,37 @@ instance answers `/api/websites/<id>/goals`, which only 3.4 has.
   report uses it for `book` by `place` and `post-read` by `item`.
 - Stats: `GET /api/websites/<id>/stats` answers plain numbers plus a
   `comparison` object for the previous period of the same length.
+
+## Analytics in the code
+
+`lib/analytics.ts` is the only list of Umami events (#318): `ANALYTICS_EVENTS`
+is a closed list, and detail goes into `data-umami-event-<key>` properties
+(`place`, `item`, `to`, `target`, `field`, `reason`, `service`), never into the
+name, so Umami can add up every Book click across pages. A link or button
+spreads `eventAttrs(name, props)`; `linkEvent(href, props)` picks `outbound`,
+`brief`, `book` or `cta` from the href (the closing band and the promise
+timeline use it); an island calls `track()`, which never throws. Never write a
+`data-umami-event` string or call `umami.track` by hand.
+`test/analytics.test.ts` fails on any event, property or `place` outside the
+list on every sitemap page, `/pay` and a not-found page.
+
+Outcomes are tracked where they happen: `islands/LeadForm.tsx` sends
+`brief-sent` (with `service`) only after `/api/lead` accepted the brief and
+`brief-error` (`reason` `invalid` or `server`) otherwise, the submit click is
+not an event; `islands/MeetEmbed.tsx` sends `calendar-shown` on the first valid
+`mig:height`, `calendar-failed` on the timeout and `call-booked` for each
+`{ type: "mig:booked" }` message under the same origin and `event.source` guard
+as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
+`islands/PostRead.tsx` sends `post-read`; `components/NotFound.tsx` sends
+`not-found` through `islands/TrackPageEvent.tsx`. Links to other sites inside a
+post get `outbound` from `lib/markdown.ts`.
+
+`routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
+(`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`).
+`/privacy` also holds a button (`islands/AnalyticsOptOut.tsx`) that sets
+`umami.disabled` in the browser's local storage, the flag Umami's tracker checks
+before it sends anything: Anton presses it once in each of his own browsers, so
+his visits stay out of the numbers, and any visitor can do the same.
+`routes/privacy.tsx` describes exactly this; change it together with the code.
+This file holds the event names and properties and the saved reports
+`deno task umami-reports` keeps.

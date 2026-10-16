@@ -1,6 +1,6 @@
 // Rendered-page guards for the Writing redesign (#274, with #191): the post
 // header, contents list, archive, author box, "Read next", feed, redirects
-// and structured data, read from the built site. See AGENTS.md
+// and structured data, read from the built site. See docs/testing.md
 // "Rendered-page tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";

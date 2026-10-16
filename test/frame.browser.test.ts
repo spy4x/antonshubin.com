@@ -1,7 +1,7 @@
 // Browser guards for the site's frame (#293): the skip link shows when it is
 // focused, and the frame (footer, back link, 404, /privacy) has no axe
 // violations and no sideways scroll at 390 and 1440px. Needs a built site and
-// Chromium; see AGENTS.md "Browser-driven tests".
+// Chromium; see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import axeCore from "axe-core";
 import type { Browser, Page } from "playwright";

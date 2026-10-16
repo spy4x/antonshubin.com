@@ -1,7 +1,7 @@
 // Guards for the site's frame (#293): the footer on every page, the phone
 // header, the 404, `/privacy`, and the one page list behind the sitemap and
 // the edge cache. They read the built site through
-// test/harness.ts; see AGENTS.md "Rendered-page tests". Assert structure and
+// test/harness.ts; see docs/testing.md "Rendered-page tests". Assert structure and
 // short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";

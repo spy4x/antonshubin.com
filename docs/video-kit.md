@@ -57,12 +57,14 @@ kebab-case, or the script fails.
 
 ## The blog draft is not publishable as-is
 
-`blog-draft.md` only carries `title` and `description` in its front matter. A
-post also needs `publishedAt`, `readTime` and `previewImageURL`, a `lib/data.ts`
-entry with a `category`, and a cover — editorial decisions this script has no
-way to make. Finish it by hand and publish it through the flow in
-[publishing.md](publishing.md); `deno task publish:blog` runs only after the
-post is merged and deployed.
+`blog-draft.md` fills only `title` and `description` in its front matter.
+`tldr`, `publishedAt`, `readTime` and `topic` are placeholders that fail
+`lib/blog-posts.ts`'s parser, naming the file, until they are filled in. A new
+post also needs a cover (`coverImage`), plus `intro` and `coverAlt` — editorial
+decisions this script has no way to make. There is no `lib/data.ts` entry: the
+metadata is read from the post file. Finish it by hand and publish it through
+the flow in [publishing.md](publishing.md); `deno task publish:blog` runs only
+after the post is merged and deployed.
 
 ## The cut step: `deno task video-cut`
 

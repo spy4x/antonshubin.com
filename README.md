@@ -49,14 +49,23 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | `deno task weekly-numbers`       | Umami/GitHub/YouTube numbers → markdown + NTFY                             |
 | `deno task umami-reports`        | Create or update the Umami goals and funnels (`--dry-run` to preview)      |
 | `deno task optimize:screenshots` | Compress portfolio screenshots                                             |
+| `deno task video-cut`            | Cut a recording: `prepare` an edit brief, then `render` (needs ffmpeg)     |
+| `deno task links`                | Print a page's tagged URL for every channel (docs/utm.md)                  |
+| `deno task reshoot:caldav`       | Retake every caldav-tasks-web screenshot (needs Docker)                    |
+| `deno task lcp`                  | Home page LCP, CPU + network modes (needs a build; `--ab`, `--path`)       |
+| `deno task og`                   | Regenerate the 1200x630 OG link-preview PNGs                               |
+| `deno task social-preview`       | Build, then regenerate `docs/social-preview.png` (1280x640)                |
+| `deno task strip-metadata`       | Strip EXIF/XMP/text chunks from images under `static/`, `assets/`          |
 
 ## Documentation
 
-- [AGENTS.md](AGENTS.md) — project structure, coding conventions, deploy
-  process, CSP, newsletter and SEO-crawler wiring — the source of truth for
-  anyone (human or agent) working on this repo.
-- [docs/](docs/) — analytics, deploy, dev setup, infra, newsletter, SEO, UTM and
-  weekly-numbers reference docs.
+- [AGENTS.md](AGENTS.md) — project structure, tasks, coding conventions, deploy
+  process and page design rules — the source of truth for anyone (human or
+  agent) working on this repo.
+- [docs/](docs/) — reference docs, indexed in [docs/README.md](docs/README.md):
+  deploy, publishing, voice, tagged links (UTM), analytics, newsletter and
+  outgoing mail, weekly numbers, video kit, AI crawlers (SEO), catalog, proof,
+  tools registry, testing and CI, CSP, cache headers, redirects and images.
 
 ## License
 
