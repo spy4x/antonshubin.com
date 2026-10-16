@@ -128,7 +128,7 @@ div:has(> [data-gallery-counter]) > button {
  * packages (Literata / IBM Plex Sans / IBM Plex Mono, all OFL — licence
  * files are in assets/fonts/, alongside the woff2 files themselves so Vite
  * content-hashes them into `/assets/*` (the immutable cache tier —
- * see AGENTS.md "Cache-Control headers"), the same as every other asset.
+ * see docs/cache-control.md), the same as every other asset.
  *
  * No `<link rel="preload">` for any font (routes/_app.tsx doesn't have one):
  * measured, a font preload competed with the home page's actual LCP element
