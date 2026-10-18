@@ -137,15 +137,17 @@ Deno.test("the More sheet lists Home, About, How I work, Writing, Infrastructure
   }
 });
 
-Deno.test("the rail's portrait links home with no tooltip", async () => {
+Deno.test("the rail's portrait is a library entry linking home with no tooltip", async () => {
   const site = await startSite({ env: { SCHEDULE_URL } });
   try {
     const html = await site.html("/blog");
     // From the end of the top zone's opening tag to the column's list.
     const start = html.indexOf(">", html.indexOf(`data-e2e="rail-shell-top"`));
     const top = html.slice(start + 1, html.indexOf("<nav", start));
+    // `RailEntry` draws it, so it is a cell like every other rail entry.
     assert(
-      /<a\b[^>]*href="\/"[^>]*aria-label="Anton Shubin, home"/.test(top),
+      /<a\b(?=[^>]*href="\/")(?=[^>]*data-e2e="rail-shell-entry")[^>]*>/
+        .test(top),
       top,
     );
     assert(

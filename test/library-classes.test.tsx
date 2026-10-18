@@ -129,11 +129,16 @@ function renderedLibraryMarkup(): string {
       render(<CiPill ci={ci} pipelinesUrl="https://ci.example.com" />)
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
-    // and a page only the More sheet lists; with Book and with Write.
+    // and a page only the More sheet lists; with Book and with Write, and
+    // with the footer slot, which wraps the page and the footer in a column.
     ...NAV_PATHS.flatMap((path) =>
       ["https://meet.example.com/book", ""].map((scheduleUrl) =>
         render(
-          <Nav currentPath={path} scheduleUrl={scheduleUrl}>
+          <Nav
+            currentPath={path}
+            scheduleUrl={scheduleUrl}
+            footer={<footer>Footer</footer>}
+          >
             <p>Page</p>
           </Nav>,
         )

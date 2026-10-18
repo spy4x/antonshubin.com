@@ -371,15 +371,23 @@ Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440
   }
 });
 
-Deno.test("the phone More sheet links About and marks it current on /about", async () => {
+Deno.test("the phone More sheet links About and marks it current on /about, and More is filled on Home, About and Infrastructure", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
     const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
-      await page.goto(`${site.origin}/about`, { waitUntil: "networkidle" });
       const more = page.getByRole("button", { name: "More", exact: true });
+      // The three pages only the sheet lists: More carries the current fill.
+      for (const path of ["/", "/infrastructure", "/about"]) {
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        assertEquals(
+          await more.evaluate((el) => getComputedStyle(el).backgroundColor),
+          await tokenColour(page, "bg-lamp", "backgroundColor"),
+          `${path}: More must be filled on a page listed under it`,
+        );
+      }
       await more.click();
       const menu = page.getByRole("dialog", { name: "More" });
       await menu.waitFor({ state: "visible" });
@@ -744,7 +752,7 @@ function tokenColour(
   }, [className, property]);
 }
 
-Deno.test("a 390px phone shows five tabs with Book in the centre and the current section filled", async () => {
+Deno.test("a 390px phone shows five tabs with Book in the centre, the current section filled, and a backdrop tap closes the sheet", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } });
   let browser: Browser | undefined;
   try {
@@ -812,6 +820,14 @@ Deno.test("a 390px phone shows five tabs with Book in the centre and the current
           .getAttribute("aria-current"),
         "page",
         "the More sheet must mark the current page's link",
+      );
+
+      // A tap on the backdrop, above the sheet, closes it and returns focus.
+      await page.mouse.click(MOBILE_VIEWPORT.width / 2, 10);
+      await menu.waitFor({ state: "hidden" });
+      assert(
+        await isFocused(more),
+        "focus must return to More after a tap outside the sheet",
       );
     } finally {
       await page.close();

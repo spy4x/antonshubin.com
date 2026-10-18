@@ -6,7 +6,7 @@
 // test/structure.test.ts and test/rendered.test.ts).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, railColumn, visibleText } from "./html.ts";
+import { count, moreSheet, railColumn, railTop, visibleText } from "./html.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -70,20 +70,28 @@ function railLinks(html: string): string[] {
 
 /**
  * Fresh's renderer would mark every link to `/` as the current section
- * (`aria-current="true"`) on every page, so components/Nav.tsx (the rail's
- * portrait) and components/Layout.tsx (the phone header) set the value
- * themselves through `navCurrent()`: "page" on the home page, "false"
+ * (`aria-current="true"`) on every page. The phone header sets the value
+ * itself through `navCurrent()`, and lib/rail-home-current.ts sets "false"
+ * on the rail's own entries to `/` (the portrait and the More sheet's Home
+ * row) that the `Rail` leaves unset: "page" on the home page, "false"
  * everywhere else.
  */
 siteTest(
-  "the two home links are the current page only on the home page",
+  "the three home links are the current page only on the home page",
   async (site) => {
     const homeLinks = (html: string) =>
-      [...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g)]
-        .map((m) => m[0]);
+      [
+        ...railTop(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
+        ...moreSheet(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
+        ...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g),
+      ].map((m) => m[0]);
     for (const [path, expected] of [["/", "page"], ["/blog", "false"]]) {
       const links = homeLinks(await site.html(path));
-      assertEquals(links.length, 2, `${path}: rail and phone header`);
+      assertEquals(
+        links.length,
+        3,
+        `${path}: the portrait, the sheet's Home and the phone header`,
+      );
       for (const link of links) {
         assert(link.includes(`href="/"`), link);
         assert(
