@@ -371,6 +371,44 @@ Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440
   }
 });
 
+/**
+ * The site footer goes in the Rail's `footer` slot, after `<main>`. A
+ * `<footer>` inside `<main>` loses its `contentinfo` role, so screen-reader
+ * users could no longer jump to it.
+ */
+Deno.test("the site footer is the page's one contentinfo landmark, outside main", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page: Page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      for (const path of ["/", "/about", "/blog"]) {
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        const landmarks = page.getByRole("contentinfo");
+        assertEquals(
+          await landmarks.count(),
+          1,
+          `${path}: one contentinfo landmark`,
+        );
+        assert(
+          await landmarks.evaluate((el) =>
+            el.matches("footer.site-footer") && !el.closest("main")
+          ),
+          `${path}: the contentinfo landmark must be the site footer, outside main`,
+        );
+      }
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
 Deno.test("the phone More sheet links About and marks it current on /about, and More is filled on Home, About and Infrastructure", async () => {
   const site = await startSite();
   let browser: Browser | undefined;

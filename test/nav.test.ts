@@ -47,7 +47,7 @@ Deno.test("Book goes to /book from the rail and the tab bar on every page, in th
         assert(!link.tag.includes("target="), `${path}: ${link.tag}`);
         assertEquals(
           link.tag.match(/aria-current="([^"]*)"/)?.[1],
-          path === "/book" ? "page" : undefined,
+          path === "/book" ? "page" : "false",
           `${path}: Book is the current page only on /book: ${link.tag}`,
         );
         assert(link.tag.includes("data-primary-book"), `${path}: ${link.tag}`);
@@ -82,7 +82,7 @@ Deno.test("Book reads Write and goes to the brief on /book when SCHEDULE_URL is 
         assertEquals(link.text, "Write", `${path}: reads "${link.text}"`);
         assertEquals(
           link.tag.match(/aria-current="([^"]*)"/)?.[1],
-          path === "/book" ? "page" : undefined,
+          path === "/book" ? "page" : "false",
           `${path}: Write is the current page only on /book: ${link.tag}`,
         );
       }

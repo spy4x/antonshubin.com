@@ -71,9 +71,9 @@ function railLinks(html: string): string[] {
 /**
  * Fresh's renderer would mark every link to `/` as the current section
  * (`aria-current="true"`) on every page. The phone header sets the value
- * itself through `navCurrent()`, and lib/rail-home-current.ts sets "false"
- * on the rail's own entries to `/` (the portrait and the More sheet's Home
- * row) that the `Rail` leaves unset: "page" on the home page, "false"
+ * itself through `navCurrent()`, and the library `Rail` renders "false" on
+ * an entry that is not current, which Fresh leaves alone, so the portrait
+ * and the More sheet's Home row read "page" on the home page and "false"
  * everywhere else.
  */
 siteTest(
@@ -85,7 +85,8 @@ siteTest(
         ...moreSheet(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
         ...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g),
       ].map((m) => m[0]);
-    for (const [path, expected] of [["/", "page"], ["/blog", "false"]]) {
+    const cases = [["/", "page"], ["/blog", "false"], ["/work", "false"]];
+    for (const [path, expected] of cases) {
       const links = homeLinks(await site.html(path));
       assertEquals(
         links.length,
