@@ -203,16 +203,14 @@ with "Anton" (a `RailEntry` in the `top` slot, linking home), Book, then
 and More. There is no Links control (#293): More lists pages only (Home, About,
 How I work, Writing, Infrastructure), and the profiles and feeds live in the
 footer. Home, About and Infrastructure are `sheetOnly` items, so More is marked
-current on their pages. The icons come from `@spy4x/preact-icons`.
-`lib/rail-home-current.ts` sets `aria-current="false"` on the rail's entries to
-`/` off the home page, where Fresh's renderer would mark them the current
-section. Keep the markup small, because under `scripts/lcp.ts`'s network profile
-every extra KB on every page measurably delays the home page's LCP image. The
-phone header (photo, name, and `ROLE` on the right) is plain markup in
-`components/Layout.tsx`; the time zone is in the footer. Book goes to `/book` in
-the same tab and carries `data-primary-book`; with `SCHEDULE_URL` unset it reads
-"Write" and goes to that page's written brief (`/book#brief`). The footer's
-Contact group links the same page. `test/nav.test.ts` checks both on every page.
+current on their pages. The icons come from `@spy4x/preact-icons`. Keep the
+markup small, because under `scripts/lcp.ts`'s network profile every extra KB on
+every page measurably delays the home page's LCP image. The phone header (photo,
+name, and `ROLE` on the right) is plain markup in `components/Layout.tsx`; the
+time zone is in the footer. Book goes to `/book` in the same tab and carries
+`data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes to that
+page's written brief (`/book#brief`). The footer's Contact group links the same
+page. `test/nav.test.ts` checks both on every page.
 
 ## Site frame
 
