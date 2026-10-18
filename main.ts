@@ -1,4 +1,6 @@
 import { App, staticFiles } from "fresh";
+// Imported after `fresh`, so its vnode hook wraps Fresh's and runs first.
+import "./lib/rail-home-current.ts";
 import type { State } from "./lib/utils.ts";
 import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
 import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";

@@ -13,12 +13,17 @@ interface LayoutProps {
 
 /**
  * The frame every page shares (#293): the rail around the phone header, the
- * page and the footer. The rail owns `<main>`, so the header and the footer
- * sit inside it, beside the column and above the phone tab bar.
+ * page and the footer. The rail owns `<main>`, so the phone header sits
+ * inside it; the footer goes in the rail's `footer` slot, after `<main>`,
+ * where it keeps its `contentinfo` landmark.
  */
 export function Layout({ children, currentPath }: LayoutProps) {
   return (
-    <Nav currentPath={currentPath} scheduleUrl={SCHEDULE_URL}>
+    <Nav
+      currentPath={currentPath}
+      scheduleUrl={SCHEDULE_URL}
+      footer={<Footer canBook={Boolean(SCHEDULE_URL)} />}
+    >
       {
         /* Phone header (#185): scrolls away with the page; the desktop rail
           carries the portrait from 768px up. The role replaces the bare UTC
@@ -51,7 +56,6 @@ export function Layout({ children, currentPath }: LayoutProps) {
       >
         {children}
       </div>
-      <Footer canBook={Boolean(SCHEDULE_URL)} />
     </Nav>
   );
 }

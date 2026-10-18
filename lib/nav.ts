@@ -138,8 +138,8 @@ export const siteItems: NavItem[] = [
  * on the page itself, `"true"` anywhere under it, `"false"` otherwise. The
  * same matching Fresh's renderer applies on the server, except that `/` is
  * only ever the page itself: Fresh marks every link to `/` as the current
- * section on every page. Used for links to `/` in `components/Nav.tsx` and
- * `components/Layout.tsx`, and for the More sheet's own rows.
+ * section on every page. Used for the phone header's link to `/` in
+ * `components/Layout.tsx`.
  */
 export function navCurrent(
   currentPath: string,

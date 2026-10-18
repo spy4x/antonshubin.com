@@ -92,9 +92,10 @@
 }
 
 /* The rail's column, tab bar and sheet (everything the library's `Rail` draws
-   beside its <main>) are Desk, with Paper under the pointer, so Lamp stays the
-   current entry's fill. The page inside <main> keeps the global mapping. */
-[data-rail-variant] > :not(main) {
+   beside the page) are Desk, with Paper under the pointer, so Lamp stays the
+   current entry's fill. The page column (<main> and the footer under it)
+   keeps the global mapping. */
+[data-rail-variant] > :not([data-e2e="rail-shell-page"]) {
   --color-surface: var(--color-desk);
   --color-hover: var(--color-paper);
 }
@@ -300,60 +301,6 @@ div:has(> [data-gallery-counter]) > button {
 body {
   @apply bg-ink text-parchment;
   font-family: var(--font-sans);
-}
-
-/*
- * The rail's slot content (#433, components/Nav.tsx): the portrait cell in
- * the column's top zone and the More sheet's own rows. Drawn like the
- * library `Rail`'s labels cells and sheet rows, from the same tokens: the
- * muted label at the medium weight at rest, the hover fill under the
- * pointer, the current page in the active fill with a semibold label. Classes rather
- * than utility strings, because the rail is on every page and its bytes
- * compete with the home page's LCP image. The focus ring is the library's
- * `railFocusRing`.
- */
-.rail-home,
-.sheet-row {
-  display: flex;
-  align-items: center;
-  border-radius: var(--radius-primary, 0.5rem);
-  color: var(--color-muted-foreground);
-  font-weight: var(--font-weight-medium, 600);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .rail-home,
-  .sheet-row {
-    transition: color 150ms, background-color 150ms;
-  }
-}
-.rail-home {
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.25rem;
-  width: 4rem;
-  min-height: 3.5rem;
-  padding: 0.5rem 0;
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-.sheet-row {
-  gap: 0.75rem;
-  width: 100%;
-  min-height: 2.75rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-.rail-home:hover,
-.sheet-row:hover {
-  background-color: var(--color-hover);
-  color: var(--color-foreground);
-}
-.rail-home[aria-current="page"],
-.sheet-row[aria-current="page"] {
-  background-color: var(--color-surface-active);
-  color: var(--color-nav-active);
-  font-weight: var(--font-weight-semibold, 600);
 }
 
 /* The footer's links (#293). One rule instead of a class string on each of

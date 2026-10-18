@@ -14,7 +14,7 @@ import {
 } from "@spy4x/preact-icons";
 import {
   Rail,
-  railFocusRing,
+  RailEntry,
   type RailItem,
   type RailPlace,
 } from "@spy4x/preact-system/rail";
@@ -22,7 +22,6 @@ import {
   BOOK_HREF,
   NAV_BOOK_LABEL,
   NAV_WRITE_LABEL,
-  navCurrent,
   type NavIcon,
   type NavItem,
   railItems,
@@ -50,6 +49,8 @@ interface NavProps {
   scheduleUrl: string;
   /** The page: lands in the rail's `<main>`. */
   children: ComponentChildren;
+  /** The site footer: drawn after `<main>`, under the page. */
+  footer: ComponentChildren;
 }
 
 /**
@@ -84,87 +85,71 @@ function railItem(item: NavItem): RailItem {
 }
 
 /**
- * A row in the phone sheet for a page the rail column does not list (Home,
- * About, Infrastructure). Drawn like the library's own sheet rows: 44px
- * high, the icon then the label, the current page filled.
+ * The portrait drawn as the `top` entry's icon: the photo where another
+ * entry has its 24px icon. The entry's `aria-label` ("Anton") names the
+ * link; the alt text is for the site's rule that no image goes without one.
  */
-function SheetLinks(
-  { items, currentPath }: { items: NavItem[]; currentPath: string },
-) {
+function Portrait() {
   return (
-    <ul class="flex flex-col gap-1">
-      {items.map((item) => {
-        const Icon = NAV_ICONS[item.icon];
-        return (
-          <li>
-            <a
-              href={item.href}
-              aria-current={navCurrent(currentPath, item.href)}
-              class={`sheet-row ${railFocusRing}`}
-            >
-              <Icon class="size-6" />
-              <span>{item.label}</span>
-            </a>
-          </li>
-        );
-      })}
-    </ul>
+    <img
+      class="size-8 rounded-full border border-rule-strong"
+      src="/img/photo-64.webp"
+      alt="Photo of Anton Shubin"
+      width="32"
+      height="32"
+    />
   );
+}
+
+/** Home, About and Infrastructure: rows of the phone sheet only. */
+function sheetItem(item: NavItem): RailItem {
+  return { ...railItem(item), sheetOnly: true };
 }
 
 /**
  * The site navigation (#185, #433): `@spy4x/preact-system`'s `Rail` in its
  * labels variant, the same 72px column, cells and current fill as the apps,
  * with a short label under each icon. From 768px: the portrait and "Anton"
- * on top, linking home, then Book in the accent fill, then `lib/nav.ts`'s
- * `railItems` (the only part that scrolls on a short screen). Below 768px: a
- * tab bar of Work, Services, Book in the centre, Tools and More, whose sheet
- * holds Home and About, the destinations that did not fit, then
- * Infrastructure. The profiles and feeds are in the footer (#293).
+ * on top (a `RailEntry` in the `top` slot), linking home, then Book in the
+ * accent fill, then `lib/nav.ts`'s `railItems` (the only part that scrolls
+ * on a short screen). Below 768px: a tab bar of Work, Services, Book in the
+ * centre, Tools and More, whose sheet holds Home and About, the destinations
+ * that did not fit, then Infrastructure: the first two and the last are
+ * `sheetOnly` items, so More is marked current on their pages. The site
+ * footer goes in the `footer` slot, after `<main>`. The profiles and feeds
+ * are in the footer (#293).
  *
- * Server-rendered with no island: every entry is a link, and More opens its
- * `<dialog>` through the button's `command`/`commandfor` invoker, so nothing
- * here ships JavaScript or competes with the home page's LCP image.
+ * Server-rendered with no island: every entry is a link, More opens its
+ * `<dialog>` through the button's `command`/`commandfor` invoker, and a
+ * backdrop tap closes it through `closedby="any"`, so nothing here ships
+ * JavaScript or competes with the home page's LCP image.
  */
-export function Nav({ currentPath, scheduleUrl, children }: NavProps) {
+export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
   const top = (place: RailPlace) =>
-    place === "sheet"
-      ? <SheetLinks items={sheetTopItems} currentPath={currentPath} />
-      : (
-        <a
-          href="/"
-          aria-label="Anton Shubin, home"
-          // Explicit "false" off the home page: Fresh's renderer would mark
-          // a link to `/` as the current section on every page.
-          aria-current={navCurrent(currentPath, "/")}
-          class={`rail-home ${railFocusRing}`}
-        >
-          <img
-            class="size-10 rounded-full border border-rule-strong"
-            src="/img/photo-64.webp"
-            alt="Photo of Anton Shubin"
-            width="40"
-            height="40"
-          />
-          <span>Anton</span>
-        </a>
-      );
-  const bottom = (place: RailPlace) =>
-    place === "sheet"
-      ? <SheetLinks items={sheetBottomItems} currentPath={currentPath} />
-      : null;
+    place === "rail" && (
+      <RailEntry
+        item={{ key: "portrait", label: "Anton", href: "/", Icon: Portrait }}
+        place="rail"
+        variant="labels"
+        current={currentPath === "/" ? "page" : undefined}
+      />
+    );
 
   return (
     <Rail
       variant="labels"
-      items={railItems.map(railItem)}
+      items={[
+        ...sheetTopItems.map(sheetItem),
+        ...railItems.map(railItem),
+        ...sheetBottomItems.map(sheetItem),
+      ]}
       primary={bookItem(scheduleUrl)}
       currentPath={currentPath}
       // On /book the primary is the page, also as "Write", whose href
       // carries `#brief` and so never equals the path.
       currentKey={currentPath === BOOK_HREF ? "book" : undefined}
       top={top}
-      bottom={bottom}
+      footer={footer}
       labels={{ skipToContent: "Skip to main content" }}
     >
       {children}
