@@ -146,10 +146,18 @@ export interface ToolFeature {
   title: string;
   /** One or two sentences, each true of the tool today. */
   text: string;
-  /** A real screenshot of the feature, under the text. */
+  /** A real screenshot of the feature, under the text, anchored to the card's bottom. */
   shot?: ToolScreenshot;
-  /** Spans two of the grid's three columns from 1024px: for a card with a landscape shot. */
-  wide?: true;
+  /**
+   * A narrower crop of the same screen for viewports under 640px, where
+   * `shot` would shrink its text below reading size.
+   */
+  phoneShot?: ToolScreenshot;
+  /**
+   * The card's width from 1024px: a third (the default), a half or two
+   * thirds of the row. Pair cards so each row adds up to the whole width.
+   */
+  size?: "half" | "wide";
 }
 
 /** The one command that starts using a tool that is not installed from a registry. */
@@ -685,26 +693,31 @@ export const tools: Tool[] = [
       {
         title: "Teams from the first sign-up",
         text:
-          "Every account gets a group at sign-up. Members, roles from viewer to owner, invitations and ownership transfer work the same in every group.",
-        wide: true,
+          "Every account gets a group at sign-up. Members, roles, invitations and ownership transfer work the same in every group.",
         shot: {
-          src: "/img/tools/seed/group-members-796.webp",
-          srcset:
-            "/img/tools/seed/group-members-398.webp 398w, /img/tools/seed/group-members-796.webp 796w",
+          src: "/img/tools/seed/members-352.webp",
           alt:
-            "A group's member list: four people, each with an e-mail address, a role (Owner, Admin, Editor) and when they were last seen, and an Invite people button.",
-          width: 796,
-          height: 450,
+            "A group's member list: Ada Lovelace (you), Grace Hopper and Linus Torvalds, each with an e-mail address and when they were last seen.",
+          width: 352,
+          height: 332,
         },
       },
       {
         title: "Realtime by default",
         text:
           "People in a group see each other's changes live, over a WebSocket.",
+        size: "wide",
         shot: {
-          src: "/img/tools/seed/realtime-a-640.webp",
+          src: "/img/tools/seed/realtime-pair-1296.webp",
           srcset:
-            "/img/tools/seed/realtime-a-320.webp 320w, /img/tools/seed/realtime-a-640.webp 640w",
+            "/img/tools/seed/realtime-pair-648.webp 648w, /img/tools/seed/realtime-pair-1296.webp 1296w",
+          alt:
+            "Two phones side by side: on the left a note is edited and its title changed to Q4 roadmap: onboarding, billing and invoices; on the right the notes list of the same group shows that note at the top, updated a moment ago.",
+          width: 1296,
+          height: 800,
+        },
+        phoneShot: {
+          src: "/img/tools/seed/realtime-a-640.webp",
           alt:
             "A note open for editing on a phone: its title, its text, the tags Design and Roadmap chosen, and a Save note button.",
           width: 640,
@@ -712,61 +725,68 @@ export const tools: Tool[] = [
         },
       },
       {
+        title: "Works offline",
+        text:
+          "The app keeps the last notes and groups on the device and queues note writes. A stale write shows as a conflict for the person to settle.",
+        size: "wide",
+        shot: {
+          src: "/img/tools/seed/conflict-802.webp",
+          alt:
+            "A note edited offline meets a newer version: the card '1 change needs your choice' shows Your version beside Server's version, with Keep mine and Use the server's buttons above the notes list.",
+          width: 802,
+          height: 369,
+        },
+        phoneShot: {
+          src: "/img/tools/seed/conflict-phone-386.webp",
+          alt:
+            "A note edited offline meets a newer version: the card shows Your version of the note, with Keep mine and Use the server's buttons.",
+          width: 386,
+          height: 250,
+        },
+      },
+      {
         title: "Billing per member",
         text:
           "Each group has one Stripe subscription, and its seats follow the member count.",
         shot: {
-          src: "/img/tools/seed/billing-plan-796.webp",
-          srcset:
-            "/img/tools/seed/billing-plan-398.webp 398w, /img/tools/seed/billing-plan-796.webp 796w",
+          src: "/img/tools/seed/plan-382.webp",
           alt:
-            "A group's plan card: Pro, active, 36 euros a month, renewing on 4 November 2026, with a Manage billing button and the line: 4 members at 9 euros each a month, the owner included.",
-          width: 796,
+            "A group's plan card: Pro, 36 euros a month, renewing on 4 November 2026, a Manage billing button, and the line: 4 members at 9 euros each a month, the owner included.",
+          width: 382,
           height: 330,
-        },
-      },
-      {
-        title: "Works offline",
-        text:
-          "The app keeps the last notes and groups on the device and queues note writes. A stale write shows as a conflict for the person to settle.",
-        wide: true,
-        shot: {
-          src: "/img/tools/seed/offline-conflict-1280.webp",
-          srcset:
-            "/img/tools/seed/offline-conflict-640.webp 640w, /img/tools/seed/offline-conflict-1280.webp 1280w",
-          alt:
-            "A note edited offline meets a newer version: the card '1 change needs your choice' shows Your version beside Server's version, with Keep mine and Use the server's buttons above the notes list.",
-          width: 1280,
-          height: 800,
-        },
-      },
-      {
-        title: "An admin area",
-        text:
-          "It runs on a host of its own. Operators find a person, see their sessions, groups and audit trail, and can block them.",
-        wide: true,
-        shot: {
-          src: "/img/tools/seed/admin-overview-1280.webp",
-          srcset:
-            "/img/tools/seed/admin-overview-640.webp 640w, /img/tools/seed/admin-overview-1280.webp 1280w",
-          alt:
-            "The admin app's Users page: a search by name or address, filters by status and role, and a table of four people with their role, status, last seen and created date.",
-          width: 1280,
-          height: 800,
         },
       },
       {
         title: "Sign-in done properly",
         text:
           "Passwords with a second factor from an authenticator app, sign-in with Google or GitHub, and a list of signed-in devices.",
+        size: "half",
         shot: {
-          src: "/img/tools/seed/profile-security-796.webp",
-          srcset:
-            "/img/tools/seed/profile-security-398.webp 398w, /img/tools/seed/profile-security-796.webp 796w",
+          src: "/img/tools/seed/security-462.webp",
           alt:
-            "The profile's Security section: the password with a Change button, two-factor sign-in turned on with a code from an authenticator app, and the account's sign-in methods.",
-          width: 796,
-          height: 430,
+            "The profile's security settings: two-factor sign-in turned on with a code from an authenticator app, and the account's sign-in methods with its password.",
+          width: 462,
+          height: 290,
+        },
+      },
+      {
+        title: "An admin area",
+        text:
+          "It runs on a host of its own. Operators find a person, see their sessions, groups and audit trail, and can block them.",
+        size: "half",
+        shot: {
+          src: "/img/tools/seed/users-647.webp",
+          alt:
+            "The admin app's table of four people, each with a role (Viewer or Administrator) and the status Active.",
+          width: 647,
+          height: 395,
+        },
+        phoneShot: {
+          src: "/img/tools/seed/users-phone-352.webp",
+          alt:
+            "The admin app's list of four people with their names and e-mail addresses.",
+          width: 352,
+          height: 395,
         },
       },
     ],

@@ -51,18 +51,24 @@ its copy button `tool-install-copy`; see "Analytics in the code" in
 **Showcase pages (#448).** An entry with a `headline` gets the showcase layout
 from the same `routes/tools/[slug].tsx`, drawn by `components/ToolShowcase.tsx`:
 the name, job and status on one line above the headline (the `<h1>`), the
-`lede`, the live button with "View on GitHub" beside it, the `quickStart`
-command with a copy button (`islands/CopyCommand.tsx`, the library's
-`CopyButton`), and the `hero` shot in the library's `WindowFrame`; then "What
-you get" (one library `FeatureCard` per `features` entry, its `shot` under the
-text, `wide` spanning two of three columns) and "Where it stands" (`works`,
-`notYet`, and always a link to the repository's open issues). The fact card then
-follows "The story behind it" (the `posts`, with `storyLine`) on a phone, and
-the closing band carries the `closing` line with the live and offer buttons
-beside Book. `pageTitle` and `lede` give the `<title>` and the meta description;
+`lede`, the live button with "View on GitHub" beside it, the `hero` shot in the
+library's `WindowFrame` (before the quick start on a phone, so the product shows
+on the first screen), and the `quickStart` command, which wraps only between
+arguments, with the site's `islands/CopyButton.tsx`. "What you get" is one
+library `FeatureCard` per `features` entry in a six-column grid: `size` makes a
+card a third (default), a half or two thirds wide, so pair cards to fill each
+row; cards in a row stretch to one height with the `shot` at the bottom, and
+`phoneShot` replaces it under 640px where the full crop would be too small to
+read. Crop shots to render near their natural size. "Where it stands" is one
+card (`works`, then `notYet`, then a line to the repository's open issues)
+beside the fact card, then "Use it if", "Skip it if" and "The story behind it"
+(the `posts`, with `storyLine`); on a phone the fact card comes last. The
+closing band carries the `closing` line with the live and offer buttons beside
+Book. `pageTitle` and `lede` give the `<title>` and the meta description;
 `hero`, `website` and the posts add `image`, `sameAs` and `subjectOf` to the
-JSON-LD. A tool without a `headline` renders exactly as before. Every claim in
-these fields comes from the project's own README or docs, and "Where it stands"
-only from its status section. Screenshots live in `static/img/tools/<slug>/`
-(see [images.md](images.md)). A template's catalog item says "Built on" and
-links the template's page.
+JSON-LD. A showcase page does not draw `fits`, `screenshots` or "What it is". A
+tool without a `headline` renders exactly as before. Every claim in these fields
+comes from the project's own README or docs, and "Where it stands" only from its
+status section. Screenshots live in `static/img/tools/<slug>/` (see
+[images.md](images.md)). A template's catalog item says "Built on" and links the
+template's page.

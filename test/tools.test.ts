@@ -753,7 +753,7 @@ siteTest(
     for (const t of showcaseTools) {
       const html = await site.html(`/tools/${t.slug}`);
       const page = pageBody(html);
-      assertEquals(count(page, /data-tool-hero/g), 1, t.slug);
+      assertEquals(count(page, /data-tool-hero(?![\w-])/g), 1, t.slug);
       if (t.hero) {
         // The hero is the page's one eager, high-priority image.
         const eager = [...page.matchAll(/<img[^>]*fetchpriority="high"[^>]*>/g)]
@@ -768,12 +768,15 @@ siteTest(
       }
       const cards = page.split('data-e2e="feature-card"').slice(1);
       assertEquals(cards.length, t.features?.length ?? 0, `${t.slug}: cards`);
-      for (const [i, f] of (t.features ?? []).entries()) {
-        const card = cards[i].slice(0, cards[i].indexOf("</article>"));
+      for (const [i, card] of cards.entries()) {
+        const f = t.features![i];
         assert(visibleText(`<x ${card}`).includes(f.title), f.title);
         assert(visibleText(`<x ${card}`).includes(f.text), f.title);
+        for (const shot of [f.shot, f.phoneShot]) {
+          if (!shot) continue;
+          assert(card.includes(`src="${shot.src}`), `${f.title}: ${shot.src}`);
+        }
         if (f.shot) {
-          assert(card.includes(`src="${f.shot.src}`), `${f.title}: shot`);
           assert(card.includes('loading="lazy"'), `${f.title}: lazy`);
         }
       }
@@ -801,8 +804,9 @@ siteTest(
       );
       // On a phone the fact card follows the story, so it is not the first
       // thing under the hero.
+      assert(page.includes("data-story"), `${t.slug}: no story`);
       assert(
-        /data-fact-card class="order-last /.test(page),
+        page.indexOf("data-fact-card") > page.indexOf("data-story"),
         `${t.slug}: fact card order`,
       );
     }
@@ -896,6 +900,24 @@ siteTest(
         line.slice(0, line.indexOf("</p>")).includes(`href="/tools/${t.slug}"`),
         `${t.catalogSlug} does not link /tools/${t.slug}`,
       );
+    }
+  },
+);
+
+siteTest(
+  "a showcase page heads its second fit list Skip it if, and every other page Don't use it if",
+  async (site) => {
+    for (const t of tools.filter((t) => t.dontUseIf?.length)) {
+      const headings = [
+        ...pageBody(await site.html(`/tools/${t.slug}`)).matchAll(
+          /<h2[^>]*>([\s\S]*?)<\/h2>/g,
+        ),
+      ].map(([, h]) => visibleText(h));
+      const [shown, other] = t.headline
+        ? ["Skip it if", "Don't use it if"]
+        : ["Don't use it if", "Skip it if"];
+      assert(headings.includes(shown), `${t.slug}: no "${shown}"`);
+      assert(!headings.includes(other), `${t.slug}: "${other}"`);
     }
   },
 );

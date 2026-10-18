@@ -19,7 +19,6 @@ import { Lightbox } from "@spy4x/preact-ui/lightbox";
 import { Card } from "@spy4x/preact-ui/card";
 import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import { WindowFrame } from "@spy4x/preact-ui/window-frame";
-import CopyCommand from "../islands/CopyCommand.tsx";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -111,15 +110,6 @@ function renderedGalleryMarkup(): string {
   ].join("\n");
 }
 
-/**
- * The quick start's copy button (islands/CopyCommand.tsx), apart from
- * `renderedLibraryMarkup()` for the lightbox's reason: it is the library's
- * own `CopyButton`, not the site's `Button`.
- */
-function renderedCopyMarkup(): string {
-  return render(<CopyCommand text="gh repo create x" />);
-}
-
 /** The paths the nav is rendered at: each current state it can draw. */
 const NAV_PATHS = ["/", "/blog", "/work/smartlite", "/book", "/about"];
 
@@ -142,8 +132,7 @@ function renderedLibraryMarkup(): string {
       render(<CiPill ci={ci} pipelinesUrl="https://ci.example.com" />)
     ),
     // A showcase tool page (#448): the hero's frame, the feature cards with
-    // and without a picture, the "Where it stands" cards and the quick
-    // start's copy button (`renderedCopyMarkup()`).
+    // and without a picture, the "Where it stands" cards.
     render(
       <WindowFrame variant="browser" title="app.example.com">
         <img src="/a.webp" alt="A" />
@@ -211,7 +200,6 @@ function renderedClasses(): { light: Set<string>; dark: Set<string> } {
     const [, list] of [
       renderedLibraryMarkup(),
       renderedGalleryMarkup(),
-      renderedCopyMarkup(),
     ].join("\n")
       .matchAll(/class="([^"]*)"/g)
   ) {

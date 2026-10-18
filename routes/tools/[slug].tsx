@@ -36,9 +36,9 @@ import {
 import { eventAttrs } from "../../lib/analytics.ts";
 import { Card } from "@spy4x/preact-ui/card";
 import {
+  ShowcaseDetails,
   ShowcaseFeatures,
   ShowcaseHero,
-  ShowcaseStanding,
 } from "../../components/ToolShowcase.tsx";
 
 const SITE = "https://antonshubin.com";
@@ -167,6 +167,123 @@ export default define.page(async function ToolPage(ctx) {
     ogImageHeight: 630,
   };
 
+  const factCard = (
+    <FactCard label="Tool facts">
+      <h2 class="text-lg text-parchment mb-3">Facts</h2>
+      <dl class="space-y-3 text-sm">
+        <Fact term="Status">
+          <StatusMark status={tool.status} />
+        </Fact>
+        {tool.registry && (
+          <Fact term="Version">
+            <span data-version>
+              {tool.registry.published
+                ? tool.registry.version
+                : `${tool.registry.version}, publishing to ${tool.registry.name}`}
+            </span>
+            {tool.registry.published && (
+              <>
+                {" on "}
+                <a href={tool.registry.url} class={linkClass}>
+                  {tool.registry.name}
+                </a>
+              </>
+            )}
+          </Fact>
+        )}
+        {licence && <Fact term="Licence">{licence}</Fact>}
+        {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
+        {tool.live && (
+          <Fact term="Live">
+            <a
+              href={tool.live.href}
+              {...toolLink("live")}
+              class={linkClass}
+            >
+              {tool.live.label}
+            </a>
+          </Fact>
+        )}
+        {repo && (
+          <Fact term="Code">
+            <a href={repo} class={linkClass}>{tool.repo}</a>
+            {snap && snap.stars >= MIN_STARS_SHOWN && (
+              <span class="text-graphite">, {snap.stars} stars</span>
+            )}
+          </Fact>
+        )}
+        {tool.ci && snap && (
+          <Fact term="CI">
+            <CiPill
+              ci={snap.ci}
+              pipelinesUrl={ciUrl(tool)!}
+              labelHidden
+            />
+            <span data-checked class="block mt-1 text-graphite">
+              {checkedLabel(live, tool.repo)}
+            </span>
+          </Fact>
+        )}
+      </dl>
+      {repo && (
+        <div class="mt-4 pt-4 border-t border-rule text-sm space-y-2">
+          <p>
+            <a
+              href={repo}
+              {...toolLink("github")}
+              class={linkClass}
+            >
+              Star on GitHub
+            </a>
+            {tool.status !== "archived" && (
+              <>
+                {" · "}
+                <a
+                  href={`${repo}/issues`}
+                  {...toolLink("github")}
+                  class={linkClass}
+                >
+                  Report an issue
+                </a>
+              </>
+            )}
+          </p>
+        </div>
+      )}
+    </FactCard>
+  );
+  // A showcase page's "The story behind it": the post as a card (#448).
+  const story = showcase && posts.length > 0
+    ? (
+      <section aria-labelledby="posts">
+        <h2 id="posts" class="text-2xl text-parchment">
+          The story behind it
+        </h2>
+        <ul class="mt-4 space-y-4">
+          {posts.map((p) => (
+            <li key={p.slug}>
+              <Card data-story class="p-6">
+                <a
+                  href={`/blog/${p.slug}`}
+                  {...eventAttrs("cta", {
+                    place: "body",
+                    target: `/blog/${p.slug}`,
+                  })}
+                  class="font-heading text-lg text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
+                >
+                  {p.title}
+                </a>
+                {tool.storyLine && (
+                  <p class="mt-2 text-graphite">{tool.storyLine}</p>
+                )}
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+    : undefined;
+
   const hasFit = (tool.useIf?.length ?? 0) + (tool.dontUseIf?.length ?? 0) > 0;
 
   return (
@@ -195,7 +312,6 @@ export default define.page(async function ToolPage(ctx) {
           <>
             <ShowcaseHero tool={tool} repo={repo} />
             <ShowcaseFeatures tool={tool} />
-            <ShowcaseStanding tool={tool} repo={repo} />
           </>
         )}
 
@@ -247,266 +363,174 @@ export default define.page(async function ToolPage(ctx) {
           </header>
         )}
 
-        <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-start">
-          <div
-            data-fact-card
-            class={cn(
-              showcase ? "order-last" : "order-first",
-              "lg:order-2 lg:sticky lg:top-8",
-            )}
-          >
-            <FactCard label="Tool facts">
-              <h2 class="text-lg text-parchment mb-3">Facts</h2>
-              <dl class="space-y-3 text-sm">
-                <Fact term="Status">
-                  <StatusMark status={tool.status} />
-                </Fact>
-                {tool.registry && (
-                  <Fact term="Version">
-                    <span data-version>
-                      {tool.registry.published
-                        ? tool.registry.version
-                        : `${tool.registry.version}, publishing to ${tool.registry.name}`}
-                    </span>
-                    {tool.registry.published && (
-                      <>
-                        {" on "}
-                        <a href={tool.registry.url} class={linkClass}>
-                          {tool.registry.name}
-                        </a>
-                      </>
-                    )}
-                  </Fact>
-                )}
-                {licence && <Fact term="Licence">{licence}</Fact>}
-                {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
-                {tool.live && (
-                  <Fact term="Live">
-                    <a
-                      href={tool.live.href}
-                      {...toolLink("live")}
-                      class={linkClass}
-                    >
-                      {tool.live.label}
-                    </a>
-                  </Fact>
-                )}
-                {repo && (
-                  <Fact term="Code">
-                    <a href={repo} class={linkClass}>{tool.repo}</a>
-                    {snap && snap.stars >= MIN_STARS_SHOWN && (
-                      <span class="text-graphite">, {snap.stars} stars</span>
-                    )}
-                  </Fact>
-                )}
-                {tool.ci && snap && (
-                  <Fact term="CI">
-                    <CiPill
-                      ci={snap.ci}
-                      pipelinesUrl={ciUrl(tool)!}
-                      labelHidden
-                    />
-                    <span data-checked class="block mt-1 text-graphite">
-                      {checkedLabel(live, tool.repo)}
-                    </span>
-                  </Fact>
-                )}
-              </dl>
-              {repo && (
-                <div class="mt-4 pt-4 border-t border-rule text-sm space-y-2">
-                  <p>
-                    <a
-                      href={repo}
-                      {...toolLink("github")}
-                      class={linkClass}
-                    >
-                      Star on GitHub
-                    </a>
-                    {tool.status !== "archived" && (
-                      <>
-                        {" · "}
-                        <a
-                          href={`${repo}/issues`}
-                          {...toolLink("github")}
-                          class={linkClass}
-                        >
-                          Report an issue
-                        </a>
-                      </>
-                    )}
-                  </p>
-                </div>
-              )}
-            </FactCard>
-          </div>
+        {showcase
+          ? (
+            <ShowcaseDetails
+              tool={tool}
+              repo={repo}
+              facts={factCard}
+              story={story}
+            />
+          )
+          : (
+            <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-start">
+              <div
+                data-fact-card
+                class="order-first lg:order-2 lg:sticky lg:top-8"
+              >
+                {factCard}
+              </div>
 
-          <div class="lg:order-1 min-w-0 space-y-12">
-            {tool.screenshots && (
-              <section aria-labelledby="screenshots">
-                <h2 id="screenshots" class="sr-only">Screenshots</h2>
-                <ImageGallery images={tool.screenshots} />
-              </section>
-            )}
+              <div class="lg:order-1 min-w-0 space-y-12">
+                {tool.screenshots && (
+                  <section aria-labelledby="screenshots">
+                    <h2 id="screenshots" class="sr-only">Screenshots</h2>
+                    <ImageGallery images={tool.screenshots} />
+                  </section>
+                )}
 
-            {tool.proofLinks && (
-              <section aria-labelledby="proof">
-                <h2 id="proof" class="text-2xl text-parchment">Live proof</h2>
-                <ul class="mt-3 space-y-1">
-                  {tool.proofLinks.map((l) => (
-                    <li key={l.href}>
-                      <a href={l.href} class={linkClass}>{l.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {!showcase && (
-              <section aria-labelledby="what">
-                <h2 id="what" class="text-2xl text-parchment">What it is</h2>
-                <p class="mt-3 text-graphite leading-relaxed">{tool.summary}</p>
-                {tool.packages && (
-                  <>
-                    <p class="mt-4 text-graphite">
-                      {tool.packages.length}{" "}
-                      packages, each installed on its own:
-                    </p>
-                    <ul class="mt-2 flex flex-wrap gap-2">
-                      {tool.packages.map((p) => (
-                        <li key={p}>
-                          <code class="text-sm">{p}</code>
+                {tool.proofLinks && (
+                  <section aria-labelledby="proof">
+                    <h2 id="proof" class="text-2xl text-parchment">
+                      Live proof
+                    </h2>
+                    <ul class="mt-3 space-y-1">
+                      {tool.proofLinks.map((l) => (
+                        <li key={l.href}>
+                          <a href={l.href} class={linkClass}>{l.label}</a>
                         </li>
                       ))}
                     </ul>
-                  </>
+                  </section>
                 )}
-              </section>
-            )}
 
-            {tool.standing && tool.usedFor && (
-              <section aria-labelledby="standing">
-                <h2 id="standing" class="text-2xl text-parchment">
-                  Where it stands
-                </h2>
-                <p class="mt-3 text-graphite leading-relaxed">
-                  {tool.standing}
-                </p>
-              </section>
-            )}
+                <section aria-labelledby="what">
+                  <h2 id="what" class="text-2xl text-parchment">
+                    What it is
+                  </h2>
+                  <p class="mt-3 text-graphite leading-relaxed">
+                    {tool.summary}
+                  </p>
+                  {tool.packages && (
+                    <>
+                      <p class="mt-4 text-graphite">
+                        {tool.packages.length}{" "}
+                        packages, each installed on its own:
+                      </p>
+                      <ul class="mt-2 flex flex-wrap gap-2">
+                        {tool.packages.map((p) => (
+                          <li key={p}>
+                            <code class="text-sm">{p}</code>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </section>
 
-            {hasFit && (
-              <section aria-labelledby="fit" class="grid gap-8 sm:grid-cols-2">
-                {(tool.useIf?.length ?? 0) > 0 && (
-                  <div>
-                    <h2 id="fit" class="text-xl text-parchment">Use it if</h2>
-                    <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                      {tool.useIf!.map((line) => <li key={line}>{line}</li>)}
-                    </ul>
-                  </div>
-                )}
-                {(tool.dontUseIf?.length ?? 0) > 0 && (
-                  <div>
-                    <h2
-                      id={tool.useIf?.length ? undefined : "fit"}
-                      class="text-xl text-parchment"
-                    >
-                      {showcase ? "Skip it if" : "Don't use it if"}
+                {tool.standing && tool.usedFor && (
+                  <section aria-labelledby="standing">
+                    <h2 id="standing" class="text-2xl text-parchment">
+                      Where it stands
                     </h2>
-                    <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                      {tool.dontUseIf!.map((line) => (
-                        <li key={line}>{line}</li>
+                    <p class="mt-3 text-graphite leading-relaxed">
+                      {tool.standing}
+                    </p>
+                  </section>
+                )}
+
+                {hasFit && (
+                  <section
+                    aria-labelledby="fit"
+                    class="grid gap-8 sm:grid-cols-2"
+                  >
+                    {(tool.useIf?.length ?? 0) > 0 && (
+                      <div>
+                        <h2 id="fit" class="text-xl text-parchment">
+                          Use it if
+                        </h2>
+                        <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
+                          {tool.useIf!.map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {(tool.dontUseIf?.length ?? 0) > 0 && (
+                      <div>
+                        <h2
+                          id={tool.useIf?.length ? undefined : "fit"}
+                          class="text-xl text-parchment"
+                        >
+                          Don't use it if
+                        </h2>
+                        <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
+                          {tool.dontUseIf!.map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                {(tool.fits?.length ?? 0) > 0 && (
+                  <section aria-labelledby="fits">
+                    <h2 id="fits" class="text-2xl text-parchment">
+                      How it fits with my other repos
+                    </h2>
+                    <ul class="mt-4 space-y-3">
+                      {tool.fits!.map((f) => (
+                        <li
+                          key={f.text}
+                          data-relation={f.planned ? "planned" : "true"}
+                          class={cn(
+                            "pl-4 border-l-2",
+                            f.planned
+                              ? "border-dashed border-rule-strong"
+                              : "border-solid border-sage",
+                          )}
+                        >
+                          <span class="text-xs uppercase tracking-wider text-graphite">
+                            {f.planned ? "Planned" : "Today"}
+                          </span>
+                          <p class="text-parchment">
+                            {f.href
+                              ? <a href={f.href} class={linkClass}>{f.text}</a>
+                              : f.text}
+                          </p>
+                        </li>
                       ))}
                     </ul>
-                  </div>
+                  </section>
                 )}
-              </section>
-            )}
 
-            {(tool.fits?.length ?? 0) > 0 && (
-              <section aria-labelledby="fits">
-                <h2 id="fits" class="text-2xl text-parchment">
-                  How it fits with my other repos
-                </h2>
-                <ul class="mt-4 space-y-3">
-                  {tool.fits!.map((f) => (
-                    <li
-                      key={f.text}
-                      data-relation={f.planned ? "planned" : "true"}
-                      class={cn(
-                        "pl-4 border-l-2",
-                        f.planned
-                          ? "border-dashed border-rule-strong"
-                          : "border-solid border-sage",
-                      )}
-                    >
-                      <span class="text-xs uppercase tracking-wider text-graphite">
-                        {f.planned ? "Planned" : "Today"}
-                      </span>
-                      <p class="text-parchment">
-                        {f.href
-                          ? <a href={f.href} class={linkClass}>{f.text}</a>
-                          : f.text}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {showcase && posts.length > 0 && (
-              <section aria-labelledby="posts">
-                <h2 id="posts" class="text-2xl text-parchment">
-                  The story behind it
-                </h2>
-                <ul class="mt-4 space-y-4">
-                  {posts.map((p) => (
-                    <li key={p.slug}>
-                      <Card data-story class="p-6">
-                        <a
-                          href={`/blog/${p.slug}`}
-                          {...eventAttrs("cta", {
-                            place: "body",
-                            target: `/blog/${p.slug}`,
-                          })}
-                          class="font-heading text-lg text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
-                        >
-                          {p.title}
-                        </a>
-                        {tool.storyLine && (
-                          <p class="mt-2 text-graphite">{tool.storyLine}</p>
-                        )}
-                      </Card>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {!showcase && posts.length > 0 && (
-              <section aria-labelledby="posts">
-                <h2 id="posts" class="text-2xl text-parchment">
-                  {posts.length > 1 ? "Posts" : "The post"}
-                </h2>
-                <ul class="mt-3 space-y-1">
-                  {posts.map((p) => (
-                    <li key={p.slug}>
-                      <a
-                        href={`/blog/${p.slug}`}
-                        {...eventAttrs("cta", {
-                          place: "body",
-                          target: `/blog/${p.slug}`,
-                        })}
-                        class={linkClass}
-                      >
-                        {p.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-          </div>
-        </div>
+                {posts.length > 0 && (
+                  <section aria-labelledby="posts">
+                    <h2 id="posts" class="text-2xl text-parchment">
+                      {posts.length > 1 ? "Posts" : "The post"}
+                    </h2>
+                    <ul class="mt-3 space-y-1">
+                      {posts.map((p) => (
+                        <li key={p.slug}>
+                          <a
+                            href={`/blog/${p.slug}`}
+                            {...eventAttrs("cta", {
+                              place: "body",
+                              target: `/blog/${p.slug}`,
+                            })}
+                            class={linkClass}
+                          >
+                            {p.title}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
+            </div>
+          )}
 
         <section aria-labelledby="more" class="mt-12">
           <h2 id="more" class="text-2xl text-parchment">More tools</h2>
