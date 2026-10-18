@@ -3,7 +3,7 @@
 // through test/harness.ts. Assert structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, mainContent, railColumn, visibleText } from "./html.ts";
 import {
   catalogItems,
   catalogOffers,
@@ -55,16 +55,25 @@ siteTest(
   },
 );
 
-siteTest("the navigation has the five agreed links", async (site) => {
-  const html = await site.html("/");
-  const menu = html.slice(html.indexOf('id="desktop-menu"'));
-  const links = [...menu.matchAll(/<a[^>]*data-nav-link[^>]*>/g)]
-    .map((m) => m[0].match(/href="([^"]*)"/)?.[1]);
-  assertEquals(
-    [...links].sort(),
-    ["/blog", "/catalog", "/how-i-work", "/tools", "/work"],
-  );
-});
+siteTest(
+  "the rail lists Book, then Work, Services, Tools, How I work and Writing",
+  async (site) => {
+    const links = [
+      ...railColumn(await site.html("/")).matchAll(
+        /<a[^>]*\bhref="([^"]*)"[^>]*>/g,
+      ),
+    ].map((m) => m[1]);
+    // Book, or Write to `/book#brief` when this run has no SCHEDULE_URL.
+    assert(links[0]?.startsWith("/book"), `the rail opens on ${links[0]}`);
+    assertEquals(links.slice(1), [
+      "/work",
+      "/catalog",
+      "/tools",
+      "/how-i-work",
+      "/blog",
+    ]);
+  },
+);
 
 /**
  * The six retired slugs and their new homes, written out here on purpose. The
@@ -224,7 +233,7 @@ Deno.test(
     const site = await startSite();
     try {
       const html = await site.html("/");
-      const main = html.slice(html.indexOf('id="main-content"'));
+      const main = mainContent(html);
       // The prices sit inside the hero (#269); "testimonials" shows only
       // while a review is cleared for the site.
       assertEquals(
@@ -908,7 +917,7 @@ siteTest(
       img.includes("object-[50%_30%]"),
       `portrait crop differs from /about: ${img}`,
     );
-    const main = html.slice(html.indexOf('id="main-content"'));
+    const main = mainContent(html);
     assertEquals(count(main, /fetchpriority="high"/g), 1);
   },
 );

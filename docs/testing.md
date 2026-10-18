@@ -37,21 +37,25 @@ sitemap page plus `/pay`, and pins that each `/pay` copy button names its field.
 `test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only accessible
 names, from server-rendered HTML only — it doesn't cover the two lightboxes'
 buttons, which only exist after client JS opens them (see "Browser-driven
-tests"). `components/Nav.tsx` sets no `aria-current` on a destination link:
-Fresh's renderer marks it from the request URL, and `test/a11y.test.ts` pins
-that. Three exceptions set it by hand. Links to `/` (the rail's portrait and the
-phone header) use `lib/nav.ts`'s `navCurrent()`, because Fresh marks every link
-to `/` as the current section on every page; `test/a11y.test.ts` checks them.
-The links inside `islands/NavMore.tsx` use `navCurrent()` too, because hydration
-strips Fresh's marker from an island (Preact drops attributes the island's own
-vnode lacks). Book carries a fixed `aria-current="false"`: it is an action,
-never the current page, and its "Write" fallback (`/book#brief`) would otherwise
-be marked by Fresh. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts`
-directly, no server needed. `test/bot-filter.test.ts` (#179) boots the site with
-placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami
-script or preconnect links while browsers do. `routes/_app.tsx` makes that
-decision at render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML
-after it is rendered.
+tests"). The library `Rail` sets `aria-current` on its entries from the path
+`components/Nav.tsx` hands it: "page" on the page, "true" on its section, so a
+nested route passes its own path. Book is the page on `/book` only, also as
+"Write", whose `#brief` href is matched by key. An entry that is not current
+carries `aria-current="false"`, so Fresh's renderer leaves the rail's links to
+`/` (the portrait and the More sheet's Home row) alone; Fresh would otherwise
+mark every link to `/` as the current section on every page. The phone header
+sets its own value through `lib/nav.ts`'s `navCurrent()`. `test/a11y.test.ts`
+checks all three home links. `test/nav.test.ts` checks Book on every page, the
+tab bar's order, the More sheet's links and the portrait's top slot.
+`test/html.ts` slices the rail's parts (`railColumn`, `railTop`, `tabBar`,
+`moreSheet`) and the page (`pageBody` stops at the footer, `mainContent` at the
+phone dock), because the footer follows `<main>` in the same column and the dock
+follows both. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no
+server needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
+`UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
+preconnect links while browsers do. `routes/_app.tsx` makes that decision at
+render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is
+rendered.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds
@@ -104,13 +108,15 @@ page. Never retry a test on this error.
   the home page mounts the calendar only after a submit.
 - `test/a11y.browser.test.ts` (#165): the project and blog lightboxes' dialog
   naming, button names and focus-return to the trigger; the nav (#185): the
-  phone More dialog's Escape handling (closes it, returns focus to More, and
-  does nothing when already closed), the desktop rail's top-to-bottom Tab order
-  with no rotated ancestor, horizontal labels and an icon on every stop, the
-  absence of any Links control in the rail and the More dialog, and the 390px
-  tab bar (five tabs, Book centred, the current page and section styled after
-  hydration, More outlined on a page listed under it, its dialog marking that
-  page, and a tap on the backdrop closing it). The explicit
+  phone More sheet's Escape handling (closes it, returns focus to More, and does
+  nothing when already closed), the desktop rail's top-to-bottom Tab order with
+  no rotated ancestor, horizontal labels and an icon on every stop, the absence
+  of any Links control in the rail and the More sheet, More filled on Home,
+  About and Infrastructure, and the 390px tab bar (five tabs, Book centred, the
+  current page and section filled, More filled on a page listed under it, its
+  sheet marking that page, and a backdrop tap closing the sheet and returning
+  focus to More), and the site footer as the page's one `contentinfo` landmark,
+  outside `<main>`, on /, /about and /blog. The explicit
   `triggerRef.current?.focus()` calls in both lightboxes are kept on purpose,
   even though native `<dialog>` already restores focus. Since #246 it also
   checks the project gallery's "n / N" counter and its named Previous/Next
@@ -152,16 +158,18 @@ page. Never retry a test on this error.
   no CSP violation. Since #365 it also scans every sitemap page plus `/pay`, a
   not-found URL, `/unsubscribe` and `/subscribe/confirm` at 1440px for the
   accent (and its hover shade) as text, border, outline, underline, ring or SVG
-  fill or stroke outside `[data-primary-book]`, checks sample links, form fields
-  and a secondary button while hovered and focused, and fails on a source class
-  in `routes/`, `components/` or `islands/` that uses an accent token for
-  anything but a background. Since preact-components#571 it also checks that the
-  project gallery's Previous/Next (`navigationVariant="ghost"`) are transparent
-  inside a Rule strong border and fill on hover, and that their row stays 40px
-  tall with and without them. `test/no-emoji.test.ts` (not browser-driven — a
-  plain `startSite()` + `visibleText()` check, like `test/rendered.test.ts`)
-  walks every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
-  characters, excluding `©`/`®`/`™` and plain digits.
+  fill or stroke outside `[data-primary-book]`, checks sample links, form
+  fields, a secondary button, a rail entry, the rail's portrait and a More sheet
+  row (opened directly, since More is phone-only) while hovered and focused, and
+  fails on a source class in `routes/`, `components/` or `islands/` that uses an
+  accent token for anything but a background. Since preact-components#571 it
+  also checks that the project gallery's Previous/Next
+  (`navigationVariant="ghost"`) are transparent inside a Rule strong border and
+  fill on hover, and that their row stays 40px tall with and without them.
+  `test/no-emoji.test.ts` (not browser-driven — a plain `startSite()` +
+  `visibleText()` check, like `test/rendered.test.ts`) walks every page in
+  `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}` characters,
+  excluding `©`/`®`/`™` and plain digits.
 - `test/notes.browser.test.ts` (#186): the margin note next to a project page's
   outcome line (`/work/foodrazor`) sits beside its claim with no horizontal
   scroll at 1100, 1280 and 1440px (the page's `scrollWidth` stays within the

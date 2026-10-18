@@ -1,12 +1,12 @@
-// Guards for issue #160: the nav's active-page marker (which
-// components/Nav.tsx leaves to Fresh's own framework behavior — see the first
+// Guards for issue #160: the nav's active-page marker (which the library
+// `Rail` sets from the path components/Nav.tsx hands it — see the first
 // test's docs) and icon-only controls keeping an accessible name. Reads the
 // built site through test/harness.ts — see docs/testing.md "Rendered-page tests".
 // Assert on structure only, never on prose (same rule as
 // test/structure.test.ts and test/rendered.test.ts).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, visibleText } from "./html.ts";
+import { count, moreSheet, railColumn, railTop, visibleText } from "./html.ts";
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -21,33 +21,25 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 }
 
 /**
- * components/Nav.tsx leaves each destination link's `aria-current` to Fresh
- * 2's renderer, which marks any `<a href>` matching the request URL: an exact
- * match gets `aria-current="page"` and `data-current="true"`, a section
- * ancestor gets `aria-current="true"` and `data-ancestor="true"` (Fresh's
- * `setActiveUrl` in its built server bundle). The nav is server-rendered, so
- * no hydration strips the marker again. What this test guards is the nav links' own `href`s in the server HTML:
- * pin both of Fresh's cases (exact match on `/blog`, section-ancestor match
- * on `/catalog` from a nested catalog item) so a typo'd or hardcoded `href`
- * — which would make Fresh's own matching miss — shows up here.
+ * components/Nav.tsx hands the request path to the library `Rail`, which
+ * marks the rail entry whose `href` equals it `aria-current="page"` and, with
+ * none, the entry whose `href` is the path's section `aria-current="true"`.
+ * It sets the attribute itself, so Fresh's own active-link markers
+ * (`data-current`, `data-ancestor`) stay off the rail. Pins both cases (the
+ * page on `/blog`, the section on a nested catalog item) so a typo'd
+ * `href`, or a route that passes its section's path instead of its own,
+ * shows up here.
  */
 siteTest(
   "the nav marks an exact page 'page' and its section 'true'",
   async (site) => {
-    const exactHtml = await site.html("/blog");
-    const exactMenu = exactHtml.slice(
-      exactHtml.indexOf('id="desktop-menu"'),
-      exactHtml.indexOf("</nav>"),
-    );
-    const exactLinks = [...exactMenu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g)]
-      .map((m) => m[0]);
+    const exactLinks = railLinks(await site.html("/blog"));
     assertEquals(exactLinks.length, 5, "expected the five agreed nav links");
     const blogLink = exactLinks.find((a) => /href="\/blog"/.test(a));
     assert(blogLink, "no nav link points at /blog");
     assert(
-      /aria-current="page"/.test(blogLink) &&
-        /data-current="true"/.test(blogLink),
-      `the /blog nav link is missing Fresh's exact-match markers: ${blogLink}`,
+      /aria-current="page"/.test(blogLink),
+      `the /blog nav link is not marked the page: ${blogLink}`,
     );
     // Counted over the rail's destination links only, so the home links
     // (checked in their own test below) and Book don't count.
@@ -55,22 +47,14 @@ siteTest(
     assertEquals(count(exactList, /aria-current="page"/g), 1);
     assertEquals(count(exactList, /aria-current="true"/g), 0);
 
-    const nestedHtml = await site.html(
-      "/catalog/zero-to-production-saas-mvp",
+    const nestedLinks = railLinks(
+      await site.html("/catalog/zero-to-production-saas-mvp"),
     );
-    const nestedMenu = nestedHtml.slice(
-      nestedHtml.indexOf('id="desktop-menu"'),
-      nestedHtml.indexOf("</nav>"),
-    );
-    const nestedLinks = [
-      ...nestedMenu.matchAll(/<a\b[^>]*data-nav-link[^>]*>/g),
-    ].map((m) => m[0]);
     const servicesLink = nestedLinks.find((a) => /href="\/catalog"/.test(a));
     assert(servicesLink, "no nav link points at /catalog");
     assert(
-      /aria-current="true"/.test(servicesLink) &&
-        /data-ancestor="true"/.test(servicesLink),
-      `the Services nav link is missing Fresh's ancestor-match markers: ${servicesLink}`,
+      /aria-current="true"/.test(servicesLink),
+      `the Services nav link is not marked the section: ${servicesLink}`,
     );
     const nestedList = nestedLinks.join("");
     assertEquals(count(nestedList, /aria-current="true"/g), 1);
@@ -78,22 +62,37 @@ siteTest(
   },
 );
 
+/** The rail column's destination links (`data-nav-link`), as opening tags. */
+function railLinks(html: string): string[] {
+  return [...railColumn(html).matchAll(/<a\b[^>]*data-nav-link[^>]*>/g)]
+    .map((m) => m[0]);
+}
+
 /**
  * Fresh's renderer would mark every link to `/` as the current section
- * (`aria-current="true"`) on every page, so components/Nav.tsx (the rail's
- * portrait) and components/Layout.tsx (the phone header) set the value
- * themselves through `navCurrent()`: "page" on the home page, "false"
+ * (`aria-current="true"`) on every page. The phone header sets the value
+ * itself through `navCurrent()`, and the library `Rail` renders "false" on
+ * an entry that is not current, which Fresh leaves alone, so the portrait
+ * and the More sheet's Home row read "page" on the home page and "false"
  * everywhere else.
  */
 siteTest(
-  "the two home links are the current page only on the home page",
+  "the three home links are the current page only on the home page",
   async (site) => {
     const homeLinks = (html: string) =>
-      [...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g)]
-        .map((m) => m[0]);
-    for (const [path, expected] of [["/", "page"], ["/blog", "false"]]) {
+      [
+        ...railTop(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
+        ...moreSheet(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
+        ...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g),
+      ].map((m) => m[0]);
+    const cases = [["/", "page"], ["/blog", "false"], ["/work", "false"]];
+    for (const [path, expected] of cases) {
       const links = homeLinks(await site.html(path));
-      assertEquals(links.length, 2, `${path}: rail and phone header`);
+      assertEquals(
+        links.length,
+        3,
+        `${path}: the portrait, the sheet's Home and the phone header`,
+      );
       for (const link of links) {
         assert(link.includes(`href="/"`), link);
         assert(

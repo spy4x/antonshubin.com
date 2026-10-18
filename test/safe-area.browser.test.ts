@@ -30,7 +30,7 @@ Deno.test("the phone tab bar clears an iPhone's home indicator at 390px", async 
     await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
 
     const { viewport, padding, barBottom } = await page.evaluate(() => {
-      const bar = document.getElementById("tab-bar")!;
+      const bar = document.querySelector('[data-e2e="rail-shell-tabbar"]')!;
       return {
         viewport: document.querySelector('meta[name="viewport"]')!.getAttribute(
           "content",
@@ -73,7 +73,7 @@ Deno.test("the rail and the main column keep out of a landscape iPhone's notch",
 
     const { linkLefts, railRight, mainLeft, mainPaddingRight } = await page
       .evaluate(() => {
-        const rail = document.getElementById("desktop-menu")!;
+        const rail = document.querySelector('aside[aria-label="Sidebar"]')!;
         const main = document.getElementById("main-content")!;
         return {
           linkLefts: [...rail.querySelectorAll("a, button")].map((el) =>

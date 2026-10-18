@@ -8,11 +8,12 @@ const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
 
 /**
  * The `#region` blocks of the preset the site takes. "Colour atoms" holds
- * every colour, focus and selection utility the components used here read.
- * Add a region (Typography, Buttons, Forms, Surfaces, ...) when a component
+ * every colour, focus and selection utility the components used here read;
+ * "Spacing" the safe-area paddings the rail reads (`pl-safe`, `pb-safe`). Add
+ * a region (Typography, Buttons, Forms, Surfaces, ...) when a component
  * that needs it is adopted.
  */
-const PRESET_REGIONS = ["Colour atoms"];
+const PRESET_REGIONS = ["Colour atoms", "Spacing"];
 
 /** One `#region` block of the preset's text, or a thrown error naming it. */
 function presetRegion(css: string, name: string): string {

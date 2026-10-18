@@ -156,11 +156,10 @@ Deno.test("no CSP violations on any static page or representative dynamic page",
   }
 });
 
-Deno.test("the mobile menu still hydrates on an unmatched URL", async () => {
-  // Zero CSP violations alone doesn't prove client JS ran — it's also true
-  // of a page where hydration silently never started. This drives the
-  // mobile menu open, same as test/a11y.browser.test.ts's Escape-handling
-  // tests, as the concrete proof.
+Deno.test("the More sheet opens on an unmatched URL with no CSP violation", async () => {
+  // Zero CSP violations alone doesn't prove the page works: this drives the
+  // phone's More sheet open, as test/a11y.browser.test.ts does, and checks
+  // again once it shows.
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -175,9 +174,11 @@ Deno.test("the mobile menu still hydrates on an unmatched URL", async () => {
 
       const toggle = page.getByRole("button", { name: "More", exact: true });
       await toggle.click();
-      await page.locator("#mobile-menu").waitFor({ state: "visible" });
+      await page.getByRole("dialog", { name: "More" }).waitFor({
+        state: "visible",
+      });
 
-      await assertNoViolations(page, "after opening the mobile menu");
+      await assertNoViolations(page, "after opening the More sheet");
     } finally {
       await page.close();
     }

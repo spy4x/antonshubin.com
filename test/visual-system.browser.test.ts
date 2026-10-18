@@ -513,6 +513,8 @@ const ACCENT_STATE_SAMPLES: {
   path: string;
   selector: string;
   states: ("hover" | "focus")[];
+  /** Opens the phone More sheet first: its rows are drawn only inside it. */
+  inSheet?: boolean;
 }[] = [
   {
     name: "review attribution link",
@@ -559,8 +561,21 @@ const ACCENT_STATE_SAMPLES: {
   {
     name: "nav item",
     path: "/",
-    selector: "nav a.nav-focus:not([data-primary-book]):visible",
+    selector: "nav a[data-nav-link]:visible",
     states: ["hover", "focus"],
+  },
+  {
+    name: "nav portrait",
+    path: "/blog",
+    selector: '[data-e2e="rail-shell-top"] a[data-e2e="rail-shell-entry"]',
+    states: ["hover", "focus"],
+  },
+  {
+    name: "More sheet row",
+    path: "/blog",
+    selector: '[data-e2e="rail-shell-dialog"] a[data-e2e="rail-shell-entry"]',
+    states: ["hover", "focus"],
+    inSheet: true,
   },
   {
     name: "secondary button",
@@ -593,6 +608,12 @@ Deno.test("a link, a form field and a secondary button show no accent while hove
           await page.addStyleTag({
             content: "*, *::before, *::after { transition: none !important; }",
           });
+        }
+        if (sample.inSheet) {
+          // The sheet's More button is phone-only; open its dialog directly.
+          await page.locator('[data-e2e="rail-shell-dialog"]').evaluate((el) =>
+            (el as HTMLDialogElement).showModal()
+          );
         }
         const target = page.locator(sample.selector).first();
         await target.waitFor({ state: "visible", timeout: WAIT_MS });

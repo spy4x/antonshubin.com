@@ -8,7 +8,7 @@
 // built pages, since the wiring lives in the route files.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import { ROLE } from "../lib/head.ts";
 import { projectLead } from "../lib/llms.ts";
 import { promise } from "../lib/promises.ts";
@@ -86,7 +86,7 @@ siteTest(
   "/work links no tool page and no channel, only client work",
   async (site) => {
     const html = await site.html("/work");
-    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    const main = pageBody(html);
     assert(main.length > 0, "/work has no <main>");
     for (const t of tools) {
       assert(
@@ -305,11 +305,11 @@ siteTest(
   },
 );
 
-/** The page's `<main>`, where the nav's own Book (#185) is not. */
+/** The page alone, where the nav's own Book (#185) is not. */
 function main(html: string): string {
-  const start = html.indexOf(`id="main-content"`);
-  assert(start > 0, "/work has no main-content");
-  return html.slice(start, html.indexOf("</main>", start));
+  const page = pageBody(html);
+  assert(page, "/work has no main-content");
+  return page;
 }
 
 /** The client projects in the order /work shows them: highlights, then the archive. */

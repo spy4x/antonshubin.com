@@ -5,7 +5,7 @@
 // and the one high-priority hero image.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, mainContent, visibleText } from "./html.ts";
 import { formatPeriod, projects } from "../lib/data.ts";
 import { catalogItems } from "../lib/catalog.ts";
 import { firstSentence } from "../lib/llms.ts";
@@ -125,7 +125,7 @@ siteTest(
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`);
       // The page body only: the nav's own Book (#185) sits before <main>.
-      const main = html.slice(html.indexOf(`id="main-content"`));
+      const main = mainContent(html);
       assertEquals(count(main, /data-primary-book/), 2, p.slug);
       const card = region(html, "data-project-facts", "aside");
       const band = region(html, "data-closing-band", "section");

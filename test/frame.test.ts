@@ -5,7 +5,7 @@
 // short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import { corePages } from "../lib/pages.ts";
 import { footerProfiles, sameAsUrls } from "../lib/profiles.ts";
 import { ROLE } from "../lib/head.ts";
@@ -148,9 +148,9 @@ siteTest(
     );
     assertEquals(count(html, /<h1\b/g), 1);
     assert(visibleText(html).includes("Page not found"));
-    const main = html.slice(html.indexOf('id="main-content"'));
+    const main = pageBody(html);
     const buttons = [
-      ...main.slice(0, main.indexOf("</main>")).matchAll(
+      ...main.matchAll(
         /<a href="([^"]+)" class="[^"]*border-rule-strong[^"]*"[^>]*>([^<]*)</g,
       ),
     ].map((m) => [m[1], m[2]]);
@@ -163,13 +163,13 @@ siteTest(
     assert(main.includes("mailto:"), "the 404 has no email line");
 
     const inBlog = await (await site.get("/blog/no-such-post")).text();
-    const blogMain = inBlog.slice(inBlog.indexOf('id="main-content"'));
+    const blogMain = pageBody(inBlog);
     const first = blogMain.match(
       /<a href="([^"]+)" class="[^"]*border-rule-strong[^"]*"[^>]*>([^<]*)</,
     );
     assertEquals([first?.[1], first?.[2]], ["/blog", "Back to Writing"]);
     assertEquals(
-      count(blogMain.slice(0, blogMain.indexOf("</main>")), /href="\/blog"/g),
+      count(blogMain, /href="\/blog"/g),
       1,
       "the Writing button is listed twice",
     );

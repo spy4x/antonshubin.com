@@ -4,7 +4,7 @@
 // "Rendered-page tests". Assert structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, mainContent, visibleText } from "./html.ts";
 import { catalogItems, priceLabel } from "../lib/catalog.ts";
 import { faqs, MAX_FAQS } from "../lib/faqs.ts";
 import { HOW_I_WORK_TITLE, PRICING_RULE } from "../lib/how-i-work.ts";
@@ -43,7 +43,7 @@ siteTest(
   "how-i-work outlines Five promises, the promises as H3 and the sections as H2",
   async (site) => {
     const html = await site.html("/how-i-work");
-    const main = html.slice(html.indexOf('id="main-content"'));
+    const main = mainContent(html);
     const h2 = [...main.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].map((m) =>
       visibleText(m[1])
     );
@@ -129,7 +129,7 @@ Deno.test(
     try {
       const page = await site.html("/how-i-work");
       // The nav's own Book links are outside the page's content.
-      const html = page.slice(page.indexOf('id="main-content"'));
+      const html = mainContent(page);
       const book = [...html.matchAll(/<a [^>]*data-primary-book[^>]*>/g)].map((
         m,
       ) => m[0]);

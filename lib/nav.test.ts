@@ -1,10 +1,11 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import {
-  moreItems,
   navCurrent,
   navItemFor,
   navLabel,
   railItems,
+  sheetBottomItems,
+  sheetTopItems,
   siteItems,
 } from "./nav.ts";
 
@@ -52,9 +53,14 @@ Deno.test("the footer's Site group is the rail plus Infrastructure and About", (
   );
 });
 
-Deno.test("the More sheet lists About right after Home", () => {
+Deno.test("the rail lists Work, Services, Tools, How I work, then Writing", () => {
   assertEquals(
-    moreItems.slice(0, 2).map((i) => i.href),
-    ["/", "/about"],
+    railItems.map((i) => i.label),
+    ["Work", "Services", "Tools", "How I work", "Writing"],
   );
+});
+
+Deno.test("the More sheet opens with Home then About and ends with Infrastructure", () => {
+  assertEquals(sheetTopItems.map((i) => i.href), ["/", "/about"]);
+  assertEquals(sheetBottomItems.map((i) => i.href), ["/infrastructure"]);
 });

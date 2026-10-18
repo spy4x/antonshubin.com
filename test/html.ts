@@ -71,3 +71,53 @@ export function count(html: string, pattern: RegExp): number {
     : `${pattern.flags}g`;
   return [...html.matchAll(new RegExp(pattern.source, flags))].length;
 }
+
+/** Slices `html` from the first `start` marker to the first `end` after it, or "" with no start. */
+function between(html: string, start: string, end: string): string {
+  const from = html.indexOf(start);
+  if (from < 0) return "";
+  const to = html.indexOf(end, from);
+  return html.slice(from, to < 0 ? undefined : to);
+}
+
+/** The desktop rail column's list: Book, then the destinations (components/Nav.tsx). */
+export function railColumn(html: string): string {
+  return between(html, `data-e2e="rail-shell-rail"`, "</nav>");
+}
+
+/** The rail's top zone: the portrait, which links home. */
+export function railTop(html: string): string {
+  return between(
+    html,
+    `data-e2e="rail-shell-top"`,
+    `data-e2e="rail-shell-rail"`,
+  );
+}
+
+/** The phone tab bar: up to four entries with Book in the centre, then More. */
+export function tabBar(html: string): string {
+  return between(html, `data-e2e="rail-shell-tabbar"`, "</nav>");
+}
+
+/** The More sheet: the `<dialog>` the tab bar's More button opens. */
+export function moreSheet(html: string): string {
+  return between(html, `data-e2e="rail-shell-dialog"`, "</dialog>");
+}
+
+/**
+ * The page and the footer: from `#main-content` to the phone dock, which the
+ * rail renders after the page column, so a count of the page's links leaves
+ * out the tab bar and the More sheet.
+ */
+export function mainContent(html: string): string {
+  return between(html, `id="main-content"`, `data-e2e="rail-shell-dock"`);
+}
+
+/**
+ * The page alone: from `#main-content` to the site footer, which the rail's
+ * `footer` slot draws right after `<main>`, so a count of the page's own
+ * links or words leaves out the footer's.
+ */
+export function pageBody(html: string): string {
+  return between(html, `id="main-content"`, `<footer class="site-footer`);
+}

@@ -4,7 +4,7 @@
 // tests". Assert structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, mainContent, pageBody, visibleText } from "./html.ts";
 import { ABOUT_NAME, aboutSteps } from "../lib/about.ts";
 import { bannedWordsIn, moneyAmountIn } from "./about-words.ts";
 
@@ -109,7 +109,7 @@ siteTest(
   "/about shows the portrait as its one eager, high-priority image",
   async (site) => {
     const html = await site.html("/about");
-    const main = html.slice(html.indexOf('id="main-content"'));
+    const main = mainContent(html);
     assertEquals(count(main, /fetchpriority="high"/g), 1);
     const img = main.match(/<img[^>]*data-about-portrait[^>]*>/)?.[0] ?? "";
     assert(img.includes('fetchpriority="high"'), img);
@@ -138,8 +138,7 @@ Deno.test("/about shows Book in its card and its closing band only", async () =>
   });
   try {
     const html = await site.html("/about");
-    const start = html.indexOf('id="main-content"');
-    const main = html.slice(start, html.indexOf("</main>", start));
+    const main = pageBody(html);
     const events = [...main.matchAll(/<a\b[^>]*data-primary-book[^>]*>/g)]
       .map((m) =>
         [
@@ -197,9 +196,9 @@ siteTest(
   "/about's visible text names no income, loan, 80/20 split, exit goal or money amount",
   async (site) => {
     const html = await site.html("/about");
-    const start = html.indexOf('id="main-content"');
-    assert(start > -1, "/about has no main content");
-    const text = visibleText(html.slice(start, html.indexOf("</main>", start)));
+    const main = pageBody(html);
+    assert(main, "/about has no main content");
+    const text = visibleText(main);
     assertEquals(bannedWordsIn(text), []);
     assertEquals(moneyAmountIn(text), undefined);
   },

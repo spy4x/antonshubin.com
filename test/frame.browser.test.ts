@@ -151,7 +151,8 @@ Deno.test("at 390px the last footer line clears the tab bar", async () => {
       const gap = await page.evaluate(() => {
         const last = document.querySelector("footer > p:last-child")!
           .getBoundingClientRect();
-        const bar = document.getElementById("tab-bar")!.getBoundingClientRect();
+        const bar = document.querySelector('[data-e2e="rail-shell-tabbar"]')!
+          .getBoundingClientRect();
         return bar.top - last.bottom;
       });
       assert(

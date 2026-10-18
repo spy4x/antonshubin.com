@@ -194,29 +194,35 @@ interpolation.
 `lib/nav.ts` is the only list of navigation destinations (#185): the desktop
 rail, the phone tab bar, the phone More dialog and the footer's Site group all
 read it, so changing a destination is one entry there. `components/Nav.tsx`
-renders the rail and the tab bar on the server; only More
-(`islands/NavMore.tsx`, its dialog's contents rendered when it opens) ships JS.
-There is no Links control (#293): More lists pages only (Home, About, How I
-work, Writing, Infrastructure), and the profiles and feeds live in the footer.
-The nav's icons are `components/NavParts.tsx`'s `NavGlyph` (one short path each,
-styled by `.nav-icon`) and its states are the `.nav-*` classes in
-`assets/styles.css`: keep its markup small, because under `scripts/lcp.ts`'s
-network profile every extra KB on every page measurably delays the home page's
-LCP image. The phone header (photo, name, and `ROLE` on the right) is plain
-markup in `components/Layout.tsx`; the time zone is in the footer. Book goes to
-`/book` in the same tab and carries `data-primary-book`; with `SCHEDULE_URL`
-unset it reads "Write" and goes to that page's written brief (`/book#brief`).
-The footer's Contact group links the same page. `test/nav.test.ts` checks both
-on every page.
+renders `@spy4x/preact-system`'s `Rail` in its labels variant (#433), the same
+column, cells and current fill as the apps, on the server with no island: More
+opens its `<dialog>` through the button's `command`/`commandfor` invoker, and a
+backdrop tap closes it through `closedby="any"`. The column holds the portrait
+with "Anton" (a `RailEntry` in the `top` slot, linking home), Book, then
+`railItems`; the phone tab bar holds Work, Services, Book in the centre, Tools
+and More. There is no Links control (#293): More lists pages only (Home, About,
+How I work, Writing, Infrastructure), and the profiles and feeds live in the
+footer. Home, About and Infrastructure are `sheetOnly` items, so More is marked
+current on their pages. The icons come from `@spy4x/preact-icons`. Keep the
+markup small, because under `scripts/lcp.ts`'s network profile every extra KB on
+every page measurably delays the home page's LCP image. The phone header (photo,
+name, and `ROLE` on the right) is plain markup in `components/Layout.tsx`; the
+time zone is in the footer. Book goes to `/book` in the same tab and carries
+`data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes to that
+page's written brief (`/book#brief`). The footer's Contact group links the same
+page. `test/nav.test.ts` checks both on every page.
 
 ## Site frame
 
 The frame is what every page shares (#293). `components/Layout.tsx` renders the
-phone header, the nav, `<main>` and `components/Footer.tsx`. The footer is plain
-server markup on Desk with five parts: identity (name, `ROLE`, `LOCATION` and
-`TIMEZONE_LABEL`, the NeatSoft invoices sentence) and four labelled lists, Site
-(`lib/nav.ts`'s `siteItems` plus Privacy), Contact, Elsewhere and For machines.
-At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
+nav, which owns `<main>`, and puts the phone header and the page
+(`#main-content`) inside it; `components/Footer.tsx` goes in the `Rail`'s
+`footer` slot, after `<main>`, so it keeps its `contentinfo` landmark. The
+footer is plain server markup on Desk with five parts: identity (name, `ROLE`,
+`LOCATION` and `TIMEZONE_LABEL`, the NeatSoft invoices sentence) and four
+labelled lists, Site (`lib/nav.ts`'s `siteItems` plus Privacy), Contact,
+Elsewhere and For machines. At 390px the tab bar is a sticky dock after the page
+and the footer, so nothing needs bottom padding to clear it.
 
 - `lib/profiles.ts` is the only list of profile URLs. The footer's Elsewhere
   group (`footerProfiles`), the `/book` side panel's email, Telegram and Upwork
@@ -237,10 +243,11 @@ At 390px it, not `<main>`, holds the bottom padding that clears the tab bar.
 - `routes/privacy.tsx` says only what the code proves, plus Anton's own
   retention rule and mail server (#301), in "How long things are kept". Change a
   sentence only together with the code or the rule it describes.
-- The site-wide skip link is hidden by `routes/_app.tsx`'s inline critical CSS,
-  whose unlayered `.sr-only` rule would beat Tailwind's layered
-  `focus:not-sr-only`. That rule is `.sr-only:not(:focus)` for this reason;
-  `test/frame.browser.test.ts` checks the link shows when focused.
+- The site-wide skip link is the `Rail`'s, worded "Skip to main content". It is
+  hidden by `routes/_app.tsx`'s inline critical CSS, whose unlayered `.sr-only`
+  rule would beat Tailwind's layered `focus:not-sr-only`. That rule is
+  `.sr-only:not(:focus)` for this reason; `test/frame.browser.test.ts` checks
+  the link shows when focused.
 
 `test/frame.test.ts` and `test/frame.browser.test.ts` guard all of this.
 

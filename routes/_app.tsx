@@ -101,12 +101,6 @@ export default define.page(function App({ Component, req }) {
         )}
       </head>
       <body class="h-full">
-        <a
-          href="#main-content"
-          class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-parchment focus:text-ink focus:font-semibold"
-        >
-          Skip to main content
-        </a>
         <Component />
       </body>
     </html>

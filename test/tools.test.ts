@@ -5,7 +5,7 @@
 // registry. Asserts structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import {
   ciUrl,
   groupedTools,
@@ -358,7 +358,8 @@ siteTest(
       assertEquals(count(html, /data-tool-doors/g), 1, t.slug);
       // The two doors sit in ClosingBand's children slot, which ends the page.
       assertEquals(count(html, /data-closing-band/g), 1, t.slug);
-      const band = html.slice(html.indexOf("data-closing-band"));
+      const page = pageBody(html);
+      const band = page.slice(page.indexOf("data-closing-band"));
       assert(band.includes("data-tool-doors"), `${t.slug}: doors in the band`);
       assert(
         html.indexOf('id="more"') < html.indexOf("data-closing-band"),
@@ -678,7 +679,8 @@ Deno.test("a tool page's closing band carries a Book action", async () => {
   try {
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
-      const band = html.slice(html.indexOf("data-closing-band"));
+      const page = pageBody(html);
+      const band = page.slice(page.indexOf("data-closing-band"));
       assertEquals(count(band, /data-primary-book/g), 1, t.slug);
       assert(
         band.includes(

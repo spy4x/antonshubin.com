@@ -7,19 +7,30 @@ import { navCurrent } from "../lib/nav.ts";
 
 interface LayoutProps {
   children: ComponentChildren;
+  /** The request's path: the rail marks the page, or its section, from it. */
   currentPath: string;
 }
 
+/**
+ * The frame every page shares (#293): the rail around the phone header, the
+ * page and the footer. The rail owns `<main>`, so the phone header sits
+ * inside it; the footer goes in the rail's `footer` slot, after `<main>`,
+ * where it keeps its `contentinfo` landmark.
+ */
 export function Layout({ children, currentPath }: LayoutProps) {
   return (
-    <>
+    <Nav
+      currentPath={currentPath}
+      scheduleUrl={SCHEDULE_URL}
+      footer={<Footer canBook={Boolean(SCHEDULE_URL)} />}
+    >
       {
         /* Phone header (#185): scrolls away with the page; the desktop rail
-          in components/Nav.tsx carries the portrait from 640px up. The role
-          replaces the bare UTC offset (#293); the time zone is in the
-          footer as "Da Nang, Vietnam (UTC+7)". */
+          carries the portrait from 768px up. The role replaces the bare UTC
+          offset (#293); the time zone is in the footer as "Da Nang, Vietnam
+          (UTC+7)". */
       }
-      <header class="sm:hidden flex items-center gap-2 h-13 px-4 border-b border-rule">
+      <header class="md:hidden flex items-center gap-2 h-13 px-4 border-b border-rule">
         <a
           href="/"
           aria-label="Anton Shubin, home"
@@ -39,14 +50,12 @@ export function Layout({ children, currentPath }: LayoutProps) {
           {ROLE}
         </span>
       </header>
-      <Nav currentPath={currentPath} scheduleUrl={SCHEDULE_URL} />
-      <main
+      <div
         id="main-content"
-        class="p-4 sm:ml-[calc(4.5rem+env(safe-area-inset-left))] lg:ml-[calc(5.5rem+env(safe-area-inset-left))] md:p-12 md:pr-[max(3rem,env(safe-area-inset-right))]"
+        class="p-4 md:p-12 md:pr-[max(3rem,env(safe-area-inset-right))]"
       >
         {children}
-      </main>
-      <Footer canBook={Boolean(SCHEDULE_URL)} />
-    </>
+      </div>
+    </Nav>
   );
 }
