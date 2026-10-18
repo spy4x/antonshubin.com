@@ -67,7 +67,7 @@ closing band carries the `closing` line with the live and offer buttons beside
 Book. `pageTitle` and `lede` give the `<title>` and the meta description;
 `hero`, `website` and the posts add `image`, `sameAs` and `subjectOf` to the
 JSON-LD. A showcase page does not draw `fits`, `screenshots` or "What it is". A
-tool without a `headline` renders exactly as before. Every claim in these fields
+tool without a `headline` keeps its plain layout. Every claim in these fields
 comes from the project's own README or docs, and "Where it stands" only from its
 status section. Screenshots live in `static/img/tools/<slug>/` (see
 [images.md](images.md)). A template's catalog item says "Built on" and links the

@@ -475,6 +475,12 @@ Deno.test("the tools hub and every tool page have no horizontal scroll and no ax
               `button[aria-label^="Copy the command to start"]`,
               (els) => els.map((el) => el.getBoundingClientRect().height),
             );
+            if (path === "/tools/seed") {
+              assert(
+                copyHeights.length > 0,
+                `${where}: no quick-start copy button found`,
+              );
+            }
             for (const height of copyHeights) {
               assert(
                 height >= 44,
