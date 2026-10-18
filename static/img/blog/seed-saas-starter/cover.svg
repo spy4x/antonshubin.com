@@ -2,19 +2,17 @@
   viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="#0f172a" />
   <text x="70" y="160" font-family="system-ui" font-size="58" font-weight="bold"
-    fill="#f59e0b">Deno Platform Template</text>
+    fill="#f59e0b">Seed</text>
   <text x="70" y="220" font-family="system-ui" font-size="30"
-    fill="#94a3b8">80+ client projects distilled into one repo</text>
+    fill="#94a3b8">The SaaS starter, and why v1 failed</text>
   <text x="70" y="370" font-family="ui-monospace,monospace" font-size="20"
-    fill="#64748b">template/</text>
+    fill="#64748b">seed/</text>
   <text x="70" y="400" font-family="ui-monospace,monospace" font-size="20"
-    fill="#64748b">├── apps/{api, spa, mpa, worker}</text>
+    fill="#64748b">├── apps/{api, spa, admin, mpa, worker}</text>
   <text x="70" y="430" font-family="ui-monospace,monospace" font-size="20"
-    fill="#64748b">├── libs/{platform, domain}</text>
+    fill="#64748b">├── libs/{server, domain, ui}</text>
   <text x="70" y="460" font-family="ui-monospace,monospace" font-size="20"
-    fill="#64748b">├── migrations/  (forward-additive)</text>
-  <text x="70" y="490" font-family="ui-monospace,monospace" font-size="20"
-    fill="#64748b">└── .woodpecker.yml</text>
+    fill="#64748b">└── .woodpecker/</text>
   <text x="70" y="580" font-family="system-ui" font-size="22"
     fill="#64748b">github.com/spy4x/seed</text>
 </svg>

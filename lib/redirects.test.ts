@@ -175,6 +175,18 @@ Deno.test("the retired CalDAV slug's target is a real post", () => {
   assertEquals(blogArticles.some((a) => a.slug === slug), true);
 });
 
+Deno.test("the old template post URL redirects to the Seed post in one hop, with and without a trailing slash", () => {
+  assertEquals(
+    redirectTarget("/blog/deno-platform-template"),
+    "/blog/seed-saas-starter",
+  );
+  assertEquals(
+    redirectTarget("/blog/deno-platform-template/"),
+    "/blog/seed-saas-starter",
+  );
+  assertEquals(blogArticles.some((a) => a.slug === "seed-saas-starter"), true);
+});
+
 Deno.test("never redirects the home page", () => {
   assertEquals(redirectTarget("/"), undefined);
 });

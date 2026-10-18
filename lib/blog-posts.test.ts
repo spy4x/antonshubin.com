@@ -181,18 +181,16 @@ Deno.test("a {proof:<id>} placeholder reads the figure from lib/proof.ts", () =>
   );
 });
 
-Deno.test("every post in content/blog loads, newest first, with the template title from lib/proof.ts", () => {
+Deno.test("every post in content/blog loads, newest first, with the Seed title from lib/proof.ts", () => {
   assertEquals(blogArticles.length > 10, true, "too few posts loaded");
   const sorted = [...blogArticles].sort(byNewest);
   assertEquals(blogArticles.map((a) => a.slug), sorted.map((a) => a.slug));
-  const template = blogArticles.find((a) =>
-    a.slug === "deno-platform-template"
-  );
+  const seed = blogArticles.find((a) => a.slug === "seed-saas-starter");
   assertEquals(
-    template?.title,
-    `Deno Platform Template: distilling ${
+    seed?.title,
+    `Seed: the SaaS starter I distilled from ${
       proof("projects")
-    } client projects into one repo`,
+    } client projects, and why v1 failed`,
   );
 });
 

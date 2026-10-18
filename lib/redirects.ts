@@ -14,6 +14,8 @@ const TOOLS_PATH = "/tools";
 /** Old blog slug -> the post that absorbed it. */
 const RETIRED_BLOG_SLUGS: Record<string, string> = {
   "self-hosted-caldav-pwa-architecture": "self-hosted-caldav-web-ui-tasks-org",
+  // The SaaS starter's post moved when the template was renamed Seed.
+  "deno-platform-template": "seed-saas-starter",
 };
 
 /** Old project slug -> the tool page that replaced it (#231: homelab was reborn as rostok). */

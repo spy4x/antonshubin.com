@@ -597,7 +597,7 @@ export const tools: Tool[] = [
     status: "wip",
     group: "products",
     catalogSlug: "zero-to-production-saas-mvp",
-    posts: ["deno-platform-template"],
+    posts: ["seed-saas-starter"],
     useIf: [
       "You start a SaaS product and want API, SPA, MPA, worker, persistence and offline sync foundations.",
     ],

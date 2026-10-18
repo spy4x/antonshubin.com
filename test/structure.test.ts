@@ -496,6 +496,30 @@ siteTest(
   },
 );
 
+siteTest(
+  "the old template post URL answers one 301 to the Seed post, query string kept",
+  async (site) => {
+    for (
+      const from of [
+        "/blog/deno-platform-template",
+        "/blog/deno-platform-template/",
+      ]
+    ) {
+      const res = await site.get(`${from}?utm_source=x`);
+      await res.body?.cancel();
+      assertEquals(res.status, 301, from);
+      const location = (res.headers.get("location") ?? "").replace(
+        site.origin,
+        "",
+      );
+      assertEquals(location, "/blog/seed-saas-starter?utm_source=x", from);
+      const landed = await site.get(location);
+      await landed.body?.cancel();
+      assertEquals(landed.status, 200, from);
+    }
+  },
+);
+
 siteTest("the home page itself never redirects", async (site) => {
   const res = await site.get("/");
   await res.body?.cancel();
