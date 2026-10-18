@@ -468,6 +468,20 @@ Deno.test("the tools hub and every tool page have no horizontal scroll and no ax
             `${where} scrolls sideways: ${scrollWidth}px wide`,
           );
           assertEquals(await axeViolations(page), [], where);
+          if (viewport === MOBILE_VIEWPORT) {
+            // The house bar for a phone tap target is 44px (`min-h-11`), stricter than axe's 24px:
+            // the showcase quick start's copy button is a developer's main action on the page.
+            const copyHeights = await page.$$eval(
+              `button[aria-label^="Copy the command to start"]`,
+              (els) => els.map((el) => el.getBoundingClientRect().height),
+            );
+            for (const height of copyHeights) {
+              assert(
+                height >= 44,
+                `${where}: a copy button is ${height}px tall`,
+              );
+            }
+          }
         }
       } finally {
         await page.close();
