@@ -190,7 +190,7 @@ Deno.test("every post in content/blog loads, newest first, with the Seed title f
     seed?.title,
     `Seed: the SaaS starter I distilled from ${
       proof("projects")
-    } client projects, and why v1 failed`,
+    } projects, and how I over-engineered v1`,
   );
 });
 
