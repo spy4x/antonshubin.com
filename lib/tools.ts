@@ -7,8 +7,8 @@
  * services, a device, products still being built and archived apps. One page
  * type serves them all and shows only the blocks an entry has data for, so a
  * tool with no registry or no CI simply has no install line and no CI pill.
- * The Seed and oko have no page yet: they are `toolRows`, a hub line with
- * links, until their job line and summary exist in the data.
+ * oko has no page yet: it is a `toolRows` entry, a hub line with links,
+ * until its job line and summary exist in the data.
  *
  * Numbers that change on their own (stars, CI status, last push) do not live
  * here: `scripts/github-snapshot.ts` writes them to `lib/github-snapshot.json`,
@@ -353,11 +353,11 @@ export const tools: Tool[] = [
     runtime:
       "Deno on the server; @spy4x/time, @spy4x/validation, @spy4x/platform's browser entry points and @spy4x/realtime's client run in a browser, untested there",
     usedFor:
-      "My SaaS template imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
+      "Seed, my SaaS template, imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
     proofLinks: [
       {
-        label: "The template's imports in deno.jsonc",
-        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+        label: "Seed's imports in deno.jsonc",
+        href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
       },
       {
         label: "This site's env tasks in deno.json",
@@ -405,8 +405,8 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "My SaaS template imports @spy4x/validation, @spy4x/platform and @spy4x/server.",
-        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+          "Seed, my SaaS template, imports @spy4x/validation, @spy4x/platform and @spy4x/server.",
+        href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
         planned: false,
       },
     ],
@@ -484,8 +484,8 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "My SaaS template builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
-        href: "https://github.com/spy4x/template/blob/master/deno.jsonc",
+          "Seed, my SaaS template, builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
+        href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
         planned: false,
       },
       {
@@ -586,8 +586,8 @@ export const tools: Tool[] = [
     ci: { provider: "woodpecker", repoId: 1 },
   },
   {
-    slug: "template",
-    name: "Deno Platform Template",
+    slug: "seed",
+    name: "Seed",
     job: "reusable repository baseline for SaaS products",
     summary:
       `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
@@ -604,13 +604,13 @@ export const tools: Tool[] = [
     dontUseIf: [
       "You want product-specific business logic: it has none.",
     ],
-    repo: "spy4x/template",
+    repo: "spy4x/seed",
     live: { label: "Open the live demo", href: "https://app.seedsaas.com" },
     runtime: "Deno",
     programmingLanguage: "TypeScript",
     usedFor:
       "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
-    ci: { provider: "woodpecker", repoId: 11 },
+    ci: { provider: "woodpecker", repoId: 15 },
   },
   {
     slug: "caldav-tasks-web",
@@ -702,8 +702,7 @@ export const tools: Tool[] = [
 
 /**
  * Projects with a hub line and no page. oko has no job line or summary in
- * the data yet; the Seed's only home was a GitHub link, which #287 took off
- * the site.
+ * the data yet.
  */
 export const toolRows: ToolRow[] = [
   {
@@ -716,16 +715,6 @@ export const toolRows: ToolRow[] = [
       { label: "Open the dashboard", href: "https://dash.antonshubin.com" },
       { label: "Repository", href: "https://github.com/spy4x/oko" },
     ],
-  },
-  {
-    slug: "seed",
-    name: "The Seed",
-    status: "archived",
-    group: "archive",
-    repo: "spy4x/seed",
-    note:
-      "A one-person SaaS application codebase template. Ship your project idea in days instead of months. It is addictive.",
-    links: [{ label: "Repository", href: "https://github.com/spy4x/seed" }],
   },
 ];
 
@@ -742,7 +731,7 @@ export const movedSlugs: Readonly<Record<string, string>> = {
   "rostok": "rostok",
   "air-quality-sensor": "air-quality-sensor",
   "financy": "financy",
-  "template": "template",
+  "template": "seed",
   "todoapp-caldav": "caldav-tasks-web",
   "toread-today": "toread-today",
 };

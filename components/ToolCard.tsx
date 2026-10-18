@@ -113,7 +113,7 @@ export function ToolCard(
   );
 }
 
-/** A hub entry with no page yet (oko, the Seed): name, status, note and links. */
+/** A hub entry with no page yet (oko): name, status, note and links. */
 export function ToolRowCard(
   { row, variant }: { row: ToolRow; variant: "card" | "wide" | "compact" },
 ) {
