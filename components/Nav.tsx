@@ -108,8 +108,8 @@ function sheetItem(item: NavItem): RailItem {
 
 /**
  * The site navigation (#185, #433): `@spy4x/preact-system`'s `Rail` in its
- * labels variant, the same 72px column, cells and current fill as the apps,
- * with a short label under each icon. From 768px: the portrait and "Anton"
+ * labels variant: an 88px column of 80px cells with a short label under
+ * each icon, and the same current fill as the apps. From 768px: the portrait and "Anton"
  * on top (a `RailEntry` in the `top` slot), linking home, then Book in the
  * accent fill, then `lib/nav.ts`'s `railItems` (the only part that scrolls
  * on a short screen). Below 768px: a tab bar of Work, Services, Book in the
