@@ -196,33 +196,35 @@ rail, the phone tab bar, the phone More dialog and the footer's Site group all
 read it, so changing a destination is one entry there. `components/Nav.tsx`
 renders `@spy4x/preact-system`'s `Rail` in its labels variant (#433), the same
 column, cells and current fill as the apps, on the server with no island: More
-opens its `<dialog>` through the button's `command`/`commandfor` invoker. The
-column holds the portrait with "Anton" (the `top` slot, linking home), Book,
-then `railItems`; the phone tab bar holds Work, Services, Book in the centre,
-Tools and More. There is no Links control (#293): More lists pages only (Home,
-About, How I work, Writing, Infrastructure), and the profiles and feeds live in
-the footer. The icons come from `@spy4x/preact-icons`. The slot content (the
-portrait cell and the sheet's own rows) is drawn by `.rail-home` and
-`.sheet-row` in `assets/styles.css`, from the tokens the library's entries read;
-never wrap it in `RailCell`, which draws a tooltip. Keep the markup small,
-because under `scripts/lcp.ts`'s network profile every extra KB on every page
-measurably delays the home page's LCP image. The phone header (photo, name, and
-`ROLE` on the right) is plain markup in `components/Layout.tsx`; the time zone
-is in the footer. Book goes to `/book` in the same tab and carries
-`data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes to that
-page's written brief (`/book#brief`). The footer's Contact group links the same
-page. `test/nav.test.ts` checks both on every page.
+opens its `<dialog>` through the button's `command`/`commandfor` invoker, and a
+backdrop tap closes it through `closedby="any"`. The column holds the portrait
+with "Anton" (a `RailEntry` in the `top` slot, linking home), Book, then
+`railItems`; the phone tab bar holds Work, Services, Book in the centre, Tools
+and More. There is no Links control (#293): More lists pages only (Home, About,
+How I work, Writing, Infrastructure), and the profiles and feeds live in the
+footer. Home, About and Infrastructure are `sheetOnly` items, so More is marked
+current on their pages. The icons come from `@spy4x/preact-icons`.
+`lib/rail-home-current.ts` sets `aria-current="false"` on the rail's entries to
+`/` off the home page, where Fresh's renderer would mark them the current
+section. Keep the markup small, because under `scripts/lcp.ts`'s network profile
+every extra KB on every page measurably delays the home page's LCP image. The
+phone header (photo, name, and `ROLE` on the right) is plain markup in
+`components/Layout.tsx`; the time zone is in the footer. Book goes to `/book` in
+the same tab and carries `data-primary-book`; with `SCHEDULE_URL` unset it reads
+"Write" and goes to that page's written brief (`/book#brief`). The footer's
+Contact group links the same page. `test/nav.test.ts` checks both on every page.
 
 ## Site frame
 
 The frame is what every page shares (#293). `components/Layout.tsx` renders the
-nav, which owns `<main>`, and puts the phone header, the page (`#main-content`)
-and `components/Footer.tsx` inside it. The footer is plain server markup on Desk
-with five parts: identity (name, `ROLE`, `LOCATION` and `TIMEZONE_LABEL`, the
-NeatSoft invoices sentence) and four labelled lists, Site (`lib/nav.ts`'s
-`siteItems` plus Privacy), Contact, Elsewhere and For machines. At 390px the tab
-bar is a sticky dock after `<main>`, so nothing needs bottom padding to clear
-it.
+nav, which owns `<main>`, and puts the phone header and the page
+(`#main-content`) inside it; `components/Footer.tsx` goes in the `Rail`'s
+`footer` slot, after `<main>`, so it keeps its `contentinfo` landmark. The
+footer is plain server markup on Desk with five parts: identity (name, `ROLE`,
+`LOCATION` and `TIMEZONE_LABEL`, the NeatSoft invoices sentence) and four
+labelled lists, Site (`lib/nav.ts`'s `siteItems` plus Privacy), Contact,
+Elsewhere and For machines. At 390px the tab bar is a sticky dock after the page
+and the footer, so nothing needs bottom padding to clear it.
 
 - `lib/profiles.ts` is the only list of profile URLs. The footer's Elsewhere
   group (`footerProfiles`), the `/book` side panel's email, Telegram and Upwork

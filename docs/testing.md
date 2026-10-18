@@ -40,15 +40,16 @@ buttons, which only exist after client JS opens them (see "Browser-driven
 tests"). The library `Rail` sets `aria-current` on its entries from the path
 `components/Nav.tsx` hands it: "page" on the page, "true" on its section, so a
 nested route passes its own path. Book is the page on `/book` only, also as
-"Write", whose `#brief` href is matched by key. The links Nav.tsx draws itself
-(the rail's portrait, the phone header and the More sheet's own rows) use
-`lib/nav.ts`'s `navCurrent()`, because Fresh marks every link to `/` as the
-current section on every page; `test/a11y.test.ts` checks the home links.
-`test/nav.test.ts` checks Book on every page, the tab bar's order, the More
-sheet's links and the portrait's top slot. `test/html.ts` slices the rail's
-parts (`railColumn`, `tabBar`, `moreSheet`) and the page (`pageBody` stops at
-the footer, `mainContent` at the phone dock), because the footer and the dock
-now share or follow `<main>`. `lib/markdown.test.ts` (#160) tests
+"Write", whose `#brief` href is matched by key. Fresh marks every link to `/` as
+the current section on every page, so the phone header sets its own value
+through `lib/nav.ts`'s `navCurrent()`, and `lib/rail-home-current.ts` sets
+"false" on the rail's entries to `/` (the portrait and the More sheet's Home
+row); `test/a11y.test.ts` checks all three home links. `test/nav.test.ts` checks
+Book on every page, the tab bar's order, the More sheet's links and the
+portrait's top slot. `test/html.ts` slices the rail's parts (`railColumn`,
+`railTop`, `tabBar`, `moreSheet`) and the page (`pageBody` stops at the footer,
+`mainContent` at the phone dock), because the footer follows `<main>` in the
+same column and the dock follows both. `lib/markdown.test.ts` (#160) tests
 `lib/markdown.ts` directly, no server needed. `test/bot-filter.test.ts` (#179)
 boots the site with placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known
 crawlers get no Umami script or preconnect links while browsers do.
@@ -106,18 +107,19 @@ page. Never retry a test on this error.
   the home page mounts the calendar only after a submit.
 - `test/a11y.browser.test.ts` (#165): the project and blog lightboxes' dialog
   naming, button names and focus-return to the trigger; the nav (#185): the
-  phone More dialog's Escape handling (closes it, returns focus to More, and
-  does nothing when already closed), the desktop rail's top-to-bottom Tab order
-  with no rotated ancestor, horizontal labels and an icon on every stop, the
-  absence of any Links control in the rail and the More dialog, and the 390px
-  tab bar (five tabs, Book centred, the current page and section filled, More
-  filled on a page listed under it, and its sheet marking that page). The
-  explicit `triggerRef.current?.focus()` calls in both lightboxes are kept on
-  purpose, even though native `<dialog>` already restores focus. Since #246 it
-  also checks the project gallery's "n / N" counter and its named Previous/Next
-  buttons, and runs every axe-core WCAG 2 A/AA rule plus a horizontal-scroll
-  check on six sample project pages, and on `/tools` and every tool page, at 390
-  and 1440px.
+  phone More sheet's Escape handling (closes it, returns focus to More, and does
+  nothing when already closed), the desktop rail's top-to-bottom Tab order with
+  no rotated ancestor, horizontal labels and an icon on every stop, the absence
+  of any Links control in the rail and the More sheet, More filled on Home,
+  About and Infrastructure, and the 390px tab bar (five tabs, Book centred, the
+  current page and section filled, More filled on a page listed under it, its
+  sheet marking that page, and a backdrop tap closing the sheet and returning
+  focus to More). The explicit `triggerRef.current?.focus()` calls in both
+  lightboxes are kept on purpose, even though native `<dialog>` already restores
+  focus. Since #246 it also checks the project gallery's "n / N" counter and its
+  named Previous/Next buttons, and runs every axe-core WCAG 2 A/AA rule plus a
+  horizontal-scroll check on six sample project pages, and on `/tools` and every
+  tool page, at 390 and 1440px.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the
@@ -153,16 +155,18 @@ page. Never retry a test on this error.
   no CSP violation. Since #365 it also scans every sitemap page plus `/pay`, a
   not-found URL, `/unsubscribe` and `/subscribe/confirm` at 1440px for the
   accent (and its hover shade) as text, border, outline, underline, ring or SVG
-  fill or stroke outside `[data-primary-book]`, checks sample links, form fields
-  and a secondary button while hovered and focused, and fails on a source class
-  in `routes/`, `components/` or `islands/` that uses an accent token for
-  anything but a background. Since preact-components#571 it also checks that the
-  project gallery's Previous/Next (`navigationVariant="ghost"`) are transparent
-  inside a Rule strong border and fill on hover, and that their row stays 40px
-  tall with and without them. `test/no-emoji.test.ts` (not browser-driven — a
-  plain `startSite()` + `visibleText()` check, like `test/rendered.test.ts`)
-  walks every page in `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}`
-  characters, excluding `©`/`®`/`™` and plain digits.
+  fill or stroke outside `[data-primary-book]`, checks sample links, form
+  fields, a secondary button, a rail entry, the rail's portrait and a More sheet
+  row (opened directly, since More is phone-only) while hovered and focused, and
+  fails on a source class in `routes/`, `components/` or `islands/` that uses an
+  accent token for anything but a background. Since preact-components#571 it
+  also checks that the project gallery's Previous/Next
+  (`navigationVariant="ghost"`) are transparent inside a Rule strong border and
+  fill on hover, and that their row stays 40px tall with and without them.
+  `test/no-emoji.test.ts` (not browser-driven — a plain `startSite()` +
+  `visibleText()` check, like `test/rendered.test.ts`) walks every page in
+  `/sitemap.xml` plus `/pay` for `\p{Extended_Pictographic}` characters,
+  excluding `©`/`®`/`™` and plain digits.
 - `test/notes.browser.test.ts` (#186): the margin note next to a project page's
   outcome line (`/work/foodrazor`) sits beside its claim with no horizontal
   scroll at 1100, 1280 and 1440px (the page's `scrollWidth` stays within the
