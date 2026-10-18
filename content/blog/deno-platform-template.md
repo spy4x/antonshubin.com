@@ -9,7 +9,7 @@ tldr:
 publishedAt: "2026-08-26"
 readTime: 11
 topic: "founders"
-relatedTool: "template"
+relatedTool: "seed"
 catalogSlug: "zero-to-production-saas-mvp"
 ---
 
@@ -148,8 +148,8 @@ For a 30-engineer org, a framework with a strict upgrade SLA would be better.
 
 ## Try it
 
-Source: [github.com/spy4x/template](https://github.com/spy4x/template). The
-README walks through the wizard and the first ten minutes with the codebase.
+Source: [github.com/spy4x/seed](https://github.com/spy4x/seed). The README walks
+through the wizard and the first ten minutes with the codebase.
 
 If you have an MVP idea and you would rather pay someone to ship the platform
 layer than build it yourself,

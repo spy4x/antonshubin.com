@@ -5,14 +5,14 @@
 adding an entry there. Every field except the name, the job line, the summary,
 the status, the group and the kind is optional, and the page shows only the
 blocks an entry has data for: no registry means no install line, no `ci` means
-no CI pill, no `repo` means no repository row. A project with no page yet (oko,
-the Seed) is a `toolRows` entry, a hub line with links, and is not in the
-sitemap or the llms files. A status is written down for every entry, never
-guessed from its link: `in-use`, `ready`, `beta`, `wip`, `paused` or `archived`,
-and "Live" is only ever a link to a running public instance. A tool's
-`registry.published` decides whether its pinned install command is offered with
-a copy button or marked "Not yet available"; flip it to `true` the day that
-version is really on its registry.
+no CI pill, no `repo` means no repository row. A project with no page yet (oko)
+is a `toolRows` entry, a hub line with links, and is not in the sitemap or the
+llms files. A status is written down for every entry, never guessed from its
+link: `in-use`, `ready`, `beta`, `wip`, `paused` or `archived`, and "Live" is
+only ever a link to a running public instance. A tool's `registry.published`
+decides whether its pinned install command is offered with a copy button or
+marked "Not yet available"; flip it to `true` the day that version is really on
+its registry.
 
 Numbers that change on their own — stars, licence GitHub detected, last push,
 and the latest push pipeline's status on the default branch in Woodpecker — live

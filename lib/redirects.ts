@@ -21,6 +21,14 @@ const RETIRED_PROJECT_SLUGS: Record<string, string> = {
   "homelab": "rostok",
 };
 
+/**
+ * Old `/tools` slug -> the tool's slug now. The SaaS starter answered at
+ * `/tools/template` until it was renamed Seed and moved to spy4x/seed.
+ */
+const RETIRED_TOOL_SLUGS: Record<string, string> = {
+  "template": "seed",
+};
+
 /** The booking page's path before #190 renamed it `/book`. */
 export const OLD_BOOK_PATH = "/contact-me";
 
@@ -40,6 +48,8 @@ export interface RedirectSources {
  * - `/projects/<old>` and `/work/<old>` -> `/tools/<new>` for an own project
  *   that moved to `/tools` (#273);
  * - `/projects/homelab` -> `/tools/rostok` (retired slug);
+ * - `/tools/<old>` -> `/tools/<new>` for a renamed tool (`/tools/template`
+ *   -> `/tools/seed`);
  * - `/blog/<retired>` -> the post that absorbed it;
  * - `/contact-me` -> `/book`, the booking page's name since #190 (the
  *   browser keeps a `#brief` fragment, the caller keeps `?service=<slug>`).
@@ -64,6 +74,9 @@ export function buildRedirectTable(
   }
   for (const [old, now] of Object.entries(RETIRED_PROJECT_SLUGS)) {
     add(`/projects/${old}`, `${TOOLS_PATH}/${now}`);
+  }
+  for (const [old, now] of Object.entries(RETIRED_TOOL_SLUGS)) {
+    add(`${TOOLS_PATH}/${old}`, `${TOOLS_PATH}/${now}`);
   }
   for (const [old, now] of Object.entries(RETIRED_BLOG_SLUGS)) {
     add(`/blog/${old}`, `/blog/${now}`);

@@ -14,8 +14,8 @@ reference.
   rate, amount earned, hours, Expert-Vetted, Top 1%) or the career project count
   is written. The home page, `components/SEOHead.tsx`'s JSON-LD, the sitemap
   comment, both llms files, `islands/LeadForm.tsx`,
-  `routes/saas-architecture-guide.tsx` and `lib/tools.ts`'s template entry all
-  read a value through `proof(id)`. A post's front matter writes a figure as a
+  `routes/saas-architecture-guide.tsx` and `lib/tools.ts`'s Seed entry all read
+  a value through `proof(id)`. A post's front matter writes a figure as a
   `{proof:<id>}` placeholder (the template post's title uses
   `{proof:projects}`), which `lib/blog-posts.ts`'s `fillProof()` replaces.
   `test/proof-promises-notes.test.ts`'s proof guard scans `routes/`,

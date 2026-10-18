@@ -76,7 +76,6 @@ Deno.test("every own project is a tool or a row, each in a known group", () => {
     "preact-components",
     "rostok",
     "seed",
-    "template",
     "toread-today",
     "ts-libs",
     "zond",
@@ -98,10 +97,9 @@ Deno.test("every status is written down: in use, ready, beta, WIP, paused or arc
     "ts-libs": "ready",
     "preact-components": "beta",
     "financy": "wip",
-    "template": "wip",
+    "seed": "wip",
     "caldav-tasks-web": "wip",
     "toread-today": "archived",
-    "seed": "archived",
   });
 });
 

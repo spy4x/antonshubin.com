@@ -36,7 +36,7 @@ const EXPECTED_PROJECT_REDIRECTS: Record<string, string> = {
   "/projects/caldav-mcp": "/tools/caldav-mcp",
   "/projects/zond": "/tools/zond",
   "/projects/rostok": "/tools/rostok",
-  "/projects/template": "/tools/template",
+  "/projects/template": "/tools/seed",
   "/projects/mig": "/tools/mig",
   // #231: homelab was reborn as rostok.
   "/projects/homelab": "/tools/rostok",
@@ -51,7 +51,7 @@ const EXPECTED_WORK_REDIRECTS: Record<string, string> = {
   "/work/caldav-mcp": "/tools/caldav-mcp",
   "/work/zond": "/tools/zond",
   "/work/rostok": "/tools/rostok",
-  "/work/template": "/tools/template",
+  "/work/template": "/tools/seed",
   "/work/mig": "/tools/mig",
 };
 
@@ -149,6 +149,12 @@ Deno.test("redirects a trailing-slash tool URL to the slash-free form", () => {
 
 Deno.test("redirects a trailing-slash URL even for an unknown slug — the target then 404s normally", () => {
   assertEquals(redirectTarget("/blog/no-such-post/"), "/blog/no-such-post");
+});
+
+Deno.test("the old /tools/template URL redirects to /tools/seed in one hop, with and without a trailing slash", () => {
+  assertEquals(redirectTarget("/tools/template"), "/tools/seed");
+  assertEquals(redirectTarget("/tools/template/"), "/tools/seed");
+  assertEquals(redirectTarget("/tools/seed"), undefined);
 });
 
 Deno.test("redirects the retired CalDAV slug to the post that absorbed it", () => {
