@@ -309,6 +309,8 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
           "/tools",
           "/tools/ts-libs",
           "/tools/preact-components",
+          // #448: the showcase layout (library cards, frame, copy button).
+          "/tools/seed",
         ]
       ) {
         await assertNoContrastViolations(page, site.origin, path);

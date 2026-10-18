@@ -137,6 +137,34 @@ export interface ToolScreenshot {
   alt: string;
   width: number;
   height: number;
+  /** Other widths of the same picture, as an `<img srcset>` ("/a-640.webp 640w, ..."). */
+  srcset?: string;
+}
+
+/** One card of a tool page's "What you get" grid, drawn by the library's `FeatureCard`. */
+export interface ToolFeature {
+  title: string;
+  /** One or two sentences, each true of the tool today. */
+  text: string;
+  /** A real screenshot of the feature, under the text, anchored to the card's bottom. */
+  shot?: ToolScreenshot;
+  /**
+   * A narrower crop of the same screen for viewports under 640px, where
+   * `shot` would shrink its text below reading size.
+   */
+  phoneShot?: ToolScreenshot;
+  /**
+   * The card's width from 1024px: a third (the default), a half or two
+   * thirds of the row. Pair cards so each row adds up to the whole width.
+   */
+  size?: "half" | "wide";
+}
+
+/** The one command that starts using a tool that is not installed from a registry. */
+export interface ToolQuickStart {
+  /** What the command does, in a few words: "Start a product from it". */
+  label: string;
+  command: string;
 }
 
 /**
@@ -210,6 +238,36 @@ export interface Tool {
   deployable?: true;
   /** schema.org `applicationCategory` for a deployable tool. */
   appCategory?: string;
+  /**
+   * A plain-language `<h1>` in place of "name: job" (#448). The page then
+   * draws the showcase layout: the name and job move to a line above the
+   * heading, the hero shot sits beside it, and the fact card follows the
+   * story on a phone. Every field below is read only on such a page.
+   */
+  headline?: string;
+  /** The lead under `headline` and the page's meta description. */
+  lede?: string;
+  /** The page's `<title>`, without the " — Anton Shubin" suffix. */
+  pageTitle?: string;
+  /** The tool's own website, besides its repository: JSON-LD `sameAs`. */
+  website?: string;
+  /** One screenshot beside the headline, in a browser frame; also JSON-LD `image`. */
+  hero?: ToolScreenshot;
+  /** A command shown with a copy button under the hero's actions. */
+  quickStart?: ToolQuickStart;
+  /** The "What you get" grid. */
+  features?: ToolFeature[];
+  /** "Where it stands": what works today, in the project's own status words. */
+  works?: string[];
+  /** "Where it stands": what is not built yet; the open issues are always linked under it. */
+  notYet?: string[];
+  /** One line under the post's title in "The story behind it". */
+  storyLine?: string;
+  /**
+   * The closing band's heading and its offer button's label; the button
+   * links `catalogSlug`'s item.
+   */
+  closing?: { line: string; offerLabel: string };
 }
 
 /**
@@ -588,29 +646,166 @@ export const tools: Tool[] = [
   {
     slug: "seed",
     name: "Seed",
-    job: "reusable repository baseline for SaaS products",
+    job: "SaaS starter template",
     summary:
-      `Reusable repository baseline for SaaS products, built on web standards — API, SPA, MPA, worker, persistence and offline sync foundations, with zero product-specific business logic. Distilled from ${
+      `Seed is the SaaS starter I build client MVPs on: an API, a web app that works offline, a public site, a worker and an admin area, on web standards, with groups as tenancy from day one. Distilled from ${
         proof("projects")
-      } client projects: libs/platform and libs/domain splits, group-core DDL with idempotent backfill, and a real outbox processor. Spec-driven, agent-assisted scaffolding compatible. Runs on Deno. Its website is seedsaas.com and its live demo is app.seedsaas.com.`,
+      } projects. Its site is seedsaas.com and its demo is app.seedsaas.com.`,
     kind: "template",
     status: "wip",
     group: "products",
     catalogSlug: "zero-to-production-saas-mvp",
     posts: ["seed-saas-starter"],
     useIf: [
-      "You start a SaaS product and want API, SPA, MPA, worker, persistence and offline sync foundations.",
+      "You are starting a SaaS where people share data in groups.",
+      "You want to own the server and the code.",
     ],
     dontUseIf: [
-      "You want product-specific business logic: it has none.",
+      "You need a finished product today.",
+      "You want a framework that updates under you: Seed is a template you change.",
     ],
     repo: "spy4x/seed",
     live: { label: "Open the live demo", href: "https://app.seedsaas.com" },
     runtime: "Deno",
     programmingLanguage: "TypeScript",
-    usedFor:
-      "Foundation for new SaaS MVPs I ship on fixed-price milestones — saves weeks of platform decisions per project.",
+    usedFor: "The base of every SaaS MVP I build for clients.",
     ci: { provider: "woodpecker", repoId: 15 },
+    headline: "The groundwork every SaaS needs, already built.",
+    lede:
+      "Seed is the repository I start client MVPs from: teams, billing per member, realtime, an offline app and an admin area, on one server you own. Clone it and change it; it is MIT-licensed.",
+    pageTitle: "Seed, my open-source SaaS starter",
+    website: "https://seedsaas.com",
+    hero: {
+      src: "/img/tools/seed/notes-1088.webp",
+      srcset:
+        "/img/tools/seed/notes-544.webp 544w, /img/tools/seed/notes-1088.webp 1088w",
+      alt:
+        "Seed's web app in the dark theme: the Notes page of the group Acme Studio, with a New note button, tag filters and six notes, each with its tags.",
+      width: 1088,
+      height: 800,
+    },
+    quickStart: {
+      label: "Start a product from it",
+      command:
+        "gh repo create my-product --template spy4x/seed --private --clone",
+    },
+    features: [
+      {
+        title: "Teams from the first sign-up",
+        text:
+          "Every account gets a group at sign-up. Members, roles, invitations and ownership transfer work the same in every group.",
+        shot: {
+          src: "/img/tools/seed/members-352.webp",
+          alt:
+            "A group's member list: Ada Lovelace (you), Grace Hopper and Linus Torvalds, each with an e-mail address and when they were last seen.",
+          width: 352,
+          height: 332,
+        },
+      },
+      {
+        title: "Realtime by default",
+        text:
+          "People in a group see each other's changes live, over a WebSocket.",
+        size: "wide",
+        shot: {
+          src: "/img/tools/seed/realtime-pair-1296.webp",
+          srcset:
+            "/img/tools/seed/realtime-pair-648.webp 648w, /img/tools/seed/realtime-pair-1296.webp 1296w",
+          alt:
+            "Two phones side by side: on the left a note is edited and its title changed to Q4 roadmap: onboarding, billing and invoices; on the right the notes list of the same group shows that note at the top, updated a moment ago.",
+          width: 1296,
+          height: 800,
+        },
+        phoneShot: {
+          src: "/img/tools/seed/realtime-a-640.webp",
+          alt:
+            "A note open for editing on a phone: its title, its text, the tags Design and Roadmap chosen, and a Save note button.",
+          width: 640,
+          height: 800,
+        },
+      },
+      {
+        title: "Works offline",
+        text:
+          "The app keeps the last notes and groups on the device and queues note writes. A stale write shows as a conflict for the person to settle.",
+        size: "wide",
+        shot: {
+          src: "/img/tools/seed/conflict-802.webp",
+          alt:
+            "A note edited offline meets a newer version: the card '1 change needs your choice' shows Your version beside Server's version, with Keep mine and Use the server's buttons above the notes list.",
+          width: 802,
+          height: 369,
+        },
+        phoneShot: {
+          src: "/img/tools/seed/conflict-phone-386.webp",
+          alt:
+            "A note edited offline meets a newer version: the card shows Your version of the note, with Keep mine and Use the server's buttons.",
+          width: 386,
+          height: 250,
+        },
+      },
+      {
+        title: "Billing per member",
+        text:
+          "Each group has one Stripe subscription, and its seats follow the member count.",
+        shot: {
+          src: "/img/tools/seed/plan-382.webp",
+          alt:
+            "A group's plan card: Pro, 36 euros a month, renewing on 4 November 2026, a Manage billing button, and the line: 4 members at 9 euros each a month, the owner included.",
+          width: 382,
+          height: 330,
+        },
+      },
+      {
+        title: "Sign-in done properly",
+        text:
+          "Passwords with a second factor from an authenticator app, sign-in with Google or GitHub, and a list of signed-in devices.",
+        size: "half",
+        shot: {
+          src: "/img/tools/seed/security-462.webp",
+          alt:
+            "The profile's security settings: two-factor sign-in turned on with a code from an authenticator app, and the account's sign-in methods with its password.",
+          width: 462,
+          height: 290,
+        },
+      },
+      {
+        title: "An admin area",
+        text:
+          "It runs on a host of its own. Operators find a person, see their sessions, groups and audit trail, and can block them.",
+        size: "half",
+        shot: {
+          src: "/img/tools/seed/users-647.webp",
+          alt:
+            "The admin app's table of four people, each with a role (Viewer or Administrator) and the status Active.",
+          width: 647,
+          height: 395,
+        },
+        phoneShot: {
+          src: "/img/tools/seed/users-phone-352.webp",
+          alt:
+            "The admin app's list of four people with their names and e-mail addresses.",
+          width: 352,
+          height: 395,
+        },
+      },
+    ],
+    works: [
+      "Sign-up",
+      "Sign-in with an authenticator-app code (TOTP)",
+      "Groups with members, roles, invitations and ownership transfer",
+      "Billing per member",
+      "Notes, the reference aggregate",
+      "The outbox worker",
+      "The admin app",
+      "The public website",
+      "The SPA, which works offline",
+    ],
+    storyLine: "Why the first Seed failed, and what this one does differently.",
+    closing: {
+      line: "Try it in the demo, or have me build your MVP on it.",
+      offerLabel: "See the MVP offer",
+    },
   },
   {
     slug: "caldav-tasks-web",

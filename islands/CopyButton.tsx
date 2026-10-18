@@ -47,7 +47,7 @@ export default function CopyButton(
     ? "text-brick hover:text-brick"
     : "text-sage hover:text-sage";
   const baseClass =
-    `inline-flex items-center min-h-6 gap-1 text-xs ${colorClass} transition-colors`;
+    `inline-flex items-center min-h-11 sm:min-h-6 gap-1 text-xs ${colorClass} transition-colors`;
 
   return (
     <button

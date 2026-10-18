@@ -16,6 +16,9 @@ import {
 } from "@spy4x/preact-ui/image-gallery";
 import { IconChevronLeft } from "@spy4x/preact-icons";
 import { Lightbox } from "@spy4x/preact-ui/lightbox";
+import { Card } from "@spy4x/preact-ui/card";
+import { FeatureCard } from "@spy4x/preact-ui/feature-card";
+import { WindowFrame } from "@spy4x/preact-ui/window-frame";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -128,6 +131,25 @@ function renderedLibraryMarkup(): string {
     ...CI_STATES.map((ci) =>
       render(<CiPill ci={ci} pipelinesUrl="https://ci.example.com" />)
     ),
+    // A showcase tool page (#448): the hero's frame, the feature cards with
+    // and without a picture, the "Where it stands" cards.
+    render(
+      <WindowFrame variant="browser" title="app.example.com">
+        <img src="/a.webp" alt="A" />
+      </WindowFrame>,
+    ),
+    render(
+      <FeatureCard
+        id="f1"
+        title="One"
+        wide
+        media={<img src="/a.webp" alt="" />}
+      >
+        Text
+      </FeatureCard>,
+    ),
+    render(<FeatureCard id="f2" title="Two">Text</FeatureCard>),
+    render(<Card class="p-6">Card</Card>),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
     // and a page only the More sheet lists; with Book and with Write, and
     // with the footer slot, which wraps the page and the footer in a column.
@@ -175,9 +197,10 @@ function renderedClasses(): { light: Set<string>; dark: Set<string> } {
   const light = new Set<string>();
   const dark = new Set<string>();
   for (
-    const [, list] of [renderedLibraryMarkup(), renderedGalleryMarkup()].join(
-      "\n",
-    )
+    const [, list] of [
+      renderedLibraryMarkup(),
+      renderedGalleryMarkup(),
+    ].join("\n")
       .matchAll(/class="([^"]*)"/g)
   ) {
     for (const raw of list.split(/\s+/)) {
