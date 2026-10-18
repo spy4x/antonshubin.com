@@ -4,7 +4,7 @@
 // closing band, and the crawler files. Asserts structure, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd } from "./html.ts";
+import { count, jsonLd, pageBody } from "./html.ts";
 import { blogArticles } from "../lib/data.ts";
 import {
   infraEdges,
@@ -166,7 +166,7 @@ siteTest(
     const html = await site.html("/infrastructure");
     assertEquals(count(html, /data-closing-band/), 1);
     // The nav's own Book sits outside <main>: the page adds two, the card's and the band's.
-    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    const main = pageBody(html);
     const bookLinks = [...main.matchAll(/<a[^>]*data-primary-book[^>]*>/g)]
       .map((m) => m[0]);
     assertEquals(bookLinks.length, 2);

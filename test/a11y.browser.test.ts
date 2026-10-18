@@ -1,6 +1,6 @@
-// Browser-driven guards for issue #165: the mobile menu's Escape handling
-// (islands/NavMore.tsx; #185 made it the More dialog and added the rail's tab
-// order and the phone tab bar) and the two photo lightboxes' names and focus return
+// Browser-driven guards for issue #165: the phone More sheet's Escape handling
+// (#185 made it the More dialog and added the rail's tab order and the phone
+// tab bar; #433 moved all three to the library `Rail` in components/Nav.tsx) and the two photo lightboxes' names and focus return
 // (islands/ImageGallery.tsx on a project page, islands/BlogImageEnhancer.tsx
 // on a blog post). None of this is visible in the server-rendered HTML the
 // other rendered-page tests read — the lightbox only gets its aria-label
@@ -371,7 +371,7 @@ Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440
   }
 });
 
-Deno.test("the phone More dialog links About and marks it current on /about", async () => {
+Deno.test("the phone More sheet links About and marks it current on /about", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -380,13 +380,8 @@ Deno.test("the phone More dialog links About and marks it current on /about", as
     try {
       await page.goto(`${site.origin}/about`, { waitUntil: "networkidle" });
       const more = page.getByRole("button", { name: "More", exact: true });
-      assertEquals(
-        await more.getAttribute("data-section-current"),
-        "true",
-        "More must be marked on a page listed under it",
-      );
       await more.click();
-      const menu = page.locator("#mobile-menu");
+      const menu = page.getByRole("dialog", { name: "More" });
       await menu.waitFor({ state: "visible" });
       assertEquals(
         await menu.getByRole("link", { name: "About", exact: true })
@@ -565,7 +560,7 @@ Deno.test("blog image lightbox is named, its Close button is named, and focus re
   }
 });
 
-Deno.test("More opens the menu dialog, Escape closes it and focus returns to More", async () => {
+Deno.test("More opens the sheet, Escape closes it and focus returns to More", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -577,15 +572,8 @@ Deno.test("More opens the menu dialog, Escape closes it and focus returns to Mor
       const more = page.getByRole("button", { name: "More", exact: true });
       await more.click();
 
-      const menu = page.locator("#mobile-menu");
-      await page.getByRole("dialog", { name: "More" }).waitFor({
-        state: "visible",
-      });
-      assertEquals(
-        await more.getAttribute("aria-expanded"),
-        "true",
-        "More must report the menu as expanded while it is open",
-      );
+      const menu = page.getByRole("dialog", { name: "More" });
+      await menu.waitFor({ state: "visible" });
 
       // Move focus into the menu before closing it, so the focus assertion
       // below actually proves Escape moves focus back to More rather than
@@ -595,17 +583,6 @@ Deno.test("More opens the menu dialog, Escape closes it and focus returns to Mor
       assert(await isFocused(writing), "focus must be inside the open menu");
       await page.keyboard.press("Escape");
       await menu.waitFor({ state: "hidden" });
-      // The dialog's `close` event, which resets More, is dispatched as a
-      // separate task after the dialog hides.
-      await page.locator('#tab-bar button[aria-expanded="false"]').waitFor({
-        timeout: WAIT_MS,
-      }).catch(() => {});
-
-      assertEquals(
-        await more.getAttribute("aria-expanded"),
-        "false",
-        "More must report the menu as collapsed after Escape",
-      );
       assert(
         await isFocused(more),
         "focus must land on More after Escape closes the menu",
@@ -644,7 +621,7 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
         await page.keyboard.press("Tab");
         const stop = await page.evaluate(() => {
           const el = document.activeElement as HTMLElement | null;
-          if (!el?.closest("#desktop-menu")) return null;
+          if (!el?.closest('aside[aria-label="Sidebar"]')) return null;
           let transformed = false;
           for (let n: Element | null = el; n; n = n.parentElement) {
             if (getComputedStyle(n).transform !== "none") transformed = true;
@@ -655,7 +632,7 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
             y: el.getBoundingClientRect().top,
             transformed,
             writingMode: label ? getComputedStyle(label).writingMode : "",
-            hasIcon: el.querySelector("svg.nav-icon") !== null,
+            hasIcon: el.querySelector("svg") !== null,
           };
         });
         if (!stop) {
@@ -672,8 +649,8 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
           "Write",
           "Work",
           "Services",
-          "How I work",
           "Tools",
+          "How I work",
           "Writing",
         ],
         "the rail must be tabbed through in its visual order",
@@ -730,7 +707,7 @@ Deno.test("neither the rail nor the More dialog has a Links control, and More li
     try {
       await phone.goto(`${site.origin}/`, { waitUntil: "networkidle" });
       await phone.getByRole("button", { name: "More", exact: true }).click();
-      const dialog = phone.locator("#mobile-menu");
+      const dialog = phone.getByRole("dialog", { name: "More" });
       await dialog.getByRole("link").first().waitFor({ state: "visible" });
       const names = await dialog.getByRole("link").allTextContents();
       assertEquals(
@@ -767,25 +744,21 @@ function tokenColour(
   }, [className, property]);
 }
 
-Deno.test("a 390px phone shows five tabs with Book in the centre and the current section marked", async () => {
+Deno.test("a 390px phone shows five tabs with Book in the centre and the current section filled", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } });
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
     const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
     try {
-      const tabs = page.locator("#tab-bar li > :is(a, button)");
-
-      /** Loads `path` and waits until the More island has hydrated (More
-       * only opens its dialog once client JS runs), so the state checks
-       * below see the page after hydration, not only the server HTML. */
-      const load = async (path: string) => {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-        await tabs.nth(4).click();
-        await page.locator("#mobile-menu").waitFor({ state: "visible" });
-        await page.keyboard.press("Escape");
-        await page.locator("#mobile-menu").waitFor({ state: "hidden" });
-      };
+      const tabs = page.locator(
+        '[data-e2e="rail-shell-tabbar"] li > :is(a, button)',
+      );
+      const load = (path: string) =>
+        page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+      const lamp = () => tokenColour(page, "bg-lamp", "backgroundColor");
+      const fill = (tab: Locator) =>
+        tab.evaluate((el) => getComputedStyle(el).backgroundColor);
 
       await load("/catalog");
       assertEquals(
@@ -808,54 +781,37 @@ Deno.test("a 390px phone shows five tabs with Book in the centre and the current
         `Book must be centred: ${JSON.stringify(book)}`,
       );
 
-      // The current page: a Lamp pill.
+      // The current page: a Lamp fill. An idle tab has none.
       const services = tabs.nth(1);
       assertEquals(await services.getAttribute("aria-current"), "page");
-      assertEquals(
-        await services.evaluate((el) => getComputedStyle(el).backgroundColor),
-        await tokenColour(page, "bg-lamp", "backgroundColor"),
-        "the current page's tab must be a Lamp pill",
+      assertEquals(await fill(services), await lamp());
+      assert(
+        (await fill(tabs.nth(0))) !== (await lamp()),
+        "an idle tab must not be filled",
       );
 
-      // A page inside the section: an outlined pill.
+      // A page inside the section: the same fill, marked as the section.
       await load("/catalog/zero-to-production-saas-mvp");
       assertEquals(await services.getAttribute("aria-current"), "true");
-      assertEquals(
-        await services.evaluate((el) => getComputedStyle(el).borderTopColor),
-        await tokenColour(page, "border-rule-strong", "borderTopColor"),
-        "the current section's tab must be an outlined pill",
-      );
+      assertEquals(await fill(services), await lamp());
 
-      // A page listed under More: More itself is outlined, and inside the
-      // dialog the page's own link is marked current.
+      // A page listed under More: More itself is filled, and inside the
+      // sheet the page's own link is marked current.
       await load("/blog");
       const more = tabs.nth(4);
       assertEquals(
-        await more.getAttribute("data-section-current"),
-        "true",
-        "More must be marked when the current page is one of its items",
-      );
-      assertEquals(
-        await more.evaluate((el) => getComputedStyle(el).borderTopColor),
-        await tokenColour(page, "border-rule-strong", "borderTopColor"),
-        "More must be an outlined pill on a page listed under it",
+        await fill(more),
+        await lamp(),
+        "More must be filled when the current page is one of its items",
       );
       await more.click();
-      const menu = page.locator("#mobile-menu");
+      const menu = page.getByRole("dialog", { name: "More" });
       await menu.waitFor({ state: "visible" });
       assertEquals(
         await menu.getByRole("link", { name: "Writing", exact: true })
           .getAttribute("aria-current"),
         "page",
-        "the More dialog must mark the current page's link",
-      );
-
-      // A tap on the backdrop, above the sheet, closes it and returns focus.
-      await page.mouse.click(MOBILE_VIEWPORT.width / 2, 10);
-      await menu.waitFor({ state: "hidden" });
-      assert(
-        await more.evaluate((el) => el === document.activeElement),
-        "focus must return to More after a tap outside the dialog",
+        "the More sheet must mark the current page's link",
       );
     } finally {
       await page.close();

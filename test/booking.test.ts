@@ -9,7 +9,7 @@
 // the reviewer gate on #161 with every other test still green).
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import { catalogItem, INTRO_CALL } from "../lib/catalog.ts";
 import { TIMEZONE_LABEL } from "../lib/config.ts";
 import { ROLE } from "../lib/head.ts";
@@ -18,9 +18,9 @@ import { testimonial } from "../lib/testimonials.ts";
 import { INITIAL_EMBED_HEIGHT_PX } from "../islands/MeetEmbed.tsx";
 import { BOOK_LABEL } from "../lib/nav.ts";
 
-/** The page's `<main>`, without the frame's nav and footer. */
+/** The page alone, without the frame's nav and footer. */
 function mainOf(html: string): string {
-  return html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+  return pageBody(html);
 }
 
 /** RFC 2606 example domain — never a real scheduler, safe in a rendered test. */

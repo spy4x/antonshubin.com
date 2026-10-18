@@ -2,16 +2,16 @@
 // sentence on a built page, and each test fails if its page loses it.
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0";
 import { startSite } from "./harness.ts";
-import { count, visibleText } from "./html.ts";
+import { count, pageBody, visibleText } from "./html.ts";
 import { promise } from "../lib/promises.ts";
 import { INTERNATIONAL_BANK } from "../lib/about.ts";
 
 /** RFC 2606 example domain, so `/book` renders its calendar branch. */
 const PLACEHOLDER_SCHEDULE_URL = "https://example.com/book";
 
-/** The page's `<main>`, without the frame's nav and footer. */
+/** The page alone, without the frame's nav and footer. */
 function mainOf(html: string): string {
-  return html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+  return pageBody(html);
 }
 
 Deno.test("the owner's #301 facts are on their pages", async (t) => {

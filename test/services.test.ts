@@ -4,7 +4,7 @@
 // the work block, the promises, the JSON-LD and the retired slugs.
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, visibleText } from "./html.ts";
+import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import {
   briefPath,
   catalogItems,
@@ -105,7 +105,7 @@ siteTest(
       assert(cardHtml.includes("Send a written brief"), item.slug);
       // Book and the brief each appear twice: the card and the closing band.
       // The footer's Contact group says Book too; count inside <main> only.
-      const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+      const main = pageBody(html);
       assertEquals(count(main, /Book a free 30-minute call/g), 2, item.slug);
       assertEquals(count(main, /Send a written brief/g), 2, item.slug);
       assertFalse(visibleText(html).includes("Talk about this"), item.slug);
@@ -177,7 +177,7 @@ siteTest(
       );
     }
     assertFalse(visibleText(html).includes("Talk about this"));
-    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    const main = pageBody(html);
     assertEquals(count(main, /Book a free 30-minute call/g), 1);
     // "Client work" for every service that has a project, none for Strategy.
     assertEquals(count(html, /data-catalog-work/g), 3);

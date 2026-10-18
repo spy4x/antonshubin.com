@@ -559,7 +559,13 @@ const ACCENT_STATE_SAMPLES: {
   {
     name: "nav item",
     path: "/",
-    selector: "nav a.nav-focus:not([data-primary-book]):visible",
+    selector: "nav a[data-nav-link]:visible",
+    states: ["hover", "focus"],
+  },
+  {
+    name: "nav portrait",
+    path: "/blog",
+    selector: "a.rail-home",
     states: ["hover", "focus"],
   },
   {

@@ -19,6 +19,7 @@ import { Lightbox } from "@spy4x/preact-ui/lightbox";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
+import { Nav } from "../components/Nav.tsx";
 import type { CiSnapshot } from "../lib/github-snapshot.ts";
 import { startSite } from "./harness.ts";
 
@@ -106,6 +107,9 @@ function renderedGalleryMarkup(): string {
   ].join("\n");
 }
 
+/** The paths the nav is rendered at: each current state it can draw. */
+const NAV_PATHS = ["/", "/blog", "/work/smartlite", "/book", "/about"];
+
 /** Every library-backed piece the site renders, in each of its forms. */
 function renderedLibraryMarkup(): string {
   return [
@@ -124,12 +128,23 @@ function renderedLibraryMarkup(): string {
     ...CI_STATES.map((ci) =>
       render(<CiPill ci={ci} pipelinesUrl="https://ci.example.com" />)
     ),
+    // The library `Rail` (#433): idle, a page, a section, Book as the page,
+    // and a page only the More sheet lists; with Book and with Write.
+    ...NAV_PATHS.flatMap((path) =>
+      ["https://meet.example.com/book", ""].map((scheduleUrl) =>
+        render(
+          <Nav currentPath={path} scheduleUrl={scheduleUrl}>
+            <p>Page</p>
+          </Nav>,
+        )
+      )
+    ),
   ].join("\n");
 }
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/(),+]/g, (c) => `\\${c}`);
+  return "." + className.replace(/[:.!\[\]\/(),+=&]/g, (c) => `\\${c}`);
 }
 
 function escapeRegExp(text: string): string {
@@ -160,8 +175,12 @@ function renderedClasses(): { light: Set<string>; dark: Set<string> } {
     )
       .matchAll(/class="([^"]*)"/g)
   ) {
-    for (const c of list.split(/\s+/)) {
-      if (c) (c.startsWith("dark:") ? dark : light).add(c);
+    for (const raw of list.split(/\s+/)) {
+      // The HTML escapes `&` (the rail's `[:root:has(&)]` variants), and a
+      // named group (`group/rail`) only marks an element, with no rule.
+      const c = raw.replaceAll("&amp;", "&");
+      if (!c || /^group(\/|$)/.test(c)) continue;
+      (c.startsWith("dark:") ? dark : light).add(c);
     }
   }
   return { light, dark };
