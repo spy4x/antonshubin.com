@@ -37,6 +37,7 @@ import {
 } from "@spy4x/preact-icons";
 import { CatalogIcon } from "../../components/Icons.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
+import { tools } from "../../lib/tools.ts";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
   return catalogItems.find((i) => i.slug === slug);
@@ -148,9 +149,31 @@ export default define.page(function CatalogDetail(ctx) {
           </div>
 
           <div class="lg:col-start-1 lg:row-start-1 min-w-0 space-y-12">
-            <p class="max-w-2xl text-lg text-graphite leading-relaxed">
-              {item.desc}
-            </p>
+            <div class="space-y-3">
+              <p class="max-w-2xl text-lg text-graphite leading-relaxed">
+                {item.desc}
+              </p>
+              {/* The starter template this service builds on (#448). */}
+              {tools
+                .filter((t) =>
+                  t.kind === "template" && t.catalogSlug === item.slug
+                )
+                .map((t) => (
+                  <p key={t.slug} data-built-on class="text-graphite">
+                    Built on{" "}
+                    <a
+                      href={`/tools/${t.slug}`}
+                      {...eventAttrs("cta", {
+                        place: "body",
+                        target: `/tools/${t.slug}`,
+                      })}
+                      class={FACT_LINK}
+                    >
+                      {t.name}
+                    </a>, my {t.job}.
+                  </p>
+                ))}
+            </div>
 
             {isStrategy && (
               <section aria-labelledby="service-versus">
