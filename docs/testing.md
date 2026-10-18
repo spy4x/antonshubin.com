@@ -37,21 +37,23 @@ sitemap page plus `/pay`, and pins that each `/pay` copy button names its field.
 `test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only accessible
 names, from server-rendered HTML only — it doesn't cover the two lightboxes'
 buttons, which only exist after client JS opens them (see "Browser-driven
-tests"). `components/Nav.tsx` sets no `aria-current` on a destination link:
-Fresh's renderer marks it from the request URL, and `test/a11y.test.ts` pins
-that. Three exceptions set it by hand. Links to `/` (the rail's portrait and the
-phone header) use `lib/nav.ts`'s `navCurrent()`, because Fresh marks every link
-to `/` as the current section on every page; `test/a11y.test.ts` checks them.
-The links inside `islands/NavMore.tsx` use `navCurrent()` too, because hydration
-strips Fresh's marker from an island (Preact drops attributes the island's own
-vnode lacks). Book carries a fixed `aria-current="false"`: it is an action,
-never the current page, and its "Write" fallback (`/book#brief`) would otherwise
-be marked by Fresh. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts`
-directly, no server needed. `test/bot-filter.test.ts` (#179) boots the site with
-placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami
-script or preconnect links while browsers do. `routes/_app.tsx` makes that
-decision at render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML
-after it is rendered.
+tests"). The library `Rail` sets `aria-current` on its entries from the path
+`components/Nav.tsx` hands it: "page" on the page, "true" on its section, so a
+nested route passes its own path. Book is the page on `/book` only, also as
+"Write", whose `#brief` href is matched by key. The links Nav.tsx draws itself
+(the rail's portrait, the phone header and the More sheet's own rows) use
+`lib/nav.ts`'s `navCurrent()`, because Fresh marks every link to `/` as the
+current section on every page; `test/a11y.test.ts` checks the home links.
+`test/nav.test.ts` checks Book on every page, the tab bar's order, the More
+sheet's links and the portrait's top slot. `test/html.ts` slices the rail's
+parts (`railColumn`, `tabBar`, `moreSheet`) and the page (`pageBody` stops at
+the footer, `mainContent` at the phone dock), because the footer and the dock
+now share or follow `<main>`. `lib/markdown.test.ts` (#160) tests
+`lib/markdown.ts` directly, no server needed. `test/bot-filter.test.ts` (#179)
+boots the site with placeholder `UMAMI_URL`/`UMAMI_ID` and checks that known
+crawlers get no Umami script or preconnect links while browsers do.
+`routes/_app.tsx` makes that decision at render time with `lib/bots.ts`'s
+`isBot()`; nothing rewrites HTML after it is rendered.
 
 `deno task test` is `deno task build && deno test ...` — the site builds once
 per `deno task check` run, before any test starts. `startSite()` never builds
@@ -108,12 +110,11 @@ page. Never retry a test on this error.
   does nothing when already closed), the desktop rail's top-to-bottom Tab order
   with no rotated ancestor, horizontal labels and an icon on every stop, the
   absence of any Links control in the rail and the More dialog, and the 390px
-  tab bar (five tabs, Book centred, the current page and section styled after
-  hydration, More outlined on a page listed under it, its dialog marking that
-  page, and a tap on the backdrop closing it). The explicit
-  `triggerRef.current?.focus()` calls in both lightboxes are kept on purpose,
-  even though native `<dialog>` already restores focus. Since #246 it also
-  checks the project gallery's "n / N" counter and its named Previous/Next
+  tab bar (five tabs, Book centred, the current page and section filled, More
+  filled on a page listed under it, and its sheet marking that page). The
+  explicit `triggerRef.current?.focus()` calls in both lightboxes are kept on
+  purpose, even though native `<dialog>` already restores focus. Since #246 it
+  also checks the project gallery's "n / N" counter and its named Previous/Next
   buttons, and runs every axe-core WCAG 2 A/AA rule plus a horizontal-scroll
   check on six sample project pages, and on `/tools` and every tool page, at 390
   and 1440px.
