@@ -3,9 +3,9 @@ title: "Seed: the SaaS starter I distilled from {proof:projects} client projects
 seoTitle: "Seed SaaS starter: why v1 failed, what v2 changed"
 description: "Seed is the SaaS starter I build client MVPs on: groups as tenancy, CQRS with an outbox, an offline-first client, on Deno and web standards. Plus the story of Seed v1, which stalled in 2022, and what v2 does differently."
 tldr:
-  - "Update, 18 October 2026: the template is now called Seed, and the post adds the story of Seed v1, my first attempt, which I started in 2019 and stopped in 2022."
+  - "Update: the template is now called Seed, and the post adds the story of Seed v1, my first attempt, which I started in 2019 and stopped in 2022."
   - "Seed is the SaaS skeleton I kept rebuilding for clients: a multi-tenant API, an offline-first Preact client and a worker that drains an outbox."
-  - "v1 stopped with half its roadmap open: 52 of its 134 commits were environment work, and its sign-in, push and background tasks were tied to Firebase and Google Cloud."
+  - "v1 stopped with half its roadmap open. My reading of why: 52 of its 134 commits were environment work, and its sign-in, push and background tasks were tied to Firebase and Google Cloud."
   - "Seed is a template, not a framework: you clone it and change it, because both times I shipped a framework, the second project had to work around it."
 publishedAt: "2026-08-26"
 updatedAt: "2026-10-18"
@@ -166,7 +166,7 @@ For a 30-engineer org, a framework with a strict upgrade SLA would be better.
 This is not the first time I built this. The name Seed belonged to an earlier
 repository first, with the same promise in its README: "Build your next startup
 idea with best practices from day 1!" I made the first commit on 16 June 2019
-and the last one on 23 December 2022. In June 2023 I archived the repository. I
+and the last one on 23 December 2022. In April 2025 I archived the repository. I
 reopened it in October 2026 for the version this post describes, and the old
 code now lives on the [`v1` branch](https://github.com/spy4x/seed/tree/v1).
 
@@ -209,9 +209,9 @@ CI/CD, a staging environment and caching.
 The database had three tables: `User`, `UserDevice` and `Notification`. There
 was no group, no membership and no billing.
 
-When I retired v1 today, 60 of its issues were still open: 27 features, 19
-environment tasks, 6 test tasks, 3 bugs, 3 docs tasks and 2 others. 18 of them
-carried a "good first issue" label.
+When I retired v1 on 18 October 2026, 60 of its issues were still open: 27
+features, 19 environment tasks, 6 test tasks, 3 bugs, 3 docs tasks and 2 others.
+18 of them carried a "good first issue" label.
 
 ### Why it stalled
 
@@ -243,8 +243,8 @@ The record does not say why 2020 was empty, so I won't guess here.
 
 ### What Seed does differently now
 
-The new Seed started in January 2026, from the same idea and a different set of
-rules:
+The new Seed started in January 2026, in a separate repository that moved here
+in October, from the same idea and a different set of rules:
 
 - **Groups first.** Every user gets a group at sign-up, in the same database
   transaction as the account. Roles, invitations and ownership transfer work
