@@ -47,3 +47,22 @@ JSON-LD, whose `url` is only ever its running `live` instance. The hub carries
 (`to` `live` or `github`, `item` the slug), `cta` and `book` with `item`, and
 its copy button `tool-install-copy`; see "Analytics in the code" in
 [analytics.md](analytics.md).
+
+**Showcase pages (#448).** An entry with a `headline` gets the showcase layout
+from the same `routes/tools/[slug].tsx`, drawn by `components/ToolShowcase.tsx`:
+the name, job and status on one line above the headline (the `<h1>`), the
+`lede`, the live button with "View on GitHub" beside it, the `quickStart`
+command with a copy button (`islands/CopyCommand.tsx`, the library's
+`CopyButton`), and the `hero` shot in the library's `WindowFrame`; then "What
+you get" (one library `FeatureCard` per `features` entry, its `shot` under the
+text, `wide` spanning two of three columns) and "Where it stands" (`works`,
+`notYet`, and always a link to the repository's open issues). The fact card then
+follows "The story behind it" (the `posts`, with `storyLine`) on a phone, and
+the closing band carries the `closing` line with the live and offer buttons
+beside Book. `pageTitle` and `lede` give the `<title>` and the meta description;
+`hero`, `website` and the posts add `image`, `sameAs` and `subjectOf` to the
+JSON-LD. A tool without a `headline` renders exactly as before. Every claim in
+these fields comes from the project's own README or docs, and "Where it stands"
+only from its status section. Screenshots live in `static/img/tools/<slug>/`
+(see [images.md](images.md)). A template's catalog item says "Built on" and
+links the template's page.

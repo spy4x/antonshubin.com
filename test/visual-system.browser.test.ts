@@ -24,6 +24,7 @@ const PAGES = [
   "/blog/ship-it-today",
   "/tools",
   "/tools/ts-libs",
+  "/tools/seed",
 ];
 
 Deno.test("no monospace font renders in a heading, nav item or button (#184)", async () => {

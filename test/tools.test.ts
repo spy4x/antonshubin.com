@@ -100,13 +100,17 @@ siteTest(
 );
 
 siteTest(
-  "every tool page has exactly one h1 reading name: job",
+  "every tool page has exactly one h1 reading its headline, or name: job without one",
   async (site) => {
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
       const h1s = [...html.matchAll(/<h1[^>]*>([\s\S]*?)<\/h1>/g)];
       assertEquals(h1s.length, 1, t.slug);
-      assertEquals(visibleText(h1s[0][1]), `${t.name}: ${t.job}`);
+      assertEquals(
+        visibleText(h1s[0][1]),
+        t.headline ?? `${t.name}: ${t.job}`,
+        t.slug,
+      );
     }
   },
 );
@@ -351,7 +355,7 @@ siteTest(
 );
 
 siteTest(
-  "a tool page ends with two doors and three more tools, and its links carry Umami events",
+  "a tool page ends with two doors (a showcase page: its closing line) and three more tools, and its links carry Umami events",
   async (site) => {
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
@@ -368,25 +372,32 @@ siteTest(
       const doors = visibleText(
         band.slice(band.indexOf(">", band.indexOf("data-tool-doors")) + 1),
       );
-      assertEquals(
-        doors.startsWith("Use it"),
-        !!t.repo,
-        `${t.slug}: first door`,
-      );
-      assert(
-        doors.includes("Need something like this for your team?"),
-        `${t.slug}: second door`,
-      );
-      const more = html.slice(
-        html.indexOf('id="more"'),
-        html.indexOf("data-closing-band"),
-      );
-      assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
       assert(
         /data-umami-event="cta" data-umami-event-place="band" data-umami-event-target="\/catalog/
           .test(html),
         `${t.slug}: catalog event`,
       );
+      if (t.headline && t.closing) {
+        // A showcase page's band asks one question and offers the demo and
+        // the offer beside Book (#448).
+        assert(doors.startsWith(t.closing.line), `${t.slug}: band line`);
+        assert(doors.includes(t.closing.offerLabel), `${t.slug}: offer`);
+      } else {
+        assertEquals(
+          doors.startsWith("Use it"),
+          !!t.repo,
+          `${t.slug}: first door`,
+        );
+        assert(
+          doors.includes("Need something like this for your team?"),
+          `${t.slug}: second door`,
+        );
+      }
+      const more = html.slice(
+        html.indexOf('id="more"'),
+        html.indexOf("data-closing-band"),
+      );
+      assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
       if (t.repo) {
         // An archived repository takes no issues, so its door links the repository.
         const door = t.status === "archived" ? t.repo : `${t.repo}/issues`;
@@ -726,5 +737,165 @@ siteTest(
       html.includes('href="https://github.com/spy4x/dotfiles"'),
       "no repository link",
     );
+  },
+);
+
+/** The tools whose entry has a `headline`: the showcase pages (#448). */
+const showcaseTools = tools.filter((t) => t.headline);
+
+siteTest(
+  "a showcase tool page shows its hero shot, a feature card with its shot for each feature, the quick start and where it stands",
+  async (site) => {
+    assert(
+      showcaseTools.length > 0,
+      "no tool has a headline: nothing to check",
+    );
+    for (const t of showcaseTools) {
+      const html = await site.html(`/tools/${t.slug}`);
+      const page = pageBody(html);
+      assertEquals(count(page, /data-tool-hero/g), 1, t.slug);
+      if (t.hero) {
+        // The hero is the page's one eager, high-priority image.
+        const eager = [...page.matchAll(/<img[^>]*fetchpriority="high"[^>]*>/g)]
+          .map(([tag]) => tag);
+        assertEquals(eager.length, 1, `${t.slug}: eager images`);
+        // Fresh appends a cache-busting query to a static path.
+        assert(eager[0].includes(`src="${t.hero.src}`), eager[0]);
+        assertEquals(
+          visibleText(eager[0].match(/alt="([^"]*)"/)?.[1] ?? ""),
+          t.hero.alt,
+        );
+      }
+      const cards = page.split('data-e2e="feature-card"').slice(1);
+      assertEquals(cards.length, t.features?.length ?? 0, `${t.slug}: cards`);
+      for (const [i, f] of (t.features ?? []).entries()) {
+        const card = cards[i].slice(0, cards[i].indexOf("</article>"));
+        assert(visibleText(`<x ${card}`).includes(f.title), f.title);
+        assert(visibleText(`<x ${card}`).includes(f.text), f.title);
+        if (f.shot) {
+          assert(card.includes(`src="${f.shot.src}`), `${f.title}: shot`);
+          assert(card.includes('loading="lazy"'), `${f.title}: lazy`);
+        }
+      }
+      if (t.quickStart) {
+        const quick = page.slice(page.indexOf("data-quick-start"));
+        assert(
+          visibleText(`<x ${quick}`).includes(t.quickStart.command),
+          `${t.slug}: quick start command`,
+        );
+        assert(
+          quick.includes(
+            `data-umami-event="tool-install-copy" data-umami-event-item="${t.slug}"`,
+          ),
+          `${t.slug}: copy event`,
+        );
+      }
+      const works = page.slice(page.indexOf("data-works"));
+      for (const w of t.works ?? []) {
+        assert(visibleText(`<x ${works}`).includes(w), `${t.slug}: ${w}`);
+      }
+      const notYet = page.slice(page.indexOf("data-not-yet"));
+      assert(
+        notYet.includes(`href="https://github.com/${t.repo}/issues"`),
+        `${t.slug}: open issues link`,
+      );
+      // On a phone the fact card follows the story, so it is not the first
+      // thing under the hero.
+      assert(
+        /data-fact-card class="order-last /.test(page),
+        `${t.slug}: fact card order`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "a tool page without a headline draws none of the showcase blocks and keeps its fact card first",
+  async (site) => {
+    const plain = tools.filter((t) => !t.headline);
+    assert(plain.length > 0);
+    for (const t of plain) {
+      const page = pageBody(await site.html(`/tools/${t.slug}`));
+      for (
+        const marker of [
+          "data-tool-hero",
+          'data-e2e="feature-card"',
+          "data-quick-start",
+          "data-works",
+          "data-story",
+        ]
+      ) {
+        assert(!page.includes(marker), `${t.slug}: ${marker}`);
+      }
+      assert(page.includes('id="what"'), `${t.slug}: What it is`);
+      assert(
+        /data-fact-card class="order-first /.test(page),
+        `${t.slug}: fact card order`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "a showcase tool page takes its title and meta description from pageTitle and lede, and its JSON-LD names the hero, website and posts",
+  async (site) => {
+    for (const t of tools) {
+      const html = await site.html(`/tools/${t.slug}`);
+      const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+      assertEquals(
+        visibleText(title),
+        `${t.pageTitle ?? `${t.name}: ${t.job}`} — Anton Shubin`,
+        t.slug,
+      );
+      if (t.lede) {
+        const description = visibleText(metaDescriptionOf(html));
+        assert(
+          t.lede.startsWith(description.replace(/…$/, "")),
+          `${t.slug}: description is not the lede: ${description}`,
+        );
+      }
+      const code = (jsonLd(html) as Record<string, unknown>[]).find((n) =>
+        n["@type"] === "SoftwareSourceCode"
+      );
+      if (!code) continue;
+      assertEquals(
+        code.image,
+        t.hero ? `https://antonshubin.com${t.hero.src}` : undefined,
+        `${t.slug}: image`,
+      );
+      assertEquals(
+        code.sameAs,
+        t.website ? [`https://github.com/${t.repo}`, t.website] : undefined,
+        `${t.slug}: sameAs`,
+      );
+      assertEquals(
+        code.subjectOf,
+        t.headline && t.posts?.length
+          ? t.posts.map((p) => ({
+            "@id": `https://antonshubin.com/blog/${p}#article`,
+          }))
+          : undefined,
+        `${t.slug}: subjectOf`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "a template's catalog item links back to its tool page",
+  async (site) => {
+    const templates = tools.filter((t) =>
+      t.kind === "template" && t.catalogSlug
+    );
+    assert(templates.length > 0, "no template names a catalog item");
+    for (const t of templates) {
+      const page = pageBody(await site.html(`/catalog/${t.catalogSlug}`));
+      const line = page.slice(page.indexOf("data-built-on"));
+      assert(page.includes("data-built-on"), `${t.catalogSlug}: no line`);
+      assert(
+        line.slice(0, line.indexOf("</p>")).includes(`href="/tools/${t.slug}"`),
+        `${t.catalogSlug} does not link /tools/${t.slug}`,
+      );
+    }
   },
 );

@@ -34,6 +34,12 @@ import {
   withLiveVersion,
 } from "../../lib/tools-live.ts";
 import { eventAttrs } from "../../lib/analytics.ts";
+import { Card } from "@spy4x/preact-ui/card";
+import {
+  ShowcaseFeatures,
+  ShowcaseHero,
+  ShowcaseStanding,
+} from "../../components/ToolShowcase.tsx";
 
 const SITE = "https://antonshubin.com";
 const linkClass =
@@ -44,10 +50,13 @@ const linkClass =
  * A field the entry has no data for is left out, never guessed: `version`
  * until the version is really on its registry, `programmingLanguage` when it
  * is not written down, `license` when neither the entry nor GitHub names one.
+ * A showcase page (`headline`) adds its hero shot as `image`, its website
+ * and repository as `sameAs`, and its posts as `subjectOf`.
  * No rating, review or offer.
  */
 function sourceCodeJsonLd(tool: Tool, url: string) {
   const licence = toolLicence(tool);
+  const repo = repoUrl(tool);
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
@@ -61,6 +70,15 @@ function sourceCodeJsonLd(tool: Tool, url: string) {
       : {}),
     ...(licence ? { "license": `https://spdx.org/licenses/${licence}` } : {}),
     ...(tool.registry?.published ? { "version": tool.registry.version } : {}),
+    ...(tool.hero ? { "image": `${SITE}${tool.hero.src}` } : {}),
+    ...(tool.website && repo ? { "sameAs": [repo, tool.website] } : {}),
+    ...(tool.headline && tool.posts?.length
+      ? {
+        "subjectOf": tool.posts.map((slug) => ({
+          "@id": `${SITE}/blog/${slug}#article`,
+        })),
+      }
+      : {}),
     "author": { "@id": `${SITE}/#person` },
     "mainEntityOfPage": { "@type": "WebPage", "@id": url },
   };
@@ -134,12 +152,14 @@ export default define.page(async function ToolPage(ctx) {
   const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null;
   const toolLink = (to: string) =>
     eventAttrs("outbound", { to, item: tool.slug });
+  // A `headline` switches the page to the showcase layout (#448).
+  const showcase = Boolean(tool.headline);
 
   head.value = {
     ...head.value,
-    title: `${tool.name}: ${tool.job} — Anton Shubin`,
+    title: `${tool.pageTitle ?? `${tool.name}: ${tool.job}`} — Anton Shubin`,
     pageName: tool.name,
-    description: metaDescription(tool.summary),
+    description: metaDescription(tool.lede ?? tool.summary),
     canonical,
     ogType: "article",
     ogImage: `${SITE}/img/og/tools/${tool.slug}.png`,
@@ -171,56 +191,69 @@ export default define.page(async function ToolPage(ctx) {
       <div class="max-w-5xl mx-auto">
         <Breadcrumb items={getBreadcrumb(canonical, tool.name)} />
 
-        <header class="max-w-3xl">
-          <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
-            {tool.name}:{" "}
-            <span class="block mt-1 text-xl sm:text-2xl text-graphite">
-              {tool.job}
-            </span>
-          </h1>
-          <p class="mt-4 text-parchment text-base sm:text-lg leading-relaxed">
-            {lead}
-          </p>
-          {tool.credit && (
-            <p data-credit class="mt-4 text-parchment">
-              {tool.credit.text}{" "}
-              {tool.credit.links.map((l, i) => (
-                <span key={l.href}>
-                  {i > 0 && " · "}
-                  <a href={l.href} class={linkClass}>{l.label}</a>
-                </span>
-              ))}
+        {showcase && (
+          <>
+            <ShowcaseHero tool={tool} repo={repo} />
+            <ShowcaseFeatures tool={tool} />
+            <ShowcaseStanding tool={tool} repo={repo} />
+          </>
+        )}
+
+        {!showcase && (
+          <header class="max-w-3xl">
+            <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
+              {tool.name}:{" "}
+              <span class="block mt-1 text-xl sm:text-2xl text-graphite">
+                {tool.job}
+              </span>
+            </h1>
+            <p class="mt-4 text-parchment text-base sm:text-lg leading-relaxed">
+              {lead}
             </p>
-          )}
-          <div class="mt-6">
-            {tool.registry
-              ? <InstallLine tool={tool} id={`install-${tool.slug}`} />
-              : tool.live
-              ? (
-                <Button
-                  href={tool.live.href}
-                  {...toolLink("live")}
-                  class="px-4 py-2.5 text-sm"
-                >
-                  {tool.live.label}
-                </Button>
-              )
-              : repo && (
-                <Button
-                  href={repo}
-                  {...toolLink("github")}
-                  class="px-4 py-2.5 text-sm"
-                >
-                  GitHub
-                </Button>
-              )}
-          </div>
-        </header>
+            {tool.credit && (
+              <p data-credit class="mt-4 text-parchment">
+                {tool.credit.text}{" "}
+                {tool.credit.links.map((l, i) => (
+                  <span key={l.href}>
+                    {i > 0 && " · "}
+                    <a href={l.href} class={linkClass}>{l.label}</a>
+                  </span>
+                ))}
+              </p>
+            )}
+            <div class="mt-6">
+              {tool.registry
+                ? <InstallLine tool={tool} id={`install-${tool.slug}`} />
+                : tool.live
+                ? (
+                  <Button
+                    href={tool.live.href}
+                    {...toolLink("live")}
+                    class="px-4 py-2.5 text-sm"
+                  >
+                    {tool.live.label}
+                  </Button>
+                )
+                : repo && (
+                  <Button
+                    href={repo}
+                    {...toolLink("github")}
+                    class="px-4 py-2.5 text-sm"
+                  >
+                    GitHub
+                  </Button>
+                )}
+            </div>
+          </header>
+        )}
 
         <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-start">
           <div
             data-fact-card
-            class="order-first lg:order-2 lg:sticky lg:top-8"
+            class={cn(
+              showcase ? "order-last" : "order-first",
+              "lg:order-2 lg:sticky lg:top-8",
+            )}
           >
             <FactCard label="Tool facts">
               <h2 class="text-lg text-parchment mb-3">Facts</h2>
@@ -328,24 +361,27 @@ export default define.page(async function ToolPage(ctx) {
               </section>
             )}
 
-            <section aria-labelledby="what">
-              <h2 id="what" class="text-2xl text-parchment">What it is</h2>
-              <p class="mt-3 text-graphite leading-relaxed">{tool.summary}</p>
-              {tool.packages && (
-                <>
-                  <p class="mt-4 text-graphite">
-                    {tool.packages.length} packages, each installed on its own:
-                  </p>
-                  <ul class="mt-2 flex flex-wrap gap-2">
-                    {tool.packages.map((p) => (
-                      <li key={p}>
-                        <code class="text-sm">{p}</code>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </section>
+            {!showcase && (
+              <section aria-labelledby="what">
+                <h2 id="what" class="text-2xl text-parchment">What it is</h2>
+                <p class="mt-3 text-graphite leading-relaxed">{tool.summary}</p>
+                {tool.packages && (
+                  <>
+                    <p class="mt-4 text-graphite">
+                      {tool.packages.length}{" "}
+                      packages, each installed on its own:
+                    </p>
+                    <ul class="mt-2 flex flex-wrap gap-2">
+                      {tool.packages.map((p) => (
+                        <li key={p}>
+                          <code class="text-sm">{p}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
+            )}
 
             {tool.standing && tool.usedFor && (
               <section aria-labelledby="standing">
@@ -374,7 +410,7 @@ export default define.page(async function ToolPage(ctx) {
                       id={tool.useIf?.length ? undefined : "fit"}
                       class="text-xl text-parchment"
                     >
-                      Don't use it if
+                      {showcase ? "Skip it if" : "Don't use it if"}
                     </h2>
                     <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
                       {tool.dontUseIf!.map((line) => (
@@ -417,7 +453,36 @@ export default define.page(async function ToolPage(ctx) {
               </section>
             )}
 
-            {posts.length > 0 && (
+            {showcase && posts.length > 0 && (
+              <section aria-labelledby="posts">
+                <h2 id="posts" class="text-2xl text-parchment">
+                  The story behind it
+                </h2>
+                <ul class="mt-4 space-y-4">
+                  {posts.map((p) => (
+                    <li key={p.slug}>
+                      <Card data-story class="p-6">
+                        <a
+                          href={`/blog/${p.slug}`}
+                          {...eventAttrs("cta", {
+                            place: "body",
+                            target: `/blog/${p.slug}`,
+                          })}
+                          class="font-heading text-lg text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
+                        >
+                          {p.title}
+                        </a>
+                        {tool.storyLine && (
+                          <p class="mt-2 text-graphite">{tool.storyLine}</p>
+                        )}
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {!showcase && posts.length > 0 && (
               <section aria-labelledby="posts">
                 <h2 id="posts" class="text-2xl text-parchment">
                   {posts.length > 1 ? "Posts" : "The post"}
@@ -456,48 +521,88 @@ export default define.page(async function ToolPage(ctx) {
         </section>
 
         {/* ── Closing band: two doors, one Book ─────────────────────── */}
-        <ClosingBand
-          promiseIds={[]}
-          bookItem={tool.slug}
-          catalogLink={
-            <a
-              href={catalog ? catalogPath(catalog.slug) : "/catalog"}
-              {...eventAttrs("cta", {
-                place: "band",
-                target: catalog ? catalogPath(catalog.slug) : "/catalog",
-              })}
-              class={linkClass}
+        {showcase && tool.closing
+          ? (
+            <ClosingBand
+              promiseIds={[]}
+              bookItem={tool.slug}
+              catalogLink={
+                <>
+                  {tool.live && (
+                    <Button
+                      href={tool.live.href}
+                      {...toolLink("live")}
+                      class="px-5 py-3"
+                    >
+                      {tool.live.label}
+                    </Button>
+                  )}
+                  <Button
+                    href={catalog ? catalogPath(catalog.slug) : "/catalog"}
+                    {...eventAttrs("cta", {
+                      place: "band",
+                      target: catalog ? catalogPath(catalog.slug) : "/catalog",
+                    })}
+                    class="px-5 py-3"
+                  >
+                    {tool.closing.offerLabel}
+                  </Button>
+                </>
+              }
             >
-              {catalog ? catalog.title : "Services"}
-            </a>
-          }
-        >
-          <div data-tool-doors class="grid gap-6 sm:grid-cols-2 mb-6">
-            {repo && (
-              <div>
-                <h2 class="text-xl text-parchment">Use it</h2>
-                <p class="mt-1 text-graphite">
-                  {tool.status === "archived"
-                    ? "The repository is archived, kept for reference."
-                    : "Star it or open an issue."}
-                </p>
+              <div data-tool-doors class="mb-6">
+                <h2 class="text-xl sm:text-2xl text-parchment text-balance">
+                  {tool.closing.line}
+                </h2>
+              </div>
+            </ClosingBand>
+          )
+          : (
+            <ClosingBand
+              promiseIds={[]}
+              bookItem={tool.slug}
+              catalogLink={
                 <a
-                  href={tool.status === "archived" ? repo : `${repo}/issues`}
-                  {...toolLink("github")}
+                  href={catalog ? catalogPath(catalog.slug) : "/catalog"}
+                  {...eventAttrs("cta", {
+                    place: "band",
+                    target: catalog ? catalogPath(catalog.slug) : "/catalog",
+                  })}
                   class={linkClass}
                 >
-                  {tool.repo} on GitHub
+                  {catalog ? catalog.title : "Services"}
                 </a>
+              }
+            >
+              <div data-tool-doors class="grid gap-6 sm:grid-cols-2 mb-6">
+                {repo && (
+                  <div>
+                    <h2 class="text-xl text-parchment">Use it</h2>
+                    <p class="mt-1 text-graphite">
+                      {tool.status === "archived"
+                        ? "The repository is archived, kept for reference."
+                        : "Star it or open an issue."}
+                    </p>
+                    <a
+                      href={tool.status === "archived"
+                        ? repo
+                        : `${repo}/issues`}
+                      {...toolLink("github")}
+                      class={linkClass}
+                    >
+                      {tool.repo} on GitHub
+                    </a>
+                  </div>
+                )}
+                <div>
+                  <h2 class="text-xl text-parchment">
+                    Need something like this for your team?
+                  </h2>
+                  <p class="mt-1 text-graphite">That's my day job.</p>
+                </div>
               </div>
-            )}
-            <div>
-              <h2 class="text-xl text-parchment">
-                Need something like this for your team?
-              </h2>
-              <p class="mt-1 text-graphite">That's my day job.</p>
-            </div>
-          </div>
-        </ClosingBand>
+            </ClosingBand>
+          )}
       </div>
     </Layout>
   );
