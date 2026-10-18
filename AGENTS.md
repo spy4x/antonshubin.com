@@ -194,23 +194,23 @@ interpolation.
 `lib/nav.ts` is the only list of navigation destinations (#185): the desktop
 rail, the phone tab bar, the phone More dialog and the footer's Site group all
 read it, so changing a destination is one entry there. `components/Nav.tsx`
-renders `@spy4x/preact-system`'s `Rail` in its labels variant (#433), the same
-column, cells and current fill as the apps, on the server with no island: More
-opens its `<dialog>` through the button's `command`/`commandfor` invoker, and a
-backdrop tap closes it through `closedby="any"`. The column holds the portrait
-with "Anton" (a `RailEntry` in the `top` slot, linking home), Book, then
-`railItems`; the phone tab bar holds Work, Services, Book in the centre, Tools
-and More. There is no Links control (#293): More lists pages only (Home, About,
-How I work, Writing, Infrastructure), and the profiles and feeds live in the
-footer. Home, About and Infrastructure are `sheetOnly` items, so More is marked
-current on their pages. The icons come from `@spy4x/preact-icons`. Keep the
-markup small, because under `scripts/lcp.ts`'s network profile every extra KB on
-every page measurably delays the home page's LCP image. The phone header (photo,
-name, and `ROLE` on the right) is plain markup in `components/Layout.tsx`; the
-time zone is in the footer. Book goes to `/book` in the same tab and carries
-`data-primary-book`; with `SCHEDULE_URL` unset it reads "Write" and goes to that
-page's written brief (`/book#brief`). The footer's Contact group links the same
-page. `test/nav.test.ts` checks both on every page.
+renders `@spy4x/preact-system`'s `Rail` in its labels variant (#433), an 88px
+column of 80px cells with the same current fill as the apps, on the server with
+no island: More opens its `<dialog>` through the button's `command`/`commandfor`
+invoker, and a backdrop tap closes it through `closedby="any"`. The column holds
+the portrait with "Anton" (a `RailEntry` in the `top` slot, linking home), Book,
+then `railItems`; the phone tab bar holds Work, Services, Book in the centre,
+Tools and More. There is no Links control (#293): More lists pages only (Home,
+About, How I work, Writing, Infrastructure), and the profiles and feeds live in
+the footer. Home, About and Infrastructure are `sheetOnly` items, so More is
+marked current on their pages. The icons come from `@spy4x/preact-icons`. Keep
+the markup small, because under `scripts/lcp.ts`'s network profile every extra
+KB on every page measurably delays the home page's LCP image. The phone header
+(photo, name, and `ROLE` on the right) is plain markup in
+`components/Layout.tsx`; the time zone is in the footer. Book goes to `/book` in
+the same tab and carries `data-primary-book`; with `SCHEDULE_URL` unset it reads
+"Write" and goes to that page's written brief (`/book#brief`). The footer's
+Contact group links the same page. `test/nav.test.ts` checks both on every page.
 
 ## Site frame
 
