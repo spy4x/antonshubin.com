@@ -6,7 +6,7 @@ tldr:
   - "Seed is the SaaS starter I build client MVPs on: groups from sign-up, billing per member, realtime, an offline app and an admin area, on one server you own."
   - "My first Seed (2019–2022) failed because I over-engineered it: 52 of its 134 commits went to setup, and groups, billing and offline never shipped."
   - "It is a template, not a framework: you clone it and change it. The reusable parts ship as @spy4x packages on JSR."
-intro: "Most SaaS projects I build start with the same groundwork before the first real feature. Seed is that groundwork, done once and kept in one repository. This post is for developers and founders who start SaaS products and want to see how it is built, and why my first attempt at it failed."
+intro: "Seed is the groundwork a SaaS needs before its first real feature, done once and kept in one repository. This post walks through how it is built: groups as tenancy, commands and queries as plain functions, an outbox and an app that works offline."
 coverImage: "/img/blog/seed-saas-starter/cover.png"
 coverAlt: "The notes screen of the Seed live demo in the dark theme: a narrow icon rail on the left, the Notes title with a New note button, tag filters and the first notes of the list."
 publishedAt: "2026-08-26"
@@ -29,8 +29,8 @@ SaaS where people share data in groups, with an API, a web app that works
 offline and a worker for background jobs. You can
 [click through it now](https://app.seedsaas.com) before reading on.
 
-I tried to build it once before, from 2019 to 2022, and failed. The last section
-is about why.
+I tried to build it once before, from 2019 to 2022, and failed. The section
+[Why Seed v1 failed](#why-seed-v1-failed) is about why.
 
 ## The shape of Seed
 
@@ -238,7 +238,7 @@ The real reason v1 failed was over-engineering. I built the foundation for a
 much bigger product than the one I had: 31 Nx projects and over 100 npm packages
 for an app with three tables. Of its 134 commits, 52 went to setup: lint and
 format rules, CI, dependency updates, renames and Docker. Groups, the decision
-this post calls load-bearing, were still an open issue when I stopped.
+the rest of the data hangs on, were still an open issue when I stopped.
 
 The cloud setup is the same story. In November 2022 I opened an issue called
 "Vendor unlocking". It lists the parts that could run only on Google's cloud and
@@ -253,7 +253,7 @@ before its first feature.
 
 Same idea, different rules:
 
-|         | v1 (2019–2022)                                     | Seed today                                             |
+| Area    | v1 (2019–2022)                                     | Seed today                                             |
 | ------- | -------------------------------------------------- | ------------------------------------------------------ |
 | Stack   | Nx, Angular, NestJS, Prisma; over 100 npm packages | Deno 2, Hono, Preact and Fresh, on web standards       |
 | Hosting | Firebase and Google Cloud only                     | Docker Compose on any Linux host you control           |
@@ -273,10 +273,10 @@ Same idea, different rules:
   components ship as packages. The template keeps the wiring and one reference
   feature, notes, that a new feature copies file by file.
 
-Isn't Seed over-engineered too? It is not small: five apps and 25 workspace
-packages. The difference is what the parts are for. Each one serves a feature
-that works today, not a feature planned for later. And the biggest optional
-part, the offline layer, comes out with the steps described above.
+Isn't Seed over-engineered too? It is not small: 25 workspace packages, five of
+them apps. The difference is what the parts are for: none of them waits for a
+feature planned for later. And the biggest optional part, the offline layer,
+comes out with the steps described above.
 
 ## Try it, or have me build on it
 
@@ -288,4 +288,5 @@ If you are a founder and would rather have me build your MVP on Seed, that is my
 [SaaS MVP offer](/catalog/zero-to-production-saas-mvp): from $8,000 and from
 three weeks, with a quote for your scope before any work starts.
 
-If you clone it, tell me what you build, or open an issue for what is missing.
+If you clone it, tell me what you build, or
+[open an issue](https://github.com/spy4x/seed/issues) for what is missing.
