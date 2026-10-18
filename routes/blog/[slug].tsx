@@ -231,7 +231,7 @@ export default define.page(function BlogPost(ctx) {
   };
 
   return (
-    <Layout currentPath="/blog">
+    <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
       <script
         type="application/ld+json"

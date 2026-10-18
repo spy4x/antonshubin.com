@@ -98,7 +98,7 @@ export default define.page(function CatalogDetail(ctx) {
   const bandPromises = catalogPromises(item.slug).slice(0, 2);
 
   return (
-    <Layout currentPath="/catalog">
+    <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
       <script
         type="application/ld+json"

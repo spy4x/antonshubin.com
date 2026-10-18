@@ -73,7 +73,7 @@ export function Footer({ canBook }: { canBook: boolean }) {
   ];
 
   return (
-    <footer class="site-footer bg-desk border-t border-rule px-4 py-8 pb-[calc(6rem+env(safe-area-inset-bottom))] text-sm text-graphite sm:ml-[calc(4.5rem+env(safe-area-inset-left))] sm:pb-8 lg:ml-[calc(5.5rem+env(safe-area-inset-left))] md:px-12 md:pr-[max(3rem,env(safe-area-inset-right))]">
+    <footer class="site-footer bg-desk border-t border-rule px-4 py-8 text-sm text-graphite md:px-12 md:pr-[max(3rem,env(safe-area-inset-right))]">
       <div class="grid grid-cols-2 gap-x-4 gap-y-8 lg:gap-x-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))]">
         <div class="col-span-2 space-y-1 lg:col-span-1">
           <p class="text-parchment font-semibold">Anton Shubin</p>

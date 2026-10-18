@@ -1,13 +1,13 @@
 /**
  * The site's navigation destinations (#185): the one place a nav label or
- * href is written. `components/Nav.tsx` renders the desktop rail and the
- * phone tab bar, `islands/NavMore.tsx` the phone "More" sheet and
- * `components/Footer.tsx` its "Site" group, from these lists, so changing a
+ * href is written. `components/Nav.tsx` renders the desktop rail, the phone
+ * tab bar and its "More" sheet, and `components/Footer.tsx` its "Site"
+ * group, from these lists, so changing a
  * destination (#188 moves Work to `/work`) is one edit here. Profiles and
  * feeds are not destinations: they live in `lib/profiles.ts` and the footer.
  */
 
-/** The item icons; each names a glyph in `components/NavParts.tsx`'s `NavGlyph`. */
+/** The item icons; `components/Nav.tsx` maps each to a `@spy4x/preact-icons` icon. */
 export type NavIcon =
   | "work"
   | "services"
@@ -45,27 +45,26 @@ const INFRASTRUCTURE: NavItem = {
   icon: "infrastructure",
 };
 
-/** The desktop rail's middle list, top to bottom (Home and Book sit above it). */
+/**
+ * The rail's destinations, top to bottom under the portrait and Book (#433).
+ * On a phone the library's `Rail` makes the first three tabs, around Book in
+ * the centre, and puts the rest in the "More" sheet; that is why Tools comes
+ * before How I work.
+ */
 export const railItems: NavItem[] = [
   WORK,
   SERVICES,
-  HOW_I_WORK,
   TOOLS,
-  WRITING,
-];
-
-/** The phone tab bar: these two, then Book in the centre, then these, then More. */
-export const tabItemsBeforeBook: NavItem[] = [WORK, SERVICES];
-export const tabItemsAfterBook: NavItem[] = [TOOLS];
-
-/** What the phone "More" sheet lists: pages only. */
-export const moreItems: NavItem[] = [
-  HOME,
-  ABOUT,
   HOW_I_WORK,
   WRITING,
-  INFRASTRUCTURE,
 ];
+
+/**
+ * The phone "More" sheet's rows around the destinations that did not fit the
+ * tab bar: Home and About above them, Infrastructure below. Pages only.
+ */
+export const sheetTopItems: NavItem[] = [HOME, ABOUT];
+export const sheetBottomItems: NavItem[] = [INFRASTRUCTURE];
 
 const allItems: NavItem[] = [
   HOME,
@@ -140,7 +139,7 @@ export const siteItems: NavItem[] = [
  * same matching Fresh's renderer applies on the server, except that `/` is
  * only ever the page itself: Fresh marks every link to `/` as the current
  * section on every page. Used for links to `/` in `components/Nav.tsx` and
- * `components/Layout.tsx`, and for every link in `islands/NavMore.tsx`.
+ * `components/Layout.tsx`, and for the More sheet's own rows.
  */
 export function navCurrent(
   currentPath: string,

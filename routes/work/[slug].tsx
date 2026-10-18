@@ -9,12 +9,7 @@ import {
   relatedProjects,
 } from "../../lib/data.ts";
 import { projectTestimonials } from "../../lib/testimonials.ts";
-import {
-  findWorkProject,
-  isClientWork,
-  WORK_PATH,
-  workHref,
-} from "../../lib/work.ts";
+import { findWorkProject, isClientWork, workHref } from "../../lib/work.ts";
 import { clientSummary, metaDescription, projectLead } from "../../lib/llms.ts";
 import { WithNote } from "../../components/WithNote.tsx";
 import ImageGallery from "../../islands/ImageGallery.tsx";
@@ -180,7 +175,7 @@ export default define.page(function ProjectDetail(ctx) {
   );
 
   return (
-    <Layout currentPath={WORK_PATH}>
+    <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
       <script
         type="application/ld+json"
