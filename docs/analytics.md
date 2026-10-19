@@ -232,7 +232,17 @@ the MVP offer with `item: seed` are the number the page should move.
 
 ### ts-libs
 
-None yet.
+- `tool-try` with `part` the package name without its scope (`validation`,
+  `platform`, … `tasks`): a press on a "Pick a package" summary. It counts
+  opening and closing alike. The summary carries the attributes and lets clicks
+  on its children through (`pointer-events: none`), because Umami reads the
+  event from a click's own target when no link or button holds it.
+- `tool-install-copy`: the "Run the example" copy buttons (hero and band) and
+  each package's install line.
+- `outbound` with `to: registry`, `place: body`: each package's "On JSR" link;
+  `to: github`, `place: body`: the README link under "Run the example" and the
+  three import lists under "Where I use it". The hero's "See the packages on
+  JSR" sends `to: registry`, `place: hero`.
 
 ### zond
 

@@ -62,13 +62,15 @@ per `deno task check` run, before any test starts. `startSite()` never builds
 itself; it throws a clear error naming the missing file and task if
 `_fresh/server.js` doesn't exist, so running `deno test` directly without a
 prior build fails loudly instead of skipping silently. `deno task test`'s
-permissions are narrow (`--allow-net=127.0.0.1,0.0.0.0`, `--allow-run=deno`) and
-apply to every file it runs — none can make an outbound call, so a test that
-looks network-shaped stubs `globalThis.fetch` itself. The browser-driven tests
-below need `-A`, so they're excluded via `--ignore` and run separately, also via
-`deno task test:browser`, which doesn't build either — it relies on running
-after `deno task test` inside `check`, and fails loudly (not silently) on its
-own before a build.
+permissions are narrow
+(`--allow-net=127.0.0.1,0.0.0.0,raw.githubusercontent.com`, `--allow-run=deno`)
+and apply to every file it runs. The one outbound host is for
+`test/tools/ts-libs.test.ts`, which reads the ts-libs READMEs at a pinned tag to
+prove the page still quotes them; any other test that looks network-shaped stubs
+`globalThis.fetch` itself. The browser-driven tests below need `-A`, so they're
+excluded via `--ignore` and run separately, also via `deno task test:browser`,
+which doesn't build either — it relies on running after `deno task test` inside
+`check`, and fails loudly (not silently) on its own before a build.
 
 **How to add a guard.** Call `startSite()`, fetch with `site.html()`/
 `site.get()`, assert with `count()`/`visibleText()`/`jsonLd()`, then
