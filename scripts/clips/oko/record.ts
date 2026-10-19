@@ -11,7 +11,7 @@
  * unknown. Then it records the browser (dashboard, reload, search, hover),
  * pauses the browser while `vhs` records `edit.tape` pasting a service into
  * the same config.json oko serves, and joins the three parts into
- * demo.webm, demo.mp4 and poster.webp. Containers, network, browser and the
+ * demo.webm, demo.mp4 and poster.webp (plus poster-640.webp). Containers, network, browser and the
  * work directory are removed on success, failure and Ctrl-C.
  *
  * Needs Docker, vhs, ffmpeg, openssl, nano and the pinned Playwright Chromium.
@@ -21,8 +21,8 @@ import { join, resolve } from "@std/path";
 import { chromium, type Page } from "playwright";
 import { moveLike } from "./human-mouse.ts";
 
-const HERE = resolve(new URL(".", import.meta.url).pathname);
-const ROOT = resolve(HERE, "../../..");
+export const HERE = resolve(new URL(".", import.meta.url).pathname);
+export const ROOT = resolve(HERE, "../../..");
 /** Pinned by digest, so a new release cannot change the clip unnoticed. */
 const IMAGES = {
   oko:
@@ -55,7 +55,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 /** Runs a command, throws with its output when it fails. */
-async function run(
+export async function run(
   cmd: string,
   args: string[],
   opts: { cwd?: string; timeoutMs?: number } = {},
@@ -75,13 +75,13 @@ async function run(
   return text.trim();
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const log = (msg: string) =>
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+export const log = (msg: string) =>
   console.log(`[${new Date().toISOString().slice(11, 19)}] ${msg}`);
 
 /** A throwaway CA and a certificate for uptime.example.com, because oko
  *  talks to gatus over HTTPS only. */
-async function makeCerts(dir: string) {
+export async function makeCerts(dir: string) {
   await Deno.mkdir(dir);
   const ssl = (...a: string[]) => run("openssl", a, { cwd: dir });
   const ec = ["-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:P-256", "-nodes"];
@@ -135,7 +135,7 @@ async function makeCerts(dir: string) {
 }
 
 /** Starts the staged services; returns oko's local URL. */
-async function stage(net: string, work: string): Promise<string> {
+export async function stage(net: string, work: string): Promise<string> {
   const docker = (...a: string[]) => run("docker", a);
   await docker("network", "create", net);
   const aliases = [
@@ -465,6 +465,21 @@ async function encode(
     "-quality",
     "85",
     join(out, "poster.webp"),
+  ]);
+  // The phone's poster, for the hero's srcset.
+  await run("ffmpeg", [
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    join(out, "poster.webp"),
+    "-vf",
+    "scale=640:-1:flags=lanczos",
+    "-c:v",
+    "libwebp",
+    "-quality",
+    "85",
+    join(out, "poster-640.webp"),
   ]);
   for (const file of [mp4, webm]) {
     const { size } = await Deno.stat(file);
