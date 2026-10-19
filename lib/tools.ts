@@ -174,9 +174,11 @@ export interface ToolClip {
   /** One visible sentence under the frame, the clip's text alternative. */
   caption: string;
   /**
-   * The window drawn around it: `browser` for something with a URL,
-   * `terminal` for a CLI, `bare` (a Rule border and the card radius) for a
-   * clip that draws its own windows.
+   * The window drawn around it: `browser` for something with a URL, `bare`
+   * (a Rule border and the card radius) for a clip that draws its own
+   * windows. `terminal` renders as `bare` for now: the library's terminal
+   * frame is built for text, not video, so a CLI clip records its terminal
+   * window itself.
    */
   frame: "browser" | "terminal" | "bare";
   /** The address or title in the frame's bar. */

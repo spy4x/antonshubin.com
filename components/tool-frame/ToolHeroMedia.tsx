@@ -42,7 +42,10 @@ function Frame(
     children: ComponentChildren;
   },
 ) {
-  if (variant === "bare") {
+  // The library's terminal frame lays its content out as scrollable text (a
+  // padded, focusable monospace group), which does not suit a video, so a
+  // terminal clip draws its own window and sits bare, like Seed's.
+  if (variant === "bare" || variant === "terminal") {
     return (
       <figure class="flex min-w-0 flex-col gap-3">
         <div class="overflow-hidden rounded-xl border border-rule">
