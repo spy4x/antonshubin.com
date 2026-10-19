@@ -121,7 +121,7 @@ Deno.test("The AI-agent setup shows six cards, each linking its files on GitHub,
   const site = await startSite();
   try {
     const page = pageBody(await site.html("/tools/dotfiles"));
-    const setup = slice(page, "data-agent-setup", "data-workstation");
+    const setup = slice(page, "data-agent-setup", "data-dotfiles-workstation");
     assertEquals(count(setup, /<h3\b/g), SETUP_CARDS.length);
     for (const card of SETUP_CARDS) {
       assert(visibleText(setup).includes(card.title), card.title);
@@ -140,8 +140,15 @@ Deno.test("The AI-agent setup shows six cards, each linking its files on GitHub,
         assert(link.href.startsWith("https://github.com/spy4x/dotfiles/"));
       }
     }
-    const workstation = slice(page, "<details data-workstation", "</details>");
-    assert(!/<details data-workstation[^>]*\bopen\b/.test(workstation), "open");
+    const workstation = slice(
+      page,
+      "<details data-dotfiles-workstation",
+      "</details>",
+    );
+    assert(
+      !/<details data-dotfiles-workstation[^>]*\bopen\b/.test(workstation),
+      "open",
+    );
     assertEquals(count(workstation, /<li\b/g), 8);
   } finally {
     await site.stop();

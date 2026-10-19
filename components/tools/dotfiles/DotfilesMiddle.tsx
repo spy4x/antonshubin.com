@@ -159,7 +159,10 @@ export function AgentSetup() {
           </li>
         ))}
       </ul>
-      <details data-workstation class="mt-8 rounded-lg border border-rule">
+      <details
+        data-dotfiles-workstation
+        class="mt-8 rounded-lg border border-rule"
+      >
         <summary class="cursor-pointer px-4 py-3 font-semibold text-parchment">
           The workstation
         </summary>
