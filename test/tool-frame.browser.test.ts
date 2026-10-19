@@ -5,7 +5,8 @@
 // tool page. Needs a built site and Chromium; see docs/testing.md
 // "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import type { Browser } from "playwright";
+import type { Browser, Page } from "playwright";
+import { encodeBase64 } from "jsr:@std/encoding@^1.0.0/base64";
 import { startSite } from "./harness.ts";
 import {
   launchChromium,
@@ -114,7 +115,32 @@ Deno.test("a screenshot below the hero opens full size from the keyboard", async
   }
 });
 
-Deno.test("a focused hero screenshot draws a ring its frame does not clip", async () => {
+/**
+ * The share of pixels in a PNG screenshot within 24 per channel of
+ * Parchment (#efebe2, the `--color-ring`), decoded on a canvas in `page`.
+ */
+async function parchmentShare(page: Page, png: Uint8Array): Promise<number> {
+  const url = `data:image/png;base64,${encodeBase64(new Uint8Array(png))}`;
+  return await page.evaluate(async (src) => {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const context = canvas.getContext("2d")!;
+    context.drawImage(img, 0, 0);
+    const { data } = context.getImageData(0, 0, img.width, img.height);
+    const ring = [0xef, 0xeb, 0xe2];
+    let near = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      if (ring.every((c, k) => Math.abs(data[i + k] - c) <= 24)) near++;
+    }
+    return near / (data.length / 4);
+  }, url);
+}
+
+Deno.test("a focused hero screenshot draws a Parchment ring on its own edge, which its frame does not clip", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -129,25 +155,30 @@ Deno.test("a focused hero screenshot draws a ring its frame does not clip", asyn
       const still = page.locator("[data-tool-media] img");
       await still.scrollIntoViewIfNeeded();
       const box = (await still.boundingBox())!;
-      // The image's left edge, away from the frame's rounded corners.
+      // A one-pixel column on the image's left edge, away from the frame's
+      // rounded corners: a ring drawn outside the image would be clipped.
       const edge = {
         x: Math.ceil(box.x),
         y: Math.ceil(box.y + box.height / 4),
-        width: 2,
+        width: 1,
         height: Math.floor(box.height / 2),
       };
-      const before = await page.screenshot({ clip: edge });
+      const before = await parchmentShare(
+        page,
+        await page.screenshot({ clip: edge }),
+      );
       let focused = false;
       for (let i = 0; i < 40 && !focused; i++) {
         await page.keyboard.press("Tab");
         focused = await still.evaluate((el) => el === document.activeElement);
       }
       assert(focused, "Tab never reaches the hero screenshot");
-      const after = await page.screenshot({ clip: edge });
-      assert(
-        !before.equals(after),
-        "focus does not change the screenshot's edge",
+      const after = await parchmentShare(
+        page,
+        await page.screenshot({ clip: edge }),
       );
+      assert(before < 0.5, `the edge is Parchment before focus (${before})`);
+      assert(after > 0.9, `the focused edge is not Parchment (${after})`);
     } finally {
       await page.close();
     }
