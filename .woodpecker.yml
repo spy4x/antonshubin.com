@@ -1,3 +1,11 @@
+# Runs on pull requests into main, pushes to main and the cron trigger.
+# `branch` matches a pull request by its target branch, so a commit on a PR
+# branch builds once, as a pull_request, not again as a push.
+when:
+  - event: [push, pull_request]
+    branch: main
+  - event: cron
+
 steps:
   check:
     image: denoland/deno:2.9.0
