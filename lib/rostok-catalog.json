@@ -1,0 +1,667 @@
+{
+  "version": "1.18.1",
+  "stacks": [
+    {
+      "name": "adguard",
+      "description": "Network-wide ad and tracker blocking DNS server (AdGuard Home)",
+      "category": "network",
+      "required": [
+        "ADGUARD_DOMAIN",
+        "ADGUARD_DNS_BIND"
+      ],
+      "secret": []
+    },
+    {
+      "name": "akaunting",
+      "description": "Self-hosted accounting and invoicing (Akaunting + MariaDB)",
+      "category": "productivity",
+      "required": [
+        "AKAUNTING_DOMAIN",
+        "AKAUNTING_DB_ROOT_PASSWORD",
+        "AKAUNTING_DB_PASSWORD"
+      ],
+      "secret": [
+        "AKAUNTING_DB_ROOT_PASSWORD",
+        "AKAUNTING_DB_PASSWORD"
+      ]
+    },
+    {
+      "name": "audiobookshelf",
+      "description": "Audiobook and ebook server (advplyr/audiobookshelf)",
+      "category": "media",
+      "required": [
+        "AUDIOBOOKSHELF_DOMAIN",
+        "PATH_BOOKS"
+      ],
+      "secret": []
+    },
+    {
+      "name": "authelia",
+      "description": "Single sign-on portal (Authelia) for services behind Traefik",
+      "category": "auth",
+      "required": [
+        "AUTHELIA_DOMAIN",
+        "AUTHELIA_SESSION_SECRET",
+        "AUTHELIA_STORAGE_ENCRYPTION_KEY",
+        "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET",
+        "AUTHELIA_ADMIN_USER",
+        "AUTHELIA_ADMIN_EMAIL",
+        "AUTHELIA_ADMIN_PASSWORD"
+      ],
+      "secret": [
+        "AUTHELIA_SESSION_SECRET",
+        "AUTHELIA_STORAGE_ENCRYPTION_KEY",
+        "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET",
+        "AUTHELIA_ADMIN_PASSWORD",
+        "AUTHELIA_SMTP_PASSWORD"
+      ]
+    },
+    {
+      "name": "bulwark",
+      "description": "Modern JMAP webmail client for the Stalwart mail server",
+      "category": "productivity",
+      "required": [
+        "BULWARK_DOMAIN",
+        "BULWARK_ADMIN_PASSWORD",
+        "BULWARK_SESSION_SECRET"
+      ],
+      "secret": [
+        "BULWARK_ADMIN_PASSWORD",
+        "BULWARK_SESSION_SECRET"
+      ]
+    },
+    {
+      "name": "caldav-mcp",
+      "description": "CalDAV MCP server for AI assistants: events and tasks (spy4x/caldav-mcp)",
+      "category": "ai",
+      "required": [
+        "CALDAV_MCP_SERVER_URL",
+        "CALDAV_MCP_USERNAME",
+        "CALDAV_MCP_PASSWORD",
+        "CALDAV_MCP_TOKEN"
+      ],
+      "secret": [
+        "CALDAV_MCP_PASSWORD",
+        "CALDAV_MCP_TOKEN",
+        "CALDAV_MCP_OWNER_PASSWORD_HASH",
+        "CALDAV_MCP_AUTH_PEPPER"
+      ]
+    },
+    {
+      "name": "caldav-tasks-web",
+      "description": "Web client for the tasks on a CalDAV server: one owner, one account, no database",
+      "category": "productivity",
+      "required": [
+        "CALDAV_TASKS_WEB_DOMAIN"
+      ],
+      "secret": []
+    },
+    {
+      "name": "caldiy",
+      "description": "Cal.diy scheduling platform (community edition of Cal.com)",
+      "category": "productivity",
+      "required": [
+        "CALDIY_DOMAIN",
+        "CALDIY_DB_PASSWORD",
+        "CALDIY_NEXTAUTH_SECRET",
+        "CALDIY_ENCRYPTION_KEY",
+        "CALDIY_CRON_API_KEY",
+        "CALDIY_SMTP_HOST",
+        "CALDIY_SMTP_PORT",
+        "CALDIY_SMTP_FROM",
+        "CALDIY_SMTP_USERNAME"
+      ],
+      "secret": [
+        "CALDIY_DB_PASSWORD",
+        "CALDIY_NEXTAUTH_SECRET",
+        "CALDIY_ENCRYPTION_KEY",
+        "CALDIY_CRON_API_KEY",
+        "CALDIY_SMTP_PASSWORD"
+      ]
+    },
+    {
+      "name": "cloudflared",
+      "description": "Cloudflare Tunnel connector: expose services without open ports",
+      "category": "network",
+      "required": [
+        "CLOUDFLARED_TUNNEL_TOKEN",
+        "CLOUDFLARED_CPU_LIMIT",
+        "CLOUDFLARED_MEM_LIMIT"
+      ],
+      "secret": [
+        "CLOUDFLARED_TUNNEL_TOKEN"
+      ]
+    },
+    {
+      "name": "deepseek-harness",
+      "description": "AI agent harness with plugin-based web UI (DeepSeek) — host-level",
+      "category": "productivity",
+      "required": [],
+      "secret": []
+    },
+    {
+      "name": "docker-registry",
+      "description": "Private Docker registry with a web UI (registry:2 + joxit/docker-registry-ui)",
+      "category": "infra",
+      "required": [
+        "DOCKER_REGISTRY_DOMAIN",
+        "DOCKER_REGISTRY_USER",
+        "DOCKER_REGISTRY_PASSWORD"
+      ],
+      "secret": [
+        "DOCKER_REGISTRY_PASSWORD"
+      ]
+    },
+    {
+      "name": "docker-sock-proxy",
+      "description": "Filtered Docker API for containers that need it (tecnativa/docker-socket-proxy)",
+      "category": "infra",
+      "required": [],
+      "secret": []
+    },
+    {
+      "name": "email-mcp",
+      "description": "Email MCP server (IMAP and SMTP) for AI assistants (ai-zerolab/mcp-email-server)",
+      "category": "ai",
+      "required": [
+        "EMAIL_MCP_TOKEN",
+        "EMAIL_MCP_HOST",
+        "EMAIL_MCP_USER",
+        "EMAIL_MCP_PASSWORD",
+        "EMAIL_MCP_ACCOUNT_NAME",
+        "EMAIL_MCP_ACCOUNT_NAME_2"
+      ],
+      "secret": [
+        "EMAIL_MCP_TOKEN",
+        "EMAIL_MCP_PASSWORD",
+        "EMAIL_MCP_PASSWORD_2"
+      ]
+    },
+    {
+      "name": "filebrowser",
+      "description": "Self-hosted web-based file manager",
+      "category": "storage",
+      "required": [
+        "FILEBROWSER_DOMAIN",
+        "PATH_MEDIA",
+        "PATH_VIDEOS",
+        "PATH_MUSIC",
+        "PATH_BOOKS",
+        "PATH_SYNC",
+        "PATH_MOVIES",
+        "PATH_SERIES",
+        "PATH_OTHER"
+      ],
+      "secret": []
+    },
+    {
+      "name": "gatus",
+      "description": "Lightweight health-check status page with ntfy alerting",
+      "category": "monitoring",
+      "required": [
+        "GATUS_DOMAIN",
+        "GATUS_NTFY_TOPIC_UPTIME",
+        "GATUS_CPU_LIMIT",
+        "GATUS_MEM_LIMIT"
+      ],
+      "secret": [
+        "GATUS_BASIC_AUTH_BASE64",
+        "GATUS_NTFY_TOKEN_UPTIME"
+      ]
+    },
+    {
+      "name": "gitea",
+      "description": "Self-hosted Git service (gitea/gitea + Postgres)",
+      "category": "devtools",
+      "required": [
+        "GITEA_DOMAIN",
+        "GITEA_DB_PASSWORD",
+        "GITEA_SMTP_HOST",
+        "GITEA_SMTP_PORT",
+        "GITEA_SMTP_USERNAME",
+        "GITEA_SMTP_PASSWORD",
+        "GITEA_SMTP_FROM"
+      ],
+      "secret": [
+        "GITEA_DB_PASSWORD",
+        "GITEA_SMTP_PASSWORD"
+      ]
+    },
+    {
+      "name": "github-mcp",
+      "description": "GitHub MCP server over Streamable HTTP for AI assistants",
+      "category": "ai",
+      "required": [
+        "GITHUB_MCP_TOKEN"
+      ],
+      "secret": [
+        "GITHUB_MCP_TOKEN"
+      ]
+    },
+    {
+      "name": "google-maps-mcp",
+      "description": "Google Maps MCP server: places, geocoding, directions, weather",
+      "category": "ai",
+      "required": [
+        "GOOGLE_MAPS_MCP_API_KEY"
+      ],
+      "secret": [
+        "GOOGLE_MAPS_MCP_API_KEY"
+      ]
+    },
+    {
+      "name": "healthchecks",
+      "description": "Cron job and scheduled task monitoring with alerts for missed pings",
+      "category": "monitoring",
+      "required": [
+        "HEALTHCHECKS_DOMAIN",
+        "HEALTHCHECKS_SECRET_KEY"
+      ],
+      "secret": [
+        "HEALTHCHECKS_SECRET_KEY",
+        "HEALTHCHECKS_SMTP_PASSWORD"
+      ]
+    },
+    {
+      "name": "home-assistant",
+      "description": "Open source home automation, host networking for LAN device discovery",
+      "category": "home",
+      "required": [
+        "HOME_ASSISTANT_ZIGBEE_DEVICE",
+        "HOME_ASSISTANT_CPU_LIMIT",
+        "HOME_ASSISTANT_MEM_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "immich",
+      "description": "Photo library with machine learning and kiosk slideshow (immich-app/immich)",
+      "category": "media",
+      "required": [
+        "IMMICH_DOMAIN",
+        "IMMICH_KIOSK_DOMAIN",
+        "IMMICH_DB_PASSWORD",
+        "IMMICH_KIOSK_PASSWORD",
+        "PATH_PHOTOS"
+      ],
+      "secret": [
+        "IMMICH_DB_PASSWORD",
+        "IMMICH_KIOSK_PASSWORD",
+        "IMMICH_MCP_API_KEY",
+        "IMMICH_KIOSK_API_KEY"
+      ]
+    },
+    {
+      "name": "jellyfin",
+      "description": "Self-hosted media server (movies, TV, music, books)",
+      "category": "media",
+      "required": [
+        "JELLYFIN_DOMAIN",
+        "PATH_MEDIA",
+        "PATH_VIDEOS",
+        "PATH_MUSIC"
+      ],
+      "secret": []
+    },
+    {
+      "name": "librespeed",
+      "description": "Self-hosted speed-test tool (librespeed/speedtest)",
+      "category": "tools",
+      "required": [
+        "LIBRESPEED_DOMAIN",
+        "LIBRESPEED_CPU_LIMIT",
+        "LIBRESPEED_MEM_LIMIT",
+        "LIBRESPEED_PASSWORD"
+      ],
+      "secret": [
+        "LIBRESPEED_PASSWORD"
+      ]
+    },
+    {
+      "name": "metube",
+      "description": "Web front end for yt-dlp downloads (alexta69/metube)",
+      "category": "media",
+      "required": [
+        "METUBE_DOMAIN",
+        "PATH_VIDEOS",
+        "PATH_MUSIC"
+      ],
+      "secret": []
+    },
+    {
+      "name": "mig",
+      "description": "Tiny self-hosted meeting scheduler: one owner, one URL, book a time slot",
+      "category": "productivity",
+      "required": [
+        "MIG_DOMAIN"
+      ],
+      "secret": []
+    },
+    {
+      "name": "mirotalk",
+      "description": "Peer-to-peer video calls with a bundled TURN relay (MiroTalk P2P + coturn)",
+      "category": "communication",
+      "required": [
+        "MIROTALK_DOMAIN",
+        "MIROTALK_PUBLIC_IP",
+        "MIROTALK_TURN_SERVER_USERNAME",
+        "MIROTALK_TURN_SERVER_CREDENTIAL",
+        "MIROTALK_JWT_KEY",
+        "MIROTALK_API_KEY_SECRET"
+      ],
+      "secret": [
+        "MIROTALK_TURN_SERVER_USERNAME",
+        "MIROTALK_TURN_SERVER_CREDENTIAL",
+        "MIROTALK_JWT_KEY",
+        "MIROTALK_API_KEY_SECRET"
+      ]
+    },
+    {
+      "name": "nginx",
+      "description": "Static site server for a landing page, dashboard or docs (nginx)",
+      "category": "web",
+      "required": [
+        "NGINX_CONTAINER_NAME"
+      ],
+      "secret": []
+    },
+    {
+      "name": "ntfy",
+      "description": "Self-hosted push notifications (binwiederhier/ntfy)",
+      "category": "monitoring",
+      "required": [
+        "NTFY_DOMAIN",
+        "NTFY_CPU_LIMIT",
+        "NTFY_MEM_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "oko",
+      "description": "Server-rendered homelab dashboard fed by Gatus (spy4x/oko)",
+      "category": "monitoring",
+      "required": [
+        "OKO_DOMAIN",
+        "OKO_UPTIME_HOSTS"
+      ],
+      "secret": []
+    },
+    {
+      "name": "ollama",
+      "description": "Local LLM server with an OpenAI-compatible API (NVIDIA GPU required)",
+      "category": "ai",
+      "required": [
+        "OLLAMA_DOMAIN",
+        "OLLAMA_CPU_LIMIT",
+        "OLLAMA_MEM_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "omni-tools",
+      "description": "Everyday online tools that run in your browser (iib0011/omni-tools)",
+      "category": "tools",
+      "required": [
+        "OMNI_TOOLS_DOMAIN",
+        "OMNI_TOOLS_CPU_LIMIT",
+        "OMNI_TOOLS_MEM_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "open-webui",
+      "description": "Chat UI for local and hosted LLMs (open-webui/open-webui)",
+      "category": "ai",
+      "required": [
+        "OPEN_WEBUI_DOMAIN",
+        "OPEN_WEBUI_WEBUI_SECRET_KEY",
+        "OPEN_WEBUI_MCPO_API_KEY",
+        "OPEN_WEBUI_ENABLE_IMAGE_GENERATION",
+        "OPEN_WEBUI_ENABLE_RAG_LOCAL_WEB_FETCH",
+        "OPEN_WEBUI_ENABLE_WEB_SEARCH",
+        "OPEN_WEBUI_WEB_SEARCH_ENGINE",
+        "OPEN_WEBUI_SEARXNG_QUERY_URL",
+        "OPEN_WEBUI_WEB_SEARCH_RESULT_COUNT",
+        "OPEN_WEBUI_BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL",
+        "OPEN_WEBUI_ENABLE_OLLAMA_API",
+        "OPEN_WEBUI_OLLAMA_API_BASE_URL",
+        "OPEN_WEBUI_OLLAMA_BASE_URL",
+        "OPEN_WEBUI_ENABLE_PLAYWRIGHT_MCP",
+        "OPEN_WEBUI_ENABLE_CALDAV_MCP",
+        "OPEN_WEBUI_ENABLE_EMAIL_MCP",
+        "OPEN_WEBUI_ENABLE_GOOGLE_MAPS_MCP",
+        "OPEN_WEBUI_ENABLE_GITHUB_MCP",
+        "OPEN_WEBUI_DEFAULT_USER_ROLE",
+        "OPEN_WEBUI_ENABLE_SIGNUP",
+        "OPEN_WEBUI_ENABLE_LOGIN_FORM",
+        "OPEN_WEBUI_RAG_TOP_K",
+        "OPEN_WEBUI_RAG_FILE_MAX_COUNT",
+        "OPEN_WEBUI_RAG_FILE_MAX_SIZE",
+        "OPEN_WEBUI_ENABLE_PERSISTENT_CONFIG",
+        "OPEN_WEBUI_WEBUI_NAME"
+      ],
+      "secret": [
+        "OPEN_WEBUI_OPENAI_API_KEYS",
+        "OPEN_WEBUI_WEBUI_SECRET_KEY",
+        "OPEN_WEBUI_HF_TOKEN",
+        "OPEN_WEBUI_MCPO_API_KEY",
+        "OPEN_WEBUI_CALDAV_MCP_TOKEN",
+        "OPEN_WEBUI_EMAIL_MCP_TOKEN"
+      ]
+    },
+    {
+      "name": "pangolin",
+      "description": "Self-hosted tunnel broker: publish services of remote sites over WireGuard",
+      "category": "proxy",
+      "required": [
+        "PANGOLIN_DOMAIN",
+        "PANGOLIN_MEM_LIMIT",
+        "PANGOLIN_CPU_LIMIT",
+        "PANGOLIN_GERBIL_MEM_LIMIT",
+        "PANGOLIN_GERBIL_CPU_LIMIT",
+        "PANGOLIN_TRAEFIK_MEM_LIMIT",
+        "PANGOLIN_TRAEFIK_CPU_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "piped",
+      "description": "Privacy-friendly YouTube front end (TeamPiped/Piped)",
+      "category": "media",
+      "required": [
+        "PIPED_DOMAIN",
+        "PIPED_API_DOMAIN",
+        "PIPED_PROXY_DOMAIN",
+        "PIPED_DB_NAME",
+        "PIPED_DB_USER",
+        "PIPED_DB_PASSWORD"
+      ],
+      "secret": [
+        "PIPED_DB_PASSWORD"
+      ]
+    },
+    {
+      "name": "playwright",
+      "description": "Playwright browser server and MCP proxy for AI agents",
+      "category": "tools",
+      "required": [],
+      "secret": []
+    },
+    {
+      "name": "searxng",
+      "description": "Meta search engine (searxng/searxng)",
+      "category": "tools",
+      "required": [
+        "SEARXNG_DOMAIN",
+        "SEARXNG_SECRET_KEY"
+      ],
+      "secret": [
+        "SEARXNG_SECRET_KEY"
+      ]
+    },
+    {
+      "name": "stalwart",
+      "description": "Self-hosted mail server (Stalwart) with Let's Encrypt certificates synced from Traefik",
+      "category": "productivity",
+      "required": [
+        "STALWART_DOMAIN",
+        "STALWART_MTA_STS_DOMAIN",
+        "STALWART_WEBMAIL_ORIGIN",
+        "STALWART_ADMIN_PASSWORD",
+        "STALWART_MEM_LIMIT",
+        "STALWART_CPU_LIMIT"
+      ],
+      "secret": [
+        "STALWART_ADMIN_PASSWORD"
+      ]
+    },
+    {
+      "name": "syncthing",
+      "description": "Continuous file sync between servers (syncthing/syncthing)",
+      "category": "infra",
+      "required": [
+        "SYNCTHING_DOMAIN",
+        "SYNCTHING_API_KEY",
+        "SYNCTHING_GUI_USER",
+        "SYNCTHING_GUI_PASSWORD",
+        "SYNCTHING_CPU_LIMIT",
+        "SYNCTHING_MEM_LIMIT"
+      ],
+      "secret": [
+        "SYNCTHING_API_KEY",
+        "SYNCTHING_GUI_PASSWORD"
+      ]
+    },
+    {
+      "name": "traefik",
+      "description": "Reverse proxy with auto-TLS via Let's Encrypt",
+      "category": "proxy",
+      "required": [
+        "TRAEFIK_DOMAIN",
+        "TRAEFIK_BASIC_AUTH_USER",
+        "TRAEFIK_BASIC_AUTH_PASSWORD",
+        "TRAEFIK_CPU_LIMIT",
+        "TRAEFIK_MEM_LIMIT"
+      ],
+      "secret": [
+        "TRAEFIK_BASIC_AUTH_PASSWORD"
+      ]
+    },
+    {
+      "name": "traggo",
+      "description": "Tag-based time tracker (traggo/server)",
+      "category": "productivity",
+      "required": [
+        "TRAGGO_DOMAIN",
+        "TRAGGO_MEM_LIMIT",
+        "TRAGGO_CPU_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "transmission",
+      "description": "BitTorrent client with web UI (linuxserver/transmission)",
+      "category": "media",
+      "required": [
+        "TRANSMISSION_DOMAIN",
+        "PATH_MOVIES",
+        "PATH_SERIES",
+        "PATH_MUSIC",
+        "PATH_BOOKS",
+        "PATH_OTHER"
+      ],
+      "secret": []
+    },
+    {
+      "name": "umami",
+      "description": "Privacy-first web analytics with a PostgreSQL database (Umami)",
+      "category": "monitoring",
+      "required": [
+        "UMAMI_DOMAIN",
+        "UMAMI_PROXY_DOMAIN",
+        "UMAMI_PROXY_WWW_DOMAIN",
+        "UMAMI_DB_PASSWORD",
+        "UMAMI_APP_SECRET"
+      ],
+      "secret": [
+        "UMAMI_DB_PASSWORD",
+        "UMAMI_APP_SECRET"
+      ]
+    },
+    {
+      "name": "usememos",
+      "description": "Self-hosted notes (usememos/memos)",
+      "category": "productivity",
+      "required": [
+        "USEMEMOS_DOMAIN"
+      ],
+      "secret": []
+    },
+    {
+      "name": "vaultwarden",
+      "description": "Bitwarden-compatible password manager with SMTP notifications",
+      "category": "security",
+      "required": [
+        "VAULTWARDEN_DOMAIN"
+      ],
+      "secret": [
+        "VAULTWARDEN_SMTP_PASSWORD"
+      ]
+    },
+    {
+      "name": "victoria-metrics",
+      "description": "Metrics and logs stack (VictoriaMetrics, VictoriaLogs, vmagent, promtail)",
+      "category": "monitoring",
+      "required": [],
+      "secret": []
+    },
+    {
+      "name": "watchtower",
+      "description": "Automatic Docker container image updates (nickfedor/watchtower)",
+      "category": "infra",
+      "required": [
+        "WATCHTOWER_CPU_LIMIT",
+        "WATCHTOWER_MEM_LIMIT"
+      ],
+      "secret": []
+    },
+    {
+      "name": "wireguard",
+      "description": "WireGuard VPN server (linuxserver/wireguard)",
+      "category": "infra",
+      "required": [
+        "WIREGUARD_DOMAIN",
+        "WIREGUARD_PEERS",
+        "WIREGUARD_DNS"
+      ],
+      "secret": []
+    },
+    {
+      "name": "woodpecker",
+      "description": "CI server and Docker agent (woodpeckerci) with GitHub sign-in",
+      "category": "devtools",
+      "required": [
+        "WOODPECKER_DOMAIN",
+        "WOODPECKER_AGENT_SECRET",
+        "WOODPECKER_GITHUB_CLIENT",
+        "WOODPECKER_GITHUB_SECRET",
+        "WOODPECKER_ADMIN"
+      ],
+      "secret": [
+        "WOODPECKER_AGENT_SECRET",
+        "WOODPECKER_GITHUB_SECRET"
+      ]
+    },
+    {
+      "name": "zond",
+      "description": "Health-probe bridge: 200 or 503 per container for external monitors (spy4x/zond)",
+      "category": "monitoring",
+      "required": [
+        "ZOND_DOMAIN",
+        "ZOND_CPU_LIMIT",
+        "ZOND_MEM_LIMIT"
+      ],
+      "secret": []
+    }
+  ]
+}
