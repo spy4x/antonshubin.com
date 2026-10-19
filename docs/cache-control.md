@@ -9,13 +9,13 @@ to `lib/pages.ts` (see "Site frame" in [AGENTS.md](../AGENTS.md)): its
 
 Cache tiers:
 
-| Tier              | Duration                        | Targets                              | Use case                                                      |
-| ----------------- | ------------------------------- | ------------------------------------ | ------------------------------------------------------------- |
-| Immutable         | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*`             | Content-hashed files (fingerprint = immutable)                |
-| Images and static | 7 days + stale-while-revalidate | `/img/*`, favicons, `/manifest.json` | Photos, illustrations, small root files (rarely change)       |
-| Core pages        | 3 days + stale-while-revalidate | `CORE_PAGES` set                     | SSR pages that update every few days                          |
-| Tools pages       | 1 hour + stale-while-revalidate | `/tools`, `/tools/*`                 | Versions, stars and CI status the server refreshes hourly     |
-| No cache          | `no-cache, must-revalidate`     | `/sw.js`                             | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection) |
+| Tier              | Duration                        | Targets                                          | Use case                                                            |
+| ----------------- | ------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------- |
+| Immutable         | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*`                         | Content-hashed files (fingerprint = immutable)                      |
+| Images and static | 7 days + stale-while-revalidate | `/img/*`, `/video/*`, favicons, `/manifest.json` | Photos, illustrations, demo clips, small root files (rarely change) |
+| Core pages        | 3 days + stale-while-revalidate | `CORE_PAGES` set                                 | SSR pages that update every few days                                |
+| Tools pages       | 1 hour + stale-while-revalidate | `/tools`, `/tools/*`                             | Versions, stars and CI status the server refreshes hourly           |
+| No cache          | `no-cache, must-revalidate`     | `/sw.js`                                         | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection)       |
 
 Error responses (status ≥ 400) are never cached, regardless of which tier the
 path would otherwise fall into — a 404 must not survive in a browser or at the

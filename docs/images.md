@@ -51,6 +51,20 @@ that asks for new screenshots of a project names every screenshot in that
 project's folder, not only the ones the issue mentions, so the environment is
 built once.
 
+## Videos
+
+A tool page's demo clip (#454) lives in `static/video/tools/<slug>/`:
+`demo.webm` (VP9, offered first), `demo.mp4` (H.264) and `poster.webp` (the
+clip's last frame, the result; a second width with `srcset` is welcome). A clip
+is 20 to 40 seconds, silent, staged demo data only, and each file is at most 2.5
+MB. Nothing downloads before the visitor presses play (`DemoVideo`), so the
+budget protects only the person who pressed. Its `lib/tools.ts` entry names it
+in `clip` (title, caption, frame, poster); set `clip.video` (`duration` as ISO
+8601, `uploadDate` the commit day) only once both files are committed, which
+also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when an
+entry marks a clip committed and a file is missing. `/video/*` is cached like
+`/img/*` (docs/cache-control.md). Strip the poster's metadata like any image.
+
 ## Image metadata
 
 Every image committed under `static/` or `assets/` ships without metadata: no

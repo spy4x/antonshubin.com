@@ -103,3 +103,19 @@ Deno.test("a missing tool page is never cached", () => {
     "no-store",
   );
 });
+
+Deno.test("a tool page's demo clip and poster get the image tier, even over Fresh's no-store", () => {
+  for (
+    const pathname of [
+      "/video/tools/oko/demo.webm",
+      "/video/tools/oko/demo.mp4",
+      "/video/tools/oko/poster.webp",
+    ]
+  ) {
+    assertEquals(
+      cacheControlFor({ ...PAGE, pathname, current: "no-store" }),
+      "public, max-age=604800, stale-while-revalidate=86400",
+      pathname,
+    );
+  }
+});
