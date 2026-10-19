@@ -87,11 +87,13 @@ Deno.test("a screenshot below the hero opens full size from the keyboard", async
     });
     try {
       // preact-components' screenshot grid and Seed's "What you get" cards.
+      // An image inside a link (Seed's "See it running" cards) keeps its
+      // link, so the first zoomable image is the first one outside a link.
       for (const slug of ["preact-components", "seed"]) {
         await page.goto(`${site.origin}/tools/${slug}`, {
           waitUntil: "networkidle",
         });
-        const shot = page.locator("[data-tool-middle] img").first();
+        const shot = page.locator("[data-tool-middle] img:not(a img)").first();
         const alt = await shot.getAttribute("alt");
         await shot.waitFor({ timeout: WAIT_MS });
         assertEquals(await shot.getAttribute("role"), "button", slug);
