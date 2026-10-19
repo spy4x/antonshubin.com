@@ -236,7 +236,13 @@ None yet.
 
 ### zond
 
-None yet.
+| Event               | When                                                              | Properties                                        |
+| ------------------- | ----------------------------------------------------------------- | ------------------------------------------------- |
+| `tool-try`          | a request in "Ask zond" is clicked (its `<label>`)                | `item=zond`, `part=ask:{path}` (`ask:/health`, …) |
+| `tool-install-copy` | any Quick start block is copied (Compose, config, command, Gatus) | `item=zond`                                       |
+
+Changing a service's answer sends nothing: a `<select>` reports a change, not a
+click, and an island only for that event would cost more than it tells.
 
 ### air-quality-sensor, toread-today
 
