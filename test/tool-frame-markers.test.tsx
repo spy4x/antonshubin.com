@@ -5,7 +5,10 @@ import { AssertionError, assertThrows } from "jsr:@std/assert@^1.0.0";
 import { render } from "npm:preact-render-to-string@^6.6.3";
 import type { ComponentChildren } from "preact";
 import { assertToolFrame } from "./tool-frame.ts";
-import { loadToolPage } from "../components/tool-frame/tool-page.ts";
+import {
+  loadToolPage,
+  type ToolPageData,
+} from "../components/tool-frame/tool-page.ts";
 import {
   ToolHero,
   type ToolHeroProps,
@@ -14,10 +17,15 @@ import { ToolDetails } from "../components/tool-frame/ToolDetails.tsx";
 import { ToolBand } from "../components/tool-frame/ToolBand.tsx";
 import { ToolMore } from "../components/tool-frame/ToolMore.tsx";
 
-const data = (await loadToolPage("oko"))!;
+const seed = (await loadToolPage("seed"))!;
+const components = (await loadToolPage("preact-components"))!;
 
 /** The frame's page body as the site renders it, with `hero` as a custom page passes it. */
-function body(hero: Omit<ToolHeroProps, "data">, middle?: ComponentChildren) {
+function body(
+  data: ToolPageData,
+  hero: Omit<ToolHeroProps, "data">,
+  middle?: ComponentChildren,
+) {
   return `<div id="main-content">${
     render(
       <>
@@ -31,25 +39,28 @@ function body(hero: Omit<ToolHeroProps, "data">, middle?: ComponentChildren) {
   }<footer class="site-footer">`;
 }
 
-Deno.test("the frame check passes a custom page that hides the job and brings its own media, with no options", () => {
-  // A headline page; its own media is a lazy picture, so it has no eager image.
+Deno.test("the frame check passes a custom page that hides the job, with no options", () => {
+  assertToolFrame(seed.tool, body(seed, { showJob: false }));
+});
+
+Deno.test("the frame check passes a custom page whose own media has no eager image, with no options", () => {
+  // preact-components has a hero still, so the frame's default media would be eager.
   assertToolFrame(
-    data.tool,
-    body({
-      showJob: false,
+    components.tool,
+    body(components, {
       media: <img src="/img/x.webp" alt="A diagram" loading="lazy" />,
     }),
   );
 });
 
 Deno.test("the frame check reads a hidden job from the marker, and fails when the marker is missing", () => {
-  const html = body({ showJob: false }).replace(
+  const html = body(seed, { showJob: false }).replace(
     "data-tool-job-hidden",
     "data-x",
   );
   assertThrows(
-    () => assertToolFrame(data.tool, html),
+    () => assertToolFrame(seed.tool, html),
     AssertionError,
-    "/tools/oko: job",
+    "/tools/seed: job",
   );
 });

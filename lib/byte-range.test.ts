@@ -95,9 +95,18 @@ Deno.test("an If-Range with a weak ETag gets the whole clip", async () => {
   assertEquals(await res.text(), "0123456789");
 });
 
-Deno.test("a 304 or 404 passes through untouched", () => {
-  for (const status of [304, 404]) {
-    const res = new Response(null, { status });
-    assertEquals(withByteRange(get({ range: "bytes=0-1" }), res), res);
-  }
+Deno.test("a 304 or a 404 page passes through untouched", () => {
+  const notModified = new Response(null, { status: 304 });
+  assertEquals(
+    withByteRange(get({ range: "bytes=0-1" }), notModified),
+    notModified,
+  );
+  const notFound = new Response("not found", {
+    status: 404,
+    headers: { "content-length": "9" },
+  });
+  assertEquals(
+    withByteRange(get({ range: "bytes=0-1" }), notFound),
+    notFound,
+  );
 });
