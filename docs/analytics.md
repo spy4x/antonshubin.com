@@ -189,7 +189,14 @@ own.
 
 ### caldav-mcp
 
-None yet.
+- `tool-try` with `part` `mode:all`, `mode:no-delete` or `mode:read-only`: a
+  position of the "Which tools the server offers" switch was clicked (on its
+  `<label>`).
+- `tool-try` with `part` `tool:<name>` (`tool:query_todos` …): a tool's row in
+  the reference was opened or closed (on its `<summary>`).
+- `tool-install-copy`: the Claude Desktop config block was copied.
+- `outbound` (`to: github`, `place: body`): the clients guide link under the
+  config block.
 
 ### caldav-tasks-web
 
