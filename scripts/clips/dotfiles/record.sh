@@ -32,4 +32,6 @@ ffmpeg -loglevel error -y -i "$raw" -an -c:v libx264 -preset slow -crf 26 -pix_f
   -movflags +faststart "$out/demo.mp4"
 ffmpeg -loglevel error -y -sseof -0.2 -i "$raw" -frames:v 1 -c:v libwebp -quality 90 \
   "$out/poster.webp"
+ffmpeg -loglevel error -y -i "$out/poster.webp" -vf scale=640:-2 -c:v libwebp -quality 90 \
+  "$out/poster-640.webp"
 ls -l "$out"
