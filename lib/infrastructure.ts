@@ -40,7 +40,7 @@ export interface InfraEdge {
 
 /**
  * Where a tool's box links: its page under `/tools` when it has one, else the
- * repository its `toolRows` entry names (oko has no page yet). Throws on a
+ * repository its `toolRows` entry names. Throws on a
  * slug that is in neither, so a typo fails the build.
  */
 export function toolLink(slug: string): { href: string; external: boolean } {

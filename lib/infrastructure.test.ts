@@ -79,10 +79,7 @@ Deno.test("every tool link resolves through lib/tools.ts", () => {
     assertEquals(n.href, toolLink(slug).href);
   }
   assertEquals(toolLink("rostok"), { href: "/tools/rostok", external: false });
-  assertEquals(toolLink("oko"), {
-    href: "https://github.com/spy4x/oko",
-    external: true,
-  });
+  assertEquals(toolLink("oko"), { href: "/tools/oko", external: false });
   assertThrows(() => toolLink("no-such-tool"), Error, "no tool");
 });
 
@@ -116,6 +113,7 @@ Deno.test("the three live links are dash, ci and meet, all https on antonshubin.
 Deno.test("only boxes with a tool page are mentioned in the JSON-LD", () => {
   assertEquals(mentionedToolIds().sort(), [
     "https://antonshubin.com/tools/mig#tool",
+    "https://antonshubin.com/tools/oko#tool",
     "https://antonshubin.com/tools/rostok#tool",
     "https://antonshubin.com/tools/zond#tool",
   ]);

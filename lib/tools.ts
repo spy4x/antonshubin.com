@@ -378,6 +378,39 @@ export const tools: Tool[] = [
     ci: { provider: "woodpecker", repoId: 5 },
   },
   {
+    slug: "oko",
+    name: "oko",
+    job:
+      "one page for every self-hosted service, with its status and 30-day uptime from gatus",
+    summary:
+      'You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days. oko (око, Russian for "eye") is the page you open to find a service and see at a glance that everything is fine.',
+    kind: "service",
+    status: "in-use",
+    group: "tools",
+    deployable: true,
+    appCategory: "DeveloperApplication",
+    useIf: [
+      "You run gatus and want one friendly page for your self-hosted services.",
+    ],
+    dontUseIf: [
+      "You need a public status page, metrics graphs, or a tool that probes services itself.",
+    ],
+    repo: "spy4x/oko",
+    runtime: "Go, as a static binary in a distroless image",
+    programmingLanguage: "Go",
+    usedFor:
+      "I built it for my own servers and run it at dash.antonshubin.com.",
+    live: {
+      label: "Open the live dashboard",
+      href: "https://dash.antonshubin.com",
+    },
+    ci: { provider: "woodpecker", repoId: 7 },
+    headline:
+      "One page for every self-hosted service, with its status and 30-day uptime from gatus.",
+    lede:
+      "You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days.",
+  },
+  {
     slug: "caldav-mcp",
     name: "caldav-mcp",
     job:
@@ -926,22 +959,10 @@ export const tools: Tool[] = [
 ];
 
 /**
- * Projects with a hub line and no page. oko has no job line or summary in
- * the data yet.
+ * Projects with a hub line and no page. None today: oko, the last one, got
+ * its page in #454. The hub still draws a row for an entry added here.
  */
-export const toolRows: ToolRow[] = [
-  {
-    slug: "oko",
-    name: "oko",
-    status: "in-use",
-    group: "tools",
-    repo: "spy4x/oko",
-    links: [
-      { label: "Open the dashboard", href: "https://dash.antonshubin.com" },
-      { label: "Repository", href: "https://github.com/spy4x/oko" },
-    ],
-  },
-];
+export const toolRows: ToolRow[] = [];
 
 /** The files of a tool's demo clip, the preferred one first (docs/images.md "Videos"). */
 export function clipSources(slug: string): { src: string; type: string }[] {
