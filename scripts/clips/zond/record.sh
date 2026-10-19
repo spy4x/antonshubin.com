@@ -53,5 +53,7 @@ ffmpeg -v error -y -i "$S/master.mp4" -an -map_metadata -1 -c:v libx264 -crf 26 
   -pix_fmt yuv420p -movflags +faststart "$OUT/demo.mp4"
 ffmpeg -v error -y -sseof -0.2 -i "$S/master.mp4" -frames:v 1 -c:v libwebp -quality 88 \
   "$OUT/poster.webp"
-(cd "$ROOT" && deno task strip-metadata "$OUT/poster.webp")
+ffmpeg -v error -y -i "$OUT/poster.webp" -vf scale=640:-1:flags=lanczos -c:v libwebp -quality 88 \
+  "$OUT/poster-640.webp"
+(cd "$ROOT" && deno task strip-metadata "$OUT/poster.webp" "$OUT/poster-640.webp")
 ls -l "$OUT"
