@@ -55,7 +55,7 @@ Deno.test("pressing a tool page's hero screenshot opens it full size and sends z
       await page.goto(`${site.origin}/tools/preact-components`, {
         waitUntil: "networkidle",
       });
-      const still = page.locator("[data-tool-media] [data-lightbox] img");
+      const still = page.locator("[data-tool-media] img");
       await still.click({ timeout: WAIT_MS });
       const dialog = page.locator("dialog[open]");
       await dialog.waitFor({ timeout: WAIT_MS });
@@ -66,6 +66,87 @@ Deno.test("pressing a tool page's hero screenshot opens it full size and sends z
       assertEquals(
         (await trackedCalls(page)).filter(([name]) => name === "zoom"),
         [["zoom", { item: "preact-components" }]],
+      );
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("a screenshot below the hero opens full size from the keyboard", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      // preact-components' screenshot grid and Seed's "What you get" cards.
+      for (const slug of ["preact-components", "seed"]) {
+        await page.goto(`${site.origin}/tools/${slug}`, {
+          waitUntil: "networkidle",
+        });
+        const shot = page.locator("[data-tool-middle] img").first();
+        const alt = await shot.getAttribute("alt");
+        await shot.waitFor({ timeout: WAIT_MS });
+        assertEquals(await shot.getAttribute("role"), "button", slug);
+        await shot.focus();
+        await page.keyboard.press("Enter");
+        const dialog = page.locator("dialog[open]");
+        await dialog.waitFor({ timeout: WAIT_MS });
+        assertEquals(
+          await dialog.locator("img").first().getAttribute("alt"),
+          alt,
+          `${slug}: the lightbox shows another image`,
+        );
+        await page.keyboard.press("Escape");
+      }
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+Deno.test("a focused hero screenshot draws a ring its frame does not clip", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      await page.goto(`${site.origin}/tools/preact-components`, {
+        waitUntil: "networkidle",
+      });
+      const still = page.locator("[data-tool-media] img");
+      await still.scrollIntoViewIfNeeded();
+      const box = (await still.boundingBox())!;
+      // The image's left edge, away from the frame's rounded corners.
+      const edge = {
+        x: Math.ceil(box.x),
+        y: Math.ceil(box.y + box.height / 4),
+        width: 2,
+        height: Math.floor(box.height / 2),
+      };
+      const before = await page.screenshot({ clip: edge });
+      let focused = false;
+      for (let i = 0; i < 40 && !focused; i++) {
+        await page.keyboard.press("Tab");
+        focused = await still.evaluate((el) => el === document.activeElement);
+      }
+      assert(focused, "Tab never reaches the hero screenshot");
+      const after = await page.screenshot({ clip: edge });
+      assert(
+        !before.equals(after),
+        "focus does not change the screenshot's edge",
       );
     } finally {
       await page.close();

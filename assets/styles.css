@@ -498,6 +498,13 @@ kbd {
   line-height: 1.6;
 }
 
+/* A tool page's zoomable screenshot (#454): the focus ring is drawn inside
+   the image, because the window frame around it clips anything outside. */
+[data-lightbox] img[data-lightbox-zoom]:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: -2px;
+}
+
 /* A row whose title link covers the whole row (UX 7). */
 .post-row-link::after {
   content: "";

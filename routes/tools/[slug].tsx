@@ -91,7 +91,7 @@ function DefaultMiddle({ data }: { data: ToolPageData }) {
           <h2 id="screenshots" class="text-2xl text-parchment">
             Screenshots
           </h2>
-          <ul data-lightbox class="mt-4 grid gap-5 sm:grid-cols-2">
+          <ul class="mt-4 grid gap-5 sm:grid-cols-2">
             {shots.map((shot) => (
               <li key={shot.src}>
                 <img

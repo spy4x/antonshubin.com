@@ -12,24 +12,22 @@ import { heroStill } from "./tool-page.ts";
 export const HERO_SIZES = "(min-width: 1024px) 33rem, calc(100vw - 2rem)";
 
 /**
- * The page's one eager, high-priority image: the hero still. It sits in a
- * `data-lightbox` box, so the frame's `ToolZoom` island opens it full size.
+ * The page's one eager, high-priority image: the hero still. The frame's
+ * `data-lightbox` box holds it, so `ToolZoom` opens it full size.
  */
 function Still({ shot }: { shot: ToolScreenshot }) {
   return (
-    <div data-lightbox>
-      <img
-        src={shot.src}
-        srcset={shot.srcset}
-        sizes={shot.srcset ? HERO_SIZES : undefined}
-        alt={shot.alt}
-        width={shot.width}
-        height={shot.height}
-        loading="eager"
-        fetchpriority="high"
-        class="block w-full h-auto"
-      />
-    </div>
+    <img
+      src={shot.src}
+      srcset={shot.srcset}
+      sizes={shot.srcset ? HERO_SIZES : undefined}
+      alt={shot.alt}
+      width={shot.width}
+      height={shot.height}
+      loading="eager"
+      fetchpriority="high"
+      class="block w-full h-auto"
+    />
   );
 }
 

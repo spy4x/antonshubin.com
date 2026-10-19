@@ -73,7 +73,7 @@ export function ShowcaseFeatures({ tool }: { tool: Tool }) {
       <h2 id="features" class="text-2xl sm:text-3xl text-parchment">
         What you get
       </h2>
-      <div data-lightbox class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+      <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
         {tool.features.map((f, i) => (
           <FeatureCard
             key={f.title}

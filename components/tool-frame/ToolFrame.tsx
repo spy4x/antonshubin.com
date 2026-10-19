@@ -47,10 +47,16 @@ export function ToolFrame(
       <ToolJsonLd data={data} />
       <div class="max-w-6xl mx-auto">
         <Breadcrumb items={getBreadcrumb(data.canonical, data.tool.name)} />
-        <ToolHero data={data} {...hero} />
-        {children && (
-          <div data-tool-middle class="mt-16 space-y-16">{children}</div>
-        )}
+        {
+          /* One lightbox box around every screenshot on the page: the
+          library's ZoomableImages wires only the first [data-lightbox]. */
+        }
+        <div data-lightbox>
+          <ToolHero data={data} {...hero} />
+          {children && (
+            <div data-tool-middle class="mt-16 space-y-16">{children}</div>
+          )}
+        </div>
         <ToolDetails data={data} beside={beside} />
         <ToolBand data={data} {...band} />
         <ToolMore data={data} picks={more} />
