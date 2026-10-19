@@ -135,6 +135,8 @@ div:has(> [data-gallery-counter]) > button {
 /* @spy4x/preact-ui/lightbox: the dialog, its controls and the image stage
    (controls="below"). The safe-area offsets are arbitrary values. */
 @source inline("bg-scrim bg-scrim-strong backdrop:bg-scrim-strong text-on-scrim-muted hover:text-scrim-foreground focus-visible:ring-(--color-scrim-foreground) top-[max(--spacing(4),env(safe-area-inset-top,0px))] right-[max(--spacing(4),env(safe-area-inset-right,0px))] bottom-[max(--spacing(4),env(safe-area-inset-bottom,0px))] left-[max(--spacing(4),env(safe-area-inset-left,0px))] top-[calc(max(--spacing(4),env(safe-area-inset-top,0px))+--spacing(12))] pointer-events-none pointer-events-auto m-auto max-h-full max-w-[90vw] max-h-[90vh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-fit");
+/* DemoVideo (tool pages' hero clip, #454): the poster, the playing video and the failed message. */
+@source inline("relative block w-full overflow-hidden group cursor-pointer focus-visible:outline-hidden h-full object-cover flex flex-col items-center justify-center gap-2 bg-canvas p-4 text-center text-sm text-foreground rounded-sm font-medium underline focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus pointer-events-none absolute inset-0 group-focus-visible:ring-2 group-focus-visible:ring-inset group-focus-visible:ring-focus size-16 rounded-full bg-scrim text-scrim-foreground shadow-lg group-focus-visible:ring-(--color-scrim-foreground) motion-safe:transition-transform motion-safe:group-hover:scale-110 motion-safe:group-focus-visible:scale-110 bg-scrim-strong size-8 translate-x-px");
 /* @spy4x/preact-ui/window-frame (browser), feature-card and card: the tool
    showcase (#448, components/ToolShowcase.tsx). Their `dark:` classes stay
    out, as the button's do. */
@@ -494,6 +496,29 @@ kbd {
 .post-lead {
   font-size: 1.125rem;
   line-height: 1.6;
+}
+
+/* A tool page's zoomable screenshot (#454): a two-tone focus ring, Parchment
+   outside and Ink inside, so it shows on dark and white screenshots alike.
+   The image's frame clips an outline drawn outside it, and an inset shadow
+   paints under an <img>, so the ring is an overlay on the image's parent,
+   whose box is the image's. */
+[data-lightbox] img[data-lightbox-zoom]:focus-visible {
+  outline: none;
+}
+
+[data-lightbox] :has(> img[data-lightbox-zoom]:focus-visible) {
+  position: relative;
+}
+
+[data-lightbox] :has(> img[data-lightbox-zoom]:focus-visible)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--color-ring), inset 0 0 0 4px
+    var(--color-ink);
 }
 
 /* A row whose title link covers the whole row (UX 7). */

@@ -25,8 +25,8 @@ Deno.test("a published tool's install line offers a copy button", () => {
   const html = render(<InstallLine tool={published} id="install" />);
   assert(html.includes("<button"), `no copy button:\n${html}`);
   assert(
-    html.includes(`title="Copy the install command for Sample"`),
-    `copy button has no title naming the tool:\n${html}`,
+    html.includes(`title="Copy the install command"`),
+    `copy button has no "Copy the install command" title:\n${html}`,
   );
   assert(!html.includes("Not yet available"), `marked not yet:\n${html}`);
 });

@@ -19,6 +19,7 @@ import { Lightbox } from "@spy4x/preact-ui/lightbox";
 import { Card } from "@spy4x/preact-ui/card";
 import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import { WindowFrame } from "@spy4x/preact-ui/window-frame";
+import { DemoVideo } from "@spy4x/preact-ui/demo-video";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -149,6 +150,17 @@ function renderedLibraryMarkup(): string {
       </FeatureCard>,
     ),
     render(<FeatureCard id="f2" title="Two">Text</FeatureCard>),
+    // A tool page's hero clip (#454): DemoVideo's poster. Its playing and
+    // failed states render only after a press; their classes are listed by
+    // hand in assets/styles.css's @source inline line.
+    render(
+      <DemoVideo
+        poster={{ src: "/p.webp", width: 1280, height: 800 }}
+        sources={[{ src: "/v.webm", type: "video/webm" }]}
+        title="A clip"
+        eager
+      />,
+    ),
     render(<Card class="p-6">Card</Card>),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
     // and a page only the More sheet lists; with Book and with Write, and

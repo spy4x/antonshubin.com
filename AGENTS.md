@@ -90,7 +90,7 @@ Constraints every review and spec keeps:
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see docs/testing.md)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow, safe-area and tool-frame tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -523,6 +523,21 @@ built page. The refund answer says how to ask for it, and "Does my code go to an
 AI provider?" (`#faq-ai-and-your-code`, linked from the AI paragraph) says yes
 without naming a provider or claiming it doesn't train on the code (Anton,
 #301): add either only once Anton confirms it.
+
+### Tool pages
+
+Every `/tools/<slug>` page is built on the shared frame in
+`components/tool-frame/` (#454). The frame renders the top line and the claim
+`<h1>`, the hero clip or still, the page's middle, the "Tool facts" card with
+"Use it if", "Skip it if" and the story, the "Two ways to use it" band with the
+body's only Book, and three "More tools" (`MORE_TOOLS` in `ToolMore.tsx`). A
+custom page is `routes/tools/<slug>.tsx`, which Fresh matches before
+`[slug].tsx` (the page of every other tool); it renders `ToolFrame` with its own
+middle as children. Demo clips are in `static/video/tools/<slug>/`
+(docs/images.md "Videos") and are served with byte ranges by
+`lib/video-files.ts`. Each page's events are listed in docs/analytics.md "Tool
+pages". The shared checks are `test/tool-frame.ts`'s `assertToolFrame()` and
+`toolPageProblems()`. The API is in docs/tools-registry.md "The tool frame".
 
 ### Type
 

@@ -7,8 +7,8 @@
  * services, a device, products still being built and archived apps. One page
  * type serves them all and shows only the blocks an entry has data for, so a
  * tool with no registry or no CI simply has no install line and no CI pill.
- * oko has no page yet: it is a `toolRows` entry, a hub line with links,
- * until its job line and summary exist in the data.
+ * A tool with a custom page (`routes/tools/<slug>.tsx`) reads the same entry
+ * through the shared frame in `components/tool-frame/` (#454).
  *
  * Numbers that change on their own (stars, CI status, last push) do not live
  * here: `scripts/github-snapshot.ts` writes them to `lib/github-snapshot.json`,
@@ -45,7 +45,7 @@ export type ToolKind =
   | "cli"
   | "app"
   | "device"
-  | "template";
+  | "starter";
 
 /** The `/tools` group a tool is listed under, in `toolGroups` order. */
 export type ToolGroupId = "tools" | "products" | "archive";
@@ -160,6 +160,43 @@ export interface ToolFeature {
   size?: "half" | "wide";
 }
 
+/**
+ * A tool's demo clip, the first media on its page (#454): `DemoVideo` inside
+ * the library's `WindowFrame`. Its files live at
+ * `/video/tools/<slug>/demo.webm` and `demo.mp4` (`clipSources()`, see
+ * docs/images.md "Videos"); until they exist, `video` is absent and the
+ * poster shows as a still in the same frame, so nothing moves when the clip
+ * arrives.
+ */
+export interface ToolClip {
+  /** What the clip shows: the play link's and the video's accessible name. */
+  title: string;
+  /** One visible sentence under the frame, the clip's text alternative. */
+  caption: string;
+  /**
+   * The window drawn around it: `browser` for something with a URL, `bare`
+   * (a Rule border and the card radius) for a clip that draws its own
+   * windows. `terminal` renders as `bare` for now: the library's terminal
+   * frame is built for text, not video, so a CLI clip records its terminal
+   * window itself.
+   */
+  frame: "browser" | "terminal" | "bare";
+  /** The address or title in the frame's bar. */
+  frameTitle?: string;
+  /** The clip's last frame (the result), under `/video/tools/<slug>/`; `alt` describes it as a still. */
+  poster: ToolScreenshot;
+  /**
+   * Set once `demo.webm` and `demo.mp4` are committed, with the real values
+   * the `VideoObject` JSON-LD needs.
+   */
+  video?: {
+    /** ISO 8601 duration, such as `PT28S`. */
+    duration: string;
+    /** The day the clip was committed, `YYYY-MM-DD`. */
+    uploadDate: string;
+  };
+}
+
 /** The one command that starts using a tool that is not installed from a registry. */
 export interface ToolQuickStart {
   /** What the command does, in a few words: "Start a product from it". */
@@ -239,20 +276,24 @@ export interface Tool {
   /** schema.org `applicationCategory` for a deployable tool. */
   appCategory?: string;
   /**
-   * A plain-language `<h1>` in place of "name: job" (#448). The page then
-   * draws the showcase layout: the name and job move to a line above the
-   * heading, the hero shot sits beside it, and the fact card follows the
-   * story on a phone. Every field below is read only on such a page.
+   * The claim `<h1>` in place of "name: job" (#448), the bold line of the
+   * repository's README. The tool frame's top line names the tool and its job
+   * either way (#454).
    */
   headline?: string;
-  /** The lead under `headline` and the page's meta description. */
+  /** The lede under the `<h1>` (at most two sentences) and the page's meta description. */
   lede?: string;
   /** The page's `<title>`, without the " — Anton Shubin" suffix. */
   pageTitle?: string;
   /** The tool's own website, besides its repository: JSON-LD `sameAs`. */
   website?: string;
-  /** One screenshot beside the headline, in a browser frame; also JSON-LD `image`. */
+  /**
+   * One screenshot beside the headline, in a browser frame; also JSON-LD
+   * `image`. A `clip` takes its place.
+   */
   hero?: ToolScreenshot;
+  /** The demo clip, the first media on the page (#454). */
+  clip?: ToolClip;
   /** A command shown with a copy button under the hero's actions. */
   quickStart?: ToolQuickStart;
   /** The "What you get" grid. */
@@ -263,11 +304,6 @@ export interface Tool {
   notYet?: string[];
   /** One line under the post's title in "The story behind it". */
   storyLine?: string;
-  /**
-   * The closing band's heading and its offer button's label; the button
-   * links `catalogSlug`'s item.
-   */
-  closing?: { line: string; offerLabel: string };
 }
 
 /**
@@ -344,6 +380,39 @@ export const tools: Tool[] = [
     ci: { provider: "woodpecker", repoId: 5 },
   },
   {
+    slug: "oko",
+    name: "oko",
+    job:
+      "one page for every self-hosted service, with its status and 30-day uptime from gatus",
+    summary:
+      'You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days. oko (око, Russian for "eye") is the page you open to find a service and see at a glance that everything is fine.',
+    kind: "service",
+    status: "in-use",
+    group: "tools",
+    deployable: true,
+    appCategory: "DeveloperApplication",
+    useIf: [
+      "You run gatus and want one friendly page for your self-hosted services.",
+    ],
+    dontUseIf: [
+      "You need a public status page, metrics graphs, or a tool that probes services itself.",
+    ],
+    repo: "spy4x/oko",
+    runtime: "Go, as a static binary in a distroless image",
+    programmingLanguage: "Go",
+    usedFor:
+      "I built it for my own servers and run it at dash.antonshubin.com.",
+    live: {
+      label: "Open the live dashboard",
+      href: "https://dash.antonshubin.com",
+    },
+    ci: { provider: "woodpecker", repoId: 7 },
+    headline:
+      "One page for every self-hosted service, with its status and 30-day uptime from gatus.",
+    lede:
+      "You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days.",
+  },
+  {
     slug: "caldav-mcp",
     name: "caldav-mcp",
     job:
@@ -411,7 +480,7 @@ export const tools: Tool[] = [
     runtime:
       "Deno on the server; @spy4x/time, @spy4x/validation, @spy4x/platform's browser entry points and @spy4x/realtime's client run in a browser, untested there",
     usedFor:
-      "Seed, my SaaS template, imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
+      "Seed, my SaaS starter, imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
     proofLinks: [
       {
         label: "Seed's imports in deno.jsonc",
@@ -463,7 +532,7 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "Seed, my SaaS template, imports @spy4x/validation, @spy4x/platform and @spy4x/server.",
+          "Seed, my SaaS starter, imports @spy4x/validation, @spy4x/platform and @spy4x/server.",
         href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
         planned: false,
       },
@@ -542,7 +611,7 @@ export const tools: Tool[] = [
       },
       {
         text:
-          "Seed, my SaaS template, builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
+          "Seed, my SaaS starter, builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
         href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
         planned: false,
       },
@@ -646,12 +715,12 @@ export const tools: Tool[] = [
   {
     slug: "seed",
     name: "Seed",
-    job: "SaaS starter template",
+    job: "SaaS starter",
     summary:
       `Seed is the SaaS starter I build client MVPs on: an API, a web app that works offline, a public site, a worker and an admin area, on web standards, with groups as tenancy from day one. Distilled from ${
         proof("projects")
       } projects. Its site is seedsaas.com and its demo is app.seedsaas.com.`,
-    kind: "template",
+    kind: "starter",
     status: "wip",
     group: "products",
     catalogSlug: "zero-to-production-saas-mvp",
@@ -662,7 +731,7 @@ export const tools: Tool[] = [
     ],
     dontUseIf: [
       "You need a finished product today.",
-      "You want a framework that updates under you: Seed is a template you change.",
+      "You want a framework that updates under you: Seed is a starter you change.",
     ],
     repo: "spy4x/seed",
     live: { label: "Open the live demo", href: "https://app.seedsaas.com" },
@@ -802,10 +871,6 @@ export const tools: Tool[] = [
       "The SPA, which works offline",
     ],
     storyLine: "Why the first Seed failed, and what this one does differently.",
-    closing: {
-      line: "Try it in the demo, or have me build your MVP on it.",
-      offerLabel: "See the MVP offer",
-    },
   },
   {
     slug: "caldav-tasks-web",
@@ -896,22 +961,18 @@ export const tools: Tool[] = [
 ];
 
 /**
- * Projects with a hub line and no page. oko has no job line or summary in
- * the data yet.
+ * Projects with a hub line and no page. None today: oko, the last one, got
+ * its page in #454. The hub still draws a row for an entry added here.
  */
-export const toolRows: ToolRow[] = [
-  {
-    slug: "oko",
-    name: "oko",
-    status: "in-use",
-    group: "tools",
-    repo: "spy4x/oko",
-    links: [
-      { label: "Open the dashboard", href: "https://dash.antonshubin.com" },
-      { label: "Repository", href: "https://github.com/spy4x/oko" },
-    ],
-  },
-];
+export const toolRows: ToolRow[] = [];
+
+/** The files of a tool's demo clip, the preferred one first (docs/images.md "Videos"). */
+export function clipSources(slug: string): { src: string; type: string }[] {
+  return [
+    { src: `/video/tools/${slug}/demo.webm`, type: "video/webm" },
+    { src: `/video/tools/${slug}/demo.mp4`, type: "video/mp4" },
+  ];
+}
 
 /**
  * Every slug an own project answered under `/work` and `/projects` before #273

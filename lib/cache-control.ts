@@ -11,6 +11,8 @@ export const CORE_PAGES = new Set(pagesFor("edge").map((p) => p.path));
 const isAsset = (pathname: string) =>
   pathname.startsWith("/assets/") || pathname.startsWith("/_fresh/");
 const isImage = (pathname: string) => pathname.startsWith("/img/");
+/** The tool pages' demo clips and posters (docs/images.md "Videos"). */
+const isVideo = (pathname: string) => pathname.startsWith("/video/");
 
 /**
  * Favicons, `manifest.json` and other small static files at the site root —
@@ -56,12 +58,12 @@ export function cacheControlFor(
   // Content-hashed assets — cache forever (fingerprint = immutable)
   if (isAsset(pathname)) return "public, max-age=31536000, immutable";
 
-  // Images and small static root files (rare changes) — cache 7 days,
+  // Images, videos and small static root files (rare changes) — cache 7 days,
   // serve stale while refreshing. Checked before the `current` no-store
   // check below: Fresh's static-file middleware stamps a plain `no-store`
   // on any static file it doesn't itself recognise as content-hashed, and
   // that must not shadow this tier (see this function's own doc comment).
-  if (isImage(pathname) || isStaticRootFile(pathname)) {
+  if (isImage(pathname) || isVideo(pathname) || isStaticRootFile(pathname)) {
     return "public, max-age=604800, stale-while-revalidate=86400";
   }
 
