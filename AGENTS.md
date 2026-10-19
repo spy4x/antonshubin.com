@@ -526,16 +526,18 @@ without naming a provider or claiming it doesn't train on the code (Anton,
 
 ### Tool pages
 
-Every `/tools/<slug>` page wears the shared frame in `components/tool-frame/`
-(#454): top line and claim `<h1>`, the hero clip or still, the page's own
-middle, the "Tool facts" card with "Use it if", "Skip it if" and the story, the
-"Two ways to use it" band with the body's only Book, and three hand-picked "More
-tools". A custom page is `routes/tools/<slug>.tsx` (Fresh matches it before
-`[slug].tsx`, which serves every other tool) and renders `ToolFrame` with its
-middle as children; it builds only the middle. Demo clips live in
-`static/video/tools/<slug>/` (docs/images.md "Videos"), a page's own events go
-in docs/analytics.md "Tool pages", and its test calls `test/tool-frame.ts`. The
-API and rules are in docs/tools-registry.md "The tool frame".
+Every `/tools/<slug>` page is built on the shared frame in
+`components/tool-frame/` (#454). The frame renders the top line and the claim
+`<h1>`, the hero clip or still, the page's middle, the "Tool facts" card with
+"Use it if", "Skip it if" and the story, the "Two ways to use it" band with the
+body's only Book, and three "More tools" (`MORE_TOOLS` in `ToolMore.tsx`). A
+custom page is `routes/tools/<slug>.tsx`, which Fresh matches before
+`[slug].tsx` (the page of every other tool); it renders `ToolFrame` with its own
+middle as children. Demo clips are in `static/video/tools/<slug>/`
+(docs/images.md "Videos") and are served with byte ranges by
+`lib/byte-range.ts`. Each page's events are listed in docs/analytics.md "Tool
+pages". The shared checks are `test/tool-frame.ts`'s `assertToolFrame()` and
+`toolPageProblems()`. The API is in docs/tools-registry.md "The tool frame".
 
 ### Type
 
