@@ -132,34 +132,21 @@ Deno.test("every sitemap page announces /rss.xml exactly once in <head>", async 
 
 /**
  * An `<img>` passes only with a non-empty `alt="..."`, unless it is marked
- * decorative (`aria-hidden="true"` or `role="presentation"`), or sits inside
- * a link named by its own `aria-label` (see {@link inNamedLink}). Fresh's precompiled
+ * decorative (`aria-hidden="true"` or `role="presentation"`) — none of the
+ * site's current images are, but the exception is here so a legitimately
+ * decorative image doesn't force a fake alt text later. Fresh's precompiled
  * JSX renders an empty `alt=""` as a bare, valueless `alt` attribute rather
  * than `alt=""` (see PR #132's evidence), so "missing" and "present but
  * empty" both simply fail to match `alt="<at least one char>"` — no need to
  * special-case them.
  */
 function imagesWithBadAlt(html: string): string[] {
-  return [...html.matchAll(/<img\b[^>]*>/gi)].filter((m) => {
-    const tag = m[0];
+  const tags = html.match(/<img\b[^>]*>/gi) ?? [];
+  return tags.filter((tag) => {
     const decorative = /aria-hidden\s*=\s*"true"/i.test(tag) ||
       /role\s*=\s*"presentation"/i.test(tag);
-    return !decorative && !/\balt\s*=\s*"[^"]+"/i.test(tag) &&
-      !inNamedLink(html, m.index);
-  }).map((m) => m[0]);
-}
-
-/**
- * True when the `<img>` at `at` sits inside an `<a>` that carries its own
- * `aria-label`: the link's name is the image's, so its empty alt is right.
- * A tool page's clip poster (`DemoVideo`, #454) is the case: its play link
- * is named by the clip's title.
- */
-function inNamedLink(html: string, at: number): boolean {
-  const before = html.slice(0, at);
-  const open = before.lastIndexOf("<a ");
-  return open !== -1 && !before.includes("</a>", open) &&
-    /^<a\b[^>]*\baria-label\s*=\s*"[^"]+"/i.test(before.slice(open));
+    return !decorative && !/\balt\s*=\s*"[^"]+"/i.test(tag);
+  });
 }
 
 Deno.test("no rendered image has an empty or missing alt", async (t) => {
