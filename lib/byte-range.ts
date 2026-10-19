@@ -34,7 +34,8 @@ export function parseRange(
   }
   const start = Number(parts[1]);
   const end = parts[2] === "" ? size - 1 : Math.min(Number(parts[2]), size - 1);
-  if (start >= size || end < start) return null;
+  // `end` is capped at the last byte, so a start past the end lands here too.
+  if (end < start) return null;
   return { start, end };
 }
 
