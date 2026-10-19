@@ -18,6 +18,7 @@ const PROP_KEYS: Record<keyof EventProps, true> = {
   field: true,
   reason: true,
   service: true,
+  part: true,
 };
 
 /** The properties each clicked event must carry, per the table in #318. */
@@ -27,6 +28,7 @@ const REQUIRED: Partial<Record<string, (keyof EventProps)[]>> = {
   cta: ["place", "target"],
   outbound: ["to"],
   "tool-install-copy": ["item"],
+  "tool-try": ["item", "part"],
 };
 
 /** RFC 2606 hosts: nothing is fetched from them. */

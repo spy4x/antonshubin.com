@@ -21,6 +21,9 @@ export const ANALYTICS_EVENTS = [
   "outbound",
   "cta",
   "tool-install-copy",
+  "demo-play",
+  "zoom",
+  "tool-try",
   "copy",
   "post-read",
   "not-found",
@@ -59,7 +62,11 @@ export interface EventProps {
   place?: Place;
   /** The catalog item, project, tool or post the link is about. */
   item?: string;
-  /** `outbound` only: a short name for where the link goes (`upwork`, `github`, `live` …). */
+  /**
+   * `outbound` only: a short name for where the link goes (`upwork`,
+   * `github`, `issues`, `live`, `website`, `registry`, `demo-app`,
+   * `demo-admin` …).
+   */
   to?: string;
   /** `cta` only: the internal path the link opens. */
   target?: string;
@@ -69,6 +76,8 @@ export interface EventProps {
   reason?: BriefErrorReason;
   /** `brief-sent` only: the catalog slug a prefilled brief was about. */
   service?: string;
+  /** `tool-try` only: which of a tool page's own interactions was used. */
+  part?: string;
 }
 
 /** The attributes `eventAttrs()` returns, ready to spread onto an element. */

@@ -28,21 +28,24 @@ This table is the canonical list. `lib/analytics.ts` is the code's copy of the
 same list, and a name not in it fails type checking. Umami stores the page URL
 with every event, so no event has a `page` property.
 
-| Event                                | When                                                                                                          | Properties                                                                                                                 |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `book`                               | a Book link or button is clicked                                                                              | `place` (`nav`, `hero`, `card`, `band`, `side`, `end`, `top`), `item` (catalog or project slug, when there is one)         |
-| `brief`                              | a "Send a written brief" link is clicked                                                                      | `place`, `item`                                                                                                            |
-| `brief-sent`                         | the lead form reports success                                                                                 | `service` (slug, when prefilled)                                                                                           |
-| `brief-error`                        | the lead form fails                                                                                           | `reason`                                                                                                                   |
-| `call-booked`                        | mig reports a booking                                                                                         | none                                                                                                                       |
-| `calendar-shown` / `calendar-failed` | embed lifecycle                                                                                               | none                                                                                                                       |
-| `newsletter-signup`                  | the server accepts a signup (the address still has to confirm by mail)                                        | none                                                                                                                       |
-| `outbound`                           | a link to another site is clicked, including links inside posts                                               | `to` (short host or profile id: `upwork`, `github`, `youtube`, `telegram`, `email`, `neatsoft`, a tool's `live` …), `item` |
-| `cta`                                | an internal call-to-action link (work card, service card, tool card, How I work, FAQ …)                       | `place`, `target` (the link's path)                                                                                        |
-| `tool-install-copy`                  | an install command, or a tool page's quick-start command, is copied                                           | `item`                                                                                                                     |
-| `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                    |
-| `post-read`                          | the end of a post's body has been on screen, and the visitor has been on the page 15 s or more; once per view | `item` (post slug)                                                                                                         |
-| `not-found`                          | the not-found page renders                                                                                    | none                                                                                                                       |
+| Event                                | When                                                                                                          | Properties                                                                                                                                                                                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `book`                               | a Book link or button is clicked                                                                              | `place` (`nav`, `hero`, `card`, `band`, `side`, `end`, `top`), `item` (catalog or project slug, when there is one)                                                                                                                    |
+| `brief`                              | a "Send a written brief" link is clicked                                                                      | `place`, `item`                                                                                                                                                                                                                       |
+| `brief-sent`                         | the lead form reports success                                                                                 | `service` (slug, when prefilled)                                                                                                                                                                                                      |
+| `brief-error`                        | the lead form fails                                                                                           | `reason`                                                                                                                                                                                                                              |
+| `call-booked`                        | mig reports a booking                                                                                         | none                                                                                                                                                                                                                                  |
+| `calendar-shown` / `calendar-failed` | embed lifecycle                                                                                               | none                                                                                                                                                                                                                                  |
+| `newsletter-signup`                  | the server accepts a signup (the address still has to confirm by mail)                                        | none                                                                                                                                                                                                                                  |
+| `outbound`                           | a link to another site is clicked, including links inside posts                                               | `to` (short host or profile id: `upwork`, `github`, `youtube`, `telegram`, `email`, `neatsoft`, a tool's `live` …), `item`; on a tool page also `place` and the `to` values `issues`, `registry`, `website`, `demo-app`, `demo-admin` |
+| `cta`                                | an internal call-to-action link (work card, service card, tool card, How I work, FAQ …)                       | `place`, `target` (the link's path)                                                                                                                                                                                                   |
+| `tool-install-copy`                  | an install command, or a tool page's quick-start command, is copied                                           | `item`                                                                                                                                                                                                                                |
+| `demo-play`                          | a tool page's demo clip is played (`DemoVideo`'s play link pressed)                                           | `item` (tool slug), `place` (`hero` or `body`)                                                                                                                                                                                        |
+| `zoom`                               | a screenshot on a tool page opens in the lightbox                                                             | `item` (tool slug)                                                                                                                                                                                                                    |
+| `tool-try`                           | a tool page's own interaction is used                                                                         | `item` (tool slug), `part` (which interaction; each page lists its values under "Tool pages" below)                                                                                                                                   |
+| `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                                                                                                                               |
+| `post-read`                          | the end of a post's body has been on screen, and the visitor has been on the page 15 s or more; once per view | `item` (post slug)                                                                                                                                                                                                                    |
+| `not-found`                          | the not-found page renders                                                                                    | none                                                                                                                                                                                                                                  |
 
 The old event names (`nav-book`, `form-submit-audit`, `meet-embed-frame-load`
 and about 90 others) stopped on 2026-09-30. The weekly report says so until
@@ -138,12 +141,12 @@ instance answers `/api/websites/<id>/goals`, which only 3.4 has.
 
 `lib/analytics.ts` is the only list of Umami events (#318): `ANALYTICS_EVENTS`
 is a closed list, and detail goes into `data-umami-event-<key>` properties
-(`place`, `item`, `to`, `target`, `field`, `reason`, `service`), never into the
-name, so Umami can add up every Book click across pages. A link or button
-spreads `eventAttrs(name, props)`; `linkEvent(href, props)` picks `outbound`,
-`brief`, `book` or `cta` from the href (the closing band and the promise
-timeline use it); an island calls `track()`, which never throws. Never write a
-`data-umami-event` string or call `umami.track` by hand.
+(`place`, `item`, `to`, `target`, `field`, `reason`, `service`, `part`), never
+into the name, so Umami can add up every Book click across pages. A link or
+button spreads `eventAttrs(name, props)`; `linkEvent(href, props)` picks
+`outbound`, `brief`, `book` or `cta` from the href (the closing band and the
+promise timeline use it); an island calls `track()`, which never throws. Never
+write a `data-umami-event` string or call `umami.track` by hand.
 `test/analytics.test.ts` fails on any event, property or `place` outside the
 list on every sitemap page, `/pay` and a not-found page.
 
@@ -167,3 +170,67 @@ his visits stay out of the numbers, and any visitor can do the same.
 `routes/privacy.tsx` describes exactly this; change it together with the code.
 This file holds the event names and properties and the saved reports
 `deno task umami-reports` keeps.
+
+`demo-play` and `zoom` are sent with `track()` from islands
+(`islands/ToolHeroClip.tsx`, `islands/ToolZoom.tsx`), never as
+`data-umami-event` attributes on the clip's play link: Umami's tracker answers a
+click on a tracked `<a href>` by cancelling it and then opening the href, which
+for the play link is the video file. A `tool-try` on a `<label>`, `<summary>` or
+`<button>` may use `eventAttrs()`; on a link that must not navigate, use
+`track()`.
+
+## Tool pages
+
+Every tool page sends the frame's events (#454): `demo-play`, `zoom`, `outbound`
+(`place` `hero`, `card`, `band` or `body`), `tool-install-copy`, `book`
+(`place: band`, `item`) and `cta` (the offer or "Services", More tools, the
+post). A page's own events go in its subsection below; each lane edits only its
+own.
+
+### caldav-mcp
+
+None yet.
+
+### caldav-tasks-web
+
+None yet.
+
+### dotfiles
+
+None yet.
+
+### financy
+
+None yet.
+
+### mig
+
+None yet.
+
+### oko
+
+None yet.
+
+### preact-components
+
+None yet.
+
+### rostok
+
+None yet.
+
+### seed
+
+None yet.
+
+### ts-libs
+
+None yet.
+
+### zond
+
+None yet.
+
+### air-quality-sensor, toread-today
+
+Archived: the frame's events only.
