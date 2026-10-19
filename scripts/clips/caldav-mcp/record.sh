@@ -8,7 +8,7 @@
 # calendar (seed.ts), runs the real exchange through `claude -p` and
 # caldav-mcp (exchange.ts) and copies its exchange.json here. Either way it
 # replays exchange.json in a browser (record.ts) and encodes demo.webm,
-# demo.mp4 and poster.webp into static/video/tools/caldav-mcp/. The
+# demo.mp4, poster.webp and poster-640.webp into static/video/tools/caldav-mcp/. The
 # container, its volume and the temp directory go on success, failure and
 # Ctrl-C.
 set -euo pipefail
@@ -52,4 +52,6 @@ ffmpeg -v error -y -ss "$trim" -i "$tmp/rec/raw.webm" -vf fps=25 -an \
 # The poster is the clip's last frame: the whole exchange on screen.
 ffmpeg -v error -y -sseof -0.3 -i "$tmp/rec/raw.webm" -frames:v 1 -c:v libwebp -quality 85 \
   "$dest/poster.webp"
+ffmpeg -v error -y -i "$dest/poster.webp" -vf scale=640:-1:flags=lanczos -c:v libwebp -quality 85 \
+  "$dest/poster-640.webp"
 ls -l "$dest"
