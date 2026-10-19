@@ -27,6 +27,20 @@ const STATUS_WORDS = {
   archived: "Archived",
 } as const;
 
+/**
+ * The tools drawn by `routes/tools/[slug].tsx`'s default middle: a tool with
+ * its own `routes/tools/<slug>.tsx` (#454) draws a middle of its own, which
+ * its own test in `test/tools/` checks instead.
+ */
+const defaultPageTools = tools.filter((t) => {
+  try {
+    Deno.statSync(new URL(`../routes/tools/${t.slug}.tsx`, import.meta.url));
+    return false;
+  } catch {
+    return true;
+  }
+});
+
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   Deno.test(name, async () => {
@@ -446,7 +460,7 @@ siteTest(
 siteTest(
   "each link between repos is labelled Planned or Today, as lib/tools.ts says",
   async (site) => {
-    for (const t of tools) {
+    for (const t of defaultPageTools) {
       const html = await site.html(`/tools/${t.slug}`);
       const labels = [
         ...html.matchAll(
@@ -837,7 +851,7 @@ siteTest(
 siteTest(
   "a tool page draws a feature card, quick start or works card only from its own data, and What it is only with summary left after the lede",
   async (site) => {
-    for (const t of tools) {
+    for (const t of defaultPageTools) {
       const page = pageBody(await site.html(`/tools/${t.slug}`));
       const markers: [string, boolean][] = [
         ['data-e2e="feature-card"', Boolean(t.features?.length)],
