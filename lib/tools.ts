@@ -357,6 +357,49 @@ export const tools: Tool[] = [
     live: { label: "Open the booking page", href: "/book" },
     ci: { provider: "woodpecker", repoId: 12 },
     headline: "One owner, one link, no database.",
+    // The README's "Why mig", less "Web standards" (#457 keeps six).
+    features: [
+      {
+        title: "Nothing to operate",
+        text:
+          "One small container, bookings in one JSON file you can cat and back up. No database, no accounts, no admin UI.",
+      },
+      {
+        title: "Config is code",
+        text:
+          "Working hours, days off, slot length and the meeting link are environment variables. Change them, restart, done.",
+      },
+      {
+        title: "Both clocks, everywhere",
+        text:
+          "Guests see times in their own time zone. Your emails show your time and the guest's side by side.",
+      },
+      {
+        title: "Invite and cancel built in",
+        text:
+          "Every confirmation carries an .ics invite and a signed cancel link. Optional push notifications through NTFY.",
+        size: "wide",
+        shot: {
+          src: "/img/tools/mig/email-confirmation.webp",
+          srcset:
+            "/img/tools/mig/email-confirmation-760.webp 760w, /img/tools/mig/email-confirmation.webp 1200w",
+          alt:
+            "The guest's confirmation email: subject \"Booking confirmed\", the meeting's date and time in Berlin time, the meeting link, a note about the attached calendar invite, and a cancel link.",
+          width: 1200,
+          height: 987,
+        },
+      },
+      {
+        title: "No stranger's text in the guest's inbox",
+        text:
+          "Anyone can type any address into the form, so mail to that address says only when the meeting is, with whom, where and how to cancel. The name, the notes and the cancel reason reach you alone.",
+      },
+      {
+        title: "Embeds anywhere",
+        text:
+          "/embed drops the whole flow into an iframe on your site, resizes itself and takes your site's theme with ?theme=.",
+      },
+    ],
     lede:
       "A visitor picks a free slot, and you both get an email with a calendar invite and a cancel link. That's the whole product.",
     clip: {

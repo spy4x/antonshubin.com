@@ -8,6 +8,7 @@ import MigTryCalendar from "../../../islands/MigTryCalendar.tsx";
 import { embedUrl, NEW_TAB_LABEL } from "../../../lib/meet-embed.ts";
 import { eventAttrs } from "../../../lib/analytics.ts";
 import type { ToolPageData } from "../../tool-frame/tool-page.ts";
+import type { Tool } from "../../../lib/tools.ts";
 
 // The middle of /tools/mig (#457). Every sentence is mig's README's own
 // (spy4x/mig README.md: the tagline, "Why mig", "Quick start", "Embed it").
@@ -125,109 +126,57 @@ export function TryItHere({ scheduleUrl }: { scheduleUrl: string }) {
   );
 }
 
-/** One "Why mig" reason: its README heading and sentence. */
-interface Reason {
-  title: string;
-  text: ComponentChildren;
-}
+/**
+ * The README's words that it sets as code, drawn as `<code>` inside a
+ * reason. "?theme=" stays plain: it ends a sentence, and a tag before the
+ * full stop would split the sentence in the page's text.
+ */
+const CODE_WORDS = /(\bcat\b|\.ics\b|\/embed\b)/;
 
-const code = (s: string) => <code class="text-parchment">{s}</code>;
-
-/** The README's "Why mig", less "Web standards" (#457 keeps six). */
-const REASONS: Reason[] = [
-  {
-    title: "Nothing to operate",
-    text: (
-      <>
-        One small container, bookings in one JSON file you can {code("cat")}
-        {" "}
-        and back up. No database, no accounts, no admin UI.
-      </>
-    ),
-  },
-  {
-    title: "Config is code",
-    text:
-      "Working hours, days off, slot length and the meeting link are environment variables. Change them, restart, done.",
-  },
-  {
-    title: "Both clocks, everywhere",
-    text:
-      "Guests see times in their own time zone. Your emails show your time and the guest's side by side.",
-  },
-  {
-    title: "Invite and cancel built in",
-    text: (
-      <>
-        Every confirmation carries an {code(".ics")}{" "}
-        invite and a signed cancel link. Optional push notifications through
-        NTFY.
-      </>
-    ),
-  },
-  {
-    title: "No stranger's text in the guest's inbox",
-    text:
-      "Anyone can type any address into the form, so mail to that address says only when the meeting is, with whom, where and how to cancel. The name, the notes and the cancel reason reach you alone.",
-  },
-  {
-    title: "Embeds anywhere",
-    text: (
-      <>
-        {code("/embed")}{" "}
-        drops the whole flow into an iframe on your site, resizes itself and
-        takes your site's theme with {code("?theme=")}.
-      </>
-    ),
-  },
-];
-
-/** The reason that carries the confirmation email screenshot. */
-const WITH_EMAIL = "Invite and cancel built in";
-
-/** The README's confirmation email screenshot, cropped to the mail window. */
-function EmailShot() {
-  return (
-    <img
-      src="/img/tools/mig/email-confirmation.webp"
-      srcset="/img/tools/mig/email-confirmation-760.webp 760w, /img/tools/mig/email-confirmation.webp 1200w"
-      sizes="(min-width: 1024px) 42rem, 100vw"
-      alt={`The guest's confirmation email: subject "Booking confirmed", the meeting's date and time in Berlin time, the meeting link, a note about the attached calendar invite, and a cancel link.`}
-      width={1200}
-      height={987}
-      loading="lazy"
-      decoding="async"
-      class="block w-full h-auto"
-    />
+/** A reason's sentence with the README's code words set as `<code>`. */
+function withCode(text: string): ComponentChildren {
+  return text.split(CODE_WORDS).map((part, i) =>
+    i % 2 ? <code key={i} class="text-parchment">{part}</code> : part
   );
 }
 
 /**
- * "Why mig": the README's reasons as six library `FeatureCard`s. From
- * 1024px three sit in the first row; the email card takes two thirds of the
- * next two rows and the last two stack beside it.
+ * "Why mig": the entry's `features` (the README's reasons) as library
+ * `FeatureCard`s. From 1024px three sit in the first row; the card with the
+ * email screenshot takes two thirds of the next two rows and the last two
+ * stack beside it.
  */
-export function WhyMig() {
+export function WhyMig({ tool }: { tool: Tool }) {
+  if (!tool.features?.length) return null;
   return (
     <section aria-labelledby="why">
       <h2 id="why" class="text-2xl sm:text-3xl text-parchment">Why mig</h2>
       <div data-mig-why class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
-        {REASONS.map((r, i) => {
-          const email = r.title === WITH_EMAIL;
-          return (
-            <FeatureCard
-              key={r.title}
-              id={`why-${i + 1}`}
-              title={r.title}
-              class={email
-                ? "sm:col-span-2 lg:col-span-4 lg:row-span-2"
-                : "lg:col-span-2"}
-              media={email ? <EmailShot /> : undefined}
-            >
-              {r.text}
-            </FeatureCard>
-          );
-        })}
+        {tool.features.map((f, i) => (
+          <FeatureCard
+            key={f.title}
+            id={`why-${i + 1}`}
+            title={f.title}
+            class={f.shot
+              ? "sm:col-span-2 lg:col-span-4 lg:row-span-2"
+              : "lg:col-span-2"}
+            media={f.shot && (
+              <img
+                src={f.shot.src}
+                srcset={f.shot.srcset}
+                sizes="(min-width: 1024px) 42rem, 100vw"
+                alt={f.shot.alt}
+                width={f.shot.width}
+                height={f.shot.height}
+                loading="lazy"
+                decoding="async"
+                class="block w-full h-auto"
+              />
+            )}
+          >
+            {withCode(f.text)}
+          </FeatureCard>
+        ))}
       </div>
     </section>
   );

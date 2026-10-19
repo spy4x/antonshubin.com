@@ -30,7 +30,7 @@ export default define.page(async function MigPage(ctx) {
       more={["zond", "caldav-mcp", "rostok"]}
     >
       <TryItHere scheduleUrl={SCHEDULE_URL} />
-      <WhyMig />
+      <WhyMig tool={data.tool} />
       <EmbedIt />
       <OpenIssues data={data} />
     </ToolFrame>
