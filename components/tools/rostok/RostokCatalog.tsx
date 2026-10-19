@@ -9,7 +9,7 @@ import {
 import { findTool } from "../../../lib/tools.ts";
 
 const CHIP =
-  "rounded border border-rule bg-ink px-1.5 py-0.5 text-xs text-parchment";
+  "rounded border border-rule bg-ink px-1.5 py-0.5 text-xs text-parchment break-all";
 
 /** A list of variable keys as code chips, or "none". */
 function Keys({ keys }: { keys: string[] }) {
@@ -147,7 +147,7 @@ export function RostokCatalog() {
               </h3>
               <ul class="mt-4 grid items-start gap-3 sm:grid-cols-2">
                 {g.stacks.map((s) => (
-                  <li key={s.name}>
+                  <li key={s.name} class="min-w-0">
                     <Stack stack={s} />
                   </li>
                 ))}
