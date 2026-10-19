@@ -553,9 +553,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "3.1.0",
+      version: "8.6.0",
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@3.1.0",
+      install: "deno add jsr:@spy4x/preact-ui@8.6.0",
       latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
     },
     licence: "MIT",
@@ -569,6 +569,27 @@ export const tools: Tool[] = [
         href: "https://spy4x.github.io/preact-components",
       },
     ],
+    headline:
+      "Server-rendered Preact and Tailwind components, with a live guide that runs every one.",
+    lede:
+      "You install one package, import a component, and it renders with the shared design tokens: the same button, table, chart and CRUD scaffold in every app, written once.",
+    clip: {
+      title: "A tour of the preact-components live guide",
+      caption:
+        "The live guide: a dashboard built only from the library, light and dark, three accent colours, keyboard search, and a component with its code.",
+      frame: "browser",
+      frameTitle: "spy4x.github.io/preact-components",
+      poster: {
+        src: "/video/tools/preact-components/poster.webp",
+        srcset:
+          "/video/tools/preact-components/poster-640.webp 640w, /video/tools/preact-components/poster.webp 1280w",
+        alt:
+          "The live UI guide's overview in dark with the rose accent: the headline Preact components that render on the server and work from the keyboard, the Browse components and Star on GitHub buttons, the install command deno add jsr:@spy4x/preact-ui with its copy button, and the counts 123 components, 124 icons and 10 packages.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT38S", uploadDate: "2026-10-19" },
+    },
     live: {
       label: "Open the live UI guide",
       href: "https://spy4x.github.io/preact-components",

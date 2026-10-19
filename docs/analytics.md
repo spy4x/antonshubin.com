@@ -213,7 +213,12 @@ None yet.
 
 ### preact-components
 
-None yet.
+- `tool-try` (`item: preact-components`, `part: code`): "Show the code" under
+  the Orbit slice is opened. The attributes sit on the `<summary>`, which is not
+  a link, so the tracker's click handling does not cancel the toggle.
+- `outbound` (`to: live`, `place: body`): "Open the live UI guide" under the
+  slice; (`to: issues`, `place: body`): the #210 link and "open issues" in
+  "Where it stands".
 
 ### rostok
 

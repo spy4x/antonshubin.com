@@ -25,6 +25,7 @@ import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
 import { Nav } from "../components/Nav.tsx";
+import { OrbitSlice } from "../components/tools/preact-components/OrbitSlice.tsx";
 import type { CiSnapshot } from "../lib/github-snapshot.ts";
 import { startSite } from "./harness.ts";
 
@@ -177,6 +178,11 @@ function renderedLibraryMarkup(): string {
         method="How."
         fit="Who."
       />,
+    ),
+    // /tools/preact-components renders the library's Kpi, KpiGrid and Table
+    // on the server (#458).
+    render(
+      <OrbitSlice live={{ label: "Guide", href: "https://example.com" }} />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
     // and a page only the More sheet lists; with Book and with Write, and
