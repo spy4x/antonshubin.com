@@ -29,7 +29,7 @@ export function InstallLine(
           <CopyButton
             elementId={id}
             label="Copy"
-            title={`Copy the install command for ${tool.name}`}
+            title="Copy the install command"
             analytics={eventAttrs("tool-install-copy", { item: tool.slug })}
           />
         )}

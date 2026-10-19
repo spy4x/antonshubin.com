@@ -153,10 +153,10 @@ export default define.page(function CatalogDetail(ctx) {
               <p class="max-w-2xl text-lg text-graphite leading-relaxed">
                 {item.desc}
               </p>
-              {/* The starter template this service builds on (#448). */}
+              {/* The SaaS starter this service builds on (#448). */}
               {tools
                 .filter((t) =>
-                  t.kind === "template" && t.catalogSlug === item.slug
+                  t.kind === "starter" && t.catalogSlug === item.slug
                 )
                 .map((t) => (
                   <p key={t.slug} data-built-on class="text-graphite">

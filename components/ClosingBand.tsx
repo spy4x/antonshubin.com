@@ -101,30 +101,32 @@ export function ClosingBand(
         </ul>
       )}
       {children}
-      <div class="flex flex-wrap items-center gap-4">
-        {book && (
-          <BookCallLink
-            href={bookHref}
-            event={eventAttrs("book", { place: "band", item: bookItem })}
-            data-primary-cta={primaryCta}
-            class="justify-center px-6 py-3"
-          >
-            {bookLabel}
-          </BookCallLink>
-        )}
-        {catalogLink}
-        {links.map((l) => (
-          <a
-            key={l.href}
-            href={l.href}
-            {...linkEvent(l.href, { place: "band" })}
-            class={LINK}
-          >
-            {l.label}
-            <ArrowRightIcon class="w-3.5 h-3.5" />
-          </a>
-        ))}
-      </div>
+      {(book || catalogLink || links.length > 0) && (
+        <div class="flex flex-wrap items-center gap-4">
+          {book && (
+            <BookCallLink
+              href={bookHref}
+              event={eventAttrs("book", { place: "band", item: bookItem })}
+              data-primary-cta={primaryCta}
+              class="justify-center px-6 py-3"
+            >
+              {bookLabel}
+            </BookCallLink>
+          )}
+          {catalogLink}
+          {links.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              {...linkEvent(l.href, { place: "band" })}
+              class={LINK}
+            >
+              {l.label}
+              <ArrowRightIcon class="w-3.5 h-3.5" />
+            </a>
+          ))}
+        </div>
+      )}
       {after}
     </section>
   );

@@ -90,7 +90,7 @@ Constraints every review and spec keeps:
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see docs/testing.md)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow and safe-area tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow, safe-area and tool-frame tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server
@@ -523,6 +523,19 @@ built page. The refund answer says how to ask for it, and "Does my code go to an
 AI provider?" (`#faq-ai-and-your-code`, linked from the AI paragraph) says yes
 without naming a provider or claiming it doesn't train on the code (Anton,
 #301): add either only once Anton confirms it.
+
+### Tool pages
+
+Every `/tools/<slug>` page wears the shared frame in `components/tool-frame/`
+(#454): top line and claim `<h1>`, the hero clip or still, the page's own
+middle, the "Tool facts" card with "Use it if", "Skip it if" and the story, the
+"Two ways to use it" band with the body's only Book, and three hand-picked "More
+tools". A custom page is `routes/tools/<slug>.tsx` (Fresh matches it before
+`[slug].tsx`, which serves every other tool) and renders `ToolFrame` with its
+middle as children; it builds only the middle. Demo clips live in
+`static/video/tools/<slug>/` (docs/images.md "Videos"), a page's own events go
+in docs/analytics.md "Tool pages", and its test calls `test/tool-frame.ts`. The
+API and rules are in docs/tools-registry.md "The tool frame".
 
 ### Type
 

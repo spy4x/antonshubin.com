@@ -355,67 +355,62 @@ siteTest(
 );
 
 siteTest(
-  "a tool page ends with two doors (a showcase page: its closing line) and three more tools, and its links carry Umami events",
+  "every tool page ends with the Two ways to use it band, then three more tools, and its links carry Umami events",
   async (site) => {
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
       assertEquals(count(html, /data-tool-doors/g), 1, t.slug);
-      // The two doors sit in ClosingBand's children slot, which ends the page.
       assertEquals(count(html, /data-closing-band/g), 1, t.slug);
       const page = pageBody(html);
-      const band = page.slice(page.indexOf("data-closing-band"));
-      assert(band.includes("data-tool-doors"), `${t.slug}: doors in the band`);
-      assert(
-        html.indexOf('id="more"') < html.indexOf("data-closing-band"),
-        `${t.slug}: the band ends the page, after More tools`,
-      );
-      const doors = visibleText(
-        band.slice(band.indexOf(">", band.indexOf("data-tool-doors")) + 1),
+      const band = page.slice(
+        page.indexOf("data-closing-band"),
+        page.indexOf("data-tool-more"),
       );
       assert(
-        /data-umami-event="cta" data-umami-event-place="band" data-umami-event-target="\/catalog/
-          .test(html),
-        `${t.slug}: catalog event`,
+        page.indexOf("data-closing-band") < page.indexOf("data-tool-more"),
+        `${t.slug}: More tools follows the band`,
       );
-      if (t.headline && t.closing) {
-        // A showcase page's band asks one question and offers the demo and
-        // the offer beside Book (#448).
-        assert(doors.startsWith(t.closing.line), `${t.slug}: band line`);
-        assert(doors.includes(t.closing.offerLabel), `${t.slug}: offer`);
-      } else {
-        assertEquals(
-          doors.startsWith("Use it"),
-          !!t.repo,
-          `${t.slug}: first door`,
-        );
-        assert(
-          doors.includes("Need something like this for your team?"),
-          `${t.slug}: second door`,
-        );
-      }
-      const more = html.slice(
-        html.indexOf('id="more"'),
-        html.indexOf("data-closing-band"),
+      const text = visibleText(`<x ${band}`);
+      assert(text.startsWith("Two ways to use it"), `${t.slug}: ${text}`);
+      assertEquals(count(band, /data-tool-door="yourself"/g), 1, t.slug);
+      assertEquals(count(band, /data-tool-door="build"/g), 1, t.slug);
+      const offer = t.catalogSlug ? `/catalog/${t.catalogSlug}` : "/catalog";
+      assert(
+        band.includes(
+          `data-umami-event="cta" data-umami-event-place="band" data-umami-event-target="${offer}"`,
+        ),
+        `${t.slug}: offer event`,
       );
-      assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
-      if (t.repo) {
-        // An archived repository takes no issues, so its door links the repository.
-        const door = t.status === "archived" ? t.repo : `${t.repo}/issues`;
+      assert(
+        text.includes(t.catalogSlug ? "See the MVP offer" : "Services"),
+        `${t.slug}: offer link`,
+      );
+      if (!t.catalogSlug) {
         assert(
-          html.includes(
-            `href="https://github.com/${door}" data-umami-event="outbound" data-umami-event-to="github" data-umami-event-item="${t.slug}"`,
+          text.includes(
+            "Need something like this for your team? That's my day job.",
           ),
-          `${t.slug}: issue event`,
+          `${t.slug}: build line`,
         );
       }
-      if (t.registry?.published) {
+      if (t.repo) {
         assert(
-          html.includes(
+          band.includes(
+            `href="https://github.com/${t.repo}" data-umami-event="outbound" data-umami-event-to="github" data-umami-event-item="${t.slug}" data-umami-event-place="band"`,
+          ),
+          `${t.slug}: GitHub event`,
+        );
+      }
+      if (t.registry?.published || t.quickStart) {
+        assert(
+          band.includes(
             `data-umami-event="tool-install-copy" data-umami-event-item="${t.slug}"`,
           ),
-          `${t.slug}: install copy event`,
+          `${t.slug}: install copy event in the band`,
         );
       }
+      const more = page.slice(page.indexOf("data-tool-more"));
+      assertEquals(count(more, /<h3/g), 3, `${t.slug}: more tools`);
     }
   },
 );
@@ -723,10 +718,32 @@ siteTest(
   },
 );
 
-siteTest("a live tool's page still offers Report an issue", async (site) => {
-  const html = await site.html("/tools/ts-libs");
-  assert(html.includes("Report an issue"));
-});
+siteTest(
+  "no tool page says Report an issue, Star on GitHub or Don't use it if, and every link to its repository or its issues reads View on GitHub or open issues",
+  async (site) => {
+    for (const t of tools) {
+      const page = pageBody(await site.html(`/tools/${t.slug}`));
+      const text = visibleText(page);
+      for (
+        const gone of ["Report an issue", "Star on GitHub", "Don't use it if"]
+      ) {
+        assert(!text.includes(gone), `${t.slug}: "${gone}"`);
+      }
+      const repo = `https://github.com/${t.repo}`;
+      const links = [
+        ...page.matchAll(/<a [^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g),
+      ]
+        .filter(([, href]) => href === repo || href === `${repo}/issues`)
+        .map(([, , label]) => visibleText(label));
+      for (const label of links) {
+        assert(
+          label === "View on GitHub" || label === "open issues",
+          `${t.slug}: GitHub link "${label}"`,
+        );
+      }
+    }
+  },
+);
 
 siteTest(
   "the dotfiles page shows its summary and links its repository",
@@ -797,16 +814,19 @@ siteTest(
       for (const w of t.works ?? []) {
         assert(visibleText(`<x ${works}`).includes(w), `${t.slug}: ${w}`);
       }
-      const notYet = page.slice(page.indexOf("data-not-yet"));
-      assert(
-        notYet.includes(`href="https://github.com/${t.repo}/issues"`),
-        `${t.slug}: open issues link`,
-      );
-      // On a phone the fact card follows the story, so it is not the first
-      // thing under the hero.
+      if (t.works?.length) {
+        const notYet = page.slice(page.indexOf("data-not-yet"));
+        assert(
+          notYet.includes(`href="https://github.com/${t.repo}/issues"`),
+          `${t.slug}: open issues link`,
+        );
+      }
+      if (!t.posts?.length) continue;
+      // On a phone the facts card comes after the middle and before the
+      // fit lists and the story (#454).
       assert(page.includes("data-story"), `${t.slug}: no story`);
       assert(
-        page.indexOf("data-fact-card") > page.indexOf("data-story"),
+        page.indexOf("data-fact-card") < page.indexOf("data-story"),
         `${t.slug}: fact card order`,
       );
     }
@@ -814,34 +834,25 @@ siteTest(
 );
 
 siteTest(
-  "a tool page without a headline draws none of the showcase blocks and keeps its fact card first",
+  "a tool page draws a feature card, quick start or works card only from its own data, and What it is without a lede",
   async (site) => {
-    const plain = tools.filter((t) => !t.headline);
-    assert(plain.length > 0);
-    for (const t of plain) {
+    for (const t of tools) {
       const page = pageBody(await site.html(`/tools/${t.slug}`));
-      for (
-        const marker of [
-          "data-tool-hero",
-          'data-e2e="feature-card"',
-          "data-quick-start",
-          "data-works",
-          "data-story",
-        ]
-      ) {
-        assert(!page.includes(marker), `${t.slug}: ${marker}`);
+      const markers: [string, boolean][] = [
+        ['data-e2e="feature-card"', Boolean(t.features?.length)],
+        ["data-quick-start", Boolean(t.quickStart)],
+        ["data-works", Boolean(t.works?.length)],
+        ['id="what"', !t.features && (!t.lede || Boolean(t.packages))],
+      ];
+      for (const [marker, expected] of markers) {
+        assertEquals(page.includes(marker), expected, `${t.slug}: ${marker}`);
       }
-      assert(page.includes('id="what"'), `${t.slug}: What it is`);
-      assert(
-        /data-fact-card class="order-first /.test(page),
-        `${t.slug}: fact card order`,
-      );
     }
   },
 );
 
 siteTest(
-  "a showcase tool page takes its title and meta description from pageTitle and lede, and its JSON-LD names the hero, website and posts",
+  "a tool page takes its title and meta description from pageTitle and lede, and its JSON-LD names the hero still, website and posts",
   async (site) => {
     for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
@@ -862,9 +873,10 @@ siteTest(
         n["@type"] === "SoftwareSourceCode"
       );
       if (!code) continue;
+      const still = t.clip?.poster ?? t.hero ?? t.screenshots?.[0];
       assertEquals(
         code.image,
-        t.hero ? `https://antonshubin.com${t.hero.src}` : undefined,
+        still ? `https://antonshubin.com${still.src}` : undefined,
         `${t.slug}: image`,
       );
       assertEquals(
@@ -886,13 +898,11 @@ siteTest(
 );
 
 siteTest(
-  "a template's catalog item links back to its tool page",
+  "a starter's catalog item links back to its tool page",
   async (site) => {
-    const templates = tools.filter((t) =>
-      t.kind === "template" && t.catalogSlug
-    );
-    assert(templates.length > 0, "no template names a catalog item");
-    for (const t of templates) {
+    const starters = tools.filter((t) => t.kind === "starter" && t.catalogSlug);
+    assert(starters.length > 0, "no starter names a catalog item");
+    for (const t of starters) {
       const page = pageBody(await site.html(`/catalog/${t.catalogSlug}`));
       const line = page.slice(page.indexOf("data-built-on"));
       assert(page.includes("data-built-on"), `${t.catalogSlug}: no line`);
@@ -905,7 +915,7 @@ siteTest(
 );
 
 siteTest(
-  "a showcase page heads its second fit list Skip it if, and every other page Don't use it if",
+  "every tool page heads its second fit list Skip it if",
   async (site) => {
     for (const t of tools.filter((t) => t.dontUseIf?.length)) {
       const headings = [
@@ -913,11 +923,7 @@ siteTest(
           /<h2[^>]*>([\s\S]*?)<\/h2>/g,
         ),
       ].map(([, h]) => visibleText(h));
-      const [shown, other] = t.headline
-        ? ["Skip it if", "Don't use it if"]
-        : ["Don't use it if", "Skip it if"];
-      assert(headings.includes(shown), `${t.slug}: no "${shown}"`);
-      assert(!headings.includes(other), `${t.slug}: "${other}"`);
+      assert(headings.includes("Skip it if"), `${t.slug}: no "Skip it if"`);
     }
   },
 );

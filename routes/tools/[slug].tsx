@@ -1,121 +1,22 @@
 import { cn } from "@spy4x/preact-cn";
 import { page } from "fresh";
 import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { Layout } from "../../components/Layout.tsx";
 import { NotFound } from "../../components/NotFound.tsx";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import Button from "../../components/Button.tsx";
-import { CiPill } from "../../components/CiPill.tsx";
-import { Fact, FactCard } from "../../components/FactCard.tsx";
 import { InstallLine } from "../../components/InstallLine.tsx";
-import { ToolCard } from "../../components/ToolCard.tsx";
-import ImageGallery from "../../islands/ImageGallery.tsx";
-import { toJsonLd } from "../../lib/json-ld.ts";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { catalogItem, catalogPath } from "../../lib/catalog.ts";
-import { blogArticles } from "../../lib/data.ts";
-import { firstSentence, metaDescription } from "../../lib/llms.ts";
+import { FACT_LINK } from "../../components/FactCard.tsx";
+import { findTool } from "../../lib/tools.ts";
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
 import {
-  ciUrl,
-  findTool,
-  repoUrl,
-  type Tool,
-  toolLicence,
-  tools,
-} from "../../lib/tools.ts";
-import { MIN_STARS_SHOWN } from "../../lib/github-snapshot.ts";
-import {
-  checkedLabel,
-  liveRepo,
-  toolsLive,
-  withLiveVersion,
-} from "../../lib/tools-live.ts";
-import { eventAttrs } from "../../lib/analytics.ts";
-import { Card } from "@spy4x/preact-ui/card";
-import {
-  ShowcaseDetails,
-  ShowcaseFeatures,
-  ShowcaseHero,
-} from "../../components/ToolShowcase.tsx";
+  heroStill,
+  loadToolPage,
+  type ToolPageData,
+} from "../../components/tool-frame/tool-page.ts";
+import { QuickStart } from "../../components/tool-frame/ToolBand.tsx";
+import { ShowcaseFeatures } from "../../components/ToolShowcase.tsx";
 
-const SITE = "https://antonshubin.com";
-const linkClass =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
-
-/**
- * The tool's `SoftwareSourceCode` JSON-LD node, from registry fields only.
- * A field the entry has no data for is left out, never guessed: `version`
- * until the version is really on its registry, `programmingLanguage` when it
- * is not written down, `license` when neither the entry nor GitHub names one.
- * A showcase page (`headline`) adds its hero shot as `image`, its website
- * and repository as `sameAs`, and its posts as `subjectOf`.
- * No rating, review or offer.
- */
-function sourceCodeJsonLd(tool: Tool, url: string) {
-  const licence = toolLicence(tool);
-  const repo = repoUrl(tool);
-  return {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "@id": `${url}#tool`,
-    "name": tool.name,
-    "description": tool.summary,
-    "url": url,
-    "codeRepository": repoUrl(tool),
-    ...(tool.programmingLanguage
-      ? { "programmingLanguage": tool.programmingLanguage }
-      : {}),
-    ...(licence ? { "license": `https://spdx.org/licenses/${licence}` } : {}),
-    ...(tool.registry?.published ? { "version": tool.registry.version } : {}),
-    ...(tool.hero ? { "image": `${SITE}${tool.hero.src}` } : {}),
-    ...(tool.website && repo ? { "sameAs": [repo, tool.website] } : {}),
-    ...(tool.headline && tool.posts?.length
-      ? {
-        "subjectOf": tool.posts.map((slug) => ({
-          "@id": `${SITE}/blog/${slug}#article`,
-        })),
-      }
-      : {}),
-    "author": { "@id": `${SITE}/#person` },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": url },
-  };
-}
-
-/**
- * `SoftwareApplication` for a tool someone can run. Its `url` is only ever a
- * running public instance (`live`), never the repository.
- */
-function applicationJsonLd(tool: Tool, url: string) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "@id": `${url}#app`,
-    "name": tool.name,
-    "description": tool.summary,
-    ...(tool.appCategory ? { "applicationCategory": tool.appCategory } : {}),
-    ...(tool.live
-      ? {
-        "url": tool.live.href.startsWith("/")
-          ? `${SITE}${tool.live.href}`
-          : tool.live.href,
-      }
-      : {}),
-    "author": { "@id": `${SITE}/#person` },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": url },
-  };
-}
-
-/** Up to `count` other tools for the strip at the foot: same group first, then the rest. */
-function moreTools(tool: Tool, count = 3): Tool[] {
-  const others = tools.filter((t) => t.slug !== tool.slug);
-  return [
-    ...others.filter((t) => t.group === tool.group),
-    ...others.filter((t) => t.group !== tool.group),
-  ].slice(0, count);
-}
+// The page of every tool without a custom route of its own. A custom page is
+// `routes/tools/<slug>.tsx`, which Fresh matches before this one; both build
+// on `components/tool-frame/` (#454).
 
 // An unknown slug answers a real 404, like /work/<slug>, so a removed
 // tool page drops out of search instead of indexing an empty 200.
@@ -128,506 +29,153 @@ export const handler = define.handlers({
   },
 });
 
-export default define.page(async function ToolPage(ctx) {
-  const found = findTool(ctx.params.slug);
-
-  if (!found) {
-    return <NotFound pathname={ctx.url.pathname} />;
-  }
-
-  const live = await toolsLive();
-  const tool = withLiveVersion(found, live);
-  const snap = liveRepo(tool, live);
-  const licence = toolLicence(tool);
-  const repo = repoUrl(tool);
-  const canonical = `${SITE}/tools/${tool.slug}`;
-  const lead = tool.usedFor ?? tool.standing ?? firstSentence(tool.summary);
-  const posts = (tool.posts ?? []).map((slug) => {
-    const post = blogArticles.find((a) => a.slug === slug);
-    if (!post) {
-      throw new Error(`lib/tools.ts: ${tool.slug} names no post "${slug}"`);
-    }
-    return post;
-  });
-  const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null;
-  const toolLink = (to: string) =>
-    eventAttrs("outbound", { to, item: tool.slug });
-  // A `headline` switches the page to the showcase layout (#448).
-  const showcase = Boolean(tool.headline);
-
-  head.value = {
-    ...head.value,
-    title: `${tool.pageTitle ?? `${tool.name}: ${tool.job}`} — Anton Shubin`,
-    pageName: tool.name,
-    description: metaDescription(tool.lede ?? tool.summary),
-    canonical,
-    ogType: "article",
-    ogImage: `${SITE}/img/og/tools/${tool.slug}.png`,
-    ogImageWidth: 1200,
-    ogImageHeight: 630,
-  };
-
-  const factCard = (
-    <FactCard label="Tool facts">
-      <h2 class="text-lg text-parchment mb-3">Facts</h2>
-      <dl class="space-y-3 text-sm">
-        <Fact term="Status">
-          <StatusMark status={tool.status} />
-        </Fact>
-        {tool.registry && (
-          <Fact term="Version">
-            <span data-version>
-              {tool.registry.published
-                ? tool.registry.version
-                : `${tool.registry.version}, publishing to ${tool.registry.name}`}
-            </span>
-            {tool.registry.published && (
-              <>
-                {" on "}
-                <a href={tool.registry.url} class={linkClass}>
-                  {tool.registry.name}
-                </a>
-              </>
-            )}
-          </Fact>
-        )}
-        {licence && <Fact term="Licence">{licence}</Fact>}
-        {tool.runtime && <Fact term="Runs on">{tool.runtime}</Fact>}
-        {tool.live && (
-          <Fact term="Live">
-            <a
-              href={tool.live.href}
-              {...toolLink("live")}
-              class={linkClass}
-            >
-              {tool.live.label}
-            </a>
-          </Fact>
-        )}
-        {repo && (
-          <Fact term="Code">
-            <a href={repo} class={linkClass}>{tool.repo}</a>
-            {snap && snap.stars >= MIN_STARS_SHOWN && (
-              <span class="text-graphite">, {snap.stars} stars</span>
-            )}
-          </Fact>
-        )}
-        {tool.ci && snap && (
-          <Fact term="CI">
-            <CiPill
-              ci={snap.ci}
-              pipelinesUrl={ciUrl(tool)!}
-              labelHidden
-            />
-            <span data-checked class="block mt-1 text-graphite">
-              {checkedLabel(live, tool.repo)}
-            </span>
-          </Fact>
-        )}
-      </dl>
-      {repo && (
-        <div class="mt-4 pt-4 border-t border-rule text-sm space-y-2">
-          <p>
-            <a
-              href={repo}
-              {...toolLink("github")}
-              class={linkClass}
-            >
-              Star on GitHub
-            </a>
-            {tool.status !== "archived" && (
-              <>
-                {" · "}
-                <a
-                  href={`${repo}/issues`}
-                  {...toolLink("github")}
-                  class={linkClass}
-                >
-                  Report an issue
-                </a>
-              </>
-            )}
-          </p>
-        </div>
-      )}
-    </FactCard>
-  );
-  // A showcase page's "The story behind it": the post as a card (#448).
-  const story = showcase && posts.length > 0
-    ? (
-      <section aria-labelledby="posts">
-        <h2 id="posts" class="text-2xl text-parchment">
-          The story behind it
-        </h2>
-        <ul class="mt-4 space-y-4">
-          {posts.map((p) => (
-            <li key={p.slug}>
-              <Card data-story class="p-6">
-                <a
-                  href={`/blog/${p.slug}`}
-                  {...eventAttrs("cta", {
-                    place: "body",
-                    target: `/blog/${p.slug}`,
-                  })}
-                  class="font-heading text-lg text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
-                >
-                  {p.title}
-                </a>
-                {tool.storyLine && (
-                  <p class="mt-2 text-graphite">{tool.storyLine}</p>
-                )}
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-    : undefined;
-
-  const hasFit = (tool.useIf?.length ?? 0) + (tool.dontUseIf?.length ?? 0) > 0;
-
+/**
+ * The middle (frame part 4) of a page with no custom route: the entry's
+ * "What you get" cards, credit, live proof, summary, packages, the
+ * screenshots the hero does not already show, its links to other repos and
+ * where it stands. Each block renders only when the entry has data for it.
+ */
+function DefaultMiddle({ data }: { data: ToolPageData }) {
+  const { tool } = data;
+  const shots = (tool.screenshots ?? []).filter((s) => s !== heroStill(tool));
   return (
-    <Layout currentPath={ctx.url.pathname}>
-      <SEOHead />
-      {repo && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: toJsonLd(sourceCodeJsonLd(tool, canonical)),
-          }}
-        />
+    <>
+      <ShowcaseFeatures tool={tool} />
+      {tool.credit && (
+        <p data-credit class="text-parchment">
+          {tool.credit.text}{" "}
+          {tool.credit.links.map((l, i) => (
+            <span key={l.href}>
+              {i > 0 && " · "}
+              <a href={l.href} class={FACT_LINK}>{l.label}</a>
+            </span>
+          ))}
+        </p>
       )}
-      {tool.deployable && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: toJsonLd(applicationJsonLd(tool, canonical)),
-          }}
-        />
-      )}
-      <div class="max-w-5xl mx-auto">
-        <Breadcrumb items={getBreadcrumb(canonical, tool.name)} />
-
-        {showcase && (
-          <>
-            <ShowcaseHero tool={tool} repo={repo} />
-            <ShowcaseFeatures tool={tool} />
-          </>
-        )}
-
-        {!showcase && (
-          <header class="max-w-3xl">
-            <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
-              {tool.name}:{" "}
-              <span class="block mt-1 text-xl sm:text-2xl text-graphite">
-                {tool.job}
-              </span>
-            </h1>
-            <p class="mt-4 text-parchment text-base sm:text-lg leading-relaxed">
-              {lead}
-            </p>
-            {tool.credit && (
-              <p data-credit class="mt-4 text-parchment">
-                {tool.credit.text}{" "}
-                {tool.credit.links.map((l, i) => (
-                  <span key={l.href}>
-                    {i > 0 && " · "}
-                    <a href={l.href} class={linkClass}>{l.label}</a>
-                  </span>
-                ))}
-              </p>
-            )}
-            <div class="mt-6">
-              {tool.registry
-                ? <InstallLine tool={tool} id={`install-${tool.slug}`} />
-                : tool.live
-                ? (
-                  <Button
-                    href={tool.live.href}
-                    {...toolLink("live")}
-                    class="px-4 py-2.5 text-sm"
-                  >
-                    {tool.live.label}
-                  </Button>
-                )
-                : repo && (
-                  <Button
-                    href={repo}
-                    {...toolLink("github")}
-                    class="px-4 py-2.5 text-sm"
-                  >
-                    GitHub
-                  </Button>
-                )}
-            </div>
-          </header>
-        )}
-
-        {showcase
-          ? (
-            <ShowcaseDetails
-              tool={tool}
-              repo={repo}
-              facts={factCard}
-              story={story}
-            />
-          )
-          : (
-            <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-start">
-              <div
-                data-fact-card
-                class="order-first lg:order-2 lg:sticky lg:top-8"
-              >
-                {factCard}
-              </div>
-
-              <div class="lg:order-1 min-w-0 space-y-12">
-                {tool.screenshots && (
-                  <section aria-labelledby="screenshots">
-                    <h2 id="screenshots" class="sr-only">Screenshots</h2>
-                    <ImageGallery images={tool.screenshots} />
-                  </section>
-                )}
-
-                {tool.proofLinks && (
-                  <section aria-labelledby="proof">
-                    <h2 id="proof" class="text-2xl text-parchment">
-                      Live proof
-                    </h2>
-                    <ul class="mt-3 space-y-1">
-                      {tool.proofLinks.map((l) => (
-                        <li key={l.href}>
-                          <a href={l.href} class={linkClass}>{l.label}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-
-                <section aria-labelledby="what">
-                  <h2 id="what" class="text-2xl text-parchment">
-                    What it is
-                  </h2>
-                  <p class="mt-3 text-graphite leading-relaxed">
-                    {tool.summary}
-                  </p>
-                  {tool.packages && (
-                    <>
-                      <p class="mt-4 text-graphite">
-                        {tool.packages.length}{" "}
-                        packages, each installed on its own:
-                      </p>
-                      <ul class="mt-2 flex flex-wrap gap-2">
-                        {tool.packages.map((p) => (
-                          <li key={p}>
-                            <code class="text-sm">{p}</code>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
-                </section>
-
-                {tool.standing && tool.usedFor && (
-                  <section aria-labelledby="standing">
-                    <h2 id="standing" class="text-2xl text-parchment">
-                      Where it stands
-                    </h2>
-                    <p class="mt-3 text-graphite leading-relaxed">
-                      {tool.standing}
-                    </p>
-                  </section>
-                )}
-
-                {hasFit && (
-                  <section
-                    aria-labelledby="fit"
-                    class="grid gap-8 sm:grid-cols-2"
-                  >
-                    {(tool.useIf?.length ?? 0) > 0 && (
-                      <div>
-                        <h2 id="fit" class="text-xl text-parchment">
-                          Use it if
-                        </h2>
-                        <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                          {tool.useIf!.map((line) => (
-                            <li key={line}>{line}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {(tool.dontUseIf?.length ?? 0) > 0 && (
-                      <div>
-                        <h2
-                          id={tool.useIf?.length ? undefined : "fit"}
-                          class="text-xl text-parchment"
-                        >
-                          Don't use it if
-                        </h2>
-                        <ul class="mt-3 space-y-2 list-disc pl-5 text-graphite">
-                          {tool.dontUseIf!.map((line) => (
-                            <li key={line}>{line}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </section>
-                )}
-
-                {(tool.fits?.length ?? 0) > 0 && (
-                  <section aria-labelledby="fits">
-                    <h2 id="fits" class="text-2xl text-parchment">
-                      How it fits with my other repos
-                    </h2>
-                    <ul class="mt-4 space-y-3">
-                      {tool.fits!.map((f) => (
-                        <li
-                          key={f.text}
-                          data-relation={f.planned ? "planned" : "true"}
-                          class={cn(
-                            "pl-4 border-l-2",
-                            f.planned
-                              ? "border-dashed border-rule-strong"
-                              : "border-solid border-sage",
-                          )}
-                        >
-                          <span class="text-xs uppercase tracking-wider text-graphite">
-                            {f.planned ? "Planned" : "Today"}
-                          </span>
-                          <p class="text-parchment">
-                            {f.href
-                              ? <a href={f.href} class={linkClass}>{f.text}</a>
-                              : f.text}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-
-                {posts.length > 0 && (
-                  <section aria-labelledby="posts">
-                    <h2 id="posts" class="text-2xl text-parchment">
-                      {posts.length > 1 ? "Posts" : "The post"}
-                    </h2>
-                    <ul class="mt-3 space-y-1">
-                      {posts.map((p) => (
-                        <li key={p.slug}>
-                          <a
-                            href={`/blog/${p.slug}`}
-                            {...eventAttrs("cta", {
-                              place: "body",
-                              target: `/blog/${p.slug}`,
-                            })}
-                            class={linkClass}
-                          >
-                            {p.title}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-              </div>
-            </div>
+      {!tool.features && (!tool.lede || tool.packages) && (
+        <section aria-labelledby="what" class="max-w-3xl">
+          <h2 id="what" class="text-2xl text-parchment">What it is</h2>
+          {!tool.lede && (
+            <p class="mt-3 text-graphite leading-relaxed">{tool.summary}</p>
           )}
-
-        <section aria-labelledby="more" class="mt-12">
-          <h2 id="more" class="text-2xl text-parchment">More tools</h2>
-          <ul class="mt-4 grid gap-4 sm:grid-cols-3">
-            {moreTools(tool).map((t) => (
-              <ToolCard key={t.slug} tool={t} live={live} variant="more" />
+          {tool.packages && (
+            <>
+              <p class="mt-4 text-graphite">
+                {tool.packages.length} packages, each installed on its own:
+              </p>
+              <ul class="mt-2 flex flex-wrap gap-2">
+                {tool.packages.map((p) => (
+                  <li key={p}>
+                    <code class="text-sm">{p}</code>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
+      {tool.proofLinks && (
+        <section aria-labelledby="proof">
+          <h2 id="proof" class="text-2xl text-parchment">Live proof</h2>
+          <ul class="mt-3 space-y-1">
+            {tool.proofLinks.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} class={FACT_LINK}>{l.label}</a>
+              </li>
             ))}
           </ul>
-          <p class="mt-4 text-sm">
-            <a href="/tools" class={linkClass}>All tools</a>
-          </p>
         </section>
-
-        {/* ── Closing band: two doors, one Book ─────────────────────── */}
-        {showcase && tool.closing
-          ? (
-            <ClosingBand
-              promiseIds={[]}
-              bookItem={tool.slug}
-              catalogLink={
-                <>
-                  {tool.live && (
-                    <Button
-                      href={tool.live.href}
-                      {...toolLink("live")}
-                      class="px-5 py-3"
-                    >
-                      {tool.live.label}
-                    </Button>
-                  )}
-                  <Button
-                    href={catalog ? catalogPath(catalog.slug) : "/catalog"}
-                    {...eventAttrs("cta", {
-                      place: "band",
-                      target: catalog ? catalogPath(catalog.slug) : "/catalog",
-                    })}
-                    class="px-5 py-3"
-                  >
-                    {tool.closing.offerLabel}
-                  </Button>
-                </>
-              }
-            >
-              <div data-tool-doors class="mb-6">
-                <h2 class="text-xl sm:text-2xl text-parchment text-balance">
-                  {tool.closing.line}
-                </h2>
-              </div>
-            </ClosingBand>
-          )
-          : (
-            <ClosingBand
-              promiseIds={[]}
-              bookItem={tool.slug}
-              catalogLink={
-                <a
-                  href={catalog ? catalogPath(catalog.slug) : "/catalog"}
-                  {...eventAttrs("cta", {
-                    place: "band",
-                    target: catalog ? catalogPath(catalog.slug) : "/catalog",
-                  })}
-                  class={linkClass}
-                >
-                  {catalog ? catalog.title : "Services"}
-                </a>
-              }
-            >
-              <div data-tool-doors class="grid gap-6 sm:grid-cols-2 mb-6">
-                {repo && (
-                  <div>
-                    <h2 class="text-xl text-parchment">Use it</h2>
-                    <p class="mt-1 text-graphite">
-                      {tool.status === "archived"
-                        ? "The repository is archived, kept for reference."
-                        : "Star it or open an issue."}
-                    </p>
-                    <a
-                      href={tool.status === "archived"
-                        ? repo
-                        : `${repo}/issues`}
-                      {...toolLink("github")}
-                      class={linkClass}
-                    >
-                      {tool.repo} on GitHub
-                    </a>
-                  </div>
+      )}
+      {shots.length > 0 && (
+        <section aria-labelledby="screenshots">
+          <h2 id="screenshots" class="text-2xl text-parchment">
+            Screenshots
+          </h2>
+          <ul data-lightbox class="mt-4 grid gap-5 sm:grid-cols-2">
+            {shots.map((shot) => (
+              <li key={shot.src}>
+                <img
+                  src={shot.src}
+                  srcset={shot.srcset}
+                  sizes={shot.srcset
+                    ? "(min-width: 1024px) 34rem, (min-width: 640px) 50vw, 100vw"
+                    : undefined}
+                  alt={shot.alt}
+                  width={shot.width}
+                  height={shot.height}
+                  loading="lazy"
+                  decoding="async"
+                  class="block w-full h-auto rounded-lg border border-rule"
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {(tool.fits?.length ?? 0) > 0 && (
+        <section aria-labelledby="fits" class="max-w-3xl">
+          <h2 id="fits" class="text-2xl text-parchment">
+            How it fits with my other repos
+          </h2>
+          <ul class="mt-4 space-y-3">
+            {tool.fits!.map((f) => (
+              <li
+                key={f.text}
+                data-relation={f.planned ? "planned" : "true"}
+                class={cn(
+                  "pl-4 border-l-2",
+                  f.planned
+                    ? "border-dashed border-rule-strong"
+                    : "border-solid border-sage",
                 )}
-                <div>
-                  <h2 class="text-xl text-parchment">
-                    Need something like this for your team?
-                  </h2>
-                  <p class="mt-1 text-graphite">That's my day job.</p>
-                </div>
-              </div>
-            </ClosingBand>
-          )}
-      </div>
-    </Layout>
+              >
+                <span class="text-xs uppercase tracking-wider text-graphite">
+                  {f.planned ? "Planned" : "Today"}
+                </span>
+                <p class="text-parchment">
+                  {f.href
+                    ? <a href={f.href} class={FACT_LINK}>{f.text}</a>
+                    : f.text}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {tool.standing && tool.usedFor && (
+        <section aria-labelledby="standing" class="max-w-3xl">
+          <h2 id="standing" class="text-2xl text-parchment">
+            Where it stands
+          </h2>
+          <p class="mt-3 text-graphite leading-relaxed">{tool.standing}</p>
+        </section>
+      )}
+    </>
+  );
+}
+
+/** The line under the hero's actions: the install or quick-start command. */
+function HeroCommand({ data }: { data: ToolPageData }) {
+  const { tool } = data;
+  if (tool.registry) {
+    return <InstallLine tool={tool} id={`install-${tool.slug}`} />;
+  }
+  return <QuickStart tool={tool} id={`quick-start-${tool.slug}`} />;
+}
+
+export default define.page(async function ToolPage(ctx) {
+  const data = await loadToolPage(ctx.params.slug);
+  if (!data) return <NotFound pathname={ctx.url.pathname} />;
+  const { tool } = data;
+  return (
+    <ToolFrame
+      data={data}
+      currentPath={ctx.url.pathname}
+      hero={tool.registry || tool.quickStart
+        ? { children: <HeroCommand data={data} /> }
+        : undefined}
+    >
+      <DefaultMiddle data={data} />
+    </ToolFrame>
   );
 });
