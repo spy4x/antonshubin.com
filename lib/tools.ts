@@ -334,20 +334,18 @@ export const tools: Tool[] = [
     posts: ["mig-tiny-self-hosted-scheduler"],
     deployable: true,
     appCategory: "BusinessApplication",
-    useIf: [
-      "You want a static meeting link without a Next.js + Postgres deployment.",
-    ],
+    // "Use it if" and "Skip it if" are the README's own lines (#457).
+    useIf: ["You want one booking link for yourself."],
     dontUseIf: [
-      "You need more than one owner or more than one feature: it books a time slot for one owner.",
-      "You need a database: storage is a JSON file.",
+      "You need teams, payments, several event types, calendar sync or thousands of bookings a day.",
     ],
     repo: "spy4x/mig",
     registry: {
       name: "Docker Hub",
       url: "https://hub.docker.com/r/antonshubin/mig",
-      version: "v0.12.0",
+      version: "v2.0.0",
       published: true,
-      install: "docker pull antonshubin/mig:v0.12.0",
+      install: "docker pull antonshubin/mig:v2.0.0",
       latestFrom: { registry: "docker", name: "antonshubin/mig" },
     },
     runtime: "Deno, as a single binary",
@@ -358,6 +356,26 @@ export const tools: Tool[] = [
     ],
     live: { label: "Open the booking page", href: "/book" },
     ci: { provider: "woodpecker", repoId: 12 },
+    headline: "One owner, one link, no database.",
+    lede:
+      "A visitor picks a free slot, and you both get an email with a calendar invite and a cancel link. That's the whole product.",
+    clip: {
+      title: "Booking a meeting with mig",
+      caption:
+        'A visitor books a meeting: picks a date, picks 15:30, types a name and email, confirms, lands on the "You\'re booked" page, and gets the confirmation email.',
+      frame: "browser",
+      frameTitle: "meet.example.com",
+      poster: {
+        src: "/video/tools/mig/poster.webp",
+        srcset:
+          "/video/tools/mig/poster-640.webp 640w, /video/tools/mig/poster.webp 1280w",
+        alt:
+          'Left, mig\'s "You\'re booked" page for a 30-minute call with Jane Doe on Tuesday, 20 October 2026 at 15:30 Berlin time; right, the guest\'s "Booking confirmed" email with the meeting link and a cancel link.',
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT34S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "zond",
