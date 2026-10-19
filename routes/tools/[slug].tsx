@@ -9,6 +9,7 @@ import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
 import {
   heroStill,
   loadToolPage,
+  summaryAfterLede,
   type ToolPageData,
 } from "../../components/tool-frame/tool-page.ts";
 import { QuickStart } from "../../components/tool-frame/ToolBand.tsx";
@@ -38,6 +39,8 @@ export const handler = define.handlers({
 function DefaultMiddle({ data }: { data: ToolPageData }) {
   const { tool } = data;
   const shots = (tool.screenshots ?? []).filter((s) => s !== heroStill(tool));
+  // An entry with its own `lede` says what it is there (#454).
+  const about = tool.lede ? "" : summaryAfterLede(tool);
   return (
     <>
       <ShowcaseFeatures tool={tool} />
@@ -52,12 +55,10 @@ function DefaultMiddle({ data }: { data: ToolPageData }) {
           ))}
         </p>
       )}
-      {!tool.features && (!tool.lede || tool.packages) && (
+      {!tool.features && (about || tool.packages) && (
         <section aria-labelledby="what" class="max-w-3xl">
           <h2 id="what" class="text-2xl text-parchment">What it is</h2>
-          {!tool.lede && (
-            <p class="mt-3 text-graphite leading-relaxed">{tool.summary}</p>
-          )}
+          {about && <p class="mt-3 text-graphite leading-relaxed">{about}</p>}
           {tool.packages && (
             <>
               <p class="mt-4 text-graphite">

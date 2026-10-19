@@ -10,12 +10,6 @@ import { count, pageBody, visibleText } from "./html.ts";
 import { heroStill } from "../components/tool-frame/tool-page.ts";
 import type { Tool } from "../lib/tools.ts";
 
-/** What a page changed in the frame, so the checks expect it. */
-export interface ToolFrameOptions {
-  /** False when the page passes `showJob={false}` to the hero. */
-  showJob?: boolean;
-}
-
 /** Every `<img ... loading="eager">` (or with no `loading`) in `html`. */
 function eagerImages(html: string): string[] {
   return [...html.matchAll(/<img\b[^>]*>/g)].map(([tag]) => tag).filter((
@@ -25,18 +19,19 @@ function eagerImages(html: string): string[] {
 
 /**
  * Checks the built HTML of `tool`'s page against the frame: one `<h1>`
- * reading the `headline` (else "name: job"), the top line's name, job and
- * status mark, at most one eager image and it is the hero still with
- * `fetchpriority="high"`, the facts card with "View on GitHub" as its only
- * link to the repository, the "Two ways to use it" band with the page body's
- * one Book, and More tools after it ending with "All tools".
+ * reading the `headline` (else "name: job"); a top line that holds the name,
+ * the job (unless the header carries `data-tool-job-hidden`) and the status
+ * mark above a headline, without repeating that headline, and the status
+ * mark alone above "name: job"; at most one eager image, with `fetchpriority="high"`, inside the hero media
+ * (with the frame's default media it is the hero still, when the tool has
+ * one; a page's own media, marked `data-tool-own-media`, may have none); the
+ * facts card with "View on GitHub" as its only link to the repository; the
+ * "Two ways to use it" band with the page body's one Book; and More tools
+ * after it ending with "All tools". A custom page's choices are read from
+ * the markers the frame writes, so its test passes no options.
  * `html` is the whole page; the checks look at the page body only.
  */
-export function assertToolFrame(
-  tool: Tool,
-  html: string,
-  { showJob = true }: ToolFrameOptions = {},
-): void {
+export function assertToolFrame(tool: Tool, html: string): void {
   const where = `/tools/${tool.slug}`;
   const page = pageBody(html);
 
@@ -45,41 +40,74 @@ export function assertToolFrame(
   assertEquals(
     visibleText(h1s[0][0]),
     tool.headline ?? `${tool.name}: ${tool.job}`,
-    `${where}: <h1>`,
+    `${where}: <h1> text`,
   );
+
+  const heroAt = page.indexOf("data-tool-hero");
+  assert(heroAt !== -1, `${where}: no hero`);
+  const heroTag = page.slice(heroAt, page.indexOf(">", heroAt));
+  const jobHidden = heroTag.includes("data-tool-job-hidden");
+  const ownMedia = heroTag.includes("data-tool-own-media");
 
   const topStart = page.indexOf("data-tool-eyebrow");
   assert(topStart !== -1, `${where}: no top line`);
   const top = page.slice(topStart, page.indexOf("</p>", topStart));
   const topText = visibleText(`<x ${top}`);
-  assert(topText.startsWith(tool.name), `${where}: top line "${topText}"`);
-  assertEquals(top.includes("data-tool-job"), showJob, `${where}: job`);
-  if (showJob) assert(topText.includes(tool.job), `${where}: job text`);
   assert(
     top.includes(`data-tool-status="${tool.status}"`) && /<svg/.test(top),
     `${where}: status mark`,
   );
+  if (tool.headline) {
+    assert(topText.startsWith(tool.name), `${where}: top line "${topText}"`);
+    assertEquals(topText.includes(tool.job), !jobHidden, `${where}: job`);
+    const claim = tool.headline.toLowerCase().replace(/[.!?]$/, "");
+    assert(
+      !topText.toLowerCase().includes(claim),
+      `${where}: the top line repeats the headline: "${topText}"`,
+    );
+  } else {
+    // The H1 already reads "name: job"; the top line says neither again.
+    assert(
+      !topText.includes(tool.name) && !topText.includes(tool.job),
+      `${where}: the top line repeats the <h1>: "${topText}"`,
+    );
+  }
 
   const eager = eagerImages(page);
   const still = heroStill(tool);
-  assertEquals(eager.length, still ? 1 : 0, `${where}: eager images`);
-  if (still) {
+  const media = page.indexOf("data-tool-media");
+  if (ownMedia) assert(eager.length <= 1, `${where}: eager images`);
+  else assertEquals(eager.length, still ? 1 : 0, `${where}: eager images`);
+  if (eager.length) {
     assert(eager[0].includes('fetchpriority="high"'), `${where}: priority`);
-    assert(eager[0].includes(`src="${still.src}`), `${where}: ${eager[0]}`);
-    const media = page.indexOf("data-tool-media");
     assert(
       media !== -1 && page.indexOf(eager[0]) > media,
       `${where}: the eager image is not the hero media`,
     );
+    if (!ownMedia) {
+      assert(eager[0].includes(`src="${still!.src}`), `${where}: ${eager[0]}`);
+    }
   }
   assertEquals(
     count(page, /fetchpriority="high"/g),
-    still ? 1 : 0,
+    eager.length,
     `${where}: high-priority images`,
   );
 
   const facts = page.indexOf('aria-label="Tool facts"');
   assert(facts !== -1, `${where}: no facts card`);
+  const card = page.slice(facts, page.indexOf("</aside>", facts));
+  const repo = `https://github.com/${tool.repo}`;
+  const repoLinks = [
+    ...card.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g),
+  ]
+    .filter(([, href]) => href === repo || href.startsWith(`${repo}/`))
+    .map(([, , text]) => visibleText(text));
+  assertEquals(
+    repoLinks,
+    tool.repo ? ["View on GitHub"] : [],
+    `${where}: the facts card's links to the repository`,
+  );
   const bandAt = page.indexOf("data-closing-band");
   const moreAt = page.indexOf("data-tool-more");
   assert(facts < bandAt && bandAt < moreAt, `${where}: part order`);

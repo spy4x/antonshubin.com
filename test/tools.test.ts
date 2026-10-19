@@ -15,6 +15,7 @@ import {
   tools,
 } from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
+import { summaryAfterLede } from "../components/tool-frame/tool-page.ts";
 
 /** The word `@spy4x/preact-ui/status-mark` prints for each tool status. */
 const STATUS_WORDS = {
@@ -834,7 +835,7 @@ siteTest(
 );
 
 siteTest(
-  "a tool page draws a feature card, quick start or works card only from its own data, and What it is without a lede",
+  "a tool page draws a feature card, quick start or works card only from its own data, and What it is only with summary left after the lede",
   async (site) => {
     for (const t of tools) {
       const page = pageBody(await site.html(`/tools/${t.slug}`));
@@ -842,7 +843,11 @@ siteTest(
         ['data-e2e="feature-card"', Boolean(t.features?.length)],
         ["data-quick-start", Boolean(t.quickStart)],
         ["data-works", Boolean(t.works?.length)],
-        ['id="what"', !t.features && (!t.lede || Boolean(t.packages))],
+        [
+          'id="what"',
+          !t.features &&
+          (Boolean(!t.lede && summaryAfterLede(t)) || Boolean(t.packages)),
+        ],
       ];
       for (const [marker, expected] of markers) {
         assertEquals(page.includes(marker), expected, `${t.slug}: ${marker}`);

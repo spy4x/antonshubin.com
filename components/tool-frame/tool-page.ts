@@ -94,18 +94,47 @@ function words(text: string): string {
   return text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
 
+/** True when two lines say the same words, ignoring case and punctuation. */
+export function sameWords(a: string, b: string): boolean {
+  return words(a) === words(b);
+}
+
+/**
+ * The summary split for the lede: its first two sentences, skipping a first
+ * sentence that only repeats the `job` (which the "name: job" heading already
+ * says), and the sentences after them.
+ */
+function splitSummary(tool: Tool): { lede: string; after: string } {
+  const sentences = tool.summary.split(/(?<=[.!?])\s+/);
+  const skip = sentences.length > 1 && words(sentences[0]) === words(tool.job)
+    ? 1
+    : 0;
+  return {
+    lede: sentences.slice(skip, skip + 2).join(" "),
+    after: sentences.slice(skip + 2).join(" "),
+  };
+}
+
+/** The entry's own lede line: `lede`, else `usedFor`, else `standing`. */
+function ownLede(tool: Tool): string | undefined {
+  return tool.lede ?? tool.usedFor ?? tool.standing;
+}
+
 /**
  * The lede under the hero's `<h1>`, at most two sentences: the entry's
  * `lede`, else `usedFor`, else `standing`, else the summary's first two
- * sentences, skipping a first sentence that only repeats the `job` (which
- * the "name: job" heading already says).
+ * sentences (see {@link splitSummary}).
  */
 export function toolLede(tool: Tool): string {
-  const own = tool.lede ?? tool.usedFor ?? tool.standing;
-  if (own) return own;
-  const sentences = tool.summary.split(/(?<=[.!?])\s+/);
-  const rest = words(sentences[0]) === words(tool.job)
-    ? sentences.slice(1)
-    : sentences;
-  return (rest.length ? rest : sentences).slice(0, 2).join(" ");
+  return ownLede(tool) ?? splitSummary(tool).lede;
+}
+
+/**
+ * The part of the summary the lede did not already say: the whole summary
+ * when the lede comes from another field, else the sentences after the two
+ * the lede took ("" when it took them all). A page's "What it is" shows this,
+ * so no sentence appears twice.
+ */
+export function summaryAfterLede(tool: Tool): string {
+  return ownLede(tool) ? tool.summary : splitSummary(tool).after;
 }
