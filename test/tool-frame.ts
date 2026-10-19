@@ -22,14 +22,15 @@ function eagerImages(html: string): string[] {
  * reading the `headline` (else "name: job"); a top line that holds the name,
  * the job (unless the header carries `data-tool-job-hidden`) and the status
  * mark above a headline, without repeating that headline, and the status
- * mark alone above "name: job"; at most one eager image, with `fetchpriority="high"`, inside the hero media
- * (with the frame's default media it is the hero still, when the tool has
- * one; a page's own media, marked `data-tool-own-media`, may have none); the
- * facts card with "View on GitHub" as its only link to the repository; the
- * "Two ways to use it" band with the page body's one Book; and More tools
- * after it ending with "All tools". A custom page's choices are read from
- * the markers the frame writes, so its test passes no options.
- * `html` is the whole page; the checks look at the page body only.
+ * mark alone above "name: job"; at most one eager image, with
+ * `fetchpriority="high"`, inside the hero media (with the frame's default
+ * media it is the hero still, when the tool has one; a page's own media,
+ * marked `data-tool-own-media`, may have none); the facts card with "View on
+ * GitHub" as its only link to the repository; the "Two ways to use it" band
+ * with the page body's one Book; and More tools after it ending with "All
+ * tools". A custom page's choices are read from the markers the frame
+ * writes, so its test passes no options. `html` is the whole page; the
+ * checks look at the page body only.
  */
 export function assertToolFrame(tool: Tool, html: string): void {
   const where = `/tools/${tool.slug}`;
