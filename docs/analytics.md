@@ -197,7 +197,12 @@ None yet.
 
 ### dotfiles
 
-None yet.
+- `tool-try` (`item: dotfiles`, `part: harness-map`): a press on a source's
+  summary in "Where each file goes", below 1024px. The table above that width
+  has nothing to press and sends nothing.
+- `outbound` (`to: github`, `place: card`): a file link on one of the six "The
+  AI-agent setup" cards; `place: hero` on "Read the global agent rules".
+- `cta` (`place: band`, `target: /how-i-work`): "How I work" in the band.
 
 ### financy
 

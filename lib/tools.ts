@@ -656,6 +656,31 @@ export const tools: Tool[] = [
     status: "in-use",
     group: "tools",
     repo: "spy4x/dotfiles",
+    headline: "One rules file, every harness.",
+    lede:
+      "I run several AI coding agents at once, in Claude Code, OpenCode and DSH (a DeepSeek harness). Their rules, skills, agents and settings are written once, and one command renders them into the format each harness reads.",
+    clip: {
+      title: "Keeping three AI harnesses in sync",
+      caption:
+        "deno task ai --check finds an edited rule in all three harnesses, deno task ai applies it, and the check prints All targets in sync.",
+      frame: "terminal",
+      frameTitle: "dotfiles",
+      poster: {
+        src: "/video/tools/dotfiles/poster.webp",
+        srcset:
+          "/video/tools/dotfiles/poster-640.webp 640w, /video/tools/dotfiles/poster.webp 1280w",
+        alt:
+          "A terminal after deno task ai applied three changes: deno task ai --check lists the Claude Code, OpenCode and DSH homes and prints All targets in sync.",
+        width: 1280,
+        height: 720,
+      },
+      video: { duration: "PT27S", uploadDate: "2026-10-19" },
+    },
+    quickStart: {
+      label: "Compare your harnesses with mine (writes nothing)",
+      command:
+        "git clone https://github.com/spy4x/dotfiles && cd dotfiles && deno task ai --check",
+    },
     usedFor:
       "This is how I run AI agents on real work, on my own machine. It is that machine's live config: a merged change is not done until it is applied there.",
     proofLinks: [
