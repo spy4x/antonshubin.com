@@ -52,10 +52,10 @@ the code" in [analytics.md](analytics.md).
 `components/tool-frame/`, so a visitor who has read one page can read the next;
 the spec is issue #454. A custom page is `routes/tools/<slug>.tsx`, which Fresh
 matches before `routes/tools/[slug].tsx`; `[slug].tsx` stays for every tool
-without one and draws a default middle from the entry (Seed's "What you get"
-cards, credit, live proof, "What it is", the screenshots the hero does not show,
-"How it fits", "Where it stands"). A custom page loads its data and renders the
-frame with its own middle as children:
+without one and draws a default middle from the entry ("What you get" cards,
+credit, live proof, "What it is", the screenshots the hero does not show, "How
+it fits", "Where it stands"). A custom page loads its data and renders the frame
+with its own middle as children:
 
 ```tsx
 export default define.page(async function OkoPage(ctx) {

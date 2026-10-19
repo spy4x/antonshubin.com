@@ -732,6 +732,7 @@ export const tools: Tool[] = [
     dontUseIf: [
       "You need a finished product today.",
       "You want a framework that updates under you: Seed is a starter you change.",
+      "You deploy to serverless functions rather than a server you run.",
     ],
     repo: "spy4x/seed",
     live: { label: "Open the live demo", href: "https://app.seedsaas.com" },
@@ -744,14 +745,21 @@ export const tools: Tool[] = [
       "Seed is the repository I start client MVPs from: teams, billing per member, realtime, an offline app and an admin area, on one server you own. Clone it and change it; it is MIT-licensed.",
     pageTitle: "Seed, my open-source SaaS starter",
     website: "https://seedsaas.com",
-    hero: {
-      src: "/img/tools/seed/notes-1088.webp",
-      srcset:
-        "/img/tools/seed/notes-544.webp 544w, /img/tools/seed/notes-1088.webp 1088w",
-      alt:
-        "Seed's web app in the dark theme: the Notes page of the group Acme Studio, with a New note button, tag filters and six notes, each with its tags.",
-      width: 1088,
-      height: 800,
+    clip: {
+      title: "Seed, from cloning the repository to the app and the admin panel",
+      caption:
+        "From an empty folder to the app and the admin panel. 37\u00a0s, no sound.",
+      frame: "bare",
+      poster: {
+        src: "/video/tools/seed/poster.webp",
+        srcset:
+          "/video/tools/seed/poster-544.webp 544w, /video/tools/seed/poster-1088.webp 1088w, /video/tools/seed/poster.webp 1440w",
+        alt:
+          "Seed's web app in the dark theme at app.localhost: the Notes page of the group Demo team, with the new note Launch checklist for Friday at the top, tagged Roadmap, above four older notes.",
+        width: 1440,
+        height: 900,
+      },
+      video: { duration: "PT37S", uploadDate: "2026-10-19" },
     },
     quickStart: {
       label: "Start a product from it",

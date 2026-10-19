@@ -1,10 +1,11 @@
+import type { ComponentChildren } from "preact";
 import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import type { Tool, ToolFeature, ToolScreenshot } from "../lib/tools.ts";
 
 /**
- * "What you get" of a tool page whose entry has `features` (#448): today
- * Seed's, drawn as the middle of its page by `routes/tools/[slug].tsx`
- * inside the shared tool frame (#454) until Seed's own page replaces it.
+ * "What you get" of a tool page whose entry has `features` (#448): drawn by
+ * Seed's own page (`routes/tools/seed.tsx`, #455) and by the default middle
+ * of `routes/tools/[slug].tsx` for any other entry with `features`.
  */
 
 /** One screenshot as a lazy `<img>`. */
@@ -64,9 +65,15 @@ function FeatureMedia({ feature }: { feature: ToolFeature }) {
  * "What you get": one library `FeatureCard` per feature in a six-column
  * grid from 1024px (a third, a half or two thirds each), two columns from
  * 640px. Cards in a row stretch to one height and each shot sits at its
- * card's bottom, so a row has no holes.
+ * card's bottom, so a row has no holes. `after` adds a page's own line under
+ * a card's text, such as Seed's link into its demo.
  */
-export function ShowcaseFeatures({ tool }: { tool: Tool }) {
+export function ShowcaseFeatures(
+  { tool, after }: {
+    tool: Tool;
+    after?: (feature: ToolFeature) => ComponentChildren;
+  },
+) {
   if (!tool.features?.length) return null;
   return (
     <section aria-labelledby="features">
@@ -83,6 +90,7 @@ export function ShowcaseFeatures({ tool }: { tool: Tool }) {
             media={f.shot && <FeatureMedia feature={f} />}
           >
             {f.text}
+            {after?.(f)}
           </FeatureCard>
         ))}
       </div>

@@ -221,7 +221,14 @@ None yet.
 
 ### seed
 
-None yet.
+No events of its own; the page adds `outbound` targets (#455). The three "See it
+running" cards send `to` `demo-app`, `demo-admin` or `website` with
+`place: body`. The "try it" link under a "What you get" card sends `demo-app` or
+`demo-admin` with `place: card`. The hero's website line sends `website` and
+"The full quick start" sends `github`, both with `place: hero`. The copy button
+of "The next commands" sends `tool-install-copy`. `outbound` to `demo-admin`
+says whether the admin panel earns its place on the page; `book` and `cta` to
+the MVP offer with `item: seed` are the number the page should move.
 
 ### ts-libs
 
