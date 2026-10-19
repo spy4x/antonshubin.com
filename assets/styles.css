@@ -498,11 +498,27 @@ kbd {
   line-height: 1.6;
 }
 
-/* A tool page's zoomable screenshot (#454): the focus ring is drawn inside
-   the image, because the window frame around it clips anything outside. */
+/* A tool page's zoomable screenshot (#454): a two-tone focus ring, Parchment
+   outside and Ink inside, so it shows on dark and white screenshots alike.
+   The image's frame clips an outline drawn outside it, and an inset shadow
+   paints under an <img>, so the ring is an overlay on the image's parent,
+   whose box is the image's. */
 [data-lightbox] img[data-lightbox-zoom]:focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: -2px;
+  outline: none;
+}
+
+[data-lightbox] :has(> img[data-lightbox-zoom]:focus-visible) {
+  position: relative;
+}
+
+[data-lightbox] :has(> img[data-lightbox-zoom]:focus-visible)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--color-ring), inset 0 0 0 4px
+    var(--color-ink);
 }
 
 /* A row whose title link covers the whole row (UX 7). */
