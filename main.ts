@@ -5,7 +5,7 @@ import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
 import { cacheControlFor } from "./lib/cache-control.ts";
 import { redirectTarget } from "./lib/redirects.ts";
 import { siteCsrf } from "./lib/csrf.ts";
-import { withByteRange } from "./lib/byte-range.ts";
+import { serveVideo } from "./lib/video-files.ts";
 
 export const app = new App<State>();
 
@@ -73,12 +73,7 @@ app.use(siteCsrf());
 
 // A clip under /video/* answers a Range request with 206 (#454): Safari
 // plays an MP4 only that way, and staticFiles() ignores Range.
-app.use(async (ctx) => {
-  const res = await ctx.next();
-  return ctx.url.pathname.startsWith("/video/")
-    ? withByteRange(ctx.req, res)
-    : res;
-});
+app.use(serveVideo);
 
 app.use(staticFiles());
 

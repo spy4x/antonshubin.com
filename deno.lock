@@ -54,6 +54,7 @@
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/bytes@1": "1.0.6",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
+    "jsr:@std/cli@^1.0.32": "1.0.32",
     "jsr:@std/collections@^1.1.3": "1.4.0",
     "jsr:@std/crypto@1.1.0": "1.1.0",
     "jsr:@std/dotenv@~0.225.5": "0.225.8",
@@ -61,12 +62,15 @@
     "jsr:@std/encoding@1.0.11": "1.0.11",
     "jsr:@std/encoding@^1.0.10": "1.0.11",
     "jsr:@std/encoding@^1.0.11": "1.0.11",
+    "jsr:@std/fmt@^1.0.10": "1.0.10",
     "jsr:@std/fmt@^1.0.7": "1.0.10",
     "jsr:@std/fmt@^1.0.8": "1.0.10",
     "jsr:@std/front-matter@^1.0.9": "1.0.9",
     "jsr:@std/fs@1": "1.0.24",
     "jsr:@std/fs@^1.0.19": "1.0.24",
+    "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/html@^1.0.5": "1.0.7",
+    "jsr:@std/html@^1.0.7": "1.0.7",
     "jsr:@std/http@^1.0.21": "1.1.4",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
@@ -75,13 +79,16 @@
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/media-types@^1.1.0": "1.1.0",
     "jsr:@std/net@^1.0.6": "1.0.7",
+    "jsr:@std/net@^1.0.7": "1.0.7",
     "jsr:@std/path@1": "1.1.6",
     "jsr:@std/path@1.1.6": "1.1.6",
     "jsr:@std/path@^1.1.1": "1.1.6",
     "jsr:@std/path@^1.1.2": "1.1.6",
     "jsr:@std/path@^1.1.5": "1.1.6",
+    "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/semver@1.0.8": "1.0.8",
     "jsr:@std/semver@^1.0.6": "1.0.8",
+    "jsr:@std/streams@^1.2.0": "1.2.0",
     "jsr:@std/toml@^1.0.3": "1.0.11",
     "jsr:@std/ulid@1.0.0": "1.0.0",
     "jsr:@std/uuid@^1.0.9": "1.1.2",
@@ -162,11 +169,11 @@
         "jsr:@std/encoding@^1.0.10",
         "jsr:@std/fmt@^1.0.8",
         "jsr:@std/fs@^1.0.19",
-        "jsr:@std/html",
+        "jsr:@std/html@^1.0.5",
         "jsr:@std/http",
         "jsr:@std/jsonc",
         "jsr:@std/media-types@^1.1.0",
-        "jsr:@std/net",
+        "jsr:@std/net@^1.0.6",
         "jsr:@std/path@^1.1.2",
         "jsr:@std/semver@^1.0.6",
         "jsr:@std/uuid",
@@ -430,6 +437,9 @@
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
     },
+    "@std/cli@1.0.32": {
+      "integrity": "188b3a100d6202d64e3f5bd3d799c7fa4f6d77f92cc65eb7f641c1fa0aa92a66"
+    },
     "@std/collections@1.1.3": {
       "integrity": "bf8b0818886df6a32b64c7d3b037a425111f28278d69fd0995aeb62777c986b0"
     },
@@ -471,7 +481,15 @@
     "@std/http@1.1.4": {
       "integrity": "4f1575226ca7c0df1df38b26d50265fed30869b2a63ab867edc5b92492150c8c",
       "dependencies": [
-        "jsr:@std/encoding@^1.0.11"
+        "jsr:@std/cli",
+        "jsr:@std/encoding@^1.0.11",
+        "jsr:@std/fmt@^1.0.10",
+        "jsr:@std/fs@^1.0.24",
+        "jsr:@std/html@^1.0.7",
+        "jsr:@std/media-types@^1.1.0",
+        "jsr:@std/net@^1.0.7",
+        "jsr:@std/path@^1.1.6",
+        "jsr:@std/streams"
       ]
     },
     "@std/internal@1.0.14": {
@@ -500,6 +518,9 @@
     },
     "@std/semver@1.0.8": {
       "integrity": "dc830e8b8b6a380c895d53fbfd1258dc253704ca57bbe1629ac65fd7830179b7"
+    },
+    "@std/streams@1.2.0": {
+      "integrity": "256b934254778f2bf45f5713b934209ff29e9b4b7fd4ec095219966813758c5f"
     },
     "@std/toml@1.0.11": {
       "integrity": "e084988b872ca4bad6aedfb7350f6eeed0e8ba88e9ee5e1590621c5b5bb8f715",
@@ -1957,6 +1978,7 @@
       "jsr:@spy4x/server@1.37.0",
       "jsr:@spy4x/time@1.37.0",
       "jsr:@std/front-matter@^1.0.9",
+      "jsr:@std/http@^1.0.21",
       "jsr:@std/net@^1.0.6",
       "jsr:@std/path@^1.1.2",
       "npm:@preact/signals@^2.9.0",

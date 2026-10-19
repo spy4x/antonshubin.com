@@ -64,9 +64,9 @@ in `clip` (title, caption, frame, poster); set `clip.video` (`duration` as ISO
 also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when an
 entry marks a clip committed and a file is missing. `/video/*` is cached like
 `/img/*` (docs/cache-control.md). `main.ts` answers a `Range` request for
-`/video/*` with 206 Partial Content (`lib/byte-range.ts`), because Safari plays
-an MP4 only that way and Fresh's static files ignore `Range`. Strip the poster's
-metadata like any image.
+`/video/*` with 206 Partial Content (`lib/video-files.ts`, through `@std/http`'s
+`serveFile`), because Safari plays an MP4 only that way and Fresh's static files
+ignore `Range`. Strip the poster's metadata like any image.
 
 ## Image metadata
 

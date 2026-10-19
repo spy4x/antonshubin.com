@@ -535,7 +535,7 @@ custom page is `routes/tools/<slug>.tsx`, which Fresh matches before
 `[slug].tsx` (the page of every other tool); it renders `ToolFrame` with its own
 middle as children. Demo clips are in `static/video/tools/<slug>/`
 (docs/images.md "Videos") and are served with byte ranges by
-`lib/byte-range.ts`. Each page's events are listed in docs/analytics.md "Tool
+`lib/video-files.ts`. Each page's events are listed in docs/analytics.md "Tool
 pages". The shared checks are `test/tool-frame.ts`'s `assertToolFrame()` and
 `toolPageProblems()`. The API is in docs/tools-registry.md "The tool frame".
 
