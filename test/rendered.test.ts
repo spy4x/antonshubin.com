@@ -142,9 +142,15 @@ Deno.test("every sitemap page announces /rss.xml exactly once in <head>", async 
  */
 function imagesWithBadAlt(html: string): string[] {
   const tags = html.match(/<img\b[^>]*>/gi) ?? [];
+  // A picture that opens a named link, such as a demo clip's poster at the
+  // start of its "Play" link (#457), is named by the link.
+  const named = new Set(
+    [...html.matchAll(/<a\b[^>]*\baria-label="[^"]+"[^>]*>\s*(<img\b[^>]*>)/gi)]
+      .map((m) => m[1]),
+  );
   return tags.filter((tag) => {
     const decorative = /aria-hidden\s*=\s*"true"/i.test(tag) ||
-      /role\s*=\s*"presentation"/i.test(tag);
+      /role\s*=\s*"presentation"/i.test(tag) || named.has(tag);
     return !decorative && !/\balt\s*=\s*"[^"]+"/i.test(tag);
   });
 }

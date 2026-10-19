@@ -80,6 +80,7 @@ const KNOWN_TYPES = new Set([
   "SoftwareSourceCode",
   "TechArticle",
   "UnitPriceSpecification",
+  "VideoObject",
   "WebPage",
   "WebSite",
 ]);
@@ -361,9 +362,11 @@ export function checkGraph(html: string, page: string) {
         `${where}: @id is not an absolute https URL`,
       );
       // A bare `{ @id }` must resolve; a typed stub such as mainEntityOfPage's WebPage says what it is.
-      // A list entry (or its `item`) and a `mentions` entry point at the page that describes the thing.
+      // A list entry (or its `item`), a `mentions` entry and a `subjectOf` entry (a tool's
+      // post, #457) point at the page that describes the thing.
       const pointsAtItsPage =
-        /\.(itemListElement\[\d+\](\.item)?|mentions\[\d+\])$/.test(path);
+        /\.(itemListElement\[\d+\](\.item)?|mentions\[\d+\]|subjectOf\[\d+\])$/
+          .test(path);
       if (types.length === 0 && !pointsAtItsPage) {
         assert(
           defined.has(id),
@@ -503,7 +506,11 @@ siteTest(
       "/about": ["ProfilePage"],
       "/how-i-work": ["FAQPage"],
       "/work/smartlite": ["CreativeWork"],
-      "/tools/mig": ["SoftwareSourceCode", "SoftwareApplication"],
+      "/tools/mig": [
+        "SoftwareSourceCode",
+        "SoftwareApplication",
+        "VideoObject",
+      ],
       "/blog/building-mcp-servers-with-deno": ["BlogPosting"],
       "/work": ["CollectionPage", "ItemList"],
       "/tools": ["CollectionPage", "ItemList"],
