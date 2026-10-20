@@ -524,6 +524,20 @@ AI provider?" (`#faq-ai-and-your-code`, linked from the AI paragraph) says yes
 without naming a provider or claiming it doesn't train on the code (Anton,
 #301): add either only once Anton confirms it.
 
+### Why not just AI page
+
+`routes/why-not-just-ai.tsx` (#486) answers "why hire me instead of an AI
+subscription?" in the project page's frame: the question as the `<h1>`, the
+lead, a sticky "The short answer" `FactCard` (AI tools, the four prices through
+`priceLabel()`, one `proof()` line with the `upwork-profile` note, Book and the
+brief), then "When a subscription is enough", the library's `ComparisonTable`,
+"Will you just run Claude and bill me for it?" with two figures linked to their
+posts, "Already built it with AI?", three projects with `StatusMark`, three
+questions (also the `FAQPage`) and `ClosingBand`. `lib/why-not-just-ai.ts` holds
+the wording; promises come through `promise()`. The footer's Site group alone
+lists it (`lib/nav.ts`'s `WHY_NOT_JUST_AI`), not the rail or the More sheet.
+`test/why-not-just-ai.test.ts` checks the built page.
+
 ### Tool pages
 
 Every `/tools/<slug>` page is built on the shared frame in
