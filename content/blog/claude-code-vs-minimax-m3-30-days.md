@@ -200,15 +200,15 @@ more often gives part of the saving back in fix rounds.
 
 ## Did M3 get worse over time?
 
-It felt that way to me. When I started, M3 felt overpowered for the price. Then
-MiniMax ran into a backlash from users over a pricing change, and a week or two
-after that I started to feel that M3 got dumber. It made mistakes more often, I
-had to hold its hand a lot, and I had to review every pull request because I
-couldn't trust it.
+It felt that way to me. When I started, M3 felt overpowered. Then MiniMax ran
+into a backlash from users over a pricing change, and a week or two after that I
+started to feel that M3 got dumber. It made mistakes more often, I had to hold
+its hand a lot, and I had to review every pull request because I couldn't trust
+it.
 
 My guess is that they found another way to make it cheaper to run, for example a
-more heavily quantized model. That's only a guess: I have no proof, and MiniMax
-hasn't said anything like it.
+more heavily quantized model. That's only a guess: I have no proof, and I know
+of nothing from MiniMax that says so.
 
 My data can't settle it either. My local logs from the M3 months are thin: about
 660 model replies in OpenCode over 16 days and a dozen sessions in DSH, with no
