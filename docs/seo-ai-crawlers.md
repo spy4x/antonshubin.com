@@ -80,9 +80,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - Catalog pages (#271): `/catalog` is "Services" in the breadcrumb and carries
   an `OfferCatalog` that lists the four `Service` nodes by `@id`; each
   `/catalog/<slug>` page has one `Service` (`serviceType` from the item's
-  `category`, its `<title>` from `seoTitle`) and no rating or review markup. The
-  retired slugs answer one 301 to the `#fragment` of the section that absorbed
-  them
+  `category`, its `<title>` from `seoTitle`, its `provider` both `#person` and
+  NeatSoft's `#org`) and no rating or review markup. The retired slugs answer
+  one 301 to the `#fragment` of the section that absorbed them
 - Project pages live at `/work/<slug>` since #188; every old `/projects` URL
   answers one 301 there (`lib/redirects.ts`), so the sitemap and both llms files
   list only the new URLs
@@ -290,6 +290,17 @@ Five entities in a `@graph` array (six on `/about`):
 - Linked from the footer's Site group, the "My AI-agent setup" paragraph on
   `/how-i-work`, the SaaS MVP service page and the ends of the two posts on AI
   agents.
+
+### 12. The SaaS MVP page (`/catalog/zero-to-production-saas-mvp`)
+
+- The one page for hiring Anton to build a product (#484); seedsaas.com/mvp
+  redirects here. The line above the `<h1>` says "SaaS MVP development", and the
+  lead is two sentences written to be quoted: the price and time from
+  `lib/catalog.ts`, then the ownership promise.
+- `lib/saas-mvp.ts` holds the lead, "Why it costs less" and the six questions
+  (four of them read from `lib/faqs.ts`); the page, its `FAQPage` (`#faq`,
+  joined to `#website`, a block of its own beside the `Service`) and the
+  `llms-full.txt` section read it. The other catalog pages carry no `FAQPage`.
 
 ## Analytics
 

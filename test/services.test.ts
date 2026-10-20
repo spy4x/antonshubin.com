@@ -7,10 +7,18 @@ import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import {
   briefPath,
+  catalogItem,
   catalogItems,
   catalogPromises,
   catalogRedirects,
+  priceLabel,
 } from "../lib/catalog.ts";
+import {
+  SAAS_MVP_EYEBROW,
+  SAAS_MVP_SLUG,
+  saasMvpAnswer,
+  saasMvpFaqs,
+} from "../lib/saas-mvp.ts";
 import { promise } from "../lib/promises.ts";
 import { projectsForCatalog } from "../lib/work.ts";
 
@@ -229,15 +237,33 @@ siteTest(
       const html = await site.html(`/catalog/${item.slug}`);
       const service = flat(html).find((d) =>
         (d as { "@type"?: string })["@type"] === "Service"
-      ) as { "@id": string; serviceType: string; url: string } | undefined;
+      ) as
+        | {
+          "@id": string;
+          serviceType: string;
+          url: string;
+          provider: { "@id": string }[];
+        }
+        | undefined;
       assert(service, item.slug);
+      assertEquals(
+        service.provider.map((p) => p["@id"]),
+        ["https://antonshubin.com/#person", "https://neatsoft.dev/#org"],
+        item.slug,
+      );
       assertEquals(
         service["@id"],
         `https://antonshubin.com/catalog/${item.slug}#service`,
       );
       assertEquals(service.serviceType, item.category);
       assertEquals(service.url, `https://antonshubin.com/catalog/${item.slug}`);
-      assertFalse(/AggregateRating|"Review"|FAQPage/.test(html), item.slug);
+      assertFalse(/AggregateRating|"Review"/.test(html), item.slug);
+      // Only the SaaS MVP page has questions (#484).
+      assertEquals(
+        /FAQPage/.test(html),
+        item.slug === SAAS_MVP_SLUG,
+        item.slug,
+      );
     }
   },
 );
@@ -360,5 +386,82 @@ siteTest(
   async (site) => {
     const text = visibleText(await site.html("/catalog"));
     assertEquals(count(text, /what to leave alone/g), 1);
+  },
+);
+
+siteTest(
+  "the SaaS MVP page names SaaS MVP development above the H1 and opens with the catalog price and time",
+  async (site) => {
+    const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`);
+    const eyebrow = html.match(
+      /<p[^>]*data-service-eyebrow[^>]*>([\s\S]*?)<\/p>/,
+    );
+    assert(eyebrow, "no line above the H1");
+    assertEquals(visibleText(eyebrow[1]), SAAS_MVP_EYEBROW);
+    assert(html.indexOf("data-service-eyebrow") < html.indexOf("<h1"));
+    const lead = html.match(/<p[^>]*data-service-lead[^>]*>([\s\S]*?)<\/p>/);
+    assert(lead, "no lead");
+    const text = visibleText(lead[1]);
+    assertEquals(text, saasMvpAnswer());
+    const item = catalogItem(SAAS_MVP_SLUG);
+    assert(text.includes(priceLabel(item).toLowerCase()), text);
+    assert(text.includes(item.delivery.toLowerCase()), text);
+    assert(text.includes(promise("ownership").title), text);
+    // The meta description is the same answer, for a search result's snippet.
+    assert(html.includes(`<meta name="description" content="${text}"`), text);
+    // Every other service keeps its outcome as the lead and has no such line.
+    for (const other of catalogItems.filter((i) => i.slug !== SAAS_MVP_SLUG)) {
+      const page = await site.html(`/catalog/${other.slug}`);
+      assertFalse(page.includes("data-service-eyebrow"), other.slug);
+    }
+  },
+);
+
+siteTest(
+  "the SaaS MVP questions come last before the closing band, short first sentences, the same as its FAQPage and llms-full.txt",
+  async (site) => {
+    const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`);
+    const faqs = saasMvpFaqs();
+    assert(faqs.length >= 5 && faqs.length <= 7, `${faqs.length} questions`);
+    const section = html.indexOf("data-faq-section");
+    assert(section > 0, "no questions section");
+    assert(
+      section > html.indexOf("data-service-next"),
+      "questions before next step",
+    );
+    // The next section after the questions is the closing band.
+    const next = html.indexOf("<section", section);
+    assert(
+      html.slice(next, html.indexOf(">", next)).includes("data-closing-band"),
+      "something between the questions and the closing band",
+    );
+    const shown = [...html.matchAll(/<div[^>]*id="faq-([^"]+)"[^>]*data-faq/g)]
+      .map((m) => m[1]);
+    assertEquals(shown, faqs.map((f) => f.id));
+    for (const f of faqs) {
+      const first = f.a.split(/(?<=[.!?])\s/)[0];
+      assert(first.split(/\s+/).length <= 40, `${f.id}: "${first}"`);
+    }
+    const faqPage = jsonLd(html).find((d) =>
+      (d as { "@type"?: string })["@type"] === "FAQPage"
+    ) as
+      | {
+        "@id": string;
+        mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+      }
+      | undefined;
+    assert(faqPage, "no FAQPage");
+    assertEquals(
+      faqPage["@id"],
+      `https://antonshubin.com/catalog/${SAAS_MVP_SLUG}#faq`,
+    );
+    assertEquals(faqPage.mainEntity.map((q) => q.name), faqs.map((f) => f.q));
+    assertEquals(
+      faqPage.mainEntity.map((q) => q.acceptedAnswer.text),
+      faqs.map((f) => f.a),
+    );
+    const full = await site.html("/llms-full.txt");
+    assert(full.includes(saasMvpAnswer()), "llms-full.txt: no answer");
+    for (const f of faqs) assert(full.includes(`### ${f.q}`), f.q);
   },
 );
