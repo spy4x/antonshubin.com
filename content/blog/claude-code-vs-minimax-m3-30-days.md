@@ -157,8 +157,8 @@ conservative.
 
 ## What actually shipped
 
-Pull requests are a means. These are the releases tagged in the Claude Code
-month, all of them public:
+Pull requests are a means. These are the tags pushed in the Claude Code month,
+all of them public:
 
 - [ts-libs](/tools/ts-libs), my shared TypeScript libraries on JSR, went from
   v1.0.0 to v1.81.0.
