@@ -7,6 +7,7 @@ import { ComparisonTable } from "@spy4x/preact-ui/comparison-table";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import Button from "../components/Button.tsx";
+import { Questions } from "../components/Questions.tsx";
 import { ClosingBand } from "../components/ClosingBand.tsx";
 import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import { NewTabHint } from "../components/NewTabHint.tsx";
@@ -388,19 +389,7 @@ export default define.page(function WhyNotJustAi() {
 
             <section aria-labelledby="wna-faq" data-faq-section>
               <h2 id="wna-faq" class="h2 mb-6">{QUESTIONS_HEADING}</h2>
-              <div class="space-y-8 max-w-2xl">
-                {faqs.map((f) => (
-                  <div
-                    key={f.id}
-                    id={`faq-${f.id}`}
-                    data-faq
-                    class="scroll-mt-8"
-                  >
-                    <h3 class="text-lg text-parchment leading-snug">{f.q}</h3>
-                    <p class="mt-2 text-graphite leading-relaxed">{f.a}</p>
-                  </div>
-                ))}
-              </div>
+              <Questions faqs={faqs} />
             </section>
           </div>
         </div>

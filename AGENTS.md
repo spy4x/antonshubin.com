@@ -425,7 +425,11 @@ page"); the brief link is `briefPath(slug)`. A promise shown for a service is
 the owner's decision (`catalogPromises()`): the strategy session and the audit
 show the refund only (#301). The paid session is booked through the brief,
 because mig takes no payment: its "How it starts" is brief, invoice, call,
-notes. `test/services.test.ts` checks the built pages.
+notes. The SaaS MVP page is the one hire page (#484): "SaaS MVP development"
+above the H1, a quotable lead (price, time, ownership), "Why it costs less" and
+six questions with a `FAQPage` after the next-step link, all from
+`lib/saas-mvp.ts`; `components/Questions.tsx` draws the questions here, on How I
+work and on Why not just AI. `test/services.test.ts` checks the built pages.
 
 ### Project page
 

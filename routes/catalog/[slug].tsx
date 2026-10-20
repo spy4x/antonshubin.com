@@ -43,6 +43,16 @@ import {
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
 } from "../../lib/why-not-just-ai.ts";
+import {
+  SAAS_MVP_EYEBROW,
+  SAAS_MVP_QUESTIONS_HEADING,
+  SAAS_MVP_SLUG,
+  saasMvpAnswer,
+  saasMvpFaqs,
+  WHY_IT_COSTS_LESS,
+  WHY_IT_COSTS_LESS_HEADING,
+} from "../../lib/saas-mvp.ts";
+import { Questions } from "../../components/Questions.tsx";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
   return catalogItems.find((i) => i.slug === slug);
@@ -80,13 +90,19 @@ export default define.page(function CatalogDetail(ctx) {
   }
 
   const canonical = `https://antonshubin.com/catalog/${item.slug}`;
+  // The SaaS MVP page is the one hire page (#484): it opens with a quotable
+  // answer and ends with questions.
+  const isMvp = item.slug === SAAS_MVP_SLUG;
+  const answer = isMvp ? saasMvpAnswer() : undefined;
+  const questions = isMvp ? saasMvpFaqs() : [];
   head.value = {
     ...head.value,
     title: `${item.seoTitle} — Anton Shubin`,
     // The breadcrumb's last item ("Home / Services / <short title>").
     pageName: item.shortTitle,
     description: metaDescription(
-      `${item.summary} ${priceLabel(item)}, ${item.delivery.toLowerCase()}.`,
+      answer ??
+        `${item.summary} ${priceLabel(item)}, ${item.delivery.toLowerCase()}.`,
     ),
     canonical,
     ogType: "website",
@@ -117,7 +133,11 @@ export default define.page(function CatalogDetail(ctx) {
             "name": item.title,
             "description": item.desc,
             "serviceType": item.category,
-            "provider": { "@id": "https://antonshubin.com/#person" },
+            // Anton does the work; NeatSoft contracts and invoices it.
+            "provider": [
+              { "@id": "https://antonshubin.com/#person" },
+              { "@id": "https://neatsoft.dev/#org" },
+            ],
             "areaServed": "Worldwide",
             // No aggregateRating or Review: Google treats a person's reviews of
             // their own work as self-serving (#193, #271). One Offer per price,
@@ -126,10 +146,36 @@ export default define.page(function CatalogDetail(ctx) {
           }),
         }}
       />
+      {questions.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: toJsonLd({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "@id": `${canonical}#faq`,
+              "isPartOf": { "@id": "https://antonshubin.com/#website" },
+              "mainEntity": questions.map((f) => ({
+                "@type": "Question",
+                "name": f.q,
+                "acceptedAnswer": { "@type": "Answer", "text": f.a },
+              })),
+            }),
+          }}
+        />
+      )}
       <div class="max-w-6xl mx-auto">
         <Breadcrumb items={getBreadcrumb(canonical, item.shortTitle)} />
 
         <header class="mb-8">
+          {isMvp && (
+            <p
+              data-service-eyebrow
+              class="mb-3 text-sm font-semibold text-graphite"
+            >
+              {SAAS_MVP_EYEBROW}
+            </p>
+          )}
           <div class="flex items-center gap-4">
             <CatalogIcon
               name={item.icon}
@@ -143,7 +189,7 @@ export default define.page(function CatalogDetail(ctx) {
             data-service-lead
             class="mt-4 font-heading text-xl text-parchment leading-snug text-balance"
           >
-            {item.outcome}
+            {answer ?? item.outcome}
           </p>
         </header>
 
@@ -179,6 +225,17 @@ export default define.page(function CatalogDetail(ctx) {
                   </p>
                 ))}
             </div>
+
+            {isMvp && (
+              <section aria-labelledby="service-why">
+                <h2 id="service-why" class="text-2xl text-parchment mb-4">
+                  {WHY_IT_COSTS_LESS_HEADING}
+                </h2>
+                <p class="max-w-2xl text-graphite leading-relaxed">
+                  {WHY_IT_COSTS_LESS}
+                </p>
+              </section>
+            )}
 
             {isStrategy && (
               <section aria-labelledby="service-versus">
@@ -371,6 +428,15 @@ export default define.page(function CatalogDetail(ctx) {
                   <ArrowRightIcon class="w-3.5 h-3.5" />
                 </a>
               </p>
+            )}
+
+            {questions.length > 0 && (
+              <section aria-labelledby="service-faq" data-faq-section>
+                <h2 id="service-faq" class="text-2xl text-parchment mb-6">
+                  {SAAS_MVP_QUESTIONS_HEADING}
+                </h2>
+                <Questions faqs={questions} />
+              </section>
             )}
           </div>
         </div>

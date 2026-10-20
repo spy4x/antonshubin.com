@@ -12,6 +12,7 @@ import {
   BRIEF_LABEL,
   WRITE_FALLBACK_HREF,
 } from "../lib/nav.ts";
+import { Questions } from "../components/Questions.tsx";
 import { ClosingBand } from "../components/ClosingBand.tsx";
 import { FACT_LINK, FactCard } from "../components/FactCard.tsx";
 import {
@@ -254,29 +255,7 @@ export default define.page(function HowIWork() {
 
             <section aria-labelledby="hiw-faq" data-faq-section>
               <h2 id="hiw-faq" class="h2 mb-6">Frequently asked questions</h2>
-              <div class="space-y-8 max-w-2xl">
-                {faqs.map((f) => (
-                  <div
-                    key={f.id}
-                    id={`faq-${f.id}`}
-                    data-faq
-                    class="scroll-mt-8"
-                  >
-                    <h3 class="text-lg text-parchment leading-snug">{f.q}</h3>
-                    <p class="mt-2 text-graphite leading-relaxed">{f.a}</p>
-                    {f.link && (
-                      <a
-                        href={f.link.href}
-                        {...linkEvent(f.link.href)}
-                        class="mt-2 inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
-                      >
-                        {f.link.label}
-                        <ArrowRightIcon class="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <Questions faqs={faqs} />
             </section>
           </div>
         </div>
