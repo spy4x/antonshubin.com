@@ -205,7 +205,17 @@ None yet.
 
 ### mig
 
-None yet.
+- `tool-try` (`item: mig`, `part: calendar`): "Load my calendar here" in "Try it
+  here" was pressed and the real calendar is loading in place. Sent with
+  `track()` from `islands/MigTryCalendar.tsx`, because the button is a link to
+  `/book#book` (its no-JavaScript fallback) and a tracked link would leave the
+  page.
+- The calendar it loads is `/book`'s `MeetEmbed`, so `calendar-shown`,
+  `calendar-failed` and `call-booked` come from this page too; a booking made
+  here is a real one and counts toward the goal.
+- "Open the calendar in a new tab" and "open issues" send `outbound` (`to`
+  `live` or `issues`, `place: body`); both copy buttons (the compose file, the
+  embed snippet) send `tool-install-copy`.
 
 ### oko
 

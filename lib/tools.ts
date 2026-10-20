@@ -334,20 +334,18 @@ export const tools: Tool[] = [
     posts: ["mig-tiny-self-hosted-scheduler"],
     deployable: true,
     appCategory: "BusinessApplication",
-    useIf: [
-      "You want a static meeting link without a Next.js + Postgres deployment.",
-    ],
+    // "Use it if" and "Skip it if" are the README's own lines (#457).
+    useIf: ["You want one booking link for yourself."],
     dontUseIf: [
-      "You need more than one owner or more than one feature: it books a time slot for one owner.",
-      "You need a database: storage is a JSON file.",
+      "You need teams, payments, several event types, calendar sync or thousands of bookings a day.",
     ],
     repo: "spy4x/mig",
     registry: {
       name: "Docker Hub",
       url: "https://hub.docker.com/r/antonshubin/mig",
-      version: "v0.12.0",
+      version: "v2.0.0",
       published: true,
-      install: "docker pull antonshubin/mig:v0.12.0",
+      install: "docker pull antonshubin/mig:v2.0.0",
       latestFrom: { registry: "docker", name: "antonshubin/mig" },
     },
     runtime: "Deno, as a single binary",
@@ -358,6 +356,69 @@ export const tools: Tool[] = [
     ],
     live: { label: "Open the booking page", href: "/book" },
     ci: { provider: "woodpecker", repoId: 12 },
+    headline: "One owner, one link, no database.",
+    // The README's "Why mig", less "Web standards" (#457 keeps six).
+    features: [
+      {
+        title: "Nothing to operate",
+        text:
+          "One small container, bookings in one JSON file you can cat and back up. No database, no accounts, no admin UI.",
+      },
+      {
+        title: "Config is code",
+        text:
+          "Working hours, days off, slot length and the meeting link are environment variables. Change them, restart, done.",
+      },
+      {
+        title: "Both clocks, everywhere",
+        text:
+          "Guests see times in their own time zone. Your emails show your time and the guest's side by side.",
+      },
+      {
+        title: "Invite and cancel built in",
+        text:
+          "Every confirmation carries an .ics invite and a signed cancel link. Optional push notifications through NTFY.",
+        size: "wide",
+        shot: {
+          src: "/img/tools/mig/email-confirmation.webp",
+          srcset:
+            "/img/tools/mig/email-confirmation-760.webp 760w, /img/tools/mig/email-confirmation.webp 1200w",
+          alt:
+            "The guest's confirmation email: subject \"Booking confirmed\", the meeting's date and time in Berlin time, the meeting link, a note about the attached calendar invite, and a cancel link.",
+          width: 1200,
+          height: 987,
+        },
+      },
+      {
+        title: "No stranger's text in the guest's inbox",
+        text:
+          "Anyone can type any address into the form, so mail to that address says only when the meeting is, with whom, where and how to cancel. The name, the notes and the cancel reason reach you alone.",
+      },
+      {
+        title: "Embeds anywhere",
+        text:
+          "/embed drops the whole flow into an iframe on your site, resizes itself and takes your site's theme with ?theme=.",
+      },
+    ],
+    lede:
+      "A visitor picks a free slot, and you both get an email with a calendar invite and a cancel link. That's the whole product.",
+    clip: {
+      title: "Booking a meeting with mig",
+      caption:
+        'A visitor books a meeting: picks a date, picks 15:30, types a name and email, confirms, lands on the "You\'re booked" page, and gets the confirmation email.',
+      frame: "browser",
+      frameTitle: "meet.example.com",
+      poster: {
+        src: "/video/tools/mig/poster.webp",
+        srcset:
+          "/video/tools/mig/poster-640.webp 640w, /video/tools/mig/poster.webp 1280w",
+        alt:
+          'Left, mig\'s "You\'re booked" page for a 30-minute call with Jane Doe on Tuesday, 20 October 2026 at 15:30 Berlin time; right, the guest\'s "Booking confirmed" email with the meeting link and a cancel link.',
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT34S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "zond",
