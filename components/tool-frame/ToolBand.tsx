@@ -77,6 +77,8 @@ export interface ToolBandProps {
    * Defaults to the hub's sentence.
    */
   buildLine?: string;
+  /** Quiet links after the offer or "Services" link in "Have me build it". */
+  buildLinks?: ComponentChildren;
 }
 
 /**
@@ -87,7 +89,9 @@ export interface ToolBandProps {
  * (the page body's only Book and only accent) and "See the MVP offer"; for
  * a tool with no catalog item, the hub's sentence, Book and "Services".
  */
-export function ToolBand({ data, yourself, buildLine }: ToolBandProps) {
+export function ToolBand(
+  { data, yourself, buildLine, buildLinks }: ToolBandProps,
+) {
   const { tool, repo } = data;
   const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null;
   const offerHref = catalog ? catalogPath(catalog.slug) : "/catalog";
@@ -168,6 +172,7 @@ export function ToolBand({ data, yourself, buildLine }: ToolBandProps) {
             >
               {catalog ? offerLabel(catalog.slug) : "Services"}
             </a>
+            {buildLinks}
           </div>
         </section>
       </div>
