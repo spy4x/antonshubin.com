@@ -30,7 +30,7 @@ export const WHY_NOT_JUST_AI_H1 = "Why hire me instead of an AI subscription?";
 
 /** The answer in one paragraph: the line answer engines quote. */
 export const WHY_NOT_JUST_AI_LEAD =
-  "An AI subscription writes code. I decide what to build, review every change, run it in production and answer for the result. I use the same AI tools every day, so you get their speed too.";
+  "An AI subscription writes code. I decide what to build, make sure every change is reviewed, run it in production and answer for the result. I use the same AI tools every day, so you get their speed too.";
 
 /** The sentence and link label other pages use to point here (/how-i-work, the MVP page). */
 export const WHY_NOT_JUST_AI_PROMPT =
@@ -128,7 +128,7 @@ export function processSteps(): string[] {
     "A written spec before any code.",
     "AI agents write the change.",
     "A separate reviewer agent checks it; sign-in, payments and secrets get a security review.",
-    "I read and test every change myself.",
+    "Nothing reaches you until it passes that review.",
     firstSentence(promise("weekly-software").desc),
   ];
 }
@@ -152,7 +152,7 @@ export const AI_FIGURES: AiFigure[] = [
   {
     value: "1,845",
     caption:
-      "pull requests merged in my first 30 days on Claude Code. Volume is not value: most of the jump came from changing how I work.",
+      "pull requests merged in my first 30 days on Claude Code. Volume is not value, and much of the jump is not the model alone.",
     href: "/blog/claude-code-vs-minimax-m3-30-days",
   },
   {
@@ -178,9 +178,9 @@ export const BUILT_STEPS: { slug: string; line: string }[] = [
   },
 ];
 
-export const SHIPPED_HEADING = "Shipped and still running";
+export const SHIPPED_HEADING = "Shipped to production";
 export const SHIPPED_INTRO =
-  "An AI tool can write code. It can't point to systems it still runs years later.";
+  "An AI tool can write code. It can't point to products it shipped, saw acquired, or still runs.";
 /** The projects shown, by `lib/data.ts` slug, with the mark each gets. */
 export const SHIPPED: { slug: string; status: "live" | "outcome" }[] = [
   { slug: "smartlite", status: "live" },

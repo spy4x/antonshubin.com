@@ -185,3 +185,21 @@ siteTest(
     );
   },
 );
+
+siteTest(
+  "claims only what its linked post and the project data say",
+  async (site) => {
+    const text = visibleText(pageBody(await site.html(PAGE)));
+    // The linked post says a reviewer agent checks every pull request, not Anton.
+    assert(!/every change myself/i.test(text), "personal review claim");
+    assert(!/most of the jump/i.test(text), "overclaimed cause of the jump");
+    // Only SmartLite is still maintained (lib/data.ts); the others were acquired.
+    assert(
+      !/still running|still runs years/i.test(text),
+      "still-running claim",
+    );
+    for (const word of ["does it", "only part of it", "doesn't"]) {
+      assert(text.includes(word), `legend word "${word}"`);
+    }
+  },
+);
