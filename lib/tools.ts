@@ -302,6 +302,11 @@ export interface Tool {
   works?: string[];
   /** "Where it stands": what is not built yet; the open issues are always linked under it. */
   notYet?: string[];
+  /**
+   * "Where it stands": a known problem a visitor should weigh before installing, said only
+   * with the facts of the open issue it links to.
+   */
+  knownIssue?: { text: string; link: ToolLink };
   /** One line under the post's title in "The story behind it". */
   storyLine?: string;
 }
@@ -924,6 +929,14 @@ export const tools: Tool[] = [
       "Works offline: edits made offline are queued and sent when the network returns.",
       "Keyboard shortcuts; press ? to see them.",
     ],
+    knownIssue: {
+      text:
+        "An edit can be lost in rare cases: two offline edits made from the same stale copy, or a task deleted on another device while you edit it.",
+      link: {
+        label: "Issue #119",
+        href: "https://github.com/spy4x/caldav-tasks-web/issues/119",
+      },
+    },
     clip: {
       title:
         "caldav-tasks-web: quick add, subtasks, a repeating task, complete and undo",

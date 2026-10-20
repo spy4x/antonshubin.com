@@ -62,8 +62,9 @@ export function Tested() {
         What was tested
       </h2>
       <p class="mt-3 text-graphite leading-relaxed">
-        A row says "tested" only when a test in this repository backs it. "In
-        daily use" means the author runs it and no automated test does.
+        A row says "tested" only when a test in caldav-tasks-web's repository
+        backs it. "In daily use" means the author runs it and no automated test
+        does.
       </p>
       <div class="mt-6 space-y-8">
         <Table caption="CalDAV servers" rows={SERVERS} />

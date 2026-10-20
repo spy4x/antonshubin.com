@@ -96,3 +96,31 @@ Deno.test("the caldav-tasks-web page renders the frame, five field chips with Ti
     await site.stop();
   }
 });
+
+Deno.test("the caldav-tasks-web page shows the known issue from caldav-tasks-web#119 in Where it stands, linked to that issue", async () => {
+  const site = await startSite();
+  try {
+    const page = pageBody(await site.html("/tools/caldav-tasks-web"));
+    const standing = page.match(
+      /<section aria-labelledby="standing">([\s\S]*?)<\/section>/,
+    );
+    assert(standing, "no Where it stands");
+    const line = standing[1].match(/<p data-known-issue[^>]*>([\s\S]*?)<\/p>/);
+    assert(line, "no known-issue line in Where it stands");
+    const text = visibleText(line[1]);
+    assert(text.startsWith("Known issue"), text);
+    assert(
+      text.includes(
+        "two offline edits made from the same stale copy, or a task deleted on another device while you edit it",
+      ),
+      text,
+    );
+    assert(
+      /<a href="https:\/\/github\.com\/spy4x\/caldav-tasks-web\/issues\/119"[^>]*data-umami-event="outbound"[^>]*>Issue #119<\/a>/
+        .test(line[1]),
+      "no outbound link to #119",
+    );
+  } finally {
+    await site.stop();
+  }
+});
