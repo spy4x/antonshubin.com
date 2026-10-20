@@ -747,10 +747,10 @@ siteTest(
 );
 
 siteTest(
-  "the dotfiles page shows its summary and links its repository",
+  "the dotfiles page shows its lede and links its repository",
   async (site) => {
     const html = await site.html("/tools/dotfiles");
-    assert(visibleText(html).includes(tool("dotfiles").summary), "no summary");
+    assert(visibleText(html).includes(tool("dotfiles").lede!), "no lede");
     assert(
       html.includes('href="https://github.com/spy4x/dotfiles"'),
       "no repository link",
