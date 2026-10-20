@@ -232,7 +232,13 @@ None yet.
 
 ### rostok
 
-None yet.
+| Event               | When                                                          | Properties                           |
+| ------------------- | ------------------------------------------------------------- | ------------------------------------ |
+| `tool-try`          | a catalog stack's summary is clicked (to open or to close it) | `item=rostok`, `part=stack:{name}`   |
+| `tool-install-copy` | a catalog stack's add command is copied                       | `item=rostok`, `part=stack:{name}`   |
+| `cta`               | a stack's "This tool's page" link                             | `place=body`, `target=/tools/{slug}` |
+
+The category index links jump inside the page and send nothing.
 
 ### seed
 
