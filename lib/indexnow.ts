@@ -1,6 +1,6 @@
 /**
- * IndexNow: tells Bing (and Yandex, Seznam, Naver) that a URL changed, so a
- * new post is crawled within hours instead of days. The key is public by
+ * IndexNow: tells Bing (and Yandex, Seznam, Naver) that a URL changed and asks
+ * them to recrawl it. The key is public by
  * design: it only proves the ping comes from whoever controls this host,
  * which serves it at {@linkcode INDEXNOW_KEY_PATH}.
  */

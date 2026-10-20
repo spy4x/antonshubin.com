@@ -180,11 +180,11 @@ It writes no file. It:
    needs `DEVTO_API_KEY`, from the environment or the local `.env.deploy`
    (restored by `deno task env:decrypt`, never uploaded); without it, it warns
    and goes on.
-4. Pings IndexNow with the post and `/blog` (`lib/indexnow.ts`), so Bing
-   recrawls them within hours; Bing's index also feeds ChatGPT search and
-   Copilot. It fails open and prints the answer. Google does not use IndexNow:
-   it finds the post through the sitemap, or Anton can request indexing in
-   Search Console's URL Inspection.
+4. Pings IndexNow with the post and `/blog` (`lib/indexnow.ts`), which asks Bing
+   to recrawl them; Bing's index also feeds ChatGPT search and Copilot. It fails
+   open and prints the answer. Google does not use IndexNow: it finds the post
+   through the sitemap, or Anton can request indexing in Search Console's URL
+   Inspection.
 5. Prints the post's tagged link for every channel, and the newsletter's subject
    (the post's title alone) and plain-text part, whose links are the `email`
    channel's tagged URLs.
