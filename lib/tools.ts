@@ -508,9 +508,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@rostok/cli",
-      version: "1.18.1",
+      version: "1.20.1",
       published: true,
-      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.18.1",
+      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.20.1",
       latestFrom: { registry: "jsr", name: "@rostok/cli" },
     },
     headline: "Scaffold a self-hosted homelab from a curated catalog.",
