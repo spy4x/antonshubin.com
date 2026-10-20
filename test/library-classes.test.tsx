@@ -199,7 +199,7 @@ function renderedLibraryMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/(),+=&>*]/g, (c) => `\\${c}`);
+  return "." + className.replace(/[:.!\[\]\/(),+=&>*%]/g, (c) => `\\${c}`);
 }
 
 function escapeRegExp(text: string): string {
