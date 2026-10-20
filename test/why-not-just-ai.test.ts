@@ -9,6 +9,8 @@ import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import {
   COMPARISON_PRODUCTS,
   comparisonRows,
+  processSteps,
+  WEEKLY_AUDIT,
   WHY_NOT_JUST_AI_H1,
   WHY_NOT_JUST_AI_LEAD,
   WHY_NOT_JUST_AI_PATH,
@@ -16,6 +18,7 @@ import {
   whyNotJustAiFaqs,
 } from "../lib/why-not-just-ai.ts";
 import { BOOK_LABEL } from "../lib/nav.ts";
+import { promise, promises } from "../lib/promises.ts";
 
 const PAGE = WHY_NOT_JUST_AI_PATH;
 const URL_OF_PAGE = `https://antonshubin.com${PAGE}`;
@@ -113,11 +116,15 @@ siteTest(
 );
 
 siteTest(
-  "why-not-just-ai shows the same three questions and answers its FAQPage JSON-LD lists",
+  "why-not-just-ai shows the same four questions and answers its FAQPage JSON-LD lists, who pays for the AI tools among them",
   async (site) => {
     const html = await site.html(PAGE);
     const faqs = whyNotJustAiFaqs();
-    assertEquals(faqs.length, 3);
+    assertEquals(faqs.length, 4);
+    assert(
+      faqs.some((f) => f.q === "Who pays for the AI tools?"),
+      "no question on who pays for the AI tools",
+    );
     const section = slice(html, "data-faq-section", "</section>");
     const shown = [...section.matchAll(
       /<h3[^>]*>([\s\S]*?)<\/h3>\s*<p[^>]*>([\s\S]*?)<\/p>/g,
@@ -203,3 +210,86 @@ siteTest(
     }
   },
 );
+
+siteTest(
+  "why-not-just-ai and the AI-provider answer on How I work describe the same process: a reviewer agent, a weekly audit, no personal review of every change",
+  async (site) => {
+    const page = visibleText(pageBody(await site.html(PAGE)));
+    const howIWork = await site.html("/how-i-work");
+    const answer = visibleText(
+      slice(howIWork, 'id="faq-ai-and-your-code"', "</p>"),
+    );
+    for (const [name, text] of [["the page", page], ["the answer", answer]]) {
+      assert(
+        text.includes("separate reviewer agent"),
+        `${name}: no reviewer agent`,
+      );
+      assert(text.includes(WEEKLY_AUDIT), `${name}: no weekly audit`);
+      assert(
+        !/\bI (read|test|review)\b[^.]*every change/i.test(text),
+        `${name} says Anton reviews every change himself`,
+      );
+    }
+    // The audit is a step of the process, before the weekly software.
+    const steps = processSteps();
+    const weekly = steps.indexOf(
+      steps.find((s) => promise("weekly-software").desc.startsWith(s))!,
+    );
+    assert(weekly > 0, "no weekly software step");
+    assertEquals(steps.indexOf(WEEKLY_AUDIT), weekly - 1);
+  },
+);
+
+siteTest(
+  "why-not-just-ai says each promise's full text at most once, so the band does not repeat the last answer",
+  async (site) => {
+    const text = visibleText(pageBody(await site.html(PAGE)));
+    for (const p of promises) {
+      assert(
+        text.split(p.desc).length - 1 <= 1,
+        `"${p.title}" is said more than once`,
+      );
+    }
+  },
+);
+
+siteTest(
+  "why-not-just-ai names no refund period but the five-day promise",
+  async (site) => {
+    const text = visibleText(pageBody(await site.html(PAGE)));
+    const refund = promise("refund");
+    const days =
+      /\b(\d+|one|two|three|four|five|six|seven|ten|fourteen|thirty)[- ]days?\b/gi;
+    const sentences = text.split(/(?<=[.!?])\s+/)
+      .filter((s) => /refund/i.test(s) && s.match(days) !== null);
+    assert(sentences.length > 0, "the page names no refund period at all");
+    for (const s of sentences) {
+      for (const m of s.matchAll(days)) {
+        assert(
+          /^(five|5)$/i.test(m[1]),
+          `"${s}" names a refund period other than ${refund.title}`,
+        );
+      }
+    }
+  },
+);
+
+for (const tz of ["Pacific/Honolulu", "Asia/Tokyo"]) {
+  Deno.test(
+    `why-not-just-ai shows the table's checked date as October 20, 2026 on a server in ${tz}`,
+    async () => {
+      const site = await startSite({ env: { TZ: tz } });
+      try {
+        const table = visibleText(
+          slice(await site.html(PAGE), "<table", "</figure>"),
+        );
+        assert(
+          table.includes("Checked on October 20, 2026."),
+          `no checked date of October 20, 2026 in: ${table}`,
+        );
+      } finally {
+        await site.stop();
+      }
+    },
+  );
+}

@@ -40,6 +40,7 @@ import {
   BUILT_STEPS,
   CLOSING_HEADING,
   CLOSING_LINE_BEFORE,
+  CLOSING_PROMISES,
   COMPARISON_CAPTION,
   COMPARISON_CHECKED_ON,
   COMPARISON_FIT,
@@ -47,6 +48,7 @@ import {
   COMPARISON_METHOD,
   COMPARISON_PRODUCTS,
   COMPARISON_RULES_LINK,
+  COMPARISON_TIME_ZONE,
   comparisonRows,
   DOTFILES_URL,
   ENOUGH_CASES,
@@ -57,6 +59,7 @@ import {
   QUESTIONS_HEADING,
   RULES_LINE_AFTER,
   RULES_LINE_BEFORE,
+  RULES_WHY,
   SHIPPED,
   SHIPPED_HEADING,
   SHIPPED_INTRO,
@@ -99,7 +102,7 @@ function DotfilesLink() {
  * the prices and Book. The main column concedes when a subscription is
  * enough, compares the two, answers "will you just run Claude?", shows the
  * owner's own numbers, the path for founders who already built with AI, three
- * projects shipped to production and three questions, which are also the `FAQPage`
+ * projects shipped to production and four questions, which are also the `FAQPage`
  * JSON-LD. All wording lives in `lib/why-not-just-ai.ts`.
  */
 export default define.page(function WhyNotJustAi() {
@@ -168,7 +171,9 @@ export default define.page(function WhyNotJustAi() {
               </p>
               <dl class="space-y-4 text-sm">
                 <Fact term="AI tools">
-                  {AI_TOOLS_FACT} <DotfilesLink />
+                  {/* Link on its own line: no rewrap when the font loads (#490). */}
+                  <span class="block">{AI_TOOLS_FACT}</span>
+                  <DotfilesLink />
                 </Fact>
                 <Fact term="Prices">
                   <ul data-price-rows class="space-y-2">
@@ -243,7 +248,8 @@ export default define.page(function WhyNotJustAi() {
                 caption={COMPARISON_CAPTION}
                 products={COMPARISON_PRODUCTS}
                 rows={comparisonRows()}
-                checkedOn={new Date(COMPARISON_CHECKED_ON)}
+                checkedOn={COMPARISON_CHECKED_ON}
+                timeZone={COMPARISON_TIME_ZONE}
                 method={COMPARISON_METHOD_NODE}
                 fit={COMPARISON_FIT}
                 labels={{
@@ -275,7 +281,7 @@ export default define.page(function WhyNotJustAi() {
                   {processSteps().map((s) => <li key={s}>{s}</li>)}
                 </ol>
                 <p>
-                  {RULES_LINE_BEFORE} <DotfilesLink />
+                  {RULES_WHY} {RULES_LINE_BEFORE} <DotfilesLink />
                   {RULES_LINE_AFTER}
                 </p>
                 <p>
@@ -399,8 +405,10 @@ export default define.page(function WhyNotJustAi() {
           </div>
         </div>
 
+        {/* Not the default refund and first milestone: the last answer above says both. */}
         <ClosingBand
           heading={CLOSING_HEADING}
+          promiseIds={CLOSING_PROMISES}
           bookHref={BOOK_HREF}
           links={[
             { href: WRITE_FALLBACK_HREF, label: BRIEF_LABEL },

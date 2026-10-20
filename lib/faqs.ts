@@ -1,6 +1,7 @@
 import { PRICING_RULE } from "./how-i-work.ts";
 import { decapitalize, promise } from "./promises.ts";
 import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts";
+import { WEEKLY_AUDIT } from "./why-not-just-ai.ts";
 
 /**
  * The How I work page's questions (#275): the only written copy. The page,
@@ -9,7 +10,8 @@ import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts";
  * `promise()`, so the promise guard in `test/proof-promises-notes.test.ts`
  * (which scans this file too) still holds. The who-does-the-work and mobile
  * answers come from the facts Anton recorded on #249 (26 Sep 2026); how to
- * ask for the refund and the AI-provider answer from #301 (30 Sep 2026).
+ * ask for the refund and the AI-provider answer from #301 (30 Sep 2026), and
+ * that answer's review process from #489 (20 Oct 2026).
  *
  * No imports of config or the environment, so a script can load it.
  */
@@ -64,7 +66,7 @@ export const faqs: Faq[] = [
   {
     id: "ai-and-your-code",
     q: "Does my code go to an AI provider?",
-    a: "Yes. I work with AI coding agents, so the code I work on is sent to an AI model provider. I read, test and review every change before you see it. If your company has its own AI account, I can work through that one, so your code stays under your contract. If your policy rules out AI tools, tell me on the call and we agree how to handle it before any work starts.",
+    a: `Yes. I work with AI coding agents, so the code I work on is sent to an AI model provider. The agents work to my written rules and my definition of quality, a separate reviewer agent checks every change, and nothing reaches you until it passes that review. ${WEEKLY_AUDIT} If your company has its own AI account, I can work through that one, so your code stays under your contract. If your policy rules out AI tools, tell me on the call and we agree how to handle it before any work starts.`,
   },
   {
     id: "not-a-good-fit",

@@ -68,8 +68,13 @@ export const COMPARISON_PRODUCTS = [
   "Me, with AI agents",
   "An AI subscription on its own",
 ] as const;
-/** When the table was last checked against how I work: the spec's date. */
-export const COMPARISON_CHECKED_ON = "2026-10-20";
+/**
+ * When the table was last checked against how I work: the spec's date, as a
+ * UTC midnight that the page formats in UTC, so no server time zone moves it.
+ */
+export const COMPARISON_CHECKED_ON = new Date(Date.UTC(2026, 9, 20));
+/** The zone the table's checked date is formatted in. */
+export const COMPARISON_TIME_ZONE = "UTC";
 export const COMPARISON_METHOD =
   "Based on how I work today, described in my public agent rules, and on my own measurements in the two posts linked here.";
 /** The words of `COMPARISON_METHOD` that link the agent rules on the page. */
@@ -122,6 +127,10 @@ export function billMeAnswer(): string {
   return `Partly, yes. AI agents type much of my code, and I say so openly. You pay for the result, not for my typing: on a fixed scope the price is fixed, and ${ownership} from day one.`;
 }
 
+/** The weekly audit: Anton's own check, now that a reviewer agent checks every change (#489). */
+export const WEEKLY_AUDIT =
+  "Every week I audit the work myself, to make sure the project is on the right track and the quality is still high.";
+
 /** How a change gets made, in order; the last step is the weekly promise. */
 export function processSteps(): string[] {
   return [
@@ -129,12 +138,20 @@ export function processSteps(): string[] {
     "AI agents write the change.",
     "A separate reviewer agent checks it; sign-in, payments and secrets get a security review.",
     "Nothing reaches you until it passes that review.",
+    WEEKLY_AUDIT,
     firstSentence(promise("weekly-software").desc),
   ];
 }
 
+/**
+ * Why the rules matter more than the tools, in Anton's words on #489: he has
+ * vibe-coded, and without his rules and definition of quality the result is
+ * mediocre and not maintainable.
+ */
+export const RULES_WHY =
+  "The tools are not the hard part. I have vibe-coded too: without clear rules and a definition of quality, the result is mediocre and hard to maintain.";
 /** Before the dotfiles link; the link text is the repository's name. */
-export const RULES_LINE_BEFORE = "My rules for the agents are public in";
+export const RULES_LINE_BEFORE = "Mine are public in";
 export const RULES_LINE_AFTER = ", so you can read exactly how I work.";
 export const AI_PROVIDER_LINK = {
   href: "/how-i-work#faq-ai-and-your-code",
@@ -190,13 +207,21 @@ export const SHIPPED: { slug: string; status: "live" | "outcome" }[] = [
 
 export const QUESTIONS_HEADING = "Questions";
 
-/** The page's questions, also its `FAQPage` JSON-LD; none repeats /how-i-work's. */
+/**
+ * The page's questions, also its `FAQPage` JSON-LD; none repeats /how-i-work's.
+ * Who pays for the AI tools is Anton's answer on #488.
+ */
 export function whyNotJustAiFaqs(): Faq[] {
   return [
     {
       id: "prompt-it-myself",
       q: "Can't I just prompt an agent myself?",
       a: "You can, and for a prototype you should. What takes years is knowing what to ask for, spotting the change that looks right but isn't, and keeping it running once people depend on it. That is the part you hire me for.",
+    },
+    {
+      id: "who-pays-for-ai",
+      q: "Who pays for the AI tools?",
+      a: "I do. My AI subscription is part of how I work, not a line on your invoice. If you would rather it ran on your company's own AI account, for example to keep your code under your own contract, I can work through that one.",
     },
     {
       id: "take-it-from-here",
@@ -212,6 +237,11 @@ export function whyNotJustAiFaqs(): Faq[] {
 }
 
 export const CLOSING_HEADING = "Not sure which you need?";
+/**
+ * The band's promises: not the refund and first milestone, which the last
+ * question's answer, right above the band, already gives (#490).
+ */
+export const CLOSING_PROMISES = ["ownership", "free-bugfixes"];
 /** The band's line before the call's name (`INTRO_CALL`). */
 export const CLOSING_LINE_BEFORE = "Tell me what you are building on a";
 
@@ -255,7 +285,7 @@ ${billMeAnswer()}
 
 ${processSteps().map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
-${RULES_LINE_BEFORE} spy4x/dotfiles (${DOTFILES_URL})${RULES_LINE_AFTER}
+${RULES_WHY} ${RULES_LINE_BEFORE} spy4x/dotfiles (${DOTFILES_URL})${RULES_LINE_AFTER}
 
 ${
     AI_FIGURES.map((f) => `- **${f.value}** ${f.caption} ${baseUrl}${f.href}`)
