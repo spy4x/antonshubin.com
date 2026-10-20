@@ -1,31 +1,14 @@
-// Guards the /tools hub and the tool pages (#189) against the built site:
-// every tool in lib/tools.ts is listed, each page has one H1, the CI status
+// Guards the tool pages (#189) against the built site (the /tools hub has its
+// own test, test/tools/hub.test.ts): each page has one H1, the CI status
 // from the committed snapshot, a pinned install (or an honest "not yet"),
 // a PNG preview, and the sitemap and llms files list the tools from the
 // registry. Asserts structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { type Site, startSite } from "./harness.ts";
 import { count, jsonLd, pageBody, visibleText } from "./html.ts";
-import {
-  ciUrl,
-  groupedTools,
-  tool,
-  toolLicence,
-  toolRows,
-  tools,
-} from "../lib/tools.ts";
+import { ciUrl, tool, toolLicence, tools } from "../lib/tools.ts";
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts";
 import { summaryAfterLede } from "../components/tool-frame/tool-page.ts";
-
-/** The word `@spy4x/preact-ui/status-mark` prints for each tool status. */
-const STATUS_WORDS = {
-  "in-use": "In use",
-  ready: "Ready",
-  beta: "Beta",
-  wip: "WIP",
-  paused: "Paused",
-  archived: "Archived",
-} as const;
 
 /**
  * True when the tool has its own route (`routes/tools/<slug>.tsx`, #454): its
@@ -53,67 +36,6 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   });
 }
 
-/** The HTML between `data-tool-group="<id>"` and the next group (or the end). */
-function groupSection(html: string, id: string): string {
-  const start = html.indexOf(`data-tool-group="${id}"`);
-  assert(start !== -1, `/tools has no group "${id}"`);
-  const next = html.indexOf("data-tool-group=", start + 1);
-  return html.slice(start, next === -1 ? undefined : next);
-}
-
-siteTest(
-  "/tools lists every registry tool in its group with a status mark",
-  async (site) => {
-    const html = await site.html("/tools");
-    assertEquals(count(html, /<h1[\s>]/g), 1);
-    assert(visibleText(html).includes("Tools I build and run myself"));
-    assertEquals(count(html, /data-tool="/g), tools.length + toolRows.length);
-    for (const { group, tools: inGroup, rows } of groupedTools()) {
-      const section = groupSection(html, group.id);
-      for (const r of rows) {
-        assert(
-          section.includes(`data-tool="${r.slug}"`),
-          `${r.slug} not in ${group.id}`,
-        );
-        for (const l of r.links) {
-          assert(section.includes(`href="${l.href}"`), `${r.slug}: ${l.href}`);
-        }
-        const rowStart = section.indexOf(`data-tool="${r.slug}"`);
-        const row = section.slice(rowStart, section.indexOf("</li>", rowStart));
-        assert(
-          visibleText(`<x ${row}`).includes(STATUS_WORDS[r.status]),
-          `${r.slug}'s row has no "${STATUS_WORDS[r.status]}" status mark`,
-        );
-        assert(
-          !section.includes(`href="/tools/${r.slug}"`),
-          `${r.slug} has no page but the hub links one`,
-        );
-      }
-      for (const t of inGroup) {
-        assert(
-          section.includes(`data-tool="${t.slug}"`),
-          `${t.slug} not in ${group.id}`,
-        );
-        assert(
-          section.includes(`href="/tools/${t.slug}"`),
-          `${t.slug} has no page link`,
-        );
-        const rowStart = section.indexOf(`data-tool="${t.slug}"`);
-        const row = section.slice(rowStart, section.indexOf("</li>", rowStart));
-        assert(
-          visibleText(`<x ${row}`).includes(STATUS_WORDS[t.status]),
-          `${t.slug}'s row has no "${STATUS_WORDS[t.status]}" status mark`,
-        );
-      }
-    }
-    assert(
-      html.includes("data-status-key") &&
-        visibleText(html).includes("What the status marks mean"),
-      "/tools has no status key",
-    );
-  },
-);
-
 siteTest(
   "every tool page has exactly one h1 reading its headline, or name: job without one",
   async (site) => {
@@ -133,15 +55,13 @@ siteTest(
 siteTest(
   "every CI pill reads the status recorded in the snapshot",
   async (site) => {
-    for (const path of ["/tools", ...tools.map((t) => `/tools/${t.slug}`)]) {
+    for (const path of tools.map((t) => `/tools/${t.slug}`)) {
       const html = await site.html(path);
       const pills = [
         ...html.matchAll(/<a[^>]*data-ci-status="[^"]*"[^>]*>([\s\S]*?)<\/a>/g),
       ]
         .map((m) => visibleText(m[1]));
-      const withCi = path === "/tools"
-        ? tools.filter((t) => t.ci)
-        : [tool(path.slice(7))].filter((t) => t.ci);
+      const withCi = [tool(path.slice(7))].filter((t) => t.ci);
       const expected = withCi.map((t) =>
         `CI ${ciReading(repoSnapshot(t.repo!).ci).word}`
       );
@@ -154,7 +74,7 @@ siteTest(
   "every CI pill links the tool's repository on Woodpecker, not one pipeline",
   async (site) => {
     for (const t of tools.filter((t) => t.ci)) {
-      for (const path of ["/tools", `/tools/${t.slug}`]) {
+      for (const path of [`/tools/${t.slug}`]) {
         const html = await site.html(path);
         const hrefs = [
           ...html.matchAll(/<a[^>]*href="([^"]*)"[^>]*data-ci-status=/g),
@@ -174,25 +94,17 @@ siteTest(
 );
 
 siteTest(
-  "an unpublished tool's version reads as publishing on the hub row and the fact card",
+  "an unpublished tool's version reads as publishing on the fact card",
   async (site) => {
-    const hub = await site.html("/tools");
     for (const t of tools.filter((t) => t.registry)) {
-      const rowStart = hub.indexOf(`data-tool="${t.slug}"`);
-      const row = hub.slice(rowStart, hub.indexOf("</li>", rowStart));
-      const hubVersion = visibleText(
-        row.match(/<span data-version[^>]*>([\s\S]*?)<\/span>/)![1],
-      );
       const page = await site.html(`/tools/${t.slug}`);
       const cardVersion = visibleText(
         page.match(/<span data-version[^>]*>([\s\S]*?)<\/span>/)![1],
       );
       const { version, name, published } = t.registry!;
       if (published) {
-        assertEquals(hubVersion, `${version} on ${name}`, t.slug);
         assertEquals(cardVersion, version, t.slug);
       } else {
-        assertEquals(hubVersion, `Publishing ${version} to ${name}`, t.slug);
         assertEquals(cardVersion, `${version}, publishing to ${name}`, t.slug);
       }
     }
@@ -285,52 +197,6 @@ siteTest(
         assert(!text.includes(banned), `${t.slug}: ${banned} in JSON-LD`);
       }
     }
-  },
-);
-
-siteTest(
-  "/tools carries CollectionPage JSON-LD listing every page tool in hub order",
-  async (site) => {
-    const nodes = jsonLd(await site.html("/tools")) as Record<
-      string,
-      unknown
-    >[];
-    const page = nodes.find((n) => n["@type"] === "CollectionPage");
-    assert(page, "no CollectionPage node");
-    const list = page.mainEntity as {
-      "@type": string;
-      itemListElement: { position: number; url: string }[];
-    };
-    assertEquals(list["@type"], "ItemList");
-    const expected = groupedTools().flatMap((g) => g.tools).map((t) =>
-      `https://antonshubin.com/tools/${t.slug}`
-    );
-    assertEquals(list.itemListElement.map((i) => i.url), expected);
-    assertEquals(
-      list.itemListElement.map((i) => i.position),
-      expected.map((_, i) => i + 1),
-    );
-  },
-);
-
-siteTest(
-  "the hub shows tools first and puts the status key in a closed details at the end",
-  async (site) => {
-    const html = await site.html("/tools");
-    const order = [...html.matchAll(/data-tool-group="([^"]+)"/g)].map((m) =>
-      m[1]
-    );
-    assertEquals(order, ["tools", "products", "archive"]);
-    assert(
-      html.indexOf("data-status-key") >
-        html.indexOf('data-tool-group="archive"'),
-      "status key is not after the groups",
-    );
-    assert(
-      !/<details[^>]*data-status-key[^>]*\sopen/.test(html),
-      "key is open",
-    );
-    assertEquals(count(html, /install-/g), 0, "the hub offers an install line");
   },
 );
 
@@ -660,21 +526,12 @@ siteTest(
 );
 
 siteTest(
-  "the hub row and the tool page show the same licence",
+  "a tool page shows the licence the registry or GitHub names",
   async (site) => {
-    const hub = await site.html("/tools");
     for (const t of tools) {
       const licence = toolLicence(t);
-      const start = hub.indexOf(`data-tool="${t.slug}"`);
-      const row = visibleText(
-        `<x ${hub.slice(start, hub.indexOf("</li>", start))}`,
-      );
       const page = visibleText(await site.html(`/tools/${t.slug}`));
       if (licence) {
-        // The archive group is one line per project, without a licence.
-        if (t.group !== "archive") {
-          assert(row.includes(licence), `${t.slug}: hub row has no ${licence}`);
-        }
         assert(page.includes(licence), `${t.slug}: page has no ${licence}`);
       }
     }

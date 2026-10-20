@@ -40,7 +40,7 @@ with every event, so no event has a `page` property.
 | `outbound`                           | a link to another site is clicked, including links inside posts                                               | `to` (short host or profile id: `upwork`, `github`, `youtube`, `telegram`, `email`, `neatsoft`, a tool's `live` …), `item`; on a tool page also `place` and the `to` values `issues`, `registry`, `website`, `demo-app`, `demo-admin` |
 | `cta`                                | an internal call-to-action link (work card, service card, tool card, How I work, FAQ …)                       | `place`, `target` (the link's path)                                                                                                                                                                                                   |
 | `tool-install-copy`                  | an install command, or a tool page's quick-start command, is copied                                           | `item`                                                                                                                                                                                                                                |
-| `demo-play`                          | a tool page's demo clip is played (`DemoVideo`'s play link pressed)                                           | `item` (tool slug), `place` (`hero` or `body`)                                                                                                                                                                                        |
+| `demo-play`                          | a tool page's demo clip is played (`DemoVideo`'s play link pressed)                                           | `item` (tool slug), `place` (`hero`, `body`, or `card` on the `/tools` hub)                                                                                                                                                           |
 | `zoom`                               | a screenshot on a tool page opens in the lightbox                                                             | `item` (tool slug)                                                                                                                                                                                                                    |
 | `tool-try`                           | a tool page's own interaction is used                                                                         | `item` (tool slug), `part` (which interaction; each page lists its values under "Tool pages" below)                                                                                                                                   |
 | `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                                                                                                                               |
@@ -186,6 +186,16 @@ Every tool page sends the frame's events (#454): `demo-play`, `zoom`, `outbound`
 (`place: band`, `item`) and `cta` (the offer or "Services", More tools, the
 post). A page's own events go in its subsection below; each lane edits only its
 own.
+
+### The hub (`/tools`)
+
+`demo-play` (`item`; `place: hero` for the spotlight's clip, `card` for a
+card's), `zoom` (`item`, the tool whose folder holds the screenshot), `cta`
+(`place: hero` for "See Seed", `card` for a card's name, `body` for a Being
+built or archive line's name, `band` for Services), `outbound` (`to: live` or
+`github`, `item`, `place: hero` or `card`), `tool-install-copy` (`item`) and
+`book` (`place: band`). The number the hub should move: the share of hub visits
+with a `cta` to a tool page or a `demo-play`.
 
 ### caldav-mcp
 

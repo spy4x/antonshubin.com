@@ -38,6 +38,8 @@ const EXCEPTIONS: Record<string, string> = {
     "the form's submit button sends the brief, it does not open it",
   "/pay | From outside US? Contact me":
     "a payment question, not a booking; it links the page that lists email and Telegram",
+  "/tools | Open the booking page":
+    "mig's running instance, the hub card's live link",
   "/tools/mig | Open the booking page":
     "mig's running instance, the tool page's live link",
   "/tools/mig | Load my calendar here":
