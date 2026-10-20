@@ -163,7 +163,9 @@ siteTest(
       "/how-i-work's AI paragraph",
     );
     assert(
-      (await site.html("/catalog/zero-to-production-saas-mvp")).includes(link),
+      // The page alone: the footer links every page to it.
+      pageBody(await site.html("/catalog/zero-to-production-saas-mvp"))
+        .includes(link),
       "the MVP page",
     );
     for (
