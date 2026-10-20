@@ -20,6 +20,7 @@ import { Card } from "@spy4x/preact-ui/card";
 import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import { WindowFrame } from "@spy4x/preact-ui/window-frame";
 import { DemoVideo } from "@spy4x/preact-ui/demo-video";
+import { ComparisonTable } from "@spy4x/preact-ui/comparison-table";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -162,6 +163,21 @@ function renderedLibraryMarkup(): string {
       />,
     ),
     render(<Card class="p-6">Card</Card>),
+    // /why-not-just-ai (#486): every value, a row with and one without a
+    // note, and the fit paragraph.
+    render(
+      <ComparisonTable
+        caption="Compared"
+        products={["Ours", "Theirs"]}
+        rows={[
+          { capability: "One", values: ["yes", "partial"], note: "A note." },
+          { capability: "Two", values: ["no", "yes"] },
+        ]}
+        checkedOn={new Date("2026-10-20")}
+        method="How."
+        fit="Who."
+      />,
+    ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
     // and a page only the More sheet lists; with Book and with Write, and
     // with the footer slot, which wraps the page and the footer in a column.
@@ -183,7 +199,7 @@ function renderedLibraryMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/(),+=&]/g, (c) => `\\${c}`);
+  return "." + className.replace(/[:.!\[\]\/(),+=&>*]/g, (c) => `\\${c}`);
 }
 
 function escapeRegExp(text: string): string {
@@ -216,9 +232,10 @@ function renderedClasses(): { light: Set<string>; dark: Set<string> } {
       .matchAll(/class="([^"]*)"/g)
   ) {
     for (const raw of list.split(/\s+/)) {
-      // The HTML escapes `&` (the rail's `[:root:has(&)]` variants), and a
+      // The HTML escapes `&` (the rail's `[:root:has(&)]` variants) and `>`
+      // (the comparison table's `[&_tbody>tr...]` variant), and a
       // named group (`group/rail`) only marks an element, with no rule.
-      const c = raw.replaceAll("&amp;", "&");
+      const c = raw.replaceAll("&amp;", "&").replaceAll("&gt;", ">");
       if (!c || /^group(\/|$)/.test(c)) continue;
       (c.startsWith("dark:") ? dark : light).add(c);
     }

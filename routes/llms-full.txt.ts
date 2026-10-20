@@ -34,6 +34,12 @@ import {
   WRITE_FALLBACK_HREF,
 } from "../lib/nav.ts";
 import { workDescription } from "../lib/work.ts";
+import {
+  WHY_NOT_JUST_AI_DESCRIPTION,
+  WHY_NOT_JUST_AI_NAME,
+  WHY_NOT_JUST_AI_PATH,
+  whyNotJustAiLlmsSection,
+} from "../lib/why-not-just-ai.ts";
 import { llmsBlogSections } from "../lib/blog.ts";
 import {
   clientProject,
@@ -196,6 +202,8 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 
 ${faqs.map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}
 
+${whyNotJustAiLlmsSection(BASE_URL)}
+
 ## Full Site Index
 
 ### Pages
@@ -207,6 +215,7 @@ ${faqs.map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}
 ${catalogList}
 - **About:** ${BASE_URL}${ABOUT_PATH} — Who I am, since 2010: the career story, two client reviews about working with me, what I run myself and how to pay
 - **How I work:** ${BASE_URL}/how-i-work — The five promises in the order a project meets them, prices, who I build for, my AI-agent setup and ${faqs.length} answered questions
+- **${WHY_NOT_JUST_AI_NAME}** ${BASE_URL}${WHY_NOT_JUST_AI_PATH} — ${WHY_NOT_JUST_AI_DESCRIPTION}
 - **Contact:** ${BASE_URL}${BOOK_HREF} — ${BOOK_LABEL} in the calendar on the page, or ${
       decapitalize(BRIEF_LABEL)
     } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email ${EMAIL_ADDRESS}, or Telegram @spy4x. Invoices are issued by ${COMPANY_LINE}
@@ -254,6 +263,7 @@ Questions a founder or CTO may arrive with:
 - "How do I avoid scope creep with my development team?"
 - "Can I build a SaaS at a fixed price?"
 - "I'm a non-technical founder looking for a technical partner"
+- "Why hire a developer when I could use an AI subscription?"
 - "How do I choose infrastructure that fits my SaaS workload and team?"
 - "How should my SaaS handle deployment, monitoring, recovery, and handoff?"
 - "What is a RAG pipeline and do I need one for my startup?"

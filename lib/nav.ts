@@ -126,11 +126,25 @@ export function navItemFor(pathname: string): NavItem | undefined {
   );
 }
 
-/** The footer's "Site" group: every page the nav lists except Home. */
-export const siteItems: NavItem[] = [
+/**
+ * "Why not just AI?" (#486): listed by the footer only, never the rail or the
+ * More sheet. `lib/why-not-just-ai.ts` reads its path and name from here.
+ */
+export const WHY_NOT_JUST_AI: Pick<NavItem, "href" | "label"> = {
+  href: "/why-not-just-ai",
+  label: "Why not just AI?",
+};
+
+/**
+ * The footer's "Site" group: every page the nav lists except Home, then
+ * "Why not just AI?" (#486), which the footer alone lists. The footer draws
+ * no icons, so an entry is a link only.
+ */
+export const siteItems: Pick<NavItem, "href" | "label">[] = [
   ...railItems,
   INFRASTRUCTURE,
   ABOUT,
+  WHY_NOT_JUST_AI,
 ];
 
 /**

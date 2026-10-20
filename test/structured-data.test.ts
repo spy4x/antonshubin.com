@@ -29,6 +29,7 @@ const TYPE_PAGES = [
   "/catalog/codebase-health-audit",
   "/infrastructure",
   "/book",
+  "/why-not-just-ai",
 ];
 
 const ABSOLUTE_URL = /^https:\/\/[^\s/]+(\/\S*)?$/;
@@ -510,6 +511,7 @@ siteTest(
       "/catalog/codebase-health-audit": ["Service", "Offer"],
       "/infrastructure": ["TechArticle"],
       "/book": ["ContactPage"],
+      "/why-not-just-ai": ["WebPage", "FAQPage"],
     };
     for (const [page, wanted] of Object.entries(expect)) {
       const types = new Set(

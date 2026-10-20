@@ -276,6 +276,21 @@ Five entities in a `@graph` array (six on `/about`):
 - `/infrastructure` is a `TechArticle` (author `#person`, `mentions` the tool
   pages' `SoftwareSourceCode` `@id`s) with its own 1200×630 OG image
 
+### 11. `/why-not-just-ai`
+
+- Answers "why hire Anton instead of an AI subscription?" (#486). The `<h1>` is
+  the question and the lead under it is the one-paragraph answer, written to be
+  quoted. Its `<title>` is "Hire a developer or just use AI? An honest answer".
+- `lib/why-not-just-ai.ts` holds every string: the page, both llms files
+  (`llms-full.txt` carries the whole page as a section), the JSON-LD and
+  `deno task og` read it.
+- JSON-LD: a `WebPage` about `#person` and a `FAQPage` with the page's three
+  questions, both joined to `#website`, plus the `BreadcrumbList`. No `Review`,
+  `AggregateRating` or `Article`.
+- Linked from the footer's Site group, the "My AI-agent setup" paragraph on
+  `/how-i-work`, the SaaS MVP service page and the ends of the two posts on AI
+  agents.
+
 ## Analytics
 
 What Umami records, and where it is left out (crawlers, `UNTRACKED_PATHS`), is

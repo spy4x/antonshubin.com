@@ -3,7 +3,8 @@
  * Generates the 1200×630 link-preview PNGs this site commits under
  * `static/img/og/`: one per blog post, one per project page, one per tool
  * page plus the `/tools` hub (#189), one for `/work` (#270), one for
- * `/about` (#294), one for `/infrastructure` (#295), one for `/how-i-work` (#275), and one
+ * `/about` (#294), one for `/infrastructure` (#295), one for `/how-i-work` (#275), one for
+ * `/why-not-just-ai` (#486), and one
  * landscape default for the site (#193).
  *
  * Run with:
@@ -31,6 +32,10 @@ import { metaDescription } from "../lib/llms.ts";
 import { workDescription } from "../lib/work.ts";
 import { ABOUT_NAME, aboutDescription } from "../lib/about.ts";
 import { HOW_I_WORK_NAME, howIWorkDescription } from "../lib/how-i-work.ts";
+import {
+  WHY_NOT_JUST_AI_DESCRIPTION,
+  WHY_NOT_JUST_AI_H1,
+} from "../lib/why-not-just-ai.ts";
 import { LOCATION } from "../lib/config.ts";
 import type { Browser } from "playwright";
 import { fromFileUrl } from "@std/path";
@@ -306,6 +311,18 @@ async function main() {
       new URL("how-i-work.png", OG_DIR),
     );
     console.log(`how-i-work.png  ${fmtBytes(howIWorkBytes)}`);
+    count++;
+
+    // /why-not-just-ai (#486): the page's question and its description.
+    const whyNotJustAiBytes = await render(
+      browser,
+      cardHtml(
+        WHY_NOT_JUST_AI_H1,
+        metaDescription(WHY_NOT_JUST_AI_DESCRIPTION),
+      ),
+      new URL("why-not-just-ai.png", OG_DIR),
+    );
+    console.log(`why-not-just-ai.png  ${fmtBytes(whyNotJustAiBytes)}`);
     count++;
 
     // /infrastructure (#295): the page's own title and description.

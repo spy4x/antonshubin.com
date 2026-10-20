@@ -216,3 +216,7 @@ cost is missing from Opus's total. That happened in only 1 of 89 Sonnet cases.
 The lesson I'd keep even if the model prices change next month: in agent work,
 you pay for steps and context, not for tokens. Measure calls and context per
 unit of work, and the right model is usually obvious.
+
+Choosing between an AI subscription and hiring a developer for your product? I
+wrote down
+[when a subscription is enough, and what I add on top](/why-not-just-ai).

@@ -149,6 +149,17 @@ Deno.test("the /how-i-work page has a 1200x630 OG preview PNG", async () => {
   );
 });
 
+Deno.test("the /why-not-just-ai page has a 1200x630 OG preview PNG", async () => {
+  const relative = "why-not-just-ai.png";
+  const { width, height, bytes } = await pngInfo(relative);
+  assertEquals(width, WIDTH, `${relative}: width`);
+  assertEquals(height, HEIGHT, `${relative}: height`);
+  assert(
+    bytes < MAX_BYTES,
+    `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
+  );
+});
+
 Deno.test("the GitHub social preview is a 1280x640 PNG", async () => {
   const relative = "docs/social-preview.png";
   let data: Uint8Array;

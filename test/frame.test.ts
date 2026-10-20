@@ -86,6 +86,7 @@ siteTest(
         "/privacy",
         "/infrastructure",
         "/about",
+        "/why-not-just-ai",
         "/book",
       ]
     ) assert(hrefs.includes(href), `footer lacks ${href}`);

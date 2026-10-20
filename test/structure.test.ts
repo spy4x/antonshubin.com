@@ -182,6 +182,8 @@ const PRICE_PAGES: Record<string, string[]> = {
   "/catalog": [],
   ...Object.fromEntries(catalogItems.map((i) => [`/catalog/${i.slug}`, []])),
   "/how-i-work": [],
+  // The fact card and "Already built it with AI?" read priceLabel() (#486).
+  "/why-not-just-ai": [],
   // The service cards of /infrastructure (#295) read priceLabel().
   "/infrastructure": [],
   // Every client project page with a catalogSlug links its "Similar work
@@ -853,6 +855,7 @@ siteTest(
       "/tools",
       "/how-i-work",
       "/infrastructure",
+      "/why-not-just-ai",
     ];
     const deep = [
       "/work/smartlite",
