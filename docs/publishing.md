@@ -180,10 +180,15 @@ It writes no file. It:
    needs `DEVTO_API_KEY`, from the environment or the local `.env.deploy`
    (restored by `deno task env:decrypt`, never uploaded); without it, it warns
    and goes on.
-4. Prints the post's tagged link for every channel, and the newsletter's subject
+4. Pings IndexNow with the post and `/blog` (`lib/indexnow.ts`), so Bing
+   recrawls them within hours; Bing's index also feeds ChatGPT search and
+   Copilot. It fails open and prints the answer. Google does not use IndexNow:
+   it finds the post through the sitemap, or Anton can request indexing in
+   Search Console's URL Inspection.
+5. Prints the post's tagged link for every channel, and the newsletter's subject
    (the post's title alone) and plain-text part, whose links are the `email`
    channel's tagged URLs.
-5. Sends nothing, and prints the commands that preview, test and send.
+6. Sends nothing else, and prints the commands that preview, test and send.
 
 ## 4. Channel texts
 
@@ -259,16 +264,16 @@ site's role", a draft in Anton's voice (`docs/voice.md`, learned from the five
 oldest posts), a pull request with the post file and its front matter (no
 `lib/data.ts` entry: the metadata is read from the file), review, merge, deploy,
 then `deno task publish:blog <slug>`. That script writes no file: it checks the
-post answers 200 live, creates the Dev.to draft and prints every channel's
-tagged link and the newsletter preview. Every post opens with a TL;DR, two to
-four short lines in its required `tldr` front matter (`lib/blog-posts.ts` fails
-the build without it, and `llms-full.txt` lists it), and a post about a project
-sets `relatedTool`, so its header shows that tool's demo (`live`) and repository
-(`repo`) from `lib/tools.ts`, never hand-written links; `test/blog.test.ts`
-checks both on every post. A post about something visual opens with a real
-screenshot right under its TL;DR (lazy like every post image: eager, it made the
-post's phone LCP slower), and its `coverImage` (a 1000×420 PNG under
-`static/img/`) becomes the Dev.to cover and the newsletter's picture;
+post answers 200 live, creates the Dev.to draft, pings IndexNow and prints every
+channel's tagged link and the newsletter preview. Every post opens with a TL;DR,
+two to four short lines in its required `tldr` front matter (`lib/blog-posts.ts`
+fails the build without it, and `llms-full.txt` lists it), and a post about a
+project sets `relatedTool`, so its header shows that tool's demo (`live`) and
+repository (`repo`) from `lib/tools.ts`, never hand-written links;
+`test/blog.test.ts` checks both on every post. A post about something visual
+opens with a real screenshot right under its TL;DR (lazy like every post image:
+eager, it made the post's phone LCP slower), and its `coverImage` (a 1000×420
+PNG under `static/img/`) becomes the Dev.to cover and the newsletter's picture;
 `publish:blog` updates an existing unpublished draft with the same
 `canonical_url` instead of adding a second. Since #364 a post published on or
 after 2026-10-02 (`LETTER_FIELDS_FROM` in `lib/blog-posts.ts`) must also carry

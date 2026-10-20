@@ -99,7 +99,7 @@ deno task deploy                # production → antonshubin.com
 deno task env:encrypt           # every .env* → its .env*.age (age64)
 deno task env:decrypt           # every .env*.age → its plaintext (age64)
 deno task env:status            # key presence + which env/age files exist
-deno task publish:blog          # after deploy: live check, Dev.to draft, links; --send-newsletter only on Anton's yes
+deno task publish:blog          # after deploy: live check, Dev.to draft, IndexNow, links; --send-newsletter only on Anton's yes
 deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
 deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY

@@ -13,6 +13,7 @@ import {
 } from "./publish-blog.ts";
 import { parsePostAnnouncement } from "./send-newsletter.ts";
 import { CHANNELS } from "./utm.ts";
+import { INDEXNOW_ENDPOINT } from "@/lib/indexnow.ts";
 
 const ARTICLE: BlogArticle = {
   title: "A <test> post",
@@ -164,6 +165,20 @@ Deno.test("the default run prints every channel's tagged link with the post's ca
       `https://antonshubin.com/blog/a-test-post?utm_source=${source}&utm_medium=${medium}&utm_campaign=a-campaign`,
     );
   }
+});
+
+Deno.test("the default run pings IndexNow with the post and /blog; a send does not", async () => {
+  const r = fakes();
+  await publishBlog(DEFAULT_RUN, r.deps);
+  const i = r.fetched.indexOf(INDEXNOW_ENDPOINT);
+  assertEquals(JSON.parse(String(r.inits[i]?.body)).urlList, [
+    "https://antonshubin.com/blog/a-test-post",
+    "https://antonshubin.com/blog",
+  ]);
+  assertStringIncludes(r.out.join("\n"), "IndexNow: submitted 2 URL(s)");
+  const send = fakes();
+  await publishBlog(SEND_RUN, send.deps);
+  assertEquals(send.fetched.includes(INDEXNOW_ENDPOINT), false);
 });
 
 /** The announcement `--send-newsletter` pipes to the container, for `article`. */
