@@ -246,7 +246,12 @@ export default define.page(function WhyNotJustAi() {
                 checkedOn={new Date(COMPARISON_CHECKED_ON)}
                 method={COMPARISON_METHOD_NODE}
                 fit={COMPARISON_FIT}
-                labels={{ ours: "" }}
+                labels={{
+                  ours: "",
+                  yesMeaning: "does it",
+                  partialMeaning: "only part of it",
+                  noMeaning: "doesn't",
+                }}
               />
               <p class="mt-4">
                 <a
