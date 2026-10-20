@@ -532,10 +532,12 @@ lead, a sticky "The short answer" `FactCard` (AI tools, the four prices through
 `priceLabel()`, one `proof()` line with the `upwork-profile` note, Book and the
 brief), then "When a subscription is enough", the library's `ComparisonTable`,
 "Will you just run Claude and bill me for it?" with two figures linked to their
-posts, "Already built it with AI?", three projects with `StatusMark`, three
-questions (also the `FAQPage`) and `ClosingBand`. `lib/why-not-just-ai.ts` holds
-the wording; promises come through `promise()`. The footer's Site group alone
-lists it (`lib/nav.ts`'s `WHY_NOT_JUST_AI`), not the rail or the More sheet.
+posts, "Already built it with AI?", three projects with `StatusMark`, four
+questions (also the `FAQPage`) and `ClosingBand` with the ownership and bug-fix
+promises, since the last answer already gives the refund and the first
+milestone. `lib/why-not-just-ai.ts` holds the wording; promises come through
+`promise()`. The footer's Site group alone lists it (`lib/nav.ts`'s
+`WHY_NOT_JUST_AI`), not the rail or the More sheet.
 `test/why-not-just-ai.test.ts` checks the built page.
 
 ### Tool pages

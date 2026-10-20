@@ -40,6 +40,7 @@ import {
   BUILT_STEPS,
   CLOSING_HEADING,
   CLOSING_LINE_BEFORE,
+  CLOSING_PROMISES,
   COMPARISON_CAPTION,
   COMPARISON_CHECKED_ON,
   COMPARISON_FIT,
@@ -47,6 +48,7 @@ import {
   COMPARISON_METHOD,
   COMPARISON_PRODUCTS,
   COMPARISON_RULES_LINK,
+  COMPARISON_TIME_ZONE,
   comparisonRows,
   DOTFILES_URL,
   ENOUGH_CASES,
@@ -169,7 +171,9 @@ export default define.page(function WhyNotJustAi() {
               </p>
               <dl class="space-y-4 text-sm">
                 <Fact term="AI tools">
-                  {AI_TOOLS_FACT} <DotfilesLink />
+                  {/* Link on its own line: no rewrap when the font loads (#490). */}
+                  <span class="block">{AI_TOOLS_FACT}</span>
+                  <DotfilesLink />
                 </Fact>
                 <Fact term="Prices">
                   <ul data-price-rows class="space-y-2">
@@ -244,7 +248,8 @@ export default define.page(function WhyNotJustAi() {
                 caption={COMPARISON_CAPTION}
                 products={COMPARISON_PRODUCTS}
                 rows={comparisonRows()}
-                checkedOn={new Date(COMPARISON_CHECKED_ON)}
+                checkedOn={COMPARISON_CHECKED_ON}
+                timeZone={COMPARISON_TIME_ZONE}
                 method={COMPARISON_METHOD_NODE}
                 fit={COMPARISON_FIT}
                 labels={{
@@ -400,8 +405,10 @@ export default define.page(function WhyNotJustAi() {
           </div>
         </div>
 
+        {/* Not the default refund and first milestone: the last answer above says both. */}
         <ClosingBand
           heading={CLOSING_HEADING}
+          promiseIds={CLOSING_PROMISES}
           bookHref={BOOK_HREF}
           links={[
             { href: WRITE_FALLBACK_HREF, label: BRIEF_LABEL },

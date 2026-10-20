@@ -68,8 +68,13 @@ export const COMPARISON_PRODUCTS = [
   "Me, with AI agents",
   "An AI subscription on its own",
 ] as const;
-/** When the table was last checked against how I work: the spec's date. */
-export const COMPARISON_CHECKED_ON = "2026-10-20";
+/**
+ * When the table was last checked against how I work: the spec's date, as a
+ * UTC midnight that the page formats in UTC, so no server time zone moves it.
+ */
+export const COMPARISON_CHECKED_ON = new Date(Date.UTC(2026, 9, 20));
+/** The zone the table's checked date is formatted in. */
+export const COMPARISON_TIME_ZONE = "UTC";
 export const COMPARISON_METHOD =
   "Based on how I work today, described in my public agent rules, and on my own measurements in the two posts linked here.";
 /** The words of `COMPARISON_METHOD` that link the agent rules on the page. */
@@ -232,6 +237,11 @@ export function whyNotJustAiFaqs(): Faq[] {
 }
 
 export const CLOSING_HEADING = "Not sure which you need?";
+/**
+ * The band's promises: not the refund and first milestone, which the last
+ * question's answer, right above the band, already gives (#490).
+ */
+export const CLOSING_PROMISES = ["ownership", "free-bugfixes"];
 /** The band's line before the call's name (`INTRO_CALL`). */
 export const CLOSING_LINE_BEFORE = "Tell me what you are building on a";
 
