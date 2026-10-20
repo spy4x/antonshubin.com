@@ -4,18 +4,18 @@ seoTitle: "Claude Code vs MiniMax M3: 30 days of real numbers"
 description: "I counted my GitHub output for three months on MiniMax M3 and my first 30 days on Claude Code: 19 times more merged pull requests a day. Here is what that number hides, what actually shipped, and how to count your own."
 tldr:
   - "My first 30 days on Claude Code merged 1,845 pull requests, 61.5 a day. The three months on MiniMax M3 before it merged 295, 3.2 a day: about 19 times fewer."
-  - "Most of the jump is not a faster model. My agents worked 6.3 times as many hours, and I stopped reviewing every pull request myself."
+  - "Much of the jump is not the model alone. My agents worked 6.3 times as many hours, and I stopped reviewing every pull request myself."
   - "Per hour of work the gain was 3 times, and pull requests got slightly smaller, not bigger. Volume is not value: 228 release tags are the better number."
   - "The plan costs four times as much, yet the subscription cost per merged pull request fell to about a fifth."
 intro: "For three months my coding agents ran on MiniMax M3, then I moved to Claude Code. This post counts what changed on my GitHub account, and is honest about how much of it the model did and how much came from changing how I work. It's for developers choosing an AI coding setup, and for anyone who wants to measure theirs."
 coverImage: "/img/blog/claude-code-vs-minimax-m3-30-days/cover.png"
 coverAlt: "My GitHub contribution graph from April to October: pale squares through the summer, then much brighter ones from late September."
 publishedAt: "2026-10-22"
-readTime: 8
+readTime: 9
 topic: "ai-mcp"
 ---
 
-![My GitHub contribution graph for the last year: scattered pale green squares through the summer, then the brightest squares of the year from late September, when I moved to Claude Code](/img/blog/claude-code-vs-minimax-m3-30-days/contributions.webp "My GitHub contribution graph on 20 October 2026. The bright squares on the right are the Claude Code month.")
+![My GitHub contribution graph for the last year: dim green squares through the summer, then the brightest squares of the year from late September, when I moved to Claude Code](/img/blog/claude-code-vs-minimax-m3-30-days/contributions.webp "My GitHub contribution graph on 20 October 2026. The bright squares on the right are the Claude Code month.")
 
 On 20 September I moved my coding agents from MiniMax M3 to Claude Code. In the
 30 days after, my GitHub account merged **1,845 pull requests**. In the three
@@ -25,24 +25,26 @@ That's about 19 times as many per day. It's also the kind of number that gets a
 post laughed off Hacker News, because it hides almost everything that matters.
 So this post gives you the number, and then takes it apart.
 
-**What is it about?** Real counts from my own GitHub account, two periods, with
-every confound I know of named. **Who is it for?** Developers deciding whether a
-$200 subscription is worth it over a $50 one, and anyone who runs AI agents and
-wants to measure what they actually get. At the end there's a way to count your
-own.
+**What is it about?** Real counts from my own GitHub account, two periods, and
+the other things that changed at the same time, named. **Who is it for?**
+Developers deciding whether a $200 subscription is worth it over a $50 one, and
+anyone who runs AI agents and wants to measure what they actually get. At the
+end there's a way to count your own.
 
 ## The two periods
 
 - **The M3 months**, 20 June to 19 September 2026 (92 days). MiniMax M3 on its
-  $50-a-month plan was my main model, through OpenCode and DSH.
+  $50-a-month plan was my subscription, used through OpenCode and DSH. It wasn't
+  the only model I ran; more on that below.
 - **The Claude Code month**, 20 September to 19 October 2026 (30 days). Claude
   Code on Claude Max, $200 a month, with agents on Opus and Sonnet models.
   [My previous post](/blog/opus-5-5-vs-sonnet-5-agent-costs) covers which model
   does what, and why.
 
-Everything below comes from GitHub's own search: pull requests authored by my
-account and merged on a given day, commits on default branches, tags and issues.
-Private repositories are included. Days are counted in my time zone.
+The counts come from GitHub's search and API: pull requests authored by my
+account and merged on a given day, commits on default branches, tags, releases
+and issues. Private repositories are included. Days are counted in my time zone.
+Which model ran when comes from my local agent logs.
 
 ## The numbers
 
@@ -82,7 +84,7 @@ happened.
 
 ### I stopped reviewing every pull request
 
-This is the biggest change, and it isn't in any chart.
+This change isn't in any chart.
 
 With M3, I reviewed every pull request myself before it merged. That made me the
 bottleneck: agents can open pull requests much faster than one person can read
@@ -93,9 +95,9 @@ With Claude Code and the rules in my
 agents wrote matched what I would have written. So I stopped. A separate
 reviewer agent now checks every pull request: it runs the tests, breaks the code
 on purpose to see whether a test goes red, and checks every claim in the
-description. Nothing merges until it passes. Removing my own review from the
-loop is a large part of the speed-up, and it only works because the output
-became predictable enough to trust a second agent with the check.
+description. Nothing merges until it passes. That removed the bottleneck, and it
+only works because the output became predictable enough to trust a second agent
+with the check.
 
 ### The whole workflow changed at the same time
 
@@ -105,12 +107,28 @@ and a separate agent builds each lane in its own git worktree. Every unit of
 work became its own pull request, squash-merged, so one pull request now means
 one commit on main.
 
-So the gain belongs to three things at once: the model, the harness and the
-workflow. I can't separate them from this data, and I won't pretend I can.
+So the gain belongs to several things at once: the model, the harness, the
+workflow and my own review leaving the loop. I can't separate them from this
+data, and I won't pretend I can.
+
+### The M3 months weren't only M3
+
+M3 was my subscription, but I tried other models along the way, and my logs say
+so. They only start in mid-July (OpenCode) and early September (DSH), and in
+them:
+
+- In September, GPT-5.6 and GPT-6 models gave 717 replies in OpenCode, against
+  431 from M3.
+- In August, DeepSeek V4 Flash gave 249 replies in one OpenCode session.
+- On 18 and 19 September, about 300 DSH sessions ran on DeepSeek V4 Flash, and
+  45 more on 20 September, the first day of the Claude Code month.
+
+So "M3 against Claude Code" is really "my setup before against my setup after",
+with M3 as the main subscription before.
 
 ### A first month has a backlog to clear
 
-The first month on a new tool is a burst: a pile of ideas that waited for the
+The first month on a new tool can be a burst: ideas that waited for the
 capacity, and the fun of a new toy. Week by week, the Claude Code month merged
 501, 529, 259 and 438 pull requests, so there's no clear fall-off yet, just one
 quiet week in the middle. Ask me again in three months.
@@ -149,7 +167,8 @@ month, all of them public:
   [why I built it instead of using shadcn](/blog/preact-component-library-without-shadcn).
 - [caldav-mcp](/tools/caldav-mcp) went from v1.0.0 to v1.6.0.
 - [mig](/tools/mig), [rostok](/tools/rostok) and
-  [caldav-tasks-web](/tools/caldav-tasks-web) got 23, 25 and 17 release tags.
+  [caldav-tasks-web](/tools/caldav-tasks-web) got 23, 25 and 17 release tags,
+  and [Seed](/tools/seed) got its first.
 
 That's 228 release tags, against 3 in the three months before. A release tag is
 a version someone else can install, which makes it a better count of shipped
@@ -166,8 +185,8 @@ Subscription money only:
 | Per 100 merged lines    |    $0.057 |            $0.016 |
 
 The pricier plan came out at about a fifth of the cost per merged pull request.
-That doesn't count API calls outside the subscriptions (DeepSeek, on a few
-days), or my own time, which is the expensive part.
+That doesn't count the API calls outside the subscriptions (the DeepSeek and GPT
+runs above), or my own time, which is the expensive part.
 
 Cost per pull request only means something if the pull requests are good. My
 quality guard is the reviewer agent's first-pass rate, and in
@@ -186,14 +205,15 @@ either way.
 
 ## How to count your own
 
-Everything above comes from GitHub search, one day per query, because a search
-returns at most 1,000 results:
+The pull request counts come from GitHub search, one day per query, because a
+search returns at most 1,000 results:
 
 ```bash
 gh api graphql -f query='
-query($q: String!) {
-  search(query: $q, type: ISSUE, first: 100) {
+query($q: String!, $after: String) {
+  search(query: $q, type: ISSUE, first: 100, after: $after) {
     issueCount
+    pageInfo { hasNextPage endCursor }
     nodes { ... on PullRequest { additions deletions repository { nameWithOwner } } }
   }
 }' -f q='is:pr author:YOUR_LOGIN is:merged merged:2026-10-01'
@@ -202,13 +222,14 @@ query($q: String!) {
 1. `is:pr author:YOUR_LOGIN is:merged` counts pull requests you authored and
    merged, in every repository your token can see.
 2. `merged:2026-10-01` is one UTC day; loop over the days of each period and
-   page through with `after` when a day has more than 100.
+   when `hasNextPage` is true, run it again with `-f after=<endCursor>`.
 3. `additions` and `deletions` give changed lines. Take the median, not the
    mean: one generated file can swamp a month.
-4. For hours worked, use the REST commit search
-   (`search/commits?q=author:YOUR_LOGIN committer-date:<day>`) and count the
-   distinct hours that have a commit. It only sees default branches, and it
-   allows 30 requests a minute.
+4. For hours worked, use the REST commit search,
+   `gh api -X GET search/commits -f q='author:YOUR_LOGIN committer-date:2026-10-01'`,
+   and count the distinct hours that have a commit. It only sees default
+   branches, allows 30 requests a minute, and finds a commit twice when two
+   repositories share history, so count each commit hash once.
 
 Compare per day, not per period, and write down everything else you changed in
 the same weeks. That list is the honest part of the result.
