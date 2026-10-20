@@ -2,10 +2,11 @@
 // line and one example from its own README, and the README's "Why ts-libs"
 // points. Every string is copied from the ts-libs repository at
 // `TS_LIBS_TAG`; `test/tools/ts-libs.test.ts` fails when one no longer
-// appears there, so a wording change upstream is caught, not drifted from.
+// appears in the READMEs at that tag. A later upstream change is caught only
+// when the tag is bumped.
 
 /** The ts-libs release whose READMEs these strings are copied from. */
-export const TS_LIBS_TAG = "v1.81.0";
+export const TS_LIBS_TAG = "v1.83.0";
 
 /** One package of ts-libs, as the "Pick a package" list shows it. */
 export interface TsLibsPackage {
@@ -160,7 +161,7 @@ const result = await billing.createCheckout({
   {
     name: "caldav",
     holds:
-      "WebDAV multistatus reader, escaped request bodies, href and origin rules",
+      "CalDAV client, sync engine and write transport, WebDAV multistatus reader, URL rules",
     runsOn: "shared",
     example:
       `import { CalDavErrorCode, createCalDavClient } from "@spy4x/caldav"

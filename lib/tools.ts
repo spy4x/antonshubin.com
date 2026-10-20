@@ -475,9 +475,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "1.81.0",
+      version: "1.83.0",
       published: true,
-      install: "deno add jsr:@spy4x/server@1.81.0",
+      install: "deno add jsr:@spy4x/server@1.83.0",
       latestFrom: { registry: "jsr", name: "@spy4x/server" },
     },
     licence: "MIT",
