@@ -5,7 +5,7 @@ description: "I counted my GitHub output for three months on MiniMax M3 and my f
 tldr:
   - "My first 30 days on Claude Code merged 1,845 pull requests, 61.5 a day. The three months on MiniMax M3 before it merged 295, 3.2 a day: about 19 times fewer."
   - "Much of the jump is not the model alone. My agents worked 6.3 times as many hours, and I stopped reviewing every pull request myself."
-  - "Per hour of work the gain was 3 times, and pull requests got slightly smaller, not bigger. Volume is not value: 228 release tags are the better number."
+  - "Per hour of work the gain was 3 times, and pull requests got slightly smaller, not bigger. Volume is not value: 227 released versions are the better number."
   - "The plan costs four times as much, yet the subscription cost per merged pull request fell to about a fifth."
 intro: "For three months my coding agents ran on MiniMax M3, then I moved to Claude Code. This post counts what changed on my GitHub account, and is honest about how much of it the model did and how much came from changing how I work. It's for developers choosing an AI coding setup, and for anyone who wants to measure theirs."
 coverImage: "/img/blog/claude-code-vs-minimax-m3-30-days/cover.png"
@@ -55,7 +55,7 @@ Which model ran when comes from my local agent logs.
 | Median pull request, lines    |         266 |                  228 |   0.86× |
 | Commits on main               |         482 |                1,980 |   12.6× |
 | Issues closed                 |         132 |                1,150 |   26.7× |
-| Release tags                  |           3 |                  228 |         |
+| Git tags                      |           3 |                  228 |         |
 | Days with at least one commit |    46 of 92 |             30 of 30 |         |
 | Hours with a commit, per day  |         1.8 |                 11.5 |    6.3× |
 | Pull requests per such hour   |        1.77 |                 5.36 |    3.0× |
@@ -168,11 +168,12 @@ month, all of them public:
 - [caldav-mcp](/tools/caldav-mcp) went from v1.0.0 to v1.6.0.
 - [mig](/tools/mig), [rostok](/tools/rostok) and
   [caldav-tasks-web](/tools/caldav-tasks-web) got 23, 25 and 17 release tags,
-  and [Seed](/tools/seed) got its first.
+  and [Seed](/tools/seed) got one, `v1-final`, which marks its old code rather
+  than a release.
 
-That's 228 release tags, against 3 in the three months before. A release tag is
-a version someone else can install, which makes it a better count of shipped
-work than pull requests.
+That's 228 tags, 227 of them versions, against 3 tags in the three months
+before. A release tag is a version someone else can install, which makes it a
+better count of shipped work than pull requests.
 
 ## What it cost
 
@@ -185,8 +186,8 @@ Subscription money only:
 | Per 100 merged lines    |    $0.057 |            $0.016 |
 
 The pricier plan came out at about a fifth of the cost per merged pull request.
-That doesn't count the API calls outside the subscriptions (the DeepSeek and GPT
-runs above), or my own time, which is the expensive part.
+That doesn't count the API calls outside the subscriptions (any of the runs on
+other models above), or my own time, which is the expensive part.
 
 Cost per pull request only means something if the pull requests are good. My
 quality guard is the reviewer agent's first-pass rate, and in
