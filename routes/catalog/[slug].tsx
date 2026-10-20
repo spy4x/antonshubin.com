@@ -38,6 +38,11 @@ import {
 import { CatalogIcon } from "../../components/Icons.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
 import { tools } from "../../lib/tools.ts";
+import {
+  WHY_NOT_JUST_AI_LINK_LABEL,
+  WHY_NOT_JUST_AI_PATH,
+  WHY_NOT_JUST_AI_PROMPT,
+} from "../../lib/why-not-just-ai.ts";
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
   return catalogItems.find((i) => i.slug === slug);
@@ -291,6 +296,24 @@ export default define.page(function CatalogDetail(ctx) {
               <p class="max-w-2xl text-graphite leading-relaxed">
                 {item.audience}
               </p>
+              {item.slug === "zero-to-production-saas-mvp" && (
+                <p
+                  class="mt-3 max-w-2xl text-graphite"
+                  data-why-not-just-ai-link
+                >
+                  {WHY_NOT_JUST_AI_PROMPT}{" "}
+                  <a
+                    href={WHY_NOT_JUST_AI_PATH}
+                    {...eventAttrs("cta", {
+                      place: "body",
+                      target: WHY_NOT_JUST_AI_PATH,
+                    })}
+                    class={FACT_LINK}
+                  >
+                    {WHY_NOT_JUST_AI_LINK_LABEL}
+                  </a>
+                </p>
+              )}
             </section>
 
             {item.examples.length > 0 && (

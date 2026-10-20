@@ -46,10 +46,15 @@ Deno.test("navItemFor finds the section a path is inside, and never Home", () =>
   assertEquals(navItemFor("/"), undefined);
 });
 
-Deno.test("the footer's Site group is the rail plus Infrastructure and About", () => {
+Deno.test("the footer's Site group is the rail plus Infrastructure, About and Why not just AI", () => {
   assertEquals(
     siteItems.map((i) => i.href),
-    [...railItems.map((i) => i.href), "/infrastructure", "/about"],
+    [
+      ...railItems.map((i) => i.href),
+      "/infrastructure",
+      "/about",
+      "/why-not-just-ai",
+    ],
   );
 });
 

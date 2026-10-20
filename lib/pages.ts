@@ -28,6 +28,7 @@ export const corePages: readonly CorePage[] = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
   { path: "/catalog", priority: "0.9", changefreq: "weekly" },
   { path: "/how-i-work", priority: "0.8", changefreq: "monthly" },
+  { path: "/why-not-just-ai", priority: "0.8", changefreq: "monthly" },
   { path: "/about", priority: "0.8", changefreq: "monthly" },
   { path: "/book", priority: "0.7", changefreq: "monthly" },
   { path: "/work", priority: "0.8", changefreq: "monthly" },

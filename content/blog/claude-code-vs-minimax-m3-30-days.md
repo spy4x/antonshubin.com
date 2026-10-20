@@ -260,3 +260,7 @@ through it, with the incident behind each rule.
 
 If you've measured your own switch between models, I'd like to see your numbers,
 especially if they disagree with mine. My email is in the footer.
+
+Choosing between an AI subscription and hiring a developer for your product? I
+wrote down
+[when a subscription is enough, and what I add on top](/why-not-just-ai).
