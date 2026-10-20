@@ -18,16 +18,26 @@ import { type Place, track } from "../lib/analytics.ts";
  * clip instead of playing it.
  */
 export default function ToolHeroClip(
-  { item, place = "hero", poster, sources, title, eager = false }: {
+  {
+    item,
+    place = "hero",
+    poster,
+    sources,
+    title,
+    eager = false,
+    loop = false,
+  }: {
     /** The tool's slug: the event's `item`. */
     item: string;
-    /** `hero` for the first-screen clip, `body` for one further down. */
-    place?: Extract<Place, "hero" | "body">;
+    /** `hero` for the first-screen clip, `body` for one further down, `card` for a `/tools` hub card. */
+    place?: Extract<Place, "hero" | "body" | "card">;
     poster: DemoVideoPoster;
     sources: DemoVideoSource[];
     title: string;
     /** True only for the hero clip, whose poster is the page's one eager image. */
     eager?: boolean;
+    /** Play in a loop (the `/tools` hub's clips); reduced motion turns it off. */
+    loop?: boolean;
   },
 ) {
   // The poster turns into the video on the first press, so one view sends one event.
@@ -54,6 +64,7 @@ export default function ToolHeroClip(
         sources={sources}
         title={title}
         eager={eager}
+        loop={loop}
       />
     </div>
   );
