@@ -10,7 +10,7 @@ tldr:
 intro: "For three months my coding agents ran on MiniMax M3, then I moved to Claude Code. This post counts what changed on my GitHub account, and is honest about how much of it the model did and how much came from changing how I work. It's for developers choosing an AI coding setup, and for anyone who wants to measure theirs."
 coverImage: "/img/blog/claude-code-vs-minimax-m3-30-days/cover.png"
 coverAlt: "My GitHub contribution graph from April to October: pale squares through the summer, then much brighter ones from late September."
-publishedAt: "2026-10-22"
+publishedAt: "2026-10-20"
 readTime: 9
 topic: "ai-mcp"
 ---
@@ -86,9 +86,9 @@ happened.
 
 This change isn't in any chart.
 
-With M3, I reviewed every pull request myself before it merged. That made me the
-bottleneck: agents can open pull requests much faster than one person can read
-them.
+With M3, I reviewed every pull request myself before it merged, because I
+couldn't trust it. That made me the bottleneck: agents can open pull requests
+much faster than one person can read them.
 
 With Claude Code and the rules in my
 [dotfiles repository](https://github.com/spy4x/dotfiles), about 99% of what the
@@ -118,10 +118,13 @@ so. They only start in mid-July (OpenCode) and early September (DSH), and in
 them:
 
 - In September, GPT-5.6 and GPT-6 models gave 717 replies in OpenCode, against
-  431 from M3.
+  431 from M3. That was a $20 ChatGPT subscription I was experimenting with.
 - In August, DeepSeek V4 Flash gave 249 replies in one OpenCode session.
 - On 18 and 19 September, about 300 DSH sessions ran on DeepSeek V4 Flash, and
   45 more on 20 September, the first day of the Claude Code month.
+
+DeepSeek was my main provider before MiniMax. I moved to M3 when DeepSeek raised
+its prices, and kept using DeepSeek's paid API now and then.
 
 So "M3 against Claude Code" is really "my setup before against my setup after",
 with M3 as the main subscription before.
@@ -186,8 +189,8 @@ Subscription money only:
 | Per 100 merged lines    |    $0.057 |            $0.016 |
 
 The pricier plan came out at about a fifth of the cost per merged pull request.
-That doesn't count the API calls outside the subscriptions (any of the runs on
-other models above), or my own time, which is the expensive part.
+That doesn't count the $20 ChatGPT experiment or the occasional DeepSeek API
+calls, or my own time, which is the expensive part.
 
 Cost per pull request only means something if the pull requests are good. My
 quality guard is the reviewer agent's first-pass rate, and in
@@ -197,12 +200,25 @@ more often gives part of the saving back in fix rounds.
 
 ## Did M3 get worse over time?
 
-I can't tell you. My local logs from the M3 months are thin: about 660 model
-replies in OpenCode over 16 days and a dozen sessions in DSH, with no record of
-where one task ends and the next begins. In August they show 30 API errors,
-mostly "high load" and "usage limit reached" responses. That's not enough to
-measure retries per task, let alone a trend, so I make no claim about the model
-either way.
+It felt that way to me. When I started, M3 felt overpowered for the price. Then
+MiniMax ran into a backlash from users over a pricing change, and a week or two
+after that I started to feel that M3 got dumber. It made mistakes more often, I
+had to hold its hand a lot, and I had to review every pull request because I
+couldn't trust it.
+
+My guess is that they found another way to make it cheaper to run, for example a
+more heavily quantized model. That's only a guess: I have no proof, and MiniMax
+hasn't said anything like it.
+
+My data can't settle it either. My local logs from the M3 months are thin: about
+660 model replies in OpenCode over 16 days and a dozen sessions in DSH, with no
+record of where one task ends and the next begins. In August they show 30 API
+errors, mostly "high load" and "usage limit reached" responses. That's not
+enough to measure mistakes per task, let alone a trend.
+
+For comparison, I trust Opus now the way I never trusted M3. I can't say the
+same about Sonnet yet: in my last cost comparison it passed its first review far
+less often.
 
 ## How to count your own
 
