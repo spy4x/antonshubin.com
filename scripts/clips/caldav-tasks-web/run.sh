@@ -6,9 +6,10 @@
 # It starts a throwaway Radicale container, seeds it with made-up lists (seed.ts), clones and
 # builds caldav-tasks-web at $TAG, starts the app with the fixed test values of its own
 # e2e/env.ts, records one take in Chromium (record.ts) and encodes demo.webm (VP9), demo.mp4
-# (H.264) and poster.webp into static/video/tools/caldav-tasks-web/. The container, the app and
-# the temp folder are removed on success and on failure. Needs Docker, Deno, ffmpeg, network and
-# the pinned Playwright Chromium (`deno task test:browser` installs it).
+# (H.264), poster.webp and poster-640.webp into static/video/tools/caldav-tasks-web/. The
+# container, the app and the temp folder are removed on success and on failure. Needs Docker,
+# Deno, ffmpeg, network and the pinned Playwright Chromium (`deno task test:browser` installs
+# it).
 set -euo pipefail
 
 TAG="${TAG:-v1.10.0}"
@@ -39,7 +40,7 @@ wait_for() {
   return 1
 }
 
-docker run -d --rm --name "$NAME" -p "127.0.0.1:$RADICALE_PORT:5232" \
+docker run -d --rm --name "$NAME" --pids-limit=500 --memory=8g -p "127.0.0.1:$RADICALE_PORT:5232" \
   ghcr.io/kozea/radicale:3.5.4 --hosts 0.0.0.0:5232 --auth-type none >/dev/null
 wait_for "http://127.0.0.1:$RADICALE_PORT/.web/"
 deno run --allow-net "$HERE/seed.ts" "http://127.0.0.1:$RADICALE_PORT" demo
@@ -86,4 +87,7 @@ ffmpeg -loglevel error -y -i "$WORK/take.webm" "${CUT[@]}" -vf fps=25 -an \
 LAST="$(awk "BEGIN { print $TRIM + $LENGTH - 0.3 }")"
 ffmpeg -loglevel error -y -ss "$LAST" -i "$WORK/take.webm" -frames:v 1 -c:v libwebp -quality 85 \
   "$OUT/poster.webp"
+# The 640px poster for phones (the clip's poster srcset).
+ffmpeg -loglevel error -y -i "$OUT/poster.webp" -vf scale=640:-1 -map_metadata -1 \
+  -c:v libwebp -quality 85 "$OUT/poster-640.webp"
 ls -l "$OUT"
