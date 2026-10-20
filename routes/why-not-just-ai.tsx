@@ -100,7 +100,7 @@ function DotfilesLink() {
  * the prices and Book. The main column concedes when a subscription is
  * enough, compares the two, answers "will you just run Claude?", shows the
  * owner's own numbers, the path for founders who already built with AI, three
- * projects shipped to production and three questions, which are also the `FAQPage`
+ * projects shipped to production and four questions, which are also the `FAQPage`
  * JSON-LD. All wording lives in `lib/why-not-just-ai.ts`.
  */
 export default define.page(function WhyNotJustAi() {

@@ -202,13 +202,21 @@ export const SHIPPED: { slug: string; status: "live" | "outcome" }[] = [
 
 export const QUESTIONS_HEADING = "Questions";
 
-/** The page's questions, also its `FAQPage` JSON-LD; none repeats /how-i-work's. */
+/**
+ * The page's questions, also its `FAQPage` JSON-LD; none repeats /how-i-work's.
+ * Who pays for the AI tools is Anton's answer on #488.
+ */
 export function whyNotJustAiFaqs(): Faq[] {
   return [
     {
       id: "prompt-it-myself",
       q: "Can't I just prompt an agent myself?",
       a: "You can, and for a prototype you should. What takes years is knowing what to ask for, spotting the change that looks right but isn't, and keeping it running once people depend on it. That is the part you hire me for.",
+    },
+    {
+      id: "who-pays-for-ai",
+      q: "Who pays for the AI tools?",
+      a: "I do. My AI subscription is part of how I work, not a line on your invoice. If you would rather it ran on your company's own AI account, for example to keep your code under your own contract, I can work through that one.",
     },
     {
       id: "take-it-from-here",
