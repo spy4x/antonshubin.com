@@ -57,6 +57,7 @@ import {
   QUESTIONS_HEADING,
   RULES_LINE_AFTER,
   RULES_LINE_BEFORE,
+  RULES_WHY,
   SHIPPED,
   SHIPPED_HEADING,
   SHIPPED_INTRO,
@@ -275,7 +276,7 @@ export default define.page(function WhyNotJustAi() {
                   {processSteps().map((s) => <li key={s}>{s}</li>)}
                 </ol>
                 <p>
-                  {RULES_LINE_BEFORE} <DotfilesLink />
+                  {RULES_WHY} {RULES_LINE_BEFORE} <DotfilesLink />
                   {RULES_LINE_AFTER}
                 </p>
                 <p>

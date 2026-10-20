@@ -122,6 +122,10 @@ export function billMeAnswer(): string {
   return `Partly, yes. AI agents type much of my code, and I say so openly. You pay for the result, not for my typing: on a fixed scope the price is fixed, and ${ownership} from day one.`;
 }
 
+/** The weekly audit: Anton's own check, now that a reviewer agent checks every change (#489). */
+export const WEEKLY_AUDIT =
+  "Every week I audit the work myself, to make sure the project is on the right track and the quality is still high.";
+
 /** How a change gets made, in order; the last step is the weekly promise. */
 export function processSteps(): string[] {
   return [
@@ -129,12 +133,20 @@ export function processSteps(): string[] {
     "AI agents write the change.",
     "A separate reviewer agent checks it; sign-in, payments and secrets get a security review.",
     "Nothing reaches you until it passes that review.",
+    WEEKLY_AUDIT,
     firstSentence(promise("weekly-software").desc),
   ];
 }
 
+/**
+ * Why the rules matter more than the tools, in Anton's words on #489: he has
+ * vibe-coded, and without his rules and definition of quality the result is
+ * mediocre and not maintainable.
+ */
+export const RULES_WHY =
+  "The tools are not the hard part. I have vibe-coded too: without clear rules and a definition of quality, the result is mediocre and hard to maintain.";
 /** Before the dotfiles link; the link text is the repository's name. */
-export const RULES_LINE_BEFORE = "My rules for the agents are public in";
+export const RULES_LINE_BEFORE = "Mine are public in";
 export const RULES_LINE_AFTER = ", so you can read exactly how I work.";
 export const AI_PROVIDER_LINK = {
   href: "/how-i-work#faq-ai-and-your-code",
@@ -255,7 +267,7 @@ ${billMeAnswer()}
 
 ${processSteps().map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
-${RULES_LINE_BEFORE} spy4x/dotfiles (${DOTFILES_URL})${RULES_LINE_AFTER}
+${RULES_WHY} ${RULES_LINE_BEFORE} spy4x/dotfiles (${DOTFILES_URL})${RULES_LINE_AFTER}
 
 ${
     AI_FIGURES.map((f) => `- **${f.value}** ${f.caption} ${baseUrl}${f.href}`)
