@@ -513,11 +513,36 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@rostok/cli",
-      version: "1.7.0",
+      version: "1.20.1",
       published: true,
-      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.7.0",
+      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.20.1",
       latestFrom: { registry: "jsr", name: "@rostok/cli" },
     },
+    headline: "Scaffold a self-hosted homelab from a curated catalog.",
+    lede:
+      "Run rostok in an empty folder and answer a few questions: the server's name, its SSH address, your domain and email. The wizard turns that into a Git repo with one folder per server, and a deploy copies the files to the server over SSH and starts them with Docker Compose.",
+    clip: {
+      title: "rostok: install, run the wizard, deploy, open the service",
+      caption:
+        "39 s, no sound: install rostok, answer the wizard, deploy to a fresh server, then run the speed test it now serves.",
+      frame: "bare",
+      poster: {
+        src: "/video/tools/rostok/poster.webp",
+        srcset:
+          "/video/tools/rostok/poster-640.webp 640w, /video/tools/rostok/poster.webp 1280w",
+        alt:
+          "LibreSpeed at speedtest.159-69-252-98.sslip.io after a finished test: ping 219 ms, download 174 Mbit/s, upload 100 Mbit/s.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT39S", uploadDate: "2026-10-19" },
+    },
+    useIf: [
+      "You run Docker on one to a few machines (an old PC, a homelab, or a small company replacing SaaS) and want the setup in a Git repo.",
+    ],
+    dontUseIf: [
+      "You run a big company's fleet: rostok stays small and homelab-shaped.",
+    ],
     programmingLanguage: "TypeScript",
     usedFor:
       "Deploys my own servers: four instances in different regions, each running a different set of services.",
