@@ -117,15 +117,21 @@ Deno.test("both llms files say who the work suits and tell no assistant whom to 
   }
 });
 
-Deno.test("the ts-libs install line in llms.txt is the one /tools/ts-libs shows", async () => {
+Deno.test("the ts-libs install line in llms.txt pins the version /tools/ts-libs shows", async () => {
   const site = await startSite();
   try {
-    const install = /deno add jsr:@spy4x\/server@[\w.-]+/;
-    const onPage = (await site.html("/tools/ts-libs")).match(install)?.[0];
-    assert(onPage, "the tool page shows no install line");
+    const install = /deno add jsr:@spy4x\/server@([\w.-]+)/;
+    const version = (await site.html("/tools/ts-libs")).match(
+      /<span data-version>([^<]+)<\/span>/,
+    )?.[1];
+    assert(version, "the tool page shows no version");
     for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
-      const inFile = (await site.html(llmsPath)).match(install)?.[0];
-      assertEquals(inFile, onPage, `${llmsPath} shows another ts-libs version`);
+      const inFile = (await site.html(llmsPath)).match(install)?.[1];
+      assertEquals(
+        inFile,
+        version,
+        `${llmsPath} shows another ts-libs version`,
+      );
     }
   } finally {
     await site.stop();

@@ -548,7 +548,11 @@ export const tools: Tool[] = [
     name: "ts-libs",
     job: "tested TypeScript building blocks for web-standards back ends",
     summary:
-      "Eight framework-agnostic packages built on web standards: ES modules, Fetch, Web Crypto and Streams. Sign-in, Postgres access, SMTP, safe outbound requests, time zones and validation, each with a one-line install. Every package is tested on Deno, the runtime I build with.",
+      "Eleven framework-agnostic packages built on web standards: ES modules, Fetch, Web Crypto and Streams. Sign-in, Postgres access, SMTP, safe outbound requests, time zones and validation, each with a one-line install. Every package is tested on Deno, the runtime I build with.",
+    headline:
+      "Small TypeScript libraries on web standards, for the server and the browser.",
+    lede:
+      "The example in the clip validates a booking request, formats its time in Berlin and sends a confirmation by SMTP: three packages, no framework.",
     kind: "library",
     status: "ready",
     group: "tools",
@@ -557,47 +561,72 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "1.31.0",
+      version: "1.83.0",
       published: true,
-      install: "deno add jsr:@spy4x/server@1.31.0",
+      install: "deno add jsr:@spy4x/server@1.83.0",
       latestFrom: { registry: "jsr", name: "@spy4x/server" },
     },
     licence: "MIT",
     runtime:
       "Deno on the server; @spy4x/time, @spy4x/validation, @spy4x/platform's browser entry points and @spy4x/realtime's client run in a browser, untested there",
     usedFor:
-      "Seed, my SaaS starter, imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
+      "Seed, my SaaS starter, imports nine of these packages; mig, my meeting scheduler, and this site import six each.",
     proofLinks: [
       {
         label: "Seed's imports in deno.jsonc",
         href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
       },
       {
-        label: "This site's env tasks in deno.json",
+        label: "mig's imports in deno.json",
+        href: "https://github.com/spy4x/mig/blob/main/deno.json",
+      },
+      {
+        label: "This site's imports in deno.json",
         href: "https://github.com/spy4x/antonshubin.com/blob/main/deno.json",
       },
     ],
     ci: { provider: "woodpecker", repoId: 10 },
     packages: [
-      "@spy4x/email",
-      "@spy4x/integrations",
-      "@spy4x/net",
-      "@spy4x/platform",
-      "@spy4x/realtime",
-      "@spy4x/server",
-      "@spy4x/time",
       "@spy4x/validation",
+      "@spy4x/platform",
+      "@spy4x/server",
+      "@spy4x/net",
+      "@spy4x/integrations",
+      "@spy4x/time",
+      "@spy4x/email",
+      "@spy4x/realtime",
+      "@spy4x/billing",
+      "@spy4x/caldav",
+      "@spy4x/tasks",
     ],
     useIf: [
-      "You build TypeScript services on web standards and want sign-in, Postgres access, SMTP or SSRF-safe outbound requests without writing them again.",
-      "You validate data with arktype and want one result shape for it.",
-      "You want small packages you install one at a time, not a framework.",
+      "You build on Deno or ship a browser bundle and want small, typed primitives without a framework.",
     ],
     dontUseIf: [
-      "You validate with zod and want to keep it: these packages use arktype only.",
-      "You need a package tested on Node or Bun: every package is tested on Deno only.",
-      "You want an app framework: there are no app shells and no UI here.",
+      "You need tested Node.js support or UI components (those live in preact-components).",
     ],
+    works: [
+      "Every package is tested on Deno.",
+      "@spy4x/time, @spy4x/validation and @spy4x/caldav use no Deno.* API, so they also run in a browser, untested there.",
+    ],
+    notYet: ["Tested Node.js support."],
+    clip: {
+      title: "ts-libs: from a request to an inbox",
+      caption:
+        "The README example, run: an invalid email is refused with a typed error, a valid one is booked and its confirmation lands in a local inbox.",
+      frame: "terminal",
+      frameTitle: "main.ts",
+      poster: {
+        src: "/video/tools/ts-libs/poster.webp",
+        alt:
+          'A terminal above a mail client: the request with the email nope is refused with "must be an email address", the one with jane@example.com answers Booked, and the inbox shows the mail Booked: See you Friday, 28 August 2026 at 10:00.',
+        width: 1280,
+        height: 720,
+        srcset:
+          "/video/tools/ts-libs/poster-640.webp 640w, /video/tools/ts-libs/poster.webp 1280w",
+      },
+      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+    },
     fits: [
       {
         text:
