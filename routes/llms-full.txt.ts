@@ -40,6 +40,7 @@ import {
   WHY_NOT_JUST_AI_PATH,
   whyNotJustAiLlmsSection,
 } from "../lib/why-not-just-ai.ts";
+import { saasMvpLlmsSection } from "../lib/saas-mvp.ts";
 import { llmsBlogSections } from "../lib/blog.ts";
 import {
   clientProject,
@@ -203,6 +204,8 @@ Also constraint-led architecture: platform choices follow product, compliance, r
 ${faqs.map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}
 
 ${whyNotJustAiLlmsSection(BASE_URL)}
+
+${saasMvpLlmsSection(BASE_URL)}
 
 ## Full Site Index
 
