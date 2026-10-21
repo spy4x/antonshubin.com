@@ -45,6 +45,7 @@ with every event, so no event has a `page` property.
 | `tool-try`                           | a tool page's own interaction is used                                                                         | `item` (tool slug), `part` (which interaction; each page lists its values under "Tool pages" below)                                                                                                                                                    |
 | `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                                                                                                                                                |
 | `post-read`                          | the end of a post's body has been on screen, and the visitor has been on the page 15 s or more; once per view | `item` (post slug)                                                                                                                                                                                                                                     |
+| `post-try`                           | a reader first uses one of a post's interactive components; once per component per view                       | `item` (post slug), `part` (the component's tag name, `RunsCalculator` …); never a value the reader entered                                                                                                                                            |
 | `not-found`                          | the not-found page renders                                                                                    | none                                                                                                                                                                                                                                                   |
 
 `place: nav` on `book` (or on `brief` when `SCHEDULE_URL` is unset) is the
@@ -165,9 +166,11 @@ not an event; `islands/MeetEmbed.tsx` sends `calendar-shown` on the first valid
 `mig:height`, `calendar-failed` on the timeout and `call-booked` for each
 `{ type: "mig:booked" }` message under the same origin and `event.source` guard
 as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
-`islands/PostRead.tsx` sends `post-read`; `components/NotFound.tsx` sends
-`not-found` through `islands/TrackPageEvent.tsx`. Links to other sites inside a
-post get `outbound` from `lib/markdown.ts`.
+`islands/PostRead.tsx` sends `post-read`; a post's component (#537) calls
+`trackPostTry(post, tag)` on every input and the helper sends `post-try` once
+per page view; `components/NotFound.tsx` sends `not-found` through
+`islands/TrackPageEvent.tsx`. Links to other sites inside a post get `outbound`
+from `lib/markdown.ts`.
 
 `routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
 (`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`).

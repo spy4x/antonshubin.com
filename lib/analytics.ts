@@ -26,6 +26,7 @@ export const ANALYTICS_EVENTS = [
   "tool-try",
   "copy",
   "post-read",
+  "post-try",
   "not-found",
 ] as const
 
@@ -75,7 +76,10 @@ export interface EventProps {
   reason?: BriefErrorReason
   /** `brief-sent` only: the catalog slug a prefilled brief was about. */
   service?: string
-  /** `tool-try` only: which of a tool page's own interactions was used. */
+  /**
+   * `tool-try`: which of a tool page's own interactions was used.
+   * `post-try`: which component of a post was used (its tag name).
+   */
   part?: string
 }
 
@@ -208,6 +212,22 @@ export function trackWhenReady(
   globalThis.addEventListener("load", () => track(name, props), {
     once: true,
   })
+}
+
+/** The `post-try` events this page view has sent, as `item` and `part`. */
+const postTries = new Set<string>()
+
+/**
+ * Sends `post-try` (#537) the first time a reader uses a post's component in
+ * this page view, and nothing after that. A component calls it on every
+ * input; `item` is the post's slug and `part` the component's tag name. It
+ * takes no other value, so nothing the reader entered reaches analytics.
+ */
+export function trackPostTry(item: string, part: string): void {
+  const key = `${item}\n${part}`
+  if (postTries.has(key)) return
+  postTries.add(key)
+  track("post-try", { item, part })
 }
 
 /**
