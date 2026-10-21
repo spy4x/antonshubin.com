@@ -1,13 +1,14 @@
 import type { ComponentChildren } from "preact";
 import { Card } from "@spy4x/preact-ui/card";
 import { IconCheck } from "@spy4x/preact-icons";
+import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { FACT_LINK } from "../FactCard.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
 import type { ToolPageData } from "./tool-page.ts";
 import { ToolFacts } from "./ToolFacts.tsx";
 
 /**
- * "Where it stands" from the entry's `works` and `notYet`, with the open
+ * "Where it stands" from the entry's `works`, `notYet` and `knownIssue`, with the open
  * issues linked under it (`outbound`, `to: issues`). Renders nothing for an
  * entry without `works`. {@link ToolDetails} draws it beside the facts card
  * unless the page passes its own `beside`.
@@ -42,6 +43,23 @@ export function ToolStanding({ data }: { data: ToolPageData }) {
                 {notYet.map((n) => <li key={n}>{n}</li>)}
               </ul>
             </>
+          )}
+          {tool.knownIssue && (
+            <p data-known-issue class="mt-6 text-graphite">
+              <StatusMark status="known-issue" class="mr-2 text-parchment" />
+              {tool.knownIssue.text}{" "}
+              <a
+                href={tool.knownIssue.link.href}
+                {...eventAttrs("outbound", {
+                  to: "issues",
+                  item: tool.slug,
+                  place: "body",
+                })}
+                class={FACT_LINK}
+              >
+                {tool.knownIssue.link.label}
+              </a>
+            </p>
           )}
         </div>
         {repo && (

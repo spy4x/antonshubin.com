@@ -81,15 +81,19 @@ export default define.page(async function OkoPage(ctx) {
 the summary's first sentences, and which "What it is" never repeats; at most one
 secondary button for `live` with "View on GitHub", the hero media and an
 optional line under the actions), the page's middle, `ToolDetails` ("Where it
-stands" from `works`/`notYet` or the page's `beside`, the sticky "Tool facts"
-card `ToolFacts`, "Use it if", "Skip it if" and "The story behind it"),
-`ToolBand` ("Two ways to use it": the install or quick-start command and "View
-on GitHub" beside the catalog price and the page body's only Book) and
-`ToolMore` (three tools: the tool's entry in `MORE_TOOLS` in
-`components/tool-frame/ToolMore.tsx`, hand-picked by what a visitor of that tool
-wants next, unless the page passes its own `more`). Props `hero`, `beside` and
-`band` change only what those parts document. The hero's header carries
-`data-tool-job-hidden` when a page passes `showJob: false` and
+stands" from `works`/`notYet`, plus the optional `knownIssue`, or the page's
+`beside`, the sticky "Tool facts" card `ToolFacts`, "Use it if", "Skip it if"
+and "The story behind it"), `ToolBand` ("Two ways to use it": the install or
+quick-start command and "View on GitHub" beside the catalog price and the page
+body's only Book) and `ToolMore` (three tools: the tool's entry in `MORE_TOOLS`
+in `components/tool-frame/ToolMore.tsx`, hand-picked by what a visitor of that
+tool wants next, unless the page passes its own `more`). Props `hero`, `beside`
+and `band` change only what those parts document. `knownIssue`
+(`{ text, link }`) is one line under "Works today": the library's `known-issue`
+`StatusMark`, a sentence built only from the facts of the open issue it links
+to, and that link, which sends `outbound` with `to: issues` and `place: body`.
+Set it only while that issue is open (caldav-tasks-web, #119). The hero's header
+carries `data-tool-job-hidden` when a page passes `showJob: false` and
 `data-tool-own-media` when it passes its own `media`; `assertToolFrame()` reads
 both, so a custom page's test passes no options. The hero media is
 `ToolHeroMedia`: the `clip` (`islands/ToolHeroClip.tsx`, the library's

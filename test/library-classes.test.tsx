@@ -21,6 +21,7 @@ import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import { WindowFrame } from "@spy4x/preact-ui/window-frame";
 import { DemoVideo } from "@spy4x/preact-ui/demo-video";
 import { ComparisonTable } from "@spy4x/preact-ui/comparison-table";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -176,6 +177,30 @@ function renderedLibraryMarkup(): string {
         checkedOn={new Date("2026-10-20")}
         method="How."
         fit="Who."
+      />,
+    ),
+    // /tools/caldav-tasks-web (#465), /tools/zond: RadioChips as the site renders it (its
+    // own legend classes: the library's default `pc-label` is a preset class
+    // the site does not load), a checked chip and a disabled one, and a
+    // hidden legend.
+    render(
+      <RadioChips
+        legend="Pick"
+        legendClass="text-parchment font-semibold"
+        name="pick"
+        defaultValue="a"
+        options={[
+          { value: "a", label: "A" },
+          { value: "b", label: "B", disabled: true },
+        ]}
+      />,
+    ),
+    render(
+      <RadioChips
+        legend="Pick"
+        hideLegend
+        name="pick2"
+        options={[{ value: "a", label: "A" }]}
       />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
