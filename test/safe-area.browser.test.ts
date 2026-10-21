@@ -6,8 +6,10 @@
 // and the tab bar's padding follows an emulated 34px inset (an iPhone's).
 // `cover` also lets the page run under the notch when the phone is held
 // sideways, where the site shows the desktop rail, so a second case checks the
-// rail and the main column keep out of emulated side insets.
+// rail and the main column keep out of emulated side insets. A third case
+// checks the SaaS MVP page's Book button clears the bar on first load (#514).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import axeCore from "axe-core"
 import type { Browser, Page } from "playwright"
 import { startSite } from "./harness.ts"
 import { launchChromium, newPage } from "./browser.ts"
@@ -100,6 +102,57 @@ Deno.test("the rail and the main column keep out of a landscape iPhone's notch",
       mainPaddingRight >= INSET_SIDE,
       `main's right padding is ${mainPaddingRight}px, under the notch`,
     )
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+const MVP_PATH = "/catalog/zero-to-production-saas-mvp"
+const PHONES = [{ width: 390, height: 844 }, { width: 412, height: 915 }]
+
+Deno.test("the SaaS MVP card's Book clears the phone tab bar on first load", async () => {
+  // BookCallLink renders nothing while SCHEDULE_URL is unset.
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com" },
+  })
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of PHONES) {
+      const page: Page = await newPage(browser, { viewport })
+      const cdp = await page.context().newCDPSession(page)
+      await cdp.send(
+        "Emulation.setSafeAreaInsetsOverride" as never,
+        { insets: { bottom: INSET_BOTTOM } } as never,
+      )
+      await page.goto(`${site.origin}${MVP_PATH}`, { waitUntil: "networkidle" })
+
+      const { bookBottom, barTop } = await page.evaluate(() => ({
+        bookBottom: document.querySelector(
+          "[data-service-card] [data-primary-book]",
+        )!.getBoundingClientRect().bottom,
+        barTop: document.querySelector('[data-e2e="rail-shell-tabbar"]')!
+          .getBoundingClientRect().top,
+      }))
+      assert(
+        bookBottom <= barTop,
+        `at ${viewport.width}px Book ends at ${bookBottom}px, under the bar at ${barTop}px`,
+      )
+
+      // A link partly under the bar is a tap target too small to hit.
+      await page.evaluate(axeCore.source)
+      const tooSmall = await page.evaluate(async () => {
+        // deno-lint-ignore no-explicit-any
+        const axe = (globalThis as any).axe
+        const results = await axe.run(document, { runOnly: ["target-size"] })
+        return results.violations.flatMap((
+          v: { nodes: { html: string }[] },
+        ) => v.nodes.map((n) => n.html.slice(0, 120)))
+      }) as string[]
+      assertEquals(tooSmall, [], `target-size at ${viewport.width}px`)
+      await page.close()
+    }
   } finally {
     await browser?.close()
     await site.stop()
