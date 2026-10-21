@@ -4,7 +4,12 @@ import { define } from "../../lib/utils.ts"
 import { Layout } from "../../components/Layout.tsx"
 import { NotFound } from "../../components/NotFound.tsx"
 import { type BlogArticle, blogArticles } from "../../lib/data.ts"
-import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts"
+import {
+  postBody,
+  type PostHeading,
+  type PostSegment,
+  renderBlogPost,
+} from "../../lib/markdown.ts"
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx"
 import PostToc from "../../islands/PostToc.tsx"
 import PostRead from "../../islands/PostRead.tsx"
@@ -52,7 +57,8 @@ async function getArticleContent(slug: string): Promise<string | null> {
 
 interface PageData {
   article: BlogArticle | null
-  content: string | null
+  /** The body around its components (#537), or null without a file. */
+  segments: PostSegment[] | null
   headings: PostHeading[]
   related: BlogArticle[]
 }
@@ -68,7 +74,7 @@ export const handler = define.handlers({
     if (!article) {
       return page<PageData>({
         article: null,
-        content: null,
+        segments: null,
         headings: [],
         related: [],
       }, {
@@ -78,18 +84,56 @@ export const handler = define.handlers({
     }
 
     const markdown = await getArticleContent(slug)
-    // Strip YAML front matter (between first pair of --- delimiters)
-    const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null
-    const rendered = body ? await renderBlogPost(body) : null
+    const body = markdown ? postBody(markdown) : null
+    const rendered = body ? await renderBlogPost(body, { slug }) : null
 
     return page<PageData>({
       article,
-      content: rendered?.html ?? null,
+      segments: rendered?.segments ?? null,
       headings: rendered?.headings ?? [],
       related: readNext(article),
     })
   },
 })
+
+/**
+ * The post's body (#537): each HTML chunk in its own `.blog-content` box,
+ * with each component between them in a box that carries its anchor. A post
+ * without a component is one chunk, the same single box as before.
+ */
+function PostBody(
+  { segments, slug }: { segments: PostSegment[]; slug: string },
+) {
+  return (
+    <>
+      {segments.map((segment, i) => {
+        const top = i === 0 ? "mt-10" : ""
+        if (segment.kind === "html") {
+          return (
+            <div
+              key={i}
+              class={i === 0
+                ? "blog-content mt-10 text-parchment"
+                : "blog-content text-parchment"}
+              dangerouslySetInnerHTML={{ __html: segment.html }}
+            />
+          )
+        }
+        const Component = segment.entry.component
+        return (
+          <div
+            key={i}
+            id={segment.anchor}
+            data-post-component={segment.tag}
+            class={`post-component scroll-mt-6 ${top || "mt-8"} mb-8`}
+          >
+            <Component {...segment.props} post={slug} />
+          </div>
+        )
+      })}
+    </>
+  )
+}
 
 /** "15 June 2026" in a `<time>` element. */
 function PostTime({ iso }: { iso: string }) {
@@ -199,7 +243,7 @@ function AuthorBox({ article }: { article: BlogArticle }) {
 }
 
 export default define.page(function BlogPost(ctx) {
-  const { article, content, headings, related } = ctx.data as PageData
+  const { article, segments, headings, related } = ctx.data as PageData
 
   if (!article) {
     return <NotFound pathname={ctx.url.pathname} />
@@ -419,13 +463,10 @@ export default define.page(function BlogPost(ctx) {
             </div>
           )}
 
-          {content
+          {segments?.length
             ? (
               <>
-                <div
-                  class="blog-content mt-10 text-parchment"
-                  dangerouslySetInnerHTML={{ __html: content }}
-                />
+                <PostBody segments={segments} slug={article.slug} />
                 <PostRead slug={article.slug} />
                 <BlogImageEnhancer />
               </>

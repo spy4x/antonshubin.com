@@ -25,10 +25,10 @@ export default function BlogImageEnhancer() {
   const triggerRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    const blogContent = document.querySelector(".blog-content")
-    if (!blogContent) return
-
-    blogContent.querySelectorAll<HTMLButtonElement>("[data-lightbox]")
+    // A post with a component has one `.blog-content` box per chunk (#537).
+    document.querySelectorAll<HTMLButtonElement>(
+      ".blog-content [data-lightbox]",
+    )
       .forEach((button) => {
         button.addEventListener("click", () => {
           const img = button.querySelector("img")
@@ -39,7 +39,9 @@ export default function BlogImageEnhancer() {
         })
       })
 
-    blogContent.querySelectorAll<HTMLButtonElement>("[data-copy-code]")
+    document.querySelectorAll<HTMLButtonElement>(
+      ".blog-content [data-copy-code]",
+    )
       .forEach((button) => {
         button.hidden = false
         button.addEventListener("click", async () => {
