@@ -179,14 +179,28 @@ function renderedLibraryMarkup(): string {
         fit="Who."
       />,
     ),
-    // /tools/zond's Ask zond request switch: a checked and an unchecked chip.
+    // /tools/caldav-tasks-web (#465), /tools/zond: RadioChips as the site renders it (its
+    // own legend classes: the library's default `pc-label` is a preset class
+    // the site does not load), a checked chip and a disabled one, and a
+    // hidden legend.
     render(
       <RadioChips
-        legend="Asks"
-        legendClass="font-semibold"
-        name="q"
+        legend="Pick"
+        legendClass="text-parchment font-semibold"
+        name="pick"
         defaultValue="a"
-        options={[{ value: "a", label: "A" }, { value: "b", label: "B" }]}
+        options={[
+          { value: "a", label: "A" },
+          { value: "b", label: "B", disabled: true },
+        ]}
+      />,
+    ),
+    render(
+      <RadioChips
+        legend="Pick"
+        hideLegend
+        name="pick2"
+        options={[{ value: "a", label: "A" }]}
       />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,

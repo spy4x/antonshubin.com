@@ -193,7 +193,13 @@ None yet.
 
 ### caldav-tasks-web
 
-None yet.
+- `tool-try` with `part` `field:title`, `field:priority`, `field:parent`,
+  `field:order` or `field:reminder`: a field of "Same file, two apps" was picked
+  (on its radio, so a click on the chip or an arrow key counts once).
+- `outbound` (`to: github`, `place: body`): "Every field" under the task file
+  and "The compatibility guide" under "What was tested".
+- `outbound` (`to: issues`, `place: body`): "Issue #119" in the known-issue line
+  of "Where it stands" (the entry's `knownIssue`).
 
 ### dotfiles
 
