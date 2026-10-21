@@ -691,9 +691,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "8.8.0",
+      version: "8.10.0",
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@8.8.0",
+      install: "deno add jsr:@spy4x/preact-ui@8.10.0",
       latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
     },
     licence: "MIT",
