@@ -1,7 +1,11 @@
 import { PRICING_RULE } from "./how-i-work.ts";
 import { promise } from "./promises.ts";
 import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts";
-import { WEEKLY_AUDIT } from "./why-not-just-ai.ts";
+import {
+  WEEKLY_AUDIT,
+  WHY_NOT_JUST_AI_LINK_LABEL,
+  WHY_NOT_JUST_AI_PATH,
+} from "./why-not-just-ai.ts";
 
 /**
  * The How I work page's questions (#275): the only written copy. The page,
@@ -11,7 +15,8 @@ import { WEEKLY_AUDIT } from "./why-not-just-ai.ts";
  * (which scans this file too) still holds. The who-does-the-work and mobile
  * answers come from the facts Anton recorded on #249 (26 Sep 2026); how to
  * ask for the refund and the AI-provider answer from #301 (30 Sep 2026), and
- * that answer's review process from #489 (20 Oct 2026).
+ * that answer's review process from #489 (20 Oct 2026), and the hourly
+ * billing sentence in the pricing answer from #516 (21 Oct 2026).
  *
  * No imports of config or the environment, so a script can load it.
  */
@@ -24,6 +29,10 @@ export interface Faq {
   a: string;
   link?: { href: string; label: string };
 }
+
+/** How hourly work is billed with AI agents, from Anton's words on #516. */
+export const HOURLY_WORK_RULE =
+  "On hourly work I bill only the hours I spend on your project, never the time an AI agent runs on its own.";
 
 /** The most questions the page carries. */
 export const MAX_FAQS = 8;
@@ -38,7 +47,8 @@ export const faqs: Faq[] = [
   {
     id: "pricing",
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
-    a: `Both. ${PRICING_RULE} If the scope changes once we have started, you get a quote for the change before I start on it — no surprise costs.`,
+    a: `Both. ${PRICING_RULE} ${HOURLY_WORK_RULE} If the scope changes once we have started, you get a quote for the change before I start on it — no surprise costs.`,
+    link: { href: WHY_NOT_JUST_AI_PATH, label: WHY_NOT_JUST_AI_LINK_LABEL },
   },
   {
     id: "ownership",
