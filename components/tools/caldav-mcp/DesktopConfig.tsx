@@ -1,5 +1,4 @@
 import { FACT_LINK } from "../../FactCard.tsx";
-import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx";
 import CopyButton from "../../../islands/CopyButton.tsx";
 import { eventAttrs } from "../../../lib/analytics.ts";
 import { CLIENTS_GUIDE, DESKTOP_CONFIG } from "./data.ts";
@@ -29,7 +28,7 @@ export function DesktopConfig() {
           <CopyButton
             elementId="mcp-desktop-config"
             label="Copy"
-            title={COPY_INSTALL_TITLE}
+            title={`Copy ${FILE}`}
             analytics={eventAttrs("tool-install-copy", { item: SLUG })}
           />
         </div>
