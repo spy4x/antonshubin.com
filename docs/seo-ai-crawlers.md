@@ -304,12 +304,13 @@ Five entities in a `@graph` array (six on `/about`):
 - `lib/why-not-just-ai.ts` holds every string: the page, both llms files
   (`llms-full.txt` carries the whole page as a section), the JSON-LD and
   `deno task og` read it.
-- JSON-LD: a `WebPage` about `#person` and a `FAQPage` with the page's three
+- JSON-LD: a `WebPage` about `#person` and a `FAQPage` with the page's five
   questions, both joined to `#website`, plus the `BreadcrumbList`. No `Review`,
   `AggregateRating` or `Article`.
-- Linked from the footer's Site group, the "My AI-agent setup" paragraph on
-  `/how-i-work`, the SaaS MVP service page and the ends of the two posts on AI
-  agents.
+- Linked from the footer's Site group, the home page under the prices,
+  `/catalog` under the services, the "My AI-agent setup" paragraph and the
+  pricing answer on `/how-i-work`, the SaaS MVP and Ongoing service pages and
+  the ends of the two posts on AI agents.
 
 ### 12. The SaaS MVP page (`/catalog/zero-to-production-saas-mvp`)
 

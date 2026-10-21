@@ -21,6 +21,11 @@ import {
 } from "@spy4x/preact-icons";
 import { CatalogIcon } from "../../components/Icons.tsx";
 import { eventAttrs } from "../../lib/analytics.ts";
+import {
+  WHY_NOT_JUST_AI_LINK_LABEL,
+  WHY_NOT_JUST_AI_PATH,
+  WHY_NOT_JUST_AI_PROMPT,
+} from "../../lib/why-not-just-ai.ts";
 
 const CANONICAL = "https://antonshubin.com/catalog";
 
@@ -143,6 +148,20 @@ export default define.page(function Catalog() {
             );
           })}
         </ul>
+
+        <p class="mt-6 text-graphite" data-why-not-just-ai-link>
+          {WHY_NOT_JUST_AI_PROMPT}{" "}
+          <a
+            href={WHY_NOT_JUST_AI_PATH}
+            {...eventAttrs("cta", {
+              place: "body",
+              target: WHY_NOT_JUST_AI_PATH,
+            })}
+            class={FACT_LINK}
+          >
+            {WHY_NOT_JUST_AI_LINK_LABEL}
+          </a>
+        </p>
 
         <ClosingBand
           bookLabel={BOOK_LABEL}

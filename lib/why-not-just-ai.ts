@@ -32,10 +32,18 @@ export const WHY_NOT_JUST_AI_H1 = "Why hire me instead of an AI subscription?";
 export const WHY_NOT_JUST_AI_LEAD =
   "An AI subscription writes code. I decide what to build, make sure every change is reviewed, run it in production and answer for the result. I use the same AI tools every day, so you get their speed too.";
 
-/** The sentence and link label other pages use to point here (/how-i-work, the MVP page). */
+/**
+ * The sentence and link label other pages use to point here (the home page,
+ * /catalog, /how-i-work, the MVP and Ongoing pages).
+ */
 export const WHY_NOT_JUST_AI_PROMPT =
   "Weighing this against an AI subscription?";
 export const WHY_NOT_JUST_AI_LINK_LABEL = "Why not just use AI?";
+/** The service pages that carry the prompt and link under "Who this is for". */
+export const WHY_NOT_JUST_AI_SERVICES = [
+  "zero-to-production-saas-mvp",
+  "cto-advisory-retainer",
+];
 
 /** The public repository the agents' rules live in. */
 export const DOTFILES_URL = "https://github.com/spy4x/dotfiles";
@@ -208,8 +216,16 @@ export const SHIPPED: { slug: string; status: "live" | "outcome" }[] = [
 export const QUESTIONS_HEADING = "Questions";
 
 /**
+ * How hourly work is billed when AI agents do the typing, in Anton's words on
+ * #516. /how-i-work's pricing answer says the same in one sentence.
+ */
+export const HOURLY_AI_BILLING =
+  "No. I bill only the hours I actually work on your project: setting the agents' tasks, checking their progress and reports, judging the quality, writing new rules, and calls. Once I hand the agents a batch of work, the timer stops, and it starts again only when they have finished and I am back on your project.";
+
+/**
  * The page's questions, also its `FAQPage` JSON-LD; none repeats /how-i-work's.
- * Who pays for the AI tools is Anton's answer on #488.
+ * Who pays for the AI tools is Anton's answer on #488; hourly billing while
+ * the agents work is his answer on #516.
  */
 export function whyNotJustAiFaqs(): Faq[] {
   return [
@@ -222,6 +238,11 @@ export function whyNotJustAiFaqs(): Faq[] {
       id: "who-pays-for-ai",
       q: "Who pays for the AI tools?",
       a: "I do. My AI subscription is part of how I work, not a line on your invoice. If you would rather it ran on your company's own AI account, for example to keep your code under your own contract, I can work through that one.",
+    },
+    {
+      id: "hourly-while-ai-works",
+      q: "If you bill hourly, do I pay while the AI works?",
+      a: HOURLY_AI_BILLING,
     },
     {
       id: "take-it-from-here",

@@ -9,6 +9,7 @@ import { count, jsonLd, pageBody, visibleText } from "./html.ts";
 import {
   COMPARISON_PRODUCTS,
   comparisonRows,
+  HOURLY_AI_BILLING,
   processSteps,
   WEEKLY_AUDIT,
   WHY_NOT_JUST_AI_H1,
@@ -18,6 +19,7 @@ import {
   whyNotJustAiFaqs,
 } from "../lib/why-not-just-ai.ts";
 import { BOOK_LABEL } from "../lib/nav.ts";
+import { HOURLY_WORK_RULE } from "../lib/faqs.ts";
 import { promise, promises } from "../lib/promises.ts";
 
 const PAGE = WHY_NOT_JUST_AI_PATH;
@@ -116,14 +118,17 @@ siteTest(
 );
 
 siteTest(
-  "why-not-just-ai shows the same four questions and answers its FAQPage JSON-LD lists, who pays for the AI tools among them",
+  "why-not-just-ai shows the same five questions and answers its FAQPage JSON-LD lists, who pays for the AI tools and hourly billing among them",
   async (site) => {
     const html = await site.html(PAGE);
     const faqs = whyNotJustAiFaqs();
-    assertEquals(faqs.length, 4);
-    assert(
-      faqs.some((f) => f.q === "Who pays for the AI tools?"),
-      "no question on who pays for the AI tools",
+    assertEquals(faqs.length, 5);
+    const who = faqs.findIndex((f) => f.q === "Who pays for the AI tools?");
+    assert(who >= 0, "no question on who pays for the AI tools");
+    assertEquals(
+      faqs[who + 1]?.q,
+      "If you bill hourly, do I pay while the AI works?",
+      "the hourly question does not follow who pays for the AI tools",
     );
     const section = slice(html, "data-faq-section", "</section>");
     const shown = [...section.matchAll(
@@ -158,23 +163,29 @@ siteTest(
 );
 
 siteTest(
-  "why-not-just-ai is linked from the footer, How I work, the MVP page, both AI posts, both llms files and the sitemap",
+  "why-not-just-ai is linked from the footer, the home page, the catalog, How I work, the MVP and Ongoing pages, both AI posts, both llms files and the sitemap",
   async (site) => {
     const link = `href="${PAGE}"`;
-    const footer = slice(await site.html("/"), "<footer", "</footer>");
+    const home = await site.html("/");
+    const footer = slice(home, "<footer", "</footer>");
     assert(footer.includes(link), "footer");
+    // The page alone: the footer links every page to it.
+    assert(pageBody(home).includes(link), "the home page");
+    assert(pageBody(await site.html("/catalog")).includes(link), "/catalog");
     const hiw = await site.html("/how-i-work");
     assert(
       slice(hiw, '<section aria-labelledby="hiw-ai"', "</section>")
         .includes(link),
       "/how-i-work's AI paragraph",
     );
-    assert(
-      // The page alone: the footer links every page to it.
-      pageBody(await site.html("/catalog/zero-to-production-saas-mvp"))
-        .includes(link),
-      "the MVP page",
-    );
+    for (
+      const service of [
+        "/catalog/zero-to-production-saas-mvp",
+        "/catalog/cto-advisory-retainer",
+      ]
+    ) {
+      assert(pageBody(await site.html(service)).includes(link), service);
+    }
     for (
       const post of [
         "/blog/claude-code-vs-minimax-m3-30-days",
@@ -189,6 +200,33 @@ siteTest(
     assert(
       (await site.html("/sitemap.xml")).includes(`<loc>${URL_OF_PAGE}</loc>`),
       "sitemap",
+    );
+  },
+);
+
+siteTest(
+  "both why-not-just-ai and How I work's pricing answer say hourly work bills only Anton's hours, never the agents' run time",
+  async (site) => {
+    /** The visible answer under the question at `#faq-<id>`. */
+    const answer = (html: string, id: string) =>
+      visibleText(
+        slice(html, `id="faq-${id}"`, "</p>").replace(/^[\s\S]*<p[^>]*>/, ""),
+      );
+    const page = answer(await site.html(PAGE), "hourly-while-ai-works");
+    assertEquals(page, HOURLY_AI_BILLING);
+    const pricing = answer(await site.html("/how-i-work"), "pricing");
+    assert(pricing.includes(HOURLY_WORK_RULE), pricing);
+    // The claim itself, not just the shared constant.
+    assert(page.startsWith("No. I bill only the hours"), page);
+    assert(/the timer stops/.test(page), "the page: no stopped timer");
+    assert(/never the time an AI agent runs/.test(pricing), pricing);
+    // The pricing answer's link lands on the hourly question itself.
+    const howIWork = await site.html("/how-i-work");
+    assert(
+      slice(howIWork, `id="faq-pricing"`, "</div>").includes(
+        `href="${PAGE}#faq-hourly-while-ai-works"`,
+      ),
+      "the pricing answer does not link the hourly question",
     );
   },
 );

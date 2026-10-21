@@ -32,6 +32,11 @@ import {
   IconCalendar as CalendarIcon,
 } from "@spy4x/preact-icons";
 import { eventAttrs } from "../lib/analytics.ts";
+import {
+  WHY_NOT_JUST_AI_LINK_LABEL,
+  WHY_NOT_JUST_AI_PATH,
+  WHY_NOT_JUST_AI_PROMPT,
+} from "../lib/why-not-just-ai.ts";
 
 /** The section link style: Parchment, underlined, the underline brightens on hover. */
 const LINK = FACT_LINK;
@@ -273,6 +278,19 @@ export default define.page(function Home(ctx) {
               >
                 All services and prices
                 <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
+              </a>
+            </p>
+            <p class="mt-2 text-sm text-graphite" data-why-not-just-ai-link>
+              {WHY_NOT_JUST_AI_PROMPT}{" "}
+              <a
+                href={WHY_NOT_JUST_AI_PATH}
+                {...eventAttrs("cta", {
+                  place: "card",
+                  target: WHY_NOT_JUST_AI_PATH,
+                })}
+                class={LINK}
+              >
+                {WHY_NOT_JUST_AI_LINK_LABEL}
               </a>
             </p>
           </div>
