@@ -57,6 +57,7 @@ wait_for nginx "${PIDS[-1]}" http://127.0.0.1:48421/
 # only, pinned here, with the repository's minimum dependency age. Lighthouse runs as a Node
 # subprocess, which needs a node_modules folder: it goes in the scratch folder too.
 ROOT=$PWD
-(cd "$SCRATCH" && deno run -A --no-config --no-lock --node-modules-dir=auto --min-dep-age=1440 \
-  npm:@lhci/cli@0.15.1 autorun --config="$ROOT/$HERE/lighthouserc.json" \
+(cd "$SCRATCH" && deno run -A --no-config --no-lock --node-modules-dir=auto \
+  --minimum-dependency-age=1440 npm:@lhci/cli@0.15.1 autorun \
+  --config="$ROOT/$HERE/lighthouserc.json" \
   --upload.outputDir="$ROOT/.lighthouseci/reports")
