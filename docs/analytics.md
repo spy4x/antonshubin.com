@@ -269,7 +269,7 @@ the MVP offer with `item: seed` are the number the page should move.
 
 | Event               | When                                                              | Properties                                        |
 | ------------------- | ----------------------------------------------------------------- | ------------------------------------------------- |
-| `tool-try`          | a request in "Ask zond" is clicked (its `<label>`)                | `item=zond`, `part=ask:{path}` (`ask:/health`, …) |
+| `tool-try`          | a request chip in "Ask zond" is picked (on its radio)             | `item=zond`, `part=ask:{path}` (`ask:/health`, …) |
 | `tool-install-copy` | any Quick start block is copied (Compose, config, command, Gatus) | `item=zond`                                       |
 
 Changing a service's answer sends nothing: a `<select>` reports a change, not a

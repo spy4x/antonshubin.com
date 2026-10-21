@@ -1,4 +1,5 @@
 import type { ComponentChildren } from "preact";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import { eventAttrs } from "../../../lib/analytics.ts";
 
 // "Ask zond" (#462): the visitor sets what each service answers and which URL
@@ -236,33 +237,22 @@ export function AskZond() {
               ))}
             </div>
           </fieldset>
-          <fieldset>
-            <legend class="font-semibold text-parchment">
-              Your monitor asks
-            </legend>
-            <div class="mt-2 flex flex-wrap gap-x-5">
-              {REQUESTS.map((q) => (
-                <label
-                  key={q.id}
-                  class="inline-flex min-h-11 items-center gap-2 font-mono text-sm text-parchment"
-                  {...eventAttrs("tool-try", {
-                    item: "zond",
-                    part: `ask:${q.path}`,
-                  })}
-                >
-                  <input
-                    type="radio"
-                    name="zond-q"
-                    id={`zond-q-${q.id}`}
-                    value={q.id}
-                    checked={q.id === DEFAULT_REQUEST}
-                    class="size-4 accent-parchment"
-                  />
-                  {q.path}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <RadioChips
+            legend="Your monitor asks"
+            legendClass="font-semibold text-parchment"
+            name="zond-q"
+            defaultValue={DEFAULT_REQUEST}
+            optionsClass="mt-3"
+            options={REQUESTS.map((q) => ({
+              value: q.id,
+              id: `zond-q-${q.id}`,
+              label: <span class="font-mono">{q.path}</span>,
+              inputAttributes: eventAttrs("tool-try", {
+                item: "zond",
+                part: `ask:${q.path}`,
+              }),
+            }))}
+          />
         </div>
         <div class="min-w-0 rounded-lg border border-rule bg-paper p-5 lg:col-span-7">
           <p id="zond-answer-label" class="font-semibold text-parchment">

@@ -54,7 +54,7 @@ Deno.test("/tools/zond keeps the frame and shows the diagram, Ask zond and the q
   }
 });
 
-Deno.test("Ask zond's answer never shows an internal URL and each request chip sends tool-try with its path", async () => {
+Deno.test("Ask zond's answer never shows an internal URL and each request radio, not its label, carries tool-try with its path", async () => {
   const site = await startSite();
   try {
     const page = pageBody(await site.html("/tools/zond"));
@@ -74,13 +74,21 @@ Deno.test("Ask zond's answer never shows an internal URL and each request chip s
         "/health/jellyfin",
       ]
     ) {
+      const radio = page.match(
+        new RegExp(`<input[^>]*data-umami-event-part="ask:${path}"[^>]*>`),
+      )?.[0] ?? "";
       assert(
-        page.includes(
-          `data-umami-event="tool-try" data-umami-event-item="zond" data-umami-event-part="ask:${path}"`,
-        ),
-        `tool-try for ${path}`,
+        radio.includes(
+          `data-umami-event="tool-try" data-umami-event-item="zond"`,
+        ) &&
+          radio.includes(`type="radio"`),
+        `tool-try for ${path} is not on its radio`,
       );
     }
+    assert(
+      !/<label[^>]*data-umami-event=/.test(page),
+      "a label carries an event, so one click counts twice",
+    );
   } finally {
     await site.stop();
   }
