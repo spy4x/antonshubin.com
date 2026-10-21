@@ -124,3 +124,27 @@ Deno.test("the caldav-mcp page renders the frame, the 13 tool rows with their No
     await site.stop();
   }
 });
+
+Deno.test("the switch's CSS stays on its page: the stylesheet every page loads has no mcp-mode rule", async () => {
+  const site = await startSite();
+  try {
+    const home = await site.html("/");
+    const href = home.match(/href="(\/assets\/client-entry-[^"?]+\.css)/)?.[1];
+    assert(href, "no shared stylesheet linked from /");
+    const shared = await site.html(href);
+    assert(shared.length > 1000, "the shared stylesheet looks empty");
+    assert(
+      !shared.includes("mcp-mode"),
+      "the switch's rules are in the stylesheet every page loads",
+    );
+
+    // The page carries them itself, in a <style> with the render's nonce.
+    const page = await site.html("/tools/caldav-mcp");
+    assert(
+      /<style nonce="[^"]+">[^<]*#mcp-mode-read-only:checked/.test(page),
+      "the page has no nonce'd <style> with the switch's rules",
+    );
+  } finally {
+    await site.stop();
+  }
+});

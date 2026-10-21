@@ -26,15 +26,14 @@ function offIn(name: string): string {
  * The switch's whole behaviour, in CSS on the section (no island): an element
  * with `data-when` shows only while one of the modes it lists is checked, and
  * a tool name with `data-off` turns Graphite while a mode it lists is checked.
- * The class strings are written out in full so Tailwind finds them.
+ * Plain CSS in a page-only `<style>` (Fresh adds the CSP nonce), not Tailwind
+ * classes: those would land in the stylesheet every page loads.
  */
-const SWITCH_CSS = [
-  "[&:has(#mcp-mode-all:checked)_[data-when]:not([data-when~=all])]:hidden",
-  "[&:has(#mcp-mode-no-delete:checked)_[data-when]:not([data-when~=no-delete])]:hidden",
-  "[&:has(#mcp-mode-read-only:checked)_[data-when]:not([data-when~=read-only])]:hidden",
-  "[&:has(#mcp-mode-no-delete:checked)_[data-off~=no-delete]]:text-graphite",
-  "[&:has(#mcp-mode-read-only:checked)_[data-off~=read-only]]:text-graphite",
-].join(" ");
+const SWITCH_CSS = MODE_VALUES.map((m) => {
+  const on = `[data-mcp-reference]:has(#${modeId(m)}:checked)`;
+  return `${on} [data-when]:not([data-when~=${m}]){display:none}` +
+    `${on} [data-off~=${m}]{color:var(--color-graphite)}`;
+}).join("");
 
 /** One tool: a native `<details>` whose summary names it and gives its first sentence. */
 function ToolRow({ tool }: { tool: McpTool }) {
@@ -100,8 +99,8 @@ export function ToolReference() {
     <section
       aria-labelledby="mcp-tools"
       data-mcp-reference
-      class={SWITCH_CSS}
     >
+      <style>{SWITCH_CSS}</style>
       <h2 id="mcp-tools" class="text-2xl sm:text-3xl text-parchment">
         What the assistant can do
       </h2>
