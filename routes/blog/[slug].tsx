@@ -10,6 +10,7 @@ import {
   type PostSegment,
   renderBlogPost,
 } from "../../lib/markdown.ts"
+import { PostBody } from "../../components/PostBody.tsx"
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx"
 import PostToc from "../../islands/PostToc.tsx"
 import PostRead from "../../islands/PostRead.tsx"
@@ -95,45 +96,6 @@ export const handler = define.handlers({
     })
   },
 })
-
-/**
- * The post's body (#537): each HTML chunk in its own `.blog-content` box,
- * with each component between them in a box that carries its anchor. A post
- * without a component is one chunk, the same single box as before.
- */
-function PostBody(
-  { segments, slug }: { segments: PostSegment[]; slug: string },
-) {
-  return (
-    <>
-      {segments.map((segment, i) => {
-        const top = i === 0 ? "mt-10" : ""
-        if (segment.kind === "html") {
-          return (
-            <div
-              key={i}
-              class={i === 0
-                ? "blog-content mt-10 text-parchment"
-                : "blog-content text-parchment"}
-              dangerouslySetInnerHTML={{ __html: segment.html }}
-            />
-          )
-        }
-        const Component = segment.entry.component
-        return (
-          <div
-            key={i}
-            id={segment.anchor}
-            data-post-component={segment.tag}
-            class={`post-component scroll-mt-6 ${top || "mt-8"} mb-8`}
-          >
-            <Component {...segment.props} post={slug} />
-          </div>
-        )
-      })}
-    </>
-  )
-}
 
 /** "15 June 2026" in a `<time>` element. */
 function PostTime({ iso }: { iso: string }) {
