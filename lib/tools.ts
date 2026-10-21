@@ -732,47 +732,6 @@ export const tools: Tool[] = [
       "You need components checked with a screen reader: none has been run against them yet.",
       "You do not use Tailwind: every component renders Tailwind classes.",
     ],
-    fits: [
-      {
-        text:
-          "Imports @spy4x/platform, @spy4x/time and @spy4x/validation from ts-libs.",
-        href: "/tools/ts-libs",
-        planned: false,
-      },
-      {
-        text:
-          "Publishes under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
-        href: "/tools/ts-libs",
-        planned: false,
-      },
-      {
-        text:
-          "Seed, my SaaS starter, builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
-        href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
-        planned: false,
-      },
-      {
-        text: "This site will replace its own components with it.",
-        href: "https://github.com/spy4x/antonshubin.com/issues/195",
-        planned: true,
-      },
-    ],
-    screenshots: [
-      {
-        src: "/img/tools/preact-components/guide-overview-dark.webp",
-        alt:
-          "The live UI guide's overview page: a side navigation listing every package, and one card per package — UI, System, CRUD, Charts, Map, Signals, Theme, Icons and cn — each with its import name, a one-line summary and a count of its live cards or icons, or the words Examples coming for a package that has none yet.",
-        width: 2560,
-        height: 1600,
-      },
-      {
-        src: "/img/tools/preact-components/guide-ui-ink.webp",
-        alt:
-          "The UI package's page in the opt-in ink dark palette: the side navigation lists the UI components by group, the Badge and StatusMark cards show their live examples, and the CiStatusPill card's description starts below them.",
-        width: 2560,
-        height: 1600,
-      },
-    ],
     credit: {
       text:
         "The design system, the component styling and the original markup are by Eirene.",
