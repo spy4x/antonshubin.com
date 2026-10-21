@@ -18,9 +18,17 @@ import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts"
  * "Retainer" for two prices) with its note, the time, the stack, the titles of
  * the promises that apply (`catalogPromises()`), then Book and the written
  * brief with the service chosen. Sticky in the right column from 1024px and
- * first at 390px, like the project page's card.
+ * first at 390px, like the project page's card. With `promisesInBody` the page
+ * opens its main column with the same promises (#541), so the Promises row
+ * shows from 1024px only, where the card sits beside them, never twice in a
+ * row on a phone.
  */
-export function ServicePriceCard({ item }: { item: CatalogItem }) {
+export function ServicePriceCard(
+  { item, promisesInBody = false }: {
+    item: CatalogItem
+    promisesInBody?: boolean
+  },
+) {
   const promiseIds = catalogPromises(item.slug)
   return (
     <div data-service-card={item.slug}>
@@ -41,7 +49,10 @@ export function ServicePriceCard({ item }: { item: CatalogItem }) {
             <span class="text-graphite">{item.tech.join(" · ")}</span>
           </Fact>
           {promiseIds.length > 0 && (
-            <Fact term="Promises">
+            <Fact
+              term="Promises"
+              class={promisesInBody ? "max-lg:hidden" : undefined}
+            >
               <ul class="space-y-1" data-service-promises>
                 {promiseIds.map((id) => <li key={id}>{promise(id).title}</li>)}
               </ul>

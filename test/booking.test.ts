@@ -264,8 +264,9 @@ Deno.test("?service= with a catalog slug prefills the brief, and any other value
     const slug = "codebase-health-audit"
     const known = await site.html(`/book?service=${slug}`)
     const about = `About: ${catalogItem(slug).shortTitle}`
+    // An attribute value, so the title's "&" arrives escaped.
     assert(
-      known.includes(`value="${about}`),
+      known.includes(`value="${about.replaceAll("&", "&amp;")}`),
       `/book?service=${slug}: the brief is not prefilled with "${about}"`,
     )
     assert(known.includes(slug), "the slug is not passed to the form")

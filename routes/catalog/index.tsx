@@ -4,11 +4,12 @@ import { SEOHead } from "../../components/SEOHead.tsx"
 import { Breadcrumb } from "../../components/Breadcrumb.tsx"
 import { Layout } from "../../components/Layout.tsx"
 import {
-  callVersusSession,
   catalogItems,
+  catalogPromises,
   INTRO_CALL,
   priceLabel,
 } from "../../lib/catalog.ts"
+import { promise } from "../../lib/promises.ts"
 import { toJsonLd } from "../../lib/json-ld.ts"
 import { formatPeriod } from "../../lib/data.ts"
 import { projectsForCatalog, workHref } from "../../lib/work.ts"
@@ -33,7 +34,7 @@ export default define.page(function Catalog() {
   head.value = {
     ...head.value,
     title:
-      "Services and prices: SaaS builds, code audits, fractional CTO — Anton Shubin",
+      "Services and prices: SaaS builds, code and security audits, fractional CTO — Anton Shubin",
     pageName: "Services",
     description: `Services and prices: ${
       catalogItems.map((i) => `${i.shortTitle} (${priceLabel(i)})`).join(", ")
@@ -41,7 +42,6 @@ export default define.page(function Catalog() {
     canonical: CANONICAL,
     ogType: "website",
   }
-  const { paid } = callVersusSession()
 
   return (
     <Layout currentPath="/catalog">
@@ -70,11 +70,10 @@ export default define.page(function Catalog() {
         <header class="mb-10 max-w-3xl">
           <h1 class="text-3xl sm:text-4xl text-parchment">Services</h1>
           <p class="mt-4 text-lg text-graphite">
-            Four ways to work with me, each with its price. Every price that
-            says "from" gets a quote for your scope before any work starts. Not
-            sure which fits? Start with the {INTRO_CALL}. The{" "}
-            {paid.title.toLowerCase()}{" "}
-            is a paid hour of advice, not a sales call.
+            Four ways to work with me, each with its price. Where a price says
+            "from", you get a quote for your scope before any work starts. Not
+            sure which fits? Start with the{" "}
+            {INTRO_CALL}. Every service comes with {promise("refund").phrase}.
           </p>
         </header>
 
@@ -95,6 +94,9 @@ export default define.page(function Catalog() {
                   <h2 class="text-2xl text-parchment">{item.shortTitle}</h2>
                 </div>
                 <p class="mt-2 text-sm text-graphite">{item.audience}</p>
+                <p class="mt-4 text-lg text-parchment" data-catalog-outcome>
+                  {item.outcome}
+                </p>
                 <p class="mt-4">
                   <span class="price text-2xl font-semibold text-parchment">
                     {priceLabel(item)}
@@ -103,18 +105,19 @@ export default define.page(function Catalog() {
                     {item.delivery}
                   </span>
                 </p>
-                <p class="mt-4 text-parchment">{item.summary}</p>
-                {!item.summaryStatesOutcome && (
-                  <p class="mt-2 text-graphite">{item.outcome}</p>
-                )}
-                <ul class="mt-4 space-y-1.5">
-                  {item.includes.slice(0, 3).map((inc) => (
+                {/* This card's own promises, never a line for the whole page (#541) */}
+                <p class="mt-3 text-sm text-graphite" data-catalog-promises>
+                  {catalogPromises(item.slug).map((id) => promise(id).title)
+                    .join(" · ")}
+                </p>
+                <ul class="mt-4 space-y-1.5" data-catalog-points>
+                  {item.cardPoints.map((point) => (
                     <li
-                      key={inc}
+                      key={point}
                       class="flex items-start gap-2 text-sm text-graphite"
                     >
                       <CheckIcon class="w-4 h-4 text-graphite shrink-0 mt-0.5" />
-                      {inc}
+                      {point}
                     </li>
                   ))}
                 </ul>

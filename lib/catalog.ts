@@ -58,10 +58,16 @@ export interface CatalogItem {
   /** One or two prices. Two means the client picks, as with the Ongoing item. */
   prices: CatalogPrice[]
   delivery: string
-  /** One sentence for cards, the llms files and the guide page. */
+  /** One sentence for the meta description, the llms files and the guide page. */
   summary: string
   desc: string
   outcome: string
+  /**
+   * Three plain points for the `/catalog` card only (#541), each a rewording
+   * of an `includes` line a non-technical founder can judge. `includes` stays
+   * technical on the item page.
+   */
+  cardPoints: [string, string, string]
   includes: string[]
   exclusions?: string[]
   tech: string[]
@@ -75,11 +81,6 @@ export interface CatalogItem {
   priceNote?: string
   /** The item a buyer usually looks at after this one (a `slug`). */
   next?: string
-  /**
-   * True when `summary` already says what `outcome` says, so a card that
-   * would show both (the index) shows the summary alone (#388).
-   */
-  summaryStatesOutcome?: boolean
 }
 
 /** Under a single "from" price: nothing is charged before the buyer has a number. */
@@ -115,6 +116,11 @@ export const catalogItems: CatalogItem[] = [
       "A focused 60-minute video call about your project or idea. I give you honest technical feedback, answer your questions, and help you plan the path forward. It is a paid hour of advice, not a sales call, and you can act on it with or without me.",
     outcome:
       "You leave with a clear technical direction and a plan you can act on.",
+    cardPoints: [
+      "A 60-minute video call",
+      "An honest view of your project or idea",
+      "Notes and a diagram of the plan afterwards",
+    ],
     includes: [
       "60-minute structured video call",
       "Honest technical assessment of your project or idea",
@@ -134,21 +140,25 @@ export const catalogItems: CatalogItem[] = [
   {
     icon: "search",
     slug: "codebase-health-audit",
-    title: "Code Audit & Refactoring Roadmap",
-    seoTitle: "Code audit and refactoring roadmap",
-    category: "Code audit",
+    title: "Code & Security Audit, With a Fix Roadmap",
+    seoTitle: "Code & security audit, for AI-built apps too",
+    category: "Code and security audit",
     next: "zero-to-production-saas-mvp",
-    shortTitle: "Code audit",
+    shortTitle: "Code & security audit",
     prices: [{ usd: 1500, from: true }],
     priceNote: QUOTE_NOTE,
     delivery: "3 days",
     summary:
-      "I review your codebase and tell you what to fix, what to rewrite and what to leave alone.",
-    summaryStatesOutcome: true,
+      "I check your app's code and security and tell you what to fix first, including apps built with Lovable, Supabase, Cursor or Claude Code.",
     desc:
-      "I review your existing codebase over three days. You get a written report covering architecture, security gaps and performance bottlenecks, with a prioritized refactoring roadmap, and we walk through it together on a call.",
+      "I review your existing codebase over three days, apps built with AI tools included. You get a written report covering architecture, security gaps and performance bottlenecks, with a prioritized roadmap of what to fix, and we walk through it together on a call.",
     outcome:
       "A prioritized roadmap that tells you what to fix, what to rewrite, and what to leave alone.",
+    cardPoints: [
+      "Security problems found and ranked",
+      "A written list of fixes, most urgent first",
+      "A 30-minute call to walk you through it",
+    ],
     includes: [
       "Full codebase review",
       "Security vulnerability scan",
@@ -158,11 +168,15 @@ export const catalogItems: CatalogItem[] = [
       "30-minute walkthrough call",
     ],
     tech: ["Any stack", "Security audit", "Performance profiling"],
+    exclusions: [
+      "A certificate that the app is secure: the report lists what I found, ranked by risk",
+      "Fixing the issues: that is quoted separately, as a Build or Ongoing job",
+    ],
     audience:
-      "Founders who inherited a messy codebase, and teams planning a major rewrite who want a clear roadmap first.",
+      "Founders who built their app with AI tools such as Lovable, Cursor or Claude Code and want it checked before real users, payments or personal data arrive; founders who inherited a messy codebase; and teams planning a major rewrite who want a clear roadmap first.",
     examples: [
+      "An app built with Lovable or Cursor on Supabase, checked for security gaps before launch, with a list of what to fix first.",
       "Technical due diligence before an acquisition, to assess code quality and security",
-      "A codebase review after the MVP, before scaling it up",
       "A performance audit for a SaaS platform with slow response times and frequent outages",
     ],
   },
@@ -178,11 +192,16 @@ export const catalogItems: CatalogItem[] = [
     prices: [{ usd: 8000, from: true }],
     delivery: "From 3 weeks",
     summary:
-      "I build your product from idea to live deployment. Backend APIs, AI integration and MCP servers are built the same way.",
+      "I build your product from idea to a live app on servers you own. Backends, AI features and MCP servers are built the same way.",
     desc:
       'I build your product from idea to live deployment: authentication, payments, an API and an admin panel, deployed on servers you own. The price and the timeline say "from" because they depend on the scope, and you get a quote for your scope before any work starts.',
     outcome:
       "A live product that real users can sign up for and pay for, without building an in-house team first.",
+    cardPoints: [
+      "Sign-up, log-in and payments through Stripe",
+      "An admin panel to manage your users",
+      "Live on servers in your name, with automatic backups",
+    ],
     firstStep: {
       title: "It starts with a discovery sprint",
       desc:
@@ -251,7 +270,12 @@ export const catalogItems: CatalogItem[] = [
     desc:
       "Ongoing work after the first build, or alongside your own team. This is where I work as a fractional CTO: architecture decisions, code review, technical direction for your developers, and looking after what is already in production. Pay by the hour when the need comes and goes, or take a monthly retainer when it is steady — the retainer works out cheaper from about 20 hours a month.",
     outcome:
-      "Senior technical leadership every week, and a production system that someone is actually watching.",
+      "Senior technical leadership every week, and someone actually watching your live product.",
+    cardPoints: [
+      "A 60-minute call every week",
+      "Technical decisions and code review for your team",
+      "Monitoring, backups and security patches after launch",
+    ],
     includes: [
       "Weekly 60-minute strategy call",
       "Architecture review and technical decisions",
