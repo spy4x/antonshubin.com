@@ -6,6 +6,7 @@ import { startSite } from "../harness.ts";
 import { assertToolFrame } from "../tool-frame.ts";
 import { visibleText } from "../html.ts";
 import { tool } from "../../lib/tools.ts";
+import { PAGE_CSS } from "../../components/tools/oko/ConfigToCard.tsx";
 
 async function okoPage(): Promise<string> {
   const site = await startSite({
@@ -32,7 +33,7 @@ Deno.test("the oko page wears the tool frame and plays its committed clip", asyn
   assert(html.includes("/video/tools/oko/demo.webm"), "no clip");
 });
 
-Deno.test("From config to card offers up, down and no answer, with Up chosen, only its picture shown and each choice counted on its radio alone", async () => {
+Deno.test("From config to card offers up, down and no answer, with Up chosen, each picture and note wired to the page's own swap CSS and each choice counted on its radio alone", async () => {
   const page = await okoPage();
   const radios = [...page.matchAll(/<input[^>]*name="oko-card-state"[^>]*>/g)]
     .map(([tag]) => tag);
@@ -64,12 +65,30 @@ Deno.test("From config to card offers up, down and no answer, with Up chosen, on
     )?.[0];
     assert(img, `no ${state} picture`);
     assert(img.includes(`loading="lazy"`), `${state} picture is not lazy`);
-    // Only Up starts displayed; the others are display:none until chosen.
-    assertEquals(
-      /class="(?:[^"]*\s)?hidden[\s"]/.test(img),
-      state !== "up",
-      `${state} picture's starting display`,
+    assert(img.includes(`data-oko-state="${state}"`), `${state} picture`);
+    assert(
+      new RegExp(`<p[^>]*data-oko-state="${state}"`).test(page),
+      `no ${state} note`,
     );
+  }
+  // What each state shows is checked in a browser
+  // (oko.browser.test.ts); here, that the CSS doing it is on the page.
+  assert(page.includes(`>${PAGE_CSS}</style>`), "the page lacks its swap CSS");
+});
+
+Deno.test("oko's swap and marker CSS reaches /tools/oko only, never the stylesheet every page loads", async () => {
+  const site = await startSite();
+  try {
+    const home = await site.html("/");
+    const href = home.match(/href="(\/assets\/client-entry-[^"?]+\.css)/)
+      ?.[1];
+    assert(href, "no client CSS on /");
+    const css = await site.html(href);
+    for (const needle of ["oko-state", "data-line", "data-oko", "oko-config"]) {
+      assert(!css.includes(needle), `shared CSS carries ${needle}`);
+    }
+  } finally {
+    await site.stop();
   }
 });
 

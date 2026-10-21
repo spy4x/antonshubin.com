@@ -145,3 +145,32 @@ Deno.test("the card states take one tab stop, and the arrow keys move the choice
     await site.stop();
   }
 });
+
+Deno.test("focusing a config line from the keyboard outlines its marker on the card", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      await page.goto(`${site.origin}/tools/oko`);
+      const marker = page.locator(
+        "section[aria-labelledby=config-to-card] [data-oko-marker='6']",
+      );
+      const outline = () =>
+        marker.evaluate((el) => getComputedStyle(el).outlineStyle);
+      assertEquals(await outline(), "none");
+      await page.locator("#oko-config-entry [data-line='6']").first().focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
+      assertEquals(await outline(), "solid");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
