@@ -1,11 +1,20 @@
-// Guards for issue #185: the nav's Book action is on every page, in both the
-// desktop rail and the phone tab bar, and falls back to "Write" when there is
-// no booking link. Guards for #433: the library `Rail`'s tab bar, More sheet
-// and portrait cell hold what the spec lists. Reads the built site through test/harness.ts — see
-// docs/testing.md "Rendered-page tests".
+// Guards for #529: the navigation holds no call to action. Contact, the
+// booking page as an ordinary destination, sits in the rail's bottom zone,
+// the More sheet and the phone header on every page, and falls back to the
+// brief when there is no booking link. Guards for #433: the library `Rail`'s
+// tab bar, More sheet and portrait cell hold what the spec lists. Reads the
+// built site through test/harness.ts — see docs/testing.md "Rendered-page
+// tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
-import { moreSheet, railColumn, tabBar, visibleText } from "./html.ts"
+import {
+  moreSheet,
+  phoneHeader,
+  railBottom,
+  railColumn,
+  tabBar,
+  visibleText,
+} from "./html.ts"
 
 const SCHEDULE_URL = "https://meet.example.com/book"
 
@@ -18,82 +27,92 @@ async function allPaths(site: Site): Promise<string[]> {
   return [...paths, "/pay"]
 }
 
-/** The nav's Book links on `html`: `{ tag, text }` for each `data-nav-book` anchor. */
-function bookLinks(html: string): { tag: string; text: string }[] {
-  return [...html.matchAll(/(<a\b[^>]*data-nav-book[^>]*>)([\s\S]*?)<\/a>/g)]
+/** The anchors in `html` whose opening tag carries `marker`: `{ tag, text }` each. */
+function links(html: string, marker: string): { tag: string; text: string }[] {
+  return [...html.matchAll(/(<a\b[^>]*>)([\s\S]*?)<\/a>/g)]
+    .filter((m) => m[1].includes(marker))
     .map((m) => ({ tag: m[1], text: visibleText(m[2]) }))
 }
 
-Deno.test("Book goes to /book from the rail and the tab bar on every page, in the same tab", async () => {
+/** Every navigation surface of `html`: the rail, its bottom zone, the tab bar and the More sheet. */
+function navSurfaces(html: string): string {
+  return railColumn(html) + railBottom(html) + tabBar(html) + moreSheet(html)
+}
+
+/**
+ * Checks Contact on every page: once in the rail's bottom zone, once in the
+ * More sheet, once in the phone header, nowhere else in the navigation,
+ * going to `href` in the same tab, current only on /book.
+ */
+async function assertContact(site: Site, href: string): Promise<void> {
+  for (const path of await allPaths(site)) {
+    const html = await site.html(path)
+    const found = [
+      ...links(railBottom(html), "data-nav-contact"),
+      ...links(moreSheet(html), "data-nav-contact"),
+      ...links(phoneHeader(html), "data-header-contact"),
+    ]
+    assertEquals(found.length, 3, `${path}: Contact in rail, sheet, header`)
+    assertEquals(
+      links(railColumn(html) + tabBar(html), "data-nav-contact").length,
+      0,
+      `${path}: Contact among the destinations or tabs`,
+    )
+    for (const link of found) {
+      assert(link.tag.includes(`href="${href}"`), `${path}: ${link.tag}`)
+      assert(!link.tag.includes("target="), `${path}: ${link.tag}`)
+      assertEquals(link.text, "Contact", `${path}: reads "${link.text}"`)
+      assertEquals(
+        link.tag.match(/aria-current="([^"]*)"/)?.[1],
+        path === "/book" ? "page" : "false",
+        `${path}: Contact is the current page only on /book: ${link.tag}`,
+      )
+    }
+  }
+}
+
+Deno.test("Contact goes to /book from the rail's bottom, the More sheet and the phone header on every page", async () => {
   const site = await startSite({ env: { SCHEDULE_URL } })
   try {
-    for (const path of await allPaths(site)) {
-      const html = await site.html(path)
-      const links = [
-        ...bookLinks(railColumn(html)),
-        ...bookLinks(tabBar(html)),
-      ]
-      assertEquals(
-        links.length,
-        2,
-        `${path}: expected Book in rail and tab bar`,
-      )
-      assertEquals(bookLinks(html).length, 2, `${path}: Book drawn elsewhere`)
-      for (const link of links) {
-        assert(
-          link.tag.includes(`href="/book"`),
-          `${path}: ${link.tag}`,
-        )
-        assert(!link.tag.includes("target="), `${path}: ${link.tag}`)
-        assertEquals(
-          link.tag.match(/aria-current="([^"]*)"/)?.[1],
-          path === "/book" ? "page" : "false",
-          `${path}: Book is the current page only on /book: ${link.tag}`,
-        )
-        assert(link.tag.includes("data-primary-book"), `${path}: ${link.tag}`)
-        assert(link.text.startsWith("Book"), `${path}: reads "${link.text}"`)
-      }
-    }
+    await assertContact(site, "/book")
   } finally {
     await site.stop()
   }
 })
 
-Deno.test("Book reads Write and goes to the brief on /book when SCHEDULE_URL is unset", async () => {
+Deno.test("Contact goes to the brief on /book when SCHEDULE_URL is unset", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } })
   try {
-    for (const path of await allPaths(site)) {
-      const html = await site.html(path)
-      const links = [
-        ...bookLinks(railColumn(html)),
-        ...bookLinks(tabBar(html)),
-      ]
-      assertEquals(
-        links.length,
-        2,
-        `${path}: expected Write in rail and tab bar`,
-      )
-      assertEquals(bookLinks(html).length, 2, `${path}: Write drawn elsewhere`)
-      for (const link of links) {
-        assert(
-          link.tag.includes(`href="/book#brief"`),
-          `${path}: ${link.tag}`,
-        )
-        assertEquals(link.text, "Write", `${path}: reads "${link.text}"`)
-        assertEquals(
-          link.tag.match(/aria-current="([^"]*)"/)?.[1],
-          path === "/book" ? "page" : "false",
-          `${path}: Write is the current page only on /book: ${link.tag}`,
-        )
-      }
-    }
-    const contact = await site.html("/book")
+    await assertContact(site, "/book#brief")
     assert(
-      contact.includes(`id="brief"`),
+      (await site.html("/book")).includes(`id="brief"`),
       "/book lost its brief anchor",
     )
   } finally {
     await site.stop()
+  }
+})
+
+Deno.test("no navigation entry is a Book call to action, on any page", async () => {
+  for (const scheduleUrl of [SCHEDULE_URL, ""]) {
+    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } })
+    try {
+      for (const path of await allPaths(site)) {
+        const nav = navSurfaces(await site.html(path))
+        assert(nav.length > 0, `${path}: no navigation found`)
+        assert(
+          !nav.includes("data-primary-book"),
+          `${path} (SCHEDULE_URL "${scheduleUrl}"): a Book action in the nav`,
+        )
+        assertEquals(
+          links(nav, "href=").filter((l) => /^Book\b|^Write$/.test(l.text)),
+          [],
+          `${path}: an entry still says Book or Write`,
+        )
+      }
+    } finally {
+      await site.stop()
+    }
   }
 })
 
@@ -103,14 +122,14 @@ function entryLabels(html: string): string[] {
     .map((m) => visibleText(m[2]))
 }
 
-Deno.test("the phone tab bar is Work, Services, Book in the centre, Tools, More", async () => {
+Deno.test("the phone tab bar is Work, Services, Tools, Writing, More", async () => {
   const site = await startSite({ env: { SCHEDULE_URL } })
   try {
     assertEquals(entryLabels(tabBar(await site.html("/"))), [
       "Work",
       "Services",
-      "Book",
       "Tools",
+      "Writing",
       "More",
     ])
   } finally {
@@ -118,7 +137,7 @@ Deno.test("the phone tab bar is Work, Services, Book in the centre, Tools, More"
   }
 })
 
-Deno.test("the More sheet lists Home, About, How I work, Writing, Infrastructure", async () => {
+Deno.test("the More sheet lists Home, About, How I work, Infrastructure, Contact", async () => {
   const site = await startSite({ env: { SCHEDULE_URL } })
   try {
     const sheet = moreSheet(await site.html("/"))
@@ -129,8 +148,8 @@ Deno.test("the More sheet lists Home, About, How I work, Writing, Infrastructure
       "/",
       "/about",
       "/how-i-work",
-      "/blog",
       "/infrastructure",
+      "/book",
     ])
   } finally {
     await site.stop()

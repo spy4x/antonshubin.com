@@ -8,12 +8,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "./harness.ts"
 import { visibleText } from "./html.ts"
-import {
-  BOOK_LABEL,
-  BRIEF_LABEL,
-  NAV_BOOK_LABEL,
-  NAV_WRITE_LABEL,
-} from "../lib/nav.ts"
+import { BOOK_LABEL, BRIEF_LABEL, CONTACT_LABEL } from "../lib/nav.ts"
 import { NEW_TAB_LABEL } from "../lib/meet-embed.ts"
 import { decapitalize } from "../lib/promises.ts"
 
@@ -22,8 +17,16 @@ const SCHEDULE = "https://meet.example.com"
 const SITE = "https://antonshubin.com"
 
 /** Wordings any booking or brief control may use, on any page. */
-const BOOK_WORDINGS = [BOOK_LABEL, decapitalize(BOOK_LABEL), NAV_BOOK_LABEL]
+const BOOK_WORDINGS = [BOOK_LABEL, decapitalize(BOOK_LABEL)]
 const BRIEF_WORDINGS = [BRIEF_LABEL, decapitalize(BRIEF_LABEL)]
+
+/**
+ * The navigation's entry for the booking page (#529), on every page in the
+ * rail, the More sheet and the phone header: it names a place, not the
+ * action, so it is allowed site-wide here rather than page by page in
+ * `EXCEPTIONS`. It goes to `/book`, or to the brief without a scheduler.
+ */
+const NAV_WORDINGS = [CONTACT_LABEL]
 
 /**
  * Controls that reach the booking page or the brief with other words, on
@@ -126,7 +129,7 @@ Deno.test("every booking and brief control uses one of the two wordings, with a 
       site,
       {
         // The scheduler's own page in a new tab is the one other booking link.
-        book: [...BOOK_WORDINGS, NEW_TAB_LABEL],
+        book: [...BOOK_WORDINGS, ...NAV_WORDINGS, NEW_TAB_LABEL],
         brief: BRIEF_WORDINGS,
       },
       seen,
@@ -142,14 +145,14 @@ Deno.test("every booking and brief control uses one of the two wordings, with a 
   }
 })
 
-Deno.test("without a scheduler, Book reads Write and the brief keeps its one wording", async () => {
+Deno.test("without a scheduler, the nav's Contact opens the brief and the brief keeps its one wording", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } })
   try {
     const stray = await strayWordings(
       site,
       {
-        book: [...BOOK_WORDINGS, NAV_WRITE_LABEL],
-        brief: [...BRIEF_WORDINGS, NAV_WRITE_LABEL],
+        book: BOOK_WORDINGS,
+        brief: [...BRIEF_WORDINGS, ...NAV_WORDINGS],
       },
       new Set(),
     )
@@ -214,7 +217,10 @@ Deno.test("every primary Book link goes to /book in the same tab, on every page"
           )
         }
       }
-      assert(seen > 20, `only ${seen} primary Book links found`)
+      // Without a scheduler only the pages that pass their own target
+      // (the booking page itself, How I work) still render Book.
+      const least = scheduleUrl ? 20 : 3
+      assert(seen > least, `only ${seen} primary Book links found`)
     } finally {
       await site.stop()
     }

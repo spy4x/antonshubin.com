@@ -5,11 +5,7 @@ import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
 import { SEOHead } from "../../components/SEOHead.tsx"
 import { Breadcrumb } from "../../components/Breadcrumb.tsx"
 import { Layout } from "../../components/Layout.tsx"
-import {
-  formatPeriod,
-  type Project,
-  projectScreenshots,
-} from "../../lib/data.ts"
+import { formatPeriod, type Project } from "../../lib/data.ts"
 import { firstSentence, metaDescription, projectLead } from "../../lib/llms.ts"
 import { projectTestimonials } from "../../lib/testimonials.ts"
 import {
@@ -33,6 +29,7 @@ import { ReviewSource } from "../../components/ReviewSource.tsx"
 import { ClosingBand } from "../../components/ClosingBand.tsx"
 import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
 import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { CardPicture } from "../../components/CardPicture.tsx"
 import { eventAttrs } from "../../lib/analytics.ts"
 
 const BASE = "https://antonshubin.com"
@@ -136,49 +133,6 @@ function Excerpt(
         <ReviewSource project={project} href={href} />
       </figcaption>
     </figure>
-  )
-}
-
-/**
- * The picture in a highlight card's 16:10 frame (UX 1, UX 10 on #270): the
- * card image, a phone screenshot centred on the Lamp panel, or the logo when
- * a project has no card image. Only the first card loads eagerly, and none
- * asks for high priority: `/work` has no hero image.
- */
-function CardPicture({ project, eager }: { project: Project; eager: boolean }) {
-  const image = project.cardImage
-  const alt = projectScreenshots(project)[0]?.alt ?? ""
-  return (
-    <div class="aspect-[16/10] bg-lamp flex items-center justify-center overflow-hidden">
-      {image
-        ? (
-          <img
-            src={image.src}
-            alt={alt}
-            width={image.width}
-            height={image.height}
-            loading={eager ? "eager" : "lazy"}
-            decoding="async"
-            class={image.width > image.height
-              ? "w-full h-full object-cover object-top"
-              : "h-full w-auto"}
-          />
-        )
-        : project.logoImageURL && (
-          <img
-            src={project.logoImageURL}
-            alt=""
-            aria-hidden="true"
-            width={96}
-            height={96}
-            loading={eager ? "eager" : "lazy"}
-            class={cn(
-              "w-24 h-24 object-contain",
-              project.logoPlate && "bg-parchment rounded-lg p-2",
-            )}
-          />
-        )}
-    </div>
   )
 }
 

@@ -1,3 +1,4 @@
+import { HOME_INTRO } from "../lib/home.ts"
 import { Head } from "fresh/runtime"
 import { type HeadTag, seoHeadTags } from "@spy4x/preact-system/seo-head"
 import {
@@ -110,7 +111,7 @@ export function SEOHead() {
                 "familyName": "Shubin",
                 "jobTitle": ROLE,
                 "description":
-                  "I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one. I work fixed price when the scope is fixed and hourly when it's open-ended.",
+                  `${HOME_INTRO} I work fixed price when the scope is fixed and hourly when it's open-ended.`,
                 "url": "https://antonshubin.com",
                 "image": "https://antonshubin.com/img/photo-big.webp",
                 "email": `mailto:${EMAIL_ADDRESS}`,

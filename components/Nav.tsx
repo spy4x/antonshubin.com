@@ -1,7 +1,6 @@
 import type { ComponentChildren, ComponentType } from "preact"
 import {
   IconBriefcase,
-  IconCalendar,
   IconFolder,
   IconGrid,
   IconHome,
@@ -20,14 +19,13 @@ import {
 } from "@spy4x/preact-system/rail"
 import {
   BOOK_HREF,
-  NAV_BOOK_LABEL,
-  NAV_WRITE_LABEL,
+  CONTACT_LABEL,
+  contactHref,
   type NavIcon,
   type NavItem,
   railItems,
   sheetBottomItems,
   sheetTopItems,
-  WRITE_FALLBACK_HREF,
 } from "../lib/nav.ts"
 import { eventAttrs } from "../lib/analytics.ts"
 
@@ -45,7 +43,7 @@ const NAV_ICONS: Record<NavIcon, ComponentType<IconProps>> = {
 
 interface NavProps {
   currentPath: string
-  /** `SCHEDULE_URL`: set → Book; empty → "Write". Both go to `/book`. */
+  /** `SCHEDULE_URL`: set → Contact goes to `/book`; empty → to its brief. */
   scheduleUrl: string
   /** The page: lands in the rail's `<main>`. */
   children: ComponentChildren
@@ -54,22 +52,21 @@ interface NavProps {
 }
 
 /**
- * The Book action as the rail's primary entry: "Book" to the booking page, or
- * "Write" to its brief when there is no calendar. It carries the markers
- * `data-primary-book` (the accent-fill guard), `data-nav-book` and the
- * analytics event.
+ * Contact (#529): the booking page as an ordinary destination, drawn like
+ * every other entry and never in the accent fill. It carries `data-nav-contact`
+ * and the analytics event (`book`, or `brief` without a calendar, with
+ * `place: nav`), never `data-primary-book`: the navigation holds no call to
+ * action.
  */
-function bookItem(scheduleUrl: string): RailItem {
-  const write = !scheduleUrl
+function contactItem(scheduleUrl: string): RailItem {
   return {
-    key: "book",
-    label: write ? NAV_WRITE_LABEL : NAV_BOOK_LABEL,
-    href: write ? WRITE_FALLBACK_HREF : BOOK_HREF,
-    Icon: write ? IconMail : IconCalendar,
+    key: "contact",
+    label: CONTACT_LABEL,
+    href: contactHref(scheduleUrl),
+    Icon: IconMail,
     attributes: {
-      "data-primary-book": "",
-      "data-nav-book": "",
-      ...eventAttrs(write ? "brief" : "book", { place: "nav" }),
+      "data-nav-contact": "",
+      ...eventAttrs(scheduleUrl ? "book" : "brief", { place: "nav" }),
     },
   }
 }
@@ -107,17 +104,17 @@ function sheetItem(item: NavItem): RailItem {
 }
 
 /**
- * The site navigation (#185, #433): `@spy4x/preact-system`'s `Rail` in its
- * labels variant: an 88px column of 80px cells with a short label under
- * each icon, and the same current fill as the apps. From 768px: the portrait and "Anton"
- * on top (a `RailEntry` in the `top` slot), linking home, then Book in the
- * accent fill, then `lib/nav.ts`'s `railItems` (the only part that scrolls
- * on a short screen). Below 768px: a tab bar of Work, Services, Book in the
- * centre, Tools and More, whose sheet holds Home and About, the destinations
- * that did not fit, then Infrastructure: the first two and the last are
- * `sheetOnly` items, so More is marked current on their pages. The site
- * footer goes in the `footer` slot, after `<main>`. The profiles and feeds
- * are in the footer (#293).
+ * The site navigation (#185, #433, #529): `@spy4x/preact-system`'s `Rail` in
+ * its labels variant: an 88px column of 80px cells with a short label under
+ * each icon, and the same current fill as the apps. From 768px: the portrait
+ * and "Anton" on top (a `RailEntry` in the `top` slot), linking home, then
+ * `lib/nav.ts`'s `railItems` (the only part that scrolls on a short screen),
+ * then Contact in the `bottom` slot. Below 768px: a tab bar of Work,
+ * Services, Tools, Writing and More, whose sheet holds Home and About, How I
+ * work, then Infrastructure and Contact: all but How I work are `sheetOnly`
+ * items, so More is marked current on their pages. The site footer goes in
+ * the `footer` slot, after `<main>`. The profiles and feeds are in the footer
+ * (#293). No entry is a call to action: Book buttons live in the page body.
  *
  * Server-rendered with no island: every entry is a link, More opens its
  * `<dialog>` through the button's `command`/`commandfor` invoker, and a
@@ -125,6 +122,10 @@ function sheetItem(item: NavItem): RailItem {
  * JavaScript or competes with the home page's LCP image.
  */
 export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
+  const contact = contactItem(scheduleUrl)
+  // Contact's href carries `#brief` without a calendar, so it never equals
+  // the path: on /book it is current by its key.
+  const onBook = currentPath === BOOK_HREF
   const top = (place: RailPlace) =>
     place === "rail" && (
       <RailEntry
@@ -132,6 +133,17 @@ export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
         place="rail"
         variant="labels"
         current={currentPath === "/" ? "page" : undefined}
+      />
+    )
+  // The column's Contact. The sheet's Contact is a `sheetOnly` item instead,
+  // so the More tab is marked current on /book like on Home or About.
+  const bottom = (place: RailPlace) =>
+    place === "rail" && (
+      <RailEntry
+        item={contact}
+        place="rail"
+        variant="labels"
+        current={onBook ? "page" : undefined}
       />
     )
 
@@ -142,13 +154,12 @@ export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
         ...sheetTopItems.map(sheetItem),
         ...railItems.map(railItem),
         ...sheetBottomItems.map(sheetItem),
+        { ...contact, sheetOnly: true },
       ]}
-      primary={bookItem(scheduleUrl)}
       currentPath={currentPath}
-      // On /book the primary is the page, also as "Write", whose href
-      // carries `#brief` and so never equals the path.
-      currentKey={currentPath === BOOK_HREF ? "book" : undefined}
+      currentKey={onBook ? contact.key : undefined}
       top={top}
+      bottom={bottom}
       footer={footer}
       labels={{ skipToContent: "Skip to main content" }}
     >

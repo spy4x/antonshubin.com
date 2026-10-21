@@ -58,10 +58,10 @@ Deno.test("the footer's Site group is the rail plus Infrastructure, About and Wh
   )
 })
 
-Deno.test("the rail lists Work, Services, Tools, How I work, then Writing", () => {
+Deno.test("the rail lists Work, Services, Tools, Writing, then How I work", () => {
   assertEquals(
     railItems.map((i) => i.label),
-    ["Work", "Services", "Tools", "How I work", "Writing"],
+    ["Work", "Services", "Tools", "Writing", "How I work"],
   )
 })
 

@@ -2,8 +2,9 @@ import { INVOICE_NOTE, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts"
 import {
   BOOK_HREF,
   BOOK_LABEL,
-  NAV_WRITE_LABEL,
+  BRIEF_LABEL,
   siteItems,
+  WRITE_FALLBACK_HREF,
 } from "../lib/nav.ts"
 import {
   emailContact,
@@ -33,8 +34,8 @@ const fromProfile = ({ href, label }: Profile): FooterLink => ({ href, label })
  * to. Plain server markup with no island, and text only: it is on every page,
  * so its bytes compete with the home page's LCP image (see `components/Nav.tsx`).
  * `canBook` is whether `SCHEDULE_URL` is set: the Contact group's first link
- * reads `BOOK_LABEL` when it is and "Write" when it isn't, like the nav's
- * Book, and goes to `/book` either way.
+ * reads `BOOK_LABEL` when it is and `BRIEF_LABEL` when it isn't (the booking
+ * page's brief), and goes to `/book` or to `/book#brief`.
  */
 export function Footer({ canBook }: { canBook: boolean }) {
   const groups: FooterGroup[] = [
@@ -50,7 +51,9 @@ export function Footer({ canBook }: { canBook: boolean }) {
       id: "contact",
       label: "Contact",
       links: [
-        { href: BOOK_HREF, label: canBook ? BOOK_LABEL : NAV_WRITE_LABEL },
+        canBook
+          ? { href: BOOK_HREF, label: BOOK_LABEL }
+          : { href: WRITE_FALLBACK_HREF, label: BRIEF_LABEL },
         fromProfile(emailContact),
         fromProfile(telegramContact),
       ],

@@ -98,8 +98,8 @@ export function TryItHere({ scheduleUrl }: { scheduleUrl: string }) {
     <section aria-labelledby="try" data-mig-try-section class="max-w-3xl">
       <h2 id="try" class="text-2xl sm:text-3xl text-parchment">Try it here</h2>
       <p class="mt-4 text-parchment">
-        This is my real booking page, the same one behind Book. Book only if you
-        want to talk.
+        This is my real booking page, the same one the Book buttons on this site
+        open. Book only if you want to talk.
       </p>
       <div class="mt-6 flex flex-col items-start gap-4">
         <MigTryCalendar

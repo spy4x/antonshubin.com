@@ -80,7 +80,7 @@ Deno.test("no monospace font renders in a heading, nav item or button (#184)", a
   }
 })
 
-Deno.test("the accent colour is a background only on the primary button and the nav's Book (#184)", async () => {
+Deno.test("the accent colour is a background only on Book buttons in the page body, never in navigation (#184, #529)", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
   })
@@ -122,6 +122,21 @@ Deno.test("the accent colour is a background only on the primary button and the 
             // with `data-primary-book` — never guessed from text content
             // ("book" appears in plenty of non-CTA copy) or element shape.
             const isPrimaryBook = el.hasAttribute("data-primary-book")
+            // Navigation never carries the accent (#529): the rail, its
+            // phone tab bar and More sheet, and the phone header. The tab
+            // bar and the sheet are hidden at this width, but their computed
+            // background still tells.
+            const inNav = el.closest(
+              'nav, aside[data-e2e="rail-shell-column"], [data-e2e="rail-shell-dock"], dialog[data-e2e="rail-shell-dialog"], main > header',
+            )
+            if (inNav) {
+              found.push(
+                `${el.tagName.toLowerCase()}.${
+                  Array.from(el.classList).join(".")
+                } in navigation`,
+              )
+              continue
+            }
             if (!isPrimaryBook) {
               found.push(
                 `${el.tagName.toLowerCase()}.${
@@ -144,7 +159,7 @@ Deno.test("the accent colour is a background only on the primary button and the 
         assertEquals(
           offenders,
           [],
-          `${path} must paint the accent background only on the Book action, found: ${
+          `${path} must paint the accent background only on a body Book button, found: ${
             offenders.join(", ")
           }`,
         )

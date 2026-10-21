@@ -3,7 +3,17 @@
 // through test/harness.ts. Assert structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
-import { count, jsonLd, mainContent, railColumn, visibleText } from "./html.ts"
+import {
+  count,
+  jsonLd,
+  mainContent,
+  pageBody,
+  railBottom,
+  railColumn,
+  visibleText,
+} from "./html.ts"
+import { HOME_LEAD } from "../lib/home.ts"
+import { BRIEF_LABEL } from "../lib/nav.ts"
 import {
   catalogItems,
   catalogOffers,
@@ -56,22 +66,22 @@ siteTest(
 )
 
 siteTest(
-  "the rail lists Book, then Work, Services, Tools, How I work and Writing",
+  "the rail lists Work, Services, Tools, Writing and How I work, then Contact last",
   async (site) => {
-    const links = [
-      ...railColumn(await site.html("/")).matchAll(
-        /<a[^>]*\bhref="([^"]*)"[^>]*>/g,
-      ),
-    ].map((m) => m[1])
-    // Book, or Write to `/book#brief` when this run has no SCHEDULE_URL.
-    assert(links[0]?.startsWith("/book"), `the rail opens on ${links[0]}`)
-    assertEquals(links.slice(1), [
+    const html = await site.html("/")
+    const hrefs = (part: string) =>
+      [...part.matchAll(/<a[^>]*\bhref="([^"]*)"[^>]*>/g)].map((m) => m[1])
+    assertEquals(hrefs(railColumn(html)), [
       "/work",
       "/catalog",
       "/tools",
-      "/how-i-work",
       "/blog",
+      "/how-i-work",
     ])
+    // `/book`, or `/book#brief` when this run has no SCHEDULE_URL.
+    const bottom = hrefs(railBottom(html))
+    assertEquals(bottom.length, 1, `rail bottom: ${bottom}`)
+    assert(bottom[0].startsWith("/book"), `the rail ends on ${bottom[0]}`)
   },
 )
 
@@ -228,7 +238,7 @@ siteTest(
 // to a URL — issue #156 replaced the previous behaviour of rendering it
 // anyway with an empty `href`.
 Deno.test(
-  "the home page has at most six sections and one primary call to action",
+  "the home page puts proof before price in seven sections, with one primary call to action",
   async () => {
     const previous = Deno.env.get("SCHEDULE_URL")
     Deno.env.set("SCHEDULE_URL", "https://meet.example.com")
@@ -236,19 +246,27 @@ Deno.test(
     try {
       const html = await site.html("/")
       const main = mainContent(html)
-      // The prices sit inside the hero (#269); "testimonials" shows only
-      // while a review is cleared for the site.
+      // Proof before price, the ask after both (#529); "testimonials"
+      // shows only while a review is cleared for the site.
       assertEquals(
         [...main.matchAll(/<section[^>]*data-home-section="([^"]*)"/g)].map((
           m,
         ) => m[1]),
         visibleTestimonials().length > 0
-          ? ["hero", "work", "testimonials", "how-it-works", "tools", "cta"]
-          : ["hero", "work", "how-it-works", "tools", "cta"],
+          ? [
+            "hero",
+            "work",
+            "testimonials",
+            "how-it-works",
+            "services",
+            "tools",
+            "cta",
+          ]
+          : ["hero", "work", "how-it-works", "services", "tools", "cta"],
       )
       assert(
-        count(main, /<section[\s>]/g) <= 6,
-        "more than six <section> elements",
+        count(main, /<section[\s>]/g) <= 7,
+        "more than seven <section> elements",
       )
       assertEquals(count(main, /data-primary-cta/g), 1)
     } finally {
@@ -256,6 +274,46 @@ Deno.test(
       if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
       else Deno.env.set("SCHEDULE_URL", previous)
     }
+  },
+)
+
+Deno.test(
+  "the home page shows Book twice, in the hero beside the brief and in the closing band",
+  async () => {
+    const site = await startSite({
+      env: { SCHEDULE_URL: "https://meet.example.com" },
+    })
+    try {
+      const body = pageBody(await site.html("/"))
+      assertEquals(count(body, /data-primary-book/g), 2)
+      const start = body.indexOf('data-home-section="hero"')
+      const hero = body.slice(start, body.indexOf("</section>", start))
+      assertEquals(count(hero, /data-primary-book/g), 1, "Book in the hero")
+      assert(
+        visibleText(hero).includes(BRIEF_LABEL),
+        "no brief action in the hero",
+      )
+      const band = body.slice(body.indexOf("<section data-closing-band"))
+      assertEquals(count(band, /data-primary-book/g), 1, "Book in the band")
+    } finally {
+      await site.stop()
+    }
+  },
+)
+
+siteTest(
+  "the home lead is one sentence that the page, the Person JSON-LD and llms.txt share",
+  async (site) => {
+    const html = await site.html("/")
+    const lead = html.match(/<p[^>]*data-home-lead[^>]*>([\s\S]*?)<\/p>/)
+    assertEquals(visibleText(lead?.[1] ?? ""), HOME_LEAD)
+    const person = jsonLd(html)
+      .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
+      .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
+        | { description: string }
+        | undefined
+    assert(person?.description.includes(HOME_LEAD), person?.description)
+    assert((await site.html("/llms.txt")).includes(HOME_LEAD), "llms.txt")
   },
 )
 
@@ -878,7 +936,7 @@ siteTest(
 )
 
 siteTest(
-  "the home page has one H1 that holds the name, and all four catalog prices in the hero",
+  "the home page has one H1 that holds the name, and all four catalog prices in the services section, not the hero",
   async (site) => {
     const html = await site.html("/")
     assertEquals(count(html, /<h1[\s>]/g), 1)
@@ -886,12 +944,21 @@ siteTest(
       html.slice(html.indexOf("<h1"), html.indexOf("</h1>")),
     )
     assert(h1.includes("Anton Shubin") && h1.includes("Tech Lead"), h1)
-    const start = html.indexOf('data-home-section="hero"')
-    const hero = html.slice(start, html.indexOf("</section>", start))
+    const section = (id: string) => {
+      const start = html.indexOf(`data-home-section="${id}"`)
+      assert(start > 0, `no ${id} section`)
+      return html.slice(start, html.indexOf("</section>", start))
+    }
+    const hero = section("hero")
+    const services = section("services")
     for (const item of catalogItems) {
       assert(
-        hero.includes(`href="/catalog/${item.slug}"`),
-        `no ${item.slug} row in the hero`,
+        services.includes(`href="/catalog/${item.slug}"`),
+        `no ${item.slug} card in the services section`,
+      )
+      assert(
+        !hero.includes(`href="/catalog/${item.slug}"`),
+        `${item.slug} price is back in the hero`,
       )
     }
   },

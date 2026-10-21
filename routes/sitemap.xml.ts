@@ -1,3 +1,4 @@
+import { HOME_LEAD } from "../lib/home.ts"
 import { define } from "../lib/utils.ts"
 import { blogArticles, hackathons } from "../lib/data.ts"
 import { workHref, workProjects } from "../lib/work.ts"
@@ -92,7 +93,7 @@ export const handler = define.handlers({
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Site: Anton Shubin — ${ROLE}
-  Description: I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
+  Description: ${HOME_LEAD}
   ${proof("expert-vetted")} (${proof("top-percent")}). ${
       proof("job-success")
     } Job Success. ${proof("earned")} earned. ${proof("jobs")} jobs on Upwork.

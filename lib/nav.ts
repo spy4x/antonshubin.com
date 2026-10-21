@@ -46,22 +46,22 @@ const INFRASTRUCTURE: NavItem = {
 }
 
 /**
- * The rail's destinations, top to bottom under the portrait and Book (#433).
- * On a phone the library's `Rail` makes the first three tabs, around Book in
- * the centre, and puts the rest in the "More" sheet; that is why Tools comes
- * before How I work.
+ * The rail's destinations, top to bottom under the portrait (#433, #529). On
+ * a phone the library's `Rail` makes the first four tabs and puts the rest in
+ * the "More" sheet: that is why Writing comes before How I work.
  */
 export const railItems: NavItem[] = [
   WORK,
   SERVICES,
   TOOLS,
-  HOW_I_WORK,
   WRITING,
+  HOW_I_WORK,
 ]
 
 /**
  * The phone "More" sheet's rows around the destinations that did not fit the
- * tab bar: Home and About above them, Infrastructure below. Pages only.
+ * tab bar: Home and About above them, Infrastructure below, then Contact
+ * (`components/Nav.tsx` adds it). Pages only.
  */
 export const sheetTopItems: NavItem[] = [HOME, ABOUT]
 export const sheetBottomItems: NavItem[] = [INFRASTRUCTURE]
@@ -79,27 +79,35 @@ const allItems: NavItem[] = [
 
 /**
  * Where Book goes: the booking page, with the calendar on it (#293). When
- * `SCHEDULE_URL` is unset the button reads "Write" and goes to that page's
- * written brief (`routes/book.tsx`'s `#brief`).
+ * `SCHEDULE_URL` is unset the nav's Contact goes to that page's written brief
+ * (`routes/book.tsx`'s `#brief`).
  */
 export const BOOK_HREF = "/book"
 export const WRITE_FALLBACK_HREF = `${BOOK_HREF}#brief`
 
 /**
  * The one wording of the Book action on every page (#190): every button or
- * link that books the call says this, and only the nav says it shorter
- * (`NAV_BOOK_LABEL`). `test/action-wording.test.ts` fails on a third wording.
+ * link that books the call says this. The navigation never books: it names
+ * the booking page as a place (`CONTACT_LABEL`). `test/action-wording.test.ts`
+ * fails on a third wording.
  */
 export const BOOK_LABEL = "Book a free 30-minute call"
 
 /** The one wording of the written-brief action on every page (#190). */
 export const BRIEF_LABEL = "Send a written brief"
 
-/** The nav's short Book, where `BOOK_LABEL` does not fit a tab. */
-export const NAV_BOOK_LABEL = "Book"
+/**
+ * The navigation's entry for the booking page (#529): the rail's bottom
+ * entry, the More sheet's last row and the phone header's link. A place, not
+ * an ask, so the navigation carries no call to action; it goes to `/book`, or
+ * to its brief when `SCHEDULE_URL` is unset (`contactHref()`).
+ */
+export const CONTACT_LABEL = "Contact"
 
-/** What Book reads, in the nav and the footer, when `SCHEDULE_URL` is unset. */
-export const NAV_WRITE_LABEL = "Write"
+/** Where the navigation's Contact goes: the booking page, or its brief without a calendar. */
+export function contactHref(scheduleUrl: string): string {
+  return scheduleUrl ? BOOK_HREF : WRITE_FALLBACK_HREF
+}
 
 /**
  * The nav's own word for a section, given the section's path: "Writing" for

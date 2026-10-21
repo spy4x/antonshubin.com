@@ -57,7 +57,7 @@ What this site adds to that flow:
 Constraints every review and spec keeps:
 
 - **Visual system** (below): the `@theme` tokens only, the accent fill only on
-  Book, `Button`/`buttonClass`, and `font-semibold`.
+  Book buttons in the page body, `Button`/`buttonClass`, and `font-semibold`.
 - **Content rule** (below): no new claim, number, quote or name. Wording comes
   from the `lib/*.ts` data files or from facts Anton supplied. When a
   recommendation needs data that doesn't exist, the spec says what the page
@@ -200,19 +200,23 @@ renders `@spy4x/preact-system`'s `Rail` in its labels variant (#433), an 88px
 column of 80px cells with the same current fill as the apps, on the server with
 no island: More opens its `<dialog>` through the button's `command`/`commandfor`
 invoker, and a backdrop tap closes it through `closedby="any"`. The column holds
-the portrait with "Anton" (a `RailEntry` in the `top` slot, linking home), Book,
-then `railItems`; the phone tab bar holds Work, Services, Book in the centre,
-Tools and More. There is no Links control (#293): More lists pages only (Home,
-About, How I work, Writing, Infrastructure), and the profiles and feeds live in
-the footer. Home, About and Infrastructure are `sheetOnly` items, so More is
-marked current on their pages. The icons come from `@spy4x/preact-icons`. Keep
-the markup small, because under `scripts/lcp.ts`'s network profile every extra
-KB on every page measurably delays the home page's LCP image. The phone header
-(photo, name, and `ROLE` on the right) is plain markup in
-`components/Layout.tsx`; the time zone is in the footer. Book goes to `/book` in
-the same tab and carries `data-primary-book`; with `SCHEDULE_URL` unset it reads
-"Write" and goes to that page's written brief (`/book#brief`). The footer's
-Contact group links the same page. `test/nav.test.ts` checks both on every page.
+the portrait with "Anton" (a `RailEntry` in the `top` slot, linking home), then
+`railItems`, then Contact (a `RailEntry` in the `bottom` slot); the phone tab
+bar holds Work, Services, Tools, Writing and More. No navigation entry is a call
+to action or carries the accent (#529): Book buttons live in the page body.
+There is no Links control (#293): More lists pages only (Home, About, How I
+work, Infrastructure, Contact), and the profiles and feeds live in the footer.
+Home, About, Infrastructure and Contact are `sheetOnly` items, so More is marked
+current on their pages. The icons come from `@spy4x/preact-icons`. Keep the
+markup small, because under `scripts/lcp.ts`'s network profile every extra KB on
+every page measurably delays the home page's LCP image. The phone header (photo
+and name on the left, a quiet Contact link on the right) is plain markup in
+`components/Layout.tsx`; the time zone is in the footer. Contact
+(`CONTACT_LABEL`, `contactHref()`) goes to `/book` in the same tab, is current
+only there, and carries `data-nav-contact` (`data-header-contact` in the
+header), never `data-primary-book`; with `SCHEDULE_URL` unset it goes to that
+page's written brief (`/book#brief`). The footer's Contact group links the same
+page. `test/nav.test.ts` checks all three on every page.
 
 ## Site frame
 
@@ -271,17 +275,17 @@ regression, not a style choice.
 library adds no padding, gap or text size and every call site sizes its own
 button through `class`. `variant` defaults to `secondary` (the library's `ghost`
 plus a Rule strong border: the library's `outline` fills itself with Paper);
-`variant="primary"` (the accent fill, Ink text) is reserved for the Book action,
-and a primary button carries `data-primary-book` — the marker
+`variant="primary"` (the accent fill, Ink text) is reserved for the Book action
+in the page body, and a primary button carries `data-primary-book` — the marker
 `test/visual-system.browser.test.ts`'s "the accent colour is a background only
-on the primary button and the nav's Book" guard looks for, instead of guessing
-from text content or element shape. With `href` it renders an `<a>`, without one
-a `<button type="button">`. The library appends a caller's classes after its own
-instead of merging them, so `SITE_VARIANT` replaces the library's `rounded-md`
-with `rounded-lg!` (important; no call site sets a radius), and the library's
-`font-medium` already renders 600 here (below). Never add a second class for a
-property the library sets without `!`: two Tailwind classes for the same
-property in one `class` attribute resolve by their order in the compiled
+on Book buttons in the page body, never in navigation" guard looks for, instead
+of guessing from text content or element shape. With `href` it renders an `<a>`,
+without one a `<button type="button">`. The library appends a caller's classes
+after its own instead of merging them, so `SITE_VARIANT` replaces the library's
+`rounded-md` with `rounded-lg!` (important; no call site sets a radius), and the
+library's `font-medium` already renders 600 here (below). Never add a second
+class for a property the library sets without `!`: two Tailwind classes for the
+same property in one `class` attribute resolve by their order in the compiled
 stylesheet, not in the attribute. `components/BookCallLink.tsx` (every "Book a
 call" link on the site) renders this `Button`, to `/book` in the same tab unless
 the page passes its own `href` (#387: never the scheduler, never
@@ -347,14 +351,23 @@ pointing at its page's `#project` node, with no review markup.
 
 ### Home page and shared pieces
 
-`routes/index.tsx` (#269) uses the project page's frame: a two-line `<h1>` (name
-small, `ROLE` large), the lead, Book and "Send a written brief", a fact card
-with the Upwork figures beside the four prices, then Client work, Client
-reviews, "How a project runs", the tools and the closing band with the brief
-form. The portrait renders only from 1024px: its `<img>` holds a blank pixel
-until a `min-width: 1024px` `<source>` matches, so a phone requests no portrait,
-and it is the page's one eager, `fetchpriority="high"` image. Reuse these rather
-than making a copy:
+`routes/index.tsx` (#269, redesigned in #529) puts proof before price and the
+ask after both. The hero holds a two-line `<h1>` (name small, `ROLE` large), the
+one-sentence lead (`lib/home.ts`'s `HOME_LEAD`, which the meta description, the
+Person JSON-LD, the sitemap comment and both llms files read too), Book and
+"Send a written brief", the three promises with "How these work" and the Upwork
+line, beside the "At a glance" `FactCard` (portrait, the Upwork figures,
+Expert-Vetted, Team, About), as tall as the text column from 1024px and after
+the actions at 390px. Then Client work (three picture cards through
+`components/CardPicture.tsx`, shared with `/work`), Client reviews, "How a
+project runs", Services and prices (four cards, `PRICING_RULE`), the tools
+(three `ToolCard`s and one writing line) and the closing band with the brief
+form. Every section under the hero is `HomeSection`: the H2 left and its one
+"All …" link on the same baseline on the right from 1024px, under the content at
+390px. Book appears twice, in the hero and in the band. The portrait renders
+only from 1024px: its `<img>` holds a blank pixel until a `min-width: 1024px`
+`<source>` matches, so a phone requests no portrait, and it is the page's one
+eager, `fetchpriority="high"` image. Reuse these rather than making a copy:
 
 - `components/FactCard.tsx`: the fact card's box plus `Fact` rows, used by the
   project page's card and the home card.
@@ -498,13 +511,12 @@ docs/redirects.md).
 `BOOK_LABEL` ("Book a free 30-minute call") and every one that opens the brief
 says `BRIEF_LABEL` ("Send a written brief"), both in `lib/nav.ts` next to
 `BOOK_HREF` and `WRITE_FALLBACK_HREF`; inside a sentence they are spliced
-through `decapitalize()`. Only the nav says it shorter (`NAV_BOOK_LABEL`,
-"Book"), "Write" (`NAV_WRITE_LABEL`) replaces Book when `SCHEDULE_URL` is unset,
-and `NEW_TAB_LABEL` is the scheduler's own page. Headings and prose that name
-the call use `INTRO_CALL`. `test/action-wording.test.ts` scans every sitemap
-page, `/pay`, a not-found URL and both llms files, and fails on any other
-wording; its `EXCEPTIONS` list names each deliberate one with its reason and
-fails when one is no longer on its page.
+through `decapitalize()`. The navigation never says either: it names the booking
+page `CONTACT_LABEL` ("Contact", #529), and `NEW_TAB_LABEL` is the scheduler's
+own page. Headings and prose that name the call use `INTRO_CALL`.
+`test/action-wording.test.ts` scans every sitemap page, `/pay`, a not-found URL
+and both llms files, and fails on any other wording; its `EXCEPTIONS` list names
+each deliberate one with its reason and fails when one is no longer on its page.
 
 ### How I work page
 

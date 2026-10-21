@@ -1,3 +1,4 @@
+import { HOME_INTRO } from "../lib/home.ts"
 import { define } from "../lib/utils.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
 import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts"
@@ -136,7 +137,7 @@ export const handler = define.handlers({
 
     const txt = `# Anton Shubin — ${ROLE} (Full Index)
 
-> I'm a senior full-stack engineer and tech lead. I build and run SaaS products end to end, and you own the code, the servers and the keys from day one.
+> ${HOME_INTRO}
 > ${proof("expert-vetted")} (${proof("top-percent")}). ${
       proof("job-success")
     } Job Success. ${proof("earned")} earned. ${proof("jobs")} jobs on Upwork.
