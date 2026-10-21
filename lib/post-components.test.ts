@@ -226,3 +226,20 @@ Deno.test("every post in content/blog renders, with each component tag registere
   }
   assert(posts > 10, `only ${posts} posts found in content/blog`)
 })
+
+Deno.test("a paragraph that opens with a tag in inline code or prose stays a paragraph", async () => {
+  const md = "Intro.\n\n`<Gauge />` is the gauge.\n\nA <Foo> tag.\n"
+  const { segments } = await renderBlogPost(md, {
+    slug: "p",
+    components: FIXTURES,
+  })
+  assertEquals(segments.map((s) => s.kind), ["html"])
+  const [only] = segments
+  assert(only.kind === "html")
+  assertStringIncludes(
+    only.html,
+    "<p><code>&lt;Gauge /&gt;</code> is the gauge.</p>",
+  )
+  assertStringIncludes(only.html, "<p>A <Foo> tag.</p>")
+  assertEquals(toDevToMarkdown(md, "https://example.com/blog/p", FIXTURES), md)
+})

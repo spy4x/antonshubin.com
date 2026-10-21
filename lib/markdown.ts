@@ -203,8 +203,10 @@ blogMarked.use({
   extensions: [{
     name: "postComponent",
     level: "block",
+    // Marked calls this on the paragraph minus its first character, so
+    // only a match after a newline is a real line start.
     start(src) {
-      return /(?:^|\n) {0,3}<[A-Z]/.exec(src)?.index
+      return /\n {0,3}<[A-Z]/.exec(src)?.index
     },
     tokenizer(src, tokens) {
       if (!TAG_START.test(src)) return undefined
