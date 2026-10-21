@@ -152,9 +152,10 @@ Deno.test("a focused screenshot, dark or white, draws a Parchment and Ink ring i
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    // caldav-tasks-web's hero is a dark screenshot; toread-today's are white.
+    // oko's status cards below the hero are dark screenshots; toread-today's
+    // are white. Every other hero is a clip poster now, which is a link.
     const cases = [
-      { slug: "caldav-tasks-web", shot: "[data-tool-media] img", width: 1440 },
+      { slug: "oko", shot: "[data-tool-middle] img", width: 1440 },
       { slug: "toread-today", shot: "[data-tool-media] img", width: 1440 },
       { slug: "toread-today", shot: "[data-tool-middle] img", width: 390 },
     ];
