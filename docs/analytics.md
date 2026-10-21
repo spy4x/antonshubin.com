@@ -198,6 +198,8 @@ None yet.
   (on its radio, so a click on the chip or an arrow key counts once).
 - `outbound` (`to: github`, `place: body`): "Every field" under the task file
   and "The compatibility guide" under "What was tested".
+- `outbound` (`to: issues`, `place: body`): "Issue #119" in the known-issue line
+  of "Where it stands" (the entry's `knownIssue`).
 
 ### dotfiles
 
