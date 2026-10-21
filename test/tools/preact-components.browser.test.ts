@@ -163,3 +163,44 @@ Deno.test("Light repaints the preview's frame and not the page, and axe finds no
     await site.stop();
   }
 });
+
+Deno.test("at 390px the first screen shows the h1, the lede and at least half of the clip's poster, and no clip bytes load before the press", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    });
+    try {
+      const videos: string[] = [];
+      page.on("request", (request) => {
+        if (/\.(webm|mp4)(\?|$)/.test(request.url())) {
+          videos.push(request.url());
+        }
+      });
+      await page.goto(`${site.origin}${PATH}`, { waitUntil: "networkidle" });
+      // The page's four-line h1 leaves room for most of the poster, not all.
+      for (
+        const [selector, share] of [
+          ["h1", 1],
+          ["[data-tool-lede]", 1],
+          ["[data-tool-media] img", 0.5],
+        ] as const
+      ) {
+        const box = await page.locator(selector).first().boundingBox();
+        assert(box, `${selector} is not drawn`);
+        assert(
+          box.y + box.height * share <= 844,
+          `${selector} is not on the first screen`,
+        );
+      }
+      assertEquals(videos, [], "the clip loaded before the press");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
