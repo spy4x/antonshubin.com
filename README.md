@@ -48,6 +48,7 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | `deno task video-kit`            | Transcript → titles, description, chapters, blog draft                     |
 | `deno task weekly-numbers`       | Umami/GitHub/YouTube numbers → markdown + NTFY                             |
 | `deno task umami-reports`        | Create or update the Umami goals and funnels (`--dry-run` to preview)      |
+| `deno task pull:videos`          | Copy each tool clip from its repository at the pinned commit               |
 | `deno task optimize:screenshots` | Compress portfolio screenshots                                             |
 | `deno task video-cut`            | Cut a recording: `prepare` an edit brief, then `render` (needs ffmpeg)     |
 | `deno task links`                | Print a page's tagged URL for every channel (docs/utm.md)                  |
