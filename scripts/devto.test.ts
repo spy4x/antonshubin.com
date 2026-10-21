@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0"
 import {
   absolutizeImageUrls,
   buildDevToPayload,
@@ -611,4 +611,17 @@ Deno.test("the Dev.to opening turns a live link on this site into a full address
       `relative link in the opening: ${target}`,
     )
   }
+})
+
+Deno.test("buildDevToPayload never sends a raw component tag to Dev.to", () => {
+  assertThrows(
+    () =>
+      buildDevToPayload(
+        "title",
+        "post-slug",
+        "before\n\n<NoSuchComponent />\n\nafter",
+      ),
+    Error,
+    `NoSuchComponent`,
+  )
 })

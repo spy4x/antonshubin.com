@@ -13,6 +13,7 @@ import { envValue } from "./cloudflare-purge.ts"
 import type { BlogArticle } from "@/lib/data.ts"
 import { postIntro } from "@/lib/blog-posts.ts"
 import { relatedToolLink } from "@/lib/blog.ts"
+import { toDevToMarkdown } from "@/lib/markdown.ts"
 
 // Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
 // must point at production, since it tells search engines which copy is the
@@ -221,6 +222,7 @@ export function absolutizeImageUrls(markdown: string): string {
  * URL that isn't the one search engines should treat as the source. The
  * body ends with {@linkcode firstPublishedLine}, whose link does carry the
  * `devto` channel's tags and `campaign` (the article's, see `docs/utm.md`).
+ * Each interactive component tag becomes its generated Markdown fallback.
  * `coverImage`, the post's front matter site path, becomes `main_image` on
  * the production origin.
  */
@@ -235,9 +237,9 @@ export function buildDevToPayload(
   const payload: DevToArticlePayload = {
     article: {
       title,
-      body_markdown: `${absolutizeImageUrls(bodyMarkdown)}\n\n---\n\n${
-        firstPublishedLine(tagged)
-      }\n`,
+      body_markdown: `${
+        absolutizeImageUrls(toDevToMarkdown(bodyMarkdown, tagged))
+      }\n\n---\n\n${firstPublishedLine(tagged)}\n`,
       published: true,
       canonical_url: `${DEVTO_BASE_URL}/blog/${slug}`,
     },
