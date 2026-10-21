@@ -232,7 +232,7 @@ siteTest(
       const card = cards.get(`home-view-${slug}`)!
       assert(
         /data-project-period/.test(card) &&
-          visibleText(card.slice(0, card.indexOf("</a>"))).includes(
+          visibleText(card.slice(0, card.indexOf("</li>"))).includes(
             formatPeriod(p.period!),
           ),
         `home card ${slug} does not show ${formatPeriod(p.period!)}`,

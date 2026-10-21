@@ -346,11 +346,20 @@ pointing at its page's `#project` node, with no review markup.
 
 ### Home page and shared pieces
 
-`routes/index.tsx` (#269) uses the project page's frame: a two-line `<h1>` (name
-small, `ROLE` large), the lead, Book and "Send a written brief", a fact card
-with the Upwork figures beside the four prices, then Client work, Client
-reviews, "How a project runs", the tools and the closing band with the brief
-form. The portrait renders only from 1024px: its `<img>` holds a blank pixel
+`routes/index.tsx` (#269, redesigned in #529) puts proof before price and the
+ask after both. The hero holds a two-line `<h1>` (name small, `ROLE` large), the
+one-sentence lead (`lib/home.ts`'s `HOME_LEAD`, which the meta description, the
+Person JSON-LD, the sitemap comment and both llms files read too), Book and
+"Send a written brief", the three promises with "How these work" and the Upwork
+line, beside the "At a glance" `FactCard` (portrait, the Upwork figures,
+Expert-Vetted, Team, About), as tall as the text column from 1024px and after
+the actions at 390px. Then Client work (three picture cards through
+`components/CardPicture.tsx`, shared with `/work`), Client reviews, "How a
+project runs", Services and prices (four cards, `PRICING_RULE`), the tools
+(three `ToolCard`s and one writing line) and the closing band with the brief
+form. Every section under the hero is `HomeSection`: the H2 left and its one
+"All …" link on the same baseline on the right from 1024px, under the content at
+390px. Book appears twice, in the hero and in the band. The portrait renders only from 1024px: its `<img>` holds a blank pixel
 until a `min-width: 1024px` `<source>` matches, so a phone requests no portrait,
 and it is the page's one eager, `fetchpriority="high"` image. Reuse these rather
 than making a copy:
