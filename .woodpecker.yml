@@ -30,6 +30,31 @@ steps:
     when:
       event: [push, pull_request]
 
+  # The Lighthouse budget ("Design gate" in the global agent rules): every
+  # page in scripts/lighthouse/lighthouserc.json scores, in Lighthouse mobile,
+  # at least 95 for performance and 100 for accessibility, best practices and
+  # SEO. scripts/lighthouse/run.sh serves the built site behind nginx with
+  # gzip, as Cloudflare serves it. After check: both build into _fresh/ in the
+  # shared checkout.
+  # The Playwright image, not the Deno one: Lighthouse CI starts Lighthouse
+  # with `node`, and the image has Node, Chromium and its libraries. Deno is
+  # the release the check step uses, 2.9.0.
+  lighthouse:
+    image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    commands:
+      - |
+          curl -fsSL -o /tmp/deno.zip https://github.com/denoland/deno/releases/download/v2.9.0/deno-x86_64-unknown-linux-gnu.zip
+          echo "96c9c73fc05ea57603bc28d8071d41e861bd40bcf2a9f849dd5969ed1a2c8498  /tmp/deno.zip" | sha256sum -c -
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends unzip nginx
+          unzip -q -o /tmp/deno.zip -d /usr/local/bin
+          chmod +x /usr/local/bin/deno
+      - deno install
+      - deno task build
+      - deno task lighthouse
+    depends_on: [check]
+    when:
+      event: [push, pull_request]
+
   # Sunday numbers report: visitors/pages/referrers/CTA events (Umami), stars
   # (GitHub), subscribers/views (YouTube) — printed as markdown and pushed to
   # NTFY. Fires only on the "weekly-numbers" cron trigger, never on push or

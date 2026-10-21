@@ -18,6 +18,8 @@ data/newsletter-log.json
 # committable .env.*.local.age too.
 _fresh/
 # Fresh build directory
+.lighthouseci/
+# Lighthouse reports (deno task lighthouse)
 launches/
 # Generated launch-kit drafts
 videos/

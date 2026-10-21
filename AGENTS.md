@@ -108,6 +108,7 @@ deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
 deno task social-preview        # build, then regenerate docs/social-preview.png (1280x640, GitHub)
 deno task lcp                   # home page LCP, CPU + network modes, n=15 (needs a build; --ab for A/B, --path for another page)
+deno task lighthouse            # the Lighthouse budget on the pages in scripts/lighthouse/lighthouserc.json (needs a build, nginx and Chromium; CI step lighthouse)
 deno task strip-metadata        # strip EXIF/XMP/text chunks from every image under static/ and assets/
 ```
 
