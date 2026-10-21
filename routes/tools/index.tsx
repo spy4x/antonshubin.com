@@ -4,19 +4,8 @@ import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
 import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { FACT_LINK } from "../../components/FactCard.tsx";
-import {
-  Spotlight,
-  ToolHubCard,
-  ToolHubLine,
-} from "../../components/tools/hub/HubParts.tsx";
-import {
-  ARCHIVE,
-  hubOrder,
-  SECTIONS,
-  SPOTLIGHT,
-} from "../../components/tools/hub/hub.ts";
-import ToolZoom from "../../islands/ToolZoom.tsx";
+import { HubTools } from "../../components/tools/hub/HubTools.tsx";
+import { hubOrder } from "../../components/tools/hub/hub.ts";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";
 import { IconArrowRight } from "@spy4x/preact-icons";
 import { toJsonLd } from "../../lib/json-ld.ts";
@@ -25,12 +14,8 @@ import {
   tool as toolBySlug,
   type ToolStatus,
 } from "../../lib/tools.ts";
-import {
-  checkedLabel,
-  toolsLive,
-  withLiveVersion,
-} from "../../lib/tools-live.ts";
-import { eventAttrs, linkEvent } from "../../lib/analytics.ts";
+import { checkedLabel, toolsLive } from "../../lib/tools-live.ts";
+import { eventAttrs } from "../../lib/analytics.ts";
 
 /** The H1 #189 sets for the hub, reused as the page name. */
 const TITLE = "Tools I build and run myself";
@@ -41,8 +26,7 @@ const CANONICAL = "https://antonshubin.com/tools";
 // in the hand-set order of components/tools/hub/hub.ts.
 export default define.page(async function ToolsIndex(ctx) {
   const live = await toolsLive();
-  const tool = (slug: string) => withLiveVersion(toolBySlug(slug), live);
-  const order = hubOrder().map(tool);
+  const order = hubOrder().map(toolBySlug);
 
   head.value = {
     ...head.value,
@@ -77,7 +61,6 @@ export default define.page(async function ToolsIndex(ctx) {
   };
 
   const statuses = Object.entries(statusMeanings) as [ToolStatus, string][];
-  const archived = ARCHIVE.map(tool);
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -96,77 +79,7 @@ export default define.page(async function ToolsIndex(ctx) {
           work. Each entry says where it stands.
         </p>
 
-        {
-          /* One lightbox box around every screenshot on the page: the
-          library's ZoomableImages wires only the first [data-lightbox]. */
-        }
-        <div data-lightbox>
-          <Spotlight tool={tool(SPOTLIGHT)} />
-
-          {SECTIONS.map((section) => (
-            <section
-              key={section.id}
-              aria-labelledby={`hub-${section.id}`}
-              data-hub-section={section.id}
-              class="mt-16"
-            >
-              <h2 id={`hub-${section.id}`} class="text-2xl text-parchment">
-                {section.title}
-              </h2>
-              {section.intro && (
-                <p class="mt-1 text-graphite">{section.intro}</p>
-              )}
-              {section.kind === "line"
-                ? (
-                  <ul class="mt-4">
-                    {section.slugs.map(tool).map((t) => (
-                      <ToolHubLine
-                        key={t.slug}
-                        tool={t}
-                        text={t.standing ?? `${t.job}.`}
-                      />
-                    ))}
-                  </ul>
-                )
-                : (
-                  <ul
-                    class={section.kind === "media"
-                      ? "mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                      : "mt-6 grid gap-6 sm:grid-cols-2"}
-                  >
-                    {section.slugs.map(tool).map((t) => (
-                      <ToolHubCard
-                        key={t.slug}
-                        tool={t}
-                        media={section.kind === "media"}
-                      />
-                    ))}
-                  </ul>
-                )}
-            </section>
-          ))}
-
-          <details data-hub-archive class="mt-12 border-t border-rule pt-4">
-            <summary class="cursor-pointer text-parchment">
-              Archived ({archived.length})
-            </summary>
-            <ul class="mt-2">
-              {archived.map((t) => (
-                <ToolHubLine key={t.slug} tool={t} text={`${t.job}.`}>
-                  {t.live && (
-                    <a
-                      href={t.live.href}
-                      {...linkEvent(t.live.href, { item: t.slug })}
-                      class={`mt-1 inline-block text-sm ${FACT_LINK}`}
-                    >
-                      {t.live.label}
-                    </a>
-                  )}
-                </ToolHubLine>
-              ))}
-            </ul>
-          </details>
-        </div>
+        <HubTools live={live} />
 
         <ClosingBand
           promiseIds={[]}
@@ -206,7 +119,6 @@ export default define.page(async function ToolsIndex(ctx) {
           </dl>
         </details>
       </div>
-      <ToolZoom />
     </Layout>
   );
 });
