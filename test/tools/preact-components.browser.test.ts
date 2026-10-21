@@ -5,7 +5,6 @@
 // Chromium; see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
-import { equals as equalBytes } from "jsr:@std/bytes@^1.0.6/equals";
 import { startSite } from "../harness.ts";
 import { launchChromium, newPage, WAIT_MS } from "../browser.ts";
 import { axeViolations, toolPageProblems } from "../tool-frame.ts";
@@ -72,9 +71,20 @@ async function focusedRadio(page: Page): Promise<string | null> {
   return await focused.count() ? await focused.getAttribute("value") : null;
 }
 
-// Playwright's evaluate needs the page's scripts, so this test reads only
-// selectors and pixels; the next one reads the colours and runs axe.
-Deno.test("with scripts off, the preview's Dark and Light radios are one tab stop and the arrow keys repaint the frame", async () => {
+/** The preview frame's colours and the page's background, as computed. */
+function previewColours(page: Page) {
+  return page.evaluate(() => {
+    const frame = getComputedStyle(
+      document.querySelector("[data-preview-frame]")!,
+    );
+    return {
+      frame: `${frame.backgroundColor} / ${frame.color}`,
+      page: getComputedStyle(document.body).backgroundColor,
+    };
+  });
+}
+
+Deno.test("with scripts off, the preview's Dark and Light radios are one tab stop and the arrow keys repaint only the frame", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -85,8 +95,7 @@ Deno.test("with scripts off, the preview's Dark and Light radios are one tab sto
     });
     try {
       await page.goto(`${site.origin}${PATH}`, { waitUntil: "load" });
-      const frame = page.locator("[data-preview-frame]");
-      const dark = await frame.screenshot({ animations: "disabled" });
+      const dark = await previewColours(page);
 
       // Tab reaches the checked radio from the control before it, and the
       // next Tab leaves the pair.
@@ -112,12 +121,12 @@ Deno.test("with scripts off, the preview's Dark and Light radios are one tab sto
         await page.locator("input[name=orbit-theme][value=light]").isChecked(),
         "the arrow key did not check Light",
       );
-      const light = await frame.screenshot({ animations: "disabled" });
-      assert(!equalBytes(light, dark), "Light did not repaint the frame");
+      const light = await previewColours(page);
+      assert(light.frame !== dark.frame, "Light did not repaint the frame");
+      assertEquals(light.page, dark.page, "Light repainted the page");
 
       await page.keyboard.press("ArrowLeft");
-      const back = await frame.screenshot({ animations: "disabled" });
-      assert(equalBytes(back, dark), "Dark did not come back");
+      assertEquals(await previewColours(page), dark, "Dark did not come back");
     } finally {
       await page.close();
     }
