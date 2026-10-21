@@ -38,6 +38,7 @@ import {
 } from "../lib/how-i-work.ts"
 import { proof } from "../lib/proof.ts"
 import {
+  WEEKLY_AUDIT,
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
@@ -46,7 +47,7 @@ import { repeatClientsLine } from "../lib/testimonials.ts"
 import { toJsonLd } from "../lib/json-ld.ts"
 import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 
-/** The public repository the AI-agent setup's rules live in. */
+/** The public repository the agents' rules live in ("How I use AI"). */
 const DOTFILES_URL = "https://github.com/spy4x/dotfiles"
 
 /** The two promises that lead to a catalog item (Mkt 3): the first milestone and the bug fixes. */
@@ -65,7 +66,7 @@ const promiseLinks: Record<string, PromiseLink> = {
  * `/how-i-work` (#275): the project page's frame. An H1 and one line, then a
  * sticky card (the pricing rule, the four prices, Book, the written brief)
  * beside who I suit, one proof line, the five promises as one timeline in
- * the order a client meets them, the AI-agent setup and the questions, open.
+ * the order a client meets them, how I use AI and the questions, open.
  * The closing band ends the page. The questions come from `lib/faqs.ts`, the
  * `FAQPage` JSON-LD from the same list.
  */
@@ -208,49 +209,58 @@ export default define.page(function HowIWork() {
             </section>
 
             <section aria-labelledby="hiw-ai" data-ai-setup>
-              <h2 id="hiw-ai" class="h2 mb-4">My AI-agent setup</h2>
-              <p class="max-w-2xl text-graphite leading-relaxed">
-                Every architectural decision is made by me, not by a model, and
-                every change starts as a written spec. The agents do the typing.
-                One set of rules lives in{" "}
-                <a
-                  href={DOTFILES_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  {...linkEvent(DOTFILES_URL)}
-                  class={FACT_LINK}
-                >
-                  spy4x/dotfiles
-                </a>{" "}
-                and is rendered into Claude Code, OpenCode and DSH, so every
-                agent works to the same rules. Each task gets its own worktree,
-                and a separate reviewer agent checks the diff before every push.
-                The stack is Deno/Node.js, Preact/React, PostgreSQL,
-                Valkey/Redis, Docker/Podman, Traefik and MCP; see{" "}
-                <a
-                  href="/infrastructure"
-                  {...eventAttrs("cta", {
-                    place: "body",
-                    target: "/infrastructure",
-                  })}
-                  class={FACT_LINK}
-                >
-                  how I run production
-                </a>{" "}
-                for proof. What happens to your code:{" "}
-                <a href="#faq-ai-and-your-code" class={FACT_LINK}>
-                  does my code go to an AI provider?
-                </a>{" "}
-                {WHY_NOT_JUST_AI_PROMPT}{" "}
-                <a
-                  href={WHY_NOT_JUST_AI_PATH}
-                  {...linkEvent(WHY_NOT_JUST_AI_PATH)}
-                  class={FACT_LINK}
-                  data-why-not-just-ai-link
-                >
-                  {WHY_NOT_JUST_AI_LINK_LABEL}
-                </a>
-              </p>
+              <h2 id="hiw-ai" class="h2 mb-4">How I use AI</h2>
+              <div class="max-w-2xl space-y-4 text-graphite leading-relaxed">
+                <p>
+                  I use AI coding agents every day, and I say so up front. The
+                  agents write much of the code. I decide what gets built and
+                  how it fits together, and every change starts as a written
+                  spec from me.
+                </p>
+                <p>
+                  A separate reviewer agent checks every change, security
+                  included, before it reaches you. {WEEKLY_AUDIT}
+                </p>
+                <p>
+                  The rules the agents work to are public, in{" "}
+                  <a
+                    href={DOTFILES_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...linkEvent(DOTFILES_URL)}
+                    class={FACT_LINK}
+                  >
+                    spy4x/dotfiles
+                  </a>
+                  . However the code was written, I answer for the result.
+                </p>
+                <p>
+                  For the servers behind it, see{" "}
+                  <a
+                    href="/infrastructure"
+                    {...eventAttrs("cta", {
+                      place: "body",
+                      target: "/infrastructure",
+                    })}
+                    class={FACT_LINK}
+                  >
+                    how I run production
+                  </a>
+                  . What happens to your code:{" "}
+                  <a href="#faq-ai-and-your-code" class={FACT_LINK}>
+                    does my code go to an AI provider?
+                  </a>{" "}
+                  {WHY_NOT_JUST_AI_PROMPT}{" "}
+                  <a
+                    href={WHY_NOT_JUST_AI_PATH}
+                    {...linkEvent(WHY_NOT_JUST_AI_PATH)}
+                    class={FACT_LINK}
+                    data-why-not-just-ai-link
+                  >
+                    {WHY_NOT_JUST_AI_LINK_LABEL}
+                  </a>
+                </p>
+              </div>
             </section>
 
             <section aria-labelledby="hiw-faq" data-faq-section>

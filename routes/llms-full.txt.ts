@@ -218,7 +218,7 @@ ${saasMvpLlmsSection(BASE_URL)}
 - **Services:** ${BASE_URL}/catalog — ${catalogItems.length} services, each with its price
 ${catalogList}
 - **About:** ${BASE_URL}${ABOUT_PATH} — Who I am, since 2010: the career story, two client reviews about working with me, what I run myself and how to pay
-- **How I work:** ${BASE_URL}/how-i-work — The five promises in the order a project meets them, prices, who I build for, my AI-agent setup and ${faqs.length} answered questions
+- **How I work:** ${BASE_URL}/how-i-work — The five promises in the order a project meets them, prices, who I build for, how I use AI and ${faqs.length} answered questions
 - **${WHY_NOT_JUST_AI_NAME}** ${BASE_URL}${WHY_NOT_JUST_AI_PATH} — ${WHY_NOT_JUST_AI_DESCRIPTION}
 - **Contact:** ${BASE_URL}${BOOK_HREF} — ${BOOK_LABEL} in the calendar on the page, or ${
       decapitalize(BRIEF_LABEL)

@@ -121,7 +121,7 @@ ${promisesList}
 - [About](${BASE_URL}${ABOUT_PATH}) — Who I am, since 2010: the career story, what I run myself and how to pay
 - [SaaS Architecture Guide](${BASE_URL}/saas-architecture-guide) — A short reading order from idea to production: current posts, client projects with their outcomes, infrastructure and AI, each with one line on why to read it
 - [Services and prices](${BASE_URL}/catalog) — the four services with their prices and what each includes
-- [How I work](${BASE_URL}/how-i-work) — The five promises in the order a project meets them, prices, who does the work, my AI-agent setup and the questions clients ask
+- [How I work](${BASE_URL}/how-i-work) — The five promises in the order a project meets them, prices, who does the work, how I use AI and the questions clients ask
 - [${WHY_NOT_JUST_AI_NAME}](${BASE_URL}${WHY_NOT_JUST_AI_PATH}) — ${WHY_NOT_JUST_AI_DESCRIPTION}
 - [How I run production](${BASE_URL}/infrastructure) — The live services I run, a map of how they connect in four lanes, and how handover, backups, monitoring and deploys are handled
 - [Contact](${BASE_URL}${BOOK_HREF}) — ${BOOK_LABEL} on the page, ${
