@@ -1,0 +1,37 @@
+WEBVTT
+
+00:02.000 --> 00:06.920
+zond's config lists the services it checks: metube for now
+
+00:06.920 --> 00:13.500
+Add two more services to check: ollama and grafana
+
+00:13.500 --> 00:20.030
+Each one gets its own timeout; grafana's is 3 seconds
+
+00:20.030 --> 00:23.560
+Save the file and close the editor
+
+00:23.560 --> 00:28.460
+Start zond on the same Docker network as the services
+
+00:28.460 --> 00:31.000
+Ask zond about metube over plain HTTP
+
+00:31.000 --> 00:34.420
+200 OK: metube is up
+
+00:34.420 --> 00:38.370
+Now ask about grafana, which is stopped
+
+00:38.370 --> 00:41.470
+zond waits out grafana's 3-second timeout
+
+00:41.470 --> 00:45.430
+503 "unreachable": a monitor sees that grafana is down
+
+00:45.430 --> 00:50.680
+/health asks about every service at once
+
+00:50.680 --> 00:55.850
+One service is down, so the whole answer is 503

@@ -1,5 +1,0 @@
-port: 8080
-
-targets:
-  - name: metube
-    url: http://hl-metube:8081/

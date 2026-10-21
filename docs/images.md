@@ -53,16 +53,23 @@ built once.
 
 ## Videos
 
-A tool page's demo clip (#454) lives in `static/video/tools/<slug>/`:
-`demo.webm` (VP9, offered first), `demo.mp4` (H.264) and `poster.webp` (the
-clip's last frame, the result; a second width with `srcset` is welcome). A clip
-is 20 to 40 seconds, silent, staged demo data only, and each file is at most 2.5
-MB. Nothing downloads before the visitor presses play (`DemoVideo`), so the
-budget protects only the person who pressed. Its `lib/tools.ts` entry names it
-in `clip` (title, caption, frame, poster); set `clip.video` (`duration` as ISO
-8601, `uploadDate` the commit day) only once both files are committed, which
-also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when an
-entry marks a clip committed and a file is missing. `/video/*` is cached like
+A tool page's demo clip (#454) is a copy of the one canonical clip in the tool's
+own repository, under `media/demo/` beside the recipe that remakes it (#521).
+`lib/video-sources.ts` pins each repository to a full commit, and
+`deno task pull:videos` copies `demo.webm` (VP9, offered first), `demo.mp4`
+(H.264), `poster.webp`, `poster-640.webp` and `captions.vtt` from
+raw.githubusercontent.com at that commit into `static/video/tools/<slug>/`,
+rewriting only the files that changed. A clip is never recorded or edited here:
+change it in its repository, then move the pin and run the task. Seed's admin
+panel video (`admin-panel.*`, shown in "See it running") comes from spy4x/seed's
+`apps/mpa/` through the same task. A clip is 20 to 40 seconds, has burned-in
+captions and its own quiet music, shows staged demo data only, and each file is
+at most 2.5 MB. Nothing downloads before the visitor presses play (`DemoVideo`),
+so the budget protects only the person who pressed. Its `lib/tools.ts` entry
+names it in `clip` (title, caption, frame, poster); set `clip.video` (`duration`
+as ISO 8601, `uploadDate` the commit day) only once both files are committed,
+which also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when
+an entry marks a clip committed and a file is missing. `/video/*` is cached like
 `/img/*` (docs/cache-control.md). `main.ts` answers a `Range` request for
 `/video/*` with 206 Partial Content (`lib/video-files.ts`, through `@std/http`'s
 `serveFile`), because Safari plays an MP4 only that way and Fresh's static files

@@ -1,8 +1,0 @@
-# nano settings for the clip's editor shot: JSON colours, line numbers,
-# a quiet title bar, and the pasted block highlighted by a selection.
-include "/usr/share/nano/json.nanorc"
-set linenumbers
-set titlecolor bold,#eed,#322
-set numbercolor gray
-set statuscolor bold,#eed,#322
-set selectedcolor bold,#fff,#346

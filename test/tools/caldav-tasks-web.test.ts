@@ -89,7 +89,9 @@ Deno.test("the caldav-tasks-web page renders the frame, five field chips with Ti
       assert(!text.toLowerCase().includes(gone.toLowerCase()), gone)
     }
     assert(
-      text.includes("37 s · no sound · demo tasks on a local Radicale"),
+      text.includes(
+        "1 min 2 s · with captions and music · demo tasks on a local Radicale",
+      ),
       "clip caption",
     )
   } finally {
