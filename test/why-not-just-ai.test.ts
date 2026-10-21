@@ -220,6 +220,14 @@ siteTest(
     assert(page.startsWith("No. I bill only the hours"), page);
     assert(/the timer stops/.test(page), "the page: no stopped timer");
     assert(/never the time an AI agent runs/.test(pricing), pricing);
+    // The pricing answer's link lands on the hourly question itself.
+    const howIWork = await site.html("/how-i-work");
+    assert(
+      slice(howIWork, `id="faq-pricing"`, "</div>").includes(
+        `href="${PAGE}#faq-hourly-while-ai-works"`,
+      ),
+      "the pricing answer does not link the hourly question",
+    );
   },
 );
 

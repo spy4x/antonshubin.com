@@ -544,9 +544,11 @@ the wording; promises come through `promise()`. The footer's Site group alone
 lists it (`lib/nav.ts`'s `WHY_NOT_JUST_AI`), not the rail or the More sheet. In
 the page body, `WHY_NOT_JUST_AI_PROMPT` and `WHY_NOT_JUST_AI_LINK_LABEL` link it
 from the home page (under the prices), `/catalog` (under the services),
-`/how-i-work` (the AI paragraph and the pricing answer) and the service pages in
-`WHY_NOT_JUST_AI_SERVICES` (the MVP and Ongoing pages, under "Who this is for").
-`test/why-not-just-ai.test.ts` checks the built page.
+`/how-i-work`'s AI paragraph and the service pages in `WHY_NOT_JUST_AI_SERVICES`
+(the MVP and Ongoing pages, under "Who this is for"). The /how-i-work pricing
+answer links straight to the hourly question (`#faq-hourly-while-ai-works`, "How
+hourly billing works with AI"). `test/why-not-just-ai.test.ts` checks the built
+page.
 
 ### Tool pages
 

@@ -1,11 +1,7 @@
 import { PRICING_RULE } from "./how-i-work.ts";
 import { promise } from "./promises.ts";
 import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts";
-import {
-  WEEKLY_AUDIT,
-  WHY_NOT_JUST_AI_LINK_LABEL,
-  WHY_NOT_JUST_AI_PATH,
-} from "./why-not-just-ai.ts";
+import { WEEKLY_AUDIT, WHY_NOT_JUST_AI_PATH } from "./why-not-just-ai.ts";
 
 /**
  * The How I work page's questions (#275): the only written copy. The page,
