@@ -146,7 +146,7 @@ Deno.test("the card states take one tab stop, and the arrow keys move the choice
   }
 });
 
-Deno.test("focusing a config line from the keyboard outlines its marker on the card", async () => {
+Deno.test("hovering a config line, or focusing it from the keyboard, outlines its marker on the card", async () => {
   const site = await startSite();
   let browser: Browser | undefined;
   try {
@@ -162,10 +162,15 @@ Deno.test("focusing a config line from the keyboard outlines its marker on the c
       const outline = () =>
         marker.evaluate((el) => getComputedStyle(el).outlineStyle);
       assertEquals(await outline(), "none");
-      await page.locator("#oko-config-entry [data-line='6']").first().focus();
+      const line = page.locator("#oko-config-entry [data-line='6']").first();
+      await line.hover();
+      assertEquals(await outline(), "solid", "hover");
+      await page.mouse.move(0, 0);
+      assertEquals(await outline(), "none", "after the pointer leaves");
+      await line.focus();
       await page.keyboard.press("Shift+Tab");
       await page.keyboard.press("Tab");
-      assertEquals(await outline(), "solid");
+      assertEquals(await outline(), "solid", "focus");
     } finally {
       await page.close();
     }
