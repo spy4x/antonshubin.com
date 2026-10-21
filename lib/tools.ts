@@ -518,12 +518,34 @@ export const tools: Tool[] = [
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
-      "You want an AI assistant such as Claude Desktop, OpenCode, Cursor or Open WebUI to read and write CalDAV events and tasks.",
+      "Your calendar lives on a CalDAV server you can reach with a username and password.",
+    ],
+    dontUseIf: [
+      "You need Google Calendar (Google offers CalDAV only behind OAuth 2.0, which caldav-mcp does not speak), contacts (CardDAV) or several users from one instance.",
     ],
     repo: "spy4x/caldav-mcp",
     runtime: "Deno, as a single binary",
     programmingLanguage: "TypeScript",
     ci: { provider: "woodpecker", repoId: 6 },
+    headline:
+      "Let your AI assistant read and manage your calendar and tasks on your own CalDAV server.",
+    lede:
+      "Connect it to Claude Desktop, OpenCode, Cursor, OpenWebUI or any other MCP client, and your assistant can list your calendars, find events and tasks, and create, update or delete them on your own CalDAV server.",
+    clip: {
+      title: "caldav-mcp: an assistant answers what is on today's task list",
+      caption: "36 s · no sound · a real exchange with a demo calendar",
+      frame: "bare",
+      poster: {
+        src: "/video/tools/caldav-mcp/poster.webp",
+        srcset:
+          "/video/tools/caldav-mcp/poster-640.webp 640w, /video/tools/caldav-mcp/poster.webp 1280w",
+        alt:
+          "A chat with an assistant connected to caldav-mcp. Asked what is on the list for today, it called query_events and query_todos and listed a call with Jane Doe at 11:00, an overdue task and three tasks due today. Asked to move the overdue one to tomorrow, it called update_todo and confirmed the new due date.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT36S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "rostok",
