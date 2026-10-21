@@ -341,6 +341,10 @@ for (
     "/infrastructure",
     "/how-i-work",
     "/why-not-just-ai",
+    "/catalog",
+    "/catalog/codebase-health-audit",
+    "/catalog/zero-to-production-saas-mvp",
+    "/catalog/cto-advisory-retainer",
   ]
 ) {
   Deno.test(`${path} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {

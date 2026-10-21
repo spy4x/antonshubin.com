@@ -205,7 +205,7 @@ siteTest(
   "the title of each page and the index follow the SEO titles",
   async (site) => {
     const title = (html: string) =>
-      html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ""
+      visibleText(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "")
     for (const item of catalogItems) {
       assertEquals(
         title(await site.html(`/catalog/${item.slug}`)),
@@ -214,7 +214,7 @@ siteTest(
     }
     assertEquals(
       title(await site.html("/catalog")),
-      "Services and prices: SaaS builds, code audits, fractional CTO — Anton Shubin",
+      "Services and prices: SaaS builds, code and security audits, fractional CTO — Anton Shubin",
     )
   },
 )
@@ -358,7 +358,8 @@ siteTest(
       const html = await site.html(url)
       assert(html.includes(`id="brief"`), `${path}: no #brief section`)
       assert(
-        html.includes(`About: ${item.shortTitle}`),
+        // The prefill is the textarea's value attribute, so "&" is escaped.
+        html.includes(`About: ${item.shortTitle.replaceAll("&", "&amp;")}`),
         `${path}: form not prefilled`,
       )
     }
@@ -495,5 +496,130 @@ siteTest(
     const full = await site.html("/llms-full.txt")
     assert(full.includes(saasMvpAnswer()), "llms-full.txt: no answer")
     for (const f of faqs) assert(full.includes(`### ${f.q}`), f.q)
+  },
+)
+
+/** One `/catalog` card's markup, from its `<li>` to the next card. */
+function catalogCard(html: string, slug: string): string {
+  const start = html.indexOf(`data-catalog-item="${slug}"`)
+  assert(start > 0, `${slug}: no card`)
+  const next = html.indexOf(`data-catalog-item="`, start + 1)
+  const end = next > 0 ? next : html.indexOf("data-why-not-just-ai-link", start)
+  return html.slice(start, end)
+}
+
+siteTest(
+  "each /catalog card shows its outcome, its own promise line and three plain points, never the technical includes",
+  async (site) => {
+    const html = await site.html("/catalog")
+    for (const item of catalogItems) {
+      const card = catalogCard(html, item.slug)
+      const text = visibleText(card)
+      const outcome = card.indexOf("data-catalog-outcome")
+      const price = card.indexOf(`class="price`)
+      const promises = card.indexOf("data-catalog-promises")
+      const points = card.indexOf("data-catalog-points")
+      assert(
+        outcome > 0 && outcome < price && price < promises &&
+          promises < points,
+        `${item.slug}: outcome, price, promises, points out of order`,
+      )
+      assert(text.includes(item.outcome), `${item.slug}: no outcome`)
+      assertFalse(text.includes(item.summary), `${item.slug}: summary on card`)
+      const line = card.match(/data-catalog-promises[^>]*>([\s\S]*?)<\/p>/)
+      assert(line, `${item.slug}: no promise line`)
+      assertEquals(
+        visibleText(line[1]),
+        catalogPromises(item.slug).map((id) => promise(id).title).join(" · "),
+        item.slug,
+      )
+      const list = card.match(/data-catalog-points[\s\S]*?<\/ul>/)
+      assert(list, `${item.slug}: no points`)
+      const shown = [...list[0].matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/g)]
+        .map((m) => visibleText(m[1]))
+      assertEquals(shown, item.cardPoints, item.slug)
+      for (const inc of item.includes) {
+        assertFalse(text.includes(inc), `${item.slug}: card shows "${inc}"`)
+      }
+    }
+    // The strategy session and the audit carry the refund alone (#301).
+    const audit = visibleText(catalogCard(html, "codebase-health-audit"))
+    assertFalse(audit.includes(promise("first-milestone").title))
+  },
+)
+
+siteTest(
+  "the audit page speaks to apps built with AI tools, names each tool at most twice and lists its two exclusions",
+  async (site) => {
+    const item = catalogItem("codebase-health-audit")
+    const html = await site.html(`/catalog/${item.slug}`)
+    const page = visibleText(pageBody(html))
+    assert(page.includes(item.audience), "no AI-built audience")
+    assert(page.includes(item.examples[0]), "no AI-built example")
+    for (const tool of ["Lovable", "Supabase", "Cursor", "Claude Code"]) {
+      const n = page.split(tool).length - 1
+      assert(n >= 1 && n <= 2, `${tool} named ${n} times`)
+    }
+    assertFalse(/production-ready/i.test(page), "production-ready on the audit")
+    const scope = html.slice(html.indexOf(`id="service-scope"`))
+    const notIncluded = visibleText(
+      scope.slice(scope.indexOf("Not included"), scope.indexOf("</section>")),
+    )
+    assertEquals(item.exclusions?.length, 2)
+    for (const exc of item.exclusions ?? []) {
+      assert(notIncluded.includes(exc), `not listed: ${exc}`)
+    }
+  },
+)
+
+siteTest(
+  "Build and Ongoing open with What you can count on, and a phone sees those promises once",
+  async (site) => {
+    for (const item of catalogItems) {
+      const html = await site.html(`/catalog/${item.slug}`)
+      const ids = catalogPromises(item.slug)
+      const heading = html.indexOf(`id="service-promises"`)
+      const row = html.match(/<div class="([^"]*)"[^>]*>\s*<dt[^>]*>Promises/)
+      if (ids.length < 2) {
+        assertEquals(heading, -1, `${item.slug}: promises heading`)
+        assertFalse(/max-lg:hidden/.test(row?.[1] ?? ""), item.slug)
+        continue
+      }
+      // The main column's first section is the promises, before any feature.
+      const column = html.indexOf("min-w-0 space-y-12")
+      assertEquals(
+        html.indexOf("<section", column),
+        html.lastIndexOf("<section", heading),
+        `${item.slug}: promises are not the first section`,
+      )
+      assert(heading < html.indexOf(`id="service-scope"`), item.slug)
+      assert(
+        heading < html.indexOf(
+          item.desc.replaceAll("&", "&amp;").replaceAll('"', "&quot;"),
+          column,
+        ),
+        `${item.slug}: desc first`,
+      )
+      const timeline = html.slice(
+        heading,
+        html.indexOf("</ol>", heading),
+      )
+      for (const id of ids) {
+        assert(timeline.includes(promise(id).title), `${item.slug}: ${id}`)
+      }
+      assertEquals(count(timeline, /<li\b/g), ids.length, item.slug)
+      // The card's own Promises row is hidden below 1024px on these pages.
+      assert(row, `${item.slug}: no Promises row`)
+      assert(row[1].split(" ").includes("max-lg:hidden"), item.slug)
+    }
+    // Build: promises, How it starts, Why it costs less, then the scope.
+    const build = await site.html(`/catalog/${SAAS_MVP_SLUG}`)
+    const order = [
+      `id="service-promises"`,
+      `id="how-it-starts"`,
+      `id="service-why"`,
+      `id="service-scope"`,
+    ].map((id) => build.indexOf(id))
+    assertEquals(order, [...order].sort((a, b) => a - b), `${order}`)
   },
 )
