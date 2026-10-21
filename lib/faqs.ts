@@ -48,7 +48,10 @@ export const faqs: Faq[] = [
     id: "pricing",
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
     a: `Both. ${PRICING_RULE} ${HOURLY_WORK_RULE} If the scope changes once we have started, you get a quote for the change before I start on it — no surprise costs.`,
-    link: { href: WHY_NOT_JUST_AI_PATH, label: WHY_NOT_JUST_AI_LINK_LABEL },
+    link: {
+      href: `${WHY_NOT_JUST_AI_PATH}#faq-hourly-while-ai-works`,
+      label: "How hourly billing works with AI",
+    },
   },
   {
     id: "ownership",
