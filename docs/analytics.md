@@ -189,11 +189,25 @@ own.
 
 ### caldav-mcp
 
-None yet.
+- `tool-try` with `part` `mode:all`, `mode:no-delete` or `mode:read-only`: a
+  position of the "Which tools the server offers" switch was clicked (on its
+  radio, never its label: a label click reaches the radio as a second click,
+  which would count twice).
+- `tool-try` with `part` `tool:<name>` (`tool:query_todos` …): a tool's row in
+  the reference was opened or closed (on its `<summary>`).
+- `tool-install-copy`: the Claude Desktop config block was copied.
+- `outbound` (`to: github`, `place: body`): the clients guide link under the
+  config block.
 
 ### caldav-tasks-web
 
-None yet.
+- `tool-try` with `part` `field:title`, `field:priority`, `field:parent`,
+  `field:order` or `field:reminder`: a field of "Same file, two apps" was picked
+  (on its radio, so a click on the chip or an arrow key counts once).
+- `outbound` (`to: github`, `place: body`): "Every field" under the task file
+  and "The compatibility guide" under "What was tested".
+- `outbound` (`to: issues`, `place: body`): "Issue #119" in the known-issue line
+  of "Where it stands" (the entry's `knownIssue`).
 
 ### dotfiles
 
@@ -224,7 +238,13 @@ None yet.
 
 ### oko
 
-None yet.
+`routes/tools/oko.tsx` (#464) sends, besides the frame's events:
+
+- `tool-try` (`item: oko`, `part` `state:up`, `state:down` or `state:unknown`):
+  a state in "From config to card" is chosen. The attributes sit on the native
+  radio, which gets a click from a press on its label or from the arrow keys.
+- `tool-install-copy` (`item: oko`): the config entry or a quick-start block
+  (`compose.yml`, `config.json`) is copied.
 
 ### preact-components
 

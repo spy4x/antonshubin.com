@@ -112,7 +112,7 @@ export function ToolHero(
         >
           {lede}
         </p>
-        <div class="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4">
+        <div class="mt-7 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
           {button && (
             <Button
               href={button.href}
@@ -121,7 +121,7 @@ export function ToolHero(
                 item: tool.slug,
                 place: "hero",
               })}
-              class="gap-2 px-5 py-3 text-base"
+              class="w-full gap-2 px-5 py-3 text-base sm:w-auto"
             >
               {button.label}
               <IconArrowRight class="size-4" />

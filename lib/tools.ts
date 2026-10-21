@@ -302,6 +302,11 @@ export interface Tool {
   works?: string[];
   /** "Where it stands": what is not built yet; the open issues are always linked under it. */
   notYet?: string[];
+  /**
+   * "Where it stands": a known problem a visitor should weigh before installing, said only
+   * with the facts of the open issue it links to.
+   */
+  knownIssue?: { text: string; link: ToolLink };
   /** One line under the post's title in "The story behind it". */
   storyLine?: string;
 }
@@ -495,6 +500,23 @@ export const tools: Tool[] = [
       "One page for every self-hosted service, with its status and 30-day uptime from gatus.",
     lede:
       "You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days.",
+    clip: {
+      title: "oko: add a service to config.json, reload, search the dashboard",
+      caption:
+        'A demo config: add a Speed test service to config.json, reload to see its card, search for "pho", and end on up, down and unknown cards. 26\u00a0s, no sound.',
+      frame: "browser",
+      frameTitle: "localhost:8080",
+      poster: {
+        src: "/video/tools/oko/poster.webp",
+        srcset:
+          "/video/tools/oko/poster-640.webp 640w, /video/tools/oko/poster.webp 1280w",
+        alt:
+          "The oko dashboard titled Jane Doe's servers, with a Home and a Cloud section of service cards with 30-day uptime pills, Email marked down with a red border, and File sync marked unknown.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT26S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "caldav-mcp",
@@ -510,12 +532,34 @@ export const tools: Tool[] = [
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
-      "You want an AI assistant such as Claude Desktop, OpenCode, Cursor or Open WebUI to read and write CalDAV events and tasks.",
+      "Your calendar lives on a CalDAV server you can reach with a username and password.",
+    ],
+    dontUseIf: [
+      "You need Google Calendar (Google offers CalDAV only behind OAuth 2.0, which caldav-mcp does not speak), contacts (CardDAV) or several users from one instance.",
     ],
     repo: "spy4x/caldav-mcp",
     runtime: "Deno, as a single binary",
     programmingLanguage: "TypeScript",
     ci: { provider: "woodpecker", repoId: 6 },
+    headline:
+      "Let your AI assistant read and manage your calendar and tasks on your own CalDAV server.",
+    lede:
+      "Connect it to Claude Desktop, OpenCode, Cursor, OpenWebUI or any other MCP client, and your assistant can list your calendars, find events and tasks, and create, update or delete them on your own CalDAV server.",
+    clip: {
+      title: "caldav-mcp: an assistant answers what is on today's task list",
+      caption: "36 s · no sound · a real exchange with a demo calendar",
+      frame: "bare",
+      poster: {
+        src: "/video/tools/caldav-mcp/poster.webp",
+        srcset:
+          "/video/tools/caldav-mcp/poster-640.webp 640w, /video/tools/caldav-mcp/poster.webp 1280w",
+        alt:
+          "A chat with an assistant connected to caldav-mcp. Asked what is on the list for today, it called query_events and query_todos and listed a call with Jane Doe at 11:00, an overdue task and three tasks due today. Asked to move the overdue one to tomorrow, it called update_todo and confirmed the new due date.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT36S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "rostok",
@@ -1026,9 +1070,9 @@ export const tools: Tool[] = [
   {
     slug: "caldav-tasks-web",
     name: "caldav-tasks-web",
-    job: "web UI for CalDAV VTODO tasks, being rewritten",
+    job: "web UI for CalDAV VTODO tasks",
     summary:
-      "Touch-first web app for editing CalDAV VTODO tasks, the web UI Tasks.org does not have. My Android tasks live in Tasks.org, which syncs them to CalDAV; I wanted a web UI over the same task files. The current version is being rewritten from scratch, with a new design on spy4x/preact-components and the shared CalDAV libraries @spy4x/caldav and @spy4x/time/ical. Do not install the current version: it does not work with Stalwart, it can lose data when you save a task, and it has no service worker. The screenshots show the current version. There is no public demo.",
+      "A web companion to Tasks.org for your own CalDAV server. Open your task lists in a browser (tested in Chromium), on the same server your phone syncs with. One install serves one person. The server only relays: your tasks stay on your CalDAV server, and the app writes them back in the form Tasks.org wrote them, so nothing the phone stored is lost when you edit in the browser.",
     kind: "app",
     status: "wip",
     group: "products",
@@ -1036,42 +1080,62 @@ export const tools: Tool[] = [
     deployable: true,
     appCategory: "ProductivityApplication",
     useIf: [
-      "You want to follow the rewrite of a web UI for Tasks.org tasks on CalDAV.",
+      "You run a CalDAV server, use Tasks.org on Android, and want the same lists on a computer without a second account or a second copy of your data.",
     ],
     dontUseIf: [
-      "You want to use it today: the current version does not work with Stalwart and can lose data when saving a task.",
+      "You want a hosted service with a sign-up: you run the container, and you are the only user.",
+      "You need Firefox or Safari tested: the browser tests run in Chromium only.",
     ],
     repo: "spy4x/caldav-tasks-web",
+    registry: {
+      name: "Docker Hub",
+      url: "https://hub.docker.com/r/antonshubin/caldav-tasks-web",
+      version: "v1.10.0",
+      published: true,
+      install: "docker pull antonshubin/caldav-tasks-web:v1.10.0",
+      latestFrom: { registry: "docker", name: "antonshubin/caldav-tasks-web" },
+    },
     runtime: "Deno, with Hono and Preact",
     programmingLanguage: "TypeScript",
+    ci: { provider: "woodpecker", repoId: 14 },
+    headline: "A web companion to Tasks.org for your own CalDAV server.",
+    lede:
+      "Open your task lists in a browser, on the same server your phone syncs with. One install serves one person.",
     standing:
-      "Being rewritten. The current version was used against Radicale, does not work with Stalwart, can lose data when saving a task, and has no service worker.",
-    screenshots: [
-      {
-        src: "/img/tools/caldav-tasks-web/desktop-dashboard.webp",
-        alt: "Desktop dashboard",
-        width: 1440,
-        height: 900,
-      },
-      {
-        src: "/img/tools/caldav-tasks-web/desktop-kanban.webp",
-        alt: "Desktop kanban",
-        width: 1440,
-        height: 900,
-      },
-      {
-        src: "/img/tools/caldav-tasks-web/desktop-settings.webp",
-        alt: "Desktop settings",
-        width: 1440,
-        height: 900,
-      },
-      {
-        src: "/img/tools/caldav-tasks-web/mobile-dashboard.webp",
-        alt: "Mobile dashboard",
-        width: 780,
-        height: 1688,
-      },
+      "Tested against Radicale 3.5.4 and in Chromium. Stalwart 0.16 is in daily use, not in CI; other servers are untested.",
+    works: [
+      "Lists, Today, Upcoming and Search across all lists.",
+      "Add, edit, complete, delete and undo. A quick-add line understands a tag, a time and a priority.",
+      "Subtasks, tags, priority, due and start dates, notes and manual order by drag or keyboard.",
+      "Repeating tasks: daily, weekly, monthly or yearly.",
+      "Works offline: edits made offline are queued and sent when the network returns.",
+      "Keyboard shortcuts; press ? to see them.",
     ],
+    knownIssue: {
+      text:
+        "An edit can be lost in rare cases: two offline edits made from the same stale copy, or a task deleted on another device while you edit it.",
+      link: {
+        label: "Issue #119",
+        href: "https://github.com/spy4x/caldav-tasks-web/issues/119",
+      },
+    },
+    clip: {
+      title:
+        "caldav-tasks-web: quick add, subtasks, a repeating task, complete and undo",
+      caption: "37 s · no sound · demo tasks on a local Radicale",
+      frame: "browser",
+      frameTitle: "localhost:38465",
+      poster: {
+        src: "/video/tools/caldav-tasks-web/poster.webp",
+        srcset:
+          "/video/tools/caldav-tasks-web/poster-640.webp 640w, /video/tools/caldav-tasks-web/poster.webp 1280w",
+        alt:
+          "The Today view of caldav-tasks-web with demo tasks: two overdue (Fix the gate, Call the plumber) and, due today, the new task Order compost at 17:00 with the tag garden and high priority, above Send the invoice to Example Co and Plan the garden.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "toread-today",
