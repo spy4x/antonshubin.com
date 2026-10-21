@@ -42,6 +42,7 @@ import {
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
+  WHY_NOT_JUST_AI_SERVICES,
 } from "../../lib/why-not-just-ai.ts";
 import {
   SAAS_MVP_EYEBROW,
@@ -355,7 +356,7 @@ export default define.page(function CatalogDetail(ctx) {
               <p class="max-w-2xl text-graphite leading-relaxed">
                 {item.audience}
               </p>
-              {item.slug === "zero-to-production-saas-mvp" && (
+              {WHY_NOT_JUST_AI_SERVICES.includes(item.slug) && (
                 <p
                   class="mt-3 max-w-2xl text-graphite"
                   data-why-not-just-ai-link

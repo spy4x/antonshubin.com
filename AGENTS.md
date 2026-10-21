@@ -536,12 +536,16 @@ lead, a sticky "The short answer" `FactCard` (AI tools, the four prices through
 `priceLabel()`, one `proof()` line with the `upwork-profile` note, Book and the
 brief), then "When a subscription is enough", the library's `ComparisonTable`,
 "Will you just run Claude and bill me for it?" with two figures linked to their
-posts, "Already built it with AI?", three projects with `StatusMark`, four
-questions (also the `FAQPage`) and `ClosingBand` with the ownership and bug-fix
-promises, since the last answer already gives the refund and the first
-milestone. `lib/why-not-just-ai.ts` holds the wording; promises come through
-`promise()`. The footer's Site group alone lists it (`lib/nav.ts`'s
-`WHY_NOT_JUST_AI`), not the rail or the More sheet.
+posts, "Already built it with AI?", three projects with `StatusMark`, five
+questions (also the `FAQPage`; hourly billing while the agents work is #516) and
+`ClosingBand` with the ownership and bug-fix promises, since the last answer
+already gives the refund and the first milestone. `lib/why-not-just-ai.ts` holds
+the wording; promises come through `promise()`. The footer's Site group alone
+lists it (`lib/nav.ts`'s `WHY_NOT_JUST_AI`), not the rail or the More sheet. In
+the page body, `WHY_NOT_JUST_AI_PROMPT` and `WHY_NOT_JUST_AI_LINK_LABEL` link it
+from the home page (under the prices), `/catalog` (under the services),
+`/how-i-work` (the AI paragraph and the pricing answer) and the service pages in
+`WHY_NOT_JUST_AI_SERVICES` (the MVP and Ongoing pages, under "Who this is for").
 `test/why-not-just-ai.test.ts` checks the built page.
 
 ### Tool pages
