@@ -11,6 +11,7 @@ import {
   catalogItems,
   catalogPromises,
   catalogRedirects,
+  formatPrice,
   priceLabel,
 } from "../lib/catalog.ts";
 import {
@@ -18,8 +19,10 @@ import {
   SAAS_MVP_SLUG,
   saasMvpAnswer,
   saasMvpFaqs,
+  saasMvpLead,
 } from "../lib/saas-mvp.ts";
-import { promise } from "../lib/promises.ts";
+import { decapitalize, promise } from "../lib/promises.ts";
+import { faqs } from "../lib/faqs.ts";
 import { projectsForCatalog } from "../lib/work.ts";
 
 /** Registers a test that gets the built site served with a booking URL. */
@@ -390,7 +393,7 @@ siteTest(
 );
 
 siteTest(
-  "the SaaS MVP page names SaaS MVP development above the H1 and opens with the catalog price and time",
+  "the SaaS MVP page names SaaS MVP development above the H1 and says the price and time once, in the card",
   async (site) => {
     const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`);
     const eyebrow = html.match(
@@ -402,13 +405,29 @@ siteTest(
     const lead = html.match(/<p[^>]*data-service-lead[^>]*>([\s\S]*?)<\/p>/);
     assert(lead, "no lead");
     const text = visibleText(lead[1]);
-    assertEquals(text, saasMvpAnswer());
+    assertEquals(text, saasMvpLead());
+    assert(text.includes(decapitalize(promise("ownership").title)), text);
+    // The price and the time show once on the page, in the card with Book.
     const item = catalogItem(SAAS_MVP_SLUG);
-    assert(text.includes(priceLabel(item).toLowerCase()), text);
-    assert(text.includes(item.delivery.toLowerCase()), text);
-    assert(text.includes(promise("ownership").title), text);
-    // The meta description is the same answer, for a search result's snippet.
-    assert(html.includes(`<meta name="description" content="${text}"`), text);
+    const page = visibleText(pageBody(html)).toLowerCase();
+    const price = formatPrice(item.prices[0]);
+    const amount = price.slice(price.indexOf("$"));
+    assertEquals(page.split(amount).length - 1, 1, amount);
+    const time = item.delivery.toLowerCase();
+    assertEquals(page.split(time).length - 1, 1, time);
+    const card = html.slice(
+      html.indexOf("data-service-card"),
+      html.indexOf("data-primary-book", html.indexOf("data-service-card")),
+    );
+    assert(visibleText(card).includes(price), "price not in the card");
+    // The meta description is the quotable answer, price and time included.
+    const answer = saasMvpAnswer();
+    assert(answer.includes(priceLabel(item).toLowerCase()), answer);
+    assert(answer.includes(item.delivery.toLowerCase()), answer);
+    assert(
+      html.includes(`<meta name="description" content="${answer}"`),
+      answer,
+    );
     // Every other service keeps its outcome as the lead and has no such line.
     for (const other of catalogItems.filter((i) => i.slug !== SAAS_MVP_SLUG)) {
       const page = await site.html(`/catalog/${other.slug}`);
@@ -416,6 +435,19 @@ siteTest(
     }
   },
 );
+
+Deno.test("the SaaS MVP lead and every question's answer open with a plain sentence, not a word and a colon", () => {
+  for (
+    const text of [
+      saasMvpLead(),
+      saasMvpAnswer(),
+      ...saasMvpFaqs().map((f) => f.a),
+      ...faqs.map((f) => f.a),
+    ]
+  ) {
+    assertFalse(/^[^.!?:]{0,20}:/.test(text), text);
+  }
+});
 
 siteTest(
   "the SaaS MVP questions come last before the closing band, short first sentences, the same as its FAQPage and llms-full.txt",
