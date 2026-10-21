@@ -742,6 +742,8 @@ export const tools: Tool[] = [
     screenshots: [
       {
         src: "/img/tools/preact-components/guide-overview-dark.webp",
+        srcset:
+          "/img/tools/preact-components/guide-overview-dark-720.webp 720w, /img/tools/preact-components/guide-overview-dark.webp 2560w",
         alt:
           "The live UI guide's overview page: a side navigation listing every package, and one card per package — UI, System, CRUD, Charts, Map, Signals, Theme, Icons and cn — each with its import name, a one-line summary and a count of its live cards or icons, or the words Examples coming for a package that has none yet.",
         width: 2560,

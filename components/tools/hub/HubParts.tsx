@@ -17,9 +17,21 @@ import {
   type ToolScreenshot,
 } from "../../../lib/tools.ts";
 
-/** A media card's picture: one of three columns from 1024px, two from 640px. */
-const CARD_SIZES =
-  "(min-width: 1024px) 22rem, (min-width: 640px) 45vw, calc(100vw - 2rem)";
+/**
+ * The smallest file a shot names (its `srcset`'s narrowest width, else its
+ * `src`): a card's picture is at most about 22rem wide, and a poster under a
+ * play mark or a screenshot the visitor opens on the tool page reads fine
+ * at about 640px on any screen. Offering only that file keeps a 3x phone
+ * from fetching the 1280px copies while the stylesheet still loads (#456).
+ */
+export function smallestFile(shot: ToolScreenshot): string {
+  if (!shot.srcset) return shot.src;
+  const candidates = shot.srcset.split(",").map((c) => {
+    const [url, width] = c.trim().split(/\s+/);
+    return { url, width: Number.parseInt(width, 10) };
+  });
+  return candidates.reduce((a, b) => (b.width < a.width ? b : a)).url;
+}
 
 /** The spotlight's clip: seven of twelve columns from 1024px. */
 const SPOTLIGHT_SIZES = "(min-width: 1024px) 40rem, calc(100vw - 2rem)";
@@ -50,8 +62,8 @@ function NameLink({ tool, place }: { tool: Tool; place: Place }) {
 /**
  * A card's picture, at one shape in every card of a row (16:10): the clip
  * (looping once pressed, lazy, nothing fetched before the press), else its
- * poster as a still, else the hero shot or first screenshot, which opens in
- * the lightbox. A 16:9 terminal clip sits centred on Ink rather than cropped.
+ * poster as a still, else the hero shot or first screenshot, each from its
+ * smallest file. A 16:9 terminal clip sits centred on Ink rather than cropped.
  * Null for a tool with no picture yet; its card is then text only.
  */
 function CardMedia({ tool }: { tool: Tool }) {
@@ -69,16 +81,14 @@ function CardMedia({ tool }: { tool: Tool }) {
           title={clip.title}
           sources={clipSources(tool.slug)}
           poster={{
-            src: clip.poster.src,
-            srcset: clip.poster.srcset,
-            sizes: clip.poster.srcset ? CARD_SIZES : undefined,
+            src: smallestFile(clip.poster),
             width: clip.poster.width,
             height: clip.poster.height,
           }}
         />
       </div>
     )
-    : <Still shot={still} sizes={CARD_SIZES} />;
+    : <Still shot={still} />;
   return (
     <MediaFrame
       variant={variant}
@@ -94,17 +104,19 @@ function CardMedia({ tool }: { tool: Tool }) {
   );
 }
 
-/** A lazy still, top-aligned when the shape crops it; the lightbox opens it whole. */
-function Still({ shot, sizes }: { shot: ToolScreenshot; sizes: string }) {
+/**
+ * A lazy, low-priority still from the shot's smallest file, top-aligned when
+ * the shape crops it. It only shows: the tool's page has the full size.
+ */
+function Still({ shot }: { shot: ToolScreenshot }) {
   return (
     <img
-      src={shot.src}
-      srcset={shot.srcset}
-      sizes={shot.srcset ? sizes : undefined}
+      src={smallestFile(shot)}
       alt={shot.alt}
       width={shot.width}
       height={shot.height}
       loading="lazy"
+      fetchpriority="low"
       decoding="async"
       class="block h-full w-full object-cover object-top"
     />

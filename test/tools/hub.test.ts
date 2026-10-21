@@ -9,6 +9,7 @@ import { count, jsonLd, pageBody, visibleText } from "../html.ts";
 import { clipSources, toolRows, tools } from "../../lib/tools.ts";
 import { heroStill } from "../../components/tool-frame/tool-page.ts";
 import { SECTIONS } from "../../components/tools/hub/hub.ts";
+import { smallestFile } from "../../components/tools/hub/HubParts.tsx";
 
 /**
  * The order the hub spec (#456) sets, written out here rather than read from
@@ -117,7 +118,7 @@ siteTest(
 );
 
 siteTest(
-  "each media card shows the clip, or else the still, that lib/tools.ts has",
+  "each media card shows the clip, or else the still, that lib/tools.ts has, from its smallest file",
   async (site) => {
     const html = pageBody(await site.html("/tools"));
     const media = SECTIONS.filter((s) => s.kind === "media").flatMap((s) =>
@@ -132,13 +133,20 @@ siteTest(
           card.includes(`href="${clipSources(slug)[0].src}"`),
           `${slug}: no play link to its clip`,
         );
-        assert(card.includes(t.clip.poster.src), `${slug}: no poster`);
+        assert(
+          card.includes(`src="${smallestFile(t.clip.poster)}`),
+          `${slug}: no poster at its smallest file`,
+        );
       } else if (still) {
         // Fresh appends a cache-busting query to a static file's src.
-        assert(card.includes(`src="${still.src}`), `${slug}: no still`);
+        assert(
+          card.includes(`src="${smallestFile(still)}`),
+          `${slug}: no still at its smallest file`,
+        );
       } else {
         assertEquals(count(card, /data-hub-media/g), 0, slug);
       }
+      assertEquals(count(card, /srcset=/g), 0, `${slug}: a srcset`);
     }
   },
 );
@@ -220,6 +228,18 @@ siteTest(
         "Need something like this for your team? That's my day job.",
       ),
       "the band's line",
+    );
+  },
+);
+
+siteTest(
+  "the hub announces no island script in a Link header, so its scripts never race the stylesheet",
+  async (site) => {
+    const res = await site.get("/tools");
+    await res.body?.cancel();
+    assert(
+      !/modulepreload/i.test(res.headers.get("link") ?? ""),
+      `Link: ${res.headers.get("link")}`,
     );
   },
 );

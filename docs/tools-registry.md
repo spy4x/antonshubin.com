@@ -7,7 +7,9 @@ the status, the group and the kind is optional, and the page shows only the
 blocks an entry has data for: no registry means no install line, no `ci` means
 no CI pill, no `repo` means no repository row. A project with no page yet would
 be a `toolRows` entry, not in the sitemap or the llms files; there is none
-today, and the hub draws none until one is placed there by hand (below). A
+today. The hub cannot show one: `components/tools/hub/hub.ts` names tools only
+(`tool()` throws on any other slug), and `test/tools/hub.test.ts` fails while a
+row exists, so such a project gets a `tools` entry before it reaches the hub. A
 status is written down for every entry, never guessed from its link: `in-use`,
 `ready`, `beta`, `wip`, `paused` or `archived`, and "Live" is only ever a link
 to a running public instance. A tool's `registry.published` decides whether its
@@ -130,7 +132,8 @@ section. Screenshots live in `static/img/tools/<slug>/` (see
 **The hub (#456).** `/tools` (`routes/tools/index.tsx`) is arranged by hand, not
 in registry order: `components/tools/hub/hub.ts` names the spotlight (the tool
 being launched, Seed today) and the slugs of each section in page order (Running
-right now, In the terminal, Under the hood, Being built), then the archive.
+right now, In the terminal, Under the hood, Being built), then the archive, and
+`HubTools.tsx` draws them, each entry read with its live registry version.
 `test/tools/hub.test.ts` fails when a tool is in none of them, so a new tool, or
 one that changes status, is placed there by an edit. The entry's group (`group`,
 `toolGroups`) no longer decides anything on the page. The spotlight shows the
@@ -145,3 +148,10 @@ hood" card is the same without the picture; a "Being built" or archive line
 shows `standing` or the `job`. The hub shows no CI pill and no licence: those
 are on each tool's page. It carries `CollectionPage` and `ItemList` JSON-LD in
 page order, and no `VideoObject`.
+
+The hub is kept light for its first paint: a card's picture is the narrowest
+file its `srcset` names (`smallestFile()`, about 640px; give a new screenshot a
+copy about 720px wide), loaded lazily without a `srcset`, so a 3x phone does not
+fetch the 1280px copies; a screenshot only shows, with no lightbox; and its
+response carries no `modulepreload` `Link` header (`lib/late-scripts.ts`), so
+the clip and Copy scripts load after the HTML instead of beside the stylesheet.
