@@ -36,7 +36,7 @@ const BOT_UA_PATTERNS = [
   "PetalBot",
   "DotBot",
   "AdsBot",
-];
+]
 
 /**
  * True when `userAgent` belongs to a known bot (AI crawler, search engine, or
@@ -44,7 +44,7 @@ const BOT_UA_PATTERNS = [
  * is `bingbot/2.0`, which a case-sensitive match against `Bingbot` never caught.
  */
 export function isBot(userAgent: string): boolean {
-  if (!userAgent) return false; // missing UA: treat as client failure, not a bot
-  const ua = userAgent.toLowerCase();
-  return BOT_UA_PATTERNS.some((pattern) => ua.includes(pattern.toLowerCase()));
+  if (!userAgent) return false // missing UA: treat as client failure, not a bot
+  const ua = userAgent.toLowerCase()
+  return BOT_UA_PATTERNS.some((pattern) => ua.includes(pattern.toLowerCase()))
 }

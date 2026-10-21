@@ -1,15 +1,15 @@
-import { define } from "../../lib/utils.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { SCHEDULE_URL } from "../../lib/config.ts";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
-import { loadToolPage } from "../../components/tool-frame/tool-page.ts";
+import { define } from "../../lib/utils.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { SCHEDULE_URL } from "../../lib/config.ts"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
+import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
 import {
   ComposeQuickStart,
   EmbedIt,
   OpenIssues,
   TryItHere,
   WhyMig,
-} from "../../components/tools/mig/MigMiddle.tsx";
+} from "../../components/tools/mig/MigMiddle.tsx"
 
 /**
  * `/tools/mig` (#457): the shared tool frame around mig's own middle. The
@@ -18,9 +18,9 @@ import {
  * gives the README's reasons and its embed snippet.
  */
 export default define.page(async function MigPage(ctx) {
-  const data = await loadToolPage("mig");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
-  const version = data.tool.registry?.version ?? "latest";
+  const data = await loadToolPage("mig")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
+  const version = data.tool.registry?.version ?? "latest"
   return (
     <ToolFrame
       data={data}
@@ -34,5 +34,5 @@ export default define.page(async function MigPage(ctx) {
       <EmbedIt />
       <OpenIssues data={data} />
     </ToolFrame>
-  );
-});
+  )
+})

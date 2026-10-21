@@ -14,15 +14,15 @@
 // tests are excluded from the plain `deno task test` glob instead of
 // widening that task's permissions. Chromium launch/version handling is
 // shared with that file via test/browser.ts.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import axeCore from "axe-core";
-import type { Browser, Locator, Page } from "playwright";
-import { startSite } from "./harness.ts";
-import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
-import { tools } from "../lib/tools.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import axeCore from "axe-core"
+import type { Browser, Locator, Page } from "playwright"
+import { startSite } from "./harness.ts"
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts"
+import { tools } from "../lib/tools.ts"
 
-const MOBILE_VIEWPORT = { width: 390, height: 844 };
-const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
+const MOBILE_VIEWPORT = { width: 390, height: 844 }
+const DESKTOP_VIEWPORT = { width: 1440, height: 900 }
 
 /** The six project pages #246 was designed and reviewed against. */
 const SAMPLE_PROJECTS = [
@@ -32,146 +32,146 @@ const SAMPLE_PROJECTS = [
   "roley",
   "microwork",
   "code-review",
-];
+]
 
 /** Rule ids and offending markup of every axe-core WCAG 2 A/AA violation on the loaded page. */
 async function axeViolations(page: Page): Promise<string[]> {
   // Injected through page.evaluate, not a <script> tag, so the site's CSP
   // does not block it (see test/contrast.browser.test.ts).
-  await page.evaluate(axeCore.source);
+  await page.evaluate(axeCore.source)
   const results = await page.evaluate(async () => {
     // deno-lint-ignore no-explicit-any
-    const axe = (globalThis as any).axe;
+    const axe = (globalThis as any).axe
     return await axe.run(document, {
       runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-    });
-  }) as { violations: { id: string; nodes: { html: string }[] }[] };
+    })
+  }) as { violations: { id: string; nodes: { html: string }[] }[] }
   return results.violations.flatMap((v) =>
     v.nodes.map((n) => `${v.id}: ${n.html.slice(0, 160)}`)
-  );
+  )
 }
 
 /** True if `locator`'s element is the page's current `document.activeElement`. */
 function isFocused(locator: Locator): Promise<boolean> {
-  return locator.evaluate((el) => el === document.activeElement);
+  return locator.evaluate((el) => el === document.activeElement)
 }
 
 Deno.test("project gallery lightbox is named, its buttons are named, and focus returns", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser);
+    browser = await launchChromium()
+    const page: Page = await newPage(browser)
     try {
       await page.goto(`${site.origin}/work/calltrack`, {
         waitUntil: "networkidle",
-      });
+      })
 
       const firstThumb = page.locator(
         'button:has(img[alt="Screenshot 1 of 7"])',
-      );
+      )
       const secondThumb = page.locator(
         'button:has(img[alt="Screenshot 2 of 7"])',
-      );
+      )
 
       // Open, check the dialog's accessible name, and that Close, Previous
       // and Next each have a real accessible name (not just the aria-hidden
       // icon inside them).
-      await firstThumb.click();
+      await firstThumb.click()
       const dialog = page.getByRole("dialog", {
         name: "Screenshot 1 of 7",
-      });
-      await dialog.waitFor({ state: "visible" });
+      })
+      await dialog.waitFor({ state: "visible" })
 
-      const closeButton = dialog.getByRole("button", { name: "Close" });
-      const nextButton = dialog.getByRole("button", { name: "Next image" });
+      const closeButton = dialog.getByRole("button", { name: "Close" })
+      const nextButton = dialog.getByRole("button", { name: "Next image" })
       const prevButton = dialog.getByRole("button", {
         name: "Previous image",
-      });
-      await closeButton.waitFor({ state: "visible" });
-      await nextButton.waitFor({ state: "visible" });
-      await prevButton.waitFor({ state: "visible" });
+      })
+      await closeButton.waitFor({ state: "visible" })
+      await nextButton.waitFor({ state: "visible" })
+      await prevButton.waitFor({ state: "visible" })
 
       // Next moves to the next image and renames the dialog.
-      await nextButton.click();
+      await nextButton.click()
       await page.getByRole("dialog", { name: "Screenshot 2 of 7" })
-        .waitFor({ state: "visible" });
+        .waitFor({ state: "visible" })
 
       // Escape closes the dialog and returns focus to the thumbnail that
       // opened it (the first one — Next only changed which image shows,
       // not which button opened the lightbox).
-      await page.keyboard.press("Escape");
-      await dialog.waitFor({ state: "hidden" });
+      await page.keyboard.press("Escape")
+      await dialog.waitFor({ state: "hidden" })
       assert(
         await isFocused(firstThumb),
         "focus must return to the thumbnail that opened the lightbox after Escape",
-      );
+      )
 
       // Close button does the same, from a different trigger.
-      await secondThumb.click();
+      await secondThumb.click()
       const dialog2 = page.getByRole("dialog", {
         name: "Screenshot 2 of 7",
-      });
-      await dialog2.waitFor({ state: "visible" });
-      await dialog2.getByRole("button", { name: "Close" }).click();
-      await dialog2.waitFor({ state: "hidden" });
+      })
+      await dialog2.waitFor({ state: "visible" })
+      await dialog2.getByRole("button", { name: "Close" }).click()
+      await dialog2.waitFor({ state: "hidden" })
       assert(
         await isFocused(secondThumb),
         "focus must return to the thumbnail that opened the lightbox after Close",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("the project gallery counts its screenshots and its named Next and Previous buttons move the strip", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT })
     try {
       await page.goto(`${site.origin}/work/smartlite`, {
         waitUntil: "networkidle",
-      });
-      const counter = page.locator("[data-gallery-counter]");
-      assertEquals((await counter.innerText()).trim(), "1 / 12");
-      const next = page.getByRole("button", { name: "Next screenshot" });
-      const prev = page.getByRole("button", { name: "Previous screenshot" });
-      await next.waitFor({ state: "visible" });
-      await prev.waitFor({ state: "visible" });
+      })
+      const counter = page.locator("[data-gallery-counter]")
+      assertEquals((await counter.innerText()).trim(), "1 / 12")
+      const next = page.getByRole("button", { name: "Next screenshot" })
+      const prev = page.getByRole("button", { name: "Previous screenshot" })
+      await next.waitFor({ state: "visible" })
+      await prev.waitFor({ state: "visible" })
 
-      await next.click();
+      await next.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
           ?.trim() === "2 / 12"
-      );
+      )
       const scrolled = await page.locator("[data-gallery-strip]").evaluate(
         (el) => el.scrollLeft,
-      );
-      assert(scrolled > 0, "Next did not scroll the strip");
+      )
+      assert(scrolled > 0, "Next did not scroll the strip")
 
-      await prev.click();
+      await prev.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
           ?.trim() === "1 / 12"
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 /** The gallery counter's text, e.g. "3 / 9". */
 async function counterText(page: Page): Promise<string> {
-  return (await page.locator("[data-gallery-counter]").innerText()).trim();
+  return (await page.locator("[data-gallery-counter]").innerText()).trim()
 }
 
 /**
@@ -181,156 +181,156 @@ async function counterText(page: Page): Promise<string> {
  * when a click does not scroll the strip at all.
  */
 async function walk(page: Page, button: Locator, limit: number) {
-  const strip = page.locator("[data-gallery-strip]");
-  const seen = [await counterText(page)];
+  const strip = page.locator("[data-gallery-strip]")
+  const seen = [await counterText(page)]
   for (let i = 0; i < limit && await button.isEnabled(); i++) {
     const scrolled = strip.evaluate(
       (el, ms) =>
         new Promise<boolean>((resolve) => {
-          el.addEventListener("scrollend", () => resolve(true), { once: true });
-          setTimeout(() => resolve(false), ms);
+          el.addEventListener("scrollend", () => resolve(true), { once: true })
+          setTimeout(() => resolve(false), ms)
         }),
       WAIT_MS,
-    );
-    await button.click();
-    assert(await scrolled, `click ${i + 1} did not scroll the strip`);
-    seen.push(await counterText(page));
+    )
+    await button.click()
+    assert(await scrolled, `click ${i + 1} did not scroll the strip`)
+    seen.push(await counterText(page))
   }
-  return seen;
+  return seen
 }
 
 Deno.test("a portrait gallery's Next walks to the last screenshot and Previous walks back", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT })
     try {
       // Roley: nine phone screenshots, several in view at once at 1440px.
       await page.goto(`${site.origin}/work/roley`, {
         waitUntil: "networkidle",
-      });
-      const next = page.getByRole("button", { name: "Next screenshot" });
-      const prev = page.getByRole("button", { name: "Previous screenshot" });
-      await next.waitFor({ state: "visible" });
-      assert(await prev.isDisabled(), "Previous is enabled at the start");
+      })
+      const next = page.getByRole("button", { name: "Next screenshot" })
+      const prev = page.getByRole("button", { name: "Previous screenshot" })
+      await next.waitFor({ state: "visible" })
+      assert(await prev.isDisabled(), "Previous is enabled at the start")
 
-      const forward = await walk(page, next, 9);
-      assertEquals(forward[0], "1 / 9");
-      assertEquals(forward[forward.length - 1], "9 / 9", forward.join(", "));
-      assert(await next.isDisabled(), "Next is still enabled at the end");
+      const forward = await walk(page, next, 9)
+      assertEquals(forward[0], "1 / 9")
+      assertEquals(forward[forward.length - 1], "9 / 9", forward.join(", "))
+      assert(await next.isDisabled(), "Next is still enabled at the end")
 
-      const back = await walk(page, prev, 9);
-      assertEquals(back[back.length - 1], "1 / 9", back.join(", "));
-      assert(await prev.isDisabled(), "Previous is still enabled at the start");
+      const back = await walk(page, prev, 9)
+      assertEquals(back[back.length - 1], "1 / 9", back.join(", "))
+      assert(await prev.isDisabled(), "Previous is still enabled at the start")
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("a gallery that fits without scrolling offers no Next or Previous", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT })
     try {
       // Connectful: three phone screenshots, all in view at 1440px.
       await page.goto(`${site.origin}/work/connectful`, {
         waitUntil: "networkidle",
-      });
+      })
       const overflow = await page.locator("[data-gallery-strip]").evaluate(
         (el) => el.scrollWidth - el.clientWidth,
-      );
-      assert(overflow <= 1, `the strip still scrolls by ${overflow}px`);
+      )
+      assert(overflow <= 1, `the strip still scrolls by ${overflow}px`)
       for (const name of ["Next screenshot", "Previous screenshot"]) {
         assertEquals(
           await page.getByRole("button", { name }).count(),
           0,
           `${name} is offered with nothing to scroll`,
-        );
+        )
       }
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("the six sample project pages have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
-  const previous = Deno.env.get("SCHEDULE_URL");
+  const previous = Deno.env.get("SCHEDULE_URL")
   // The Book buttons render only with a booking URL; RFC 2606 host.
-  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
-  const site = await startSite();
-  let browser: Browser | undefined;
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book")
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-      const page: Page = await newPage(browser, { viewport });
+      const page: Page = await newPage(browser, { viewport })
       try {
         for (const slug of SAMPLE_PROJECTS) {
-          const where = `/work/${slug} at ${viewport.width}px`;
+          const where = `/work/${slug} at ${viewport.width}px`
           await page.goto(`${site.origin}/work/${slug}`, {
             waitUntil: "networkidle",
-          });
+          })
           const scrollWidth = await page.evaluate(() =>
             document.documentElement.scrollWidth
-          );
+          )
           assert(
             scrollWidth <= viewport.width,
             `${where} scrolls sideways: ${scrollWidth}px wide`,
-          );
-          assertEquals(await axeViolations(page), [], where);
+          )
+          assertEquals(await axeViolations(page), [], where)
         }
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
-    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-    else Deno.env.set("SCHEDULE_URL", previous);
+    await browser?.close()
+    await site.stop()
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
+    else Deno.env.set("SCHEDULE_URL", previous)
   }
-});
+})
 
 /** No sideways scroll and no axe violation on `path` at 390 and 1440px, with a booking URL set. */
 async function assertPageSound(path: string) {
-  const previous = Deno.env.get("SCHEDULE_URL");
+  const previous = Deno.env.get("SCHEDULE_URL")
   // The closing band's Book renders only with a booking URL; RFC 2606 host.
-  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
-  const site = await startSite();
-  let browser: Browser | undefined;
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book")
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-      const page: Page = await newPage(browser, { viewport });
+      const page: Page = await newPage(browser, { viewport })
       try {
-        const where = `${path} at ${viewport.width}px`;
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        const where = `${path} at ${viewport.width}px`
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
         const scrollWidth = await page.evaluate(() =>
           document.documentElement.scrollWidth
-        );
+        )
         assert(
           scrollWidth <= viewport.width,
           `${where} scrolls sideways: ${scrollWidth}px wide`,
-        );
-        assertEquals(await axeViolations(page), [], where);
+        )
+        assertEquals(await axeViolations(page), [], where)
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
-    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-    else Deno.env.set("SCHEDULE_URL", previous);
+    await browser?.close()
+    await site.stop()
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
+    else Deno.env.set("SCHEDULE_URL", previous)
   }
 }
 
@@ -338,40 +338,40 @@ for (
   const path of ["/work", "/infrastructure", "/how-i-work", "/why-not-just-ai"]
 ) {
   Deno.test(`${path} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
-    await assertPageSound(path);
-  });
+    await assertPageSound(path)
+  })
 }
 
 Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440px", async () => {
   // Book renders only with a booking URL; RFC 2606 host.
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
-  });
-  let browser: Browser | undefined;
+  })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-      const page: Page = await newPage(browser, { viewport });
+      const page: Page = await newPage(browser, { viewport })
       try {
-        const where = `/about at ${viewport.width}px`;
-        await page.goto(`${site.origin}/about`, { waitUntil: "networkidle" });
+        const where = `/about at ${viewport.width}px`
+        await page.goto(`${site.origin}/about`, { waitUntil: "networkidle" })
         const scrollWidth = await page.evaluate(() =>
           document.documentElement.scrollWidth
-        );
+        )
         assert(
           scrollWidth <= viewport.width,
           `${where} scrolls sideways: ${scrollWidth}px wide`,
-        );
-        assertEquals(await axeViolations(page), [], where);
+        )
+        assertEquals(await axeViolations(page), [], where)
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 /**
  * The site footer goes in the Rail's `footer` slot, after `<main>`. A
@@ -379,127 +379,127 @@ Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440
  * users could no longer jump to it.
  */
 Deno.test("the site footer is the page's one contentinfo landmark, outside main", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     const page: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
-    });
+    })
     try {
       for (const path of ["/", "/about", "/blog"]) {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-        const landmarks = page.getByRole("contentinfo");
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
+        const landmarks = page.getByRole("contentinfo")
         assertEquals(
           await landmarks.count(),
           1,
           `${path}: one contentinfo landmark`,
-        );
+        )
         assert(
           await landmarks.evaluate((el) =>
             el.matches("footer.site-footer") && !el.closest("main")
           ),
           `${path}: the contentinfo landmark must be the site footer, outside main`,
-        );
+        )
       }
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("the phone More sheet links About and marks it current on /about, and More is filled on Home, About and Infrastructure", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT })
     try {
-      const more = page.getByRole("button", { name: "More", exact: true });
+      const more = page.getByRole("button", { name: "More", exact: true })
       // The three pages only the sheet lists: More carries the current fill.
       for (const path of ["/", "/infrastructure", "/about"]) {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
         assertEquals(
           await more.evaluate((el) => getComputedStyle(el).backgroundColor),
           await tokenColour(page, "bg-lamp", "backgroundColor"),
           `${path}: More must be filled on a page listed under it`,
-        );
+        )
       }
-      await more.click();
-      const menu = page.getByRole("dialog", { name: "More" });
-      await menu.waitFor({ state: "visible" });
+      await more.click()
+      const menu = page.getByRole("dialog", { name: "More" })
+      await menu.waitFor({ state: "visible" })
       assertEquals(
         await menu.getByRole("link", { name: "About", exact: true })
           .getAttribute("aria-current"),
         "page",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("the tools hub and every tool page have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
   // The closing band's Book renders only with a booking URL; RFC 2606 host.
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
-  });
-  let browser: Browser | undefined;
+  })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const paths = ["/tools", ...tools.map((t) => `/tools/${t.slug}`)];
+    browser = await launchChromium()
+    const paths = ["/tools", ...tools.map((t) => `/tools/${t.slug}`)]
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-      const page: Page = await newPage(browser, { viewport });
+      const page: Page = await newPage(browser, { viewport })
       try {
         for (const path of paths) {
-          const where = `${path} at ${viewport.width}px`;
+          const where = `${path} at ${viewport.width}px`
           await page.goto(`${site.origin}${path}`, {
             waitUntil: "networkidle",
-          });
+          })
           const scrollWidth = await page.evaluate(() =>
             document.documentElement.scrollWidth
-          );
+          )
           assert(
             scrollWidth <= viewport.width,
             `${where} scrolls sideways: ${scrollWidth}px wide`,
-          );
-          assertEquals(await axeViolations(page), [], where);
+          )
+          assertEquals(await axeViolations(page), [], where)
           if (viewport === MOBILE_VIEWPORT) {
             // The house bar for a phone tap target is 44px (`min-h-11`), stricter than axe's 24px:
             // the quick start's and install line's copy buttons are a developer's main action on the page.
             const copyHeights = await page.$$eval(
               `button[aria-label="Copy the install command"]`,
               (els) => els.map((el) => el.getBoundingClientRect().height),
-            );
+            )
             if (path === "/tools/seed") {
               assert(
                 copyHeights.length > 0,
                 `${where}: no quick-start copy button found`,
-              );
+              )
             }
             for (const height of copyHeights) {
               assert(
                 height >= 44,
                 `${where}: a copy button is ${height}px tall`,
-              );
+              )
             }
           }
         }
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 for (
   const [label, scheduleUrl] of [
@@ -508,206 +508,206 @@ for (
   ]
 ) {
   Deno.test(`/book ${label} has no horizontal scroll and no axe violations at 390 and 1440px`, async () => {
-    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
-    let browser: Browser | undefined;
+    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } })
+    let browser: Browser | undefined
     try {
-      browser = await launchChromium();
+      browser = await launchChromium()
       for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-        const page: Page = await newPage(browser, { viewport });
+        const page: Page = await newPage(browser, { viewport })
         try {
-          const where = `/book ${label} at ${viewport.width}px`;
+          const where = `/book ${label} at ${viewport.width}px`
           await page.goto(`${site.origin}/book`, {
             waitUntil: "networkidle",
-          });
+          })
           const scrollWidth = await page.evaluate(() =>
             document.documentElement.scrollWidth
-          );
+          )
           assert(
             scrollWidth <= viewport.width,
             `${where} scrolls sideways: ${scrollWidth}px wide`,
-          );
-          assertEquals(await axeViolations(page), [], where);
+          )
+          assertEquals(await axeViolations(page), [], where)
         } finally {
-          await page.close();
+          await page.close()
         }
       }
     } finally {
-      await browser?.close();
-      await site.stop();
+      await browser?.close()
+      await site.stop()
     }
-  });
+  })
 }
 
 Deno.test("the booking page's skip link shows on focus and jumps past the calendar to the brief", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
-  });
-  let browser: Browser | undefined;
+  })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser, { viewport: DESKTOP_VIEWPORT });
+    browser = await launchChromium()
+    const page = await newPage(browser, { viewport: DESKTOP_VIEWPORT })
     try {
       await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
-      });
-      const skip = page.getByRole("link", { name: "Skip the calendar" });
-      await skip.focus();
-      const box = await skip.boundingBox();
-      assert(box && box.width > 20, "the focused skip link is not visible");
-      await page.keyboard.press("Enter");
-      await page.waitForURL(/#brief$/);
-      const brief = await page.locator("#brief").boundingBox();
+      })
+      const skip = page.getByRole("link", { name: "Skip the calendar" })
+      await skip.focus()
+      const box = await skip.boundingBox()
+      assert(box && box.width > 20, "the focused skip link is not visible")
+      await page.keyboard.press("Enter")
+      await page.waitForURL(/#brief$/)
+      const brief = await page.locator("#brief").boundingBox()
       assert(
         brief && brief.y < DESKTOP_VIEWPORT.height,
         "the brief is not in view after the skip link",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("blog image lightbox is named, its Close button is named, and focus returns", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser);
+    browser = await launchChromium()
+    const page: Page = await newPage(browser)
     try {
       await page.goto(
         `${site.origin}/blog/from-office-job-to-freelance-to-my-startups`,
         { waitUntil: "networkidle" },
-      );
+      )
 
       const trigger = page.getByRole("button", {
         name: "View larger image: Young developer",
-      });
-      await trigger.click();
+      })
+      await trigger.click()
 
-      const dialog = page.getByRole("dialog", { name: "Young developer" });
-      await dialog.waitFor({ state: "visible" });
-      const closeButton = dialog.getByRole("button", { name: "Close" });
-      await closeButton.waitFor({ state: "visible" });
+      const dialog = page.getByRole("dialog", { name: "Young developer" })
+      await dialog.waitFor({ state: "visible" })
+      const closeButton = dialog.getByRole("button", { name: "Close" })
+      await closeButton.waitFor({ state: "visible" })
 
       // This lightbox has one image per post — no Previous/Next controls.
       assertEquals(
         await dialog.getByRole("button", { name: "Next image" }).count(),
         0,
         "the single-image blog lightbox must not have a Next button",
-      );
+      )
       assertEquals(
         await dialog.getByRole("button", { name: "Previous image" }).count(),
         0,
         "the single-image blog lightbox must not have a Previous button",
-      );
+      )
 
-      await page.keyboard.press("Escape");
-      await dialog.waitFor({ state: "hidden" });
+      await page.keyboard.press("Escape")
+      await dialog.waitFor({ state: "hidden" })
       assert(
         await isFocused(trigger),
         "focus must return to the image that opened the lightbox after Escape",
-      );
+      )
 
-      await trigger.click();
-      await dialog.waitFor({ state: "visible" });
-      await dialog.getByRole("button", { name: "Close" }).click();
-      await dialog.waitFor({ state: "hidden" });
+      await trigger.click()
+      await dialog.waitFor({ state: "visible" })
+      await dialog.getByRole("button", { name: "Close" }).click()
+      await dialog.waitFor({ state: "hidden" })
       assert(
         await isFocused(trigger),
         "focus must return to the image that opened the lightbox after Close",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("More opens the sheet, Escape closes it and focus returns to More", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT })
     try {
-      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" })
 
-      const more = page.getByRole("button", { name: "More", exact: true });
-      await more.click();
+      const more = page.getByRole("button", { name: "More", exact: true })
+      await more.click()
 
-      const menu = page.getByRole("dialog", { name: "More" });
-      await menu.waitFor({ state: "visible" });
+      const menu = page.getByRole("dialog", { name: "More" })
+      await menu.waitFor({ state: "visible" })
 
       // Move focus into the menu before closing it, so the focus assertion
       // below actually proves Escape moves focus back to More rather than
       // merely leaving it where the earlier click put it.
-      const writing = menu.getByRole("link", { name: "Writing", exact: true });
-      await writing.focus();
-      assert(await isFocused(writing), "focus must be inside the open menu");
-      await page.keyboard.press("Escape");
-      await menu.waitFor({ state: "hidden" });
+      const writing = menu.getByRole("link", { name: "Writing", exact: true })
+      await writing.focus()
+      assert(await isFocused(writing), "focus must be inside the open menu")
+      await page.keyboard.press("Escape")
+      await menu.waitFor({ state: "hidden" })
       assert(
         await isFocused(more),
         "focus must land on More after Escape closes the menu",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("Tabbing through the desktop rail goes top to bottom with upright labels", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: "" } });
-  let browser: Browser | undefined;
+  const site = await startSite({ env: { SCHEDULE_URL: "" } })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     const page: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
-    });
+    })
     try {
-      await page.goto(`${site.origin}/blog`, { waitUntil: "networkidle" });
+      await page.goto(`${site.origin}/blog`, { waitUntil: "networkidle" })
 
       // Tab from the top of the page until focus leaves the rail, recording
       // each rail stop's top edge and whether anything above it is
       // transformed (the old rail was the phone bar rotated -90deg).
       const stops: {
-        label: string;
-        y: number;
-        transformed: boolean;
-        writingMode: string;
-        hasIcon: boolean;
-      }[] = [];
+        label: string
+        y: number
+        transformed: boolean
+        writingMode: string
+        hasIcon: boolean
+      }[] = []
       for (let i = 0; i < 20; i++) {
-        await page.keyboard.press("Tab");
+        await page.keyboard.press("Tab")
         const stop = await page.evaluate(() => {
-          const el = document.activeElement as HTMLElement | null;
-          if (!el?.closest('aside[aria-label="Sidebar"]')) return null;
-          let transformed = false;
+          const el = document.activeElement as HTMLElement | null
+          if (!el?.closest('aside[aria-label="Sidebar"]')) return null
+          let transformed = false
           for (let n: Element | null = el; n; n = n.parentElement) {
-            if (getComputedStyle(n).transform !== "none") transformed = true;
+            if (getComputedStyle(n).transform !== "none") transformed = true
           }
-          const label = el.querySelector("span");
+          const label = el.querySelector("span")
           return {
             label: (el.textContent || "").replace(/\s+/g, " ").trim(),
             y: el.getBoundingClientRect().top,
             transformed,
             writingMode: label ? getComputedStyle(label).writingMode : "",
             hasIcon: el.querySelector("svg") !== null,
-          };
-        });
+          }
+        })
         if (!stop) {
-          if (stops.length > 0) break;
-          continue;
+          if (stops.length > 0) break
+          continue
         }
-        stops.push(stop);
+        stops.push(stop)
       }
 
       assertEquals(
@@ -722,79 +722,79 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
           "Writing",
         ],
         "the rail must be tabbed through in its visual order",
-      );
+      )
       for (let i = 1; i < stops.length; i++) {
         assert(
           stops[i].y > stops[i - 1].y,
           `"${stops[i].label}" (y=${stops[i].y}) must sit below "${
             stops[i - 1].label
           }" (y=${stops[i - 1].y})`,
-        );
+        )
       }
       for (const stop of stops) {
-        assert(!stop.transformed, `"${stop.label}" is inside a transform`);
+        assert(!stop.transformed, `"${stop.label}" is inside a transform`)
         assertEquals(
           stop.writingMode,
           "horizontal-tb",
           `"${stop.label}" must read horizontally`,
-        );
+        )
         // The portrait is Anton's icon; every other stop draws a nav icon.
         if (stop.label !== "Anton") {
-          assert(stop.hasIcon, `"${stop.label}" has no icon`);
+          assert(stop.hasIcon, `"${stop.label}" has no icon`)
         }
       }
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("neither the rail nor the More dialog has a Links control, and More lists pages only", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     const desktop: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
-    });
+    })
     try {
-      await desktop.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await desktop.goto(`${site.origin}/`, { waitUntil: "networkidle" })
       assertEquals(
         await desktop.getByRole("button", { name: "Links" }).count(),
         0,
         "the rail still has a Links button",
-      );
-      assertEquals(await desktop.locator("#nav-links").count(), 0);
+      )
+      assertEquals(await desktop.locator("#nav-links").count(), 0)
     } finally {
-      await desktop.close();
+      await desktop.close()
     }
-    const phone: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    const phone: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT })
     try {
-      await phone.goto(`${site.origin}/`, { waitUntil: "networkidle" });
-      await phone.getByRole("button", { name: "More", exact: true }).click();
-      const dialog = phone.getByRole("dialog", { name: "More" });
-      await dialog.getByRole("link").first().waitFor({ state: "visible" });
-      const names = await dialog.getByRole("link").allTextContents();
+      await phone.goto(`${site.origin}/`, { waitUntil: "networkidle" })
+      await phone.getByRole("button", { name: "More", exact: true }).click()
+      const dialog = phone.getByRole("dialog", { name: "More" })
+      await dialog.getByRole("link").first().waitFor({ state: "visible" })
+      const names = await dialog.getByRole("link").allTextContents()
       assertEquals(
         names.map((n) => n.trim()),
         ["Home", "About", "How I work", "Writing", "Infrastructure"],
-      );
+      )
       assertEquals(
         await dialog.locator('a[href^="http"]').count(),
         0,
         "More lists an outside link",
-      );
+      )
     } finally {
-      await phone.close();
+      await phone.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 /** The computed colour a probe element gets from `className`, e.g. `bg-lamp`. */
 function tokenColour(
@@ -803,109 +803,109 @@ function tokenColour(
   property: "backgroundColor" | "borderTopColor",
 ): Promise<string> {
   return page.evaluate(([cls, prop]) => {
-    const probe = document.createElement("div");
-    probe.className = `${cls} border`;
-    document.body.append(probe);
-    const value = getComputedStyle(probe)[prop as "backgroundColor"];
-    probe.remove();
-    return value;
-  }, [className, property]);
+    const probe = document.createElement("div")
+    probe.className = `${cls} border`
+    document.body.append(probe)
+    const value = getComputedStyle(probe)[prop as "backgroundColor"]
+    probe.remove()
+    return value
+  }, [className, property])
 }
 
 Deno.test("a 390px phone shows five tabs with Book in the centre, the current section filled, and a backdrop tap closes the sheet", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: "" } });
-  let browser: Browser | undefined;
+  const site = await startSite({ env: { SCHEDULE_URL: "" } })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT })
     try {
       const tabs = page.locator(
         '[data-e2e="rail-shell-tabbar"] li > :is(a, button)',
-      );
+      )
       const load = (path: string) =>
-        page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-      const lamp = () => tokenColour(page, "bg-lamp", "backgroundColor");
+        page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
+      const lamp = () => tokenColour(page, "bg-lamp", "backgroundColor")
       const fill = (tab: Locator) =>
-        tab.evaluate((el) => getComputedStyle(el).backgroundColor);
+        tab.evaluate((el) => getComputedStyle(el).backgroundColor)
 
-      await load("/catalog");
+      await load("/catalog")
       assertEquals(
         (await tabs.allInnerTexts()).map((t) => t.trim()),
         ["Work", "Services", "Write", "Tools", "More"],
-      );
+      )
       for (let i = 0; i < 5; i++) {
-        const box = await tabs.nth(i).boundingBox();
-        assert(box, `tab ${i} has no box`);
+        const box = await tabs.nth(i).boundingBox()
+        assert(box, `tab ${i} has no box`)
         assert(
           box.x >= 0 && box.x + box.width <= MOBILE_VIEWPORT.width &&
             box.y >= 0 && box.y + box.height <= MOBILE_VIEWPORT.height,
           `tab ${i} must sit inside the 390px viewport: ${JSON.stringify(box)}`,
-        );
+        )
       }
-      const book = await tabs.nth(2).boundingBox();
-      assert(book);
+      const book = await tabs.nth(2).boundingBox()
+      assert(book)
       assert(
         Math.abs(book.x + book.width / 2 - MOBILE_VIEWPORT.width / 2) < 2,
         `Book must be centred: ${JSON.stringify(book)}`,
-      );
+      )
 
       // The current page: a Lamp fill. An idle tab has none.
-      const services = tabs.nth(1);
-      assertEquals(await services.getAttribute("aria-current"), "page");
-      assertEquals(await fill(services), await lamp());
+      const services = tabs.nth(1)
+      assertEquals(await services.getAttribute("aria-current"), "page")
+      assertEquals(await fill(services), await lamp())
       assert(
         (await fill(tabs.nth(0))) !== (await lamp()),
         "an idle tab must not be filled",
-      );
+      )
 
       // A page inside the section: the same fill, marked as the section.
-      await load("/catalog/zero-to-production-saas-mvp");
-      assertEquals(await services.getAttribute("aria-current"), "true");
-      assertEquals(await fill(services), await lamp());
+      await load("/catalog/zero-to-production-saas-mvp")
+      assertEquals(await services.getAttribute("aria-current"), "true")
+      assertEquals(await fill(services), await lamp())
 
       // A page listed under More: More itself is filled, and inside the
       // sheet the page's own link is marked current.
-      await load("/blog");
-      const more = tabs.nth(4);
+      await load("/blog")
+      const more = tabs.nth(4)
       assertEquals(
         await fill(more),
         await lamp(),
         "More must be filled when the current page is one of its items",
-      );
-      await more.click();
-      const menu = page.getByRole("dialog", { name: "More" });
-      await menu.waitFor({ state: "visible" });
+      )
+      await more.click()
+      const menu = page.getByRole("dialog", { name: "More" })
+      await menu.waitFor({ state: "visible" })
       assertEquals(
         await menu.getByRole("link", { name: "Writing", exact: true })
           .getAttribute("aria-current"),
         "page",
         "the More sheet must mark the current page's link",
-      );
+      )
 
       // A tap on the backdrop, above the sheet, closes it and returns focus.
-      await page.mouse.click(MOBILE_VIEWPORT.width / 2, 10);
-      await menu.waitFor({ state: "hidden" });
+      await page.mouse.click(MOBILE_VIEWPORT.width / 2, 10)
+      await menu.waitFor({ state: "hidden" })
       assert(
         await isFocused(more),
         "focus must return to More after a tap outside the sheet",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("Escape leaves focus alone when the mobile menu is already closed", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, { viewport: MOBILE_VIEWPORT })
     try {
-      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" })
 
       // The menu is closed from the start — focus a link outside it, in
       // <main>, and press Escape. A menu handler that closes on every
@@ -913,33 +913,33 @@ Deno.test("Escape leaves focus alone when the mobile menu is already closed", as
       // there is nothing open to close.
       const mainLink = page.locator("#main-content").getByRole("link", {
         name: "All client work",
-      });
-      await mainLink.focus();
-      await page.keyboard.press("Escape");
+      })
+      await mainLink.focus()
+      await page.keyboard.press("Escape")
 
       assert(
         await isFocused(mainLink),
         "focus must stay on the link when Escape is pressed with the menu already closed",
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("/catalog and two service pages have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
-  const previous = Deno.env.get("SCHEDULE_URL");
+  const previous = Deno.env.get("SCHEDULE_URL")
   // Book renders only with a booking URL; RFC 2606 host.
-  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
-  const site = await startSite();
-  let browser: Browser | undefined;
+  Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book")
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
-      const page: Page = await newPage(browser, { viewport });
+      const page: Page = await newPage(browser, { viewport })
       try {
         for (
           const path of [
@@ -948,77 +948,77 @@ Deno.test("/catalog and two service pages have no horizontal scroll and no axe v
             "/catalog/strategy-call",
           ]
         ) {
-          const where = `${path} at ${viewport.width}px`;
+          const where = `${path} at ${viewport.width}px`
           await page.goto(`${site.origin}${path}`, {
             waitUntil: "networkidle",
-          });
+          })
           const scrollWidth = await page.evaluate(() =>
             document.documentElement.scrollWidth
-          );
+          )
           assert(
             scrollWidth <= viewport.width,
             `${where} scrolls sideways: ${scrollWidth}px wide`,
-          );
-          assertEquals(await axeViolations(page), [], where);
+          )
+          assertEquals(await axeViolations(page), [], where)
         }
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
-    if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-    else Deno.env.set("SCHEDULE_URL", previous);
+    await browser?.close()
+    await site.stop()
+    if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
+    else Deno.env.set("SCHEDULE_URL", previous)
   }
-});
+})
 
 Deno.test("/infrastructure map lanes stay inside the content column and labels break only after a dot, from 1024 to 1440px", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const width of [1024, 1280, 1440]) {
       const page: Page = await newPage(browser, {
         viewport: { width, height: 900 },
-      });
+      })
       try {
         await page.goto(`${site.origin}/infrastructure`, {
           waitUntil: "networkidle",
-        });
+        })
         const overflow = await page.evaluate(() => {
           const map = document.querySelector("[data-infra-map]")!
-            .getBoundingClientRect();
+            .getBoundingClientRect()
           return [...document.querySelectorAll("[data-infra-lane]")]
             .map((l) => l.getBoundingClientRect().right - map.right)
-            .filter((d) => d > 1);
-        });
+            .filter((d) => d > 1)
+        })
         assertEquals(
           overflow,
           [],
           `a lane passes the map's right edge at ${width}px`,
-        );
+        )
         const split = await page.evaluate(() =>
           [...document.querySelectorAll("[data-infra-node] [data-label-part]")]
             .filter((p) =>
               !/\s/.test(p.textContent!) && p.getClientRects().length > 1
             )
             .map((p) => p.textContent)
-        );
-        assertEquals(split, [], `a box label breaks mid-word at ${width}px`);
+        )
+        assertEquals(split, [], `a box label breaks mid-word at ${width}px`)
         const scrollWidth = await page.evaluate(() =>
           document.documentElement.scrollWidth
-        );
+        )
         assert(
           scrollWidth <= width,
           `/infrastructure scrolls sideways at ${width}px`,
-        );
+        )
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})

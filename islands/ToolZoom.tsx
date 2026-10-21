@@ -1,5 +1,5 @@
-import { ZoomableImages } from "@spy4x/preact-ui/zoomable-images";
-import { track } from "../lib/analytics.ts";
+import { ZoomableImages } from "@spy4x/preact-ui/zoomable-images"
+import { track } from "../lib/analytics.ts"
 
 /**
  * The one lightbox of a tool page (#454): every image inside the frame's one
@@ -20,5 +20,5 @@ export default function ToolZoom({ item }: { item: string }) {
       nextLabel="Next screenshot"
       onOpen={() => track("zoom", { item })}
     />
-  );
+  )
 }

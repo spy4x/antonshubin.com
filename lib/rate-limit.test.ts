@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assertEquals } from "jsr:@std/assert@^1.0.0"
 import {
   clientKey,
   createSubmissionLimiter,
@@ -6,18 +6,18 @@ import {
   limitSubmission,
   requestClientIp,
   SUBMISSION_WINDOW_MS,
-} from "./rate-limit.ts";
+} from "./rate-limit.ts"
 
 const SOCKET: Deno.ServeHandlerInfo = {
   remoteAddr: { transport: "tcp", hostname: "10.0.0.5", port: 40000 },
   completed: Promise.resolve(),
-};
+}
 
 function request(headers: Record<string, string>): Request {
   return new Request("http://127.0.0.1/api/subscribe", {
     method: "POST",
     headers,
-  });
+  })
 }
 
 Deno.test("recognises Cloudflare's edge addresses and nothing else", () => {
@@ -28,9 +28,9 @@ Deno.test("recognises Cloudflare's edge addresses and nothing else", () => {
     "173.245.63.255",
     "2606:4700::1",
     "2a06:98c7:ffff::1",
-  ];
+  ]
   for (const address of edges) {
-    assertEquals(isCloudflareAddress(address), true, address);
+    assertEquals(isCloudflareAddress(address), true, address)
   }
   const others = [
     "104.15.255.255",
@@ -45,49 +45,49 @@ Deno.test("recognises Cloudflare's edge addresses and nothing else", () => {
     "999.16.0.1",
     "",
     "unknown",
-  ];
+  ]
   for (const address of others) {
-    assertEquals(isCloudflareAddress(address), false, address);
+    assertEquals(isCloudflareAddress(address), false, address)
   }
-});
+})
 
 Deno.test("keys a direct request by X-Real-IP, ignoring CF-Connecting-IP and X-Forwarded-For", () => {
   const req = request({
     "x-real-ip": "192.0.2.1",
     "cf-connecting-ip": "198.51.100.7",
     "x-forwarded-for": "203.0.113.9",
-  });
-  assertEquals(requestClientIp(req, "10.0.0.5"), "192.0.2.1");
-});
+  })
+  assertEquals(requestClientIp(req, "10.0.0.5"), "192.0.2.1")
+})
 
 Deno.test("keys a request through Cloudflare by CF-Connecting-IP", () => {
   const req = request({
     "x-real-ip": "104.16.0.1",
     "cf-connecting-ip": "198.51.100.7",
     "x-forwarded-for": "203.0.113.9",
-  });
-  assertEquals(requestClientIp(req, "10.0.0.5"), "198.51.100.7");
+  })
+  assertEquals(requestClientIp(req, "10.0.0.5"), "198.51.100.7")
   assertEquals(
     requestClientIp(request({ "x-real-ip": "104.16.0.1" }), "10.0.0.5"),
     "104.16.0.1",
-  );
-});
+  )
+})
 
 Deno.test("never keys a request through Cloudflare by X-Forwarded-For", () => {
   const req = request({
     "x-real-ip": "104.16.0.1",
     "x-forwarded-for": "203.0.113.9",
-  });
-  assertEquals(requestClientIp(req, "10.0.0.5"), "104.16.0.1");
-});
+  })
+  assertEquals(requestClientIp(req, "10.0.0.5"), "104.16.0.1")
+})
 
 Deno.test("keys a request without X-Real-IP by the socket address", () => {
   const req = request({
     "cf-connecting-ip": "198.51.100.7",
     "x-forwarded-for": "203.0.113.9",
-  });
-  assertEquals(requestClientIp(req, "10.0.0.5"), "10.0.0.5");
-});
+  })
+  assertEquals(requestClientIp(req, "10.0.0.5"), "10.0.0.5")
+})
 
 Deno.test("treats a header that is not exactly one IP address as absent", () => {
   // A forged X-Real-IP never reaches the app past Traefik, but without Traefik
@@ -104,7 +104,7 @@ Deno.test("treats a header that is not exactly one IP address as absent", () => 
       requestClientIp(request({ "x-real-ip": value }), "10.0.0.5"),
       "10.0.0.5",
       value,
-    );
+    )
   }
   // Through Cloudflare, an unreadable CF-Connecting-IP leaves the edge's own address.
   for (
@@ -118,10 +118,10 @@ Deno.test("treats a header that is not exactly one IP address as absent", () => 
     const req = request({
       "x-real-ip": "104.16.0.1",
       "cf-connecting-ip": value,
-    });
-    assertEquals(requestClientIp(req, "10.0.0.5"), "104.16.0.1", value);
+    })
+    assertEquals(requestClientIp(req, "10.0.0.5"), "104.16.0.1", value)
   }
-});
+})
 
 Deno.test("answers 429 after three submissions even when the spoofed headers rotate", async () => {
   // What stays fixed per client, and which caller-written headers rotate.
@@ -144,63 +144,63 @@ Deno.test("answers 429 after three submissions even when the spoofed headers rot
       "x-forwarded-for": `203.0.113.${i}`,
       "cf-connecting-ip": `198.18.0.${i}`,
     })],
-  ];
+  ]
   for (const [fixed, spoofed] of cases) {
-    const limiter = createSubmissionLimiter(() => 0);
-    const statuses = [];
+    const limiter = createSubmissionLimiter(() => 0)
+    const statuses = []
     for (let i = 1; i <= 4; i++) {
-      const req = request({ ...spoofed(i), ...fixed });
-      const res = limitSubmission(limiter, req, SOCKET);
-      statuses.push(res?.status ?? 200);
+      const req = request({ ...spoofed(i), ...fixed })
+      const res = limitSubmission(limiter, req, SOCKET)
+      statuses.push(res?.status ?? 200)
       if (res) {
-        assertEquals(res.headers.get("retry-after"), "3600");
-        await res.body?.cancel();
+        assertEquals(res.headers.get("retry-after"), "3600")
+        await res.body?.cancel()
       }
     }
-    assertEquals(statuses, [200, 200, 200, 429], JSON.stringify(fixed));
+    assertEquals(statuses, [200, 200, 200, 429], JSON.stringify(fixed))
   }
-});
+})
 
 Deno.test("evicts clients that have been idle past their window", () => {
-  let now = 0;
-  const limiter = createSubmissionLimiter(() => now);
-  for (let i = 0; i < 1000; i++) limiter.check(`198.18.${i >> 8}.${i & 255}`);
-  assertEquals(limiter.size, 1000);
-  now = SUBMISSION_WINDOW_MS * 2;
-  limiter.check("192.0.2.1");
-  assertEquals(limiter.size, 1);
-});
+  let now = 0
+  const limiter = createSubmissionLimiter(() => now)
+  for (let i = 0; i < 1000; i++) limiter.check(`198.18.${i >> 8}.${i & 255}`)
+  assertEquals(limiter.size, 1000)
+  now = SUBMISSION_WINDOW_MS * 2
+  limiter.check("192.0.2.1")
+  assertEquals(limiter.size, 1)
+})
 
 Deno.test("keys an IPv6 address on its /64, and an IPv4 or IPv4-mapped address on itself", () => {
-  assertEquals(clientKey("2001:db8:1:2:aaaa::1"), "2001:db8:1:2::/64");
+  assertEquals(clientKey("2001:db8:1:2:aaaa::1"), "2001:db8:1:2::/64")
   assertEquals(
     clientKey("2001:db8:1:2:ffff:ffff:ffff:ffff"),
     "2001:db8:1:2::/64",
-  );
-  assertEquals(clientKey("2001:db8:1:3::1"), "2001:db8:1:3::/64");
-  assertEquals(clientKey("192.0.2.1"), "192.0.2.1");
-  assertEquals(clientKey("::ffff:192.0.2.1"), "192.0.2.1");
-  assertEquals(clientKey("unknown"), "unknown");
-});
+  )
+  assertEquals(clientKey("2001:db8:1:3::1"), "2001:db8:1:3::/64")
+  assertEquals(clientKey("192.0.2.1"), "192.0.2.1")
+  assertEquals(clientKey("::ffff:192.0.2.1"), "192.0.2.1")
+  assertEquals(clientKey("unknown"), "unknown")
+})
 
 Deno.test("answers 429 to the fourth post from different addresses in one IPv6 /64, and another /64 still passes", async () => {
-  const limiter = createSubmissionLimiter(() => 0);
-  const statuses = [];
+  const limiter = createSubmissionLimiter(() => 0)
+  const statuses = []
   for (let i = 1; i <= 4; i++) {
-    const req = request({ "x-real-ip": `2001:db8:1:2::${i.toString(16)}` });
-    const res = limitSubmission(limiter, req, SOCKET);
-    statuses.push(res?.status ?? 200);
-    await res?.body?.cancel();
+    const req = request({ "x-real-ip": `2001:db8:1:2::${i.toString(16)}` })
+    const res = limitSubmission(limiter, req, SOCKET)
+    statuses.push(res?.status ?? 200)
+    await res?.body?.cancel()
   }
-  assertEquals(statuses, [200, 200, 200, 429]);
+  assertEquals(statuses, [200, 200, 200, 429])
   const other = limitSubmission(
     limiter,
     request({ "x-real-ip": "2001:db8:1:3::1" }),
     SOCKET,
-  );
-  assertEquals(other, null);
+  )
+  assertEquals(other, null)
   // Through Cloudflare, the visitor's IPv6 address is keyed the same way.
-  const viaEdge = createSubmissionLimiter(() => 0);
+  const viaEdge = createSubmissionLimiter(() => 0)
   for (let i = 1; i <= 3; i++) {
     limitSubmission(
       viaEdge,
@@ -209,7 +209,7 @@ Deno.test("answers 429 to the fourth post from different addresses in one IPv6 /
         "cf-connecting-ip": `2001:db8:9:9::${i}`,
       }),
       SOCKET,
-    );
+    )
   }
   const fourth = limitSubmission(
     viaEdge,
@@ -218,7 +218,7 @@ Deno.test("answers 429 to the fourth post from different addresses in one IPv6 /
       "cf-connecting-ip": "2001:db8:9:9::99",
     }),
     SOCKET,
-  );
-  assertEquals(fourth?.status, 429);
-  await fourth?.body?.cancel();
-});
+  )
+  assertEquals(fourth?.status, 429)
+  await fourth?.body?.cancel()
+})

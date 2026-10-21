@@ -1,10 +1,10 @@
-import type { ComponentChildren } from "preact";
-import { define } from "../lib/utils.ts";
-import { Layout } from "../components/Layout.tsx";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { head } from "../lib/head.ts";
-import AnalyticsOptOut from "../islands/AnalyticsOptOut.tsx";
-import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
+import type { ComponentChildren } from "preact"
+import { define } from "../lib/utils.ts"
+import { Layout } from "../components/Layout.tsx"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { head } from "../lib/head.ts"
+import AnalyticsOptOut from "../islands/AnalyticsOptOut.tsx"
+import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts"
 
 /**
  * What the site collects (#192). Every sentence is something the code in this
@@ -20,7 +20,7 @@ function Section(
       <h2 class="text-xl sm:text-2xl text-parchment">{title}</h2>
       {children}
     </section>
-  );
+  )
 }
 
 export default define.page(function Privacy(ctx) {
@@ -32,7 +32,7 @@ export default define.page(function Privacy(ctx) {
       "What antonshubin.com collects when you send the brief form, subscribe to the newsletter or just read: what is stored, where, and how to be removed.",
     canonical: "https://antonshubin.com/privacy",
     ogType: "website",
-  };
+  }
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -184,5 +184,5 @@ export default define.page(function Privacy(ctx) {
         </Section>
       </div>
     </Layout>
-  );
-});
+  )
+})

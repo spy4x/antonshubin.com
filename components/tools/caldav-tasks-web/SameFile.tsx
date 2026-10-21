@@ -1,11 +1,11 @@
-import { RadioChips } from "@spy4x/preact-ui/radio-chips";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import { fieldOf, TASK_FIELDS, TASK_FILE } from "./data.ts";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import { fieldOf, TASK_FIELDS, TASK_FILE } from "./data.ts"
 
-const SLUG = "caldav-tasks-web";
+const SLUG = "caldav-tasks-web"
 const COMPATIBILITY =
-  "https://github.com/spy4x/caldav-tasks-web/blob/main/docs/compatibility.md#which-tasksorg-fields-round-trip";
+  "https://github.com/spy4x/caldav-tasks-web/blob/main/docs/compatibility.md#which-tasksorg-fields-round-trip"
 
 /**
  * The switch's whole behaviour, in CSS (no island): while a field's radio is
@@ -16,11 +16,11 @@ const COMPATIBILITY =
  * page's LCP). Fresh gives the element the render's CSP nonce.
  */
 const SWITCH_CSS = TASK_FIELDS.map(({ id }) => {
-  const on = `[data-same-file]:has(#ctw-field-${id}:checked)`;
+  const on = `[data-same-file]:has(#ctw-field-${id}:checked)`
   return `${on} [data-line~=${id}]{background-color:var(--color-lamp);` +
     `border-color:var(--color-parchment);color:var(--color-parchment)}` +
-    `${on} [data-note]:not([data-note=${id}]){display:none}`;
-}).join("");
+    `${on} [data-note]:not([data-note=${id}]){display:none}`
+}).join("")
 
 /**
  * A compatibility.md cell: text with its `backtick` spans as `<code>`. Plain
@@ -36,7 +36,7 @@ function Cell({ text }: { text: string }) {
           : <span key={i}>{part}</span>
       )}
     </>
-  );
+  )
 }
 
 /**
@@ -138,5 +138,5 @@ export function SameFile() {
         </a>
       </p>
     </section>
-  );
+  )
 }

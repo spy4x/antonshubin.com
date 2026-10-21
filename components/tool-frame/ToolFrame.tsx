@@ -1,31 +1,31 @@
-import type { ComponentChildren } from "preact";
-import { Breadcrumb } from "../Breadcrumb.tsx";
-import { Layout } from "../Layout.tsx";
-import { SEOHead } from "../SEOHead.tsx";
-import ToolZoom from "../../islands/ToolZoom.tsx";
-import { getBreadcrumb } from "../../lib/head.ts";
-import { setToolHead, type ToolPageData } from "./tool-page.ts";
-import { ToolJsonLd } from "./ToolJsonLd.tsx";
-import { ToolHero, type ToolHeroProps } from "./ToolHero.tsx";
-import { ToolDetails } from "./ToolDetails.tsx";
-import { ToolBand, type ToolBandProps } from "./ToolBand.tsx";
-import { ToolMore } from "./ToolMore.tsx";
+import type { ComponentChildren } from "preact"
+import { Breadcrumb } from "../Breadcrumb.tsx"
+import { Layout } from "../Layout.tsx"
+import { SEOHead } from "../SEOHead.tsx"
+import ToolZoom from "../../islands/ToolZoom.tsx"
+import { getBreadcrumb } from "../../lib/head.ts"
+import { setToolHead, type ToolPageData } from "./tool-page.ts"
+import { ToolJsonLd } from "./ToolJsonLd.tsx"
+import { ToolHero, type ToolHeroProps } from "./ToolHero.tsx"
+import { ToolDetails } from "./ToolDetails.tsx"
+import { ToolBand, type ToolBandProps } from "./ToolBand.tsx"
+import { ToolMore } from "./ToolMore.tsx"
 
 /** Props of {@link ToolFrame}: the page's data, its own middle, and what it changes in the frame. */
 export interface ToolFrameProps {
-  data: ToolPageData;
+  data: ToolPageData
   /** `ctx.url.pathname`, for the nav's current item. */
-  currentPath: string;
+  currentPath: string
   /** The hero's options (`ToolHeroProps` without `data`); its `children` is the line under the actions. */
-  hero?: Omit<ToolHeroProps, "data">;
+  hero?: Omit<ToolHeroProps, "data">
   /** Beside the facts card; defaults to "Where it stands" from `works`. `null` for none. */
-  beside?: ComponentChildren;
+  beside?: ComponentChildren
   /** The band's options (`ToolBandProps` without `data`). */
-  band?: Omit<ToolBandProps, "data">;
+  band?: Omit<ToolBandProps, "data">
   /** The three tools "More tools" shows, by slug. */
-  more?: string[];
+  more?: string[]
   /** Part 4, the page's own middle: free, within the `@theme` tokens and the library. */
-  children?: ComponentChildren;
+  children?: ComponentChildren
 }
 
 /**
@@ -40,7 +40,7 @@ export interface ToolFrameProps {
 export function ToolFrame(
   { data, currentPath, hero, beside, band, more, children }: ToolFrameProps,
 ) {
-  setToolHead(data);
+  setToolHead(data)
   return (
     <Layout currentPath={currentPath}>
       <SEOHead />
@@ -63,5 +63,5 @@ export function ToolFrame(
       </div>
       <ToolZoom item={data.tool.slug} />
     </Layout>
-  );
+  )
 }

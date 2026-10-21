@@ -5,23 +5,23 @@
 // unit-tested without a server, the same pattern lib/csp.ts uses — main.ts's
 // middleware is the only caller, and it keeps the query string (launch links
 // carry UTM tags).
-import { WORK_PATH, workHref, workProjects } from "./work.ts";
-import { movedSlugs } from "./tools.ts";
-import { BOOK_HREF } from "./nav.ts";
+import { WORK_PATH, workHref, workProjects } from "./work.ts"
+import { movedSlugs } from "./tools.ts"
+import { BOOK_HREF } from "./nav.ts"
 
-const TOOLS_PATH = "/tools";
+const TOOLS_PATH = "/tools"
 
 /** Old blog slug -> the post that absorbed it. */
 const RETIRED_BLOG_SLUGS: Record<string, string> = {
   "self-hosted-caldav-pwa-architecture": "self-hosted-caldav-web-ui-tasks-org",
   // The SaaS starter's post moved when the template was renamed Seed.
   "deno-platform-template": "seed-saas-starter",
-};
+}
 
 /** Old project slug -> the tool page that replaced it (#231: homelab was reborn as rostok). */
 const RETIRED_PROJECT_SLUGS: Record<string, string> = {
   "homelab": "rostok",
-};
+}
 
 /**
  * Old `/tools` slug -> the tool's slug now. The SaaS starter answered at
@@ -29,16 +29,16 @@ const RETIRED_PROJECT_SLUGS: Record<string, string> = {
  */
 const RETIRED_TOOL_SLUGS: Record<string, string> = {
   "template": "seed",
-};
+}
 
 /** The booking page's path before #190 renamed it `/book`. */
-export const OLD_BOOK_PATH = "/contact-me";
+export const OLD_BOOK_PATH = "/contact-me"
 
 /** What the table is built from: every slug with a work page and every own project that moved. */
 export interface RedirectSources {
-  workSlugs: string[];
+  workSlugs: string[]
   /** Old `/work` and `/projects` slug -> its tool page's slug (`lib/tools.ts`'s `movedSlugs`). */
-  movedSlugs: Readonly<Record<string, string>>;
+  movedSlugs: Readonly<Record<string, string>>
 }
 
 /**
@@ -63,35 +63,35 @@ export interface RedirectSources {
 export function buildRedirectTable(
   { workSlugs, movedSlugs }: RedirectSources,
 ): Map<string, string> {
-  const table = new Map<string, string>();
+  const table = new Map<string, string>()
   const add = (from: string, to: string) => {
-    table.set(from, to);
-    table.set(`${from}/`, to);
-  };
-  add("/projects", WORK_PATH);
-  for (const slug of workSlugs) add(`/projects/${slug}`, workHref(slug));
+    table.set(from, to)
+    table.set(`${from}/`, to)
+  }
+  add("/projects", WORK_PATH)
+  for (const slug of workSlugs) add(`/projects/${slug}`, workHref(slug))
   for (const [old, now] of Object.entries(movedSlugs)) {
-    add(`/projects/${old}`, `${TOOLS_PATH}/${now}`);
-    add(workHref(old), `${TOOLS_PATH}/${now}`);
+    add(`/projects/${old}`, `${TOOLS_PATH}/${now}`)
+    add(workHref(old), `${TOOLS_PATH}/${now}`)
   }
   for (const [old, now] of Object.entries(RETIRED_PROJECT_SLUGS)) {
-    add(`/projects/${old}`, `${TOOLS_PATH}/${now}`);
+    add(`/projects/${old}`, `${TOOLS_PATH}/${now}`)
   }
   for (const [old, now] of Object.entries(RETIRED_TOOL_SLUGS)) {
-    add(`${TOOLS_PATH}/${old}`, `${TOOLS_PATH}/${now}`);
+    add(`${TOOLS_PATH}/${old}`, `${TOOLS_PATH}/${now}`)
   }
   for (const [old, now] of Object.entries(RETIRED_BLOG_SLUGS)) {
-    add(`/blog/${old}`, `/blog/${now}`);
+    add(`/blog/${old}`, `/blog/${now}`)
   }
-  add(OLD_BOOK_PATH, BOOK_HREF);
-  return table;
+  add(OLD_BOOK_PATH, BOOK_HREF)
+  return table
 }
 
 /** The site's redirect table, built from `lib/data.ts` and `lib/tools.ts`. */
 export const redirectTable: ReadonlyMap<string, string> = buildRedirectTable({
   workSlugs: workProjects().map((p) => p.slug!),
   movedSlugs,
-});
+})
 
 /**
  * Returns the path `pathname` should 301 to, or undefined when it needs no
@@ -108,10 +108,10 @@ export function redirectTarget(
   table: ReadonlyMap<string, string> = redirectTable,
 ): string | undefined {
   // "/" is the one route that keeps its trailing slash and must never redirect.
-  if (pathname === "/") return undefined;
-  const target = table.get(pathname);
-  if (target) return target;
-  return pathname.match(/^(\/(?:blog|work|tools)\/[^/]+)\/$/)?.[1];
+  if (pathname === "/") return undefined
+  const target = table.get(pathname)
+  if (target) return target
+  return pathname.match(/^(\/(?:blog|work|tools)\/[^/]+)\/$/)?.[1]
 }
 
 /**
@@ -122,10 +122,10 @@ export function redirectTarget(
  */
 export function blogTabRedirect(url: URL): string | undefined {
   if (url.pathname !== "/blog" || !url.searchParams.has("tab")) {
-    return undefined;
+    return undefined
   }
-  const params = new URLSearchParams(url.search);
-  params.delete("tab");
-  const rest = params.toString();
-  return rest ? `/blog?${rest}` : "/blog";
+  const params = new URLSearchParams(url.search)
+  params.delete("tab")
+  const rest = params.toString()
+  return rest ? `/blog?${rest}` : "/blog"
 }

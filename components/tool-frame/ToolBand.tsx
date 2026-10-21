@@ -1,17 +1,17 @@
-import { type ComponentChildren, Fragment } from "preact";
-import { BookCallLink } from "../BookCallLink.tsx";
-import { ClosingBand } from "../ClosingBand.tsx";
-import { FACT_LINK } from "../FactCard.tsx";
-import { InstallLine } from "../InstallLine.tsx";
-import CopyButton from "../../islands/CopyButton.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
-import { catalogItem, catalogPath, priceLabel } from "../../lib/catalog.ts";
-import { BOOK_LABEL } from "../../lib/nav.ts";
-import { type Tool, toolLicence } from "../../lib/tools.ts";
-import type { ToolPageData } from "./tool-page.ts";
+import { type ComponentChildren, Fragment } from "preact"
+import { BookCallLink } from "../BookCallLink.tsx"
+import { ClosingBand } from "../ClosingBand.tsx"
+import { FACT_LINK } from "../FactCard.tsx"
+import { InstallLine } from "../InstallLine.tsx"
+import CopyButton from "../../islands/CopyButton.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
+import { catalogItem, catalogPath, priceLabel } from "../../lib/catalog.ts"
+import { BOOK_LABEL } from "../../lib/nav.ts"
+import { type Tool, toolLicence } from "../../lib/tools.ts"
+import type { ToolPageData } from "./tool-page.ts"
 
 /** The tooltip of every install and quick-start copy button on a tool page. */
-export const COPY_INSTALL_TITLE = "Copy the install command";
+export const COPY_INSTALL_TITLE = "Copy the install command"
 
 /**
  * A tool's quick-start command with its copy button (`tool-install-copy`).
@@ -19,7 +19,7 @@ export const COPY_INSTALL_TITLE = "Copy the install command";
  * unique on the page: the copy button reads the command through it.
  */
 export function QuickStart({ tool, id }: { tool: Tool; id: string }) {
-  if (!tool.quickStart) return null;
+  if (!tool.quickStart) return null
   return (
     <div data-quick-start>
       <p id={`${id}-label`} class="text-sm text-graphite">
@@ -46,39 +46,39 @@ export function QuickStart({ tool, id }: { tool: Tool; id: string }) {
         />
       </div>
     </div>
-  );
+  )
 }
 
 /** The "Use it yourself" sentence from the entry's own data: its state or its licence. */
 function yourselfLine(tool: Tool): string {
   if (tool.status === "archived") {
-    return "The repository is archived, kept for reference.";
+    return "The repository is archived, kept for reference."
   }
-  const licence = toolLicence(tool);
+  const licence = toolLicence(tool)
   return licence
     ? `The code is on GitHub under the ${licence} licence.`
-    : "The code is on GitHub.";
+    : "The code is on GitHub."
 }
 
 /** The label of the quiet link to a tool's catalog item. */
 function offerLabel(slug: string): string {
   return slug === "zero-to-production-saas-mvp"
     ? "See the MVP offer"
-    : `See the ${catalogItem(slug).shortTitle} offer`;
+    : `See the ${catalogItem(slug).shortTitle} offer`
 }
 
 /** What a page may change in {@link ToolBand}. */
 export interface ToolBandProps {
-  data: ToolPageData;
+  data: ToolPageData
   /** Replaces the "Use it yourself" column's body (its heading stays). */
-  yourself?: ComponentChildren;
+  yourself?: ComponentChildren
   /**
    * The "Have me build it" line for a tool without a `catalogSlug`.
    * Defaults to the hub's sentence.
    */
-  buildLine?: string;
+  buildLine?: string
   /** Quiet links after the offer or "Services" link in "Have me build it". */
-  buildLinks?: ComponentChildren;
+  buildLinks?: ComponentChildren
 }
 
 /**
@@ -92,9 +92,9 @@ export interface ToolBandProps {
 export function ToolBand(
   { data, yourself, buildLine, buildLinks }: ToolBandProps,
 ) {
-  const { tool, repo } = data;
-  const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null;
-  const offerHref = catalog ? catalogPath(catalog.slug) : "/catalog";
+  const { tool, repo } = data
+  const catalog = tool.catalogSlug ? catalogItem(tool.catalogSlug) : null
+  const offerHref = catalog ? catalogPath(catalog.slug) : "/catalog"
   return (
     <ClosingBand
       heading="Two ways to use it"
@@ -177,5 +177,5 @@ export function ToolBand(
         </section>
       </div>
     </ClosingBand>
-  );
+  )
 }

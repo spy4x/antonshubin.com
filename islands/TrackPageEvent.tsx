@@ -1,5 +1,5 @@
-import { useEffect } from "preact/hooks";
-import { type AnalyticsEvent, trackWhenReady } from "../lib/analytics.ts";
+import { useEffect } from "preact/hooks"
+import { type AnalyticsEvent, trackWhenReady } from "../lib/analytics.ts"
 
 /**
  * Sends one Umami event when the page opens, for an event no click causes:
@@ -8,6 +8,6 @@ import { type AnalyticsEvent, trackWhenReady } from "../lib/analytics.ts";
  * CSP nonce as every other island and goes through `lib/analytics.ts`.
  */
 export default function TrackPageEvent({ name }: { name: AnalyticsEvent }) {
-  useEffect(() => trackWhenReady(name), [name]);
-  return null;
+  useEffect(() => trackWhenReady(name), [name])
+  return null
 }

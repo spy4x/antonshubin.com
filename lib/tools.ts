@@ -19,9 +19,9 @@
  * the committed snapshot (`github-snapshot.ts`, for `toolLicence()`), so tests
  * and scripts can load it without any permission.
  */
-import { githubSnapshot } from "./github-snapshot.ts";
-import { proof } from "./proof.ts";
-import type { RegistryPackage } from "./snapshot-fetch.ts";
+import { githubSnapshot } from "./github-snapshot.ts"
+import { proof } from "./proof.ts"
+import type { RegistryPackage } from "./snapshot-fetch.ts"
 
 /**
  * Where a tool stands, shown as a shape plus a word by
@@ -35,7 +35,7 @@ export type ToolStatus =
   | "beta"
   | "wip"
   | "paused"
-  | "archived";
+  | "archived"
 
 /** What kind of thing a tool is: decides nothing on the page yet but its label. */
 export type ToolKind =
@@ -45,22 +45,22 @@ export type ToolKind =
   | "cli"
   | "app"
   | "device"
-  | "starter";
+  | "starter"
 
 /**
  * The group a tool belongs to, in `toolGroups` order. Since #456 the `/tools`
  * hub is arranged by hand (`components/tools/hub/hub.ts`), so it no longer
  * decides where a tool shows.
  */
-export type ToolGroupId = "tools" | "products" | "archive";
+export type ToolGroupId = "tools" | "products" | "archive"
 
 export interface ToolGroup {
-  id: ToolGroupId;
+  id: ToolGroupId
   /** How the hub draws the group: cards in two columns, wide cards, or one line each. */
-  layout: "grid" | "wide" | "compact";
-  title: string;
+  layout: "grid" | "wide" | "compact"
+  title: string
   /** One sentence under the group heading. */
-  intro: string;
+  intro: string
 }
 
 /**
@@ -86,7 +86,7 @@ export const toolGroups: ToolGroup[] = [
     title: "Paused or archived",
     intro: "Projects I am not working on right now.",
   },
-];
+]
 
 /** What each status word means, for the status key on `/tools`. */
 export const statusMeanings: Record<ToolStatus, string> = {
@@ -96,71 +96,71 @@ export const statusMeanings: Record<ToolStatus, string> = {
   wip: "Being built. Not ready for someone else to depend on.",
   paused: "Works as it is, but I am not working on it right now.",
   archived: "No longer maintained. Kept for reference.",
-};
+}
 
 export interface ToolRegistry {
   /** The registry's own name, as a reader knows it: "JSR", "GHCR", "Docker Hub". */
-  name: string;
+  name: string
   /** The tool's page on that registry. */
-  url: string;
+  url: string
   /** The version the install command pins. */
-  version: string;
+  version: string
   /**
    * False until the version above is really on the registry. While false, the
    * install line is shown marked as not yet available, with no copy button,
    * and `status` in the fact card says it is being published. Flipping this
    * to true is the whole change after a first publish.
    */
-  published: boolean;
+  published: boolean
   /** One command, pinned to `version`. */
-  install: string;
+  install: string
   /**
    * Where the server asks for the latest version once an hour
    * (`lib/tools-live.ts`). `version` and `install` are the committed
    * fallback when that call fails or the refresh is off.
    */
-  latestFrom?: RegistryPackage;
+  latestFrom?: RegistryPackage
 }
 
 export interface ToolCi {
-  provider: "woodpecker";
+  provider: "woodpecker"
   /** Woodpecker's numeric repository id (`ci.antonshubin.com/repos/<id>`). */
-  repoId: number;
+  repoId: number
 }
 
 export interface ToolLink {
-  label: string;
-  href: string;
+  label: string
+  href: string
 }
 
 export interface ToolScreenshot {
   /** Path under `static/`, starting with `/img/tools/<slug>/`. */
-  src: string;
+  src: string
   /** Alt text, kept from the tool's own README. */
-  alt: string;
-  width: number;
-  height: number;
+  alt: string
+  width: number
+  height: number
   /** Other widths of the same picture, as an `<img srcset>` ("/a-640.webp 640w, ..."). */
-  srcset?: string;
+  srcset?: string
 }
 
 /** One card of a tool page's "What you get" grid, drawn by the library's `FeatureCard`. */
 export interface ToolFeature {
-  title: string;
+  title: string
   /** One or two sentences, each true of the tool today. */
-  text: string;
+  text: string
   /** A real screenshot of the feature, under the text, anchored to the card's bottom. */
-  shot?: ToolScreenshot;
+  shot?: ToolScreenshot
   /**
    * A narrower crop of the same screen for viewports under 640px, where
    * `shot` would shrink its text below reading size.
    */
-  phoneShot?: ToolScreenshot;
+  phoneShot?: ToolScreenshot
   /**
    * The card's width from 1024px: a third (the default), a half or two
    * thirds of the row. Pair cards so each row adds up to the whole width.
    */
-  size?: "half" | "wide";
+  size?: "half" | "wide"
 }
 
 /**
@@ -173,9 +173,9 @@ export interface ToolFeature {
  */
 export interface ToolClip {
   /** What the clip shows: the play link's and the video's accessible name. */
-  title: string;
+  title: string
   /** One visible sentence under the frame, the clip's text alternative. */
-  caption: string;
+  caption: string
   /**
    * The window drawn around it: `browser` for something with a URL, `bare`
    * (a Rule border and the card radius) for a clip that draws its own
@@ -183,28 +183,28 @@ export interface ToolClip {
    * frame is built for text, not video, so a CLI clip records its terminal
    * window itself.
    */
-  frame: "browser" | "terminal" | "bare";
+  frame: "browser" | "terminal" | "bare"
   /** The address or title in the frame's bar. */
-  frameTitle?: string;
+  frameTitle?: string
   /** The clip's last frame (the result), under `/video/tools/<slug>/`; `alt` describes it as a still. */
-  poster: ToolScreenshot;
+  poster: ToolScreenshot
   /**
    * Set once `demo.webm` and `demo.mp4` are committed, with the real values
    * the `VideoObject` JSON-LD needs.
    */
   video?: {
     /** ISO 8601 duration, such as `PT28S`. */
-    duration: string;
+    duration: string
     /** The day the clip was committed, `YYYY-MM-DD`. */
-    uploadDate: string;
-  };
+    uploadDate: string
+  }
 }
 
 /** The one command that starts using a tool that is not installed from a registry. */
 export interface ToolQuickStart {
   /** What the command does, in a few words: "Start a product from it". */
-  label: string;
-  command: string;
+  label: string
+  command: string
 }
 
 /**
@@ -213,105 +213,105 @@ export interface ToolQuickStart {
  * says so, so a plan never reads as a fact.
  */
 export interface ToolRelation {
-  text: string;
+  text: string
   /** A tool page or repository the sentence names. */
-  href?: string;
-  planned: boolean;
+  href?: string
+  planned: boolean
 }
 
 export interface Tool {
-  slug: string;
-  name: string;
+  slug: string
+  name: string
   /** The one-line job, the second half of the H1 ("name: job"). */
-  job: string;
+  job: string
   /** What it is, in the words the project already used. */
-  summary: string;
-  kind: ToolKind;
-  status: ToolStatus;
-  group: ToolGroupId;
+  summary: string
+  kind: ToolKind
+  status: ToolStatus
+  group: ToolGroupId
   /** `owner/name` on GitHub. Absent when the code is not public. */
-  repo?: string;
+  repo?: string
   /**
    * Absent for a tool that is not on a registry: the page then has no install
    * line, no version row and no registry row.
    */
-  registry?: ToolRegistry;
+  registry?: ToolRegistry
   /** Absent: the fact card shows the licence GitHub detected (the snapshot). */
-  licence?: string;
+  licence?: string
   /** Where the code runs, as true for this tool. Absent: no "Runs on" row. */
-  runtime?: string;
+  runtime?: string
   /** schema.org `programmingLanguage`; absent when the language is not written down. */
-  programmingLanguage?: string;
+  programmingLanguage?: string
   /** What I use it for myself: the live-proof sentence. */
-  usedFor?: string;
+  usedFor?: string
   /** Where the tool stands today, when its status word is not enough. */
-  standing?: string;
+  standing?: string
   /** Links that prove `usedFor`, shown under it. */
-  proofLinks?: ToolLink[];
+  proofLinks?: ToolLink[]
   /**
    * A running instance anyone can open (a demo, a live guide, a public
    * service), shown as a hero button and on the hub. Absent for a tool with
    * nothing to open.
    */
-  live?: ToolLink;
+  live?: ToolLink
   /** Absent for a repository with no Woodpecker pipeline: no CI pill. */
-  ci?: ToolCi;
+  ci?: ToolCi
   /** The packages a multi-package tool publishes, in the order its README lists them. */
-  packages?: string[];
-  useIf?: string[];
-  dontUseIf?: string[];
-  fits?: ToolRelation[];
-  screenshots?: ToolScreenshot[];
+  packages?: string[]
+  useIf?: string[]
+  dontUseIf?: string[]
+  fits?: ToolRelation[]
+  screenshots?: ToolScreenshot[]
   /** Credit a tool must show visibly, such as the design a port is based on. */
-  credit?: { text: string; links: ToolLink[] };
+  credit?: { text: string; links: ToolLink[] }
   /**
    * The `lib/catalog.ts` item closest to this tool today, linked from the
    * page's "hire me" door. Absent: the door links `/catalog`.
    */
-  catalogSlug?: string;
+  catalogSlug?: string
   /** Blog post slugs about this tool; each post links back to the page. */
-  posts?: string[];
+  posts?: string[]
   /**
    * True for a tool someone can deploy and run (a service, a self-hosted app):
    * the page then also carries `SoftwareApplication` JSON-LD.
    */
-  deployable?: true;
+  deployable?: true
   /** schema.org `applicationCategory` for a deployable tool. */
-  appCategory?: string;
+  appCategory?: string
   /**
    * The claim `<h1>` in place of "name: job" (#448), the bold line of the
    * repository's README. The tool frame's top line names the tool and its job
    * either way (#454).
    */
-  headline?: string;
+  headline?: string
   /** The lede under the `<h1>` (at most two sentences) and the page's meta description. */
-  lede?: string;
+  lede?: string
   /** The page's `<title>`, without the " — Anton Shubin" suffix. */
-  pageTitle?: string;
+  pageTitle?: string
   /** The tool's own website, besides its repository: JSON-LD `sameAs`. */
-  website?: string;
+  website?: string
   /**
    * One screenshot beside the headline, in a browser frame; also JSON-LD
    * `image`. A `clip` takes its place.
    */
-  hero?: ToolScreenshot;
+  hero?: ToolScreenshot
   /** The demo clip, the first media on the page (#454). */
-  clip?: ToolClip;
+  clip?: ToolClip
   /** A command shown with a copy button under the hero's actions. */
-  quickStart?: ToolQuickStart;
+  quickStart?: ToolQuickStart
   /** The "What you get" grid. */
-  features?: ToolFeature[];
+  features?: ToolFeature[]
   /** "Where it stands": what works today, in the project's own status words. */
-  works?: string[];
+  works?: string[]
   /** "Where it stands": what is not built yet; the open issues are always linked under it. */
-  notYet?: string[];
+  notYet?: string[]
   /**
    * "Where it stands": a known problem a visitor should weigh before installing, said only
    * with the facts of the open issue it links to.
    */
-  knownIssue?: { text: string; link: ToolLink };
+  knownIssue?: { text: string; link: ToolLink }
   /** One line under the post's title in "The story behind it". */
-  storyLine?: string;
+  storyLine?: string
 }
 
 /**
@@ -319,14 +319,14 @@ export interface Tool {
  * It is not in the sitemap, the llms files or the redirect table.
  */
 export interface ToolRow {
-  slug: string;
-  name: string;
-  status: ToolStatus;
-  group: ToolGroupId;
-  repo: string;
+  slug: string
+  name: string
+  status: ToolStatus
+  group: ToolGroupId
+  repo: string
   /** One sentence the project already used about itself. */
-  note?: string;
-  links: ToolLink[];
+  note?: string
+  links: ToolLink[]
 }
 
 export const tools: Tool[] = [
@@ -1176,20 +1176,20 @@ export const tools: Tool[] = [
       },
     ],
   },
-];
+]
 
 /**
  * Projects with a hub line and no page. None today: oko, the last one, got
  * its page in #454. The hub still draws a row for an entry added here.
  */
-export const toolRows: ToolRow[] = [];
+export const toolRows: ToolRow[] = []
 
 /** The files of a tool's demo clip, the preferred one first (docs/images.md "Videos"). */
 export function clipSources(slug: string): { src: string; type: string }[] {
   return [
     { src: `/video/tools/${slug}/demo.webm`, type: "video/webm" },
     { src: `/video/tools/${slug}/demo.mp4`, type: "video/mp4" },
-  ];
+  ]
 }
 
 /**
@@ -1208,30 +1208,30 @@ export const movedSlugs: Readonly<Record<string, string>> = {
   "template": "seed",
   "todoapp-caldav": "caldav-tasks-web",
   "toread-today": "toread-today",
-};
+}
 
 /** Looks a tool up by slug and throws on a typo, like `catalogItem()`. */
 export function tool(slug: string): Tool {
-  const found = tools.find((t) => t.slug === slug);
-  if (!found) throw new Error(`lib/tools.ts: no tool "${slug}"`);
-  return found;
+  const found = tools.find((t) => t.slug === slug)
+  if (!found) throw new Error(`lib/tools.ts: no tool "${slug}"`)
+  return found
 }
 
 /** The tools that name the blog post `slug` in their `posts`, in registry order. */
 export function toolsForPost(slug: string): Tool[] {
-  return tools.filter((t) => t.posts?.includes(slug));
+  return tools.filter((t) => t.posts?.includes(slug))
 }
 
 /** The tool for `slug`, or undefined: for a route that answers 404 instead of throwing. */
 export function findTool(slug: string): Tool | undefined {
-  return tools.find((t) => t.slug === slug);
+  return tools.find((t) => t.slug === slug)
 }
 
 /** One group: its page tools first, then its rows with no page. */
 export interface HubGroup {
-  group: ToolGroup;
-  tools: Tool[];
-  rows: ToolRow[];
+  group: ToolGroup
+  tools: Tool[]
+  rows: ToolRow[]
 }
 
 /** Every group that has at least one entry, in `toolGroups` order. */
@@ -1245,7 +1245,7 @@ export function groupedTools(
       tools: list.filter((t) => t.group === group.id),
       rows: rows.filter((r) => r.group === group.id),
     }))
-    .filter((g) => g.tools.length + g.rows.length > 0);
+    .filter((g) => g.tools.length + g.rows.length > 0)
 }
 
 /**
@@ -1256,18 +1256,18 @@ export function groupedTools(
  */
 export function toolLicence(t: Tool): string | null {
   const found = t.licence ??
-    (t.repo ? githubSnapshot.repos[t.repo]?.licence : null) ?? null;
-  return found && found !== "NOASSERTION" ? found : null;
+    (t.repo ? githubSnapshot.repos[t.repo]?.licence : null) ?? null
+  return found && found !== "NOASSERTION" ? found : null
 }
 
 /** The tool's GitHub URL, or undefined when its code is not public. */
 export function repoUrl(t: Tool): string | undefined {
-  return t.repo ? `https://github.com/${t.repo}` : undefined;
+  return t.repo ? `https://github.com/${t.repo}` : undefined
 }
 
 /** The tool's Woodpecker pipeline list, or undefined when it has no pipeline. */
 export function ciUrl(t: Tool): string | undefined {
-  return t.ci ? `https://ci.antonshubin.com/repos/${t.ci.repoId}` : undefined;
+  return t.ci ? `https://ci.antonshubin.com/repos/${t.ci.repoId}` : undefined
 }
 
 /** Every tool page's repository, with its Woodpecker id when it has one, for the snapshot script. */
@@ -1275,5 +1275,5 @@ export function snapshotRepos(): { repo: string; ciRepoId?: number }[] {
   return tools.filter((t) => t.repo).map((t) => ({
     repo: t.repo!,
     ciRepoId: t.ci?.repoId,
-  }));
+  }))
 }

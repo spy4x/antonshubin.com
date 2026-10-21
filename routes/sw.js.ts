@@ -1,4 +1,4 @@
-import { define } from "../lib/utils.ts";
+import { define } from "../lib/utils.ts"
 
 // The site has no service worker any more (#285). Browsers that registered
 // the old one (#259: it reloaded a first visit; it precached eight pages)
@@ -13,7 +13,7 @@ import { define } from "../lib/utils.ts";
 // script still carries it as `const CACHE = "antonshubin-<id>"` because the
 // deploy reads that line from the live URL to know when the new build is up
 // and which static files changed since the previous one.
-const BUILD_ID = Deno.env.get("BUILD_ID") || "dev";
+const BUILD_ID = Deno.env.get("BUILD_ID") || "dev"
 
 // It never calls skipWaiting() or clients.claim(): replacing the old worker
 // under an open page fires "controllerchange", and the old page's update code
@@ -37,7 +37,7 @@ self.addEventListener("activate", (event) => {
       .then(() => self.registration.unregister()),
   );
 });
-`;
+`
 
 export const handler = define.handlers({
   GET() {
@@ -48,6 +48,6 @@ export const handler = define.handlers({
         // must never be cached.
         "Cache-Control": "no-cache, must-revalidate",
       },
-    });
+    })
   },
-});
+})

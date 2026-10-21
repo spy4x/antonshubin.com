@@ -1,7 +1,7 @@
-import type { Project } from "../lib/data.ts";
-import type { Testimonial } from "../lib/testimonials.ts";
-import { Rating } from "./Rating.tsx";
-import { ReviewSource } from "./ReviewSource.tsx";
+import type { Project } from "../lib/data.ts"
+import type { Testimonial } from "../lib/testimonials.ts"
+import { Rating } from "./Rating.tsx"
+import { ReviewSource } from "./ReviewSource.tsx"
 
 /**
  * A project's client reviews (#231, #246), each in full, upright in
@@ -14,8 +14,8 @@ import { ReviewSource } from "./ReviewSource.tsx";
 export function ProjectReviews(
   { project, reviews }: { project: Project; reviews: Testimonial[] },
 ) {
-  if (reviews.length === 0) return null;
-  const once = reviews.every((r) => r.sourceHref === reviews[0].sourceHref);
+  if (reviews.length === 0) return null
+  const once = reviews.every((r) => r.sourceHref === reviews[0].sourceHref)
   return (
     <section data-project-reviews aria-labelledby="project-reviews">
       <h2 id="project-reviews" class="text-2xl text-parchment mb-2">
@@ -43,7 +43,7 @@ export function ProjectReviews(
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 /**
@@ -54,7 +54,7 @@ export function ProjectReviews(
 export function PullQuote(
   { project, review }: { project: Project; review?: Testimonial },
 ) {
-  if (!review) return null;
+  if (!review) return null
   return (
     <figure data-pull-quote class="border-l-2 border-rule-strong pl-5">
       <blockquote
@@ -68,5 +68,5 @@ export function PullQuote(
         <ReviewSource project={project} href={review.sourceHref} />
       </figcaption>
     </figure>
-  );
+  )
 }

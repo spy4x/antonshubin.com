@@ -99,12 +99,12 @@ HMAC of a random token, signed with `CANCEL_SECRET`.
 
 ```ts
 // Sign: embed token + signature in the URL
-const token = randomBase64(32);
-const sig = hmac(CANCEL_SECRET, token);
-const url = `${PUBLIC_URL}/cancel?t=${token}&s=${sig}`;
+const token = randomBase64(32)
+const sig = hmac(CANCEL_SECRET, token)
+const url = `${PUBLIC_URL}/cancel?t=${token}&s=${sig}`
 
 // Verify: recompute and compare
-if (!timingSafeEqual(sig, hmac(CANCEL_SECRET, token))) return 403;
+if (!timingSafeEqual(sig, hmac(CANCEL_SECRET, token))) return 403
 ```
 
 Stateless. The link itself is the record. Rotate `CANCEL_SECRET` once a year to

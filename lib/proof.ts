@@ -13,13 +13,13 @@
  */
 
 export interface ProofFigure {
-  id: string;
+  id: string
   /**
    * The value exactly as it is rendered, e.g. "80", "100%", "$300K+". An
    * Upwork figure matches the public profile; `projects` is Anton's own count.
    * A "+" belongs to the value; no caller appends one.
    */
-  value: string;
+  value: string
 }
 
 export const proofFigures: ProofFigure[] = [
@@ -36,11 +36,11 @@ export const proofFigures: ProofFigure[] = [
   { id: "hours", value: "6,600+" },
   { id: "expert-vetted", value: "Expert-Vetted" },
   { id: "top-percent", value: "Top 1%" },
-];
+]
 
 /** Looks a figure up by id and throws on a typo, so a bad id fails the build, not a visitor. */
 export function proof(id: string): string {
-  const figure = proofFigures.find((f) => f.id === id);
-  if (!figure) throw new Error(`lib/proof.ts: no proof figure "${id}"`);
-  return figure.value;
+  const figure = proofFigures.find((f) => f.id === id)
+  if (!figure) throw new Error(`lib/proof.ts: no proof figure "${id}"`)
+  return figure.value
 }

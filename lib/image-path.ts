@@ -8,8 +8,8 @@
  * Returns null if path does not end in `.png` (case-insensitive).
  */
 export function webpForPng(src: string): string | null {
-  if (!src.toLowerCase().endsWith(".png")) return null;
-  return src.slice(0, -4) + ".webp";
+  if (!src.toLowerCase().endsWith(".png")) return null
+  return src.slice(0, -4) + ".webp"
 }
 
 /**
@@ -17,4 +17,4 @@ export function webpForPng(src: string): string | null {
  * because the browser decodes every pixel before it paints (#336).
  * `deno task optimize:screenshots` scales down to it.
  */
-export const MAX_SCREENSHOT_WIDTH = 1600;
+export const MAX_SCREENSHOT_WIDTH = 1600

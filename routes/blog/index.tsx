@@ -1,11 +1,11 @@
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { Layout } from "../../components/Layout.tsx";
-import { NewsletterBlock } from "../../components/NewsletterBlock.tsx";
-import { type BlogArticle, blogArticles } from "../../lib/data.ts";
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { Layout } from "../../components/Layout.tsx"
+import { NewsletterBlock } from "../../components/NewsletterBlock.tsx"
+import { type BlogArticle, blogArticles } from "../../lib/data.ts"
 import {
   archivedPosts,
   blogNode,
@@ -13,25 +13,25 @@ import {
   postHref,
   topicPosts,
   topics,
-} from "../../lib/blog.ts";
-import { blogTabRedirect } from "../../lib/redirects.ts";
-import { toJsonLd } from "../../lib/json-ld.ts";
+} from "../../lib/blog.ts"
+import { blogTabRedirect } from "../../lib/redirects.ts"
+import { toJsonLd } from "../../lib/json-ld.ts"
 
-const SITE = "https://antonshubin.com";
+const SITE = "https://antonshubin.com"
 
 export const handler = define.handlers({
   GET(ctx) {
     // The old `?tab=` filters answer one 301 to the single list (SEO 4).
-    const target = blogTabRedirect(ctx.url);
+    const target = blogTabRedirect(ctx.url)
     if (target) {
       return new Response(null, {
         status: 301,
         headers: { Location: target },
-      });
+      })
     }
-    return page();
+    return page()
   },
-});
+})
 
 /** One post as a text row (#274, UX 6 and 7): date first, the title is the link. */
 function PostRow({ article }: { article: BlogArticle }) {
@@ -53,14 +53,14 @@ function PostRow({ article }: { article: BlogArticle }) {
       </h3>
       <p class="mt-1 text-graphite line-clamp-2">{article.description}</p>
     </li>
-  );
+  )
 }
 
 export default define.page(function Blog(ctx) {
   const topicSections = topics
     .map((t) => ({ topic: t, posts: topicPosts(t.id) }))
-    .filter((s) => s.posts.length > 0);
-  const archive = archivedPosts();
+    .filter((s) => s.posts.length > 0)
+  const archive = archivedPosts()
 
   head.value = {
     ...head.value,
@@ -71,7 +71,7 @@ export default define.page(function Blog(ctx) {
       `Anton Shubin, ${ROLE}, writes about decisions for founders, AI and MCP, self-hosting, and his own mistakes, from the work and the tools he builds.`,
     canonical: `${SITE}/blog`,
     ogType: "website",
-  };
+  }
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -174,5 +174,5 @@ export default define.page(function Blog(ctx) {
         <NewsletterBlock />
       </div>
     </Layout>
-  );
-});
+  )
+})

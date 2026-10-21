@@ -10,7 +10,7 @@
  * own `data/` over the app's, so a file committed there never reaches the
  * production build.
  */
-import snapshot from "./github-snapshot.json" with { type: "json" };
+import snapshot from "./github-snapshot.json" with { type: "json" }
 
 /** Woodpecker's pipeline status, as its API reports it. */
 export type CiRunStatus =
@@ -22,52 +22,52 @@ export type CiRunStatus =
   | "pending"
   | "blocked"
   | "declined"
-  | "skipped";
+  | "skipped"
 
 export interface CiSnapshot {
-  status: CiRunStatus;
+  status: CiRunStatus
   /** The pipeline's number within its repository. */
-  pipeline: number;
+  pipeline: number
   /** ISO date-time the pipeline finished, or started when still running. */
-  at: string;
-  url: string;
+  at: string
+  url: string
 }
 
 export interface RepoSnapshot {
-  stars: number;
+  stars: number
   /** SPDX id GitHub detected, or null when it detected none. */
-  licence: string | null;
-  pushedAt: string;
+  licence: string | null
+  pushedAt: string
   /** The latest push pipeline on the default branch, or null when there is none. */
-  ci: CiSnapshot | null;
+  ci: CiSnapshot | null
 }
 
 export interface GithubSnapshot {
   /** The day the snapshot was taken, YYYY-MM-DD. */
-  checkedOn: string;
-  repos: Record<string, RepoSnapshot>;
+  checkedOn: string
+  repos: Record<string, RepoSnapshot>
 }
 
-export const githubSnapshot: GithubSnapshot = snapshot as GithubSnapshot;
+export const githubSnapshot: GithubSnapshot = snapshot as GithubSnapshot
 
 /** The snapshot of `repo` (`owner/name`); throws when the script has not recorded it. */
 export function repoSnapshot(
   repo: string,
   data: GithubSnapshot = githubSnapshot,
 ): RepoSnapshot {
-  const found = data.repos[repo];
+  const found = data.repos[repo]
   if (!found) {
     throw new Error(
       `lib/github-snapshot.json has no entry for "${repo}" — run \`deno run -A scripts/github-snapshot.ts\``,
-    );
+    )
   }
-  return found;
+  return found
 }
 
 /** How a CI status reads on the page: the word and the StatusMark shape behind it. */
 export interface CiReading {
-  word: "Passing" | "Failing" | "Running" | "Unknown";
-  mark: "ready" | "known-issue" | "wip";
+  word: "Passing" | "Failing" | "Running" | "Unknown"
+  mark: "ready" | "known-issue" | "wip"
 }
 
 /**
@@ -79,18 +79,18 @@ export interface CiReading {
 export function ciReading(ci: CiSnapshot | null): CiReading {
   switch (ci?.status) {
     case "success":
-      return { word: "Passing", mark: "ready" };
+      return { word: "Passing", mark: "ready" }
     case "failure":
     case "error":
     case "killed":
-      return { word: "Failing", mark: "known-issue" };
+      return { word: "Failing", mark: "known-issue" }
     case "running":
     case "pending":
-      return { word: "Running", mark: "wip" };
+      return { word: "Running", mark: "wip" }
     default:
-      return { word: "Unknown", mark: "wip" };
+      return { word: "Unknown", mark: "wip" }
   }
 }
 
 /** Stars are shown only from 25 up. */
-export const MIN_STARS_SHOWN = 25;
+export const MIN_STARS_SHOWN = 25

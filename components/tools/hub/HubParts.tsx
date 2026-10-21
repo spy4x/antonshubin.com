@@ -1,21 +1,21 @@
-import type { ComponentChildren } from "preact";
-import { Card } from "@spy4x/preact-ui/card";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { IconArrowRight, IconArrowUpRight } from "@spy4x/preact-icons";
-import Button from "../../Button.tsx";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { InstallLine } from "../../InstallLine.tsx";
-import { MediaFrame } from "../../tool-frame/ToolHeroMedia.tsx";
-import { heroStill, toolLede } from "../../tool-frame/tool-page.ts";
-import ToolHeroClip from "../../../islands/ToolHeroClip.tsx";
-import { eventAttrs, linkEvent, type Place } from "../../../lib/analytics.ts";
-import { firstSentence } from "../../../lib/llms.ts";
+import type { ComponentChildren } from "preact"
+import { Card } from "@spy4x/preact-ui/card"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { IconArrowRight, IconArrowUpRight } from "@spy4x/preact-icons"
+import Button from "../../Button.tsx"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { InstallLine } from "../../InstallLine.tsx"
+import { MediaFrame } from "../../tool-frame/ToolHeroMedia.tsx"
+import { heroStill, toolLede } from "../../tool-frame/tool-page.ts"
+import ToolHeroClip from "../../../islands/ToolHeroClip.tsx"
+import { eventAttrs, linkEvent, type Place } from "../../../lib/analytics.ts"
+import { firstSentence } from "../../../lib/llms.ts"
 import {
   clipSources,
   repoUrl,
   type Tool,
   type ToolScreenshot,
-} from "../../../lib/tools.ts";
+} from "../../../lib/tools.ts"
 
 /**
  * The smallest file a shot names (its `srcset`'s narrowest width, else its
@@ -25,25 +25,23 @@ import {
  * from fetching the 1280px copies while the stylesheet still loads (#456).
  */
 export function smallestFile(shot: ToolScreenshot): string {
-  if (!shot.srcset) return shot.src;
+  if (!shot.srcset) return shot.src
   const candidates = shot.srcset.split(",").map((c) => {
-    const [url, width] = c.trim().split(/\s+/);
-    return { url, width: Number.parseInt(width, 10) };
-  });
-  return candidates.reduce((a, b) => (b.width < a.width ? b : a)).url;
+    const [url, width] = c.trim().split(/\s+/)
+    return { url, width: Number.parseInt(width, 10) }
+  })
+  return candidates.reduce((a, b) => (b.width < a.width ? b : a)).url
 }
 
 /** The spotlight's clip: seven of twelve columns from 1024px. */
-const SPOTLIGHT_SIZES = "(min-width: 1024px) 40rem, calc(100vw - 2rem)";
+const SPOTLIGHT_SIZES = "(min-width: 1024px) 40rem, calc(100vw - 2rem)"
 
 /** The host a frame's address bar shows: the clip's own title, else the live link's host. */
 function frameTitle(tool: Tool): string | undefined {
-  if (tool.clip?.frameTitle) return tool.clip.frameTitle;
-  const href = tool.live?.href;
-  if (!href) return undefined;
-  return href.startsWith("http")
-    ? new URL(href).host
-    : `antonshubin.com${href}`;
+  if (tool.clip?.frameTitle) return tool.clip.frameTitle
+  const href = tool.live?.href
+  if (!href) return undefined
+  return href.startsWith("http") ? new URL(href).host : `antonshubin.com${href}`
 }
 
 /** The tool's name, linking its page: the card's first link. */
@@ -56,7 +54,7 @@ function NameLink({ tool, place }: { tool: Tool; place: Place }) {
     >
       {tool.name}
     </a>
-  );
+  )
 }
 
 /**
@@ -67,10 +65,10 @@ function NameLink({ tool, place }: { tool: Tool; place: Place }) {
  * Null for a tool with no picture yet; its card is then text only.
  */
 function CardMedia({ tool }: { tool: Tool }) {
-  const clip = tool.clip;
-  const still = heroStill(tool);
-  if (!still) return null;
-  const variant = clip?.frame ?? "browser";
+  const clip = tool.clip
+  const still = heroStill(tool)
+  if (!still) return null
+  const variant = clip?.frame ?? "browser"
   const picture = clip?.video
     ? (
       <div class="w-full">
@@ -88,7 +86,7 @@ function CardMedia({ tool }: { tool: Tool }) {
         />
       </div>
     )
-    : <Still shot={still} />;
+    : <Still shot={still} />
   return (
     <MediaFrame
       variant={variant}
@@ -101,7 +99,7 @@ function CardMedia({ tool }: { tool: Tool }) {
         {picture}
       </div>
     </MediaFrame>
-  );
+  )
 }
 
 /**
@@ -120,7 +118,7 @@ function Still({ shot }: { shot: ToolScreenshot }) {
       decoding="async"
       class="block h-full w-full object-cover object-top"
     />
-  );
+  )
 }
 
 /**
@@ -129,7 +127,7 @@ function Still({ shot }: { shot: ToolScreenshot }) {
  */
 function CardAction({ tool }: { tool: Tool }) {
   if (tool.live) {
-    const external = tool.live.href.startsWith("http");
+    const external = tool.live.href.startsWith("http")
     return (
       <a
         href={tool.live.href}
@@ -147,13 +145,13 @@ function CardAction({ tool }: { tool: Tool }) {
           ? <IconArrowUpRight class="size-4 shrink-0" />
           : <IconArrowRight class="size-4 shrink-0" />}
       </a>
-    );
+    )
   }
   if (tool.registry) {
-    return <InstallLine tool={tool} id={`install-${tool.slug}`} />;
+    return <InstallLine tool={tool} id={`install-${tool.slug}`} />
   }
-  const repo = repoUrl(tool);
-  if (!repo) return null;
+  const repo = repoUrl(tool)
+  if (!repo) return null
   return (
     <a
       href={repo}
@@ -166,12 +164,12 @@ function CardAction({ tool }: { tool: Tool }) {
     >
       View on GitHub
     </a>
-  );
+  )
 }
 
 /** The Eirene credit, under the preact-components card's action. */
 function Credit({ tool }: { tool: Tool }) {
-  if (!tool.credit) return null;
+  if (!tool.credit) return null
   return (
     <p data-credit class="text-sm text-graphite">
       {tool.credit.text} {tool.credit.links.map((l, i) => (
@@ -181,7 +179,7 @@ function Credit({ tool }: { tool: Tool }) {
         </span>
       ))}
     </p>
-  );
+  )
 }
 
 /** "name · status" over the job line: how every card opens. */
@@ -193,7 +191,7 @@ function TopLine({ tool }: { tool: Tool }) {
       </h3>
       <StatusMark status={tool.status} />
     </div>
-  );
+  )
 }
 
 /**
@@ -205,7 +203,7 @@ function TopLine({ tool }: { tool: Tool }) {
 export function ToolHubCard(
   { tool, media }: { tool: Tool; media: boolean },
 ) {
-  const proof = tool.usedFor && firstSentence(tool.usedFor);
+  const proof = tool.usedFor && firstSentence(tool.usedFor)
   return (
     <li data-tool={tool.slug} class="flex">
       <Card class="flex w-full flex-col gap-4 p-4 sm:p-5">
@@ -221,15 +219,15 @@ export function ToolHubCard(
         </div>
       </Card>
     </li>
-  );
+  )
 }
 
 /** A "Being built" or archive line: name, status and one sentence, no card. */
 export function ToolHubLine(
   { tool, text, children }: {
-    tool: Tool;
-    text: string;
-    children?: ComponentChildren;
+    tool: Tool
+    text: string
+    children?: ComponentChildren
   },
 ) {
   return (
@@ -246,7 +244,7 @@ export function ToolHubLine(
         {children}
       </div>
     </li>
-  );
+  )
 }
 
 /**
@@ -256,7 +254,7 @@ export function ToolHubLine(
  * heading, so the moving picture is on the first screen.
  */
 export function Spotlight({ tool }: { tool: Tool }) {
-  const clip = tool.clip;
+  const clip = tool.clip
   return (
     <section
       aria-labelledby="spotlight"
@@ -331,10 +329,10 @@ export function Spotlight({ tool }: { tool: Tool }) {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
 /** "tiny self-hosted …" → "Tiny self-hosted …": a job line read as a sentence. */
 function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }

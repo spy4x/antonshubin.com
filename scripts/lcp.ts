@@ -36,52 +36,52 @@
  *   deno task lcp --ab ../main ../branch     # compare two built directories
  *   deno task lcp --path /work/smartlite # measure another page
  */
-import { type Site, startSite } from "../test/harness.ts";
-import { launchChromium } from "../test/browser.ts";
-import type { Browser } from "playwright";
-import { resolve } from "@std/path";
+import { type Site, startSite } from "../test/harness.ts"
+import { launchChromium } from "../test/browser.ts"
+import type { Browser } from "playwright"
+import { resolve } from "@std/path"
 
-type Mode = "cpu" | "network";
+type Mode = "cpu" | "network"
 
 interface Args {
-  n: number;
-  modes: Mode[];
-  ab?: [string, string];
+  n: number
+  modes: Mode[]
+  ab?: [string, string]
   /** The page to measure, from the site root; "/" by default. */
-  path: string;
+  path: string
 }
 
 function parseArgs(argv: string[]): Args {
-  let n = 15;
-  let modes: Mode[] = ["cpu", "network"];
-  let ab: [string, string] | undefined;
-  let path = "/";
+  let n = 15
+  let modes: Mode[] = ["cpu", "network"]
+  let ab: [string, string] | undefined
+  let path = "/"
   for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (arg === "--n") n = Number(argv[++i]);
+    const arg = argv[i]
+    if (arg === "--n") n = Number(argv[++i])
     else if (arg === "--mode") {
-      const m = argv[++i];
+      const m = argv[++i]
       if (m !== "cpu" && m !== "network") {
-        throw new Error(`--mode must be "cpu" or "network", got "${m}"`);
+        throw new Error(`--mode must be "cpu" or "network", got "${m}"`)
       }
-      modes = [m];
+      modes = [m]
     } else if (arg === "--path") {
-      path = argv[++i];
+      path = argv[++i]
       if (!path?.startsWith("/")) {
-        throw new Error(`--path must start with "/", got "${path}"`);
+        throw new Error(`--path must start with "/", got "${path}"`)
       }
     } else if (arg === "--ab") {
-      ab = [argv[++i], argv[++i]];
+      ab = [argv[++i], argv[++i]]
     } else {
-      throw new Error(`unknown argument: ${arg}`);
+      throw new Error(`unknown argument: ${arg}`)
     }
   }
-  return { n, modes, ab, path };
+  return { n, modes, ab, path }
 }
 
-const MOBILE_VIEWPORT = { width: 390, height: 844 };
+const MOBILE_VIEWPORT = { width: 390, height: 844 }
 const MOBILE_UA =
-  "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+  "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
 
 /** Boots a production server from an already-built directory (must contain
  * `_fresh/server.js`), for `--ab` mode. Mirrors `test/harness.ts`'s
@@ -89,51 +89,51 @@ const MOBILE_UA =
  * current worktree. */
 async function startSiteAt(relativeDir: string): Promise<Site> {
   // The server runs with `cwd: dir`, so a relative entry path would resolve twice.
-  const dir = resolve(relativeDir);
-  const serverEntry = `${dir}/_fresh/server.js`;
+  const dir = resolve(relativeDir)
+  const serverEntry = `${dir}/_fresh/server.js`
   try {
-    await Deno.stat(serverEntry);
+    await Deno.stat(serverEntry)
   } catch {
     throw new Error(
       `${serverEntry} not found — run "deno task build" in ${dir} first.`,
-    );
+    )
   }
-  const { getAvailablePort } = await import("@std/net");
-  const port = getAvailablePort();
-  const origin = `http://127.0.0.1:${port}`;
+  const { getAvailablePort } = await import("@std/net")
+  const port = getAvailablePort()
+  const origin = `http://127.0.0.1:${port}`
   const command = new Deno.Command(Deno.execPath(), {
     args: ["serve", "-A", `--port=${port}`, serverEntry],
     cwd: dir,
     stdout: "null",
     stderr: "null",
-  });
-  const process = command.spawn();
-  const deadline = Date.now() + 20_000;
+  })
+  const process = command.spawn()
+  const deadline = Date.now() + 20_000
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(origin);
-      await res.body?.cancel();
-      break;
+      const res = await fetch(origin)
+      await res.body?.cancel()
+      break
     } catch {
-      await new Promise((r) => setTimeout(r, 100));
+      await new Promise((r) => setTimeout(r, 100))
     }
   }
   return {
     origin,
     get: (path, init) => fetch(new URL(path, origin), init),
     html: async (path) => {
-      const res = await fetch(new URL(path, origin));
-      return await res.text();
+      const res = await fetch(new URL(path, origin))
+      return await res.text()
     },
     stop: async () => {
       try {
-        process.kill();
+        process.kill()
       } catch {
         // already stopped
       }
-      await process.status;
+      await process.status
     },
-  };
+  }
 }
 
 /** One LCP sample: a fresh Chromium instance, a fresh page, navigate, read
@@ -143,7 +143,7 @@ async function sampleOnce(
   mode: Mode,
   path = "/",
 ): Promise<number> {
-  const browser: Browser = await launchChromium();
+  const browser: Browser = await launchChromium()
   try {
     const context = await browser.newContext({
       viewport: MOBILE_VIEWPORT,
@@ -152,11 +152,11 @@ async function sampleOnce(
       // #285) reloads the page from the worker's cache, and the reload's LCP
       // is a warm repeat visit (0 or ~200 ms), not a first load.
       serviceWorkers: "block",
-    });
-    const page = await context.newPage();
-    const cdp = await context.newCDPSession(page);
+    })
+    const page = await context.newPage()
+    const cdp = await context.newCDPSession(page)
     if (mode === "cpu") {
-      await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+      await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 })
     } else {
       await cdp.send("Network.emulateNetworkConditions", {
         offline: false,
@@ -167,95 +167,95 @@ async function sampleOnce(
         // slower than intended).
         downloadThroughput: 200 * 1024,
         uploadThroughput: 200 * 1024,
-      });
+      })
     }
     await page.addInitScript(() => {
-      (globalThis as unknown as { __lcp: number }).__lcp = 0;
+      ;(globalThis as unknown as { __lcp: number }).__lcp = 0
       new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const last = entries[entries.length - 1];
+        const entries = list.getEntries()
+        const last = entries[entries.length - 1]
         if (last) {
-          (globalThis as unknown as { __lcp: number }).__lcp = last.startTime;
+          ;(globalThis as unknown as { __lcp: number }).__lcp = last.startTime
         }
-      }).observe({ type: "largest-contentful-paint", buffered: true });
-    });
-    await page.goto(`${origin}${path}`, { waitUntil: "load", timeout: 30_000 });
+      }).observe({ type: "largest-contentful-paint", buffered: true })
+    })
+    await page.goto(`${origin}${path}`, { waitUntil: "load", timeout: 30_000 })
     // Let the LCP settle after load (images/fonts can still shift it briefly).
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(500)
     return await page.evaluate(() =>
       (globalThis as unknown as { __lcp: number }).__lcp
-    );
+    )
   } finally {
-    await browser.close();
+    await browser.close()
   }
 }
 
 function stats(values: number[]) {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
+  const sorted = [...values].sort((a, b) => a - b)
+  const mid = Math.floor(sorted.length / 2)
   const median = sorted.length % 2 === 0
     ? (sorted[mid - 1] + sorted[mid]) / 2
-    : sorted[mid];
-  return { median, min: sorted[0], max: sorted[sorted.length - 1] };
+    : sorted[mid]
+  return { median, min: sorted[0], max: sorted[sorted.length - 1] }
 }
 
 function report(label: string, samples: number[]) {
-  const { median, min, max } = stats(samples);
-  console.log(`\n${label}`);
-  console.log(`  samples: ${samples.map((s) => s.toFixed(1)).join(", ")}`);
+  const { median, min, max } = stats(samples)
+  console.log(`\n${label}`)
+  console.log(`  samples: ${samples.map((s) => s.toFixed(1)).join(", ")}`)
   console.log(
     `  median: ${median.toFixed(1)}ms  min: ${min.toFixed(1)}ms  max: ${
       max.toFixed(1)
     }ms`,
-  );
+  )
 }
 
-const args = parseArgs(Deno.args);
+const args = parseArgs(Deno.args)
 
 if (args.ab) {
-  const [dirA, dirB] = args.ab;
+  const [dirA, dirB] = args.ab
   console.log(
     `A/B: A=${dirA}  B=${dirB}  path=${args.path}  n=${args.n} per build per mode`,
-  );
-  const siteA = await startSiteAt(dirA);
-  const siteB = await startSiteAt(dirB);
+  )
+  const siteA = await startSiteAt(dirA)
+  const siteB = await startSiteAt(dirB)
   try {
     for (const mode of args.modes) {
-      const samplesA: number[] = [];
-      const samplesB: number[] = [];
+      const samplesA: number[] = []
+      const samplesB: number[] = []
       for (let i = 0; i < args.n; i++) {
         // Alternate A, B, A, B, ... so neither build is consistently
         // measured earlier or later in the run.
-        const lcpA = await sampleOnce(siteA.origin, mode, args.path);
-        const lcpB = await sampleOnce(siteB.origin, mode, args.path);
-        samplesA.push(lcpA);
-        samplesB.push(lcpB);
+        const lcpA = await sampleOnce(siteA.origin, mode, args.path)
+        const lcpB = await sampleOnce(siteB.origin, mode, args.path)
+        samplesA.push(lcpA)
+        samplesB.push(lcpB)
         console.log(
           `[${mode}] sample ${i + 1}/${args.n}: A=${lcpA.toFixed(1)}ms  B=${
             lcpB.toFixed(1)
           }ms`,
-        );
+        )
       }
-      report(`[${mode}] A (${dirA})`, samplesA);
-      report(`[${mode}] B (${dirB})`, samplesB);
+      report(`[${mode}] A (${dirA})`, samplesA)
+      report(`[${mode}] B (${dirB})`, samplesB)
     }
   } finally {
-    await siteA.stop();
-    await siteB.stop();
+    await siteA.stop()
+    await siteB.stop()
   }
 } else {
-  const site = await startSite();
+  const site = await startSite()
   try {
     for (const mode of args.modes) {
-      const samples: number[] = [];
+      const samples: number[] = []
       for (let i = 0; i < args.n; i++) {
-        const lcp = await sampleOnce(site.origin, mode, args.path);
-        samples.push(lcp);
-        console.log(`[${mode}] sample ${i + 1}/${args.n}: ${lcp.toFixed(1)}ms`);
+        const lcp = await sampleOnce(site.origin, mode, args.path)
+        samples.push(lcp)
+        console.log(`[${mode}] sample ${i + 1}/${args.n}: ${lcp.toFixed(1)}ms`)
       }
-      report(`[${mode}]`, samples);
+      report(`[${mode}]`, samples)
     }
   } finally {
-    await site.stop();
+    await site.stop()
   }
 }

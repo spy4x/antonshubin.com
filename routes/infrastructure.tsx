@@ -1,47 +1,47 @@
-import { cn } from "@spy4x/preact-cn";
+import { cn } from "@spy4x/preact-cn"
 import {
   BOOK_HREF,
   BOOK_LABEL,
   BRIEF_LABEL,
   WRITE_FALLBACK_HREF,
-} from "../lib/nav.ts";
-import { Breadcrumb } from "../components/Breadcrumb.tsx";
-import { Layout } from "../components/Layout.tsx";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { BookCallLink } from "../components/BookCallLink.tsx";
-import Button, { buttonClass } from "../components/Button.tsx";
-import { ClosingBand } from "../components/ClosingBand.tsx";
-import { Fact, FactCard } from "../components/FactCard.tsx";
-import { InfraMap } from "../components/InfraMap.tsx";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { WithNote } from "../components/WithNote.tsx";
-import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
-import { projects } from "../lib/data.ts";
-import { getBreadcrumb, head } from "../lib/head.ts";
+} from "../lib/nav.ts"
+import { Breadcrumb } from "../components/Breadcrumb.tsx"
+import { Layout } from "../components/Layout.tsx"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { BookCallLink } from "../components/BookCallLink.tsx"
+import Button, { buttonClass } from "../components/Button.tsx"
+import { ClosingBand } from "../components/ClosingBand.tsx"
+import { Fact, FactCard } from "../components/FactCard.tsx"
+import { InfraMap } from "../components/InfraMap.tsx"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { WithNote } from "../components/WithNote.tsx"
+import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts"
+import { projects } from "../lib/data.ts"
+import { getBreadcrumb, head } from "../lib/head.ts"
 import {
   infraLayers,
   type LayerCheck,
   liveLinks,
   MAP_CAPTION,
   mentionedToolIds,
-} from "../lib/infrastructure.ts";
-import { toJsonLd } from "../lib/json-ld.ts";
-import { projectLead } from "../lib/llms.ts";
-import { define } from "../lib/utils.ts";
-import { eventAttrs } from "../lib/analytics.ts";
+} from "../lib/infrastructure.ts"
+import { toJsonLd } from "../lib/json-ld.ts"
+import { projectLead } from "../lib/llms.ts"
+import { define } from "../lib/utils.ts"
+import { eventAttrs } from "../lib/analytics.ts"
 
-const BASE = "https://antonshubin.com";
-const REPO = "https://github.com/spy4x/antonshubin.com";
-const BUILD_ID = Deno.env.get("BUILD_ID") || "dev";
+const BASE = "https://antonshubin.com"
+const REPO = "https://github.com/spy4x/antonshubin.com"
+const BUILD_ID = Deno.env.get("BUILD_ID") || "dev"
 
 const LINK =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment"
 
 /** The founder sentence the page has always led with: the buyer's questions, not tool names. */
 const LEAD =
-  "Founders should not need to manage infrastructure. They should know how product risk is controlled, what happens when something fails, and whether another team can take over cleanly.";
+  "Founders should not need to manage infrastructure. They should know how product risk is controlled, what happens when something fails, and whether another team can take over cleanly."
 
 /** The three rows of "your cloud is fine too"; `example` adds the SmartLite case under it. */
 const workload = [
@@ -63,11 +63,11 @@ const workload = [
       "Managed services where they remove risk, stable workloads on dedicated hardware where control and capacity matter more.",
     example: false,
   },
-];
+]
 
 /** One "where to check" entry: a link, or the sentence saying why there is none. */
 function Check({ c }: { c: LayerCheck }) {
-  if (typeof c === "string") return <>{c}</>;
+  if (typeof c === "string") return <>{c}</>
   return (
     <a
       href={c.href}
@@ -77,7 +77,7 @@ function Check({ c }: { c: LayerCheck }) {
       {c.label}
       {c.external && <NewTabHint />}
     </a>
-  );
+  )
 }
 
 /** The `TechArticle` node: the page as a write-up, mentioning each tool page's node. */
@@ -94,11 +94,11 @@ function articleJsonLd(canonical: string) {
     "author": { "@id": `${BASE}/#person` },
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
     "mentions": mentionedToolIds().map((id) => ({ "@id": id })),
-  };
+  }
 }
 
 export default define.page(function Infrastructure() {
-  const canonical = `${BASE}/infrastructure`;
+  const canonical = `${BASE}/infrastructure`
   head.value = {
     ...head.value,
     title:
@@ -111,12 +111,12 @@ export default define.page(function Infrastructure() {
     ogImage: `${BASE}/img/og/infrastructure.png`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
+  }
 
-  const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!;
-  const mvp = catalogItem("zero-to-production-saas-mvp");
-  const ongoing = catalogItem("cto-advisory-retainer");
-  const commit = /^[0-9a-f]{7,40}$/.test(BUILD_ID) ? BUILD_ID : "";
+  const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!
+  const mvp = catalogItem("zero-to-production-saas-mvp")
+  const ongoing = catalogItem("cto-advisory-retainer")
+  const commit = /^[0-9a-f]{7,40}$/.test(BUILD_ID) ? BUILD_ID : ""
 
   return (
     <Layout currentPath="/infrastructure">
@@ -349,8 +349,8 @@ export default define.page(function Infrastructure() {
         </ClosingBand>
       </div>
     </Layout>
-  );
-});
+  )
+})
 
 /** "This site": what the page you are reading is built with and where it runs, then Book and the brief. */
 function ColophonCard({ commit }: { commit: string }) {
@@ -404,5 +404,5 @@ function ColophonCard({ commit }: { commit: string }) {
         </Button>
       </div>
     </FactCard>
-  );
+  )
 }

@@ -9,10 +9,10 @@
  * The allowed origin is the configured base URL's, not a fixed host, so a
  * local or test server accepts its own forms.
  */
-import { csrf } from "fresh";
-import type { Middleware } from "fresh";
-import { BASE_URL } from "./config.ts";
-import type { State } from "./utils.ts";
+import { csrf } from "fresh"
+import type { Middleware } from "fresh"
+import { BASE_URL } from "./config.ts"
+import type { State } from "./utils.ts"
 
 /** The paths the guard covers, without a trailing slash. */
 export const CSRF_PATHS = [
@@ -20,16 +20,16 @@ export const CSRF_PATHS = [
   "/api/lead",
   "/unsubscribe",
   "/subscribe/confirm",
-];
+]
 
 /** True for a path in {@link CSRF_PATHS}, with or without a trailing slash. */
 export function isCsrfPath(pathname: string): boolean {
-  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  return CSRF_PATHS.includes(path);
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname
+  return CSRF_PATHS.includes(path)
 }
 
 /** Middleware that applies Fresh's `csrf()` to {@link CSRF_PATHS} only. */
 export function siteCsrf(baseUrl = BASE_URL): Middleware<State> {
-  const guard = csrf<State>({ origin: new URL(baseUrl).origin });
-  return (ctx) => isCsrfPath(ctx.url.pathname) ? guard(ctx) : ctx.next();
+  const guard = csrf<State>({ origin: new URL(baseUrl).origin })
+  return (ctx) => isCsrfPath(ctx.url.pathname) ? guard(ctx) : ctx.next()
 }

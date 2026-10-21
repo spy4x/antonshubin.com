@@ -1,4 +1,4 @@
-import { define } from "../../lib/utils.ts";
+import { define } from "../../lib/utils.ts"
 
 // Legacy redirect target (see #177). New mail links straight to
 // `/unsubscribe?token=...` (see lib/mailing-list.ts's `unsubscribeUrl`
@@ -9,13 +9,13 @@ import { define } from "../../lib/utils.ts";
 // routes/unsubscribe.tsx itself, with a verified token.
 export const handler = define.handlers({
   GET(ctx) {
-    const token = ctx.url.searchParams.get("token");
+    const token = ctx.url.searchParams.get("token")
     const location = token
       ? `/unsubscribe?token=${encodeURIComponent(token)}`
-      : "/unsubscribe";
+      : "/unsubscribe"
     return new Response(null, {
       status: 301,
       headers: { Location: location },
-    });
+    })
   },
-});
+})

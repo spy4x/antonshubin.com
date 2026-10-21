@@ -1,32 +1,32 @@
-import { define } from "../lib/utils.ts";
-import { getBreadcrumb, head } from "../lib/head.ts";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { Breadcrumb } from "../components/Breadcrumb.tsx";
-import { Layout } from "../components/Layout.tsx";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { BookCallLink } from "../components/BookCallLink.tsx";
-import Button from "../components/Button.tsx";
+import { define } from "../lib/utils.ts"
+import { getBreadcrumb, head } from "../lib/head.ts"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { Breadcrumb } from "../components/Breadcrumb.tsx"
+import { Layout } from "../components/Layout.tsx"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { BookCallLink } from "../components/BookCallLink.tsx"
+import Button from "../components/Button.tsx"
 import {
   BOOK_HREF,
   BOOK_LABEL,
   BRIEF_LABEL,
   WRITE_FALLBACK_HREF,
-} from "../lib/nav.ts";
-import { Questions } from "../components/Questions.tsx";
-import { ClosingBand } from "../components/ClosingBand.tsx";
-import { FACT_LINK, FactCard } from "../components/FactCard.tsx";
+} from "../lib/nav.ts"
+import { Questions } from "../components/Questions.tsx"
+import { ClosingBand } from "../components/ClosingBand.tsx"
+import { FACT_LINK, FactCard } from "../components/FactCard.tsx"
 import {
   type PromiseLink,
   PromiseTimeline,
-} from "../components/PromiseTimeline.tsx";
-import { WithNote } from "../components/WithNote.tsx";
+} from "../components/PromiseTimeline.tsx"
+import { WithNote } from "../components/WithNote.tsx"
 import {
   catalogItem,
   catalogItems,
   catalogPath,
   priceLabel,
-} from "../lib/catalog.ts";
-import { faqs } from "../lib/faqs.ts";
+} from "../lib/catalog.ts"
+import { faqs } from "../lib/faqs.ts"
 import {
   GOOD_FIT,
   HOW_I_WORK_NAME,
@@ -35,19 +35,19 @@ import {
   howIWorkDescription,
   NOT_A_FIT,
   PRICING_RULE,
-} from "../lib/how-i-work.ts";
-import { proof } from "../lib/proof.ts";
+} from "../lib/how-i-work.ts"
+import { proof } from "../lib/proof.ts"
 import {
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
-} from "../lib/why-not-just-ai.ts";
-import { repeatClientsLine } from "../lib/testimonials.ts";
-import { toJsonLd } from "../lib/json-ld.ts";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+} from "../lib/why-not-just-ai.ts"
+import { repeatClientsLine } from "../lib/testimonials.ts"
+import { toJsonLd } from "../lib/json-ld.ts"
+import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 
 /** The public repository the AI-agent setup's rules live in. */
-const DOTFILES_URL = "https://github.com/spy4x/dotfiles";
+const DOTFILES_URL = "https://github.com/spy4x/dotfiles"
 
 /** The two promises that lead to a catalog item (Mkt 3): the first milestone and the bug fixes. */
 const promiseLinks: Record<string, PromiseLink> = {
@@ -59,7 +59,7 @@ const promiseLinks: Record<string, PromiseLink> = {
     href: catalogPath("cto-advisory-retainer"),
     label: catalogItem("cto-advisory-retainer").shortTitle,
   },
-};
+}
 
 /**
  * `/how-i-work` (#275): the project page's frame. An H1 and one line, then a
@@ -80,7 +80,7 @@ export default define.page(function HowIWork() {
     ogImage: "https://antonshubin.com/img/og/how-i-work.png",
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
+  }
 
   return (
     <Layout currentPath="/how-i-work">
@@ -276,5 +276,5 @@ export default define.page(function HowIWork() {
         />
       </div>
     </Layout>
-  );
-});
+  )
+})

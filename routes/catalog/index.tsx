@@ -1,33 +1,33 @@
-import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { Layout } from "../../components/Layout.tsx";
+import { define } from "../../lib/utils.ts"
+import { getBreadcrumb, head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { Layout } from "../../components/Layout.tsx"
 import {
   callVersusSession,
   catalogItems,
   INTRO_CALL,
   priceLabel,
-} from "../../lib/catalog.ts";
-import { toJsonLd } from "../../lib/json-ld.ts";
-import { formatPeriod } from "../../lib/data.ts";
-import { projectsForCatalog, workHref } from "../../lib/work.ts";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { FACT_LINK } from "../../components/FactCard.tsx";
-import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts";
+} from "../../lib/catalog.ts"
+import { toJsonLd } from "../../lib/json-ld.ts"
+import { formatPeriod } from "../../lib/data.ts"
+import { projectsForCatalog, workHref } from "../../lib/work.ts"
+import { ClosingBand } from "../../components/ClosingBand.tsx"
+import { FACT_LINK } from "../../components/FactCard.tsx"
+import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts"
 import {
   IconArrowRight as ArrowRightIcon,
   IconCheck as CheckIcon,
-} from "@spy4x/preact-icons";
-import { CatalogIcon } from "../../components/Icons.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
+} from "@spy4x/preact-icons"
+import { CatalogIcon } from "../../components/Icons.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
 import {
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
-} from "../../lib/why-not-just-ai.ts";
+} from "../../lib/why-not-just-ai.ts"
 
-const CANONICAL = "https://antonshubin.com/catalog";
+const CANONICAL = "https://antonshubin.com/catalog"
 
 export default define.page(function Catalog() {
   head.value = {
@@ -40,8 +40,8 @@ export default define.page(function Catalog() {
     }.`,
     canonical: CANONICAL,
     ogType: "website",
-  };
-  const { paid } = callVersusSession();
+  }
+  const { paid } = callVersusSession()
 
   return (
     <Layout currentPath="/catalog">
@@ -80,7 +80,7 @@ export default define.page(function Catalog() {
 
         <ul class="grid gap-6 lg:grid-cols-2">
           {catalogItems.map((item) => {
-            const work = projectsForCatalog(item.slug, 1)[0];
+            const work = projectsForCatalog(item.slug, 1)[0]
             return (
               <li
                 key={item.slug}
@@ -145,7 +145,7 @@ export default define.page(function Catalog() {
                   </a>
                 </div>
               </li>
-            );
+            )
           })}
         </ul>
 
@@ -182,5 +182,5 @@ export default define.page(function Catalog() {
         />
       </div>
     </Layout>
-  );
-});
+  )
+})

@@ -13,18 +13,18 @@
  * It prints counts only, never an address. Back up `data/` first
  * (docs/deploy.md "Subscriber data").
  */
-import type { SubscriptionCrypto } from "@spy4x/server/subscribers";
-import type { FileSubscriberStore } from "@spy4x/server/subscribers/file";
+import type { SubscriptionCrypto } from "@spy4x/server/subscribers"
+import type { FileSubscriberStore } from "@spy4x/server/subscribers/file"
 import {
   subscribersFile,
   subscriberStore,
   subscriptionCrypto,
-} from "@/lib/mailing-list.ts";
+} from "@/lib/mailing-list.ts"
 
 /** What one run did: rows given a key now, and rows on the list in all. */
 export interface BackfillCounts {
-  added: number;
-  total: number;
+  added: number
+  total: number
 }
 
 /** Fills in every missing key; idempotent. */
@@ -32,8 +32,8 @@ export async function backfillKeys(
   store: Pick<FileSubscriberStore, "backfillKeys" | "count">,
   crypto: Pick<SubscriptionCrypto, "subscriberKey">,
 ): Promise<BackfillCounts> {
-  const added = await store.backfillKeys(crypto);
-  return { added, total: await store.count() };
+  const added = await store.backfillKeys(crypto)
+  return { added, total: await store.count() }
 }
 
 if (import.meta.main) {
@@ -41,14 +41,14 @@ if (import.meta.main) {
     const { added, total } = await backfillKeys(
       subscriberStore(),
       subscriptionCrypto(),
-    );
+    )
     console.log(
       `${subscribersFile()}: ${added} of ${total} rows got a key; ` +
         `${total - added} already had one.`,
-    );
+    )
   } catch (err) {
     // The message names a file or a setting, never a row.
-    console.error(err instanceof Error ? err.message : String(err));
-    Deno.exit(1);
+    console.error(err instanceof Error ? err.message : String(err))
+    Deno.exit(1)
   }
 }

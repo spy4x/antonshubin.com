@@ -1,19 +1,19 @@
-import { cn } from "@spy4x/preact-cn";
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { InstallLine } from "../../components/InstallLine.tsx";
-import { FACT_LINK } from "../../components/FactCard.tsx";
-import { findTool } from "../../lib/tools.ts";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
+import { cn } from "@spy4x/preact-cn"
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { InstallLine } from "../../components/InstallLine.tsx"
+import { FACT_LINK } from "../../components/FactCard.tsx"
+import { findTool } from "../../lib/tools.ts"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
 import {
   heroStill,
   loadToolPage,
   summaryAfterLede,
   type ToolPageData,
-} from "../../components/tool-frame/tool-page.ts";
-import { QuickStart } from "../../components/tool-frame/ToolBand.tsx";
-import { ShowcaseFeatures } from "../../components/ToolShowcase.tsx";
+} from "../../components/tool-frame/tool-page.ts"
+import { QuickStart } from "../../components/tool-frame/ToolBand.tsx"
+import { ShowcaseFeatures } from "../../components/ToolShowcase.tsx"
 
 // The page of every tool without a custom route of its own. A custom page is
 // `routes/tools/<slug>.tsx`, which Fresh matches before this one; both build
@@ -26,9 +26,9 @@ export const handler = define.handlers({
     return findTool(ctx.params.slug) ? page() : page(null, {
       status: 404,
       headers: { "Cache-Control": "no-store" },
-    });
+    })
   },
-});
+})
 
 /**
  * The middle (frame part 4) of a page with no custom route: the entry's
@@ -37,10 +37,10 @@ export const handler = define.handlers({
  * where it stands. Each block renders only when the entry has data for it.
  */
 function DefaultMiddle({ data }: { data: ToolPageData }) {
-  const { tool } = data;
-  const shots = (tool.screenshots ?? []).filter((s) => s !== heroStill(tool));
+  const { tool } = data
+  const shots = (tool.screenshots ?? []).filter((s) => s !== heroStill(tool))
   // An entry with its own `lede` says what it is there (#454).
-  const about = tool.lede ? "" : summaryAfterLede(tool);
+  const about = tool.lede ? "" : summaryAfterLede(tool)
   return (
     <>
       <ShowcaseFeatures tool={tool} />
@@ -152,22 +152,22 @@ function DefaultMiddle({ data }: { data: ToolPageData }) {
         </section>
       )}
     </>
-  );
+  )
 }
 
 /** The line under the hero's actions: the install or quick-start command. */
 function HeroCommand({ data }: { data: ToolPageData }) {
-  const { tool } = data;
+  const { tool } = data
   if (tool.registry) {
-    return <InstallLine tool={tool} id={`install-${tool.slug}`} />;
+    return <InstallLine tool={tool} id={`install-${tool.slug}`} />
   }
-  return <QuickStart tool={tool} id={`quick-start-${tool.slug}`} />;
+  return <QuickStart tool={tool} id={`quick-start-${tool.slug}`} />
 }
 
 export default define.page(async function ToolPage(ctx) {
-  const data = await loadToolPage(ctx.params.slug);
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
-  const { tool } = data;
+  const data = await loadToolPage(ctx.params.slug)
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
+  const { tool } = data
   return (
     <ToolFrame
       data={data}
@@ -178,5 +178,5 @@ export default define.page(async function ToolPage(ctx) {
     >
       <DefaultMiddle data={data} />
     </ToolFrame>
-  );
-});
+  )
+})

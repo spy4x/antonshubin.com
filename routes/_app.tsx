@@ -1,21 +1,21 @@
-import { define } from "../lib/utils.ts";
-import { UMAMI_ID, UMAMI_PRECONNECT_ORIGIN, UMAMI_URL } from "../lib/config.ts";
-import { resetHead } from "../lib/head.ts";
-import { referrerPolicyFor } from "../lib/referrer.ts";
-import { isBot } from "../lib/bots.ts";
-import { analyticsAllowed } from "../lib/analytics.ts";
+import { define } from "../lib/utils.ts"
+import { UMAMI_ID, UMAMI_PRECONNECT_ORIGIN, UMAMI_URL } from "../lib/config.ts"
+import { resetHead } from "../lib/head.ts"
+import { referrerPolicyFor } from "../lib/referrer.ts"
+import { isBot } from "../lib/bots.ts"
+import { analyticsAllowed } from "../lib/analytics.ts"
 
 export default define.page(function App({ Component, req }) {
-  resetHead();
+  resetHead()
 
   // Known bots (issue #179) get no analytics script: deciding here, before
   // anything renders, means no regex rewriting the response body afterward.
-  const isCrawler = isBot(req.headers.get("user-agent") || "");
+  const isCrawler = isBot(req.headers.get("user-agent") || "")
   // `/unsubscribe` and `/pay` never load it either (#318): Umami stores each
   // page view's full URL, and the unsubscribe link's token is a credential.
-  const tracked = !isCrawler && analyticsAllowed(new URL(req.url).pathname);
+  const tracked = !isCrawler && analyticsAllowed(new URL(req.url).pathname)
 
-  const referrer = referrerPolicyFor(new URL(req.url).pathname);
+  const referrer = referrerPolicyFor(new URL(req.url).pathname)
 
   return (
     <html lang="en" class="h-full bg-ink">
@@ -104,5 +104,5 @@ export default define.page(function App({ Component, req }) {
         <Component />
       </body>
     </html>
-  );
-});
+  )
+})

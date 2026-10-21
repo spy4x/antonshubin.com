@@ -1,15 +1,15 @@
-import { Fragment } from "preact";
-import { NewTabHint } from "./NewTabHint.tsx";
-import { linkEvent } from "../lib/analytics.ts";
+import { Fragment } from "preact"
+import { NewTabHint } from "./NewTabHint.tsx"
+import { linkEvent } from "../lib/analytics.ts"
 import {
   type InfraLane,
   infraLanes,
   infraNode,
   laneConnections,
-} from "../lib/infrastructure.ts";
+} from "../lib/infrastructure.ts"
 
 const LINK =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment"
 
 /**
  * A connector's arrow, drawn in CSS and one triangle, never read aloud: the
@@ -37,7 +37,7 @@ function Arrow({ forward }: { forward: boolean }) {
         <path d="M0 0h10L5 10z" />
       </svg>
     </span>
-  );
+  )
 }
 
 /**
@@ -46,7 +46,7 @@ function Arrow({ forward }: { forward: boolean }) {
  * Each piece is its own span, so a browser test can see it stays on one line.
  */
 function Label({ text }: { text: string }) {
-  const parts = text.split(".");
+  const parts = text.split(".")
   return (
     <>
       {parts.map((part, i) => (
@@ -58,12 +58,12 @@ function Label({ text }: { text: string }) {
         </Fragment>
       ))}
     </>
-  );
+  )
 }
 
 /** One lane: a chain of linked boxes joined by labelled arrows, all in one piece of markup. */
 function Lane({ lane }: { lane: InfraLane }) {
-  const links = laneConnections(lane);
+  const links = laneConnections(lane)
   return (
     <li
       data-infra-lane={lane.id}
@@ -74,8 +74,8 @@ function Lane({ lane }: { lane: InfraLane }) {
       </h3>
       <ol class="flex flex-col lg:flex-row lg:items-stretch lg:justify-start">
         {lane.nodes.map((id, i) => {
-          const n = infraNode(id);
-          const link = links[i - 1];
+          const n = infraNode(id)
+          const link = links[i - 1]
           return (
             <Fragment key={n.id}>
               {link && (
@@ -108,7 +108,7 @@ function Lane({ lane }: { lane: InfraLane }) {
                 <p class="text-xs text-graphite">{n.job}</p>
               </li>
             </Fragment>
-          );
+          )
         })}
       </ol>
       {lane.post && (
@@ -117,7 +117,7 @@ function Lane({ lane }: { lane: InfraLane }) {
         </p>
       )}
     </li>
-  );
+  )
 }
 
 /**
@@ -130,5 +130,5 @@ export function InfraMap() {
     <ul class="grid gap-3 sm:gap-4">
       {infraLanes.map((lane) => <Lane key={lane.id} lane={lane} />)}
     </ul>
-  );
+  )
 }

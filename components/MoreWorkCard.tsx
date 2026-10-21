@@ -1,6 +1,6 @@
-import { formatPeriod, type Project } from "../lib/data.ts";
-import { projectLead } from "../lib/llms.ts";
-import { workHref } from "../lib/work.ts";
+import { formatPeriod, type Project } from "../lib/data.ts"
+import { projectLead } from "../lib/llms.ts"
+import { workHref } from "../lib/work.ts"
 
 /** A "More work" card: title, lead line and period, linking the project's page. */
 export function MoreWorkCard({ project }: { project: Project }) {
@@ -20,5 +20,5 @@ export function MoreWorkCard({ project }: { project: Project }) {
         )}
       </a>
     </li>
-  );
+  )
 }

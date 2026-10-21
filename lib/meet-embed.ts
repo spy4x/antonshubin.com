@@ -3,7 +3,7 @@
 // loading the calendar's code on every home page view (#272).
 
 /** The words on the one link that opens the scheduler outside the frame (#272). */
-export const NEW_TAB_LABEL = "Open the calendar in a new tab";
+export const NEW_TAB_LABEL = "Open the calendar in a new tab"
 
 /**
  * Builds the iframe-friendly scheduler URL from `SCHEDULE_URL`, trimming a
@@ -16,6 +16,6 @@ export const NEW_TAB_LABEL = "Open the calendar in a new tab";
  * page inside the frame.
  */
 export function embedUrl(scheduleUrl: string): string {
-  if (!scheduleUrl) return "";
-  return `${scheduleUrl.replace(/\/+$/, "")}/embed?theme=dark`;
+  if (!scheduleUrl) return ""
+  return `${scheduleUrl.replace(/\/+$/, "")}/embed?theme=dark`
 }

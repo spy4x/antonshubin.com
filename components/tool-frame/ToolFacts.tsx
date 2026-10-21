@@ -1,11 +1,11 @@
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { CiPill } from "../CiPill.tsx";
-import { Fact, FACT_LINK, FactCard } from "../FactCard.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
-import { MIN_STARS_SHOWN } from "../../lib/github-snapshot.ts";
-import { ciUrl, toolLicence } from "../../lib/tools.ts";
-import { checkedLabel } from "../../lib/tools-live.ts";
-import type { ToolPageData } from "./tool-page.ts";
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { CiPill } from "../CiPill.tsx"
+import { Fact, FACT_LINK, FactCard } from "../FactCard.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
+import { MIN_STARS_SHOWN } from "../../lib/github-snapshot.ts"
+import { ciUrl, toolLicence } from "../../lib/tools.ts"
+import { checkedLabel } from "../../lib/tools-live.ts"
+import type { ToolPageData } from "./tool-page.ts"
 
 /**
  * The tool frame's facts card (#454, part 5): Status, Version, Licence, Runs
@@ -14,10 +14,10 @@ import type { ToolPageData } from "./tool-page.ts";
  * `outbound` with `place: card`.
  */
 export function ToolFacts({ data }: { data: ToolPageData }) {
-  const { tool, live, snap, repo } = data;
-  const licence = toolLicence(tool);
+  const { tool, live, snap, repo } = data
+  const licence = toolLicence(tool)
   const out = (to: string) =>
-    eventAttrs("outbound", { to, item: tool.slug, place: "card" });
+    eventAttrs("outbound", { to, item: tool.slug, place: "card" })
   return (
     <FactCard label="Tool facts">
       <h2 class="text-lg text-parchment mb-3">Facts</h2>
@@ -87,5 +87,5 @@ export function ToolFacts({ data }: { data: ToolPageData }) {
         </p>
       )}
     </FactCard>
-  );
+  )
 }

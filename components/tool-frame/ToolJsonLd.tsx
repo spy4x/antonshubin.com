@@ -1,6 +1,6 @@
-import { toJsonLd } from "../../lib/json-ld.ts";
-import { clipSources, type Tool, toolLicence } from "../../lib/tools.ts";
-import { heroStill, SITE, type ToolPageData } from "./tool-page.ts";
+import { toJsonLd } from "../../lib/json-ld.ts"
+import { clipSources, type Tool, toolLicence } from "../../lib/tools.ts"
+import { heroStill, SITE, type ToolPageData } from "./tool-page.ts"
 
 /**
  * The tool's `SoftwareSourceCode` JSON-LD node, from registry fields only.
@@ -13,8 +13,8 @@ import { heroStill, SITE, type ToolPageData } from "./tool-page.ts";
 export function sourceCodeJsonLd(
   { tool, repo, canonical: url, posts }: ToolPageData,
 ) {
-  const licence = toolLicence(tool);
-  const still = heroStill(tool);
+  const licence = toolLicence(tool)
+  const still = heroStill(tool)
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
@@ -39,7 +39,7 @@ export function sourceCodeJsonLd(
       : {}),
     "author": { "@id": `${SITE}/#person` },
     "mainEntityOfPage": { "@type": "WebPage", "@id": url },
-  };
+  }
 }
 
 /**
@@ -63,7 +63,7 @@ export function applicationJsonLd(tool: Tool, url: string) {
       : {}),
     "author": { "@id": `${SITE}/#person` },
     "mainEntityOfPage": { "@type": "WebPage", "@id": url },
-  };
+  }
 }
 
 /**
@@ -72,9 +72,9 @@ export function applicationJsonLd(tool: Tool, url: string) {
  * `uploadDate`, the poster as `thumbnailUrl` and the MP4 as `contentUrl`.
  */
 export function videoJsonLd(tool: Tool, url: string) {
-  const clip = tool.clip;
-  if (!clip?.video) return null;
-  const mp4 = clipSources(tool.slug).find((s) => s.type === "video/mp4")!;
+  const clip = tool.clip
+  if (!clip?.video) return null
+  const mp4 = clipSources(tool.slug).find((s) => s.type === "video/mp4")!
   return {
     "@context": "https://schema.org",
     "@type": "VideoObject",
@@ -86,7 +86,7 @@ export function videoJsonLd(tool: Tool, url: string) {
     "uploadDate": clip.video.uploadDate,
     "duration": clip.video.duration,
     "about": { "@id": `${url}#tool` },
-  };
+  }
 }
 
 /** One structured-data script tag. */
@@ -96,7 +96,7 @@ function Script({ node }: { node: object }) {
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: toJsonLd(node) }}
     />
-  );
+  )
 }
 
 /**
@@ -105,13 +105,13 @@ function Script({ node }: { node: object }) {
  * committed clip.
  */
 export function ToolJsonLd({ data }: { data: ToolPageData }) {
-  const { tool, repo, canonical } = data;
-  const video = videoJsonLd(tool, canonical);
+  const { tool, repo, canonical } = data
+  const video = videoJsonLd(tool, canonical)
   return (
     <>
       {repo && <Script node={sourceCodeJsonLd(data)} />}
       {tool.deployable && <Script node={applicationJsonLd(tool, canonical)} />}
       {video && <Script node={video} />}
     </>
-  );
+  )
 }

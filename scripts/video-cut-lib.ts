@@ -7,68 +7,68 @@
 
 /** A time range in seconds. */
 export interface Range {
-  start: number;
-  end: number;
+  start: number
+  end: number
 }
 
 export interface Word extends Range {
-  text: string;
+  text: string
 }
 
 export interface Segment extends Range {
-  n: number;
-  text: string;
+  n: number
+  text: string
 }
 
-export type CutReason = "silence" | "filler" | "retake" | "off-topic";
+export type CutReason = "silence" | "filler" | "retake" | "off-topic"
 
 export const CUT_REASONS: readonly CutReason[] = [
   "silence",
   "filler",
   "retake",
   "off-topic",
-];
+]
 
 export interface Cut extends Range {
-  reason: CutReason;
-  note?: string;
+  reason: CutReason
+  note?: string
 }
 
 export interface Chapter {
-  start: number;
-  title: string;
+  start: number
+  title: string
 }
 
 export interface Short extends Range {
-  title: string;
+  title: string
 }
 
 /** What Claude returns: ranges to remove, chapter marks and two Short candidates. */
 export interface EditList {
-  cuts: Cut[];
-  chapters: Chapter[];
-  shorts: Short[];
+  cuts: Cut[]
+  chapters: Chapter[]
+  shorts: Short[]
 }
 
-export const SHORT_MIN_SECONDS = 30;
-export const SHORT_MAX_SECONDS = 55;
-export const SHORT_COUNT = 2;
-export const DEFAULT_MIN_SILENCE_SECONDS = 0.8;
+export const SHORT_MIN_SECONDS = 30
+export const SHORT_MAX_SECONDS = 55
+export const SHORT_COUNT = 2
+export const DEFAULT_MIN_SILENCE_SECONDS = 0.8
 /** Quiet kept on each side of a cut silence, so speech does not start abruptly. */
-const SILENCE_PAD_SECONDS = 0.2;
-const EPSILON = 0.001;
+const SILENCE_PAD_SECONDS = 0.2
+const EPSILON = 0.001
 
-const ms = (seconds: number) => Math.round(seconds * 1000) / 1000;
+const ms = (seconds: number) => Math.round(seconds * 1000) / 1000
 
 interface WhisperToken {
-  text?: string;
-  offsets?: { from?: number; to?: number };
+  text?: string
+  offsets?: { from?: number; to?: number }
 }
 
 interface WhisperSegment {
-  text?: string;
-  offsets?: { from?: number; to?: number };
-  tokens?: WhisperToken[];
+  text?: string
+  offsets?: { from?: number; to?: number }
+  tokens?: WhisperToken[]
 }
 
 /**
@@ -81,67 +81,67 @@ interface WhisperSegment {
 export function parseWhisperJson(
   text: string,
 ): { words: Word[]; segments: Segment[] } {
-  let data: { transcription?: WhisperSegment[] };
+  let data: { transcription?: WhisperSegment[] }
   try {
-    data = JSON.parse(text);
+    data = JSON.parse(text)
   } catch {
-    throw new Error(`The Whisper file is not valid JSON.`);
+    throw new Error(`The Whisper file is not valid JSON.`)
   }
   if (!Array.isArray(data.transcription)) {
     throw new Error(
       `The Whisper file has no "transcription" list. Run whisper.cpp with --output-json-full.`,
-    );
+    )
   }
-  const words: Word[] = [];
-  const segments: Segment[] = [];
+  const words: Word[] = []
+  const segments: Segment[] = []
   for (const seg of data.transcription) {
-    const from = (seg.offsets?.from ?? 0) / 1000;
-    const to = (seg.offsets?.to ?? 0) / 1000;
-    const segText = (seg.text ?? "").trim();
+    const from = (seg.offsets?.from ?? 0) / 1000
+    const to = (seg.offsets?.to ?? 0) / 1000
+    const segText = (seg.text ?? "").trim()
     if (segText) {
       segments.push({
         n: segments.length + 1,
         start: from,
         end: to,
         text: segText,
-      });
+      })
     }
     const tokens = (seg.tokens ?? []).filter((t) =>
       t.text !== undefined && !/^\[_[^\]]*\]$/.test(t.text.trim()) && t.offsets
-    );
+    )
     if (tokens.length > 0) {
-      let current: Word | undefined;
+      let current: Word | undefined
       for (const t of tokens) {
-        const tStart = (t.offsets!.from ?? 0) / 1000;
-        const tEnd = Math.max(tStart, (t.offsets!.to ?? 0) / 1000);
-        const raw = t.text!;
+        const tStart = (t.offsets!.from ?? 0) / 1000
+        const tEnd = Math.max(tStart, (t.offsets!.to ?? 0) / 1000)
+        const raw = t.text!
         if (!current || /^\s/.test(raw)) {
-          if (current) words.push(current);
+          if (current) words.push(current)
           if (raw.trim() === "") {
-            current = undefined;
-            continue;
+            current = undefined
+            continue
           }
-          current = { start: tStart, end: tEnd, text: raw.trim() };
+          current = { start: tStart, end: tEnd, text: raw.trim() }
         } else {
-          current.text += raw;
-          current.end = Math.max(current.end, tEnd);
+          current.text += raw
+          current.end = Math.max(current.end, tEnd)
         }
       }
-      if (current) words.push(current);
+      if (current) words.push(current)
     } else if (segText) {
-      const parts = segText.split(/\s+/);
-      const step = (to - from) / parts.length;
+      const parts = segText.split(/\s+/)
+      const step = (to - from) / parts.length
       parts.forEach((p, i) =>
         words.push({
           start: from + i * step,
           end: from + (i + 1) * step,
           text: p,
         })
-      );
+      )
     }
   }
-  if (words.length === 0) throw new Error(`The Whisper file holds no words.`);
-  return { words, segments };
+  if (words.length === 0) throw new Error(`The Whisper file holds no words.`)
+  return { words, segments }
 }
 
 /**
@@ -154,27 +154,27 @@ export function silenceCuts(
   mediaSeconds: number,
   minSilence = DEFAULT_MIN_SILENCE_SECONDS,
 ): Cut[] {
-  const cuts: Cut[] = [];
+  const cuts: Cut[] = []
   const add = (start: number, end: number) => {
     if (end - start > EPSILON) {
-      cuts.push({ start: ms(start), end: ms(end), reason: "silence" });
+      cuts.push({ start: ms(start), end: ms(end), reason: "silence" })
     }
-  };
-  if (words[0].start > minSilence) add(0, words[0].start - SILENCE_PAD_SECONDS);
+  }
+  if (words[0].start > minSilence) add(0, words[0].start - SILENCE_PAD_SECONDS)
   for (let i = 1; i < words.length; i++) {
-    const gap = words[i].start - words[i - 1].end;
+    const gap = words[i].start - words[i - 1].end
     if (gap > minSilence) {
       add(
         words[i - 1].end + SILENCE_PAD_SECONDS,
         words[i].start - SILENCE_PAD_SECONDS,
-      );
+      )
     }
   }
-  const last = words[words.length - 1];
+  const last = words[words.length - 1]
   if (mediaSeconds - last.end > minSilence) {
-    add(last.end + SILENCE_PAD_SECONDS, mediaSeconds);
+    add(last.end + SILENCE_PAD_SECONDS, mediaSeconds)
   }
-  return cuts;
+  return cuts
 }
 
 /** Sorted union of ranges; touching or overlapping ranges become one. */
@@ -182,37 +182,37 @@ export function mergeRanges(ranges: Range[]): Range[] {
   const sorted = ranges.map((r) => ({ start: r.start, end: r.end })).sort((
     a,
     b,
-  ) => a.start - b.start);
-  const merged: Range[] = [];
+  ) => a.start - b.start)
+  const merged: Range[] = []
   for (const r of sorted) {
-    const last = merged[merged.length - 1];
+    const last = merged[merged.length - 1]
     if (last && r.start <= last.end + EPSILON) {
-      last.end = Math.max(last.end, r.end);
-    } else merged.push(r);
+      last.end = Math.max(last.end, r.end)
+    } else merged.push(r)
   }
-  return merged;
+  return merged
 }
 
 /** The parts of `[from, to]` that no cut removes, in order. */
 export function keepRanges(cuts: Range[], from: number, to: number): Range[] {
-  const keeps: Range[] = [];
-  let at = from;
+  const keeps: Range[] = []
+  let at = from
   for (const c of mergeRanges(cuts)) {
-    if (c.end <= from || c.start >= to) continue;
+    if (c.end <= from || c.start >= to) continue
     if (c.start - at > EPSILON) {
-      keeps.push({ start: ms(at), end: ms(Math.min(c.start, to)) });
+      keeps.push({ start: ms(at), end: ms(Math.min(c.start, to)) })
     }
-    at = Math.max(at, c.end);
+    at = Math.max(at, c.end)
   }
-  if (to - at > EPSILON) keeps.push({ start: ms(at), end: ms(to) });
-  return keeps;
+  if (to - at > EPSILON) keeps.push({ start: ms(at), end: ms(to) })
+  return keeps
 }
 
 export function totalSeconds(ranges: Range[]): number {
-  return ms(ranges.reduce((sum, r) => sum + (r.end - r.start), 0));
+  return ms(ranges.reduce((sum, r) => sum + (r.end - r.start), 0))
 }
 
-const fmtRange = (r: Range) => `${r.start}–${r.end} s`;
+const fmtRange = (r: Range) => `${r.start}–${r.end} s`
 
 /**
  * Checks the edit list Claude returned against the media. Every problem is
@@ -225,150 +225,150 @@ export function validateEditList(
   mediaSeconds: number,
   autoCuts: Range[] = [],
 ): EditList {
-  const problems: string[] = [];
-  const obj = (raw ?? {}) as Record<string, unknown>;
+  const problems: string[] = []
+  const obj = (raw ?? {}) as Record<string, unknown>
   const list = (key: string): unknown[] => {
     if (!Array.isArray(obj[key])) {
-      problems.push(`"${key}" must be a list.`);
-      return [];
+      problems.push(`"${key}" must be a list.`)
+      return []
     }
-    return obj[key] as unknown[];
-  };
+    return obj[key] as unknown[]
+  }
   const checkRange = (label: string, r: Record<string, unknown>): boolean => {
-    const { start, end } = r;
+    const { start, end } = r
     if (
       typeof start !== "number" || typeof end !== "number" ||
       !isFinite(start) || !isFinite(end)
     ) {
-      problems.push(`${label}: start and end must be numbers (seconds).`);
-      return false;
+      problems.push(`${label}: start and end must be numbers (seconds).`)
+      return false
     }
-    const where = `${label} ${fmtRange({ start, end })}`;
+    const where = `${label} ${fmtRange({ start, end })}`
     if (start < 0 || end > mediaSeconds + EPSILON) {
-      problems.push(`${where}: outside the media (0–${ms(mediaSeconds)} s).`);
-      return false;
+      problems.push(`${where}: outside the media (0–${ms(mediaSeconds)} s).`)
+      return false
     }
     if (end <= start) {
-      problems.push(`${where}: ends before it starts.`);
-      return false;
+      problems.push(`${where}: ends before it starts.`)
+      return false
     }
-    return true;
-  };
+    return true
+  }
   const checkOrder = (label: string, previous: Range | undefined, r: Range) => {
     if (previous && r.start < previous.end - EPSILON) {
-      const kind = r.start < previous.start ? "out of order" : "overlaps";
+      const kind = r.start < previous.start ? "out of order" : "overlaps"
       problems.push(
         `${label} ${fmtRange(r)}: ${kind} with the range before it (${
           fmtRange(previous)
         }).`,
-      );
+      )
     }
-  };
+  }
 
-  const cuts: Cut[] = [];
+  const cuts: Cut[] = []
   list("cuts").forEach((c, i) => {
-    const r = (c ?? {}) as Record<string, unknown>;
-    const label = `cuts[${i}]`;
+    const r = (c ?? {}) as Record<string, unknown>
+    const label = `cuts[${i}]`
     if (!CUT_REASONS.includes(r.reason as CutReason)) {
       problems.push(
         `${label}: reason must be one of ${CUT_REASONS.join(", ")}.`,
-      );
+      )
     }
-    if (!checkRange(label, r)) return;
-    const cut = r as unknown as Cut;
-    checkOrder(label, cuts[cuts.length - 1], cut);
-    cuts.push(cut);
-  });
+    if (!checkRange(label, r)) return
+    const cut = r as unknown as Cut
+    checkOrder(label, cuts[cuts.length - 1], cut)
+    cuts.push(cut)
+  })
 
-  const chapters: Chapter[] = [];
+  const chapters: Chapter[] = []
   list("chapters").forEach((c, i) => {
-    const r = (c ?? {}) as Record<string, unknown>;
-    const label = `chapters[${i}]`;
+    const r = (c ?? {}) as Record<string, unknown>
+    const label = `chapters[${i}]`
     if (typeof r.title !== "string" || r.title.trim() === "") {
-      problems.push(`${label}: title must be a non-empty string.`);
+      problems.push(`${label}: title must be a non-empty string.`)
     }
     if (typeof r.start !== "number" || r.start < 0 || r.start >= mediaSeconds) {
       problems.push(
         `${label} at ${r.start}: start must be a number inside the media.`,
-      );
-      return;
+      )
+      return
     }
-    const prev = chapters[chapters.length - 1];
+    const prev = chapters[chapters.length - 1]
     if (prev && r.start <= prev.start) {
       problems.push(
         `${label} at ${r.start} s: not after the chapter before it (${prev.start} s).`,
-      );
+      )
     }
-    chapters.push(r as unknown as Chapter);
-  });
+    chapters.push(r as unknown as Chapter)
+  })
   if (chapters.length === 0) {
-    problems.push(`"chapters" needs at least one chapter.`);
+    problems.push(`"chapters" needs at least one chapter.`)
   } else if (chapters[0].start !== 0) {
     problems.push(
       `chapters[0] at ${
         chapters[0].start
       } s: the first chapter must start at 0.`,
-    );
+    )
   }
 
-  const shorts: Short[] = [];
-  const shortsRaw = list("shorts");
+  const shorts: Short[] = []
+  const shortsRaw = list("shorts")
   if (shortsRaw.length !== SHORT_COUNT) {
     problems.push(
       `"shorts" needs exactly ${SHORT_COUNT} candidates, got ${shortsRaw.length}.`,
-    );
+    )
   }
   shortsRaw.forEach((s, i) => {
-    const r = (s ?? {}) as Record<string, unknown>;
-    const label = `shorts[${i}]`;
+    const r = (s ?? {}) as Record<string, unknown>
+    const label = `shorts[${i}]`
     if (typeof r.title !== "string" || r.title.trim() === "") {
-      problems.push(`${label}: title must be a non-empty string.`);
+      problems.push(`${label}: title must be a non-empty string.`)
     }
-    if (!checkRange(label, r)) return;
-    const short = r as unknown as Short;
-    checkOrder(label, shorts[shorts.length - 1], short);
-    shorts.push(short);
+    if (!checkRange(label, r)) return
+    const short = r as unknown as Short
+    checkOrder(label, shorts[shorts.length - 1], short)
+    shorts.push(short)
     const length = totalSeconds(
       keepRanges([...autoCuts, ...cuts], short.start, short.end),
-    );
+    )
     if (length < SHORT_MIN_SECONDS || length > SHORT_MAX_SECONDS) {
       problems.push(
         `${label} ${
           fmtRange(short)
         }: ${length} s after the cuts, must be ${SHORT_MIN_SECONDS}–${SHORT_MAX_SECONDS} s.`,
-      );
+      )
     }
-  });
+  })
 
   if (problems.length > 0) {
-    throw new Error(`The edit list is not valid:\n- ${problems.join("\n- ")}`);
+    throw new Error(`The edit list is not valid:\n- ${problems.join("\n- ")}`)
   }
-  return { cuts, chapters, shorts };
+  return { cuts, chapters, shorts }
 }
 
 /** Maps a source time to the cut timeline, or the next kept moment when it was cut. */
 export function toCutTime(t: number, keeps: Range[]): number {
-  let out = 0;
+  let out = 0
   for (const k of keeps) {
-    if (t < k.start) return ms(out);
-    if (t <= k.end) return ms(out + (t - k.start));
-    out += k.end - k.start;
+    if (t < k.start) return ms(out)
+    if (t <= k.end) return ms(out + (t - k.start))
+    out += k.end - k.start
   }
-  return ms(out);
+  return ms(out)
 }
 
 export interface Cue extends Range {
-  text: string;
+  text: string
 }
 
 export interface CueOptions {
-  maxWords: number;
-  maxChars: number;
+  maxWords: number
+  maxChars: number
 }
 
-export const LONG_CUES: CueOptions = { maxWords: 12, maxChars: 42 };
+export const LONG_CUES: CueOptions = { maxWords: 12, maxChars: 42 }
 /** Phone captions: short lines, big letters. */
-export const SHORT_CUES: CueOptions = { maxWords: 4, maxChars: 24 };
+export const SHORT_CUES: CueOptions = { maxWords: 4, maxChars: 24 }
 
 /**
  * Caption cues on the cut timeline. A word counts when its middle is kept;
@@ -380,77 +380,77 @@ export function buildCues(
   keeps: Range[],
   options: CueOptions,
 ): Cue[] {
-  const cues: Cue[] = [];
-  let current: Cue | undefined;
-  let count = 0;
-  let offset = 0;
+  const cues: Cue[] = []
+  let current: Cue | undefined
+  let count = 0
+  let offset = 0
   const flush = () => {
-    if (current) cues.push(current);
-    current = undefined;
-    count = 0;
-  };
+    if (current) cues.push(current)
+    current = undefined
+    count = 0
+  }
   for (const k of keeps) {
     for (const w of words) {
-      const mid = (w.start + w.end) / 2;
-      if (mid < k.start || mid >= k.end) continue;
-      const start = ms(offset + Math.max(w.start, k.start) - k.start);
-      const end = ms(offset + Math.min(w.end, k.end) - k.start);
+      const mid = (w.start + w.end) / 2
+      if (mid < k.start || mid >= k.end) continue
+      const start = ms(offset + Math.max(w.start, k.start) - k.start)
+      const end = ms(offset + Math.min(w.end, k.end) - k.start)
       if (current) {
         const tooLong =
-          current.text.length + 1 + w.text.length > options.maxChars;
+          current.text.length + 1 + w.text.length > options.maxChars
         if (count >= options.maxWords || tooLong || start - current.end > 0.7) {
-          flush();
+          flush()
         }
       }
       if (current) {
-        current.text += ` ${w.text}`;
-        current.end = end;
+        current.text += ` ${w.text}`
+        current.end = end
       } else {
-        current = { start, end, text: w.text };
+        current = { start, end, text: w.text }
       }
-      count++;
-      if (count >= 3 && /[.?!]$/.test(w.text)) flush();
+      count++
+      if (count >= 3 && /[.?!]$/.test(w.text)) flush()
     }
-    offset += k.end - k.start;
+    offset += k.end - k.start
   }
-  flush();
-  return cues;
+  flush()
+  return cues
 }
 
 function srtTime(seconds: number): string {
-  const total = Math.round(seconds * 1000);
-  const h = Math.floor(total / 3600000);
-  const m = Math.floor((total % 3600000) / 60000);
-  const s = Math.floor((total % 60000) / 1000);
-  const p = (n: number, w = 2) => String(n).padStart(w, "0");
-  return `${p(h)}:${p(m)}:${p(s)},${p(total % 1000, 3)}`;
+  const total = Math.round(seconds * 1000)
+  const h = Math.floor(total / 3600000)
+  const m = Math.floor((total % 3600000) / 60000)
+  const s = Math.floor((total % 60000) / 1000)
+  const p = (n: number, w = 2) => String(n).padStart(w, "0")
+  return `${p(h)}:${p(m)}:${p(s)},${p(total % 1000, 3)}`
 }
 
 export function toSrt(cues: Cue[]): string {
   return cues.map((c, i) =>
     `${i + 1}\n${srtTime(c.start)} --> ${srtTime(c.end)}\n${c.text}\n`
   )
-    .join("\n");
+    .join("\n")
 }
 
 export interface AssStyle {
-  width: number;
-  height: number;
+  width: number
+  height: number
   /** Letter height in pixels of the `width` x `height` frame. */
-  fontSize: number;
+  fontSize: number
   /** Distance from the bottom edge to the text, in pixels. */
-  marginBottom: number;
+  marginBottom: number
   /** Distance from the left and right edges, in pixels. */
-  marginSide: number;
+  marginSide: number
 }
 
 function assTime(seconds: number): string {
-  const cs = Math.round(seconds * 100);
-  const h = Math.floor(cs / 360000);
-  const m = Math.floor((cs % 360000) / 6000);
-  const s = Math.floor((cs % 6000) / 100);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${h}:${p(m)}:${p(s)}.${p(cs % 100)}`;
+  const cs = Math.round(seconds * 100)
+  const h = Math.floor(cs / 360000)
+  const m = Math.floor((cs % 360000) / 6000)
+  const s = Math.floor((cs % 6000) / 100)
+  const p = (n: number) => String(n).padStart(2, "0")
+  return `${h}:${p(m)}:${p(s)}.${p(cs % 100)}`
 }
 
 /**
@@ -463,7 +463,7 @@ export function toAss(cues: Cue[], style: AssStyle): string {
     `Dialogue: 0,${assTime(c.start)},${assTime(c.end)},Default,,0,0,0,,${
       c.text.replace(/[{}]/g, "")
     }`
-  );
+  )
   return `[Script Info]
 ScriptType: v4.00+
 PlayResX: ${style.width}
@@ -480,7 +480,7 @@ Style: Default,DejaVu Sans,${style.fontSize},&H00FFFFFF,&H00FFFFFF,&H00000000,&H
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 ${events.join("\n")}
-`;
+`
 }
 
 /**
@@ -494,7 +494,7 @@ export function editBrief(
 ): string {
   const lines = segments.map((s) =>
     `[${s.n}] ${s.start.toFixed(1)}–${s.end.toFixed(1)} s  ${s.text}`
-  );
+  )
   return `# Edit list request
 
 You edit a talking-head video, ${
@@ -526,28 +526,28 @@ Save the reply as a \`.json\` file and pass it to \`deno task video-cut render\`
 ## Transcript
 
 ${lines.join("\n")}
-`;
+`
 }
 
 export interface KdenliveInput {
-  title: string;
-  mediaPath: string;
-  width: number;
-  height: number;
-  fpsNum: number;
-  fpsDen: number;
+  title: string
+  mediaPath: string
+  width: number
+  height: number
+  fpsNum: number
+  fpsDen: number
   /** Whole source length, for the bin clip. */
-  mediaSeconds: number;
-  keeps: Range[];
+  mediaSeconds: number
+  keeps: Range[]
   /** Chapter marks on the cut timeline, in seconds. */
-  chapters: Chapter[];
+  chapters: Chapter[]
 }
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(
     /"/g,
     "&quot;",
-  );
+  )
 
 /**
  * A Kdenlive project (MLT XML, document version 1.1) of the cut: the source
@@ -555,26 +555,26 @@ const esc = (s: string) =>
  * back, and the chapters as guides. Edit it in Kdenlive like any project.
  */
 export function buildKdenlive(input: KdenliveInput): string {
-  const fps = input.fpsNum / input.fpsDen;
-  const frames = (s: number) => Math.round(s * fps);
-  const sourceFrames = frames(input.mediaSeconds);
+  const fps = input.fpsNum / input.fpsDen
+  const frames = (s: number) => Math.round(s * fps)
+  const sourceFrames = frames(input.mediaSeconds)
   const entries = (producer: string) =>
     input.keeps.map((k) =>
       `  <entry producer="${producer}" in="${frames(k.start)}" out="${
         Math.max(frames(k.end) - 1, frames(k.start))
       }"/>`
-    ).join("\n");
+    ).join("\n")
   const total = input.keeps.reduce(
     (n, k) => n + Math.max(frames(k.end) - frames(k.start), 1),
     0,
-  );
+  )
   const guides = JSON.stringify(
     input.chapters.map((c) => ({
       comment: c.title,
       pos: frames(c.start),
       type: 0,
     })),
-  );
+  )
   const clip = (id: string, extra: string) =>
     ` <producer id="${id}" in="0" out="${sourceFrames - 1}">
   <property name="length">${sourceFrames}</property>
@@ -583,7 +583,7 @@ export function buildKdenlive(input: KdenliveInput): string {
   <property name="mlt_service">avformat-novalidate</property>
   <property name="seekable">1</property>${extra}
   <property name="kdenlive:id">2</property>
- </producer>`;
+ </producer>`
   return `<?xml version="1.0" encoding="utf-8"?>
 <mlt LC_NUMERIC="C" version="7.22.0" title="${
     esc(input.title)
@@ -637,5 +637,5 @@ ${entries("producer_v")}
   <transition mlt_service="qtblend" a_track="0" b_track="2" compositing="0" distort="0" rotate_center="0"/>
  </tractor>
 </mlt>
-`;
+`
 }

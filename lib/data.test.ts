@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import {
   archiveProjects,
   blogArticles,
@@ -7,9 +7,9 @@ import {
   highlightSlugs,
   projects,
   relatedProjects,
-} from "./data.ts";
-import { tools } from "./tools.ts";
-import { catalogItem } from "./catalog.ts";
+} from "./data.ts"
+import { tools } from "./tools.ts"
+import { catalogItem } from "./catalog.ts"
 
 Deno.test("the highlights are the six projects #232 names, in the order #270 set", () => {
   assertEquals(highlightProjects().map((p) => p.slug), [
@@ -19,24 +19,24 @@ Deno.test("the highlights are the six projects #232 names, in the order #270 set
     "truth-or-dare",
     "roley",
     "connectful",
-  ]);
-});
+  ])
+})
 
 Deno.test("every client project is a highlight or in the archive, never both", () => {
-  const archive = archiveProjects().map((p) => p.slug);
-  assert(archive.length > 0, "the archive is empty");
+  const archive = archiveProjects().map((p) => p.slug)
+  assert(archive.length > 0, "the archive is empty")
   for (const p of projects.freelance) {
-    const inHighlights = highlightSlugs.includes(p.slug!);
-    const inArchive = archive.includes(p.slug);
+    const inHighlights = highlightSlugs.includes(p.slug!)
+    const inArchive = archive.includes(p.slug)
     assert(
       inHighlights !== inArchive,
       `${p.slug}: highlight ${inHighlights}, archive ${inArchive}`,
-    );
+    )
   }
   for (const t of tools) {
-    assert(!archive.includes(t.slug), `tool ${t.slug} is in the archive`);
+    assert(!archive.includes(t.slug), `tool ${t.slug} is in the archive`)
   }
-});
+})
 
 Deno.test("the archive is newest first, and a same-year tie keeps the data order", () => {
   assertEquals(archiveProjects().map((p) => p.slug), [
@@ -46,81 +46,81 @@ Deno.test("the archive is newest first, and a same-year tie keeps the data order
     "microwork",
     "calltrack",
     "sajari",
-  ]);
-});
+  ])
+})
 
 Deno.test("Microwork's tags are AngularJS, MongoDB and AWS EC2, with no Firebase", () => {
-  const microwork = projects.freelance.find((p) => p.slug === "microwork");
-  assert(microwork?.tags, "microwork has no tags");
+  const microwork = projects.freelance.find((p) => p.slug === "microwork")
+  assert(microwork?.tags, "microwork has no tags")
   for (const tag of ["AngularJS", "MongoDB", "AWS EC2"]) {
-    assert(microwork.tags.includes(tag), `microwork lacks tag ${tag}`);
+    assert(microwork.tags.includes(tag), `microwork lacks tag ${tag}`)
   }
   for (const tag of ["Firebase", "Firestore"]) {
-    assert(!microwork.tags.includes(tag), `microwork still tagged ${tag}`);
+    assert(!microwork.tags.includes(tag), `microwork still tagged ${tag}`)
   }
-});
+})
 
 Deno.test("every blog article slug is unique", () => {
-  const slugs = blogArticles.map((a) => a.slug);
+  const slugs = blogArticles.map((a) => a.slug)
   assert(
     new Set(slugs).size === slugs.length,
     "blogArticles has duplicate slugs",
-  );
-});
+  )
+})
 
 Deno.test("every client project has a period", () => {
-  assert(projects.freelance.length > 0, "no client projects");
+  assert(projects.freelance.length > 0, "no client projects")
   for (const p of projects.freelance) {
-    assert(p.period, `${p.slug} has no period`);
+    assert(p.period, `${p.slug} has no period`)
     assert(
       Number.isInteger(p.period.from),
       `${p.slug}: period.from is not a year`,
-    );
+    )
     if (p.period.to !== undefined) {
       assert(
         p.period.to >= p.period.from,
         `${p.slug}: period ends before it starts`,
-      );
+      )
     }
   }
-});
+})
 
 Deno.test("a period renders as one year, a range with an en dash, or a year to now", () => {
-  assertEquals(formatPeriod({ from: 2021 }), "2021");
-  assertEquals(formatPeriod({ from: 2021, to: 2021 }), "2021");
-  assertEquals(formatPeriod({ from: 2018, to: 2019 }), "2018\u20132019");
-  assertEquals(formatPeriod({ from: 2024, ongoing: true }), "2024\u2013now");
-});
+  assertEquals(formatPeriod({ from: 2021 }), "2021")
+  assertEquals(formatPeriod({ from: 2021, to: 2021 }), "2021")
+  assertEquals(formatPeriod({ from: 2018, to: 2019 }), "2018\u20132019")
+  assertEquals(formatPeriod({ from: 2024, ongoing: true }), "2024\u2013now")
+})
 
 /**
  * CallTrack and Sajari were frontend roles on someone else's product: no
  * catalog item describes that work, so their pages show no catalog link.
  */
-const NO_CATALOG_MATCH = ["calltrack", "sajari"];
+const NO_CATALOG_MATCH = ["calltrack", "sajari"]
 
 Deno.test("every client project maps to a real catalog item, except the two frontend roles", () => {
   for (const p of projects.freelance) {
     if (NO_CATALOG_MATCH.includes(p.slug!)) {
-      assertEquals(p.catalogSlug, undefined, p.slug);
-      continue;
+      assertEquals(p.catalogSlug, undefined, p.slug)
+      continue
     }
-    assert(p.catalogSlug, `${p.slug} has no catalogSlug`);
-    catalogItem(p.catalogSlug);
+    assert(p.catalogSlug, `${p.slug} has no catalogSlug`)
+    catalogItem(p.catalogSlug)
   }
-});
+})
 
 Deno.test("More work ranks by shared tags, then by the /work order, and never lists the page itself", () => {
-  const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!;
+  const smartlite = projects.freelance.find((p) => p.slug === "smartlite")!
   // Roley and DareChat share four tags each; DareChat is the earlier highlight.
   // Corecircle and Sogroya share one each; Corecircle is a highlight.
   assertEquals(relatedProjects(smartlite).map((p) => p.slug), [
     "truth-or-dare",
     "roley",
     "corecircle",
-  ]);
+  ])
   for (const p of projects.freelance) {
-    const related = relatedProjects(p);
-    assertEquals(related.length, 3, `${p.slug} gets ${related.length}`);
-    assert(!related.includes(p), `${p.slug} lists itself`);
+    const related = relatedProjects(p)
+    assertEquals(related.length, 3, `${p.slug} gets ${related.length}`)
+    assert(!related.includes(p), `${p.slug} lists itself`)
   }
-});
+})

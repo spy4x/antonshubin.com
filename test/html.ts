@@ -10,7 +10,7 @@ const NAMED_ENTITIES: Record<string, string> = {
   quot: '"',
   apos: "'",
   nbsp: " ",
-};
+}
 
 /** Decodes the handful of HTML entities this site's rendered pages actually use. */
 function decodeEntities(text: string): string {
@@ -20,14 +20,14 @@ function decodeEntities(text: string): string {
       if (entity[0] === "#") {
         const codePoint = entity[1] === "x" || entity[1] === "X"
           ? parseInt(entity.slice(2), 16)
-          : parseInt(entity.slice(1), 10);
+          : parseInt(entity.slice(1), 10)
         return Number.isFinite(codePoint)
           ? String.fromCodePoint(codePoint)
-          : match;
+          : match
       }
-      return NAMED_ENTITIES[entity] ?? match;
+      return NAMED_ENTITIES[entity] ?? match
     },
-  );
+  )
 }
 
 /**
@@ -38,13 +38,13 @@ function decodeEntities(text: string): string {
  * markup in between.
  */
 export function visibleText(html: string): string {
-  const withoutScripts = html.replace(/<script[\s\S]*?<\/script>/gi, " ");
+  const withoutScripts = html.replace(/<script[\s\S]*?<\/script>/gi, " ")
   const withoutStyles = withoutScripts.replace(
     /<style[\s\S]*?<\/style>/gi,
     " ",
-  );
-  const withoutTags = withoutStyles.replace(/<[^>]*>/g, " ");
-  return decodeEntities(withoutTags).replace(/\s+/g, " ").trim();
+  )
+  const withoutTags = withoutStyles.replace(/<[^>]*>/g, " ")
+  return decodeEntities(withoutTags).replace(/\s+/g, " ").trim()
 }
 
 /**
@@ -54,35 +54,35 @@ export function visibleText(html: string): string {
  * something a guard test should swallow.
  */
 export function jsonLd(html: string): unknown[] {
-  const blocks: unknown[] = [];
+  const blocks: unknown[] = []
   const pattern =
-    /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
   for (const match of html.matchAll(pattern)) {
-    const raw = match[1].trim();
-    if (raw) blocks.push(JSON.parse(raw));
+    const raw = match[1].trim()
+    if (raw) blocks.push(JSON.parse(raw))
   }
-  return blocks;
+  return blocks
 }
 
 /** Counts non-overlapping matches of `pattern` in `html` (adds the `g` flag if missing). */
 export function count(html: string, pattern: RegExp): number {
   const flags = pattern.flags.includes("g")
     ? pattern.flags
-    : `${pattern.flags}g`;
-  return [...html.matchAll(new RegExp(pattern.source, flags))].length;
+    : `${pattern.flags}g`
+  return [...html.matchAll(new RegExp(pattern.source, flags))].length
 }
 
 /** Slices `html` from the first `start` marker to the first `end` after it, or "" with no start. */
 function between(html: string, start: string, end: string): string {
-  const from = html.indexOf(start);
-  if (from < 0) return "";
-  const to = html.indexOf(end, from);
-  return html.slice(from, to < 0 ? undefined : to);
+  const from = html.indexOf(start)
+  if (from < 0) return ""
+  const to = html.indexOf(end, from)
+  return html.slice(from, to < 0 ? undefined : to)
 }
 
 /** The desktop rail column's list: Book, then the destinations (components/Nav.tsx). */
 export function railColumn(html: string): string {
-  return between(html, `data-e2e="rail-shell-rail"`, "</nav>");
+  return between(html, `data-e2e="rail-shell-rail"`, "</nav>")
 }
 
 /** The rail's top zone: the portrait, which links home. */
@@ -91,17 +91,17 @@ export function railTop(html: string): string {
     html,
     `data-e2e="rail-shell-top"`,
     `data-e2e="rail-shell-rail"`,
-  );
+  )
 }
 
 /** The phone tab bar: up to four entries with Book in the centre, then More. */
 export function tabBar(html: string): string {
-  return between(html, `data-e2e="rail-shell-tabbar"`, "</nav>");
+  return between(html, `data-e2e="rail-shell-tabbar"`, "</nav>")
 }
 
 /** The More sheet: the `<dialog>` the tab bar's More button opens. */
 export function moreSheet(html: string): string {
-  return between(html, `data-e2e="rail-shell-dialog"`, "</dialog>");
+  return between(html, `data-e2e="rail-shell-dialog"`, "</dialog>")
 }
 
 /**
@@ -110,7 +110,7 @@ export function moreSheet(html: string): string {
  * out the tab bar and the More sheet.
  */
 export function mainContent(html: string): string {
-  return between(html, `id="main-content"`, `data-e2e="rail-shell-dock"`);
+  return between(html, `id="main-content"`, `data-e2e="rail-shell-dock"`)
 }
 
 /**
@@ -119,5 +119,5 @@ export function mainContent(html: string): string {
  * links or words leaves out the footer's.
  */
 export function pageBody(html: string): string {
-  return between(html, `id="main-content"`, `<footer class="site-footer`);
+  return between(html, `id="main-content"`, `<footer class="site-footer`)
 }

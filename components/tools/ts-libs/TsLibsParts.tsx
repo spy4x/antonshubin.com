@@ -1,17 +1,17 @@
-import { Fragment } from "preact";
-import { Card } from "@spy4x/preact-ui/card";
-import { IconChevronDown } from "@spy4x/preact-icons";
-import CopyButton from "../../../islands/CopyButton.tsx";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
+import { Fragment } from "preact"
+import { Card } from "@spy4x/preact-ui/card"
+import { IconChevronDown } from "@spy4x/preact-icons"
+import CopyButton from "../../../islands/CopyButton.tsx"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
 import {
   TS_LIBS_QUICK_START,
   type TsLibsPackage,
   tsLibsPackages,
   tsLibsReasons,
-} from "../../../lib/ts-libs.ts";
+} from "../../../lib/ts-libs.ts"
 
-const SLUG = "ts-libs";
+const SLUG = "ts-libs"
 
 /** `text` with each `backticked` span as `<code>`, the way the README renders it. */
 export function WithCode({ text }: { text: string }) {
@@ -23,7 +23,7 @@ export function WithCode({ text }: { text: string }) {
           : <Fragment key={i}>{part}</Fragment>
       )}
     </>
-  );
+  )
 }
 
 /**
@@ -39,7 +39,7 @@ function CodeBlock(
       aria-label={label}
       class="overflow-x-auto rounded-lg border border-rule bg-paper p-4 text-sm leading-relaxed text-parchment"
     ><code id={id}>{code}</code></pre>
-  );
+  )
 }
 
 /**
@@ -81,14 +81,14 @@ export function RunExample({ id, repo }: { id: string; repo: string }) {
         </a>.
       </p>
     </div>
-  );
+  )
 }
 
 /** One package's disclosure: its name, line and where it runs; open, its example, install line and JSR link. */
 function PackageItem({ pkg, open }: { pkg: TsLibsPackage; open: boolean }) {
-  const full = `@spy4x/${pkg.name}`;
-  const install = `deno add jsr:${full}`;
-  const installId = `ts-libs-install-${pkg.name}`;
+  const full = `@spy4x/${pkg.name}`
+  const install = `deno add jsr:${full}`
+  const installId = `ts-libs-install-${pkg.name}`
   return (
     <details
       name="ts-libs-package"
@@ -145,7 +145,7 @@ function PackageItem({ pkg, open }: { pkg: TsLibsPackage; open: boolean }) {
         </p>
       </div>
     </details>
-  );
+  )
 }
 
 /**
@@ -170,7 +170,7 @@ export function PackagePicker() {
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 /** "Why ts-libs": four of the README's points as cards, two by two from 640px. */
@@ -193,13 +193,13 @@ export function Reasons() {
         ))}
       </ul>
     </section>
-  );
+  )
 }
 
 /** One project that imports ts-libs, with the file that proves it. */
 export interface TsLibsUse {
-  text: string;
-  proof: { label: string; href: string };
+  text: string
+  proof: { label: string; href: string }
 }
 
 /** "Where I use it": each line links the import list that proves it. */
@@ -228,5 +228,5 @@ export function WhereIUseIt({ uses }: { uses: TsLibsUse[] }) {
         ))}
       </ul>
     </section>
-  );
+  )
 }

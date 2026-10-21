@@ -11,18 +11,18 @@
  * "Outside Work" section, and `/book`'s NeatSoft line.
  */
 
-import { COMPANY } from "./company.ts";
+import { COMPANY } from "./company.ts"
 
-export const ABOUT_PATH = "/about";
+export const ABOUT_PATH = "/about"
 
 /** The page's name: the `<h1>`, the breadcrumb's last item and the `ProfilePage` name. */
-export const ABOUT_NAME = "About Anton Shubin";
+export const ABOUT_NAME = "About Anton Shubin"
 
 /** One dated step of the career story. */
 export interface AboutStep {
   /** The year column: a year, or a word for a step without one. */
-  when: string;
-  text: string;
+  when: string
+  text: string
 }
 
 /** The career in four dated steps, oldest first. */
@@ -47,7 +47,7 @@ export const aboutSteps: AboutStep[] = [
     text:
       `I'm co-founder and CEO of ${COMPANY.name} in ${COMPANY.country}, and clients can contract through it. I build SaaS for clients and my own open-source tools.`,
   },
-];
+]
 
 /**
  * The meta description: only the listed facts a buyer checks after a name
@@ -55,11 +55,11 @@ export const aboutSteps: AboutStep[] = [
  * this module reads no environment.
  */
 export function aboutDescription(location: string): string {
-  return `Software developer since 2010, freelancing since 2013, co-founder and CEO of ${COMPANY.name} in ${COMPANY.country}. Based in ${location}.`;
+  return `Software developer since 2010, freelancing since 2013, co-founder and CEO of ${COMPANY.name} in ${COMPANY.country}. Based in ${location}.`
 }
 
 /** The hobbies clause, shared by `/about`'s "Outside work" and `/llms-full.txt`. */
-export const ABOUT_HOBBIES = "Outside work I ride enduro, ski and scuba dive";
+export const ABOUT_HOBBIES = "Outside work I ride enduro, ski and scuba dive"
 
 /**
  * The travel clause after "I've", shared by `/about`'s "Outside work" and
@@ -67,35 +67,35 @@ export const ABOUT_HOBBIES = "Outside work I ride enduro, ski and scuba dive";
  * its apostrophe from static JSX, byte for byte as before.
  */
 export const ABOUT_TRAVEL =
-  "travelled to more than 25 countries across Asia and Europe";
+  "travelled to more than 25 countries across Asia and Europe"
 
 /** One way a client can pay, and the service or rail behind it. */
 export interface PaymentMethod {
-  name: string;
-  via?: string;
+  name: string
+  via?: string
 }
 
-const CARD: PaymentMethod = { name: "card", via: "Stripe" };
-const BANK: PaymentMethod = { name: "US bank transfer", via: "ACH or Fedwire" };
-const CRYPTO: PaymentMethod = { name: "crypto" };
+const CARD: PaymentMethod = { name: "card", via: "Stripe" }
+const BANK: PaymentMethod = { name: "US bank transfer", via: "ACH or Fedwire" }
+const CRYPTO: PaymentMethod = { name: "crypto" }
 
 /**
  * The bank rails for a client outside the US (Anton, #301). `/pay` shows
  * only the US account's details; these are sent on request.
  */
 export const INTERNATIONAL_BANK =
-  "SWIFT, SEPA (EUR), Wise, Revolut or a Singapore account";
+  "SWIFT, SEPA (EUR), Wise, Revolut or a Singapore account"
 
 /** The line under `/pay`'s US bank details. */
 export const INTERNATIONAL_BANK_LINE =
-  `Outside the US: ${INTERNATIONAL_BANK}. Ask and I send the details.`;
+  `Outside the US: ${INTERNATIONAL_BANK}. Ask and I send the details.`
 
 /** The payment methods as `/about` says them, a full sentence. */
 export function paymentSentence(): string {
-  return `You can pay by ${CARD.name} through ${CARD.via}, by ${BANK.name} (${BANK.via}) or in ${CRYPTO.name}. From outside the US: ${INTERNATIONAL_BANK}.`;
+  return `You can pay by ${CARD.name} through ${CARD.via}, by ${BANK.name} (${BANK.via}) or in ${CRYPTO.name}. From outside the US: ${INTERNATIONAL_BANK}.`
 }
 
 /** The payment methods as `/llms-full.txt` lists them, a clause. */
 export function paymentList(): string {
-  return `${CARD.name} (${CARD.via}), ${BANK.name} (${BANK.via}), ${CRYPTO.name}, or from outside the US ${INTERNATIONAL_BANK}`;
+  return `${CARD.name} (${CARD.via}), ${BANK.name} (${BANK.via}), ${CRYPTO.name}, or from outside the US ${INTERNATIONAL_BANK}`
 }

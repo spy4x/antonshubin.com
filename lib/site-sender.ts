@@ -7,8 +7,8 @@ import {
   SMTP_PASSWORD,
   SMTP_PORT,
   SMTP_USERNAME,
-} from "./config.ts";
-import { createSiteSender, type EmailSender, smtpSettings } from "./mail.ts";
+} from "./config.ts"
+import { createSiteSender, type EmailSender, smtpSettings } from "./mail.ts"
 
 const SMTP = smtpSettings({
   host: SMTP_HOST,
@@ -17,9 +17,9 @@ const SMTP = smtpSettings({
   pass: SMTP_PASSWORD,
   from: SMTP_FROM,
   ehloName: new URL(BASE_URL).hostname,
-});
+})
 
 /** The relay sender, or `null` without SMTP settings. */
 export const SITE_SENDER: EmailSender | null = SMTP
   ? createSiteSender(SMTP)
-  : null;
+  : null

@@ -7,5 +7,5 @@
  * name computation and would make this span invisible to assistive tech.
  */
 export function NewTabHint() {
-  return <span class="sr-only">&nbsp;(opens in a new tab)</span>;
+  return <span class="sr-only">&nbsp;(opens in a new tab)</span>
 }

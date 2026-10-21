@@ -1,8 +1,8 @@
-import { IconArrowUpRight } from "@spy4x/preact-icons";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { NewTabHint } from "../../NewTabHint.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import type { TryLink } from "./demo.ts";
+import { IconArrowUpRight } from "@spy4x/preact-icons"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { NewTabHint } from "../../NewTabHint.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import type { TryLink } from "./demo.ts"
 
 /**
  * A quiet link from a "What you get" card into Seed's demo, in a new tab,
@@ -23,5 +23,5 @@ export function SeedTryLink({ link }: { link: TryLink }) {
       <IconArrowUpRight class="size-4 shrink-0" />
       <NewTabHint />
     </a>
-  );
+  )
 }

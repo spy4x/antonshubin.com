@@ -1,5 +1,5 @@
-import { signal } from "@preact/signals";
-import type { PageHead as LibraryPageHead } from "@spy4x/preact-system/head";
+import { signal } from "@preact/signals"
+import type { PageHead as LibraryPageHead } from "@spy4x/preact-system/head"
 
 /**
  * The fields of `@spy4x/preact-system`'s page head this site sets (#195),
@@ -22,8 +22,8 @@ export interface PageHead
    * that changes `ogImage` without also touching these would otherwise
    * inherit the wrong size, `resetHead()` notwithstanding).
    */
-  ogImageWidth?: number;
-  ogImageHeight?: number;
+  ogImageWidth?: number
+  ogImageHeight?: number
   /**
    * The bare page name for the breadcrumb (visible nav and JSON-LD
    * BreadcrumbList) — "Ship It Today", not "Ship It Today — Anton Shubin".
@@ -33,7 +33,7 @@ export interface PageHead
    * this for the pages this issue touches; other pages still pass their
    * full title here, unchanged from before).
    */
-  pageName?: string;
+  pageName?: string
 }
 
 /**
@@ -41,7 +41,7 @@ export interface PageHead
  * JSON-LD, llms files. "Fractional CTO" is one service in lib/catalog.ts, not
  * a label.
  */
-export const ROLE = "Senior Full-Stack Engineer & Tech Lead";
+export const ROLE = "Senior Full-Stack Engineer & Tech Lead"
 
 const DEFAULTS: PageHead = {
   title: `Anton Shubin | ${ROLE}`,
@@ -59,7 +59,7 @@ const DEFAULTS: PageHead = {
   ogImageWidth: 1200,
   ogImageHeight: 630,
   ogType: "profile",
-};
+}
 
 /**
  * The WebSite JSON-LD node's `description` (components/SEOHead.tsx). Fixed
@@ -68,25 +68,25 @@ const DEFAULTS: PageHead = {
  * every page (#193). Derived from `DEFAULTS`, not a second literal, so the
  * two can't drift apart.
  */
-export const SITE_DESCRIPTION = DEFAULTS.description;
+export const SITE_DESCRIPTION = DEFAULTS.description
 
-export const head = signal<PageHead>({ ...DEFAULTS });
+export const head = signal<PageHead>({ ...DEFAULTS })
 
 /** Runs on every render: `head` is module-level, so without a reset one request's title and tags would leak into the next. */
 export function resetHead() {
-  head.value = { ...DEFAULTS };
+  head.value = { ...DEFAULTS }
 }
 
 // --------------- Breadcrumb helpers ---------------
 
 /** Path segments whose name is not their humanized slug: `/catalog` is "Services" (#271). */
-const SEGMENT_NAMES: Record<string, string> = { catalog: "Services" };
+const SEGMENT_NAMES: Record<string, string> = { catalog: "Services" }
 
 function humanize(slug: string): string {
   return SEGMENT_NAMES[slug] ?? slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+    .join(" ")
 }
 
 /**
@@ -102,22 +102,22 @@ export function getBreadcrumb(
   canonical: string,
   pageName: string,
 ): { name: string; href?: string }[] {
-  const segments = new URL(canonical).pathname.split("/").filter(Boolean);
+  const segments = new URL(canonical).pathname.split("/").filter(Boolean)
 
   const items: { name: string; href?: string }[] = [{
     name: "Home",
     href: "/",
-  }];
+  }]
 
-  let acc = "";
+  let acc = ""
   segments.forEach((seg, idx) => {
-    acc += "/" + seg;
-    const isLast = idx === segments.length - 1;
+    acc += "/" + seg
+    const isLast = idx === segments.length - 1
     items.push({
       name: isLast ? pageName : humanize(seg),
       href: isLast ? undefined : acc,
-    });
-  });
+    })
+  })
 
-  return items;
+  return items
 }

@@ -38,42 +38,42 @@ been formatted with Prettier:
 
 ```typescript
 class User {
-  name: string;
-  age: number;
+  name: string
+  age: number
   constructor(name: string, age: number) {
-    this.name = name;
-    this.age = age;
+    this.name = name
+    this.age = age
   }
   sayHello() {
     console.log(
       `Hello, my name is ${this.name} and I am ${this.age} years old.`,
-    );
+    )
   }
 }
 
-const user = new User("John", 30);
-user.sayHello();
+const user = new User("John", 30)
+user.sayHello()
 ```
 
 And here is the same file after running it through Prettier:
 
 ```typescript
 class User {
-  name: string;
-  age: number;
+  name: string
+  age: number
   constructor(name: string, age: number) {
-    this.name = name;
-    this.age = age;
+    this.name = name
+    this.age = age
   }
   sayHello() {
     console.log(
       `Hello, my name is ${this.name} and I am ${this.age} years old.`,
-    );
+    )
   }
 }
 
-const user = new User("John", 30);
-user.sayHello();
+const user = new User("John", 30)
+user.sayHello()
 ```
 
 ## Why is Code Formatting Important?

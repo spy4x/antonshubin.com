@@ -1,8 +1,8 @@
-import { FACT_LINK } from "../../FactCard.tsx";
-import { COPY_INSTALL_TITLE, QuickStart } from "../../tool-frame/ToolBand.tsx";
-import CopyButton from "../../../islands/CopyButton.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import type { Tool } from "../../../lib/tools.ts";
+import { FACT_LINK } from "../../FactCard.tsx"
+import { COPY_INSTALL_TITLE, QuickStart } from "../../tool-frame/ToolBand.tsx"
+import CopyButton from "../../../islands/CopyButton.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import type { Tool } from "../../../lib/tools.ts"
 
 /** The README's start-up commands after the quick start's first one, verbatim. */
 export const NEXT_COMMANDS = [
@@ -11,10 +11,10 @@ export const NEXT_COMMANDS = [
   "deno task vapid-key:create",
   "deno task proxy:start",
   "deno task dev",
-];
+]
 
 /** The README's Quick start section in spy4x/seed. */
-const QUICK_START_DOCS = "https://github.com/spy4x/seed#quick-start";
+const QUICK_START_DOCS = "https://github.com/spy4x/seed#quick-start"
 
 /**
  * The line under Seed's hero actions (#455): the website link, the quick
@@ -75,5 +75,5 @@ export function SeedStart({ tool }: { tool: Tool }) {
         </p>
       </details>
     </div>
-  );
+  )
 }

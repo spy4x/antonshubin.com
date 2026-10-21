@@ -298,145 +298,145 @@
       </div>
     </footer>
     <script>
-    const ex = window.__exchange;
-    const $ = (id) => document.getElementById(id);
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-    $("toolCount").textContent = `· ${ex.tools.length} tools`;
+    const ex = window.__exchange
+    const $ = (id) => document.getElementById(id)
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+    $("toolCount").textContent = `· ${ex.tools.length} tools`
     $("note").textContent =
-      `Replay of a real exchange: ${ex.model} · caldav-mcp 1.6.0 · a demo Radicale calendar`;
+      `Replay of a real exchange: ${ex.model} · caldav-mcp 1.6.0 · a demo Radicale calendar`
 
-    const chat = $("chat");
-    let column = null;
+    const chat = $("chat")
+    let column = null
     const follow = () =>
-      chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+      chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" })
     const add = (el) => {
       if (!column) {
-        $("empty").remove();
-        column = document.createElement("div");
-        column.className = "col";
-        chat.append(column);
+        $("empty").remove()
+        column = document.createElement("div")
+        column.className = "col"
+        chat.append(column)
       }
-      column.append(el);
-      follow();
-      return el;
-    };
+      column.append(el)
+      follow()
+      return el
+    }
     const h = (tag, cls, text) => {
-      const el = document.createElement(tag);
-      if (cls) el.className = cls;
-      if (text !== undefined) el.textContent = text;
-      return el;
-    };
+      const el = document.createElement(tag)
+      if (cls) el.className = cls
+      if (text !== undefined) el.textContent = text
+      return el
+    }
 
     /** Shortens a long value for the card; the full value is in exchange.json. */
     const short = (v) => {
-      const s = typeof v === "string" ? v : JSON.stringify(v);
+      const s = typeof v === "string" ? v : JSON.stringify(v)
       if (/^https?:\/\//.test(s)) {
-        return `"…${new URL(s).pathname.replace(/^\/[^/]+/, "")}"`;
+        return `"…${new URL(s).pathname.replace(/^\/[^/]+/, "")}"`
       }
       if (s.length > 34) {
-        return `"${s.replace(/^"|"$/g, "").replace(/\\"/g, "").slice(0, 12)}…"`;
+        return `"${s.replace(/^"|"$/g, "").replace(/\\"/g, "").slice(0, 12)}…"`
       }
-      return JSON.stringify(v);
-    };
+      return JSON.stringify(v)
+    }
     /** One line about what the server answered, read from the real result. */
     const summary = (call) => {
-      const r = call.result ?? {};
-      const n = (k, one, many) => `${r[k]} ${r[k] === 1 ? one : many}`;
+      const r = call.result ?? {}
+      const n = (k, one, many) => `${r[k]} ${r[k] === 1 ? one : many}`
       if (call.name === "query_todos") {
         return `${n("total", "task", "tasks")}${
           r.overdue ? `, ${r.overdue} overdue` : ""
-        }`;
+        }`
       }
-      if (call.name === "query_events") return n("total", "event", "events");
+      if (call.name === "query_events") return n("total", "event", "events")
       if (call.name === "update_todo") {
         return r.todo?.due
           ? `saved, due ${r.todo.due.slice(0, 16).replace("T", " ")}`
-          : "saved";
+          : "saved"
       }
-      return "done";
-    };
+      return "done"
+    }
 
     /** Text with **bold** spans; an unclosed ** while streaming is already bold. */
     const inline = (tag, text) => {
-      const el = h(tag);
+      const el = h(tag)
       text.split("**").forEach((part, i) =>
         el.append(i % 2 ? h("strong", null, part) : part)
-      );
-      return el;
-    };
+      )
+      return el
+    }
     /** Renders the answer's Markdown subset: paragraphs, "- " lists, **bold**. */
     const render = (el, text) => {
-      el.replaceChildren();
-      let list = null;
+      el.replaceChildren()
+      let list = null
       for (const line of text.split("\n")) {
         if (line.startsWith("- ")) {
-          if (!list) list = el.appendChild(h("ul"));
-          list.append(inline("li", line.slice(2)));
+          if (!list) list = el.appendChild(h("ul"))
+          list.append(inline("li", line.slice(2)))
         } else if (line.trim()) {
-          list = null;
-          el.append(inline("p", line));
-        } else list = null;
+          list = null
+          el.append(inline("p", line))
+        } else list = null
       }
-    };
+    }
 
-    let turnIndex = 0;
-    window.__turnDone = -1;
+    let turnIndex = 0
+    window.__turnDone = -1
     $("msg").addEventListener("input", () => {
-      $("send").classList.toggle("ready", $("msg").value.trim() !== "");
-    });
+      $("send").classList.toggle("ready", $("msg").value.trim() !== "")
+    })
     $("composer").addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (!$("msg").value.trim()) return;
-      play(turnIndex++);
-    });
+      e.preventDefault()
+      if (!$("msg").value.trim()) return
+      play(turnIndex++)
+    })
 
     async function play(i) {
-      const turn = ex.turns[i];
-      const input = $("msg");
-      add(h("div", "user")).append(h("div", null, input.value));
-      input.value = "";
-      $("send").classList.remove("ready");
-      const thinking = add(h("p", "thinking", "Thinking…"));
-      await sleep(900);
-      thinking.remove();
+      const turn = ex.turns[i]
+      const input = $("msg")
+      add(h("div", "user")).append(h("div", null, input.value))
+      input.value = ""
+      $("send").classList.remove("ready")
+      const thinking = add(h("p", "thinking", "Thinking…"))
+      await sleep(900)
+      thinking.remove()
 
-      const cards = [];
+      const cards = []
       for (const call of turn.calls) {
-        const card = h("div", "call");
-        const head = card.appendChild(h("div", "head"));
-        head.append(h("span", "name", call.name), h("span", "via", "caldav-mcp"));
-        const status = head.appendChild(h("span", "status"));
-        status.innerHTML = `<span class="spin"></span>Running`;
-        const body = card.appendChild(h("div", "body")).appendChild(h("div"));
-        const pre = body.appendChild(h("pre"));
+        const card = h("div", "call")
+        const head = card.appendChild(h("div", "head"))
+        head.append(h("span", "name", call.name), h("span", "via", "caldav-mcp"))
+        const status = head.appendChild(h("span", "status"))
+        status.innerHTML = `<span class="spin"></span>Running`
+        const body = card.appendChild(h("div", "body")).appendChild(h("div"))
+        const pre = body.appendChild(h("pre"))
         for (const [k, v] of Object.entries(call.input)) {
-          const row = pre.appendChild(h("div"));
-          row.append(h("span", "k", k), `: ${short(v)}`);
+          const row = pre.appendChild(h("div"))
+          row.append(h("span", "k", k), `: ${short(v)}`)
         }
-        add(card);
-        cards.push({ card, status, call });
-        await sleep(700);
+        add(card)
+        cards.push({ card, status, call })
+        await sleep(700)
       }
       for (const { status, call } of cards) {
-        await sleep(500);
-        status.className = "status ok";
-        status.textContent = `✓ ${summary(call)}`;
+        await sleep(500)
+        status.className = "status ok"
+        status.textContent = `✓ ${summary(call)}`
       }
       // Hold the expanded cards so the arguments can be read.
-      await sleep(cards.length ? 2600 : 0);
-      for (const { card } of cards) card.classList.add("collapsed");
-      await sleep(cards.length ? 500 : 0);
+      await sleep(cards.length ? 2600 : 0)
+      for (const { card } of cards) card.classList.add("collapsed")
+      await sleep(cards.length ? 500 : 0)
 
-      const answer = add(h("div", "answer"));
-      const words = turn.answer.split(/(\s+)/);
-      let shown = "";
+      const answer = add(h("div", "answer"))
+      const words = turn.answer.split(/(\s+)/)
+      let shown = ""
       for (const w of words) {
-        shown += w;
-        render(answer, shown);
-        follow();
-        await sleep(/\s/.test(w) ? 0 : 85);
+        shown += w
+        render(answer, shown)
+        follow()
+        await sleep(/\s/.test(w) ? 0 : 85)
       }
-      window.__turnDone = i;
+      window.__turnDone = i
     }
     </script>
   </body>

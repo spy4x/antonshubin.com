@@ -1,16 +1,16 @@
-import { define } from "../lib/utils.ts";
-import { Layout } from "../components/Layout.tsx";
-import { head } from "../lib/head.ts";
-import { SEOHead } from "../components/SEOHead.tsx";
+import { define } from "../lib/utils.ts"
+import { Layout } from "../components/Layout.tsx"
+import { head } from "../lib/head.ts"
+import { SEOHead } from "../components/SEOHead.tsx"
 import {
   IconArrowRight as ArrowRightIcon,
   IconBuilding as BuildingIcon,
   IconCreditCard as CardIcon,
   IconWallet as WalletIcon,
-} from "@spy4x/preact-icons";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import CopyButton from "../islands/CopyButton.tsx";
-import { INTERNATIONAL_BANK_LINE } from "../lib/about.ts";
+} from "@spy4x/preact-icons"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import CopyButton from "../islands/CopyButton.tsx"
+import { INTERNATIONAL_BANK_LINE } from "../lib/about.ts"
 
 export default define.page(function Pay() {
   head.value = {
@@ -20,7 +20,7 @@ export default define.page(function Pay() {
     canonical: "https://antonshubin.com/pay",
     ogType: "website",
     noindex: true,
-  };
+  }
 
   return (
     <Layout currentPath="/pay">
@@ -238,5 +238,5 @@ export default define.page(function Pay() {
         </div>
       </div>
     </Layout>
-  );
-});
+  )
+})

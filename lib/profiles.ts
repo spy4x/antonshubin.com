@@ -1,4 +1,4 @@
-import { UPWORK_URL } from "./config.ts";
+import { UPWORK_URL } from "./config.ts"
 
 /**
  * Anton's public profiles and contact channels (#293): the one place a
@@ -8,9 +8,9 @@ import { UPWORK_URL } from "./config.ts";
  * or renamed profile is one edit.
  */
 export interface Profile {
-  id: string;
-  label: string;
-  href: string;
+  id: string
+  label: string
+  href: string
 }
 
 /**
@@ -36,17 +36,17 @@ export const profiles: readonly Profile[] = [
     href: "https://www.youtube.com/@anton-shubin-live",
   },
   { id: "x", label: "X", href: "https://x.com/spy4x" },
-];
+]
 
 /** One profile by id; throws on a typo so a bad id fails the build. */
 export function profile(id: string): Profile {
-  const found = profiles.find((p) => p.id === id);
-  if (!found) throw new Error(`Unknown profile id: ${id}`);
-  return found;
+  const found = profiles.find((p) => p.id === id)
+  if (!found) throw new Error(`Unknown profile id: ${id}`)
+  return found
 }
 
 function pick(ids: readonly string[]): Profile[] {
-  return ids.map(profile);
+  return ids.map(profile)
 }
 
 /** The footer's "Elsewhere" group, in reading order. */
@@ -56,20 +56,20 @@ export const footerProfiles: Profile[] = pick([
   "youtube",
   "upwork",
   "x",
-]);
+])
 
 /** The Person JSON-LD's `sameAs`. */
-export const sameAsUrls: string[] = profiles.map((p) => p.href);
+export const sameAsUrls: string[] = profiles.map((p) => p.href)
 
 /** Direct contact channels, shown in the footer's "Contact" group. */
-export const EMAIL_ADDRESS = "hi@antonshubin.com";
+export const EMAIL_ADDRESS = "hi@antonshubin.com"
 export const emailContact: Profile = {
   id: "email",
   label: "Email",
   href: `mailto:${EMAIL_ADDRESS}`,
-};
+}
 export const telegramContact: Profile = {
   id: "telegram",
   label: "Telegram",
   href: "https://t.me/spy4x",
-};
+}

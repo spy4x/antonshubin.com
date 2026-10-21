@@ -11,13 +11,13 @@
  * `<meta name="referrer">`, because the proxy in front of the site overwrites
  * the header and a meta policy wins for the document.
  */
-export const TOKEN_PAGE_REFERRER_POLICY = "strict-origin";
+export const TOKEN_PAGE_REFERRER_POLICY = "strict-origin"
 
 /** The policy for `pathname`, or `undefined` for a page that keeps the default.
  * A trailing slash serves the same page, so it counts. */
 export function referrerPolicyFor(pathname: string): string | undefined {
-  const page = pathname.replace(/\/+$/, "") || "/";
+  const page = pathname.replace(/\/+$/, "") || "/"
   return page === "/unsubscribe" || page === "/subscribe/confirm"
     ? TOKEN_PAGE_REFERRER_POLICY
-    : undefined;
+    : undefined
 }

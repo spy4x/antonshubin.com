@@ -1,45 +1,45 @@
-import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
-import { define } from "../lib/utils.ts";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { Layout } from "../components/Layout.tsx";
-import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts";
-import { formatPeriod, highlightProjects } from "../lib/data.ts";
-import { catalogItems, priceLabel } from "../lib/catalog.ts";
-import { proof } from "../lib/proof.ts";
-import { promise } from "../lib/promises.ts";
-import { ClosingBand } from "../components/ClosingBand.tsx";
-import { PromiseTimeline } from "../components/PromiseTimeline.tsx";
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts"
+import { define } from "../lib/utils.ts"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { Layout } from "../components/Layout.tsx"
+import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts"
+import { formatPeriod, highlightProjects } from "../lib/data.ts"
+import { catalogItems, priceLabel } from "../lib/catalog.ts"
+import { proof } from "../lib/proof.ts"
+import { promise } from "../lib/promises.ts"
+import { ClosingBand } from "../components/ClosingBand.tsx"
+import { PromiseTimeline } from "../components/PromiseTimeline.tsx"
 import {
   homeTestimonialIds,
   testimonial,
   testimonialProject,
   visibleTestimonials,
-} from "../lib/testimonials.ts";
-import { head, ROLE } from "../lib/head.ts";
-import { homeDescription } from "../lib/home.ts";
-import { tools } from "../lib/tools.ts";
-import { clientProject } from "../lib/llms.ts";
-import { WithNote } from "../components/WithNote.tsx";
-import LeadForm from "../islands/LeadForm.tsx";
-import { BookCallLink } from "../components/BookCallLink.tsx";
-import Button from "../components/Button.tsx";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { TestimonialCard } from "../components/TestimonialCard.tsx";
-import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
+} from "../lib/testimonials.ts"
+import { head, ROLE } from "../lib/head.ts"
+import { homeDescription } from "../lib/home.ts"
+import { tools } from "../lib/tools.ts"
+import { clientProject } from "../lib/llms.ts"
+import { WithNote } from "../components/WithNote.tsx"
+import LeadForm from "../islands/LeadForm.tsx"
+import { BookCallLink } from "../components/BookCallLink.tsx"
+import Button from "../components/Button.tsx"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { TestimonialCard } from "../components/TestimonialCard.tsx"
+import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
 import {
   IconArrowRight as ArrowRightIcon,
   IconCalendar as CalendarIcon,
-} from "@spy4x/preact-icons";
-import { eventAttrs } from "../lib/analytics.ts";
+} from "@spy4x/preact-icons"
+import { eventAttrs } from "../lib/analytics.ts"
 import {
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
-} from "../lib/why-not-just-ai.ts";
+} from "../lib/why-not-just-ai.ts"
 
 /** The section link style: Parchment, underlined, the underline brightens on hover. */
-const LINK = FACT_LINK;
+const LINK = FACT_LINK
 
 /** The four Upwork figures of the fact card, in reading order. */
 const figures = [
@@ -47,7 +47,7 @@ const figures = [
   { value: proof("job-success"), label: "Job Success" },
   { value: proof("earned"), label: "earned on Upwork" },
   { value: proof("hours"), label: "hours on Upwork" },
-];
+]
 
 /**
  * The three promises named next to Book (#269, psychologist 4): the risk
@@ -55,31 +55,31 @@ const figures = [
  */
 const heroPromises = ["refund", "first-milestone", "ownership"].map(
   (id) => promise(id).title,
-);
+)
 
 /**
  * The work rows: the first three highlights (`highlightSlugs` in
  * lib/data.ts). Outcome, role and period are read from there, so a figure
  * lives in one place.
  */
-const caseStudies = highlightProjects().slice(0, 3);
+const caseStudies = highlightProjects().slice(0, 3)
 
 /** The "Also:" line under the rows: the project slug and the name a visitor knows it by. */
 const alsoWork = [
   { slug: "sogroya", label: "Novo Nordisk" },
   { slug: "truth-or-dare", label: "DareChat" },
-].map((a) => ({ ...a, project: clientProject(a.slug) }));
+].map((a) => ({ ...a, project: clientProject(a.slug) }))
 
 /** The tools row: at most this many, so a growing registry never crowds the page. */
-const TOOLS_SHOWN = 4;
+const TOOLS_SHOWN = 4
 const shownTools = tools.filter((t) => t.status !== "archived").slice(
   0,
   TOOLS_SHOWN,
-);
+)
 
 /** A 1x1 transparent GIF: the portrait's `<img>` fallback, so a phone requests nothing. */
 const BLANK_PIXEL =
-  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 
 /**
  * The home page (#269, #187). The frame is the project page's: a two-line
@@ -91,8 +91,8 @@ const BLANK_PIXEL =
  * closing band with the brief form.
  */
 export default define.page(function Home(ctx) {
-  head.value = { ...head.value, description: homeDescription() };
-  const visible = visibleTestimonials(homeTestimonialIds.map(testimonial));
+  head.value = { ...head.value, description: homeDescription() }
+  const visible = visibleTestimonials(homeTestimonialIds.map(testimonial))
   return (
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
@@ -474,5 +474,5 @@ export default define.page(function Home(ctx) {
         </ClosingBand>
       </div>
     </Layout>
-  );
-});
+  )
+})

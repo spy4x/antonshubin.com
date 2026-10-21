@@ -15,7 +15,7 @@
  * confirmation or unsubscribe link) is left as it is, because its URL carries
  * a token.
  */
-import { escapeHtml } from "@spy4x/email/html";
+import { escapeHtml } from "@spy4x/email/html"
 import {
   bulletList,
   button as letterButton,
@@ -26,16 +26,16 @@ import {
   paragraph,
   renderLetter as renderShell,
   UNSUBSCRIBE_PLACEHOLDER,
-} from "@spy4x/email/letter";
-import { channelUrl } from "@/scripts/utm.ts";
+} from "@spy4x/email/letter"
+import { channelUrl } from "@/scripts/utm.ts"
 import {
   type BlogArticle,
   postCover,
   postCoverAlt,
   postIntro,
-} from "./blog-posts.ts";
-import { ROLE } from "./head.ts";
-import { BOOK_LABEL } from "./nav.ts";
+} from "./blog-posts.ts"
+import { ROLE } from "./head.ts"
+import { BOOK_LABEL } from "./nav.ts"
 
 export {
   bulletList,
@@ -44,47 +44,47 @@ export {
   linkedImage,
   paragraph,
   UNSUBSCRIBE_PLACEHOLDER,
-};
-export { fillUnsubscribe } from "@spy4x/email/letter";
+}
+export { fillUnsubscribe } from "@spy4x/email/letter"
 
 /** Anton's portrait for mail: 96×96 PNG, shown at 48×48. */
-export const PORTRAIT_PATH = "/img/email/anton-96.png";
+export const PORTRAIT_PATH = "/img/email/anton-96.png"
 
 /** The accent filled button: Accent with Ink text (`assets/styles.css`'s `@theme`). */
-export const BUTTON_COLORS = { background: "#f97316", color: "#0b0d10" };
+export const BUTTON_COLORS = { background: "#f97316", color: "#0b0d10" }
 
-const HEADING_FONT = "Georgia,'Times New Roman',serif";
-const BODY_FONT = "Arial,Helvetica,sans-serif";
-const MUTED = "#6b7280";
-const LINK = "#b45309";
+const HEADING_FONT = "Georgia,'Times New Roman',serif"
+const BODY_FONT = "Arial,Helvetica,sans-serif"
+const MUTED = "#6b7280"
+const LINK = "#b45309"
 
 /** The accent button; the plain-text version is its label and link on two
  * lines. Throws a `TypeError` for a link that is not `https:`, `http:` or
  * `mailto:`. */
 export function button(href: string, label: string): LetterBlock {
-  return letterButton(href, label, BUTTON_COLORS);
+  return letterButton(href, label, BUTTON_COLORS)
 }
 
 /** What {@linkcode renderLetter} needs. */
 export interface LetterInput {
   /** The site's origin; images and every tagged link are built from it. */
-  baseUrl: string;
+  baseUrl: string
   /** The `utm_campaign` of every link into the site. */
-  campaign: string;
+  campaign: string
   /** The hidden preview line the inbox shows next to the subject. */
-  preheader?: string;
-  blocks: readonly LetterBlock[];
+  preheader?: string
+  blocks: readonly LetterBlock[]
   /** Show the P.S. with the booking link; the confirmation mail has none. */
-  ps?: boolean;
+  ps?: boolean
   /** The question or sentence before the booking link in the P.S. */
-  psLead?: string;
+  psLead?: string
   /** Why the reader gets this mail, one sentence. */
-  reason: string;
+  reason: string
   /**
    * The reader's own unsubscribe link, or {@linkcode UNSUBSCRIBE_PLACEHOLDER}.
    * Omitted when the mail goes to someone who has not subscribed yet.
    */
-  unsubscribeLink?: string;
+  unsubscribeLink?: string
 }
 
 /** `path` on the site as the `email` channel's tagged URL. */
@@ -93,7 +93,7 @@ export function emailLink(
   path: string,
   campaign: string,
 ): string {
-  return channelUrl(baseUrl, path, "email", campaign);
+  return channelUrl(baseUrl, path, "email", campaign)
 }
 
 /** Anton's portrait, name and role above the content. */
@@ -106,26 +106,26 @@ function portraitHeader(baseUrl: string): LetterBlock {
         escapeHtml(ROLE)
       }</div></td></tr></table>`,
     text: `Anton Shubin\n${ROLE}`,
-  };
+  }
 }
 
 /** Wraps `blocks` in the letter layout and returns both parts. */
 export function renderLetter(input: LetterInput): Letter {
-  const { baseUrl, campaign } = input;
-  const bookUrl = emailLink(baseUrl, "/book", campaign);
-  const psLead = input.psLead ?? "Building a product?";
-  const replyLine = "Reply to this email: it comes straight to me.";
+  const { baseUrl, campaign } = input
+  const bookUrl = emailLink(baseUrl, "/book", campaign)
+  const psLead = input.psLead ?? "Building a product?"
+  const replyLine = "Reply to this email: it comes straight to me."
 
   const ps: LetterBlock = {
     html: `<p style="margin:16px 0 0">P.S. ${escapeHtml(psLead)} <a href="${
       escapeHtml(bookUrl)
     }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a>.</p>`,
     text: `P.S. ${psLead} ${BOOK_LABEL}: ${bookUrl}`,
-  };
+  }
   const reply: LetterBlock = {
     html: `<p style="margin:16px 0 0">${escapeHtml(replyLine)}</p>`,
     text: replyLine,
-  };
+  }
 
   return renderShell({
     header: portraitHeader(baseUrl),
@@ -148,7 +148,7 @@ export function renderLetter(input: LetterInput): Letter {
       linkColor: MUTED,
     },
     ...(input.preheader ? { preheader: input.preheader } : {}),
-  });
+  })
 }
 
 /**
@@ -157,7 +157,7 @@ export function renderLetter(input: LetterInput): Letter {
  * " · ", and a dot before that separator reads as a typo.
  */
 export const SUBSCRIBED_REASON =
-  "You get this because you subscribed to Anton Shubin's newsletter";
+  "You get this because you subscribed to Anton Shubin's newsletter"
 
 /**
  * The announcement of a blog post: the cover (linked to the post), the intro,
@@ -170,7 +170,7 @@ export function postLetter(
   article: BlogArticle,
   { baseUrl, campaign }: { baseUrl: string; campaign: string },
 ): Letter {
-  const url = emailLink(baseUrl, `/blog/${article.slug}`, campaign);
+  const url = emailLink(baseUrl, `/blog/${article.slug}`, campaign)
   return renderLetter({
     baseUrl,
     campaign,
@@ -188,5 +188,5 @@ export function postLetter(
     ],
     reason: SUBSCRIBED_REASON,
     unsubscribeLink: UNSUBSCRIBE_PLACEHOLDER,
-  });
+  })
 }

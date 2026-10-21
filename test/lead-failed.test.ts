@@ -1,11 +1,11 @@
 // Rendered-site guard for #266: when the relay cannot be reached, the lead is
 // appended to LEADS_FAILED_FILE, and the visitor's answer is unchanged.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { startSite } from "./harness.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { startSite } from "./harness.ts"
 
 Deno.test("a lead whose mail cannot be sent is kept in the failed-leads file", async () => {
-  const dir = await Deno.makeTempDir();
-  const file = `${dir}/data/leads-failed.jsonl`;
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/data/leads-failed.jsonl`
   try {
     const site = await startSite({
       env: {
@@ -17,7 +17,7 @@ Deno.test("a lead whose mail cannot be sent is kept in the failed-leads file", a
         CONTACT_EMAIL: "owner@example.com",
         LEADS_FAILED_FILE: file,
       },
-    });
+    })
     try {
       const res = await site.get("/api/lead", {
         method: "POST",
@@ -30,27 +30,27 @@ Deno.test("a lead whose mail cannot be sent is kept in the failed-leads file", a
           email: "jane@example.com",
           techStack: "Deno and Postgres",
         }),
-      });
-      assertEquals(res.status, 200);
-      await res.body?.cancel();
+      })
+      assertEquals(res.status, 200)
+      await res.body?.cancel()
 
       // The mail is sent after the answer, so wait for the file (10 s cap).
-      let text = "";
+      let text = ""
       for (let i = 0; i < 100 && !text; i++) {
-        text = await Deno.readTextFile(file).catch(() => "");
-        if (!text) await new Promise((r) => setTimeout(r, 100));
+        text = await Deno.readTextFile(file).catch(() => "")
+        if (!text) await new Promise((r) => setTimeout(r, 100))
       }
-      assert(text, "the failed lead never reached the file");
-      const kept = JSON.parse(text.trim().split("\n")[0]);
+      assert(text, "the failed lead never reached the file")
+      const kept = JSON.parse(text.trim().split("\n")[0])
       assertEquals(kept.lead, {
         name: "Jane Doe",
         email: "jane@example.com",
         techStack: "Deno and Postgres",
-      });
+      })
     } finally {
-      await site.stop();
+      await site.stop()
     }
   } finally {
-    await Deno.remove(dir, { recursive: true });
+    await Deno.remove(dir, { recursive: true })
   }
-});
+})

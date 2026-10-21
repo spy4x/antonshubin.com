@@ -1,6 +1,6 @@
-import type { ComponentChildren } from "preact";
-import { FeatureCard } from "@spy4x/preact-ui/feature-card";
-import type { Tool, ToolFeature, ToolScreenshot } from "../lib/tools.ts";
+import type { ComponentChildren } from "preact"
+import { FeatureCard } from "@spy4x/preact-ui/feature-card"
+import type { Tool, ToolFeature, ToolScreenshot } from "../lib/tools.ts"
 
 /**
  * "What you get" of a tool page whose entry has `features` (#448): drawn by
@@ -11,9 +11,9 @@ import type { Tool, ToolFeature, ToolScreenshot } from "../lib/tools.ts";
 /** One screenshot as a lazy `<img>`. */
 function Shot(
   { shot, sizes, class: className = "block" }: {
-    shot: ToolScreenshot;
-    sizes: string;
-    class?: string;
+    shot: ToolScreenshot
+    sizes: string
+    class?: string
   },
 ) {
   return (
@@ -28,7 +28,7 @@ function Shot(
       decoding="async"
       class={`${className} w-full h-auto`}
     />
-  );
+  )
 }
 
 /** The `lg` column span of each feature card size in the six-column grid. */
@@ -36,21 +36,21 @@ const SPAN: Record<NonNullable<ToolFeature["size"]> | "third", string> = {
   third: "lg:col-span-2",
   half: "lg:col-span-3",
   wide: "lg:col-span-4",
-};
+}
 
 /** The `sizes` of a card's shot at each card size. */
 const SIZES: Record<keyof typeof SPAN, string> = {
   third: "(min-width: 1024px) 20.5rem, (min-width: 640px) 50vw, 100vw",
   half: "(min-width: 1024px) 31.5rem, (min-width: 640px) 50vw, 100vw",
   wide: "(min-width: 1024px) 42rem, (min-width: 640px) 50vw, 100vw",
-};
+}
 
 /** A feature's picture: its `phoneShot` under 640px when it has one. */
 function FeatureMedia({ feature }: { feature: ToolFeature }) {
-  const { shot, phoneShot } = feature;
-  if (!shot) return null;
-  const sizes = SIZES[feature.size ?? "third"];
-  if (!phoneShot) return <Shot shot={shot} sizes={sizes} />;
+  const { shot, phoneShot } = feature
+  if (!shot) return null
+  const sizes = SIZES[feature.size ?? "third"]
+  if (!phoneShot) return <Shot shot={shot} sizes={sizes} />
   // Two images, one shown per width: each keeps its own alt text, and the
   // hidden one is never fetched because a lazy image loads only when shown.
   return (
@@ -58,7 +58,7 @@ function FeatureMedia({ feature }: { feature: ToolFeature }) {
       <Shot shot={phoneShot} sizes="100vw" class="block sm:hidden" />
       <Shot shot={shot} sizes={sizes} class="hidden sm:block" />
     </>
-  );
+  )
 }
 
 /**
@@ -70,11 +70,11 @@ function FeatureMedia({ feature }: { feature: ToolFeature }) {
  */
 export function ShowcaseFeatures(
   { tool, after }: {
-    tool: Tool;
-    after?: (feature: ToolFeature) => ComponentChildren;
+    tool: Tool
+    after?: (feature: ToolFeature) => ComponentChildren
   },
 ) {
-  if (!tool.features?.length) return null;
+  if (!tool.features?.length) return null
   return (
     <section aria-labelledby="features">
       <h2 id="features" class="text-2xl sm:text-3xl text-parchment">
@@ -95,5 +95,5 @@ export function ShowcaseFeatures(
         ))}
       </div>
     </section>
-  );
+  )
 }

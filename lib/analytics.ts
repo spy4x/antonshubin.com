@@ -27,10 +27,10 @@ export const ANALYTICS_EVENTS = [
   "copy",
   "post-read",
   "not-found",
-] as const;
+] as const
 
 /** One of `ANALYTICS_EVENTS`. */
-export type AnalyticsEvent = typeof ANALYTICS_EVENTS[number];
+export type AnalyticsEvent = typeof ANALYTICS_EVENTS[number]
 
 /**
  * Where on the page a link sits: the nav, the first screen (`hero`), a fact
@@ -49,41 +49,41 @@ export const PLACES = [
   "top",
   "calendar",
   "body",
-] as const;
+] as const
 
 /** One of `PLACES`. */
-export type Place = typeof PLACES[number];
+export type Place = typeof PLACES[number]
 
 /** Why a brief did not go through: the form refused it, or the server did. */
-export type BriefErrorReason = "invalid" | "server";
+export type BriefErrorReason = "invalid" | "server"
 
 /** The properties an event can carry; each becomes `data-umami-event-<key>`. */
 export interface EventProps {
-  place?: Place;
+  place?: Place
   /** The catalog item, project, tool or post the link is about. */
-  item?: string;
+  item?: string
   /**
    * `outbound` only: a short name for where the link goes (`upwork`,
    * `github`, `issues`, `live`, `website`, `registry`, `demo-app`,
    * `demo-admin` …).
    */
-  to?: string;
+  to?: string
   /** `cta` only: the internal path the link opens. */
-  target?: string;
+  target?: string
   /** `copy` only: which field was copied. */
-  field?: string;
+  field?: string
   /** `brief-error` only. */
-  reason?: BriefErrorReason;
+  reason?: BriefErrorReason
   /** `brief-sent` only: the catalog slug a prefilled brief was about. */
-  service?: string;
+  service?: string
   /** `tool-try` only: which of a tool page's own interactions was used. */
-  part?: string;
+  part?: string
 }
 
 /** The attributes `eventAttrs()` returns, ready to spread onto an element. */
 export type EventAttrs =
   & { "data-umami-event": AnalyticsEvent }
-  & { [key: `data-umami-event-${string}`]: string };
+  & { [key: `data-umami-event-${string}`]: string }
 
 /**
  * The `data-umami-event` attribute and one `data-umami-event-<key>` per set
@@ -93,11 +93,11 @@ export function eventAttrs(
   name: AnalyticsEvent,
   props: EventProps = {},
 ): EventAttrs {
-  const attrs: EventAttrs = { "data-umami-event": name };
+  const attrs: EventAttrs = { "data-umami-event": name }
   for (const [key, value] of Object.entries(props)) {
-    if (value) attrs[`data-umami-event-${key}`] = String(value);
+    if (value) attrs[`data-umami-event-${key}`] = String(value)
   }
-  return attrs;
+  return attrs
 }
 
 /** Short `to` names for the hosts the site links to most. */
@@ -114,10 +114,10 @@ const OUTBOUND_NAMES: Record<string, string> = {
   "dev.to": "devto",
   "jsr.io": "jsr",
   "npmjs.com": "npm",
-};
+}
 
 /** This site's own hosts: a link to one of them is not outbound. */
-const OWN_HOSTS = ["antonshubin.com", "www.antonshubin.com"];
+const OWN_HOSTS = ["antonshubin.com", "www.antonshubin.com"]
 
 /**
  * The `to` property for a link to another site: `email` for `mailto:`, a
@@ -126,24 +126,24 @@ const OWN_HOSTS = ["antonshubin.com", "www.antonshubin.com"];
  * a link that stays on this site (a path, a fragment, or this site's host).
  */
 export function outboundTo(href: string): string | null {
-  if (href.startsWith("mailto:")) return "email";
-  if (!/^https?:\/\//i.test(href)) return null;
-  let host: string;
+  if (href.startsWith("mailto:")) return "email"
+  if (!/^https?:\/\//i.test(href)) return null
+  let host: string
   try {
-    host = new URL(href).hostname.toLowerCase();
+    host = new URL(href).hostname.toLowerCase()
   } catch {
-    return null;
+    return null
   }
-  if (OWN_HOSTS.includes(host)) return null;
-  const bare = host.replace(/^www\./, "");
-  if (bare.endsWith(`.${OWN_HOSTS[0]}`)) return bare.split(".")[0];
-  return OUTBOUND_NAMES[bare] ?? bare;
+  if (OWN_HOSTS.includes(host)) return null
+  const bare = host.replace(/^www\./, "")
+  if (bare.endsWith(`.${OWN_HOSTS[0]}`)) return bare.split(".")[0]
+  return OUTBOUND_NAMES[bare] ?? bare
 }
 
 /** The written brief: on the booking page, or the home page's form. */
-const BRIEF_HREF = /^\/(?:book(?:\?[^#]*)?#brief|#audit-form)$/;
+const BRIEF_HREF = /^\/(?:book(?:\?[^#]*)?#brief|#audit-form)$/
 /** The booking page itself. */
-const BOOK_HREF = /^\/book(?:\?[^#]*)?$/;
+const BOOK_HREF = /^\/book(?:\?[^#]*)?$/
 
 /**
  * The event for a link given only its `href`: `outbound` (with `to` and
@@ -155,23 +155,23 @@ export function linkEvent(
   href: string,
   props: Pick<EventProps, "place" | "item" | "to"> = {},
 ): EventAttrs {
-  const to = outboundTo(href);
+  const to = outboundTo(href)
   if (to) {
-    return eventAttrs("outbound", { to: props.to ?? to, item: props.item });
+    return eventAttrs("outbound", { to: props.to ?? to, item: props.item })
   }
-  const place = props.place ?? "body";
+  const place = props.place ?? "body"
   if (BRIEF_HREF.test(href)) {
-    return eventAttrs("brief", { place, item: props.item });
+    return eventAttrs("brief", { place, item: props.item })
   }
   if (BOOK_HREF.test(href)) {
-    return eventAttrs("book", { place, item: props.item });
+    return eventAttrs("book", { place, item: props.item })
   }
-  return eventAttrs("cta", { place, target: href });
+  return eventAttrs("cta", { place, target: href })
 }
 
 /** Umami's tracker, when the page loaded it (never for crawlers, `/pay` or `/unsubscribe`). */
 interface UmamiGlobal {
-  umami?: { track?: (name: string, data?: Record<string, string>) => void };
+  umami?: { track?: (name: string, data?: Record<string, string>) => void }
 }
 
 /**
@@ -180,14 +180,14 @@ interface UmamiGlobal {
  * page. Unset properties are left out, as in `eventAttrs()`.
  */
 export function track(name: AnalyticsEvent, props: EventProps = {}): void {
-  const data: Record<string, string> = {};
+  const data: Record<string, string> = {}
   for (const [key, value] of Object.entries(props)) {
-    if (value) data[key] = String(value);
+    if (value) data[key] = String(value)
   }
   try {
-    const umami = (globalThis as UmamiGlobal).umami;
-    if (Object.keys(data).length > 0) umami?.track?.(name, data);
-    else umami?.track?.(name);
+    const umami = (globalThis as UmamiGlobal).umami
+    if (Object.keys(data).length > 0) umami?.track?.(name, data)
+    else umami?.track?.(name)
   } catch {
     // Analytics is fail-open.
   }
@@ -203,12 +203,12 @@ export function trackWhenReady(
   props: EventProps = {},
 ): void {
   if ((globalThis as UmamiGlobal).umami || document.readyState === "complete") {
-    track(name, props);
-    return;
+    track(name, props)
+    return
   }
   globalThis.addEventListener("load", () => track(name, props), {
     once: true,
-  });
+  })
 }
 
 /**
@@ -216,7 +216,7 @@ export function trackWhenReady(
  * event: while it holds any value, the tracker sends nothing from this
  * browser. `/privacy` offers it as a button (`islands/AnalyticsOptOut.tsx`).
  */
-export const ANALYTICS_OPT_OUT_KEY = "umami.disabled";
+export const ANALYTICS_OPT_OUT_KEY = "umami.disabled"
 
 /**
  * True when this browser has switched the counting off: the key holds a
@@ -224,9 +224,9 @@ export const ANALYTICS_OPT_OUT_KEY = "umami.disabled";
  */
 export function analyticsOptedOut(): boolean {
   try {
-    return Boolean(localStorage.getItem(ANALYTICS_OPT_OUT_KEY));
+    return Boolean(localStorage.getItem(ANALYTICS_OPT_OUT_KEY))
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -237,11 +237,11 @@ export function analyticsOptedOut(): boolean {
  */
 export function setAnalyticsOptOut(off: boolean): boolean {
   try {
-    if (off) localStorage.setItem(ANALYTICS_OPT_OUT_KEY, "1");
-    else localStorage.removeItem(ANALYTICS_OPT_OUT_KEY);
-    return true;
+    if (off) localStorage.setItem(ANALYTICS_OPT_OUT_KEY, "1")
+    else localStorage.removeItem(ANALYTICS_OPT_OUT_KEY)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -251,10 +251,10 @@ export function setAnalyticsOptOut(off: boolean): boolean {
  * holds the address, and `/pay` holds bank details. Umami stores the full URL
  * of every page view.
  */
-export const UNTRACKED_PATHS = ["/unsubscribe", "/subscribe/confirm", "/pay"];
+export const UNTRACKED_PATHS = ["/unsubscribe", "/subscribe/confirm", "/pay"]
 
 /** False for a path in `UNTRACKED_PATHS`, with or without a trailing slash. */
 export function analyticsAllowed(pathname: string): boolean {
-  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  return !UNTRACKED_PATHS.includes(path);
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname
+  return !UNTRACKED_PATHS.includes(path)
 }

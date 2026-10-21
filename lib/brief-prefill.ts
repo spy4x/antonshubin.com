@@ -4,7 +4,7 @@
 
 /** The editable first line of a brief about one catalog item. */
 export function briefPrefill(shortTitle: string): string {
-  return `About: ${shortTitle}\n\n`;
+  return `About: ${shortTitle}\n\n`
 }
 
 /**
@@ -12,8 +12,8 @@ export function briefPrefill(shortTitle: string): string {
  * prefill alone does not count as describing an idea or an app.
  */
 export function isEmptyBrief(text: string, shortTitle?: string): boolean {
-  const trimmed = text.trim();
-  if (!trimmed) return true;
+  const trimmed = text.trim()
+  if (!trimmed) return true
   return shortTitle !== undefined &&
-    trimmed === briefPrefill(shortTitle).trim();
+    trimmed === briefPrefill(shortTitle).trim()
 }

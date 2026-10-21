@@ -1,59 +1,59 @@
-import { useSignal } from "@preact/signals";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useSignal } from "@preact/signals"
+import { useEffect, useRef, useState } from "preact/hooks"
 import {
   IconArrowRight as ArrowRightIcon,
   IconCheck as CheckIcon,
-} from "@spy4x/preact-icons";
-import { honeypotField } from "@spy4x/preact-ui/honeypot";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { proof } from "../lib/proof.ts";
-import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
-import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts";
-import { type BriefErrorReason, eventAttrs, track } from "../lib/analytics.ts";
-import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
-import { decapitalize } from "../lib/promises.ts";
+} from "@spy4x/preact-icons"
+import { honeypotField } from "@spy4x/preact-ui/honeypot"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { proof } from "../lib/proof.ts"
+import { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts"
+import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts"
+import { type BriefErrorReason, eventAttrs, track } from "../lib/analytics.ts"
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts"
+import { decapitalize } from "../lib/promises.ts"
 
 /** The calendar island's component, loaded only when the success panel needs it. */
-type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default;
+type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default
 
 /** What the written brief promises; the form and `/book` without a scheduler both say it. */
 export const BRIEF_PROMISE =
-  "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment. I reply by email myself, within one working day.";
+  "Send me your idea or your current app and I'll write back with 3 concrete architectural improvements. No cost. No commitment. I reply by email myself, within one working day."
 
 /** The field name `lib/lead.ts` reads back as the honeypot. */
-const HONEYPOT_FIELD = "_website";
+const HONEYPOT_FIELD = "_website"
 
 /** The catalog item a visitor came from (`/book?service=<slug>`), already checked against `lib/catalog.ts`. */
 export interface LeadService {
-  slug: string;
-  shortTitle: string;
+  slug: string
+  shortTitle: string
 }
 
 interface LeadFormProps {
-  scheduleUrl: string;
+  scheduleUrl: string
   /**
    * The id-link of a calendar already on the page (`/book` passes
    * `#book`). The success panel then points up to it instead of rendering a
    * second calendar (#272).
    */
-  calendarAbove?: string;
+  calendarAbove?: string
   /** Prefills the brief with "About: <shortTitle>" and sends the slug with it. */
-  service?: LeadService;
+  service?: LeadService
   /** False when the page's own heading already says "Send a written brief" and its promise. */
-  intro?: boolean;
+  intro?: boolean
 }
 
 interface FormState {
-  name: string;
-  email: string;
-  techStack: string;
+  name: string
+  email: string
+  techStack: string
 }
 
 type SubmitStatus =
   | { type: "idle" }
   | { type: "submitting" }
   | { type: "success" }
-  | { type: "error"; message: string; field?: string };
+  | { type: "error"; message: string; field?: string }
 
 /** The id of the field a validation error is about, so it can carry aria-invalid/aria-describedby. */
 function validate(
@@ -61,21 +61,21 @@ function validate(
   serviceTitle?: string,
 ): { field: string; message: string } | null {
   if (!form.name.trim()) {
-    return { field: "lead-name", message: "Name is required" };
+    return { field: "lead-name", message: "Name is required" }
   }
   if (!form.email.trim()) {
-    return { field: "lead-email", message: "Email is required" };
+    return { field: "lead-email", message: "Email is required" }
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    return { field: "lead-email", message: "Please enter a valid email" };
+    return { field: "lead-email", message: "Please enter a valid email" }
   }
   if (isEmptyBrief(form.techStack, serviceTitle)) {
     return {
       field: "lead-stack",
       message: "Describe your idea or your current app",
-    };
+    }
   }
-  return null;
+  return null
 }
 
 export default function LeadForm(
@@ -86,44 +86,44 @@ export default function LeadForm(
     intro = true,
   }: LeadFormProps,
 ) {
-  const name = useSignal("");
-  const email = useSignal("");
+  const name = useSignal("")
+  const email = useSignal("")
   const techStack = useSignal(
     service ? briefPrefill(service.shortTitle) : "",
-  );
-  const status = useSignal<SubmitStatus>({ type: "idle" });
+  )
+  const status = useSignal<SubmitStatus>({ type: "idle" })
 
   // Set page-load timestamp on mount
-  const pageLoad = useSignal(Date.now());
+  const pageLoad = useSignal(Date.now())
 
   // Focus moves to the success heading once the submit succeeds, so a screen
   // reader announces it — see the note on the success wrapper below for why
   // focus rather than a live region.
-  const successHeadingRef = useRef<HTMLHeadingElement>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null)
 
   const handleSubmit = async (e: Event) => {
-    e.preventDefault();
+    e.preventDefault()
     // Read before the first `await`: `currentTarget` is gone afterwards.
     const trap = (e.currentTarget as HTMLFormElement).elements.namedItem(
       HONEYPOT_FIELD,
-    ) as HTMLInputElement | null;
+    ) as HTMLInputElement | null
     const form: FormState = {
       name: name.value,
       email: email.value,
       techStack: techStack.value,
-    };
-    const error = validate(form, service?.shortTitle);
+    }
+    const error = validate(form, service?.shortTitle)
     if (error) {
       status.value = {
         type: "error",
         message: error.message,
         field: error.field,
-      };
-      track("brief-error", { reason: "invalid" });
-      return;
+      }
+      track("brief-error", { reason: "invalid" })
+      return
     }
-    status.value = { type: "submitting" };
-    let reason: BriefErrorReason = "server";
+    status.value = { type: "submitting" }
+    let reason: BriefErrorReason = "server"
     try {
       const resp = await fetch("/api/lead", {
         method: "POST",
@@ -134,43 +134,43 @@ export default function LeadForm(
           _t: pageLoad.value,
           [HONEYPOT_FIELD]: trap?.value ?? "",
         }),
-      });
+      })
       if (!resp.ok) {
-        const body = await resp.json().catch(() => ({}));
+        const body = await resp.json().catch(() => ({}))
         // 400 is the server refusing what was typed; anything else is the
         // server or the network failing (#318).
-        reason = resp.status === 400 ? "invalid" : "server";
-        throw new Error(body?.error || "Something went wrong. Try again.");
+        reason = resp.status === 400 ? "invalid" : "server"
+        throw new Error(body?.error || "Something went wrong. Try again.")
       }
-      status.value = { type: "success" };
+      status.value = { type: "success" }
       // Counted only once the server accepted the brief, never on the click.
-      track("brief-sent", { service: service?.slug });
+      track("brief-sent", { service: service?.slug })
     } catch (err) {
       status.value = {
         type: "error",
         message: err instanceof Error ? err.message : "Something went wrong",
-      };
-      track("brief-error", { reason });
+      }
+      track("brief-error", { reason })
     }
-  };
+  }
 
-  const isSuccess = status.value.type === "success";
+  const isSuccess = status.value.type === "success"
   const errorField = status.value.type === "error"
     ? status.value.field
-    : undefined;
+    : undefined
 
   // The calendar's code is fetched only once a brief went out and this panel
   // is going to show it (#272).
-  const [MeetEmbed, setMeetEmbed] = useState<MeetEmbedComponent | null>(null);
-  const wantsCalendar = isSuccess && Boolean(scheduleUrl) && !calendarAbove;
+  const [MeetEmbed, setMeetEmbed] = useState<MeetEmbedComponent | null>(null)
+  const wantsCalendar = isSuccess && Boolean(scheduleUrl) && !calendarAbove
   useEffect(() => {
-    if (!wantsCalendar || MeetEmbed) return;
+    if (!wantsCalendar || MeetEmbed) return
     import("./MeetEmbed.tsx")
       .then((m) => setMeetEmbed(() => m.default))
       // A failed chunk load (offline, a deploy in between) leaves the panel
       // without a calendar; the new-tab link under it still works.
-      .catch(() => {});
-  }, [wantsCalendar]);
+      .catch(() => {})
+  }, [wantsCalendar])
 
   // Runs after the DOM commits the success state, once the heading is no
   // longer inside an `inert` subtree and can actually take focus.
@@ -180,8 +180,8 @@ export default function LeadForm(
     // focus() scrolls the page down to where the panel will end up, then
     // back up as the panel expands — a ~150ms jump-and-settle that doesn't
     // happen on the server-rendered page at all.
-    if (isSuccess) successHeadingRef.current?.focus({ preventScroll: true });
-  }, [isSuccess]);
+    if (isSuccess) successHeadingRef.current?.focus({ preventScroll: true })
+  }, [isSuccess])
 
   return (
     <div class="bg-paper rounded-xl border border-rule p-4 sm:p-6 relative overflow-hidden">
@@ -455,5 +455,5 @@ export default function LeadForm(
         )}
       </div>
     </div>
-  );
+  )
 }

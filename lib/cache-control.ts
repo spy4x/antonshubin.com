@@ -2,17 +2,17 @@
 // A pure function of the request's path and the response's status and
 // header, so a unit test can cover every tier.
 
-import { pagesFor } from "./pages.ts";
+import { pagesFor } from "./pages.ts"
 
 // Core static page routes that change infrequently (cached 3 days at edge):
 // `lib/pages.ts`'s list, minus the pages it marks as kept off the edge tier.
-export const CORE_PAGES = new Set(pagesFor("edge").map((p) => p.path));
+export const CORE_PAGES = new Set(pagesFor("edge").map((p) => p.path))
 
 const isAsset = (pathname: string) =>
-  pathname.startsWith("/assets/") || pathname.startsWith("/_fresh/");
-const isImage = (pathname: string) => pathname.startsWith("/img/");
+  pathname.startsWith("/assets/") || pathname.startsWith("/_fresh/")
+const isImage = (pathname: string) => pathname.startsWith("/img/")
 /** The tool pages' demo clips and posters (docs/images.md "Videos"). */
-const isVideo = (pathname: string) => pathname.startsWith("/video/");
+const isVideo = (pathname: string) => pathname.startsWith("/video/")
 
 /**
  * Favicons, `manifest.json` and other small static files at the site root —
@@ -22,14 +22,14 @@ const isVideo = (pathname: string) => pathname.startsWith("/video/");
  */
 const isStaticRootFile = (pathname: string) =>
   pathname === "/manifest.json" ||
-  /^\/(favicon|apple-icon)[\w.-]*\.(png|ico)$/.test(pathname);
+  /^\/(favicon|apple-icon)[\w.-]*\.(png|ico)$/.test(pathname)
 
 /** What {@link cacheControlFor} decides from. */
 export interface CacheInput {
-  pathname: string;
-  status: number;
+  pathname: string
+  status: number
   /** The Cache-Control header the route already set, if any. */
-  current: string | null;
+  current: string | null
 }
 
 /**
@@ -53,10 +53,10 @@ export function cacheControlFor(
   // Never cache an error. A 404 for a core page (for example /hackathons
   // while its list is empty) would otherwise stay in browsers and at the edge
   // for three days after the page comes back.
-  if (status >= 400) return "no-store";
+  if (status >= 400) return "no-store"
 
   // Content-hashed assets — cache forever (fingerprint = immutable)
-  if (isAsset(pathname)) return "public, max-age=31536000, immutable";
+  if (isAsset(pathname)) return "public, max-age=31536000, immutable"
 
   // Images, videos and small static root files (rare changes) — cache 7 days,
   // serve stale while refreshing. Checked before the `current` no-store
@@ -64,13 +64,13 @@ export function cacheControlFor(
   // on any static file it doesn't itself recognise as content-hashed, and
   // that must not shadow this tier (see this function's own doc comment).
   if (isImage(pathname) || isVideo(pathname) || isStaticRootFile(pathname)) {
-    return "public, max-age=604800, stale-while-revalidate=86400";
+    return "public, max-age=604800, stale-while-revalidate=86400"
   }
 
   // A route's own deliberate no-store (not a static file, checked above —
   // routes/unsubscribe.tsx shows one subscriber's address, and every
   // status >= 400 response already returned above) wins from here down.
-  if (current?.includes("no-store")) return undefined;
+  if (current?.includes("no-store")) return undefined
 
   // ── Caching strategy ─────────────────────────────────────────
   //
@@ -93,15 +93,15 @@ export function cacheControlFor(
   // the server refreshes hourly (lib/tools-live.ts), so a three-day edge copy
   // would hide every refresh: keep them for an hour.
   if (pathname === "/tools" || pathname.startsWith("/tools/")) {
-    return "public, max-age=3600, stale-while-revalidate=600";
+    return "public, max-age=3600, stale-while-revalidate=600"
   }
 
   // Core static pages — cache 3 days at edge, stale-while-revalidate
   // for PWA background refreshes. The site content changes every few
   // days, so 3 days balances freshness with max edge cache HIT rate.
   if (CORE_PAGES.has(pathname)) {
-    return "public, max-age=259200, stale-while-revalidate=43200";
+    return "public, max-age=259200, stale-while-revalidate=43200"
   }
 
-  return undefined;
+  return undefined
 }

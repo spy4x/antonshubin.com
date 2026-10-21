@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0";
+import { assert, assertEquals, assertThrows } from "jsr:@std/assert@^1.0.0"
 import {
   archiveNoteText,
   latestPostDate,
@@ -10,10 +10,10 @@ import {
   relatedService,
   relatedToolLink,
   serviceLabel,
-} from "./blog.ts";
-import type { BlogArticle } from "./blog-posts.ts";
-import { blogArticles } from "./data.ts";
-import { findTool, toolsForPost } from "./tools.ts";
+} from "./blog.ts"
+import type { BlogArticle } from "./blog-posts.ts"
+import { blogArticles } from "./data.ts"
+import { findTool, toolsForPost } from "./tools.ts"
 
 function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
   return {
@@ -25,28 +25,28 @@ function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
     publishedAt: "2026-01-01",
     topic: "self-hosting",
     ...extra,
-  };
+  }
 }
 
 Deno.test("every post's relatedTool and catalogSlug resolve", () => {
   for (const article of blogArticles) {
-    relatedToolLink(article);
-    relatedService(article);
+    relatedToolLink(article)
+    relatedService(article)
   }
-});
+})
 
 Deno.test("an unknown relatedTool or catalogSlug throws", () => {
   assertThrows(
     () => relatedToolLink(post("x", { relatedTool: "no-such-tool" })),
     Error,
     'relatedTool "no-such-tool"',
-  );
+  )
   assertThrows(
     () => relatedService(post("x", { catalogSlug: "no-such-item" })),
     Error,
     'no catalog item "no-such-item"',
-  );
-});
+  )
+})
 
 Deno.test("a relatedTool links its /tools page in one hop, its live instance and its repository, from lib/tools.ts", () => {
   assertEquals(relatedToolLink(post("x", { relatedTool: "mig" })), {
@@ -55,20 +55,20 @@ Deno.test("a relatedTool links its /tools page in one hop, its live instance and
     href: "/tools/mig",
     repoUrl: "https://github.com/spy4x/mig",
     live: findTool("mig")!.live,
-  });
-  assert(findTool("mig")!.live, "mig lost its live link; pick another tool");
-  const libs = relatedToolLink(post("x", { relatedTool: "ts-libs" }));
-  assertEquals(libs?.href, "/tools/ts-libs");
-  assertEquals(libs?.live, undefined, "ts-libs has no live instance");
-});
+  })
+  assert(findTool("mig")!.live, "mig lost its live link; pick another tool")
+  const libs = relatedToolLink(post("x", { relatedTool: "ts-libs" }))
+  assertEquals(libs?.href, "/tools/ts-libs")
+  assertEquals(libs?.live, undefined, "ts-libs has no live instance")
+})
 
 Deno.test("the service label reads the title and price from lib/catalog.ts", () => {
-  const item = relatedService(post("x", { catalogSlug: "strategy-call" }))!;
+  const item = relatedService(post("x", { catalogSlug: "strategy-call" }))!
   assertEquals(
     serviceLabel(item),
     "The same work for you: Strategy session, $150",
-  );
-});
+  )
+})
 
 Deno.test("read next is the same topic, current posts only, newest first", () => {
   const list = [
@@ -78,17 +78,17 @@ Deno.test("read next is the same topic, current posts only, newest first", () =>
     post("archived", { publishedAt: "2026-04-01", archived: true }),
     post("other-topic", { publishedAt: "2026-05-01", topic: "ai-mcp" }),
     post("newest", { publishedAt: "2026-06-01" }),
-  ];
+  ]
   assertEquals(readNext(list[1], 3, list).map((a) => a.slug), [
     "newest",
     "new",
     "old",
-  ]);
+  ])
   assertEquals(readNext(list[1], 2, list).map((a) => a.slug), [
     "newest",
     "new",
-  ]);
-});
+  ])
+})
 
 Deno.test("no post suggests an archived post under Read next", () => {
   for (const article of blogArticles) {
@@ -97,16 +97,16 @@ Deno.test("no post suggests an archived post under Read next", () => {
         next.archived ?? false,
         false,
         `${article.slug} -> ${next.slug}`,
-      );
+      )
     }
   }
-});
+})
 
 Deno.test("an archived post's note names the month and year it was written", () => {
   assertEquals(
     archiveNoteText(post("x", { publishedAt: "2022-04-27", archived: true })),
     "Written in April 2022. Kept as written.",
-  );
+  )
   assertEquals(
     archiveNoteText(
       post("x", {
@@ -116,21 +116,21 @@ Deno.test("an archived post's note names the month and year it was written", () 
       }),
     ),
     "Written in February 2023. Kept as written. I now use Woodpecker.",
-  );
-});
+  )
+})
 
 Deno.test("a title tag drops the name suffix past 55 characters, or uses seoTitle", () => {
   assertEquals(
     postTitleTag(post("x", { title: "Short title" })),
     "Short title — Anton Shubin",
-  );
-  const long = "A title that is long enough to be cut off by a search result";
-  assertEquals(postTitleTag(post("x", { title: long })), long);
+  )
+  const long = "A title that is long enough to be cut off by a search result"
+  assertEquals(postTitleTag(post("x", { title: long })), long)
   assertEquals(
     postTitleTag(post("x", { title: long, seoTitle: "Short" })),
     "Short",
-  );
-});
+  )
+})
 
 Deno.test("the latest post date skips archived posts and counts updates", () => {
   assertEquals(
@@ -140,8 +140,8 @@ Deno.test("the latest post date skips archived posts and counts updates", () => 
       post("c", { publishedAt: "2026-09-01", archived: true }),
     ]),
     "2026-05-01",
-  );
-});
+  )
+})
 
 Deno.test("a post's relatedTool is the tool whose posts list names it, and only that one", () => {
   // lib/tools.ts lists each tool's posts (#273) and a post's front matter
@@ -151,48 +151,48 @@ Deno.test("a post's relatedTool is the tool whose posts list names it, and only 
       article.relatedTool,
       toolsForPost(article.slug)[0]?.slug,
       article.slug,
-    );
-    assertEquals(toolsForPost(article.slug).length <= 1, true, article.slug);
+    )
+    assertEquals(toolsForPost(article.slug).length <= 1, true, article.slug)
   }
-});
+})
 
 Deno.test("a post date reads as day, month name and year", () => {
-  assertEquals(postDate("2026-06-15"), "15 June 2026");
-  assertEquals(postDate("2026-01-01"), "1 January 2026");
-});
+  assertEquals(postDate("2026-06-15"), "15 June 2026")
+  assertEquals(postDate("2026-01-01"), "1 January 2026")
+})
 
 Deno.test("a post date does not move to the previous day west of UTC", async () => {
-  const blog = import.meta.resolve("./blog.ts");
+  const blog = import.meta.resolve("./blog.ts")
   const { stdout, stderr, success } = await new Deno.Command("deno", {
     args: [
       "eval",
       `import { postDate } from "${blog}"; console.log(postDate("2026-01-01"))`,
     ],
     env: { TZ: "America/Los_Angeles" },
-  }).output();
-  assert(success, new TextDecoder().decode(stderr));
-  assertEquals(new TextDecoder().decode(stdout).trim(), "1 January 2026");
-});
+  }).output()
+  assert(success, new TextDecoder().decode(stderr))
+  assertEquals(new TextDecoder().decode(stdout).trim(), "1 January 2026")
+})
 
 Deno.test("the full llms list carries every post's TL;DR, the short list none", () => {
-  const full = llmsBlogSections("https://example.com", true);
-  const short = llmsBlogSections("https://example.com", false);
-  assertEquals(short.includes("TL;DR"), false);
+  const full = llmsBlogSections("https://example.com", true)
+  const short = llmsBlogSections("https://example.com", false)
+  assertEquals(short.includes("TL;DR"), false)
   for (const article of blogArticles) {
-    const at = full.indexOf(`(https://example.com/blog/${article.slug})`);
-    assert(at !== -1, `${article.slug} is not in the list`);
+    const at = full.indexOf(`(https://example.com/blog/${article.slug})`)
+    assert(at !== -1, `${article.slug} is not in the list`)
     // The entry runs to the next post's line, or to the end of the list.
-    const next = full.indexOf("\n- [", at);
-    const entry = full.slice(at, next === -1 ? undefined : next);
+    const next = full.indexOf("\n- [", at)
+    const entry = full.slice(at, next === -1 ? undefined : next)
     for (const line of article.tldr) {
-      assert(entry.includes(`  - ${line}`), `${article.slug}: no "${line}"`);
+      assert(entry.includes(`  - ${line}`), `${article.slug}: no "${line}"`)
     }
   }
-});
+})
 
 Deno.test("a founder post ends with Book and a post of any other topic with the newsletter", () => {
-  assertEquals(postAsk(post("x", { topic: "founders" })), "book");
+  assertEquals(postAsk(post("x", { topic: "founders" })), "book")
   for (const topic of ["ai-mcp", "self-hosting", "scars"] as const) {
-    assertEquals(postAsk(post("x", { topic })), "newsletter");
+    assertEquals(postAsk(post("x", { topic })), "newsletter")
   }
-});
+})

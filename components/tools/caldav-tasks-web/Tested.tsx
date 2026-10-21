@@ -1,10 +1,10 @@
-import { IconCheck } from "@spy4x/preact-icons";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import { BROWSERS, SERVERS, type TestedRow } from "./data.ts";
+import { IconCheck } from "@spy4x/preact-icons"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import { BROWSERS, SERVERS, type TestedRow } from "./data.ts"
 
 const COMPATIBILITY =
-  "https://github.com/spy4x/caldav-tasks-web/blob/main/docs/compatibility.md";
+  "https://github.com/spy4x/caldav-tasks-web/blob/main/docs/compatibility.md"
 
 /** One table of "What was tested": a name, its status word and the evidence. */
 function Table(
@@ -48,7 +48,7 @@ function Table(
         ))}
       </tbody>
     </table>
-  );
+  )
 }
 
 /**
@@ -85,5 +85,5 @@ export function Tested() {
         has the evidence for each row.
       </p>
     </section>
-  );
+  )
 }

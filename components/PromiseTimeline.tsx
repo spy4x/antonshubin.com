@@ -1,11 +1,11 @@
-import { type PromiseItem, promises } from "../lib/promises.ts";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+import { type PromiseItem, promises } from "../lib/promises.ts"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 
 /** A quiet link under one promise of the `full` timeline: a catalog item or a page. */
 export interface PromiseLink {
-  href: string;
-  label: string;
+  href: string
+  label: string
 }
 
 /**
@@ -33,16 +33,16 @@ export function PromiseTimeline(
     layout = "row",
     links = {},
   }: {
-    variant: "full" | "compact";
-    headingLevel: 2 | 3;
-    items?: PromiseItem[];
+    variant: "full" | "compact"
+    headingLevel: 2 | 3
+    items?: PromiseItem[]
     /** `row` (default): five columns from 1024px. `stack`: vertical at every width. */
-    layout?: "row" | "stack";
+    layout?: "row" | "stack"
     /** `full` only: one quiet link under a promise, keyed by promise id. */
-    links?: Record<string, PromiseLink>;
+    links?: Record<string, PromiseLink>
   },
 ) {
-  const Heading = `h${headingLevel}` as "h2" | "h3";
+  const Heading = `h${headingLevel}` as "h2" | "h3"
   return (
     <ol
       data-promise-timeline={variant}
@@ -79,7 +79,7 @@ export function PromiseTimeline(
               </a>
             )}
           </>
-        );
+        )
         return (
           <li
             key={p.id}
@@ -111,8 +111,8 @@ export function PromiseTimeline(
               )
               : body}
           </li>
-        );
+        )
       })}
     </ol>
-  );
+  )
 }

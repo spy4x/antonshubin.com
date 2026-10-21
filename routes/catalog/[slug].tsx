@@ -1,8 +1,8 @@
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { Layout } from "../../components/Layout.tsx";
-import { NotFound } from "../../components/NotFound.tsx";
-import { BASE_URL } from "../../lib/config.ts";
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { Layout } from "../../components/Layout.tsx"
+import { NotFound } from "../../components/NotFound.tsx"
+import { BASE_URL } from "../../lib/config.ts"
 import {
   briefPath,
   callVersusSession,
@@ -14,36 +14,36 @@ import {
   catalogRedirects,
   priceLabel,
   startSteps,
-} from "../../lib/catalog.ts";
-import { projectsForCatalog } from "../../lib/work.ts";
+} from "../../lib/catalog.ts"
+import { projectsForCatalog } from "../../lib/work.ts"
 import {
   projectTestimonials,
   testimonialProject,
-} from "../../lib/testimonials.ts";
-import { metaDescription } from "../../lib/llms.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { toJsonLd } from "../../lib/json-ld.ts";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { FACT_LINK } from "../../components/FactCard.tsx";
-import { MoreWorkCard } from "../../components/MoreWorkCard.tsx";
-import { ServicePriceCard } from "../../components/ServicePriceCard.tsx";
-import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts";
-import { TestimonialCard } from "../../components/TestimonialCard.tsx";
+} from "../../lib/testimonials.ts"
+import { metaDescription } from "../../lib/llms.ts"
+import { getBreadcrumb, head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { toJsonLd } from "../../lib/json-ld.ts"
+import { ClosingBand } from "../../components/ClosingBand.tsx"
+import { FACT_LINK } from "../../components/FactCard.tsx"
+import { MoreWorkCard } from "../../components/MoreWorkCard.tsx"
+import { ServicePriceCard } from "../../components/ServicePriceCard.tsx"
+import { BOOK_LABEL, BRIEF_LABEL } from "../../lib/nav.ts"
+import { TestimonialCard } from "../../components/TestimonialCard.tsx"
 import {
   IconArrowRight as ArrowRightIcon,
   IconCheck as CheckIcon,
-} from "@spy4x/preact-icons";
-import { CatalogIcon } from "../../components/Icons.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
-import { tools } from "../../lib/tools.ts";
+} from "@spy4x/preact-icons"
+import { CatalogIcon } from "../../components/Icons.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
+import { tools } from "../../lib/tools.ts"
 import {
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_PROMPT,
   WHY_NOT_JUST_AI_SERVICES,
-} from "../../lib/why-not-just-ai.ts";
+} from "../../lib/why-not-just-ai.ts"
 import {
   SAAS_MVP_EYEBROW,
   SAAS_MVP_QUESTIONS_HEADING,
@@ -53,11 +53,11 @@ import {
   saasMvpLead,
   WHY_IT_COSTS_LESS,
   WHY_IT_COSTS_LESS_HEADING,
-} from "../../lib/saas-mvp.ts";
-import { Questions } from "../../components/Questions.tsx";
+} from "../../lib/saas-mvp.ts"
+import { Questions } from "../../components/Questions.tsx"
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
-  return catalogItems.find((i) => i.slug === slug);
+  return catalogItems.find((i) => i.slug === slug)
 }
 
 // Retired slugs answer 301 to the item that absorbed them (lib/catalog.ts).
@@ -66,38 +66,38 @@ function getItemBySlug(slug: string): CatalogItem | undefined {
 // an empty 200.
 export const handler = define.handlers({
   GET(ctx) {
-    const movedTo = catalogRedirects[ctx.params.slug];
+    const movedTo = catalogRedirects[ctx.params.slug]
     if (movedTo) {
       // Keep the query string, so a tagged link (?utm_…) survives the move.
-      const [path, hash] = movedTo.split("#");
-      const location = path + ctx.url.search + (hash ? `#${hash}` : "");
+      const [path, hash] = movedTo.split("#")
+      const location = path + ctx.url.search + (hash ? `#${hash}` : "")
       return new Response(null, {
         status: 301,
         headers: { Location: location },
-      });
+      })
     }
     return getItemBySlug(ctx.params.slug) ? page() : page(null, {
       status: 404,
       headers: { "Cache-Control": "no-store" },
-    });
+    })
   },
-});
+})
 
 export default define.page(function CatalogDetail(ctx) {
-  const slug = ctx.params.slug;
-  const item = getItemBySlug(slug);
+  const slug = ctx.params.slug
+  const item = getItemBySlug(slug)
 
   if (!item) {
-    return <NotFound pathname={ctx.url.pathname} />;
+    return <NotFound pathname={ctx.url.pathname} />
   }
 
-  const canonical = `https://antonshubin.com/catalog/${item.slug}`;
+  const canonical = `https://antonshubin.com/catalog/${item.slug}`
   // The SaaS MVP page is the one hire page (#484): it ends with questions,
   // and its meta description is a quotable answer with the price and time,
   // which the visible lead leaves to the price card (#501).
-  const isMvp = item.slug === SAAS_MVP_SLUG;
-  const answer = isMvp ? saasMvpAnswer() : undefined;
-  const questions = isMvp ? saasMvpFaqs() : [];
+  const isMvp = item.slug === SAAS_MVP_SLUG
+  const answer = isMvp ? saasMvpAnswer() : undefined
+  const questions = isMvp ? saasMvpFaqs() : []
   head.value = {
     ...head.value,
     title: `${item.seoTitle} — Anton Shubin`,
@@ -109,18 +109,18 @@ export default define.page(function CatalogDetail(ctx) {
     ),
     canonical,
     ogType: "website",
-  };
+  }
 
-  const steps = startSteps(item.slug);
-  const projects = projectsForCatalog(item.slug);
+  const steps = startSteps(item.slug)
+  const projects = projectsForCatalog(item.slug)
   // The first review of the first project that has one.
   const excerpted = projects
     .map((p) => ({ p, t: projectTestimonials(p.slug ?? "")[0] }))
-    .find((x) => x.t);
-  const next = item.next ? catalogItem(item.next) : undefined;
-  const isStrategy = item.slug === "strategy-call";
-  const versus = callVersusSession();
-  const bandPromises = catalogPromises(item.slug).slice(0, 2);
+    .find((x) => x.t)
+  const next = item.next ? catalogItem(item.next) : undefined
+  const isStrategy = item.slug === "strategy-call"
+  const versus = callVersusSession()
+  const bandPromises = catalogPromises(item.slug).slice(0, 2)
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -464,5 +464,5 @@ export default define.page(function CatalogDetail(ctx) {
         />
       </div>
     </Layout>
-  );
-});
+  )
+})

@@ -413,9 +413,9 @@ of this repo; to re-run, put a script like this in a scratch directory with a
 `deno run -A --config <scratch>/deno.json lh.ts <scratch>`:
 
 ```ts
-import lighthouse from "npm:lighthouse@12";
-import { chromium } from "playwright";
-import { startSite } from "<repo>/test/harness.ts";
+import lighthouse from "npm:lighthouse@12"
+import { chromium } from "playwright"
+import { startSite } from "<repo>/test/harness.ts"
 
 const PAGES = [
   "/",
@@ -424,8 +424,8 @@ const PAGES = [
   "/work/smartlite",
   "/tools/mig",
   "/blog/zond-sso-probe-bridge",
-];
-const site = await startSite();
+]
+const site = await startSite()
 const chrome = new Deno.Command(chromium.executablePath(), {
   args: [
     "--headless=new",
@@ -436,9 +436,9 @@ const chrome = new Deno.Command(chromium.executablePath(), {
   ],
   stdout: "null",
   stderr: "null",
-}).spawn();
+}).spawn()
 try {
-  await new Promise((r) => setTimeout(r, 2500));
+  await new Promise((r) => setTimeout(r, 2500))
   for (const p of PAGES) {
     for (const mode of ["mobile", "desktop"]) {
       const config = mode === "desktop"
@@ -455,34 +455,34 @@ try {
             },
           },
         }
-        : undefined;
+        : undefined
       const r = await lighthouse(site.origin + p, {
         port: 9333,
         output: "json",
         onlyCategories: ["seo", "accessibility", "best-practices"],
-      }, config);
-      const { categories, audits } = r!.lhr;
+      }, config)
+      const { categories, audits } = r!.lhr
       console.log(
         p,
         mode,
         Object.entries(categories).map(([k, v]) =>
           `${k}=${Math.round((v.score ?? 0) * 100)}`
         ).join(" "),
-      );
+      )
       for (const c of Object.values(categories)) {
         for (const a of c.auditRefs) {
           if (
             audits[a.id].score !== null && audits[a.id].score! < 1 &&
             audits[a.id].scoreDisplayMode !== "informative"
-          ) console.log("  FAIL", a.id);
+          ) console.log("  FAIL", a.id)
         }
       }
     }
   }
 } finally {
-  chrome.kill();
-  await chrome.status;
-  await site.stop();
+  chrome.kill()
+  await chrome.status
+  await site.stop()
 }
 ```
 

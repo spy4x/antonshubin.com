@@ -2,9 +2,9 @@ import {
   DemoVideo,
   type DemoVideoPoster,
   type DemoVideoSource,
-} from "@spy4x/preact-ui/demo-video";
-import { useRef } from "preact/hooks";
-import { type Place, track } from "../lib/analytics.ts";
+} from "@spy4x/preact-ui/demo-video"
+import { useRef } from "preact/hooks"
+import { type Place, track } from "../lib/analytics.ts"
 
 /**
  * A tool page's demo clip (#454): `@spy4x/preact-ui`'s `DemoVideo`, which
@@ -28,34 +28,34 @@ export default function ToolHeroClip(
     loop = false,
   }: {
     /** The tool's slug: the event's `item`. */
-    item: string;
+    item: string
     /** `hero` for the first-screen clip, `body` for one further down, `card` for a `/tools` hub card. */
-    place?: Extract<Place, "hero" | "body" | "card">;
-    poster: DemoVideoPoster;
-    sources: DemoVideoSource[];
-    title: string;
+    place?: Extract<Place, "hero" | "body" | "card">
+    poster: DemoVideoPoster
+    sources: DemoVideoSource[]
+    title: string
     /** True only for the hero clip, whose poster is the page's one eager image. */
-    eager?: boolean;
+    eager?: boolean
     /** Play in a loop (the `/tools` hub's clips); reduced motion turns it off. */
-    loop?: boolean;
+    loop?: boolean
   },
 ) {
   // The poster turns into the video on the first press, so one view sends one event.
-  const sent = useRef(false);
+  const sent = useRef(false)
   const send = () => {
-    if (sent.current) return;
-    sent.current = true;
-    track("demo-play", { item, place });
-  };
+    if (sent.current) return
+    sent.current = true
+    track("demo-play", { item, place })
+  }
   return (
     <div
       onClick={(event) => {
-        if ((event.target as Element).closest("a[aria-label]")) send();
+        if ((event.target as Element).closest("a[aria-label]")) send()
       }}
       onKeyDown={(event) => {
         // DemoVideo plays on Space from keydown, with no click event.
         if (event.key === " " && (event.target as Element).closest("a")) {
-          send();
+          send()
         }
       }}
     >
@@ -67,5 +67,5 @@ export default function ToolHeroClip(
         loop={loop}
       />
     </div>
-  );
+  )
 }

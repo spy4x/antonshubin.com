@@ -160,10 +160,10 @@ restore are in `docs/deploy.md` "Subscriber data".
 
 ## Code style
 
-Double quotes, no semicolons, 2-space indent, 100 columns — this is what
-`deno fmt` enforces, so run it instead of hand-formatting. Double quotes
-override the global "backticks for strings" rule; backticks only for
-interpolation.
+Double quotes, no semicolons, 2-space indent, 80 columns — what `deno fmt`
+enforces (`"semiColons": false` in `deno.json`), so run it instead of
+hand-formatting. Double quotes override the global "backticks for strings" rule;
+backticks only for interpolation.
 
 ## Reference docs
 

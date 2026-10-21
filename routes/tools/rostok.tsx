@@ -1,9 +1,9 @@
-import { define } from "../../lib/utils.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { InstallLine } from "../../components/InstallLine.tsx";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
-import { loadToolPage } from "../../components/tool-frame/tool-page.ts";
-import { RostokCatalog } from "../../components/tools/rostok/RostokCatalog.tsx";
+import { define } from "../../lib/utils.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { InstallLine } from "../../components/InstallLine.tsx"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
+import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
+import { RostokCatalog } from "../../components/tools/rostok/RostokCatalog.tsx"
 
 // The rostok page (#461): the shared frame (#454) with rostok's own middle,
 // the three quick-start commands, the whole catalog and the project tree.
@@ -14,7 +14,7 @@ const COMMANDS = [
   { command: "rostok", text: "Wizard: init → server create → stack add" },
   { command: "rostok stack list", text: "Browse the bundled catalog" },
   { command: "rostok deploy home", text: "Deploy what you configured" },
-];
+]
 
 /** README "What you get": the project folder after `rostok`, verbatim. */
 const TREE = `.
@@ -26,7 +26,7 @@ const TREE = `.
     └── home/
         ├── config.json     # which stacks (CLI-managed, committed)
         ├── .env            # per-server vars (gitignored)
-        └── .env.age        # encrypted — safe to commit`;
+        └── .env.age        # encrypted — safe to commit`
 
 function ThreeCommands() {
   return (
@@ -47,7 +47,7 @@ function ThreeCommands() {
         ))}
       </ol>
     </section>
-  );
+  )
 }
 
 function WhatYouGet() {
@@ -72,12 +72,12 @@ function WhatYouGet() {
         to commit.
       </p>
     </section>
-  );
+  )
 }
 
 export default define.page(async function RostokPage(ctx) {
-  const data = await loadToolPage("rostok");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
+  const data = await loadToolPage("rostok")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
   return (
     <ToolFrame
       data={data}
@@ -88,5 +88,5 @@ export default define.page(async function RostokPage(ctx) {
       <RostokCatalog />
       <WhatYouGet />
     </ToolFrame>
-  );
-});
+  )
+})

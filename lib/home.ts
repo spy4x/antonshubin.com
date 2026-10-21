@@ -6,11 +6,11 @@
  * narrow permissions.
  */
 
-import { INTRO_CALL } from "./catalog.ts";
-import { proof } from "./proof.ts";
+import { INTRO_CALL } from "./catalog.ts"
+import { proof } from "./proof.ts"
 
 /** The longest meta description search engines show without cutting it. */
-export const META_DESCRIPTION_MAX = 160;
+export const META_DESCRIPTION_MAX = 160
 
 /**
  * The home page's meta description: for a name search the buyer already
@@ -21,5 +21,5 @@ export const META_DESCRIPTION_MAX = 160;
 export function homeDescription(): string {
   return `Senior full-stack engineer and tech lead. I build SaaS end to end; you own code, servers and keys. ${
     proof("expert-vetted")
-  } on Upwork. Book a ${INTRO_CALL}.`;
+  } on Upwork. Book a ${INTRO_CALL}.`
 }

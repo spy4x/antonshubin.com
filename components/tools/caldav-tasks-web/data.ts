@@ -5,19 +5,19 @@
 // `docs/compatibility.md`'s, word for word.
 
 /** The Tasks.org fields "Same file, two apps" offers: the ones the file holds. */
-export type FieldId = "title" | "priority" | "parent" | "order" | "reminder";
+export type FieldId = "title" | "priority" | "parent" | "order" | "reminder"
 
 /** One field: its chip, the lines it owns in the file and its compatibility.md row. */
 export interface TaskField {
-  id: FieldId;
+  id: FieldId
   /** The chip's label. */
-  label: string;
+  label: string
   /** The first words of the file lines that belong to the field. */
-  lines: string[];
+  lines: string[]
   /** compatibility.md's "In the file" cell; `code` spans are in backticks. */
-  inFile: string;
+  inFile: string
   /** compatibility.md's "Covered by the fixtures and tests" cell. */
-  covered: string;
+  covered: string
 }
 
 /** The fixture's "Buy seeds" task, line by line, exactly as Tasks.org writes it. */
@@ -40,7 +40,7 @@ export const TASK_FILE: readonly string[] = [
   "END:VALARM",
   "END:VTODO",
   "END:VCALENDAR",
-];
+]
 
 export const TASK_FIELDS: readonly TaskField[] = [
   {
@@ -87,22 +87,22 @@ export const TASK_FIELDS: readonly TaskField[] = [
     covered:
       'Yes, the default "when due" alarm; kept untouched by an edit (`e2e/tasks.e2e.ts`)',
   },
-];
+]
 
 /** The field a line of {@link TASK_FILE} belongs to, or undefined for a line no chip lights. */
 export function fieldOf(line: string): FieldId | undefined {
   return TASK_FIELDS.find((f) =>
     f.lines.some((start) => line.startsWith(start))
   )
-    ?.id;
+    ?.id
 }
 
 /** One row of "What was tested". */
 export interface TestedRow {
-  name: string;
-  version?: string;
-  status: "Tested" | "In daily use, not in CI" | "Untested";
-  evidence?: string;
+  name: string
+  version?: string
+  status: "Tested" | "In daily use, not in CI" | "Untested"
+  evidence?: string
 }
 
 /** compatibility.md's "CalDAV servers" table; Nextcloud and Baikal share a row. */
@@ -123,7 +123,7 @@ export const SERVERS: readonly TestedRow[] = [
   },
   { name: "Nextcloud, Baikal", status: "Untested" },
   { name: "Others", status: "Untested" },
-];
+]
 
 /** compatibility.md's "Browsers" table. */
 export const BROWSERS: readonly TestedRow[] = [
@@ -134,4 +134,4 @@ export const BROWSERS: readonly TestedRow[] = [
       "The browser tests run in Chromium only, one spec in a 375 by 812 window.",
   },
   { name: "Firefox, Safari, others", status: "Untested" },
-];
+]

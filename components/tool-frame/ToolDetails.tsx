@@ -1,11 +1,11 @@
-import type { ComponentChildren } from "preact";
-import { Card } from "@spy4x/preact-ui/card";
-import { IconCheck } from "@spy4x/preact-icons";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { FACT_LINK } from "../FactCard.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
-import type { ToolPageData } from "./tool-page.ts";
-import { ToolFacts } from "./ToolFacts.tsx";
+import type { ComponentChildren } from "preact"
+import { Card } from "@spy4x/preact-ui/card"
+import { IconCheck } from "@spy4x/preact-icons"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { FACT_LINK } from "../FactCard.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
+import type { ToolPageData } from "./tool-page.ts"
+import { ToolFacts } from "./ToolFacts.tsx"
 
 /**
  * "Where it stands" from the entry's `works`, `notYet` and `knownIssue`, with the open
@@ -14,9 +14,9 @@ import { ToolFacts } from "./ToolFacts.tsx";
  * unless the page passes its own `beside`.
  */
 export function ToolStanding({ data }: { data: ToolPageData }) {
-  const { tool, repo } = data;
-  if (!tool.works?.length) return null;
-  const notYet = tool.notYet ?? [];
+  const { tool, repo } = data
+  if (!tool.works?.length) return null
+  const notYet = tool.notYet ?? []
   return (
     <section aria-labelledby="standing">
       <h2 id="standing" class="text-2xl sm:text-3xl text-parchment">
@@ -81,12 +81,12 @@ export function ToolStanding({ data }: { data: ToolPageData }) {
         )}
       </Card>
     </section>
-  );
+  )
 }
 
 /** "Use it if" and "Skip it if", each only when the entry has lines for it. */
 export function ToolFit({ data }: { data: ToolPageData }) {
-  const { tool } = data;
+  const { tool } = data
   return (
     <>
       {(tool.useIf?.length ?? 0) > 0 && (
@@ -106,13 +106,13 @@ export function ToolFit({ data }: { data: ToolPageData }) {
         </section>
       )}
     </>
-  );
+  )
 }
 
 /** "The story behind it": each post as a card, with the entry's `storyLine` under its title. */
 export function ToolStory({ data }: { data: ToolPageData }) {
-  const { tool, posts } = data;
-  if (posts.length === 0) return null;
+  const { tool, posts } = data
+  if (posts.length === 0) return null
   return (
     <section aria-labelledby="posts">
       <h2 id="posts" class="text-xl text-parchment">The story behind it</h2>
@@ -138,7 +138,7 @@ export function ToolStory({ data }: { data: ToolPageData }) {
         ))}
       </ul>
     </section>
-  );
+  )
 }
 
 /**
@@ -151,14 +151,14 @@ export function ToolStory({ data }: { data: ToolPageData }) {
  */
 export function ToolDetails(
   { data, beside }: {
-    data: ToolPageData;
+    data: ToolPageData
     /** The left column beside the facts card; `null` for none. */
-    beside?: ComponentChildren;
+    beside?: ComponentChildren
   },
 ) {
-  const left = beside === undefined ? <ToolStanding data={data} /> : beside;
+  const left = beside === undefined ? <ToolStanding data={data} /> : beside
   const hasLeft = left !== null && left !== false &&
-    (beside !== undefined || Boolean(data.tool.works?.length));
+    (beside !== undefined || Boolean(data.tool.works?.length))
   return (
     <div
       data-tool-details
@@ -183,5 +183,5 @@ export function ToolDetails(
         <ToolStory data={data} />
       </div>
     </div>
-  );
+  )
 }

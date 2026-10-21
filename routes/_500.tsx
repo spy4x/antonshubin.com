@@ -1,6 +1,6 @@
-import { define } from "../lib/utils.ts";
-import { Layout } from "../components/Layout.tsx";
-import { IconWrench as WrenchIcon } from "@spy4x/preact-icons";
+import { define } from "../lib/utils.ts"
+import { Layout } from "../components/Layout.tsx"
+import { IconWrench as WrenchIcon } from "@spy4x/preact-icons"
 
 export default define.page(function ServerError() {
   return (
@@ -33,5 +33,5 @@ export default define.page(function ServerError() {
         </div>
       </div>
     </Layout>
-  );
-});
+  )
+})

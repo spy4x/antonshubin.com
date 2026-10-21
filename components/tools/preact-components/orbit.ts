@@ -4,13 +4,13 @@
 // README's package table. Nothing here is Anton's own data.
 
 /** A project's state in the Orbit demo. */
-export type OrbitStatus = "healthy" | "building" | "failing" | "paused";
+export type OrbitStatus = "healthy" | "building" | "failing" | "paused"
 
 /** One row of the Orbit demo's table. */
 export interface OrbitProject {
-  name: string;
-  status: OrbitStatus;
-  builds: number;
+  name: string
+  status: OrbitStatus
+  builds: number
 }
 
 /** The guide's five demo projects (`MINI_PROJECTS`). */
@@ -20,7 +20,7 @@ export const ORBIT_PROJECTS: readonly OrbitProject[] = [
   { name: "Comet", status: "failing", builds: 41 },
   { name: "Drift", status: "healthy", builds: 212 },
   { name: "Ember", status: "paused", builds: 17 },
-];
+]
 
 /**
  * Each status's word, and the `StatusMark` shape that carries it: a shape
@@ -34,10 +34,10 @@ export const ORBIT_STATUS: Record<
   building: { label: "Building", mark: "wip" },
   failing: { label: "Failing", mark: "known-issue" },
   paused: { label: "Paused", mark: "paused" },
-};
+}
 
 /** The guide's "Median build" tile, a literal in the demo too. */
-export const ORBIT_MEDIAN_BUILD = "2m 41s";
+export const ORBIT_MEDIAN_BUILD = "2m 41s"
 
 /** The guide's `MINI_APP_SNIPPET`: the code of the dashboard this slice is cut from. */
 export const ORBIT_SNIPPET =
@@ -89,12 +89,12 @@ export function Dashboard({ projects }: { projects: Project[] }) {
       )}
     </>
   )
-}`;
+}`
 
 /** One published package and the README's "What it holds" line for it. */
 export interface LibraryPackage {
-  name: string;
-  holds: string;
+  name: string
+  holds: string
 }
 
 /** The README's package table, in its order, without the unpublished `pages/`. */
@@ -136,4 +136,4 @@ export const LIBRARY_PACKAGES: readonly LibraryPackage[] = [
     name: "@spy4x/preact-ui-guide",
     holds: "the live component catalogue, mounted in one line",
   },
-];
+]

@@ -3,28 +3,28 @@
 // ai-harnesses/README.md ("Layout"). Change a line here only together with
 // the line it quotes there.
 
-const BLOB = "https://github.com/spy4x/dotfiles/blob/main";
-const TREE = "https://github.com/spy4x/dotfiles/tree/main";
+const BLOB = "https://github.com/spy4x/dotfiles/blob/main"
+const TREE = "https://github.com/spy4x/dotfiles/tree/main"
 
 /** One harness `deno task ai` renders for, and where it reads its config. */
 export interface Harness {
-  name: string;
-  home: string;
+  name: string
+  home: string
 }
 
 export const HARNESSES: Harness[] = [
   { name: "Claude Code", home: "~/.claude" },
   { name: "OpenCode", home: "~/.config/opencode" },
   { name: "DSH", home: "$DSH_HOME" },
-];
+]
 
 /**
  * One row of ai-harnesses/README.md's layout table: a source path and what
  * it becomes in each harness, in {@link HARNESSES} order.
  */
 export interface HarnessRow {
-  source: string;
-  targets: [string, string, string];
+  source: string
+  targets: [string, string, string]
 }
 
 export const HARNESS_MAP: HarnessRow[] = [
@@ -64,17 +64,17 @@ export const HARNESS_MAP: HarnessRow[] = [
       "not rendered",
     ],
   },
-];
+]
 
 /** The sentence under the table, from ai-harnesses/README.md, after its leading `--check`. */
 export const CHECK_LINE =
-  "answers one question: is what the harnesses read on this machine the same as what is committed here?";
+  "answers one question: is what the harnesses read on this machine the same as what is committed here?"
 
 /** One card of "The AI-agent setup": a README bullet and the files it names. */
 export interface SetupCard {
-  title: string;
-  text: string;
-  links: { label: string; href: string }[];
+  title: string
+  text: string
+  links: { label: string; href: string }[]
 }
 
 export const SETUP_CARDS: SetupCard[] = [
@@ -132,7 +132,7 @@ export const SETUP_CARDS: SetupCard[] = [
       href: `${BLOB}/tools/env-key-copy.ts`,
     }],
   },
-];
+]
 
 /** "The workstation": each README bullet's label and its first sentence. */
 export const WORKSTATION: [string, string][] = [
@@ -168,10 +168,10 @@ export const WORKSTATION: [string, string][] = [
     "Synced, not cloned.",
     "The repository lives in a Syncthing folder, and agent worktrees are ignored so they never replicate.",
   ],
-];
+]
 
 /** The README's warning next to the quick start, shortened: the words around `deno task install-all`. */
 export const INSTALL_WARNING = [
   "Only",
   "installs my setup: it adds my apps and replaces your shell configuration.",
-] as const;
+] as const

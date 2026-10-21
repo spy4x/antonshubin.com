@@ -3,88 +3,88 @@
 // forged, expired or meant for something else changes nothing. Each test boots
 // the built site with a temp SUBSCRIBERS_FILE, a throwaway UNSUBSCRIBE_SECRET
 // and SMTP switched off.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { type Site, startSite } from "./harness.ts";
-import { BASE_URL } from "../lib/config.ts";
-import { count, visibleText } from "./html.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { type Site, startSite } from "./harness.ts"
+import { BASE_URL } from "../lib/config.ts"
+import { count, visibleText } from "./html.ts"
 import {
   createConfirmToken,
   createUnsubscribeToken,
-} from "./subscription-tokens.ts";
+} from "./subscription-tokens.ts"
 
-const SECRET = "t".repeat(32);
-const DAY_MS = 24 * 60 * 60 * 1000;
+const SECRET = "t".repeat(32)
+const DAY_MS = 24 * 60 * 60 * 1000
 
 async function withSite(
   fn: (site: Site, file: string) => Promise<void>,
 ): Promise<void> {
-  const dir = await Deno.makeTempDir();
-  const file = `${dir}/subscribers.json`;
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/subscribers.json`
   try {
-    await Deno.writeTextFile(file, "[]");
+    await Deno.writeTextFile(file, "[]")
     const site = await startSite({
       env: {
         SUBSCRIBERS_FILE: file,
         UNSUBSCRIBE_SECRET: SECRET,
         SMTP_HOST: "",
       },
-    });
+    })
     try {
-      await fn(site, file);
+      await fn(site, file)
     } finally {
-      await site.stop();
+      await site.stop()
     }
   } finally {
-    await Deno.remove(dir, { recursive: true });
+    await Deno.remove(dir, { recursive: true })
   }
 }
 
 const listed = async (file: string): Promise<string[]> =>
   (JSON.parse(await Deno.readTextFile(file)) as { email: string }[]).map((s) =>
     s.email
-  );
+  )
 
 const linkFor = (token: string) =>
-  `/subscribe/confirm?token=${encodeURIComponent(token)}`;
+  `/subscribe/confirm?token=${encodeURIComponent(token)}`
 
 Deno.test("opening a confirmation link shows the address and subscribes nobody", async () => {
   await withSite(async (site, file) => {
-    const token = await createConfirmToken("reader@example.com", SECRET);
-    const res = await site.get(linkFor(token));
-    const html = await res.text();
-    assertEquals(res.status, 200);
-    assert(visibleText(html).includes("reader@example.com"));
-    assertEquals(res.headers.get("Cache-Control"), "no-store");
-    assertEquals(res.headers.get("X-Robots-Tag"), "noindex, nofollow");
-    assertEquals(await listed(file), []);
-  });
-});
+    const token = await createConfirmToken("reader@example.com", SECRET)
+    const res = await site.get(linkFor(token))
+    const html = await res.text()
+    assertEquals(res.status, 200)
+    assert(visibleText(html).includes("reader@example.com"))
+    assertEquals(res.headers.get("Cache-Control"), "no-store")
+    assertEquals(res.headers.get("X-Robots-Tag"), "noindex, nofollow")
+    assertEquals(await listed(file), [])
+  })
+})
 
 Deno.test("pressing the button subscribes the address once, however often the link is used", async () => {
   await withSite(async (site, file) => {
-    const token = await createConfirmToken("reader@example.com", SECRET);
+    const token = await createConfirmToken("reader@example.com", SECRET)
     for (let i = 0; i < 2; i++) {
       const res = await site.get("/subscribe/confirm", {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ token }),
-      });
-      await res.body?.cancel();
-      assertEquals(res.status, 303);
-      assertEquals(res.headers.get("Location"), "/subscribe/confirm?done=1");
-      assertEquals(res.headers.get("Cache-Control"), "no-store");
+      })
+      await res.body?.cancel()
+      assertEquals(res.status, 303)
+      assertEquals(res.headers.get("Location"), "/subscribe/confirm?done=1")
+      assertEquals(res.headers.get("Cache-Control"), "no-store")
     }
-    const done = await site.get("/subscribe/confirm?done=1");
-    const text = visibleText(await done.text());
-    assertEquals(done.status, 200);
-    assert(text.includes("You're subscribed"), text);
-    assertEquals(await listed(file), ["reader@example.com"]);
-  });
-});
+    const done = await site.get("/subscribe/confirm?done=1")
+    const text = visibleText(await done.text())
+    assertEquals(done.status, 200)
+    assert(text.includes("You're subscribed"), text)
+    assertEquals(await listed(file), ["reader@example.com"])
+  })
+})
 
 Deno.test("the confirm and unsubscribe pages send only their origin as referrer", async () => {
   await withSite(async (site) => {
-    const token = await createConfirmToken("reader@example.com", SECRET);
+    const token = await createConfirmToken("reader@example.com", SECRET)
     for (
       const path of [
         linkFor(token),
@@ -95,15 +95,15 @@ Deno.test("the confirm and unsubscribe pages send only their origin as referrer"
         "/unsubscribe/?token=forged",
       ]
     ) {
-      const res = await site.get(path);
-      await res.body?.cancel();
-      assertEquals(res.headers.get("Referrer-Policy"), "strict-origin", path);
+      const res = await site.get(path)
+      await res.body?.cancel()
+      assertEquals(res.headers.get("Referrer-Policy"), "strict-origin", path)
     }
-    const other = await site.get("/");
-    await other.body?.cancel();
-    assertEquals(other.headers.get("Referrer-Policy"), null);
-  });
-});
+    const other = await site.get("/")
+    await other.body?.cancel()
+    assertEquals(other.headers.get("Referrer-Policy"), null)
+  })
+})
 
 Deno.test("a forged, expired or unsubscribe token subscribes nobody and answers 400", async () => {
   await withSite(async (site, file) => {
@@ -111,26 +111,26 @@ Deno.test("a forged, expired or unsubscribe token subscribes nobody and answers 
       "reader@example.com",
       SECRET,
       () => Date.now() - 4 * DAY_MS,
-    );
+    )
     const tokens = {
       forged: "forged",
       expired,
       foreign: await createConfirmToken("reader@example.com", "f".repeat(32)),
       unsubscribe: await createUnsubscribeToken("reader@example.com", SECRET),
-    };
+    }
     for (const [name, token] of Object.entries(tokens)) {
       for (const method of ["GET", "POST"]) {
-        const res = await site.get(linkFor(token), { method });
-        await res.body?.cancel();
-        assertEquals(res.status, 400, `${method} ${name}`);
+        const res = await site.get(linkFor(token), { method })
+        await res.body?.cancel()
+        assertEquals(res.status, 400, `${method} ${name}`)
       }
     }
-    assertEquals(await listed(file), []);
-    const res = await site.get("/subscribe/confirm");
-    await res.body?.cancel();
-    assertEquals(res.status, 400, "no token at all");
-  });
-});
+    assertEquals(await listed(file), [])
+    const res = await site.get("/subscribe/confirm")
+    await res.body?.cancel()
+    assertEquals(res.status, 400, "no token at all")
+  })
+})
 
 Deno.test("an expired link says so, apart from one that is not recognised", async () => {
   await withSite(async (site) => {
@@ -138,80 +138,80 @@ Deno.test("an expired link says so, apart from one that is not recognised", asyn
       "reader@example.com",
       SECRET,
       () => Date.now() - 4 * DAY_MS,
-    );
-    const old = visibleText(await (await site.get(linkFor(expired))).text());
-    const bad = visibleText(await (await site.get(linkFor("forged"))).text());
-    assert(old.includes("Link expired"), old);
-    assert(bad.includes("Link not recognised"), bad);
-  });
-});
+    )
+    const old = visibleText(await (await site.get(linkFor(expired))).text())
+    const bad = visibleText(await (await site.get(linkFor("forged"))).text())
+    assert(old.includes("Link expired"), old)
+    assert(bad.includes("Link not recognised"), bad)
+  })
+})
 
 const post = (site: Site, path: string, body?: URLSearchParams) =>
   site.get(path, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body,
-  });
+  })
 
 Deno.test("a confirmation link used again after the address unsubscribed adds nobody, and a link issued afterwards still subscribes", async () => {
   await withSite(async (site, file) => {
-    const email = "reader@example.com";
+    const email = "reader@example.com"
     const old = await createConfirmToken(
       email,
       SECRET,
       () => Date.now() - 1000,
-    );
+    )
     let res = await post(
       site,
       "/subscribe/confirm",
       new URLSearchParams({ token: old }),
-    );
-    await res.body?.cancel();
-    assertEquals(await listed(file), [email]);
+    )
+    await res.body?.cancel()
+    assertEquals(await listed(file), [email])
 
-    const unsub = await createUnsubscribeToken(email, SECRET);
-    res = await post(site, `/unsubscribe?token=${encodeURIComponent(unsub)}`);
-    await res.body?.cancel();
-    assertEquals(await listed(file), []);
+    const unsub = await createUnsubscribeToken(email, SECRET)
+    res = await post(site, `/unsubscribe?token=${encodeURIComponent(unsub)}`)
+    await res.body?.cancel()
+    assertEquals(await listed(file), [])
 
     res = await post(
       site,
       "/subscribe/confirm",
       new URLSearchParams({ token: old }),
-    );
-    const text = visibleText(await res.text());
-    assertEquals(res.status, 400);
-    assert(text.includes("Link not recognised"), text);
-    assertEquals(await listed(file), [], "the replay added nobody");
+    )
+    const text = visibleText(await res.text())
+    assertEquals(res.status, 400)
+    assert(text.includes("Link not recognised"), text)
+    assertEquals(await listed(file), [], "the replay added nobody")
     // The record next to the list holds a hash, not the address.
-    const record = await Deno.readTextFile(`${file}.unsubscribed`);
-    assert(!record.includes("reader"), record);
+    const record = await Deno.readTextFile(`${file}.unsubscribed`)
+    assert(!record.includes("reader"), record)
 
     const fresh = await createConfirmToken(
       email,
       SECRET,
       () => Date.now() + 5000,
-    );
+    )
     res = await post(
       site,
       "/subscribe/confirm",
       new URLSearchParams({ token: fresh }),
-    );
-    await res.body?.cancel();
-    assertEquals(res.status, 303);
-    assertEquals(await listed(file), [email]);
-  });
-});
+    )
+    await res.body?.cancel()
+    assertEquals(res.status, 303)
+    assertEquals(await listed(file), [email])
+  })
+})
 
 Deno.test("every state of the confirm and unsubscribe pages carries the strict-origin meta, first after the charset", async () => {
   await withSite(async (site) => {
-    const good = await createConfirmToken("reader@example.com", SECRET);
+    const good = await createConfirmToken("reader@example.com", SECRET)
     const expired = await createConfirmToken(
       "reader@example.com",
       SECRET,
       () => Date.now() - 4 * DAY_MS,
-    );
-    const unsub = await createUnsubscribeToken("reader@example.com", SECRET);
+    )
+    const unsub = await createUnsubscribeToken("reader@example.com", SECRET)
     const paths = [
       linkFor(good),
       linkFor(expired),
@@ -221,59 +221,59 @@ Deno.test("every state of the confirm and unsubscribe pages carries the strict-o
       "/unsubscribe?token=forged",
       "/unsubscribe",
       `/unsubscribe?token=${encodeURIComponent(unsub)}`,
-    ];
+    ]
     for (const path of paths) {
-      const html = await (await site.get(path)).text();
+      const html = await (await site.get(path)).text()
       assertEquals(
         count(html, /<meta name="referrer" content="strict-origin"/g),
         1,
         path,
-      );
+      )
       // Right after the charset, so early asset requests use it too.
       assert(
         /<meta charset="utf-8"\s*\/?>\s*<meta name="referrer"/.test(html),
         path,
-      );
+      )
     }
-    const home = await (await site.get("/")).text();
-    assertEquals(count(home, /<meta name="referrer"/g), 0);
-  });
-});
+    const home = await (await site.get("/")).text()
+    assertEquals(count(home, /<meta name="referrer"/g), 0)
+  })
+})
 
 Deno.test("the forms post with the site's own Origin and no Sec-Fetch-Site, as Safari before 16.4 does", async () => {
   await withSite(async (site, file) => {
-    const origin = new URL(BASE_URL).origin;
-    const email = "reader@example.com";
-    const form = { "content-type": "application/x-www-form-urlencoded" };
-    const confirm = await createConfirmToken(email, SECRET);
+    const origin = new URL(BASE_URL).origin
+    const email = "reader@example.com"
+    const form = { "content-type": "application/x-www-form-urlencoded" }
+    const confirm = await createConfirmToken(email, SECRET)
     // Control: what the pages' forms sent under `no-referrer`, `Origin: null`
     // with no Sec-Fetch-Site, is refused.
     let res = await site.get("/subscribe/confirm", {
       method: "POST",
       headers: { ...form, origin: "null" },
       body: new URLSearchParams({ token: confirm }),
-    });
-    await res.body?.cancel();
-    assertEquals(res.status, 403);
-    assertEquals(await listed(file), []);
+    })
+    await res.body?.cancel()
+    assertEquals(res.status, 403)
+    assertEquals(await listed(file), [])
 
     res = await site.get("/subscribe/confirm", {
       method: "POST",
       headers: { ...form, origin },
       body: new URLSearchParams({ token: confirm }),
-    });
-    await res.body?.cancel();
-    assertEquals(res.status, 303);
-    assertEquals(await listed(file), [email]);
+    })
+    await res.body?.cancel()
+    assertEquals(res.status, 303)
+    assertEquals(await listed(file), [email])
 
-    const unsub = await createUnsubscribeToken(email, SECRET);
+    const unsub = await createUnsubscribeToken(email, SECRET)
     res = await site.get("/unsubscribe", {
       method: "POST",
       headers: { ...form, origin },
       body: new URLSearchParams({ token: unsub }),
-    });
-    await res.body?.cancel();
-    assertEquals(res.status, 200);
-    assertEquals(await listed(file), []);
-  });
-});
+    })
+    await res.body?.cancel()
+    assertEquals(res.status, 200)
+    assertEquals(await listed(file), [])
+  })
+})

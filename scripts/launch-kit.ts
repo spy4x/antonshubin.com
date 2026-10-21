@@ -28,18 +28,18 @@
  *   3. the first post whose body mentions `<repo>` as a whole word
  */
 
-import { extract as extractYaml } from "@std/front-matter/yaml";
-import { fillProof } from "@/lib/blog-posts.ts";
-import { BASE_URL } from "@/lib/config.ts";
-import { firstPublishedLine } from "./devto.ts";
-import { channelUrl } from "./utm.ts";
+import { extract as extractYaml } from "@std/front-matter/yaml"
+import { fillProof } from "@/lib/blog-posts.ts"
+import { BASE_URL } from "@/lib/config.ts"
+import { firstPublishedLine } from "./devto.ts"
+import { channelUrl } from "./utm.ts"
 
-const CONTENT_DIR = "content/blog";
-const OUT_DIR = "launches";
+const CONTENT_DIR = "content/blog"
+const OUT_DIR = "launches"
 
 export interface ReadmeSummary {
-  title: string;
-  description: string;
+  title: string
+  description: string
 }
 
 /**
@@ -48,43 +48,43 @@ export interface ReadmeSummary {
  * badge image/link line.
  */
 export function parseReadme(text: string): ReadmeSummary {
-  const lines = text.split("\n");
-  let title = "";
-  let i = 0;
+  const lines = text.split("\n")
+  let title = ""
+  let i = 0
   for (; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i].trim()
     if (line.startsWith("# ")) {
-      title = line.slice(2).trim();
-      i++;
-      break;
+      title = line.slice(2).trim()
+      i++
+      break
     }
   }
   if (!title) {
     throw new Error(
       'No H1 title (a line starting with "# ") found in the README',
-    );
+    )
   }
 
   // Collect a full paragraph, not just its first wrapped line: README prose
   // is usually hard-wrapped at ~80 columns.
-  const descriptionLines: string[] = [];
+  const descriptionLines: string[] = []
   for (; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (descriptionLines.length > 0 && !line) break; // blank line ends the paragraph
-    if (!line) continue;
-    if (line.startsWith("#")) break;
+    const line = lines[i].trim()
+    if (descriptionLines.length > 0 && !line) break // blank line ends the paragraph
+    if (!line) continue
+    if (line.startsWith("#")) break
     if (
       descriptionLines.length === 0 &&
       (line.startsWith("[![") || line.startsWith("!["))
-    ) continue;
-    descriptionLines.push(line);
+    ) continue
+    descriptionLines.push(line)
   }
-  const description = descriptionLines.join(" ");
+  const description = descriptionLines.join(" ")
   if (!description) {
-    throw new Error("No description paragraph found under the README title");
+    throw new Error("No description paragraph found under the README title")
   }
 
-  return { title, description };
+  return { title, description }
 }
 
 /** Resolves the local checkout path holding `<repo>/README.md`. */
@@ -92,20 +92,20 @@ export async function findReadmePath(
   repo: string,
   explicitPath?: string,
 ): Promise<string> {
-  const candidates: string[] = [];
+  const candidates: string[] = []
   if (explicitPath) {
-    candidates.push(`${explicitPath.replace(/\/$/, "")}/README.md`);
+    candidates.push(`${explicitPath.replace(/\/$/, "")}/README.md`)
   }
-  const reposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR");
+  const reposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR")
   if (reposDir) {
-    candidates.push(`${reposDir.replace(/\/$/, "")}/${repo}/README.md`);
+    candidates.push(`${reposDir.replace(/\/$/, "")}/${repo}/README.md`)
   }
-  candidates.push(`../${repo}/README.md`);
+  candidates.push(`../${repo}/README.md`)
 
   for (const candidate of candidates) {
     try {
-      const stat = await Deno.stat(candidate);
-      if (stat.isFile) return candidate;
+      const stat = await Deno.stat(candidate)
+      if (stat.isFile) return candidate
     } catch {
       // try the next candidate
     }
@@ -118,11 +118,11 @@ export async function findReadmePath(
       `Pass the checkout path as a second argument ` +
       `(deno task launch-kit ${repo} /path/to/${repo}), or set LAUNCH_KIT_REPOS_DIR to the ` +
       `directory that holds your repo checkouts.`,
-  );
+  )
 }
 
 function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
 /** Slug-name match only: exact slug, or a `<repo>-` prefix. No file I/O. */
@@ -130,22 +130,22 @@ export function matchBlogSlugByName(
   repo: string,
   slugs: string[],
 ): string | undefined {
-  return slugs.find((slug) => slug === repo || slug.startsWith(`${repo}-`));
+  return slugs.find((slug) => slug === repo || slug.startsWith(`${repo}-`))
 }
 
 /** True when `text` mentions `repo` as a whole word (case-insensitive). */
 export function mentionsRepo(repo: string, text: string): boolean {
-  return new RegExp(`\\b${escapeRegExp(repo)}\\b`, "i").test(text);
+  return new RegExp(`\\b${escapeRegExp(repo)}\\b`, "i").test(text)
 }
 
 export interface BlogSlugSelection {
   /** A by-name match (exact slug, or a `<repo>-` prefix), if any. */
-  slug: string | undefined;
+  slug: string | undefined
   /**
    * Every candidate slug, sorted — the order the mention scan must read
    * files in, so the result never depends on directory-listing order.
    */
-  orderedSlugs: string[];
+  orderedSlugs: string[]
 }
 
 /**
@@ -160,19 +160,19 @@ export function selectBlogSlug(
   repo: string,
   slugs: string[],
 ): BlogSlugSelection {
-  const orderedSlugs = [...slugs].sort();
-  return { slug: matchBlogSlugByName(repo, orderedSlugs), orderedSlugs };
+  const orderedSlugs = [...slugs].sort()
+  return { slug: matchBlogSlugByName(repo, orderedSlugs), orderedSlugs }
 }
 
 /** Lists the `.md` slugs directly under `contentDir`, in whatever order `Deno.readDir` returns. */
 export async function listBlogSlugs(contentDir: string): Promise<string[]> {
-  const slugs: string[] = [];
+  const slugs: string[] = []
   for await (const entry of Deno.readDir(contentDir)) {
     if (entry.isFile && entry.name.endsWith(".md")) {
-      slugs.push(entry.name.slice(0, -3));
+      slugs.push(entry.name.slice(0, -3))
     }
   }
-  return slugs;
+  return slugs
 }
 
 /**
@@ -190,28 +190,28 @@ export async function findBlogSlug(
   contentDir: string = CONTENT_DIR,
   candidateSlugs?: string[],
 ): Promise<string> {
-  const override = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
-  if (override) return override;
+  const override = Deno.env.get("LAUNCH_KIT_BLOG_SLUG")
+  if (override) return override
 
-  const slugs = candidateSlugs ?? await listBlogSlugs(contentDir);
+  const slugs = candidateSlugs ?? await listBlogSlugs(contentDir)
 
-  const { slug: byName, orderedSlugs } = selectBlogSlug(repo, slugs);
-  if (byName) return byName;
+  const { slug: byName, orderedSlugs } = selectBlogSlug(repo, slugs)
+  if (byName) return byName
 
   for (const slug of orderedSlugs) {
-    const text = await Deno.readTextFile(`${contentDir}/${slug}.md`);
-    if (mentionsRepo(repo, text)) return slug;
+    const text = await Deno.readTextFile(`${contentDir}/${slug}.md`)
+    if (mentionsRepo(repo, text)) return slug
   }
 
   throw new Error(
     `No post in ${contentDir}/ is named "${repo}-..." or mentions "${repo}". ` +
       `Set LAUNCH_KIT_BLOG_SLUG=<slug> to point at the right one.`,
-  );
+  )
 }
 
 export interface BlogSummary {
-  title: string;
-  description: string;
+  title: string
+  description: string
 }
 
 /**
@@ -223,34 +223,34 @@ export function parseBlogFrontMatter(
   text: string,
   filePath?: string,
 ): BlogSummary {
-  const name = filePath ?? "the blog post";
-  let attrs: { title?: string; description?: string };
+  const name = filePath ?? "the blog post"
+  let attrs: { title?: string; description?: string }
   try {
-    ({ attrs } = extractYaml<{ title?: string; description?: string }>(text));
+    ;({ attrs } = extractYaml<{ title?: string; description?: string }>(text))
   } catch {
     throw new Error(
       `${name} has no YAML front matter — add title and description, or set ` +
         `LAUNCH_KIT_BLOG_SLUG to a post that has them.`,
-    );
+    )
   }
   if (!attrs.title || !attrs.description) {
-    throw new Error(`${name} front matter is missing title or description`);
+    throw new Error(`${name} front matter is missing title or description`)
   }
   // A title may cite an Upwork figure as `{proof:<id>}` (lib/blog-posts.ts).
   return {
     title: fillProof(attrs.title),
     description: fillProof(attrs.description),
-  };
+  }
 }
 
 export interface DraftContext {
-  repo: string;
-  readme: ReadmeSummary;
-  blog: BlogSummary;
-  githubUrl: string;
+  repo: string
+  readme: ReadmeSummary
+  blog: BlogSummary
+  githubUrl: string
   /** Clean canonical blog URL, no UTM — for a `canonical_url` field. */
-  canonicalBlogUrl: string;
-  taggedBlogUrl: string;
+  canonicalBlogUrl: string
+  taggedBlogUrl: string
 }
 
 /** Builds one draft's context; the tagged link is `source`'s row of the channel table. */
@@ -269,7 +269,7 @@ export function context(
     githubUrl: `https://github.com/spy4x/${repo}`,
     canonicalBlogUrl: `${BASE_URL}/blog/${slug}`,
     taggedBlogUrl: channelUrl(BASE_URL, `/blog/${slug}`, source, campaign),
-  };
+  }
 }
 
 export function redditDraft(ctx: DraftContext): string {
@@ -287,7 +287,7 @@ GitHub: ${ctx.githubUrl}
 Full write-up: ${ctx.taggedBlogUrl}
 
 Feedback and questions welcome — I'll be in the comments today.
-`;
+`
 }
 
 export function hnDraft(ctx: DraftContext): string {
@@ -305,7 +305,7 @@ Repo: ${ctx.githubUrl}
 Background and write-up: ${ctx.taggedBlogUrl}
 
 Happy to answer questions — I'll be around today.
-`;
+`
 }
 
 export function linkedinDraft(ctx: DraftContext): string {
@@ -315,7 +315,7 @@ ${ctx.blog.description}
 
 Full write-up: ${ctx.taggedBlogUrl}
 Repo: ${ctx.githubUrl}
-`;
+`
 }
 
 export function devtoDraft(ctx: DraftContext): string {
@@ -332,7 +332,7 @@ ${ctx.readme.description}
 Repo: ${ctx.githubUrl}
 
 ${firstPublishedLine(ctx.taggedBlogUrl)}
-`;
+`
 }
 
 export function youtubeDraft(ctx: DraftContext): string {
@@ -344,61 +344,61 @@ ${ctx.blog.description}
 
 Write-up: ${ctx.taggedBlogUrl}
 Repo: ${ctx.githubUrl}
-`;
+`
 }
 
 /** One file per channel; each draft's link is tagged with its `source`'s table row. */
 export const DRAFTS: {
-  file: string;
-  source: string;
-  draft: (c: DraftContext) => string;
+  file: string
+  source: string
+  draft: (c: DraftContext) => string
 }[] = [
   { file: "reddit.md", source: "reddit", draft: redditDraft },
   { file: "hn.md", source: "hn", draft: hnDraft },
   { file: "linkedin.md", source: "linkedin", draft: linkedinDraft },
   { file: "devto.md", source: "devto", draft: devtoDraft },
   { file: "youtube.md", source: "youtube", draft: youtubeDraft },
-];
+]
 
 async function main() {
-  const repo = Deno.args[0];
+  const repo = Deno.args[0]
   if (!repo) {
-    console.error("Usage: deno task launch-kit <repo> [path-to-repo-checkout]");
-    Deno.exit(1);
+    console.error("Usage: deno task launch-kit <repo> [path-to-repo-checkout]")
+    Deno.exit(1)
   }
 
-  let readme: ReadmeSummary;
-  let blog: BlogSummary;
-  let slug: string;
+  let readme: ReadmeSummary
+  let blog: BlogSummary
+  let slug: string
   try {
-    const readmePath = await findReadmePath(repo, Deno.args[1]);
-    readme = parseReadme(await Deno.readTextFile(readmePath));
-    slug = await findBlogSlug(repo);
-    const blogPath = `${CONTENT_DIR}/${slug}.md`;
-    blog = parseBlogFrontMatter(await Deno.readTextFile(blogPath), blogPath);
+    const readmePath = await findReadmePath(repo, Deno.args[1])
+    readme = parseReadme(await Deno.readTextFile(readmePath))
+    slug = await findBlogSlug(repo)
+    const blogPath = `${CONTENT_DIR}/${slug}.md`
+    blog = parseBlogFrontMatter(await Deno.readTextFile(blogPath), blogPath)
   } catch (err) {
-    console.error(`\n  ✗ ${(err as Error).message}\n`);
-    Deno.exit(1);
+    console.error(`\n  ✗ ${(err as Error).message}\n`)
+    Deno.exit(1)
   }
 
-  console.log(`  blog post: ${CONTENT_DIR}/${slug}.md`);
+  console.log(`  blog post: ${CONTENT_DIR}/${slug}.md`)
 
-  const campaign = `${repo}-launch`;
-  const outDir = `${OUT_DIR}/${repo}`;
-  await Deno.mkdir(outDir, { recursive: true });
+  const campaign = `${repo}-launch`
+  const outDir = `${OUT_DIR}/${repo}`
+  await Deno.mkdir(outDir, { recursive: true })
 
   for (const draft of DRAFTS) {
-    const ctx = context(repo, readme, blog, slug, draft.source, campaign);
-    const path = `${outDir}/${draft.file}`;
-    await Deno.writeTextFile(path, draft.draft(ctx));
-    console.log(`  ✓ ${path}`);
+    const ctx = context(repo, readme, blog, slug, draft.source, campaign)
+    const path = `${outDir}/${draft.file}`
+    await Deno.writeTextFile(path, draft.draft(ctx))
+    console.log(`  ✓ ${path}`)
   }
 
   console.log(
     `\n  ✅ Launch kit ready in ${outDir}/ — drafts only, nothing was posted.\n`,
-  );
+  )
 }
 
 if (import.meta.main) {
-  await main();
+  await main()
 }

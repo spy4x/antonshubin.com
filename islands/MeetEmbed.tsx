@@ -1,14 +1,14 @@
-import { useSignal } from "@preact/signals";
-import { useEffect, useRef } from "preact/hooks";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { originOf } from "../lib/csp.ts";
-import { NEW_TAB_LABEL } from "../lib/meet-embed.ts";
-import { eventAttrs, track } from "../lib/analytics.ts";
-import { BRIEF_LABEL } from "../lib/nav.ts";
-import { decapitalize } from "../lib/promises.ts";
+import { useSignal } from "@preact/signals"
+import { useEffect, useRef } from "preact/hooks"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { originOf } from "../lib/csp.ts"
+import { NEW_TAB_LABEL } from "../lib/meet-embed.ts"
+import { eventAttrs, track } from "../lib/analytics.ts"
+import { BRIEF_LABEL } from "../lib/nav.ts"
+import { decapitalize } from "../lib/promises.ts"
 
 // Kept importable from here, where the tests and routes already look.
-export { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
+export { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts"
 
 /**
  * The reserved height of the placeholder box, and the hidden frame's height
@@ -16,7 +16,7 @@ export { embedUrl, NEW_TAB_LABEL } from "../lib/meet-embed.ts";
  * fixed height, close to the first booking step, so the page below the
  * calendar barely moves when the real height replaces it.
  */
-export const INITIAL_EMBED_HEIGHT_PX = 760;
+export const INITIAL_EMBED_HEIGHT_PX = 760
 
 /**
  * `mig:height` never resizes the frame past this many CSS pixels, however
@@ -38,7 +38,7 @@ export const INITIAL_EMBED_HEIGHT_PX = 760;
  * booking flow inside it can still scroll internally if the real height
  * exceeds this cap.
  */
-export const MAX_EMBED_HEIGHT_PX = 2000;
+export const MAX_EMBED_HEIGHT_PX = 2000
 
 /**
  * True when `event` is a genuine `mig:height` message from the embed's own
@@ -59,19 +59,19 @@ export function isEmbedHeightMessage(
   embedOrigin: string,
   iframeWindow: Window | null | undefined,
 ): number | null {
-  const data = embedMessageData(event, embedOrigin, iframeWindow);
-  if (!data || data.type !== "mig:height") return null;
+  const data = embedMessageData(event, embedOrigin, iframeWindow)
+  if (!data || data.type !== "mig:height") return null
 
-  const height = data.height;
+  const height = data.height
   // The `typeof` check exists only to narrow `height` to `number` for
   // TypeScript below — `Number.isInteger()` alone already rejects every
   // non-number value (it never coerces), NaN and Infinity, so no separate
   // `Number.isFinite()` check is needed on top of it.
-  if (typeof height !== "number") return null;
-  if (!Number.isInteger(height)) return null;
-  if (height <= 0) return null;
+  if (typeof height !== "number") return null
+  if (!Number.isInteger(height)) return null
+  if (height <= 0) return null
 
-  return Math.min(height, MAX_EMBED_HEIGHT_PX);
+  return Math.min(height, MAX_EMBED_HEIGHT_PX)
 }
 
 /**
@@ -86,7 +86,7 @@ export function isEmbedBookedMessage(
   iframeWindow: Window | null | undefined,
 ): boolean {
   return embedMessageData(event, embedOrigin, iframeWindow)?.type ===
-    "mig:booked";
+    "mig:booked"
 }
 
 /**
@@ -99,11 +99,11 @@ function embedMessageData(
   embedOrigin: string,
   iframeWindow: Window | null | undefined,
 ): { type?: unknown; height?: unknown } | null {
-  if (!embedOrigin || event.origin !== embedOrigin) return null;
-  if (!iframeWindow || event.source !== iframeWindow) return null;
-  const data = event.data;
-  if (!data || typeof data !== "object") return null;
-  return data as { type?: unknown; height?: unknown };
+  if (!embedOrigin || event.origin !== embedOrigin) return null
+  if (!iframeWindow || event.source !== iframeWindow) return null
+  const data = event.data
+  if (!data || typeof data !== "object") return null
+  return data as { type?: unknown; height?: unknown }
 }
 
 /**
@@ -112,25 +112,25 @@ function embedMessageData(
  * `X-Frame-Options` or `frame-ancestors` refusal) still fires `load`, so the
  * message, not `load`, is the only proof the calendar rendered (#272).
  */
-export const EMBED_TIMEOUT_MS = 8000;
+export const EMBED_TIMEOUT_MS = 8000
 
 /** The placeholder's three states: waiting, the calendar showed, or it never did. */
-export type EmbedState = "loading" | "ready" | "failed";
+export type EmbedState = "loading" | "ready" | "failed"
 
 interface MeetEmbedProps {
   /**
    * Iframe-friendly scheduler URL, normally built with `embedUrl()`. Empty
    * when `SCHEDULE_URL` is unset — the component renders nothing then.
    */
-  url: string;
+  url: string
   /**
    * The scheduler's own page, offered in the failure state and without
    * JavaScript. Optional so `/how-i-work`'s older call site still renders;
    * without it those two lines offer no link.
    */
-  scheduleUrl?: string;
+  scheduleUrl?: string
   /** Where the failure state sends someone who would rather write, e.g. `#brief`. */
-  briefHref?: string;
+  briefHref?: string
 }
 
 /**
@@ -150,15 +150,15 @@ interface MeetEmbedProps {
 export default function MeetEmbed(
   { url, scheduleUrl, briefHref }: MeetEmbedProps,
 ) {
-  const inserted = useSignal(false);
-  const state = useSignal<EmbedState>("loading");
-  const height = useSignal(INITIAL_EMBED_HEIGHT_PX);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const inserted = useSignal(false)
+  const state = useSignal<EmbedState>("loading")
+  const height = useSignal(INITIAL_EMBED_HEIGHT_PX)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
   // `originOf()` (lib/csp.ts) never throws — a bare `new URL(url)` here did,
   // and since this runs on every render (including the server-rendered
   // first one), a `SCHEDULE_URL` without a scheme (a plausible config typo)
   // 500'd every page that renders the calendar.
-  const embedOrigin = originOf(url);
+  const embedOrigin = originOf(url)
 
   // Listens for mig's `mig:height` message (README "Embedding") so the frame
   // takes its content's height. The listener is attached in this effect and
@@ -170,42 +170,42 @@ export default function MeetEmbed(
   // counts a booking once per message (#318). The first height counts
   // `calendar-shown` and the timeout `calendar-failed`, once each per mount.
   useEffect(() => {
-    if (!embedOrigin) return;
-    let shown = false;
+    if (!embedOrigin) return
+    let shown = false
     const onMessage = (event: MessageEvent) => {
-      const iframeWindow = iframeRef.current?.contentWindow;
+      const iframeWindow = iframeRef.current?.contentWindow
       if (isEmbedBookedMessage(event, embedOrigin, iframeWindow)) {
-        track("call-booked");
-        return;
+        track("call-booked")
+        return
       }
-      const next = isEmbedHeightMessage(event, embedOrigin, iframeWindow);
-      if (next === null) return;
-      height.value = next;
-      state.value = "ready";
+      const next = isEmbedHeightMessage(event, embedOrigin, iframeWindow)
+      if (next === null) return
+      height.value = next
+      state.value = "ready"
       if (!shown) {
-        shown = true;
-        track("calendar-shown");
+        shown = true
+        track("calendar-shown")
       }
-    };
-    globalThis.addEventListener("message", onMessage);
+    }
+    globalThis.addEventListener("message", onMessage)
     const timer = setTimeout(() => {
-      if (state.value !== "loading") return;
-      state.value = "failed";
-      track("calendar-failed");
-    }, EMBED_TIMEOUT_MS);
-    inserted.value = true;
+      if (state.value !== "loading") return
+      state.value = "failed"
+      track("calendar-failed")
+    }, EMBED_TIMEOUT_MS)
+    inserted.value = true
     return () => {
-      clearTimeout(timer);
-      globalThis.removeEventListener("message", onMessage);
-    };
-  }, [embedOrigin]);
+      clearTimeout(timer)
+      globalThis.removeEventListener("message", onMessage)
+    }
+  }, [embedOrigin])
 
-  if (!url) return null;
+  if (!url) return null
 
-  const ready = state.value === "ready";
-  const failed = state.value === "failed";
+  const ready = state.value === "ready"
+  const failed = state.value === "failed"
   const linkClass =
-    "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
+    "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
 
   return (
     <div data-meet-embed={state.value} class="relative w-full max-w-[36rem]">
@@ -282,5 +282,5 @@ export default function MeetEmbed(
         />
       )}
     </div>
-  );
+  )
 }

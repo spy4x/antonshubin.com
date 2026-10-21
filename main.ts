@@ -1,34 +1,34 @@
-import { App, staticFiles } from "fresh";
-import type { State } from "./lib/utils.ts";
-import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts";
-import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts";
-import { cacheControlFor } from "./lib/cache-control.ts";
-import { redirectTarget } from "./lib/redirects.ts";
-import { siteCsrf } from "./lib/csrf.ts";
-import { serveVideo } from "./lib/video-files.ts";
-import { dropModulePreload, LATE_SCRIPT_PATHS } from "./lib/late-scripts.ts";
+import { App, staticFiles } from "fresh"
+import type { State } from "./lib/utils.ts"
+import { buildCsp, originOf, readFreshNonce } from "./lib/csp.ts"
+import { SCHEDULE_URL, UMAMI_PRECONNECT_ORIGIN } from "./lib/config.ts"
+import { cacheControlFor } from "./lib/cache-control.ts"
+import { redirectTarget } from "./lib/redirects.ts"
+import { siteCsrf } from "./lib/csrf.ts"
+import { serveVideo } from "./lib/video-files.ts"
+import { dropModulePreload, LATE_SCRIPT_PATHS } from "./lib/late-scripts.ts"
 
-export const app = new App<State>();
+export const app = new App<State>()
 
 // www → non-www redirect (301 permanent)
 app.use(async (ctx) => {
-  const hostname = ctx.url.hostname;
+  const hostname = ctx.url.hostname
   if (hostname.startsWith("www.")) {
-    const target = new URL(ctx.url);
-    target.hostname = hostname.slice(4);
-    return Response.redirect(target.toString(), 301);
+    const target = new URL(ctx.url)
+    target.hostname = hostname.slice(4)
+    return Response.redirect(target.toString(), 301)
   }
-  return await ctx.next();
-});
+  return await ctx.next()
+})
 
 // Content-Security-Policy (#177) — every response, not just pages. Own
 // middleware instead of Fresh's csp() — see lib/csp.ts's header for why.
 // SCHEDULE_URL/UMAMI_URL don't change per request, so their origins are
 // computed once here rather than on every response.
-const SCHEDULE_ORIGIN = originOf(SCHEDULE_URL);
+const SCHEDULE_ORIGIN = originOf(SCHEDULE_URL)
 app.use(async (ctx) => {
-  const res = await ctx.next();
-  const nonce = readFreshNonce(res);
+  const res = await ctx.next()
+  const nonce = readFreshNonce(res)
   res.headers.set(
     "Content-Security-Policy",
     buildCsp({
@@ -36,30 +36,30 @@ app.use(async (ctx) => {
       umamiOrigin: UMAMI_PRECONNECT_ORIGIN,
       scheduleOrigin: SCHEDULE_ORIGIN,
     }),
-  );
-  return res;
-});
+  )
+  return res
+})
 
 // Pages whose scripts wait for the HTML instead of racing the stylesheet
 // (lib/late-scripts.ts).
 app.use(async (ctx) => {
-  const res = await ctx.next();
-  if (LATE_SCRIPT_PATHS.has(ctx.url.pathname)) dropModulePreload(res.headers);
-  return res;
-});
+  const res = await ctx.next()
+  if (LATE_SCRIPT_PATHS.has(ctx.url.pathname)) dropModulePreload(res.headers)
+  return res
+})
 
 // Cache middleware: Cache-Control per response (lib/cache-control.ts).
 app.use(async (ctx) => {
-  const resp = await ctx.next();
+  const resp = await ctx.next()
 
   const cacheControl = cacheControlFor({
     pathname: ctx.url.pathname,
     status: resp.status,
     current: resp.headers.get("Cache-Control"),
-  });
-  if (cacheControl) resp.headers.set("Cache-Control", cacheControl);
-  return resp;
-});
+  })
+  if (cacheControl) resp.headers.set("Cache-Control", cacheControl)
+  return resp
+})
 
 // Trailing-slash post/project URLs and retired slugs (#193) — placed after
 // the CSP and cache middlewares above, so a redirect response still gets
@@ -69,22 +69,22 @@ app.use(async (ctx) => {
 // in docs/csp.md — change headers on the response ctx.next() returned, never
 // rebuild it; this middleware is the thing ctx.next() resolves to for them).
 app.use(async (ctx) => {
-  const target = redirectTarget(ctx.url.pathname);
-  if (!target) return await ctx.next();
+  const target = redirectTarget(ctx.url.pathname)
+  if (!target) return await ctx.next()
   return new Response(null, {
     status: 301,
     headers: { Location: target + ctx.url.search },
-  });
-});
+  })
+})
 
 // Cross-site POSTs to the mailing and unsubscribe routes answer 403 (#253).
-app.use(siteCsrf());
+app.use(siteCsrf())
 
 // A clip under /video/* answers a Range request with 206 (#454): Safari
 // plays an MP4 only that way, and staticFiles() ignores Range.
-app.use(serveVideo);
+app.use(serveVideo)
 
-app.use(staticFiles());
+app.use(staticFiles())
 
 // Include file-system based routes here
-app.fsRoutes();
+app.fsRoutes()

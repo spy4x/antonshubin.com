@@ -62,14 +62,14 @@ with its own middle as children:
 ```tsx
 export default define.page(async function OkoPage(ctx) {
   // components/tool-frame/tool-page.ts; null only for a slug not in the registry
-  const data = await loadToolPage("oko");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
+  const data = await loadToolPage("oko")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
   return (
     <ToolFrame data={data} currentPath={ctx.url.pathname}>
       {/* the page's own middle */}
     </ToolFrame>
-  );
-});
+  )
+})
 ```
 
 `ToolFrame` renders, in order: the head and JSON-LD (`ToolJsonLd`:

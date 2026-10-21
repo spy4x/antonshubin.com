@@ -1,11 +1,11 @@
-import { define } from "../../lib/utils.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
-import { loadToolPage } from "../../components/tool-frame/tool-page.ts";
-import { ToolReference } from "../../components/tools/caldav-mcp/ToolReference.tsx";
-import { DesktopConfig } from "../../components/tools/caldav-mcp/DesktopConfig.tsx";
-import { ANSWER_SHAPE } from "../../components/tools/caldav-mcp/data.ts";
-import { IconChevronRight } from "@spy4x/preact-icons";
+import { define } from "../../lib/utils.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
+import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
+import { ToolReference } from "../../components/tools/caldav-mcp/ToolReference.tsx"
+import { DesktopConfig } from "../../components/tools/caldav-mcp/DesktopConfig.tsx"
+import { ANSWER_SHAPE } from "../../components/tools/caldav-mcp/data.ts"
+import { IconChevronRight } from "@spy4x/preact-icons"
 
 // /tools/caldav-mcp (#463): the shared tool frame around the page's own
 // middle, the tool reference with its permission switch, the answer shape
@@ -53,12 +53,12 @@ function AnswerShape() {
         </ul>
       </div>
     </details>
-  );
+  )
 }
 
 export default define.page(async function CaldavMcpPage(ctx) {
-  const data = await loadToolPage("caldav-mcp");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
+  const data = await loadToolPage("caldav-mcp")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
   return (
     <ToolFrame
       data={data}
@@ -68,5 +68,5 @@ export default define.page(async function CaldavMcpPage(ctx) {
       <AnswerShape />
       <DesktopConfig />
     </ToolFrame>
-  );
-});
+  )
+})

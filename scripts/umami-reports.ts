@@ -26,57 +26,57 @@
  */
 
 /** How long one Umami API call may take before it is abandoned. */
-export const UMAMI_TIMEOUT_MS = 10_000;
+export const UMAMI_TIMEOUT_MS = 10_000
 
 /** The report types this script manages. */
-export type ManagedReportType = "goal" | "funnel";
+export type ManagedReportType = "goal" | "funnel"
 
 /** One saved report, as this script wants it to exist in Umami. */
 export interface ReportDefinition {
-  name: string;
-  type: ManagedReportType;
-  description: string;
-  parameters: Record<string, unknown>;
+  name: string
+  type: ManagedReportType
+  description: string
+  parameters: Record<string, unknown>
 }
 
 /** A saved report as `GET /api/reports` returns it (only the fields used here). */
 export interface SavedReport {
-  id: string;
-  name: string;
-  type: string;
-  description: string;
-  parameters: unknown;
+  id: string
+  name: string
+  type: string
+  description: string
+  parameters: unknown
 }
 
 /** Where and as whom the script talks to Umami. */
 export interface UmamiConfig {
-  apiUrl: string;
-  token: string;
-  websiteId: string;
+  apiUrl: string
+  token: string
+  websiteId: string
 }
 
 /** One API call the script sends, or would send under `--dry-run`. */
 export interface PlannedCall {
-  action: "create" | "update" | "delete" | "unchanged";
-  name: string;
-  method: "POST" | "DELETE" | "NONE";
-  path: string;
-  body?: Record<string, unknown>;
+  action: "create" | "update" | "delete" | "unchanged"
+  name: string
+  method: "POST" | "DELETE" | "NONE"
+  path: string
+  body?: Record<string, unknown>
 }
 
 /** The structured result of a run. */
 export interface RunResult {
-  success: boolean;
-  output: string[];
-  error?: string;
+  success: boolean
+  output: string[]
+  error?: string
 }
 
 /** The marker every managed report's description ends with. */
 export const MANAGED =
-  "Managed by scripts/umami-reports.ts in spy4x/antonshubin.com.";
+  "Managed by scripts/umami-reports.ts in spy4x/antonshubin.com."
 
 /** Minutes a visitor has to complete a funnel, from its first step. */
-export const FUNNEL_WINDOW_MINUTES = 60;
+export const FUNNEL_WINDOW_MINUTES = 60
 
 function goal(event: string, question: string): ReportDefinition {
   return {
@@ -84,7 +84,7 @@ function goal(event: string, question: string): ReportDefinition {
     type: "goal",
     description: `${question} ${MANAGED}`,
     parameters: { type: "event", value: event },
-  };
+  }
 }
 
 /**
@@ -141,7 +141,7 @@ export const REPORTS: ReportDefinition[] = [
       ],
     },
   },
-];
+]
 
 /**
  * Reports this script created once and no longer wants, by exact name. The
@@ -153,44 +153,44 @@ export const REPORTS: ReportDefinition[] = [
 export const RETIRED_REPORTS: readonly string[] = [
   "Funnel: any page → /contact-me → call-booked",
   "Funnel: /contact-me → call-booked",
-];
+]
 
 /** Reads the three Umami settings; throws naming every one that is missing. */
 export function readConfig(
   get: (name: string) => string | undefined = (n) => Deno.env.get(n),
 ): UmamiConfig {
-  const names = ["UMAMI_API_URL", "UMAMI_API_TOKEN", "UMAMI_ID"] as const;
-  const missing = names.filter((n) => !get(n));
+  const names = ["UMAMI_API_URL", "UMAMI_API_TOKEN", "UMAMI_ID"] as const
+  const missing = names.filter((n) => !get(n))
   if (missing.length > 0) {
-    throw new Error(`Missing required env: ${missing.join(", ")}`);
+    throw new Error(`Missing required env: ${missing.join(", ")}`)
   }
   return {
     apiUrl: get("UMAMI_API_URL")!.replace(/\/$/, ""),
     token: get("UMAMI_API_TOKEN")!,
     websiteId: get("UMAMI_ID")!,
-  };
+  }
 }
 
 /** Serializes a value with object keys sorted, so key order never counts as a change. */
 export function stableJson(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`
   if (value && typeof value === "object") {
     const entries = Object.entries(value as Record<string, unknown>)
       .filter(([, v]) => v !== undefined)
-      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     return `{${
       entries.map(([k, v]) => `${JSON.stringify(k)}:${stableJson(v)}`).join(",")
-    }}`;
+    }}`
   }
-  return JSON.stringify(value);
+  return JSON.stringify(value)
 }
 
 function parseParameters(value: unknown): unknown {
-  if (typeof value !== "string") return value;
+  if (typeof value !== "string") return value
   try {
-    return JSON.parse(value);
+    return JSON.parse(value)
   } catch {
-    return value;
+    return value
   }
 }
 
@@ -217,7 +217,7 @@ export function planReportCalls(
       name: r.name,
       method: "DELETE",
       path: `/api/reports/${r.id}`,
-    }));
+    }))
   return [
     ...definitions.map((def): PlannedCall => {
       const body = {
@@ -226,8 +226,8 @@ export function planReportCalls(
         name: def.name,
         description: def.description,
         parameters: def.parameters,
-      };
-      const match = saved.find((r) => r.name === def.name);
+      }
+      const match = saved.find((r) => r.name === def.name)
       if (!match) {
         return {
           action: "create",
@@ -235,19 +235,19 @@ export function planReportCalls(
           method: "POST",
           path: "/api/reports",
           body,
-        };
+        }
       }
       const same = match.type === def.type &&
         match.description === def.description &&
         stableJson(parseParameters(match.parameters)) ===
-          stableJson(def.parameters);
+          stableJson(def.parameters)
       if (same) {
         return {
           action: "unchanged",
           name: def.name,
           method: "NONE",
           path: `/api/reports/${match.id}`,
-        };
+        }
       }
       return {
         action: "update",
@@ -255,10 +255,10 @@ export function planReportCalls(
         method: "POST",
         path: `/api/reports/${match.id}`,
         body,
-      };
+      }
     }),
     ...deletions,
-  ];
+  ]
 }
 
 async function umamiFetch(
@@ -275,55 +275,55 @@ async function umamiFetch(
       ...(init.body ? { "Content-Type": "application/json" } : {}),
     },
     signal: AbortSignal.timeout(UMAMI_TIMEOUT_MS),
-  });
+  })
   if (!res.ok) {
-    await res.body?.cancel();
+    await res.body?.cancel()
     throw new Error(
       `${
         init.method ?? "GET"
       } ${path} answered ${res.status} ${res.statusText}`,
-    );
+    )
   }
-  return await res.json();
+  return await res.json()
 }
 
 /** Page size for listing saved reports. */
-export const LIST_PAGE_SIZE = 100;
+export const LIST_PAGE_SIZE = 100
 /** A safety cap on listing pages, so a server that never ends a list can't loop forever. */
-export const MAX_LIST_PAGES = 20;
+export const MAX_LIST_PAGES = 20
 
 /** Lists every saved report of the website, following Umami's paging. */
 export async function listReports(
   config: UmamiConfig,
   fetchFn: typeof fetch = fetch,
 ): Promise<SavedReport[]> {
-  const all: SavedReport[] = [];
+  const all: SavedReport[] = []
   for (let page = 1; page <= MAX_LIST_PAGES; page++) {
     const query = new URLSearchParams({
       websiteId: config.websiteId,
       page: String(page),
       pageSize: String(LIST_PAGE_SIZE),
-    });
+    })
     const res = await umamiFetch(config, fetchFn, `/api/reports?${query}`) as {
-      data?: SavedReport[];
-      count?: number;
-    };
-    const data = res.data ?? [];
-    all.push(...data);
-    if (data.length === 0 || all.length >= Number(res.count ?? 0)) return all;
+      data?: SavedReport[]
+      count?: number
+    }
+    const data = res.data ?? []
+    all.push(...data)
+    if (data.length === 0 || all.length >= Number(res.count ?? 0)) return all
   }
-  throw new Error(`Umami listed more than ${MAX_LIST_PAGES} pages of reports`);
+  throw new Error(`Umami listed more than ${MAX_LIST_PAGES} pages of reports`)
 }
 
 /** One line describing a planned call, with no token in it. */
 export function describeCall(call: PlannedCall): string {
-  if (call.action === "unchanged") return `unchanged  ${call.name}`;
+  if (call.action === "unchanged") return `unchanged  ${call.name}`
   if (call.action === "delete") {
-    return `delete     ${call.method} ${call.path}  ${call.name}`;
+    return `delete     ${call.method} ${call.path}  ${call.name}`
   }
   return `${call.action.padEnd(9)}  ${call.method} ${call.path}  ${
     JSON.stringify(call.body)
-  }`;
+  }`
 }
 
 /**
@@ -334,25 +334,25 @@ export function describeCall(call: PlannedCall): string {
 export async function syncReports(
   config: UmamiConfig,
   options: {
-    dryRun?: boolean;
-    fetchFn?: typeof fetch;
-    definitions?: ReportDefinition[];
+    dryRun?: boolean
+    fetchFn?: typeof fetch
+    definitions?: ReportDefinition[]
   } = {},
 ): Promise<RunResult> {
-  const { dryRun = false, fetchFn = fetch, definitions = REPORTS } = options;
-  const output: string[] = [];
+  const { dryRun = false, fetchFn = fetch, definitions = REPORTS } = options
+  const output: string[] = []
   try {
-    const saved = await listReports(config, fetchFn);
-    output.push(`Umami has ${saved.length} saved report(s) for this website.`);
-    const calls = planReportCalls(saved, definitions, config.websiteId);
+    const saved = await listReports(config, fetchFn)
+    output.push(`Umami has ${saved.length} saved report(s) for this website.`)
+    const calls = planReportCalls(saved, definitions, config.websiteId)
     for (const call of calls) {
       if (call.action === "unchanged" || dryRun) {
         output.push(
           `${dryRun && call.action !== "unchanged" ? "[dry-run] " : ""}${
             describeCall(call)
           }`,
-        );
-        continue;
+        )
+        continue
       }
       await umamiFetch(
         config,
@@ -362,21 +362,21 @@ export async function syncReports(
           method: "POST",
           body: JSON.stringify(call.body),
         },
-      );
-      output.push(describeCall(call));
+      )
+      output.push(describeCall(call))
     }
-    return { success: true, output };
+    return { success: true, output }
   } catch (err) {
-    return { success: false, output, error: (err as Error).message };
+    return { success: false, output, error: (err as Error).message }
   }
 }
 
 if (import.meta.main) {
-  const dryRun = Deno.args.includes("--dry-run");
-  const result = await syncReports(readConfig(), { dryRun });
-  for (const line of result.output) console.log(line);
+  const dryRun = Deno.args.includes("--dry-run")
+  const result = await syncReports(readConfig(), { dryRun })
+  for (const line of result.output) console.log(line)
   if (!result.success) {
-    console.error(`Failed: ${result.error}`);
-    Deno.exit(1);
+    console.error(`Failed: ${result.error}`)
+    Deno.exit(1)
   }
 }

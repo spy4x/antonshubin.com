@@ -7,33 +7,33 @@ import {
   type EmailSender,
   type SendResult,
   type SmtpTransportFactory,
-} from "@spy4x/email/smtp";
-import type { EmailMessage } from "@spy4x/email/message";
+} from "@spy4x/email/smtp"
+import type { EmailMessage } from "@spy4x/email/message"
 
-export type { EmailMessage, EmailSender, SendResult };
+export type { EmailMessage, EmailSender, SendResult }
 
 /** The SMTP relay the site sends through. */
 export interface SmtpSettings {
-  host: string;
-  port: number;
-  user: string;
-  pass: string;
+  host: string
+  port: number
+  user: string
+  pass: string
   /** `From` mailbox: SMTP_FROM, or SMTP_USERNAME when SMTP_FROM is empty. */
-  from: string;
+  from: string
   /** Name announced in EHLO; the site's own hostname. Absent: nodemailer
    * uses the machine's, which inside a container is `[127.0.0.1]`. */
-  ehloName?: string;
+  ehloName?: string
 }
 
 /** Raw SMTP_* values, as `lib/config.ts` or a script reads them. */
 export interface SmtpEnvValues {
-  host: string;
-  port: number;
-  user: string;
-  pass: string;
-  from: string;
+  host: string
+  port: number
+  user: string
+  pass: string
+  from: string
   /** The site's hostname, for EHLO (from `DOMAIN` via `BASE_URL`). */
-  ehloName?: string;
+  ehloName?: string
 }
 
 /**
@@ -41,7 +41,7 @@ export interface SmtpEnvValues {
  * the hand-written clients used: host, username and password must all be set.
  */
 export function smtpSettings(values: SmtpEnvValues): SmtpSettings | null {
-  if (!values.host || !values.user || !values.pass) return null;
+  if (!values.host || !values.user || !values.pass) return null
   return {
     host: values.host,
     port: values.port,
@@ -49,7 +49,7 @@ export function smtpSettings(values: SmtpEnvValues): SmtpSettings | null {
     pass: values.pass,
     from: values.from || values.user,
     ...(values.ehloName ? { ehloName: values.ehloName } : {}),
-  };
+  }
 }
 
 /**
@@ -71,15 +71,15 @@ export function createSiteSender(
   settings: SmtpSettings,
   factory?: SmtpTransportFactory,
 ): EmailSender {
-  let sender: EmailSender | undefined;
+  let sender: EmailSender | undefined
   return {
     send(message: EmailMessage): Promise<SendResult> {
       try {
-        const { ehloName, ...smtp } = settings;
+        const { ehloName, ...smtp } = settings
         sender ??= createSmtpSender(
           { ...smtp, secure: true, ...(ehloName ? { name: ehloName } : {}) },
           factory,
-        );
+        )
       } catch (err) {
         return Promise.resolve({
           ok: false,
@@ -89,21 +89,21 @@ export function createSiteSender(
           accepted: [],
           rejected: [],
           duplicates: [],
-        });
+        })
       }
-      return sender.send(message);
+      return sender.send(message)
     },
-  };
+  }
 }
 
 /** Where a mail helper writes its log lines; `console` outside tests. */
 export interface MailLog {
-  log(...args: unknown[]): void;
-  error(...args: unknown[]): void;
+  log(...args: unknown[]): void
+  error(...args: unknown[]): void
 }
 
 /** A line break or other control character, which a mail subject may not carry. */
-const CONTROL_CHARACTERS = /\p{Cc}+/gu;
+const CONTROL_CHARACTERS = /\p{Cc}+/gu
 
 /**
  * `value` with every run of control characters folded to one space, for text a
@@ -112,5 +112,5 @@ const CONTROL_CHARACTERS = /\p{Cc}+/gu;
  * over it would lose the lead.
  */
 export function subjectSafe(value: string): string {
-  return value.replace(CONTROL_CHARACTERS, " ");
+  return value.replace(CONTROL_CHARACTERS, " ")
 }

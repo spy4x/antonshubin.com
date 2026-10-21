@@ -2,9 +2,9 @@
 // routes/catalog/*.tsx, components/ServicePriceCard.tsx and lib/catalog.ts:
 // H1 and breadcrumb, the price card ahead of the scope, Book and the brief,
 // the work block, the promises, the JSON-LD and the retired slugs.
-import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0";
-import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, pageBody, visibleText } from "./html.ts";
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^1.0.0"
+import { type Site, startSite } from "./harness.ts"
+import { count, jsonLd, pageBody, visibleText } from "./html.ts"
 import {
   briefPath,
   catalogItem,
@@ -13,211 +13,211 @@ import {
   catalogRedirects,
   formatPrice,
   priceLabel,
-} from "../lib/catalog.ts";
+} from "../lib/catalog.ts"
 import {
   SAAS_MVP_EYEBROW,
   SAAS_MVP_SLUG,
   saasMvpAnswer,
   saasMvpFaqs,
   saasMvpLead,
-} from "../lib/saas-mvp.ts";
-import { decapitalize, promise } from "../lib/promises.ts";
-import { faqs } from "../lib/faqs.ts";
-import { projectsForCatalog } from "../lib/work.ts";
+} from "../lib/saas-mvp.ts"
+import { decapitalize, promise } from "../lib/promises.ts"
+import { faqs } from "../lib/faqs.ts"
+import { projectsForCatalog } from "../lib/work.ts"
 
 /** Registers a test that gets the built site served with a booking URL. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   Deno.test(name, async () => {
-    const previous = Deno.env.get("SCHEDULE_URL");
-    Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book");
-    const site = await startSite();
+    const previous = Deno.env.get("SCHEDULE_URL")
+    Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book")
+    const site = await startSite()
     try {
-      await fn(site);
+      await fn(site)
     } finally {
-      await site.stop();
-      if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-      else Deno.env.set("SCHEDULE_URL", previous);
+      await site.stop()
+      if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
+      else Deno.env.set("SCHEDULE_URL", previous)
     }
-  });
+  })
 }
 
 /** The back link's text (`<nav aria-label="Breadcrumb">`), without its "‹". */
 function backLink(html: string): string {
-  const nav = html.match(/<nav[^>]*aria-label="Breadcrumb"[\s\S]*?<\/nav>/);
-  assert(nav, "no back link");
-  return visibleText(nav[0]).replace(/^‹\s*/, "");
+  const nav = html.match(/<nav[^>]*aria-label="Breadcrumb"[\s\S]*?<\/nav>/)
+  assert(nav, "no back link")
+  return visibleText(nav[0]).replace(/^‹\s*/, "")
 }
 
 siteTest(
   "each service page has one <h1> holding the item title",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
-      const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)];
-      assertEquals(h1s.length, 1, item.slug);
-      assertEquals(visibleText(h1s[0][1]), item.title, item.slug);
+      const html = await site.html(`/catalog/${item.slug}`)
+      const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)]
+      assertEquals(h1s.length, 1, item.slug)
+      assertEquals(visibleText(h1s[0][1]), item.title, item.slug)
     }
-    const index = await site.html("/catalog");
-    assertEquals(count(index, /<h1\b/g), 1);
-    assert(/<h1\b[^>]*>Services<\/h1>/.test(index));
+    const index = await site.html("/catalog")
+    assertEquals(count(index, /<h1\b/g), 1)
+    assert(/<h1\b[^>]*>Services<\/h1>/.test(index))
   },
-);
+)
 
 siteTest(
   "the back link says Services, and the JSON-LD trail is Home / Services / <short title>",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
+      const html = await site.html(`/catalog/${item.slug}`)
       const list = jsonLd(html).flatMap((d) =>
         (d as { "@graph"?: unknown[] })["@graph"] ?? [d]
       ).find((d) =>
         (d as { "@type"?: string })["@type"] === "BreadcrumbList"
       ) as
         | { itemListElement: { name: string }[] }
-        | undefined;
-      assert(list, `${item.slug}: no BreadcrumbList`);
+        | undefined
+      assert(list, `${item.slug}: no BreadcrumbList`)
       assertEquals(
         list.itemListElement.map((i) => i.name),
         ["Home", "Services", item.shortTitle],
         item.slug,
-      );
-      assertEquals(backLink(html), "Services", item.slug);
+      )
+      assertEquals(backLink(html), "Services", item.slug)
     }
-    const index = await site.html("/catalog");
+    const index = await site.html("/catalog")
     const graph = jsonLd(index).flatMap((d) =>
       (d as { "@graph"?: unknown[] })["@graph"] ?? [d]
-    );
+    )
     const list = graph.find((d) =>
       (d as { "@type"?: string })["@type"] === "BreadcrumbList"
-    ) as { itemListElement: { name: string }[] };
-    assertEquals(list.itemListElement.map((i) => i.name), ["Home", "Services"]);
+    ) as { itemListElement: { name: string }[] }
+    assertEquals(list.itemListElement.map((i) => i.name), ["Home", "Services"])
   },
-);
+)
 
 siteTest(
   "the price card comes before the scope, with Book and the brief carrying the service",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
-      const card = html.indexOf(`data-service-card="${item.slug}"`);
-      assert(card > 0, `${item.slug}: no price card`);
+      const html = await site.html(`/catalog/${item.slug}`)
+      const card = html.indexOf(`data-service-card="${item.slug}"`)
+      assert(card > 0, `${item.slug}: no price card`)
       assert(
         card < html.indexOf(`id="service-scope"`),
         `${item.slug}: card after scope`,
-      );
-      const cardHtml = html.slice(card, html.indexOf("</aside>", card));
-      assert(cardHtml.includes("Book a free 30-minute call"), item.slug);
+      )
+      const cardHtml = html.slice(card, html.indexOf("</aside>", card))
+      assert(cardHtml.includes("Book a free 30-minute call"), item.slug)
       assert(
         cardHtml.includes(
           `href="${briefPath(item.slug).replace("&", "&amp;")}"`,
         ),
         `${item.slug}: card brief link`,
-      );
-      assert(cardHtml.includes("Send a written brief"), item.slug);
+      )
+      assert(cardHtml.includes("Send a written brief"), item.slug)
       // Book and the brief each appear twice: the card and the closing band.
       // The footer's Contact group says Book too; count inside <main> only.
-      const main = pageBody(html);
-      assertEquals(count(main, /Book a free 30-minute call/g), 2, item.slug);
-      assertEquals(count(main, /Send a written brief/g), 2, item.slug);
-      assertFalse(visibleText(html).includes("Talk about this"), item.slug);
+      const main = pageBody(html)
+      assertEquals(count(main, /Book a free 30-minute call/g), 2, item.slug)
+      assertEquals(count(main, /Send a written brief/g), 2, item.slug)
+      assertFalse(visibleText(html).includes("Talk about this"), item.slug)
     }
   },
-);
+)
 
 siteTest(
   "the price card lists the promises that apply, and only those",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
-      const ids = catalogPromises(item.slug);
+      const html = await site.html(`/catalog/${item.slug}`)
+      const ids = catalogPromises(item.slug)
       const card = html.slice(
         html.indexOf(`data-service-card="${item.slug}"`),
         html.indexOf(
           "</aside>",
           html.indexOf(`data-service-card="${item.slug}"`),
         ),
-      );
-      assertEquals(count(card, /<li\b/g), ids.length, item.slug);
+      )
+      assertEquals(count(card, /<li\b/g), ids.length, item.slug)
       for (const id of ids) {
         assert(
           card.includes(promise(id).title),
           `${item.slug}: ${id}`,
-        );
+        )
       }
     }
   },
-);
+)
 
 siteTest(
   "the work block lists exactly the projects sold under the service, none for Strategy",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
-      const expected = projectsForCatalog(item.slug).map((p) => p.slug);
+      const html = await site.html(`/catalog/${item.slug}`)
+      const expected = projectsForCatalog(item.slug).map((p) => p.slug)
       const shown = [...html.matchAll(/data-more-work="([^"]+)"/g)].map((m) =>
         m[1]
-      );
-      assertEquals(shown, expected, item.slug);
+      )
+      assertEquals(shown, expected, item.slug)
       assertEquals(
         html.includes("data-service-work"),
         expected.length > 0,
         item.slug,
-      );
+      )
       // One review excerpt when there is work, none otherwise.
       assertEquals(
         count(html, /data-service-excerpt/g),
         expected.length > 0 ? 1 : 0,
         item.slug,
-      );
+      )
     }
-    const strategy = visibleText(await site.html("/catalog/strategy-call"));
-    assertFalse(strategy.includes("Work under this service"));
+    const strategy = visibleText(await site.html("/catalog/strategy-call"))
+    assertFalse(strategy.includes("Work under this service"))
   },
-);
+)
 
 siteTest(
   "the index lists the four services as cards with one details link each and no Talk about this",
   async (site) => {
-    const html = await site.html("/catalog");
-    assertEquals(count(html, /data-catalog-item="/g), 4);
+    const html = await site.html("/catalog")
+    assertEquals(count(html, /data-catalog-item="/g), 4)
     for (const item of catalogItems) {
       assertEquals(
         count(html, new RegExp(`href="/catalog/${item.slug}"`, "g")),
         1,
         item.slug,
-      );
+      )
     }
-    assertFalse(visibleText(html).includes("Talk about this"));
-    const main = pageBody(html);
-    assertEquals(count(main, /Book a free 30-minute call/g), 1);
+    assertFalse(visibleText(html).includes("Talk about this"))
+    const main = pageBody(html)
+    assertEquals(count(main, /Book a free 30-minute call/g), 1)
     // "Client work" for every service that has a project, none for Strategy.
-    assertEquals(count(html, /data-catalog-work/g), 3);
+    assertEquals(count(html, /data-catalog-work/g), 3)
     // No time claim: the audit's project is from 2017 and Ongoing's from 2018.
     assertFalse(
       /recent/i.test(visibleText(html)),
       "/catalog claims recent work",
-    );
-    assertEquals(count(html, /Send a written brief/g), 1);
+    )
+    assertEquals(count(html, /Send a written brief/g), 1)
   },
-);
+)
 
 siteTest(
   "the title of each page and the index follow the SEO titles",
   async (site) => {
     const title = (html: string) =>
-      html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+      html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ""
     for (const item of catalogItems) {
       assertEquals(
         title(await site.html(`/catalog/${item.slug}`)),
         `${item.seoTitle} — Anton Shubin`,
-      );
+      )
     }
     assertEquals(
       title(await site.html("/catalog")),
       "Services and prices: SaaS builds, code audits, fractional CTO — Anton Shubin",
-    );
+    )
   },
-);
+)
 
 siteTest(
   "the index carries an OfferCatalog naming the four services by @id, and no rating anywhere",
@@ -225,216 +225,216 @@ siteTest(
     const flat = (html: string) =>
       jsonLd(html).flatMap((d) =>
         (d as { "@graph"?: unknown[] })["@graph"] ?? [d]
-      );
+      )
     const catalog = flat(await site.html("/catalog")).find((d) =>
       (d as { "@type"?: string })["@type"] === "OfferCatalog"
-    ) as { itemListElement: { "@id": string }[] } | undefined;
-    assert(catalog, "no OfferCatalog");
+    ) as { itemListElement: { "@id": string }[] } | undefined
+    assert(catalog, "no OfferCatalog")
     assertEquals(
       catalog.itemListElement.map((i) => i["@id"]),
       catalogItems.map((i) =>
         `https://antonshubin.com/catalog/${i.slug}#service`
       ),
-    );
+    )
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
+      const html = await site.html(`/catalog/${item.slug}`)
       const service = flat(html).find((d) =>
         (d as { "@type"?: string })["@type"] === "Service"
       ) as
         | {
-          "@id": string;
-          serviceType: string;
-          url: string;
-          provider: { "@id": string }[];
+          "@id": string
+          serviceType: string
+          url: string
+          provider: { "@id": string }[]
         }
-        | undefined;
-      assert(service, item.slug);
+        | undefined
+      assert(service, item.slug)
       assertEquals(
         service.provider.map((p) => p["@id"]),
         ["https://antonshubin.com/#person", "https://neatsoft.dev/#org"],
         item.slug,
-      );
+      )
       assertEquals(
         service["@id"],
         `https://antonshubin.com/catalog/${item.slug}#service`,
-      );
-      assertEquals(service.serviceType, item.category);
-      assertEquals(service.url, `https://antonshubin.com/catalog/${item.slug}`);
-      assertFalse(/AggregateRating|"Review"/.test(html), item.slug);
+      )
+      assertEquals(service.serviceType, item.category)
+      assertEquals(service.url, `https://antonshubin.com/catalog/${item.slug}`)
+      assertFalse(/AggregateRating|"Review"/.test(html), item.slug)
       // Only the SaaS MVP page has questions (#484).
       assertEquals(
         /FAQPage/.test(html),
         item.slug === SAAS_MVP_SLUG,
         item.slug,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the retired slugs land on a heading the page has, in one hop",
   async (site) => {
     for (const [slug, target] of Object.entries(catalogRedirects)) {
-      const res = await site.get(`/catalog/${slug}`);
-      await res.body?.cancel();
-      assertEquals(res.status, 301, slug);
+      const res = await site.get(`/catalog/${slug}`)
+      await res.body?.cancel()
+      assertEquals(res.status, 301, slug)
       const location = (res.headers.get("location") ?? "").replace(
         site.origin,
         "",
-      );
-      assertEquals(location, target, slug);
-      const [path, fragment] = target.split("#");
-      if (!fragment || !path.startsWith("/catalog/")) continue;
-      const html = await site.html(path);
+      )
+      assertEquals(location, target, slug)
+      const [path, fragment] = target.split("#")
+      if (!fragment || !path.startsWith("/catalog/")) continue
+      const html = await site.html(path)
       assert(
         html.includes(`id="${fragment}"`),
         `${path} has no id="${fragment}"`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "How it starts is a list on Build (three steps) and Strategy (four) only",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
-      const steps = html.match(/data-service-steps[\s\S]*?<\/ol>/);
+      const html = await site.html(`/catalog/${item.slug}`)
+      const steps = html.match(/data-service-steps[\s\S]*?<\/ol>/)
       if (
         item.slug === "zero-to-production-saas-mvp" ||
         item.slug === "strategy-call"
       ) {
-        assert(steps, `${item.slug}: no steps`);
-        const expected = item.slug === "strategy-call" ? 4 : 3;
-        assertEquals(count(steps[0], /<li\b/g), expected, item.slug);
+        assert(steps, `${item.slug}: no steps`)
+        const expected = item.slug === "strategy-call" ? 4 : 3
+        assertEquals(count(steps[0], /<li\b/g), expected, item.slug)
       } else {
-        assertEquals(steps, null, item.slug);
+        assertEquals(steps, null, item.slug)
       }
     }
     // The lone "1. It starts with a discovery sprint" heading is gone.
     const build = visibleText(
       await site.html("/catalog/zero-to-production-saas-mvp"),
-    );
-    assertFalse(build.includes("It starts with a discovery sprint"));
+    )
+    assertFalse(build.includes("It starts with a discovery sprint"))
   },
-);
+)
 
 siteTest(
   "the strategy page sets the free call beside the paid session",
   async (site) => {
-    const html = await site.html("/catalog/strategy-call");
-    assert(html.includes("data-service-versus"));
-    const versus = html.slice(html.indexOf("data-service-versus"));
-    assertEquals(count(versus.slice(0, 1500), /paid hour of advice/g), 0);
-    const other = await site.html("/catalog/codebase-health-audit");
-    assertFalse(other.includes("data-service-versus"));
+    const html = await site.html("/catalog/strategy-call")
+    assert(html.includes("data-service-versus"))
+    const versus = html.slice(html.indexOf("data-service-versus"))
+    assertEquals(count(versus.slice(0, 1500), /paid hour of advice/g), 0)
+    const other = await site.html("/catalog/codebase-health-audit")
+    assertFalse(other.includes("data-service-versus"))
   },
-);
+)
 
 siteTest(
   "the next-step link reads its price in lower case after the dot",
   async (site) => {
     for (const item of catalogItems.filter((i) => i.next)) {
-      const html = await site.html(`/catalog/${item.slug}`);
+      const html = await site.html(`/catalog/${item.slug}`)
       const next = visibleText(
         html.match(/<p data-service-next[\s\S]*?<\/p>/)![0],
-      );
-      assertFalse(/· From/.test(next), `${item.slug}: "${next}"`);
+      )
+      assertFalse(/· From/.test(next), `${item.slug}: "${next}"`)
       assert(
         /^Next step: .+ · (\$|from )/.test(next),
         `${item.slug}: "${next}"`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "every brief link lands on the #brief section with its service prefilled",
   async (site) => {
     for (const item of catalogItems) {
-      const path = briefPath(item.slug);
-      const [url, fragment] = path.split("#");
-      assertEquals(fragment, "brief");
-      const html = await site.html(url);
-      assert(html.includes(`id="brief"`), `${path}: no #brief section`);
+      const path = briefPath(item.slug)
+      const [url, fragment] = path.split("#")
+      assertEquals(fragment, "brief")
+      const html = await site.html(url)
+      assert(html.includes(`id="brief"`), `${path}: no #brief section`)
       assert(
         html.includes(`About: ${item.shortTitle}`),
         `${path}: form not prefilled`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the home price card names each service once, never doubled by its time",
   async (site) => {
-    const html = await site.html("/");
+    const html = await site.html("/")
     for (const item of catalogItems) {
       const row = html.match(
         new RegExp(`<a[^>]*href="/catalog/${item.slug}"[\\s\\S]*?</a>`),
-      );
-      assert(row, `${item.slug}: no row in the home price card`);
-      const text = visibleText(row[0]);
+      )
+      assert(row, `${item.slug}: no row in the home price card`)
+      const text = visibleText(row[0])
       assertEquals(
         text.split(item.shortTitle).length - 1,
         1,
         `${item.slug}: "${text}"`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the index says the audit's outcome once, not in two lines in a row",
   async (site) => {
-    const text = visibleText(await site.html("/catalog"));
-    assertEquals(count(text, /what to leave alone/g), 1);
+    const text = visibleText(await site.html("/catalog"))
+    assertEquals(count(text, /what to leave alone/g), 1)
   },
-);
+)
 
 siteTest(
   "the SaaS MVP page names SaaS MVP development above the H1 and says the price and time once, in the card",
   async (site) => {
-    const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`);
+    const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`)
     const eyebrow = html.match(
       /<p[^>]*data-service-eyebrow[^>]*>([\s\S]*?)<\/p>/,
-    );
-    assert(eyebrow, "no line above the H1");
-    assertEquals(visibleText(eyebrow[1]), SAAS_MVP_EYEBROW);
-    assert(html.indexOf("data-service-eyebrow") < html.indexOf("<h1"));
-    const lead = html.match(/<p[^>]*data-service-lead[^>]*>([\s\S]*?)<\/p>/);
-    assert(lead, "no lead");
-    const text = visibleText(lead[1]);
-    assertEquals(text, saasMvpLead());
-    assert(text.includes(decapitalize(promise("ownership").title)), text);
+    )
+    assert(eyebrow, "no line above the H1")
+    assertEquals(visibleText(eyebrow[1]), SAAS_MVP_EYEBROW)
+    assert(html.indexOf("data-service-eyebrow") < html.indexOf("<h1"))
+    const lead = html.match(/<p[^>]*data-service-lead[^>]*>([\s\S]*?)<\/p>/)
+    assert(lead, "no lead")
+    const text = visibleText(lead[1])
+    assertEquals(text, saasMvpLead())
+    assert(text.includes(decapitalize(promise("ownership").title)), text)
     // The price and the time show once on the page, in the card with Book.
-    const item = catalogItem(SAAS_MVP_SLUG);
-    const page = visibleText(pageBody(html)).toLowerCase();
-    const price = formatPrice(item.prices[0]);
-    const amount = price.slice(price.indexOf("$"));
-    assertEquals(page.split(amount).length - 1, 1, amount);
-    const time = item.delivery.toLowerCase();
-    assertEquals(page.split(time).length - 1, 1, time);
+    const item = catalogItem(SAAS_MVP_SLUG)
+    const page = visibleText(pageBody(html)).toLowerCase()
+    const price = formatPrice(item.prices[0])
+    const amount = price.slice(price.indexOf("$"))
+    assertEquals(page.split(amount).length - 1, 1, amount)
+    const time = item.delivery.toLowerCase()
+    assertEquals(page.split(time).length - 1, 1, time)
     const card = html.slice(
       html.indexOf("data-service-card"),
       html.indexOf("data-primary-book", html.indexOf("data-service-card")),
-    );
-    assert(visibleText(card).includes(price), "price not in the card");
+    )
+    assert(visibleText(card).includes(price), "price not in the card")
     // The meta description is the quotable answer, price and time included.
-    const answer = saasMvpAnswer();
-    assert(answer.includes(priceLabel(item).toLowerCase()), answer);
-    assert(answer.includes(item.delivery.toLowerCase()), answer);
+    const answer = saasMvpAnswer()
+    assert(answer.includes(priceLabel(item).toLowerCase()), answer)
+    assert(answer.includes(item.delivery.toLowerCase()), answer)
     assert(
       html.includes(`<meta name="description" content="${answer}"`),
       answer,
-    );
+    )
     // Every other service keeps its outcome as the lead and has no such line.
     for (const other of catalogItems.filter((i) => i.slug !== SAAS_MVP_SLUG)) {
-      const page = await site.html(`/catalog/${other.slug}`);
-      assertFalse(page.includes("data-service-eyebrow"), other.slug);
+      const page = await site.html(`/catalog/${other.slug}`)
+      assertFalse(page.includes("data-service-eyebrow"), other.slug)
     }
   },
-);
+)
 
 Deno.test("the SaaS MVP lead and every question's answer open with a plain sentence, not a word and a colon", () => {
   for (
@@ -445,55 +445,55 @@ Deno.test("the SaaS MVP lead and every question's answer open with a plain sente
       ...faqs.map((f) => f.a),
     ]
   ) {
-    assertFalse(/^[^.!?:]{0,20}:/.test(text), text);
+    assertFalse(/^[^.!?:]{0,20}:/.test(text), text)
   }
-});
+})
 
 siteTest(
   "the SaaS MVP questions come last before the closing band, short first sentences, the same as its FAQPage and llms-full.txt",
   async (site) => {
-    const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`);
-    const faqs = saasMvpFaqs();
-    assert(faqs.length >= 5 && faqs.length <= 7, `${faqs.length} questions`);
-    const section = html.indexOf("data-faq-section");
-    assert(section > 0, "no questions section");
+    const html = await site.html(`/catalog/${SAAS_MVP_SLUG}`)
+    const faqs = saasMvpFaqs()
+    assert(faqs.length >= 5 && faqs.length <= 7, `${faqs.length} questions`)
+    const section = html.indexOf("data-faq-section")
+    assert(section > 0, "no questions section")
     assert(
       section > html.indexOf("data-service-next"),
       "questions before next step",
-    );
+    )
     // The next section after the questions is the closing band.
-    const next = html.indexOf("<section", section);
+    const next = html.indexOf("<section", section)
     assert(
       html.slice(next, html.indexOf(">", next)).includes("data-closing-band"),
       "something between the questions and the closing band",
-    );
+    )
     const shown = [...html.matchAll(/<div[^>]*id="faq-([^"]+)"[^>]*data-faq/g)]
-      .map((m) => m[1]);
-    assertEquals(shown, faqs.map((f) => f.id));
+      .map((m) => m[1])
+    assertEquals(shown, faqs.map((f) => f.id))
     for (const f of faqs) {
-      const first = f.a.split(/(?<=[.!?])\s/)[0];
-      assert(first.split(/\s+/).length <= 40, `${f.id}: "${first}"`);
+      const first = f.a.split(/(?<=[.!?])\s/)[0]
+      assert(first.split(/\s+/).length <= 40, `${f.id}: "${first}"`)
     }
     const faqPage = jsonLd(html).find((d) =>
       (d as { "@type"?: string })["@type"] === "FAQPage"
     ) as
       | {
-        "@id": string;
-        mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+        "@id": string
+        mainEntity: { name: string; acceptedAnswer: { text: string } }[]
       }
-      | undefined;
-    assert(faqPage, "no FAQPage");
+      | undefined
+    assert(faqPage, "no FAQPage")
     assertEquals(
       faqPage["@id"],
       `https://antonshubin.com/catalog/${SAAS_MVP_SLUG}#faq`,
-    );
-    assertEquals(faqPage.mainEntity.map((q) => q.name), faqs.map((f) => f.q));
+    )
+    assertEquals(faqPage.mainEntity.map((q) => q.name), faqs.map((f) => f.q))
     assertEquals(
       faqPage.mainEntity.map((q) => q.acceptedAnswer.text),
       faqs.map((f) => f.a),
-    );
-    const full = await site.html("/llms-full.txt");
-    assert(full.includes(saasMvpAnswer()), "llms-full.txt: no answer");
-    for (const f of faqs) assert(full.includes(`### ${f.q}`), f.q);
+    )
+    const full = await site.html("/llms-full.txt")
+    assert(full.includes(saasMvpAnswer()), "llms-full.txt: no answer")
+    for (const f of faqs) assert(full.includes(`### ${f.q}`), f.q)
   },
-);
+)

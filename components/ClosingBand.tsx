@@ -1,21 +1,21 @@
-import type { ComponentChildren } from "preact";
-import { promise } from "../lib/promises.ts";
-import { BookCallLink } from "./BookCallLink.tsx";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
-import { BOOK_LABEL } from "../lib/nav.ts";
+import type { ComponentChildren } from "preact"
+import { promise } from "../lib/promises.ts"
+import { BookCallLink } from "./BookCallLink.tsx"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { eventAttrs, linkEvent } from "../lib/analytics.ts"
+import { BOOK_LABEL } from "../lib/nav.ts"
 
 const LINK =
-  "inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
+  "inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
 
 /** One quiet text link in the band, after Book and the catalog link. */
 export interface BandLink {
-  href: string;
-  label: string;
+  href: string
+  label: string
 }
 
 /** The promises the band shows when a page passes none: the two that lower a first engagement's risk. */
-export const DEFAULT_BAND_PROMISES = ["refund", "first-milestone"];
+export const DEFAULT_BAND_PROMISES = ["refund", "first-milestone"]
 
 /**
  * What a page puts in its closing band. Every slot is optional and defaults
@@ -30,33 +30,33 @@ export const DEFAULT_BAND_PROMISES = ["refund", "first-milestone"];
  */
 export interface ClosingBandProps {
   /** The catalog item, project, tool or post the page is about: Book's `item` property. */
-  bookItem?: string;
+  bookItem?: string
   /** An `<h2>` at the top of the band; none by default. */
-  heading?: string;
+  heading?: string
   /** `lib/promises.ts` ids, in order; an empty list shows no promise line. */
-  promiseIds?: string[];
+  promiseIds?: string[]
   /** Page-specific content, rendered after the promises. */
-  children?: ComponentChildren;
+  children?: ComponentChildren
   /** False hides Book; the band then shows only its links. */
-  book?: boolean;
+  book?: boolean
   /**
    * Where Book goes when it is an on-site page (`/book`) instead of the
    * calendar: it then shows even when `SCHEDULE_URL` is
    * unset. Omitted, Book goes to `/book` and shows only when it is set.
    */
-  bookHref?: string;
+  bookHref?: string
   /** Book's text. */
-  bookLabel?: string;
+  bookLabel?: string
   /** The catalog link, rendered after Book: a project's "Similar work today", or `/catalog`. */
-  catalogLink?: ComponentChildren;
+  catalogLink?: ComponentChildren
   /** Quiet links after the catalog link. */
-  links?: BandLink[];
+  links?: BandLink[]
   /** Page-specific content under Book and the links: the blog's quiet links and reply line. */
-  after?: ComponentChildren;
+  after?: ComponentChildren
   /** Marks Book as the page's one primary call to action (`data-primary-cta`). */
-  primaryCta?: boolean;
+  primaryCta?: boolean
   /** Extra attributes for the `<section>`: an anchor `id`, or the home page's section marker. */
-  sectionAttrs?: { id?: string; "data-home-section"?: string };
+  sectionAttrs?: { id?: string; "data-home-section"?: string }
 }
 
 /**
@@ -81,7 +81,7 @@ export function ClosingBand(
     sectionAttrs,
   }: ClosingBandProps,
 ) {
-  const shown = promiseIds.map(promise);
+  const shown = promiseIds.map(promise)
   return (
     <section
       data-closing-band
@@ -129,5 +129,5 @@ export function ClosingBand(
       )}
       {after}
     </section>
-  );
+  )
 }

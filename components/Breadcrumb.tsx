@@ -1,8 +1,8 @@
-import { navLabel } from "../lib/nav.ts";
+import { navLabel } from "../lib/nav.ts"
 
 interface Crumb {
-  name: string;
-  href?: string;
+  name: string
+  href?: string
 }
 
 /**
@@ -18,9 +18,9 @@ interface Crumb {
  * same spot everywhere; the 40px minimum height is its tap area.
  */
 export function Breadcrumb({ items }: { items: Crumb[] }) {
-  if (items.length <= 2) return null;
-  const parent = items[items.length - 2];
-  if (!parent.href) return null;
+  if (items.length <= 2) return null
+  const parent = items[items.length - 2]
+  if (!parent.href) return null
 
   return (
     <nav aria-label="Breadcrumb" class="mb-4 text-sm">
@@ -32,5 +32,5 @@ export function Breadcrumb({ items }: { items: Crumb[] }) {
         {navLabel(parent.href) ?? parent.name}
       </a>
     </nav>
-  );
+  )
 }

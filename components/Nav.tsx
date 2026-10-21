@@ -1,4 +1,4 @@
-import type { ComponentChildren, ComponentType } from "preact";
+import type { ComponentChildren, ComponentType } from "preact"
 import {
   IconBriefcase,
   IconCalendar,
@@ -11,13 +11,13 @@ import {
   type IconProps,
   IconServer,
   IconWrench,
-} from "@spy4x/preact-icons";
+} from "@spy4x/preact-icons"
 import {
   Rail,
   RailEntry,
   type RailItem,
   type RailPlace,
-} from "@spy4x/preact-system/rail";
+} from "@spy4x/preact-system/rail"
 import {
   BOOK_HREF,
   NAV_BOOK_LABEL,
@@ -28,8 +28,8 @@ import {
   sheetBottomItems,
   sheetTopItems,
   WRITE_FALLBACK_HREF,
-} from "../lib/nav.ts";
-import { eventAttrs } from "../lib/analytics.ts";
+} from "../lib/nav.ts"
+import { eventAttrs } from "../lib/analytics.ts"
 
 /** The house icon (`@spy4x/preact-icons`) each nav destination draws. */
 const NAV_ICONS: Record<NavIcon, ComponentType<IconProps>> = {
@@ -41,16 +41,16 @@ const NAV_ICONS: Record<NavIcon, ComponentType<IconProps>> = {
   home: IconHome,
   about: IconInformationCircle,
   infrastructure: IconServer,
-};
+}
 
 interface NavProps {
-  currentPath: string;
+  currentPath: string
   /** `SCHEDULE_URL`: set → Book; empty → "Write". Both go to `/book`. */
-  scheduleUrl: string;
+  scheduleUrl: string
   /** The page: lands in the rail's `<main>`. */
-  children: ComponentChildren;
+  children: ComponentChildren
   /** The site footer: drawn after `<main>`, under the page. */
-  footer: ComponentChildren;
+  footer: ComponentChildren
 }
 
 /**
@@ -60,7 +60,7 @@ interface NavProps {
  * analytics event.
  */
 function bookItem(scheduleUrl: string): RailItem {
-  const write = !scheduleUrl;
+  const write = !scheduleUrl
   return {
     key: "book",
     label: write ? NAV_WRITE_LABEL : NAV_BOOK_LABEL,
@@ -71,7 +71,7 @@ function bookItem(scheduleUrl: string): RailItem {
       "data-nav-book": "",
       ...eventAttrs(write ? "brief" : "book", { place: "nav" }),
     },
-  };
+  }
 }
 
 function railItem(item: NavItem): RailItem {
@@ -81,7 +81,7 @@ function railItem(item: NavItem): RailItem {
     href: item.href,
     Icon: NAV_ICONS[item.icon],
     attributes: { "data-nav-link": "" },
-  };
+  }
 }
 
 /**
@@ -98,12 +98,12 @@ function Portrait() {
       width="32"
       height="32"
     />
-  );
+  )
 }
 
 /** Home, About and Infrastructure: rows of the phone sheet only. */
 function sheetItem(item: NavItem): RailItem {
-  return { ...railItem(item), sheetOnly: true };
+  return { ...railItem(item), sheetOnly: true }
 }
 
 /**
@@ -133,7 +133,7 @@ export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
         variant="labels"
         current={currentPath === "/" ? "page" : undefined}
       />
-    );
+    )
 
   return (
     <Rail
@@ -154,5 +154,5 @@ export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
     >
       {children}
     </Rail>
-  );
+  )
 }

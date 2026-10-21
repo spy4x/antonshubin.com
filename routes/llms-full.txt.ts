@@ -1,66 +1,66 @@
-import { define } from "../lib/utils.ts";
-import { EMAIL_ADDRESS } from "../lib/profiles.ts";
-import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
-import { COMPANY, COMPANY_LINE } from "../lib/company.ts";
+import { define } from "../lib/utils.ts"
+import { EMAIL_ADDRESS } from "../lib/profiles.ts"
+import { BASE_URL, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts"
+import { COMPANY, COMPANY_LINE } from "../lib/company.ts"
 import {
   ABOUT_HOBBIES,
   ABOUT_PATH,
   ABOUT_TRAVEL,
   aboutSteps,
   paymentList,
-} from "../lib/about.ts";
+} from "../lib/about.ts"
 import {
   archiveProjects,
   formatPeriod,
   hackathons,
   highlightSlugs,
-} from "../lib/data.ts";
+} from "../lib/data.ts"
 import {
   catalogItem,
   catalogItems,
   catalogPromises,
   INTRO_CALL,
   priceLabel,
-} from "../lib/catalog.ts";
-import { decapitalize, promise, promises } from "../lib/promises.ts";
-import { faqs } from "../lib/faqs.ts";
-import { infrastructureLines } from "../lib/infrastructure.ts";
-import { proof } from "../lib/proof.ts";
-import { ROLE } from "../lib/head.ts";
+} from "../lib/catalog.ts"
+import { decapitalize, promise, promises } from "../lib/promises.ts"
+import { faqs } from "../lib/faqs.ts"
+import { infrastructureLines } from "../lib/infrastructure.ts"
+import { proof } from "../lib/proof.ts"
+import { ROLE } from "../lib/head.ts"
 import {
   BOOK_HREF,
   BOOK_LABEL,
   BRIEF_LABEL,
   WRITE_FALLBACK_HREF,
-} from "../lib/nav.ts";
-import { workDescription } from "../lib/work.ts";
+} from "../lib/nav.ts"
+import { workDescription } from "../lib/work.ts"
 import {
   WHY_NOT_JUST_AI_DESCRIPTION,
   WHY_NOT_JUST_AI_NAME,
   WHY_NOT_JUST_AI_PATH,
   whyNotJustAiLlmsSection,
-} from "../lib/why-not-just-ai.ts";
-import { saasMvpLlmsSection } from "../lib/saas-mvp.ts";
-import { llmsBlogSections } from "../lib/blog.ts";
+} from "../lib/why-not-just-ai.ts"
+import { saasMvpLlmsSection } from "../lib/saas-mvp.ts"
+import { llmsBlogSections } from "../lib/blog.ts"
 import {
   clientProject,
   firstSentence,
   llmsClientSummary,
   toolLines,
   whoThisSuits,
-} from "../lib/llms.ts";
-import { toolsLive, withLiveVersion } from "../lib/tools-live.ts";
-import { tools } from "../lib/tools.ts";
+} from "../lib/llms.ts"
+import { toolsLive, withLiveVersion } from "../lib/tools-live.ts"
+import { tools } from "../lib/tools.ts"
 
 export const handler = define.handlers({
   async GET() {
     // The tool pages read the live version; so does the install line here (#391).
-    const live = await toolsLive();
-    const liveTools = tools.map((t) => withLiveVersion(t, live));
+    const live = await toolsLive()
+    const liveTools = tools.map((t) => withLiveVersion(t, live))
     // Every post grouped by its topic, with its tool link, the Archive last
     // (#274, SEO 7 and 10). lib/blog.ts filters copies of the shared
     // blogArticles array and never sorts it in place (test/llms.test.ts).
-    const blogList = llmsBlogSections(BASE_URL, true, 4);
+    const blogList = llmsBlogSections(BASE_URL, true, 4)
 
     // Built from lib/data.ts so the section exists only while there are real
     // entries, and never restates results by hand.
@@ -74,7 +74,7 @@ export const handler = define.handlers({
           )
           .join("\n")
       }\n`
-      : "";
+      : ""
 
     // Titles, prices and delivery times come from lib/catalog.ts; nothing in
     // this file restates one by hand.
@@ -85,22 +85,22 @@ export const handler = define.handlers({
             i.alsoCovers.map((c) => `${c.title} (/catalog/${i.slug}#${c.id})`)
               .join(", ")
           }.`
-          : "";
-        const ids = catalogPromises(i.slug);
+          : ""
+        const ids = catalogPromises(i.slug)
         const kept = ids.length > 0
           ? ` Promises shown with the price: ${
             ids.map((id) => promise(id).title).join("; ")
           }.`
-          : "";
+          : ""
         return `  - /catalog/${i.slug} — ${i.title} (${
           priceLabel(i)
-        }, ${i.delivery.toLowerCase()}). ${i.summary}${covers}${kept}`;
+        }, ${i.delivery.toLowerCase()}). ${i.summary}${covers}${kept}`
       })
-      .join("\n");
-    const build = catalogItem("zero-to-production-saas-mvp");
-    const audit = catalogItem("codebase-health-audit");
-    const strategy = catalogItem("strategy-call");
-    const ongoing = catalogItem("cto-advisory-retainer");
+      .join("\n")
+    const build = catalogItem("zero-to-production-saas-mvp")
+    const audit = catalogItem("codebase-health-audit")
+    const strategy = catalogItem("strategy-call")
+    const ongoing = catalogItem("cto-advisory-retainer")
 
     // Every highlight, in the order /work and its ItemList show them
     // (highlightSlugs is ordered strongest-first), generated
@@ -108,12 +108,12 @@ export const handler = define.handlers({
     // clientSummary's docs).
     const clientList = highlightSlugs
       .map((slug) => {
-        const p = clientProject(slug);
+        const p = clientProject(slug)
         return `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
           llmsClientSummary(p)
-        }`;
+        }`
       })
-      .join("\n");
+      .join("\n")
 
     // Every other client project, newest first (archiveProjects()), with its
     // period and role; a company's own later outcome is labelled as theirs.
@@ -121,18 +121,18 @@ export const handler = define.handlers({
       .map((p) => {
         const company = p.companyOutcome
           ? ` The company's outcome: ${p.companyOutcome.text} (${p.companyOutcome.href}).`
-          : "";
+          : ""
         return `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
           formatPeriod(p.period!)
-        }, ${p.role}. ${firstSentence(p.description)}${company}`;
+        }, ${p.role}. ${firstSentence(p.description)}${company}`
       })
-      .join("\n");
+      .join("\n")
 
     // Titles and descriptions come from lib/promises.ts; nothing here
     // restates a promise's title or wording by hand.
     const promisesList = promises
       .map((p, n) => `${n + 1}. **${p.title}** — ${decapitalize(p.desc)}`)
-      .join("\n");
+      .join("\n")
 
     const txt = `# Anton Shubin — ${ROLE} (Full Index)
 
@@ -284,13 +284,13 @@ Existing pages for each of these queries:
 - Ongoing technical leadership, a fractional CTO, or post-launch support: /catalog/${ongoing.slug}
 - Production infrastructure guidance: /infrastructure
 - Free written feedback first: ${WRITE_FALLBACK_HREF}
-`;
+`
 
     return new Response(txt, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "max-age=86400",
       },
-    });
+    })
   },
-});
+})

@@ -1,15 +1,15 @@
-import type { ComponentChildren } from "preact";
+import type { ComponentChildren } from "preact"
 
 /** Link style shared by the fact cards' rows. */
 export const FACT_LINK =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
 
 /** One `<dt>`/`<dd>` pair of a fact card, wrapped in a `<div>` as `<dl>` allows. */
 export function Fact(
   { term, children, ...rest }: {
-    term: string;
-    children: ComponentChildren;
-    "data-project-period"?: boolean;
+    term: string
+    children: ComponentChildren
+    "data-project-period"?: boolean
   },
 ) {
   return (
@@ -17,7 +17,7 @@ export function Fact(
       <dt class="text-graphite">{term}</dt>
       <dd class="text-parchment min-w-0">{children}</dd>
     </div>
-  );
+  )
 }
 
 /**
@@ -35,10 +35,10 @@ export function FactCard(
     "data-home-facts": homeFacts,
   }: {
     /** The landmark's accessible name, e.g. "Project facts". */
-    label: string;
-    children: ComponentChildren;
-    "data-project-facts"?: boolean;
-    "data-home-facts"?: boolean;
+    label: string
+    children: ComponentChildren
+    "data-project-facts"?: boolean
+    "data-home-facts"?: boolean
   },
 ) {
   return (
@@ -50,5 +50,5 @@ export function FactCard(
     >
       {children}
     </aside>
-  );
+  )
 }

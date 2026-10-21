@@ -1,4 +1,4 @@
-import { UPWORK_URL } from "./config.ts";
+import { UPWORK_URL } from "./config.ts"
 
 /**
  * Margin notes: the redesign's signature element (#184, #186) — a short
@@ -9,12 +9,12 @@ import { UPWORK_URL } from "./config.ts";
  * to a note with `href` or `checkedOn`.
  */
 export interface Note {
-  id: string;
+  id: string
   /** A short first-person sentence, e.g. "From my Upwork profile." */
-  text: string;
-  href?: string;
+  text: string
+  href?: string
   /** A fact Anton hasn't supplied yet renders without one — see #186's PR body. */
-  checkedOn?: string;
+  checkedOn?: string
 }
 
 export const notes: Note[] = [
@@ -48,11 +48,11 @@ export const notes: Note[] = [
       "All three answered when I checked. The CI link opens a public repository's pipelines, because the root asks for a GitHub sign-in.",
     checkedOn: "2026-09-30",
   },
-];
+]
 
 /** Looks a note up by id and throws on a typo, so a bad id fails the build, not a visitor. */
 export function note(id: string): Note {
-  const n = notes.find((x) => x.id === id);
-  if (!n) throw new Error(`lib/notes.ts: no note "${id}"`);
-  return n;
+  const n = notes.find((x) => x.id === id)
+  if (!n) throw new Error(`lib/notes.ts: no note "${id}"`)
+  return n
 }

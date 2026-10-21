@@ -6,34 +6,34 @@
 // files themselves and every *.test.ts) and fail on a hand-written copy —
 // same reasoning as test/no-emoji.test.ts walking rendered pages instead of
 // trusting that a fix was applied everywhere.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { proof, proofFigures } from "../lib/proof.ts";
-import { promises } from "../lib/promises.ts";
-import { testimonials, visibleTestimonials } from "../lib/testimonials.ts";
-import { startSite } from "./harness.ts";
-import { jsonLd, visibleText } from "./html.ts";
-import { note } from "../lib/notes.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { proof, proofFigures } from "../lib/proof.ts"
+import { promises } from "../lib/promises.ts"
+import { testimonials, visibleTestimonials } from "../lib/testimonials.ts"
+import { startSite } from "./harness.ts"
+import { jsonLd, visibleText } from "./html.ts"
+import { note } from "../lib/notes.ts"
 
-const SCAN_DIRS = ["routes", "components", "islands", "lib"];
+const SCAN_DIRS = ["routes", "components", "islands", "lib"]
 
 /** Every .ts/.tsx file under SCAN_DIRS, excluding the given file names and every *.test.ts. */
 async function sourceFiles(exclude: string[]): Promise<string[]> {
-  const found: string[] = [];
+  const found: string[] = []
   async function walk(dir: string) {
     for await (const entry of Deno.readDir(dir)) {
-      const path = `${dir}/${entry.name}`;
+      const path = `${dir}/${entry.name}`
       if (entry.isDirectory) {
-        await walk(path);
-        continue;
+        await walk(path)
+        continue
       }
-      if (!/\.tsx?$/.test(entry.name)) continue;
-      if (entry.name.endsWith(".test.ts")) continue;
-      if (exclude.some((e) => path.endsWith(e))) continue;
-      found.push(path);
+      if (!/\.tsx?$/.test(entry.name)) continue
+      if (entry.name.endsWith(".test.ts")) continue
+      if (exclude.some((e) => path.endsWith(e))) continue
+      found.push(path)
     }
   }
-  for (const dir of SCAN_DIRS) await walk(dir);
-  return found;
+  for (const dir of SCAN_DIRS) await walk(dir)
+  return found
 }
 
 // Figures with punctuation specific enough that a plain substring match
@@ -51,25 +51,25 @@ const FIGURE_NEEDLES: Record<string, string> = {
   "hours": "6,600",
   "expert-vetted": "Expert-Vetted",
   "top-percent": "Top 1%",
-};
+}
 
 Deno.test("every proof figure appears in source only through lib/proof.ts", async () => {
   assertEquals(
     proofFigures.map((f) => f.id).sort(),
     Object.keys(FIGURE_NEEDLES).sort(),
     "FIGURE_NEEDLES is missing or has an extra id compared to lib/proof.ts",
-  );
-  const files = await sourceFiles(["lib/proof.ts"]);
+  )
+  const files = await sourceFiles(["lib/proof.ts"])
   for (const [id, needle] of Object.entries(FIGURE_NEEDLES)) {
     for (const file of files) {
-      const text = await Deno.readTextFile(file);
+      const text = await Deno.readTextFile(file)
       assert(
         !text.includes(needle),
         `${file} hand-writes proof figure "${id}" ("${needle}") instead of reading lib/proof.ts`,
-      );
+      )
     }
   }
-});
+})
 
 // A quoted `"80"` or `"100%"` string literal is exactly the shape
 // routes/index.tsx's proofNumbers array used before this PR
@@ -81,65 +81,65 @@ Deno.test("every proof figure appears in source only through lib/proof.ts", asyn
 // not by value, so it doesn't quietly cover a real regression.
 const QUOTED_LITERAL_ALLOWLIST: Record<string, string[]> = {
   '"100%"': ["islands/MeetEmbed.tsx"],
-};
+}
 
 Deno.test('a quoted "80" or "100%" string literal does not restate the proof strip by hand', async () => {
-  const files = await sourceFiles(["lib/proof.ts"]);
+  const files = await sourceFiles(["lib/proof.ts"])
   for (const needle of ['"80"', '"100%"']) {
-    const allowed = QUOTED_LITERAL_ALLOWLIST[needle] ?? [];
+    const allowed = QUOTED_LITERAL_ALLOWLIST[needle] ?? []
     for (const file of files) {
-      if (allowed.some((a) => file.endsWith(a))) continue;
-      const text = await Deno.readTextFile(file);
+      if (allowed.some((a) => file.endsWith(a))) continue
+      const text = await Deno.readTextFile(file)
       assert(
         !text.includes(needle),
         `${file} hand-writes the quoted literal ${needle} instead of reading lib/proof.ts`,
-      );
+      )
     }
   }
-});
+})
 
 Deno.test('"top 1%" (any case) appears only through lib/proof.ts', async () => {
-  const files = await sourceFiles(["lib/proof.ts"]);
+  const files = await sourceFiles(["lib/proof.ts"])
   for (const file of files) {
-    const text = await Deno.readTextFile(file);
+    const text = await Deno.readTextFile(file)
     assert(
       !/top 1%/i.test(text),
       `${file} hand-writes "top 1%" instead of reading lib/proof.ts`,
-    );
+    )
   }
-});
+})
 
 Deno.test("every promise title, phrase (any case) and desc appears in source only through lib/promises.ts", async () => {
-  const files = await sourceFiles(["lib/promises.ts"]);
+  const files = await sourceFiles(["lib/promises.ts"])
   for (const p of promises) {
     for (const file of files) {
-      const text = await Deno.readTextFile(file);
+      const text = await Deno.readTextFile(file)
       assert(
         !text.toLowerCase().includes(p.title.toLowerCase()),
         `${file} hand-writes promise title "${p.title}" instead of reading lib/promises.ts`,
-      );
+      )
       assert(
         !text.toLowerCase().includes(p.phrase.toLowerCase()),
         `${file} hand-writes promise phrase "${p.phrase}" instead of reading lib/promises.ts`,
-      );
+      )
       assert(
         !text.includes(p.desc),
         `${file} hand-writes promise desc "${p.desc}" instead of reading lib/promises.ts`,
-      );
+      )
     }
   }
-});
+})
 
 // #275: the FAQ answers splice promises through `promise()`; the guard above
 // must keep scanning the file that holds them, or a hand-written copy there
 // would go unseen.
 Deno.test("the promise guard scans lib/faqs.ts, where the FAQ answers splice promises", async () => {
-  const files = await sourceFiles(["lib/promises.ts"]);
+  const files = await sourceFiles(["lib/promises.ts"])
   assert(
     files.includes("lib/faqs.ts"),
     "lib/faqs.ts is not scanned by the promise guard",
-  );
-});
+  )
+})
 
 // Key terms a paraphrase could restate without quoting a promise's full
 // `desc` word for word — the exact drift issue #186 exists to prevent
@@ -149,163 +149,163 @@ Deno.test("the promise guard scans lib/faqs.ts, where the FAQ answers splice pro
 const PROMISE_TERM_NEEDLES: Record<string, string> = {
   "first-milestone": "one or two weeks of work",
   "free-bugfixes": "fixed free for 30 days",
-};
+}
 
 Deno.test("key promise terms appear in source only through lib/promises.ts", async () => {
-  const files = await sourceFiles(["lib/promises.ts"]);
+  const files = await sourceFiles(["lib/promises.ts"])
   for (const [id, needle] of Object.entries(PROMISE_TERM_NEEDLES)) {
     for (const file of files) {
-      const text = await Deno.readTextFile(file);
+      const text = await Deno.readTextFile(file)
       assert(
         !text.includes(needle),
         `${file} hand-writes promise "${id}"'s term "${needle}" instead of reading lib/promises.ts`,
-      );
+      )
     }
   }
-});
+})
 
 Deno.test("every data-note-ref on every page in /sitemap.xml resolves to a note with a source", async () => {
-  const site = await startSite();
+  const site = await startSite()
   try {
-    const xml = await site.html("/sitemap.xml");
+    const xml = await site.html("/sitemap.xml")
     const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) =>
       new URL(m[1]).pathname
-    );
+    )
     assert(
       paths.length > 0,
       "sitemap.xml is empty — the loop below would pass vacuously",
-    );
-    let refsSeen = 0;
+    )
+    let refsSeen = 0
     for (const path of paths) {
-      const html = await site.html(path);
+      const html = await site.html(path)
       const refs = [...html.matchAll(/data-note-ref="([^"]+)"/g)].map((m) =>
         m[1]
-      );
+      )
       for (const id of refs) {
-        refsSeen++;
-        const n = note(id); // throws on a typo'd id, which fails this test loudly
+        refsSeen++
+        const n = note(id) // throws on a typo'd id, which fails this test loudly
         assert(
           Boolean(n.href) || Boolean(n.checkedOn),
           `${path}'s note "${id}" has neither an href nor a checkedOn`,
-        );
+        )
       }
     }
     assert(
       refsSeen > 0,
       "no data-note-ref found on any page — the checks above would pass vacuously",
-    );
+    )
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 Deno.test("no JSON-LD award field carries a money figure", async () => {
-  const site = await startSite();
+  const site = await startSite()
   try {
-    const html = await site.html("/");
-    const graphs = jsonLd(html) as { "@graph"?: Record<string, unknown>[] }[];
-    let awardsSeen = 0;
+    const html = await site.html("/")
+    const graphs = jsonLd(html) as { "@graph"?: Record<string, unknown>[] }[]
+    let awardsSeen = 0
     for (const block of graphs) {
       for (const node of block["@graph"] ?? []) {
-        const award = (node as { award?: unknown }).award;
-        if (!Array.isArray(award)) continue;
+        const award = (node as { award?: unknown }).award
+        if (!Array.isArray(award)) continue
         for (const entry of award) {
-          awardsSeen++;
+          awardsSeen++
           assert(
             typeof entry === "string" && !/\$[\d,]/.test(entry),
             `award entry "${entry}" carries a money figure — move it out of "award"`,
-          );
+          )
         }
       }
     }
     assert(
       awardsSeen > 0,
       "no award field found — the check above would pass vacuously",
-    );
+    )
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 Deno.test("no JSON-LD block on the home page states the earnings figure", async () => {
-  const site = await startSite();
+  const site = await startSite()
   try {
-    const html = await site.html("/");
+    const html = await site.html("/")
     const scripts = [
       ...html.matchAll(
         /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
       ),
-    ].map((m) => m[1]);
-    assert(scripts.length > 0, "no JSON-LD block found on /");
+    ].map((m) => m[1])
+    assert(scripts.length > 0, "no JSON-LD block found on /")
     for (const raw of scripts) {
       assert(
         !raw.includes(proof("earned")),
         `a JSON-LD block states the earnings figure ("${
           proof("earned")
         }") — it belongs on the page, not in structured data (#186 review)`,
-      );
+      )
     }
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 // #231: every review is a real, public Upwork review (sourceHref) cleared
 // for the site; the unsourced "$55,749" figure and the "consultation" quote
 // that matched no review are gone and must not come back.
 Deno.test("lib/testimonials.ts holds only sourced reviews and no dollar figure", async () => {
-  assert(testimonials.length > 0, "no testimonials");
-  assertEquals(visibleTestimonials(testimonials), testimonials);
-  const text = await Deno.readTextFile("lib/testimonials.ts");
-  assert(!/\$\s?\d/.test(text), "lib/testimonials.ts states a dollar figure");
-});
+  assert(testimonials.length > 0, "no testimonials")
+  assertEquals(visibleTestimonials(testimonials), testimonials)
+  const text = await Deno.readTextFile("lib/testimonials.ts")
+  assert(!/\$\s?\d/.test(text), "lib/testimonials.ts states a dollar figure")
+})
 
 Deno.test("the home page shows the public Upwork earnings with the date they were read", async () => {
-  const site = await startSite();
+  const site = await startSite()
   try {
-    const text = visibleText(await site.html("/"));
+    const text = visibleText(await site.html("/"))
     // The "+" is part of the figure as the profile shows it (#269).
-    assert(text.includes("$300K+"), "home page does not show $300K+");
+    assert(text.includes("$300K+"), "home page does not show $300K+")
     assert(
       text.includes("checked 26 Sep 2026"),
       "home page does not show the checked date",
-    );
+    )
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 Deno.test("no page or llms file shows the private earnings figure or the old email", async () => {
-  const site = await startSite();
+  const site = await startSite()
   try {
-    const sitemap = await site.html("/sitemap.xml");
+    const sitemap = await site.html("/sitemap.xml")
     const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) =>
       new URL(m[1]).pathname
-    );
-    assert(paths.length > 0, "sitemap.xml is empty");
+    )
+    assert(paths.length > 0, "sitemap.xml is empty")
     for (const path of [...paths, "/llms.txt", "/llms-full.txt"]) {
-      const body = await site.html(path);
-      assert(!body.includes("$395K"), `${path} contains $395K`);
+      const body = await site.html(path)
+      assert(!body.includes("$395K"), `${path} contains $395K`)
       // The mig post's HOST_EMAIL is sample config, not a contact address.
       if (path !== "/blog/mig-tiny-self-hosted-scheduler") {
         assert(
           !body.includes("anton@antonshubin.com"),
           `${path} contains anton@antonshubin.com`,
-        );
+        )
       }
     }
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 Deno.test("llms.txt states the earnings figure with its plus sign", async () => {
-  const site = await startSite();
+  const site = await startSite()
   try {
-    const body = await site.html("/llms.txt");
-    assert(body.includes("$300K+"), "llms.txt does not show $300K+");
-    assert(!body.includes("$300K++"), "llms.txt appends a second plus");
+    const body = await site.html("/llms.txt")
+    assert(body.includes("$300K+"), "llms.txt does not show $300K+")
+    assert(!body.includes("$300K++"), "llms.txt appends a second plus")
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})

@@ -1,14 +1,14 @@
-import type { ComponentChildren } from "preact";
-import { Nav } from "./Nav.tsx";
-import { SCHEDULE_URL } from "../lib/config.ts";
-import { ROLE } from "../lib/head.ts";
-import { Footer } from "./Footer.tsx";
-import { navCurrent } from "../lib/nav.ts";
+import type { ComponentChildren } from "preact"
+import { Nav } from "./Nav.tsx"
+import { SCHEDULE_URL } from "../lib/config.ts"
+import { ROLE } from "../lib/head.ts"
+import { Footer } from "./Footer.tsx"
+import { navCurrent } from "../lib/nav.ts"
 
 interface LayoutProps {
-  children: ComponentChildren;
+  children: ComponentChildren
   /** The request's path: the rail marks the page, or its section, from it. */
-  currentPath: string;
+  currentPath: string
 }
 
 /**
@@ -57,5 +57,5 @@ export function Layout({ children, currentPath }: LayoutProps) {
         {children}
       </div>
     </Nav>
-  );
+  )
 }

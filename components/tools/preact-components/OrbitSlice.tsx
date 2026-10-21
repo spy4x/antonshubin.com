@@ -1,26 +1,26 @@
-import { Kpi, KpiGrid } from "@spy4x/preact-charts/kpi";
-import { Button } from "@spy4x/preact-ui/button";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { Table } from "@spy4x/preact-ui/table";
-import { ThemePreview } from "@spy4x/preact-ui/theme-preview";
-import { THEME_PREVIEW_CSS } from "@spy4x/preact-theme";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import type { ToolLink } from "../../../lib/tools.ts";
+import { Kpi, KpiGrid } from "@spy4x/preact-charts/kpi"
+import { Button } from "@spy4x/preact-ui/button"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { Table } from "@spy4x/preact-ui/table"
+import { ThemePreview } from "@spy4x/preact-ui/theme-preview"
+import { THEME_PREVIEW_CSS } from "@spy4x/preact-theme"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import type { ToolLink } from "../../../lib/tools.ts"
 import {
   ORBIT_MEDIAN_BUILD,
   ORBIT_PROJECTS,
   ORBIT_SNIPPET,
   ORBIT_STATUS,
-} from "./orbit.ts";
+} from "./orbit.ts"
 
-const ITEM = "preact-components";
+const ITEM = "preact-components"
 
 /** The library's preview palettes, and an instant switch under reduced motion. */
 const PREVIEW_CSS = `${THEME_PREVIEW_CSS}
 @media (prefers-reduced-motion: reduce) {
   [data-preview-frame] * { transition: none; }
-}`;
+}`
 
 /**
  * "Rendered by the library, on this page": a slice of the live guide's
@@ -30,8 +30,8 @@ const PREVIEW_CSS = `${THEME_PREVIEW_CSS}
  * island, then the demo's code in a `<details>` and the link to the guide.
  */
 export function OrbitSlice({ live }: { live?: ToolLink }) {
-  const builds = ORBIT_PROJECTS.reduce((sum, p) => sum + p.builds, 0);
-  const failing = ORBIT_PROJECTS.filter((p) => p.status === "failing").length;
+  const builds = ORBIT_PROJECTS.reduce((sum, p) => sum + p.builds, 0)
+  const failing = ORBIT_PROJECTS.filter((p) => p.status === "failing").length
   return (
     <section aria-labelledby="rendered" data-orbit-slice>
       <h2 id="rendered" class="text-2xl sm:text-3xl text-parchment">
@@ -140,5 +140,5 @@ export function OrbitSlice({ live }: { live?: ToolLink }) {
         </p>
       )}
     </section>
-  );
+  )
 }

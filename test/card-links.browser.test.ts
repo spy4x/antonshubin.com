@@ -5,10 +5,10 @@
 // a card's top-right corner, away from any text, must land on the page its
 // one link names, and a link inside the card must keep its own target. Needs a
 // built site and Chromium; see docs/testing.md "Browser-driven tests".
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import type { Browser, Page } from "playwright";
-import { startSite } from "./harness.ts";
-import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import type { Browser, Page } from "playwright"
+import { startSite } from "./harness.ts"
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts"
 
 const CARDS = [
   { path: "/work", card: "[data-archive-row]", link: "a[data-work-link]" },
@@ -22,93 +22,93 @@ const CARDS = [
     card: "[data-catalog-item]",
     link: 'a[href^="/catalog/"]',
   },
-];
+]
 
 Deno.test("a click anywhere on a card opens the card's page", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const { path, card, link } of CARDS) {
       const page: Page = await newPage(browser, {
         viewport: { width: 1440, height: 900 },
-      });
+      })
       try {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-        const first = page.locator(card).first();
-        const href = await first.locator(link).first().getAttribute("href");
-        assert(href, `${path}: no link in ${card}`);
-        const box = await first.boundingBox();
-        assert(box, `${path}: ${card} is not on screen`);
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
+        const first = page.locator(card).first()
+        const href = await first.locator(link).first().getAttribute("href")
+        assert(href, `${path}: no link in ${card}`)
+        const box = await first.boundingBox()
+        assert(box, `${path}: ${card} is not on screen`)
         await Promise.all([
           page.waitForURL(`${site.origin}${href}`, { timeout: WAIT_MS }),
           first.click({ position: { x: box.width - 8, y: 8 } }),
-        ]);
+        ])
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 /** Links inside a card that must sit above its stretched link. */
 const INNER_LINKS = [
   { path: "/work", link: "[data-archive-row] figure a" },
   { path: "/work", link: "[data-archive-row] [data-company-outcome] a" },
   { path: "/tools/ts-libs", link: "[data-tool-more] [data-credit] a" },
-];
+]
 
 Deno.test("links inside archive rows and tool cards stay above the card's link", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     for (const { path, link } of INNER_LINKS) {
       const page: Page = await newPage(browser, {
         viewport: { width: 1440, height: 900 },
-      });
+      })
       try {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-        const inner = page.locator(link).first();
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
+        const inner = page.locator(link).first()
         // A trial click runs Playwright's hit-target check without navigating:
         // it times out when the stretched card link sits on top.
-        await inner.click({ trial: true, timeout: WAIT_MS });
+        await inner.click({ trial: true, timeout: WAIT_MS })
       } finally {
-        await page.close();
+        await page.close()
       }
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("a link inside a catalog card keeps its own target", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
+    browser = await launchChromium()
     const page: Page = await newPage(browser, {
       viewport: { width: 1440, height: 900 },
-    });
+    })
     try {
-      await page.goto(`${site.origin}/catalog`, { waitUntil: "networkidle" });
-      const inner = page.locator("[data-catalog-work] a").first();
-      const href = await inner.getAttribute("href");
-      assert(href?.startsWith("/work/"), `unexpected client-work link ${href}`);
+      await page.goto(`${site.origin}/catalog`, { waitUntil: "networkidle" })
+      const inner = page.locator("[data-catalog-work] a").first()
+      const href = await inner.getAttribute("href")
+      assert(href?.startsWith("/work/"), `unexpected client-work link ${href}`)
       await Promise.all([
         page.waitForURL(`${site.origin}${href}`),
         inner.click(),
-      ]);
-      assertEquals(new URL(page.url()).pathname, href);
+      ])
+      assertEquals(new URL(page.url()).pathname, href)
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})

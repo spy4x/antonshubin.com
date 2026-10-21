@@ -11,13 +11,13 @@
  */
 
 interface DemoTask {
-  calendar: "personal" | "work";
-  uid: string;
-  summary: string;
+  calendar: "personal" | "work"
+  uid: string
+  summary: string
   /** Days from today, then the UTC time of day. */
-  due: [days: number, time: string];
-  priority?: number;
-  completed?: boolean;
+  due: [days: number, time: string]
+  priority?: number
+  completed?: boolean
 }
 
 const TASKS: DemoTask[] = [
@@ -59,7 +59,7 @@ const TASKS: DemoTask[] = [
     due: [0, "09:00"],
     completed: true,
   },
-];
+]
 
 /** One meeting today, so "today" holds an event as well as tasks. */
 const EVENTS = [
@@ -70,28 +70,28 @@ const EVENTS = [
     start: [0, "11:00"],
     end: [0, "11:30"],
   },
-] as const;
+] as const
 
 const CALENDARS = [
   { id: "personal", name: "Personal" },
   { id: "work", name: "Work" },
-];
+]
 
-const base = Deno.args[0]?.replace(/\/$/, "");
+const base = Deno.args[0]?.replace(/\/$/, "")
 if (!base) {
   throw new Error(
     "usage: seed.ts <collection URL, e.g. http://127.0.0.1:25232/demo>",
-  );
+  )
 }
-const auth = `Basic ${btoa("demo:demo")}`;
+const auth = `Basic ${btoa("demo:demo")}`
 
 /** iCalendar UTC date-time, e.g. 20261019T100000Z. */
 function icalDate(days: number, time: string): string {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() + days);
-  const [h, m] = time.split(":");
-  d.setUTCHours(Number(h), Number(m), 0, 0);
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() + days)
+  const [h, m] = time.split(":")
+  d.setUTCHours(Number(h), Number(m), 0, 0)
+  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")
 }
 
 async function request(
@@ -104,9 +104,9 @@ async function request(
     method,
     body,
     headers: { authorization: auth, "content-type": type },
-  });
-  await res.body?.cancel();
-  return res.status;
+  })
+  await res.body?.cancel()
+  return res.status
 }
 
 for (const cal of CALENDARS) {
@@ -118,13 +118,13 @@ for (const cal of CALENDARS) {
       `<C:comp name="VEVENT"/><C:comp name="VTODO"/></C:supported-calendar-component-set>` +
       `</D:prop></D:set></C:mkcalendar>`,
     "application/xml",
-  );
+  )
   if (![201, 405, 409].includes(status)) {
-    throw new Error(`MKCALENDAR ${cal.id}: ${status}`);
+    throw new Error(`MKCALENDAR ${cal.id}: ${status}`)
   }
 }
 
-const stamp = icalDate(0, "00:00");
+const stamp = icalDate(0, "00:00")
 for (const t of TASKS) {
   const lines = [
     "BEGIN:VCALENDAR",
@@ -145,15 +145,15 @@ for (const t of TASKS) {
       : ["STATUS:NEEDS-ACTION"]),
     "END:VTODO",
     "END:VCALENDAR",
-  ];
+  ]
   const status = await request(
     "PUT",
     `${base}/${t.calendar}/${t.uid}.ics`,
     lines.join("\r\n") + "\r\n",
     "text/calendar; charset=utf-8",
-  );
+  )
   if (status !== 201 && status !== 204) {
-    throw new Error(`PUT ${t.uid}: ${status}`);
+    throw new Error(`PUT ${t.uid}: ${status}`)
   }
 }
 for (const e of EVENTS) {
@@ -169,17 +169,17 @@ for (const e of EVENTS) {
     `DTEND:${icalDate(...e.end)}`,
     "END:VEVENT",
     "END:VCALENDAR",
-  ];
+  ]
   const status = await request(
     "PUT",
     `${base}/${e.calendar}/${e.uid}.ics`,
     lines.join("\r\n") + "\r\n",
     "text/calendar; charset=utf-8",
-  );
+  )
   if (status !== 201 && status !== 204) {
-    throw new Error(`PUT ${e.uid}: ${status}`);
+    throw new Error(`PUT ${e.uid}: ${status}`)
   }
 }
 console.log(
   `seeded ${EVENTS.length} event and ${TASKS.length} tasks in ${CALENDARS.length} calendars at ${base}`,
-);
+)

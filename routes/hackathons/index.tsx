@@ -1,18 +1,18 @@
-import { BOOK_LABEL } from "../../lib/nav.ts";
-import { HttpError } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { Layout } from "../../components/Layout.tsx";
-import { type Hackathon, hackathons } from "../../lib/data.ts";
+import { BOOK_LABEL } from "../../lib/nav.ts"
+import { HttpError } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { getBreadcrumb, head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { Layout } from "../../components/Layout.tsx"
+import { type Hackathon, hackathons } from "../../lib/data.ts"
 import {
   IconCalendar as CalendarIcon,
   IconCode as CodeIcon,
   IconUser as PersonIcon,
-} from "@spy4x/preact-icons";
-import { BookCallLink } from "../../components/BookCallLink.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
+} from "@spy4x/preact-icons"
+import { BookCallLink } from "../../components/BookCallLink.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
 
 function HackathonCard({ h }: { h: Hackathon }) {
   return (
@@ -101,23 +101,23 @@ function HackathonCard({ h }: { h: Hackathon }) {
         </div>
       </div>
     </a>
-  );
+  )
 }
 
 // No entries means no page: an empty trophy shelf is worse than none.
 export const handler = define.handlers({
   GET() {
-    if (hackathons.length === 0) throw new HttpError(404);
-    return { data: null };
+    if (hackathons.length === 0) throw new HttpError(404)
+    return { data: null }
   },
-});
+})
 
 export default define.page(function Hackathons(ctx) {
-  const wins = hackathons.filter((h) => h.won).length;
+  const wins = hackathons.filter((h) => h.won).length
   const prizes = hackathons
     .filter((h) => h.prize)
     .map((h) => h.prize)
-    .join(" · ");
+    .join(" · ")
 
   head.value = {
     ...head.value,
@@ -126,7 +126,7 @@ export default define.page(function Hackathons(ctx) {
       "Real hackathon wins and projects. I compete to prove my architecture skills under extreme time pressure — 48-hour builds, self-healing infra, and payment orchestration. Results speak for themselves.",
     canonical: "https://antonshubin.com/hackathons",
     ogType: "website",
-  };
+  }
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -225,5 +225,5 @@ export default define.page(function Hackathons(ctx) {
         </div>
       </div>
     </Layout>
-  );
-});
+  )
+})

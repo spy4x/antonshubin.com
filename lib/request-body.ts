@@ -8,34 +8,34 @@ import {
   BodyReadTimeoutError,
   PayloadTooLargeError,
   readBoundedJson,
-} from "@spy4x/net/bounded-body";
-import { parseBoundedFormData } from "@spy4x/server/http/bounded-body";
+} from "@spy4x/net/bounded-body"
+import { parseBoundedFormData } from "@spy4x/server/http/bounded-body"
 
 /** `/api/subscribe` and `/unsubscribe`: an address or a token is a few hundred
  * bytes, so 4 KiB leaves room for any real form and nothing more. */
-export const SMALL_FORM_MAX_BYTES = 4 * 1024;
+export const SMALL_FORM_MAX_BYTES = 4 * 1024
 
 /** `/api/lead`: the tech-stack field is free text; 64 KiB is about ten
  * thousand words, far more than anyone types into the form. */
-export const LEAD_MAX_BYTES = 64 * 1024;
+export const LEAD_MAX_BYTES = 64 * 1024
 
 /** A body read that failed: the status to answer and a short reason. */
 export interface BodyError {
-  ok: false;
+  ok: false
   /** 413 over the cap, 408 when the body stalls, 400 when it does not parse. */
-  status: 400 | 408 | 413;
-  error: string;
+  status: 400 | 408 | 413
+  error: string
 }
 
 /** Maps a failed bounded read onto its HTTP answer. */
 function bodyError(err: unknown, invalid: string): BodyError {
   if (err instanceof PayloadTooLargeError) {
-    return { ok: false, status: 413, error: "Request body too large" };
+    return { ok: false, status: 413, error: "Request body too large" }
   }
   if (err instanceof BodyReadTimeoutError) {
-    return { ok: false, status: 408, error: "Request body timed out" };
+    return { ok: false, status: 408, error: "Request body timed out" }
   }
-  return { ok: false, status: 400, error: invalid };
+  return { ok: false, status: 400, error: invalid }
 }
 
 /** Reads a JSON body of at most `maxBytes` bytes; `invalid` is the error
@@ -46,9 +46,9 @@ export async function readJsonBody(
   invalid = "Invalid JSON",
 ): Promise<{ ok: true; value: unknown } | BodyError> {
   try {
-    return { ok: true, value: await readBoundedJson(req, { maxBytes }) };
+    return { ok: true, value: await readBoundedJson(req, { maxBytes }) }
   } catch (err) {
-    return bodyError(err, invalid);
+    return bodyError(err, invalid)
   }
 }
 
@@ -64,8 +64,8 @@ export async function readFormBody(
   maxBytes: number,
 ): Promise<{ ok: true; value: FormData } | BodyError> {
   try {
-    return { ok: true, value: await parseBoundedFormData(req, { maxBytes }) };
+    return { ok: true, value: await parseBoundedFormData(req, { maxBytes }) }
   } catch (err) {
-    return bodyError(err, "Invalid form body");
+    return bodyError(err, "Invalid form body")
   }
 }

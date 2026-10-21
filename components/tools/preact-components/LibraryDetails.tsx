@@ -1,10 +1,10 @@
-import { Card } from "@spy4x/preact-ui/card";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import type { ToolPageData } from "../../tool-frame/tool-page.ts";
-import { LIBRARY_PACKAGES } from "./orbit.ts";
+import { Card } from "@spy4x/preact-ui/card"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import type { ToolPageData } from "../../tool-frame/tool-page.ts"
+import { LIBRARY_PACKAGES } from "./orbit.ts"
 
-const ITEM = "preact-components";
+const ITEM = "preact-components"
 
 /**
  * The column beside the facts card on /tools/preact-components: the ten
@@ -12,7 +12,7 @@ const ITEM = "preact-components";
  * README's status line, #210 as the one "not yet"), and Eirene's credit.
  */
 export function LibraryDetails({ data }: { data: ToolPageData }) {
-  const { tool, repo } = data;
+  const { tool, repo } = data
   return (
     <div class="space-y-12">
       <section aria-labelledby="packages" data-library-packages>
@@ -84,5 +84,5 @@ export function LibraryDetails({ data }: { data: ToolPageData }) {
         </p>
       )}
     </div>
-  );
+  )
 }

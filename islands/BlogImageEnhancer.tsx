@@ -1,7 +1,7 @@
-import { useSignal } from "@preact/signals";
-import { useEffect, useRef } from "preact/hooks";
-import { IconXMark } from "@spy4x/preact-icons";
-import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
+import { useSignal } from "@preact/signals"
+import { useEffect, useRef } from "preact/hooks"
+import { IconXMark } from "@spy4x/preact-icons"
+import { copyToClipboard } from "@spy4x/platform/browser/clipboard"
 
 /**
  * The post body's two interactive parts, wired to markup `lib/markdown.ts`
@@ -18,60 +18,60 @@ import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
  *   can't hydrate inside the post's `dangerouslySetInnerHTML` markup.
  */
 export default function BlogImageEnhancer() {
-  const activeImage = useSignal<{ src: string; alt: string } | null>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const activeImage = useSignal<{ src: string; alt: string } | null>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   // The button that opened the lightbox, so closing it returns keyboard
   // focus there instead of dropping it to <body>.
-  const triggerRef = useRef<HTMLElement | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    const blogContent = document.querySelector(".blog-content");
-    if (!blogContent) return;
+    const blogContent = document.querySelector(".blog-content")
+    if (!blogContent) return
 
     blogContent.querySelectorAll<HTMLButtonElement>("[data-lightbox]")
       .forEach((button) => {
         button.addEventListener("click", () => {
-          const img = button.querySelector("img");
-          if (!img) return;
-          triggerRef.current = button;
-          activeImage.value = { src: img.src, alt: img.alt || "Blog image" };
-          dialogRef.current?.showModal();
-        });
-      });
+          const img = button.querySelector("img")
+          if (!img) return
+          triggerRef.current = button
+          activeImage.value = { src: img.src, alt: img.alt || "Blog image" }
+          dialogRef.current?.showModal()
+        })
+      })
 
     blogContent.querySelectorAll<HTMLButtonElement>("[data-copy-code]")
       .forEach((button) => {
-        button.hidden = false;
+        button.hidden = false
         button.addEventListener("click", async () => {
-          const code = button.closest(".code-block")?.querySelector("pre");
-          const text = code?.textContent ?? "";
-          const copied = await copyToClipboard(text.replace(/\n$/, ""));
-          button.textContent = copied ? "Copied!" : "Copy failed";
+          const code = button.closest(".code-block")?.querySelector("pre")
+          const text = code?.textContent ?? ""
+          const copied = await copyToClipboard(text.replace(/\n$/, ""))
+          button.textContent = copied ? "Copied!" : "Copy failed"
           setTimeout(() => {
-            button.textContent = "Copy";
-          }, 3000);
-        });
-      });
-  }, []);
+            button.textContent = "Copy"
+          }, 3000)
+        })
+      })
+  }, [])
 
   const closeLightbox = () => {
-    dialogRef.current?.close();
-    activeImage.value = null;
-    triggerRef.current?.focus();
-  };
+    dialogRef.current?.close()
+    activeImage.value = null
+    triggerRef.current?.focus()
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (activeImage.value === null) return;
+      if (activeImage.value === null) return
       if (e.key === "Escape") {
-        e.preventDefault();
-        closeLightbox();
+        e.preventDefault()
+        closeLightbox()
       }
-    };
+    }
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   return (
     <dialog
@@ -82,7 +82,7 @@ export default function BlogImageEnhancer() {
         // Anything but the image itself (or the close button, which closes
         // on its own) closes the lightbox: the backdrop, the frame around
         // the image and the caption alike.
-        if ((e.target as HTMLElement).tagName !== "IMG") closeLightbox();
+        if ((e.target as HTMLElement).tagName !== "IMG") closeLightbox()
       }}
     >
       {activeImage.value && (
@@ -90,8 +90,8 @@ export default function BlogImageEnhancer() {
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation();
-              closeLightbox();
+              e.stopPropagation()
+              closeLightbox()
             }}
             class="lightbox-close z-10 p-2 text-parchment bg-desk border border-rule-strong rounded-full hover:bg-lamp transition-colors"
             aria-label="Close"
@@ -109,5 +109,5 @@ export default function BlogImageEnhancer() {
         </figure>
       )}
     </dialog>
-  );
+  )
 }

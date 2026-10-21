@@ -1,13 +1,13 @@
-import { Head } from "fresh/runtime";
-import { Layout } from "./Layout.tsx";
-import Button from "./Button.tsx";
-import { navItemFor } from "../lib/nav.ts";
-import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts";
-import { eventAttrs } from "../lib/analytics.ts";
-import TrackPageEvent from "../islands/TrackPageEvent.tsx";
+import { Head } from "fresh/runtime"
+import { Layout } from "./Layout.tsx"
+import Button from "./Button.tsx"
+import { navItemFor } from "../lib/nav.ts"
+import { EMAIL_ADDRESS, emailContact } from "../lib/profiles.ts"
+import { eventAttrs } from "../lib/analytics.ts"
+import TrackPageEvent from "../islands/TrackPageEvent.tsx"
 
 /** The three sections a lost visitor most likely wants, in this order. */
-const SECTIONS = ["/work", "/tools", "/blog"];
+const SECTIONS = ["/work", "/tools", "/blog"]
 
 /**
  * The "page not found" page (#293), for `routes/_404.tsx` and for every
@@ -20,7 +20,7 @@ const SECTIONS = ["/work", "/tools", "/blog"];
 export function NotFound({ pathname }: { pathname: string }) {
   // A dead link inside a section (`/blog/no-such-post`) most likely wanted
   // that section, so its button comes first, under the nav's own word.
-  const section = navItemFor(pathname);
+  const section = navItemFor(pathname)
   const buttons = [
     section
       ? { href: section.href, label: `Back to ${section.label}` }
@@ -29,7 +29,7 @@ export function NotFound({ pathname }: { pathname: string }) {
       .map((href) => navItemFor(href)!)
       .filter((item) => item.href !== section?.href)
       .map((item) => ({ href: item.href, label: item.label })),
-  ];
+  ]
 
   return (
     <Layout currentPath="/404">
@@ -65,5 +65,5 @@ export function NotFound({ pathname }: { pathname: string }) {
         <TrackPageEvent name="not-found" />
       </div>
     </Layout>
-  );
+  )
 }

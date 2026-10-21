@@ -11,9 +11,9 @@
  *
  * `createConfirmToken` mints a confirm link the way the package does now.
  */
-import { type } from "arktype";
-import { createSignedPayloadCodec } from "@spy4x/platform/signed-payload";
-import { createSubscriptionCrypto } from "@spy4x/server/subscribers";
+import { type } from "arktype"
+import { createSignedPayloadCodec } from "@spy4x/platform/signed-payload"
+import { createSubscriptionCrypto } from "@spy4x/server/subscribers"
 
 /** A token the pre-#405 `createUnsubscribeToken` printed for `email` under `secret`. */
 export const LEGACY_TOKEN_FIXTURE = {
@@ -21,7 +21,7 @@ export const LEGACY_TOKEN_FIXTURE = {
   secret: "f".repeat(32),
   token:
     "eyJwdXJwb3NlIjoidW5zdWJzY3JpYmUiLCJ2ZXJzaW9uIjoxLCJwYXlsb2FkIjp7fX0.TGvK8UisFIejyU9etP93tPkgZSh-_MVBnDPgy5ZjVn4",
-};
+}
 
 /** A version 1 unsubscribe token for `email`, as mailed before #405. */
 export function createUnsubscribeToken(
@@ -33,7 +33,7 @@ export function createUnsubscribeToken(
     purpose: "unsubscribe",
     version: 1,
     schema: type({ "+": "reject" }),
-  }).sign({}, { context: email.trim().toLowerCase() });
+  }).sign({}, { context: email.trim().toLowerCase() })
 }
 
 /** A confirm token for `email`, as `/api/subscribe` mails it today, issued at `now()`. */
@@ -42,5 +42,5 @@ export function createConfirmToken(
   secret: string,
   now?: () => number,
 ): Promise<string> {
-  return createSubscriptionCrypto({ secret, now }).confirmToken(email);
+  return createSubscriptionCrypto({ secret, now }).confirmToken(email)
 }

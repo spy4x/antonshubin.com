@@ -1,11 +1,11 @@
-import { useSignal } from "@preact/signals";
-import { useEffect, useRef } from "preact/hooks";
-import { buttonClass } from "../components/Button.tsx";
-import MeetEmbed from "./MeetEmbed.tsx";
-import { track } from "../lib/analytics.ts";
+import { useSignal } from "@preact/signals"
+import { useEffect, useRef } from "preact/hooks"
+import { buttonClass } from "../components/Button.tsx"
+import MeetEmbed from "./MeetEmbed.tsx"
+import { track } from "../lib/analytics.ts"
 
 /** The press-to-load button's words on `/tools/mig` (#457). */
-export const LOAD_CALENDAR_LABEL = "Load my calendar here";
+export const LOAD_CALENDAR_LABEL = "Load my calendar here"
 
 /**
  * "Try it here" on `/tools/mig` (#457): a button that loads the real booking
@@ -23,18 +23,18 @@ export const LOAD_CALENDAR_LABEL = "Load my calendar here";
 export default function MigTryCalendar(
   { url, scheduleUrl, briefHref }: {
     /** The scheduler's embed URL (`embedUrl(SCHEDULE_URL)`). */
-    url: string;
+    url: string
     /** The scheduler's own page, offered when the calendar fails to load. */
-    scheduleUrl: string;
+    scheduleUrl: string
     /** Where the failure state sends someone who would rather write. */
-    briefHref: string;
+    briefHref: string
   },
 ) {
-  const shown = useSignal(false);
-  const region = useRef<HTMLDivElement>(null);
+  const shown = useSignal(false)
+  const region = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (shown.value) region.current?.focus();
-  }, [shown.value]);
+    if (shown.value) region.current?.focus()
+  }, [shown.value])
 
   if (shown.value) {
     return (
@@ -48,20 +48,20 @@ export default function MigTryCalendar(
       >
         <MeetEmbed url={url} scheduleUrl={scheduleUrl} briefHref={briefHref} />
       </div>
-    );
+    )
   }
   return (
     <a
       href="/book#book"
       data-mig-try="button"
       onClick={(event) => {
-        event.preventDefault();
-        track("tool-try", { item: "mig", part: "calendar" });
-        shown.value = true;
+        event.preventDefault()
+        track("tool-try", { item: "mig", part: "calendar" })
+        shown.value = true
       }}
       class={buttonClass("secondary", "px-5 py-3 text-base")}
     >
       {LOAD_CALENDAR_LABEL}
     </a>
-  );
+  )
 }

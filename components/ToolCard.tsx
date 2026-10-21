@@ -1,13 +1,13 @@
-import type { Tool } from "../lib/tools.ts";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { eventAttrs } from "../lib/analytics.ts";
+import type { Tool } from "../lib/tools.ts"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { eventAttrs } from "../lib/analytics.ts"
 
 const linkClass =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
 
 /** The Eirene credit, shown wherever a tool that carries one is listed. */
 function Credit({ tool }: { tool: Tool }) {
-  if (!tool.credit) return null;
+  if (!tool.credit) return null
   return (
     <p data-credit class="relative z-10 mt-2 text-sm text-parchment">
       {tool.credit.text} {tool.credit.links.map((l, i) => (
@@ -17,7 +17,7 @@ function Credit({ tool }: { tool: Tool }) {
         </span>
       ))}
     </p>
-  );
+  )
 }
 
 /**
@@ -50,5 +50,5 @@ export function ToolCard({ tool }: { tool: Tool }) {
         <StatusMark status={tool.status} />
       </div>
     </li>
-  );
+  )
 }

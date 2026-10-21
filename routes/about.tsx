@@ -1,14 +1,14 @@
-import { BOOK_LABEL } from "../lib/nav.ts";
-import { define } from "../lib/utils.ts";
-import { Layout } from "../components/Layout.tsx";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { head, ROLE } from "../lib/head.ts";
+import { BOOK_LABEL } from "../lib/nav.ts"
+import { define } from "../lib/utils.ts"
+import { Layout } from "../components/Layout.tsx"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { head, ROLE } from "../lib/head.ts"
 import {
   INVOICE_NOTE,
   LOCATION,
   TIMEZONE_LABEL,
   UPWORK_URL,
-} from "../lib/config.ts";
+} from "../lib/config.ts"
 import {
   ABOUT_HOBBIES,
   ABOUT_NAME,
@@ -17,35 +17,35 @@ import {
   aboutDescription,
   aboutSteps,
   paymentSentence,
-} from "../lib/about.ts";
-import { COMPANY } from "../lib/company.ts";
-import { proof } from "../lib/proof.ts";
-import { tool } from "../lib/tools.ts";
+} from "../lib/about.ts"
+import { COMPANY } from "../lib/company.ts"
+import { proof } from "../lib/proof.ts"
+import { tool } from "../lib/tools.ts"
 import {
   aboutTestimonialIds,
   testimonial,
   testimonialProject,
   visibleTestimonials,
-} from "../lib/testimonials.ts";
-import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
-import { BookCallLink } from "../components/BookCallLink.tsx";
-import { ClosingBand } from "../components/ClosingBand.tsx";
-import { TestimonialCard } from "../components/TestimonialCard.tsx";
-import { WithNote } from "../components/WithNote.tsx";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { profile } from "../lib/profiles.ts";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+} from "../lib/testimonials.ts"
+import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx"
+import { BookCallLink } from "../components/BookCallLink.tsx"
+import { ClosingBand } from "../components/ClosingBand.tsx"
+import { TestimonialCard } from "../components/TestimonialCard.tsx"
+import { WithNote } from "../components/WithNote.tsx"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { profile } from "../lib/profiles.ts"
+import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 
-const LINK = FACT_LINK;
+const LINK = FACT_LINK
 
 /** The 2022 post the story is told from; linked as "the longer story". */
-const STORY_POST = "from-office-job-to-freelance-to-my-startups";
+const STORY_POST = "from-office-job-to-freelance-to-my-startups"
 
 /** Anton's vlog channel, from `lib/profiles.ts` next to the work channel. */
-const VLOG_URL = profile("youtube-vlog").href;
+const VLOG_URL = profile("youtube-vlog").href
 
-const financy = tool("financy");
+const financy = tool("financy")
 
 /**
  * The About page (#294): the project page's frame. The H1 and lead line, then
@@ -66,8 +66,8 @@ export default define.page(function About(ctx) {
     ogImage: "https://antonshubin.com/img/og/about.png",
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
-  const reviews = visibleTestimonials(aboutTestimonialIds.map(testimonial));
+  }
+  const reviews = visibleTestimonials(aboutTestimonialIds.map(testimonial))
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -327,5 +327,5 @@ export default define.page(function About(ctx) {
         />
       </div>
     </Layout>
-  );
-});
+  )
+})

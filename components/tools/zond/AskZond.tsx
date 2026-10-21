@@ -1,6 +1,6 @@
-import type { ComponentChildren } from "preact";
-import { RadioChips } from "@spy4x/preact-ui/radio-chips";
-import { eventAttrs } from "../../../lib/analytics.ts";
+import type { ComponentChildren } from "preact"
+import { RadioChips } from "@spy4x/preact-ui/radio-chips"
+import { eventAttrs } from "../../../lib/analytics.ts"
 
 // "Ask zond" (#462): the visitor sets what each service answers and which URL
 // the monitor asks, and reads what zond replies. Built only from zond's
@@ -15,9 +15,9 @@ export const SERVICES = [
   { name: "metube", timeout: 5000 },
   { name: "ollama", timeout: 10000 },
   { name: "grafana", timeout: 3000 },
-] as const;
+] as const
 
-type Service = typeof SERVICES[number]["name"];
+type Service = typeof SERVICES[number]["name"]
 
 const WHY = {
   redirect: (
@@ -34,7 +34,7 @@ const WHY = {
     </>
   ),
   error: <>Any error, a timeout or a refused connection, counts as down.</>,
-};
+}
 
 /** What a service can answer zond with, and whether zond counts it as down. */
 export const ANSWERS = [
@@ -69,27 +69,27 @@ export const ANSWERS = [
     down: true,
     why: WHY.error,
   },
-] as const;
+] as const
 
 /** The first render: one KO, so a reader who never touches a control still sees a 503. */
 export const DEFAULT_ANSWERS: Record<Service, string> = {
   metube: "ok",
   ollama: "redirect",
   grafana: "error",
-};
+}
 
 /** What the monitor can ask: each target, all of them, and a name not in the config. */
 export const REQUESTS = [
   ...SERVICES.map((s) => ({ id: s.name, path: `/health/${s.name}` })),
   { id: "all", path: "/health" },
   { id: "jellyfin", path: "/health/jellyfin" },
-];
+]
 
-const DEFAULT_REQUEST = "all";
+const DEFAULT_REQUEST = "all"
 
-const R = "[data-zond-sim]";
-const down = (s: Service) => `#zond-a-${s} option[data-down]:checked`;
-const anyDown = SERVICES.map((s) => down(s.name)).join(",");
+const R = "[data-zond-sim]"
+const down = (s: Service) => `#zond-a-${s} option[data-down]:checked`
+const anyDown = SERVICES.map((s) => down(s.name)).join(",")
 
 /**
  * The rules that show one answer: a hidden default, then one rule per
@@ -112,13 +112,13 @@ const CSS = [
     `${R}:has(${anyDown}) [data-if~=any-down]`,
     `${R}:not(:has(${anyDown})) [data-if~=all-up]`,
   ].map((selector) => `${selector}{display:revert-layer}`),
-].join("\n");
+].join("\n")
 
 /** One line of the answer, shown only under `when` (space-separated conditions). */
 function Line(
   { when, children }: { when?: string; children: ComponentChildren },
 ) {
-  return <span data-if={when}>{children}{NL}</span>;
+  return <span data-if={when}>{children}{NL}</span>
 }
 
 /** The "Why" sentence under the answer, shown only under `when`. */
@@ -129,13 +129,13 @@ function Why(
     <span data-if={when} class="mt-3 block text-graphite leading-relaxed">
       {children}
     </span>
-  );
+  )
 }
 
-const NL = "\n";
-const STATUS_200 = "HTTP/1.1 200 OK";
-const STATUS_503 = "HTTP/1.1 503 Service Unavailable";
-const CONTENT_TYPE = "Content-Type: text/plain; charset=utf-8";
+const NL = "\n"
+const STATUS_200 = "HTTP/1.1 200 OK"
+const STATUS_503 = "HTTP/1.1 503 Service Unavailable"
+const CONTENT_TYPE = "Content-Type: text/plain; charset=utf-8"
 
 /** zond's reply to `/health/<name>` for one target. */
 function OneTarget({ name }: { name: Service }) {
@@ -148,7 +148,7 @@ function OneTarget({ name }: { name: Service }) {
       <Line when={`${name}-up`}>ok</Line>
       <Line when={`${name}-down`}>unreachable</Line>
     </>
-  );
+  )
 }
 
 /** zond's reply to `/health`: one OK or KO line per target, 503 if any is down. */
@@ -168,21 +168,21 @@ function AllTargets() {
         </span>
       ))}
     </>
-  );
+  )
 }
 
 /** The "Why" lines of one target's answer, by what it answered. */
 function TargetWhy({ name }: { name: Service }) {
   const by = (why: ComponentChildren) =>
     ANSWERS.filter((a) => "why" in a && a.why === why)
-      .map((a) => `${name}-${a.value}`).join(" ");
+      .map((a) => `${name}-${a.value}`).join(" ")
   return (
     <>
       <Why when={by(WHY.redirect)}>{WHY.redirect}</Why>
       <Why when={by(WHY.http)}>{WHY.http}</Why>
       <Why when={by(WHY.error)}>{WHY.error}</Why>
     </>
-  );
+  )
 }
 
 /** "Ask zond", the page's own middle: the controls and zond's answer. */
@@ -190,7 +190,7 @@ export function AskZond() {
   const controls = [
     ...SERVICES.map((s) => `zond-a-${s.name}`),
     ...REQUESTS.map((q) => `zond-q-${q.id}`),
-  ].join(" ");
+  ].join(" ")
   return (
     <section aria-labelledby="ask-zond" data-zond-sim>
       <style>{CSS}</style>
@@ -311,5 +311,5 @@ export function AskZond() {
         </div>
       </div>
     </section>
-  );
+  )
 }

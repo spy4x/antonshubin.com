@@ -1,32 +1,32 @@
-import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { Layout } from "../../components/Layout.tsx";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { HubTools } from "../../components/tools/hub/HubTools.tsx";
-import { hubOrder } from "../../components/tools/hub/hub.ts";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { IconArrowRight } from "@spy4x/preact-icons";
-import { toJsonLd } from "../../lib/json-ld.ts";
+import { define } from "../../lib/utils.ts"
+import { getBreadcrumb, head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { Layout } from "../../components/Layout.tsx"
+import { ClosingBand } from "../../components/ClosingBand.tsx"
+import { HubTools } from "../../components/tools/hub/HubTools.tsx"
+import { hubOrder } from "../../components/tools/hub/hub.ts"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { IconArrowRight } from "@spy4x/preact-icons"
+import { toJsonLd } from "../../lib/json-ld.ts"
 import {
   statusMeanings,
   tool as toolBySlug,
   type ToolStatus,
-} from "../../lib/tools.ts";
-import { checkedLabel, toolsLive } from "../../lib/tools-live.ts";
-import { eventAttrs } from "../../lib/analytics.ts";
+} from "../../lib/tools.ts"
+import { checkedLabel, toolsLive } from "../../lib/tools-live.ts"
+import { eventAttrs } from "../../lib/analytics.ts"
 
 /** The H1 #189 sets for the hub, reused as the page name. */
-const TITLE = "Tools I build and run myself";
-const CANONICAL = "https://antonshubin.com/tools";
+const TITLE = "Tools I build and run myself"
+const CANONICAL = "https://antonshubin.com/tools"
 
 // The curated hub (#456): Seed's clip first, then what runs live, what runs
 // in a terminal, the building blocks, the work in progress and the archive,
 // in the hand-set order of components/tools/hub/hub.ts.
 export default define.page(async function ToolsIndex(ctx) {
-  const live = await toolsLive();
-  const order = hubOrder().map(toolBySlug);
+  const live = await toolsLive()
+  const order = hubOrder().map(toolBySlug)
 
   head.value = {
     ...head.value,
@@ -39,7 +39,7 @@ export default define.page(async function ToolsIndex(ctx) {
     ogImage: "https://antonshubin.com/img/og/tools.png",
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -58,9 +58,9 @@ export default define.page(async function ToolsIndex(ctx) {
         "url": `https://antonshubin.com/tools/${t.slug}`,
       })),
     },
-  };
+  }
 
-  const statuses = Object.entries(statusMeanings) as [ToolStatus, string][];
+  const statuses = Object.entries(statusMeanings) as [ToolStatus, string][]
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -120,5 +120,5 @@ export default define.page(async function ToolsIndex(ctx) {
         </details>
       </div>
     </Layout>
-  );
-});
+  )
+})

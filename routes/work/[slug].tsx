@@ -1,29 +1,29 @@
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { Layout } from "../../components/Layout.tsx";
-import { NotFound } from "../../components/NotFound.tsx";
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { Layout } from "../../components/Layout.tsx"
+import { NotFound } from "../../components/NotFound.tsx"
 import {
   type Period,
   type Project,
   projectScreenshots,
   relatedProjects,
-} from "../../lib/data.ts";
-import { projectTestimonials } from "../../lib/testimonials.ts";
-import { findWorkProject, isClientWork, workHref } from "../../lib/work.ts";
-import { clientSummary, metaDescription, projectLead } from "../../lib/llms.ts";
-import { WithNote } from "../../components/WithNote.tsx";
-import ImageGallery from "../../islands/ImageGallery.tsx";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { MoreWorkCard } from "../../components/MoreWorkCard.tsx";
+} from "../../lib/data.ts"
+import { projectTestimonials } from "../../lib/testimonials.ts"
+import { findWorkProject, isClientWork, workHref } from "../../lib/work.ts"
+import { clientSummary, metaDescription, projectLead } from "../../lib/llms.ts"
+import { WithNote } from "../../components/WithNote.tsx"
+import ImageGallery from "../../islands/ImageGallery.tsx"
+import { getBreadcrumb, head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { ClosingBand } from "../../components/ClosingBand.tsx"
+import { MoreWorkCard } from "../../components/MoreWorkCard.tsx"
 import {
   ProjectFactCard,
   SimilarWorkLink,
-} from "../../components/ProjectFactCard.tsx";
-import { ProjectReviews, PullQuote } from "../../components/ProjectReviews.tsx";
-import { toJsonLd } from "../../lib/json-ld.ts";
+} from "../../components/ProjectFactCard.tsx"
+import { ProjectReviews, PullQuote } from "../../components/ProjectReviews.tsx"
+import { toJsonLd } from "../../lib/json-ld.ts"
 
 /**
  * Split a description on blank lines into semantic paragraphs. Returns an
@@ -34,16 +34,16 @@ function splitParagraphs(text: string): string[] {
   return text
     .split(/\n\n+/)
     .map((p) => p.trim().replace(/\s+/g, " "))
-    .filter(Boolean);
+    .filter(Boolean)
 }
 
 /** A period as schema.org `temporalCoverage`: "2021", "2018/2019" or "2024/.." while ongoing. */
 function temporalCoverage(period: Period): string {
-  if (period.ongoing) return `${period.from}/..`;
+  if (period.ongoing) return `${period.from}/..`
   if (period.to && period.to !== period.from) {
-    return `${period.from}/${period.to}`;
+    return `${period.from}/${period.to}`
   }
-  return `${period.from}`;
+  return `${period.from}`
 }
 
 /**
@@ -70,12 +70,12 @@ function projectJsonLd(project: Project, canonical: string) {
     ...(project.logoImageURL
       ? [`https://antonshubin.com${project.logoImageURL}`]
       : []),
-  ];
+  ]
 
   const sameAs = project.externalURL && !project.externalURLDead
     ? [project.externalURL]
-    : undefined;
-  const person = { "@id": "https://antonshubin.com/#person" };
+    : undefined
+  const person = { "@id": "https://antonshubin.com/#person" }
 
   return {
     "@context": "https://schema.org",
@@ -101,7 +101,7 @@ function projectJsonLd(project: Project, canonical: string) {
       }
       : {}),
     "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
-  };
+  }
 }
 
 // Unknown slugs show the shared not-found page (components/NotFound.tsx), but must answer with
@@ -112,13 +112,13 @@ export const handler = define.handlers({
     return findWorkProject(ctx.params.slug) ? page() : page(null, {
       status: 404,
       headers: { "Cache-Control": "no-store" },
-    });
+    })
   },
-});
+})
 
 /** The project's small logo mark beside the `<h1>`; decorative, since the heading names it. */
 function LogoMark({ project }: { project: Project }) {
-  if (!project.logoImageURL) return null;
+  if (!project.logoImageURL) return null
   return (
     <img
       src={project.logoImageURL}
@@ -130,25 +130,25 @@ function LogoMark({ project }: { project: Project }) {
         project.logoPlate ? " bg-parchment rounded-lg p-2" : ""
       }`}
     />
-  );
+  )
 }
 
 export default define.page(function ProjectDetail(ctx) {
-  const { slug } = ctx.params;
-  const project = findWorkProject(slug);
+  const { slug } = ctx.params
+  const project = findWorkProject(slug)
 
   if (!project) {
-    return <NotFound pathname={ctx.url.pathname} />;
+    return <NotFound pathname={ctx.url.pathname} />
   }
 
-  const isClientProject = isClientWork(slug);
-  const lead = projectLead(project);
+  const isClientProject = isClientWork(slug)
+  const lead = projectLead(project)
   // The lead already says the description's first paragraph: print it once.
-  const all = splitParagraphs(project.description);
-  const paragraphs = all.length > 1 && all[0] === lead ? all.slice(1) : all;
-  const reviews = projectTestimonials(slug);
-  const screenshots = projectScreenshots(project);
-  const related = isClientProject ? relatedProjects(project) : [];
+  const all = splitParagraphs(project.description)
+  const paragraphs = all.length > 1 && all[0] === lead ? all.slice(1) : all
+  const reviews = projectTestimonials(slug)
+  const screenshots = projectScreenshots(project)
+  const related = isClientProject ? relatedProjects(project) : []
 
   head.value = {
     ...head.value,
@@ -163,7 +163,7 @@ export default define.page(function ProjectDetail(ctx) {
     ogImage: `https://antonshubin.com/img/og/projects/${slug}.png`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
+  }
 
   const leadLine = (
     <p
@@ -172,7 +172,7 @@ export default define.page(function ProjectDetail(ctx) {
     >
       {lead}
     </p>
-  );
+  )
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -290,5 +290,5 @@ export default define.page(function ProjectDetail(ctx) {
         />
       </div>
     </Layout>
-  );
-});
+  )
+})

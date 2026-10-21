@@ -24,55 +24,55 @@
  * edit (see AGENTS.md's note in this file's own docs section) is this one
  * command.
  */
-import { launchChromium, newPage } from "../test/browser.ts";
-import { blogArticles, projects } from "../lib/data.ts";
-import { ROLE } from "../lib/head.ts";
-import { tools } from "../lib/tools.ts";
-import { metaDescription } from "../lib/llms.ts";
-import { workDescription } from "../lib/work.ts";
-import { ABOUT_NAME, aboutDescription } from "../lib/about.ts";
-import { HOW_I_WORK_NAME, howIWorkDescription } from "../lib/how-i-work.ts";
+import { launchChromium, newPage } from "../test/browser.ts"
+import { blogArticles, projects } from "../lib/data.ts"
+import { ROLE } from "../lib/head.ts"
+import { tools } from "../lib/tools.ts"
+import { metaDescription } from "../lib/llms.ts"
+import { workDescription } from "../lib/work.ts"
+import { ABOUT_NAME, aboutDescription } from "../lib/about.ts"
+import { HOW_I_WORK_NAME, howIWorkDescription } from "../lib/how-i-work.ts"
 import {
   WHY_NOT_JUST_AI_DESCRIPTION,
   WHY_NOT_JUST_AI_H1,
-} from "../lib/why-not-just-ai.ts";
-import { LOCATION } from "../lib/config.ts";
-import type { Browser } from "playwright";
-import { fromFileUrl } from "@std/path";
-import { stripFile } from "./strip-metadata.ts";
-import { startSite } from "../test/harness.ts";
+} from "../lib/why-not-just-ai.ts"
+import { LOCATION } from "../lib/config.ts"
+import type { Browser } from "playwright"
+import { fromFileUrl } from "@std/path"
+import { stripFile } from "./strip-metadata.ts"
+import { startSite } from "../test/harness.ts"
 
-const WIDTH = 1200;
-const HEIGHT = 630;
+const WIDTH = 1200
+const HEIGHT = 630
 
 // Colors match the coming visual system (#214): Ink background, Parchment
 // title text, a muted secondary, the orange accent used only as a small bar.
-const BG = "#15120f";
-const TITLE_COLOR = "#efebe2";
-const SUB_COLOR = "#bcb7af";
-const ACCENT = "#f97316";
+const BG = "#15120f"
+const TITLE_COLOR = "#efebe2"
+const SUB_COLOR = "#bcb7af"
+const ACCENT = "#f97316"
 
-const ROOT = new URL("../", import.meta.url);
-const OG_DIR = new URL("static/img/og/", ROOT);
+const ROOT = new URL("../", import.meta.url)
+const OG_DIR = new URL("static/img/og/", ROOT)
 
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/>/g, "&gt;")
 }
 
 /** First sentence of a (possibly multi-paragraph) description, capped so it fits the card. */
 function oneLine(text: string, maxChars = 160): string {
-  const firstParagraph = text.split(/\n\n+/)[0].replace(/\s+/g, " ").trim();
+  const firstParagraph = text.split(/\n\n+/)[0].replace(/\s+/g, " ").trim()
   const firstSentence = firstParagraph.match(/^[^.!?]*[.!?]/)?.[0] ??
-    firstParagraph;
+    firstParagraph
   const source = firstSentence.length <= maxChars
     ? firstSentence
-    : firstParagraph;
+    : firstParagraph
   return source.length > maxChars
     ? `${source.slice(0, maxChars - 1).trimEnd()}…`
-    : source;
+    : source
 }
 
 function cardHtml(title: string, subtitle: string): string {
@@ -101,7 +101,7 @@ function cardHtml(title: string, subtitle: string): string {
   <div class="bar"></div>
   <h1>${escapeHtml(title)}</h1>
   ${subtitle ? `<p>${escapeHtml(subtitle)}</p>` : ""}
-</body></html>`;
+</body></html>`
 }
 
 async function render(
@@ -111,25 +111,25 @@ async function render(
 ): Promise<number> {
   const page = await browser.newPage({
     viewport: { width: WIDTH, height: HEIGHT },
-  });
+  })
   try {
-    await page.setContent(html, { waitUntil: "load" });
-    await Deno.mkdir(new URL("./", outUrl), { recursive: true });
+    await page.setContent(html, { waitUntil: "load" })
+    await Deno.mkdir(new URL("./", outUrl), { recursive: true })
     // Playwright's `path` option is an OS path, not a URL — `.pathname`
     // isn't one (unescaped, and wrong on Windows), so go through
     // `@std/path`'s `fromFileUrl`.
-    await page.screenshot({ path: fromFileUrl(outUrl), type: "png" });
-    const info = await Deno.stat(outUrl);
-    return info.size;
+    await page.screenshot({ path: fromFileUrl(outUrl), type: "png" })
+    const info = await Deno.stat(outUrl)
+    return info.size
   } finally {
-    await page.close();
+    await page.close()
   }
 }
 
-const SOCIAL_WIDTH = 1280;
-const SOCIAL_HEIGHT = 640;
-const SOCIAL_FILE = new URL("docs/social-preview.png", ROOT);
-const FONT_DIR = new URL("assets/fonts/", ROOT);
+const SOCIAL_WIDTH = 1280
+const SOCIAL_HEIGHT = 640
+const SOCIAL_FILE = new URL("docs/social-preview.png", ROOT)
+const FONT_DIR = new URL("assets/fonts/", ROOT)
 
 async function fontFace(
   family: string,
@@ -137,9 +137,9 @@ async function fontFace(
   weight: number,
   style = "normal",
 ): Promise<string> {
-  const data = await Deno.readFile(new URL(file, FONT_DIR));
+  const data = await Deno.readFile(new URL(file, FONT_DIR))
   return `@font-face { font-family: "${family}"; font-weight: ${weight}; font-style: ${style};
-    src: url(data:font/woff2;base64,${data.toBase64()}) format("woff2"); }`;
+    src: url(data:font/woff2;base64,${data.toBase64()}) format("woff2"); }`
 }
 
 /**
@@ -175,7 +175,7 @@ function socialHtml(shotBase64: string, fonts: string): string {
     <p>${escapeHtml(ROLE)}</p>
   </div>
   <div class="shot"><img src="data:image/png;base64,${shotBase64}" alt=""></div>
-</body></html>`;
+</body></html>`
 }
 
 /** Writes `docs/social-preview.png`: needs a built site (`deno task build`). */
@@ -188,88 +188,88 @@ async function socialPreview(browser: Browser): Promise<number> {
       UMAMI_URL: "",
       UMAMI_ID: "",
     },
-  });
-  let shot: Uint8Array;
+  })
+  let shot: Uint8Array
   try {
     const page = await newPage(browser, {
       viewport: { width: 1280, height: 800 },
       colorScheme: "dark",
-    });
+    })
     try {
-      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" });
-      await page.evaluate(() => document.fonts.ready);
-      shot = await page.screenshot({ type: "png", animations: "disabled" });
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" })
+      await page.evaluate(() => document.fonts.ready)
+      shot = await page.screenshot({ type: "png", animations: "disabled" })
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await site.stop();
+    await site.stop()
   }
   const fonts = (await Promise.all([
     fontFace("Literata", "literata-latin-600-normal.woff2", 600),
     fontFace("IBM Plex Sans", "ibm-plex-sans-latin-400-normal.woff2", 400),
-  ])).join("\n");
+  ])).join("\n")
   const page = await newPage(browser, {
     viewport: { width: SOCIAL_WIDTH, height: SOCIAL_HEIGHT },
-  });
+  })
   try {
     await page.setContent(socialHtml(shot.toBase64(), fonts), {
       waitUntil: "load",
-    });
-    await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: fromFileUrl(SOCIAL_FILE), type: "png" });
+    })
+    await page.evaluate(() => document.fonts.ready)
+    await page.screenshot({ path: fromFileUrl(SOCIAL_FILE), type: "png" })
   } finally {
-    await page.close();
+    await page.close()
   }
-  const bytes = await stripFile(fromFileUrl(SOCIAL_FILE));
-  console.log(`docs/social-preview.png  (metadata stripped: ${bytes} B)`);
-  return (await Deno.stat(SOCIAL_FILE)).size;
+  const bytes = await stripFile(fromFileUrl(SOCIAL_FILE))
+  console.log(`docs/social-preview.png  (metadata stripped: ${bytes} B)`)
+  return (await Deno.stat(SOCIAL_FILE)).size
 }
 
 function fmtBytes(n: number): string {
-  return n < 1024 ? `${n}B` : `${(n / 1024).toFixed(1)}KB`;
+  return n < 1024 ? `${n}B` : `${(n / 1024).toFixed(1)}KB`
 }
 
 /** `deno task social-preview`: only `docs/social-preview.png`, after a fresh build. */
 async function mainSocial() {
-  const browser = await launchChromium();
+  const browser = await launchChromium()
   try {
-    const bytes = await socialPreview(browser);
-    console.log(`\nWrote docs/social-preview.png (${fmtBytes(bytes)}).`);
+    const bytes = await socialPreview(browser)
+    console.log(`\nWrote docs/social-preview.png (${fmtBytes(bytes)}).`)
   } finally {
-    await browser.close();
+    await browser.close()
   }
 }
 
 async function main() {
-  const browser = await launchChromium();
-  let count = 0;
+  const browser = await launchChromium()
+  let count = 0
   try {
     for (const article of blogArticles) {
-      const html = cardHtml(article.title, oneLine(article.description));
-      const outUrl = new URL(`blog/${article.slug}.png`, OG_DIR);
-      const bytes = await render(browser, html, outUrl);
-      console.log(`blog/${article.slug}.png  ${fmtBytes(bytes)}`);
-      count++;
+      const html = cardHtml(article.title, oneLine(article.description))
+      const outUrl = new URL(`blog/${article.slug}.png`, OG_DIR)
+      const bytes = await render(browser, html, outUrl)
+      console.log(`blog/${article.slug}.png  ${fmtBytes(bytes)}`)
+      count++
     }
 
     const allProjects = projects.freelance.filter((
       p,
-    ): p is typeof p & { slug: string } => Boolean(p.slug));
+    ): p is typeof p & { slug: string } => Boolean(p.slug))
     for (const project of allProjects) {
-      const html = cardHtml(project.title, oneLine(project.description));
-      const outUrl = new URL(`projects/${project.slug}.png`, OG_DIR);
-      const bytes = await render(browser, html, outUrl);
-      console.log(`projects/${project.slug}.png  ${fmtBytes(bytes)}`);
-      count++;
+      const html = cardHtml(project.title, oneLine(project.description))
+      const outUrl = new URL(`projects/${project.slug}.png`, OG_DIR)
+      const bytes = await render(browser, html, outUrl)
+      console.log(`projects/${project.slug}.png  ${fmtBytes(bytes)}`)
+      count++
     }
 
     for (const t of tools) {
-      const html = cardHtml(`${t.name}: ${t.job}`, oneLine(t.summary));
-      const outUrl = new URL(`tools/${t.slug}.png`, OG_DIR);
-      const bytes = await render(browser, html, outUrl);
-      console.log(`tools/${t.slug}.png  ${fmtBytes(bytes)}`);
-      count++;
+      const html = cardHtml(`${t.name}: ${t.job}`, oneLine(t.summary))
+      const outUrl = new URL(`tools/${t.slug}.png`, OG_DIR)
+      const bytes = await render(browser, html, outUrl)
+      console.log(`tools/${t.slug}.png  ${fmtBytes(bytes)}`)
+      count++
     }
 
     const toolsHubBytes = await render(
@@ -279,9 +279,9 @@ async function main() {
         "Open-source tools, each with its status, CI status and install.",
       ),
       new URL("tools.png", OG_DIR),
-    );
-    console.log(`tools.png  ${fmtBytes(toolsHubBytes)}`);
-    count++;
+    )
+    console.log(`tools.png  ${fmtBytes(toolsHubBytes)}`)
+    count++
 
     // /work (#270): the page's own title and meta description.
     const workBytes = await render(
@@ -291,27 +291,27 @@ async function main() {
         metaDescription(workDescription(ROLE)),
       ),
       new URL("work.png", OG_DIR),
-    );
-    console.log(`work.png  ${fmtBytes(workBytes)}`);
-    count++;
+    )
+    console.log(`work.png  ${fmtBytes(workBytes)}`)
+    count++
 
     // /about (#294): the page's name and meta description.
     const aboutBytes = await render(
       browser,
       cardHtml(ABOUT_NAME, aboutDescription(LOCATION)),
       new URL("about.png", OG_DIR),
-    );
-    console.log(`about.png  ${fmtBytes(aboutBytes)}`);
-    count++;
+    )
+    console.log(`about.png  ${fmtBytes(aboutBytes)}`)
+    count++
 
     // /how-i-work (#275): the page's name and its description.
     const howIWorkBytes = await render(
       browser,
       cardHtml(HOW_I_WORK_NAME, metaDescription(howIWorkDescription())),
       new URL("how-i-work.png", OG_DIR),
-    );
-    console.log(`how-i-work.png  ${fmtBytes(howIWorkBytes)}`);
-    count++;
+    )
+    console.log(`how-i-work.png  ${fmtBytes(howIWorkBytes)}`)
+    count++
 
     // /why-not-just-ai (#486): the page's question and its description.
     const whyNotJustAiBytes = await render(
@@ -321,9 +321,9 @@ async function main() {
         metaDescription(WHY_NOT_JUST_AI_DESCRIPTION),
       ),
       new URL("why-not-just-ai.png", OG_DIR),
-    );
-    console.log(`why-not-just-ai.png  ${fmtBytes(whyNotJustAiBytes)}`);
-    count++;
+    )
+    console.log(`why-not-just-ai.png  ${fmtBytes(whyNotJustAiBytes)}`)
+    count++
 
     // /infrastructure (#295): the page's own title and description.
     const infraBytes = await render(
@@ -333,25 +333,25 @@ async function main() {
         "Docker Compose behind Traefik, Authelia sign-in, restic backups, Gatus checks and self-hosted CI, with the live services linked.",
       ),
       new URL("infrastructure.png", OG_DIR),
-    );
-    console.log(`infrastructure.png  ${fmtBytes(infraBytes)}`);
-    count++;
+    )
+    console.log(`infrastructure.png  ${fmtBytes(infraBytes)}`)
+    count++
 
-    const defaultHtml = cardHtml("Anton Shubin", ROLE);
+    const defaultHtml = cardHtml("Anton Shubin", ROLE)
     const defaultBytes = await render(
       browser,
       defaultHtml,
       new URL("default.png", OG_DIR),
-    );
-    console.log(`default.png  ${fmtBytes(defaultBytes)}`);
-    count++;
+    )
+    console.log(`default.png  ${fmtBytes(defaultBytes)}`)
+    count++
   } finally {
-    await browser.close();
+    await browser.close()
   }
-  console.log(`\nGenerated ${count} OG images under static/img/og/.`);
+  console.log(`\nGenerated ${count} OG images under static/img/og/.`)
 }
 
 if (import.meta.main) {
-  if (Deno.args.includes("--social")) await mainSocial();
-  else await main();
+  if (Deno.args.includes("--social")) await mainSocial()
+  else await main()
 }
