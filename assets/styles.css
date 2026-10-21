@@ -23,8 +23,10 @@
   --color-mist: #8ec5ec; /* beta / info */
   --color-brick: #f87e77; /* risk / errors */
 
-  --font-heading: "Literata", "Literata Fallback", serif;
-  --font-sans: "IBM Plex Sans", "IBM Plex Sans Fallback", sans-serif;
+  --font-heading: "Literata", "Literata Fallback", "Literata Fallback Times",
+    "Literata Fallback Noto", "Literata Fallback DejaVu", serif;
+  --font-sans: "IBM Plex Sans", "IBM Plex Sans Fallback",
+    "IBM Plex Sans Fallback Noto", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
     monospace;
 
@@ -300,9 +302,46 @@ div:has(> [data-gallery-counter]) > button {
  */
 @font-face {
   font-family: "Literata Fallback";
-  src:
-    local("Georgia"), local("Times New Roman"), local("DejaVu Serif"),
-    local("Liberation Serif"), local("Noto Serif");
+  src: local("Georgia");
+  size-adjust: 112.16%;
+  ascent-override: 104.94%;
+  descent-override: 27.46%;
+  line-gap-override: 0%;
+}
+
+/*
+ * Times New Roman (and Liberation Serif, its metric twin on Linux) and Noto
+ * Serif (Android's serif) set narrower and wider than Georgia, so Georgia's
+ * numbers made a heading wrap to fewer or more lines than Literata, and the
+ * page shifted when Literata arrived (#501: the SaaS MVP page's H1, 0.05 CLS
+ * in Lighthouse mobile). Each gets its own face. Its `size-adjust` is the
+ * width ratio Literata 600 / that font over the headings of five pages,
+ * measured with canvas `measureText()` in Chromium; ascent and descent keep
+ * Literata's own (104.94% × 1.1216 and 27.46% × 1.1216) divided by it.
+ */
+@font-face {
+  font-family: "Literata Fallback Times";
+  src: local("Times New Roman"), local("Liberation Serif");
+  size-adjust: 120.69%;
+  ascent-override: 97.53%;
+  descent-override: 25.52%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Literata Fallback Noto";
+  src: local("Noto Serif");
+  size-adjust: 102.96%;
+  ascent-override: 114.32%;
+  descent-override: 29.91%;
+  line-gap-override: 0%;
+}
+
+/* DejaVu Serif keeps Georgia's numbers, as before #501; it comes after
+   Liberation Serif, so a Linux box with both (CI) takes the measured face. */
+@font-face {
+  font-family: "Literata Fallback DejaVu";
+  src: local("DejaVu Serif");
   size-adjust: 112.16%;
   ascent-override: 104.94%;
   descent-override: 27.46%;
@@ -313,10 +352,21 @@ div:has(> [data-gallery-counter]) > button {
   font-family: "IBM Plex Sans Fallback";
   src:
     local("Arial"), local("Helvetica"), local("Liberation Sans"),
-    local("DejaVu Sans"), local("Noto Sans");
+    local("DejaVu Sans");
   size-adjust: 101.17%;
   ascent-override: 101.32%;
   descent-override: 27.18%;
+  line-gap-override: 0%;
+}
+
+/* Noto Sans (Android's sans) is about 5% wider than Arial: measured the same
+   way over the body text of five pages, Plex Sans 400 / Noto Sans = 95.91%. */
+@font-face {
+  font-family: "IBM Plex Sans Fallback Noto";
+  src: local("Noto Sans");
+  size-adjust: 95.91%;
+  ascent-override: 106.88%;
+  descent-override: 28.67%;
   line-gap-override: 0%;
 }
 
