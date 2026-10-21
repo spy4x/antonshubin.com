@@ -45,7 +45,7 @@ export const TASK_FILE: readonly string[] = [
 export const TASK_FIELDS: readonly TaskField[] = [
   {
     id: "title",
-    label: "Title",
+    label: "Title, notes",
     lines: ["SUMMARY:"],
     inFile: "`SUMMARY`, `DESCRIPTION`",
     covered: "Yes (the repeating task has notes)",

@@ -1,3 +1,4 @@
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import { FACT_LINK } from "../../FactCard.tsx";
 import { eventAttrs } from "../../../lib/analytics.ts";
 import { fieldOf, TASK_FIELDS, TASK_FILE } from "./data.ts";
@@ -55,8 +56,9 @@ function Cell({ text }: { text: string }) {
 /**
  * "Same file, two apps" (#465): the made-up "Buy seeds" task as Tasks.org
  * writes it, beside the fields Tasks.org shows. Picking a field lights its
- * lines in the file and shows what compatibility.md says about it. Native
- * radios and CSS only, so it works without JavaScript.
+ * lines in the file and shows what compatibility.md says about it. The
+ * library's `RadioChips` (native radios) plus CSS, so it works without
+ * JavaScript.
  */
 export function SameFile() {
   return (
@@ -75,33 +77,22 @@ export function SameFile() {
       </p>
       <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div class="min-w-0">
-          <fieldset>
-            <legend class="text-parchment font-semibold">
-              Pick a field Tasks.org shows
-            </legend>
-            <div class="mt-3 flex flex-wrap gap-2 lg:flex-col lg:items-start">
-              {TASK_FIELDS.map((f, i) => (
-                <label
-                  key={f.id}
-                  class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-rule-strong px-4 py-2 text-sm text-graphite has-[:checked]:border-parchment has-[:checked]:bg-lamp has-[:checked]:text-parchment has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-parchment"
-                >
-                  <input
-                    type="radio"
-                    name="ctw-field"
-                    id={`ctw-field-${f.id}`}
-                    value={f.id}
-                    checked={i === 0}
-                    {...eventAttrs("tool-try", {
-                      item: SLUG,
-                      part: `field:${f.id}`,
-                    })}
-                    class="sr-only"
-                  />
-                  {f.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <RadioChips
+            legend="Pick a field Tasks.org shows"
+            legendClass="text-parchment font-semibold"
+            name="ctw-field"
+            defaultValue={TASK_FIELDS[0].id}
+            optionsClass="mt-3 lg:flex-col lg:items-start"
+            options={TASK_FIELDS.map((f) => ({
+              value: f.id,
+              label: f.label,
+              id: `ctw-field-${f.id}`,
+              inputAttributes: eventAttrs("tool-try", {
+                item: SLUG,
+                part: `field:${f.id}`,
+              }),
+            }))}
+          />
           {TASK_FIELDS.map((f) => (
             <dl
               key={f.id}
