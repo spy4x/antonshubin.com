@@ -66,10 +66,10 @@ panel video (`admin-panel.*`, shown in "See it running") comes from spy4x/seed's
 captions and its own quiet music, shows staged demo data only, and each file is
 at most 2.5 MB. Nothing downloads before the visitor presses play (`DemoVideo`),
 so the budget protects only the person who pressed. Its `lib/tools.ts` entry
-names it in `clip` (title, caption, frame, poster); set `clip.video` (`duration`
-as ISO 8601, `uploadDate` the commit day) only once both files are committed,
-which also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when
-an entry marks a clip committed and a file is missing. `/video/*` is cached like
+names it in `clip` (title, caption, poster); set `clip.video` (`duration` as ISO
+8601, `uploadDate` the commit day) only once both files are committed, which
+also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when an
+entry marks a clip committed and a file is missing. `/video/*` is cached like
 `/img/*` (docs/cache-control.md). `main.ts` answers a `Range` request for
 `/video/*` with 206 Partial Content (`lib/video-files.ts`, through `@std/http`'s
 `serveFile`), because Safari plays an MP4 only that way and Fresh's static files

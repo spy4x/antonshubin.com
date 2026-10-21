@@ -36,14 +36,6 @@ export function smallestFile(shot: ToolScreenshot): string {
 /** The spotlight's clip: seven of twelve columns from 1024px. */
 const SPOTLIGHT_SIZES = "(min-width: 1024px) 40rem, calc(100vw - 2rem)"
 
-/** The host a frame's address bar shows: the clip's own title, else the live link's host. */
-function frameTitle(tool: Tool): string | undefined {
-  if (tool.clip?.frameTitle) return tool.clip.frameTitle
-  const href = tool.live?.href
-  if (!href) return undefined
-  return href.startsWith("http") ? new URL(href).host : `antonshubin.com${href}`
-}
-
 /** The tool's name, linking its page: the card's first link. */
 function NameLink({ tool, place }: { tool: Tool; place: Place }) {
   return (
@@ -68,7 +60,6 @@ function CardMedia({ tool }: { tool: Tool }) {
   const clip = tool.clip
   const still = heroStill(tool)
   if (!still) return null
-  const variant = clip?.frame ?? "browser"
   const picture = clip?.video
     ? (
       <div class="w-full">
@@ -88,10 +79,7 @@ function CardMedia({ tool }: { tool: Tool }) {
     )
     : <Still shot={still} />
   return (
-    <MediaFrame
-      variant={variant}
-      title={variant === "browser" ? frameTitle(tool) : undefined}
-    >
+    <MediaFrame>
       <div
         data-hub-media
         class="flex aspect-[16/10] w-full items-center overflow-hidden bg-ink"
@@ -279,7 +267,7 @@ export function Spotlight({ tool }: { tool: Tool }) {
       </div>
       {clip?.video && (
         <div class="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
-          <MediaFrame variant={clip.frame} title={clip.frameTitle}>
+          <MediaFrame>
             <ToolHeroClip
               item={tool.slug}
               place="hero"
