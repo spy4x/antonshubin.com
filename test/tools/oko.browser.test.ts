@@ -131,10 +131,12 @@ Deno.test("the card states take one tab stop, and the arrow keys move the choice
         "ArrowRight: wrong picture",
       );
       await page.keyboard.press("Tab");
-      const next = await page.evaluate(() =>
-        document.activeElement?.getAttribute("name") ?? ""
+      const left = await page.evaluate(() =>
+        !document.activeElement?.closest(
+          "section[aria-labelledby=config-to-card] fieldset",
+        )
       );
-      assert(next !== "oko-card-state", "Tab stayed in the card states");
+      assert(left, "Tab stayed in the card states");
     } finally {
       await page.close();
     }
