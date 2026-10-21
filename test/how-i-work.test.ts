@@ -177,6 +177,7 @@ siteTest(
     const html = await site.html("/how-i-work")
     const ai = slice(html, '<section aria-labelledby="hiw-ai"', "</section>")
     assert(ai.includes('href="https://github.com/spy4x/dotfiles"'), "dotfiles")
+    assert(ai.includes('href="/infrastructure"'), "infrastructure")
     assert(ai.includes('href="#faq-ai-and-your-code"'), "AI-provider answer")
     assert(ai.includes("data-why-not-just-ai-link"), "why-not-just-ai link")
     const text = visibleText(ai)

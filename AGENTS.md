@@ -528,8 +528,8 @@ card beside the main column (from 1024px; first at 390px) with the pricing rule
 (`GOOD_FIT`/`NOT_A_FIT`, in Anton's #249 words) with one proof line
 (`repeatClientsLine()` and the Job Success figure through `proof()`, with the
 `upwork-profile` note), "Five promises" (H2, promises as H3) as
-`PromiseTimeline variant="full" layout="stack"`, "How I use AI" (#542: three
-plain paragraphs, links `spy4x/dotfiles`) and the questions, open, each at
+`PromiseTimeline variant="full" layout="stack"`, "How I use AI" (#542: four
+short paragraphs, links `spy4x/dotfiles`) and the questions, open, each at
 `#faq-<id>`. Book goes to `/book` and the brief to `/book#brief` (#272); the
 page has no calendar embed. `lib/faqs.ts` is the only copy of the questions (at
 most `MAX_FAQS`, eight): the page, the `FAQPage` JSON-LD (joined to the site
