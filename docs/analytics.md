@@ -197,7 +197,12 @@ None yet.
 
 ### dotfiles
 
-None yet.
+- `tool-try` (`item: dotfiles`, `part: harness-map`): a press on a source's
+  summary in "Where each file goes", below 1024px. The table above that width
+  has nothing to press and sends nothing.
+- `outbound` (`to: github`, `place: card`): a file link on one of the six "The
+  AI-agent setup" cards; `place: hero` on "Read the global agent rules".
+- `cta` (`place: band`, `target: /how-i-work`): "How I work" in the band.
 
 ### financy
 
@@ -205,7 +210,17 @@ None yet.
 
 ### mig
 
-None yet.
+- `tool-try` (`item: mig`, `part: calendar`): "Load my calendar here" in "Try it
+  here" was pressed and the real calendar is loading in place. Sent with
+  `track()` from `islands/MigTryCalendar.tsx`, because the button is a link to
+  `/book#book` (its no-JavaScript fallback) and a tracked link would leave the
+  page.
+- The calendar it loads is `/book`'s `MeetEmbed`, so `calendar-shown`,
+  `calendar-failed` and `call-booked` come from this page too; a booking made
+  here is a real one and counts toward the goal.
+- "Open the calendar in a new tab" and "open issues" send `outbound` (`to`
+  `live` or `issues`, `place: body`); both copy buttons (the compose file, the
+  embed snippet) send `tool-install-copy`.
 
 ### oko
 
@@ -223,7 +238,13 @@ None yet.
 
 ### rostok
 
-None yet.
+| Event               | When                                                          | Properties                           |
+| ------------------- | ------------------------------------------------------------- | ------------------------------------ |
+| `tool-try`          | a catalog stack's summary is clicked (to open or to close it) | `item=rostok`, `part=stack:{name}`   |
+| `tool-install-copy` | a catalog stack's add command is copied                       | `item=rostok`, `part=stack:{name}`   |
+| `cta`               | a stack's "This tool's page" link                             | `place=body`, `target=/tools/{slug}` |
+
+The category index links jump inside the page and send nothing.
 
 ### seed
 
@@ -238,7 +259,17 @@ the MVP offer with `item: seed` are the number the page should move.
 
 ### ts-libs
 
-None yet.
+- `tool-try` with `part` the package name without its scope (`validation`,
+  `platform`, … `tasks`): a press on a "Pick a package" summary. It counts
+  opening and closing alike. The summary carries the attributes and lets clicks
+  on its children through (`pointer-events: none`), because Umami reads the
+  event from a click's own target when no link or button holds it.
+- `tool-install-copy`: the "Run the example" copy buttons (hero and band) and
+  each package's install line.
+- `outbound` with `to: registry`, `place: body`: each package's "On JSR" link;
+  `to: github`, `place: body`: the README link under "Run the example" and the
+  three import lists under "Where I use it". The hero's "See the packages on
+  JSR" sends `to: registry`, `place: hero`.
 
 ### zond
 

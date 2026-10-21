@@ -1,0 +1,23 @@
+import { type } from "arktype"
+import { validate } from "@spy4x/validation"
+import { formatDateTimeLong } from "@spy4x/time/tz"
+import { createSmtpSender } from "@spy4x/email/smtp"
+
+const Booking = type({ email: "string.email", date: /^\d{4}-\d\d-\d\d$/, time: /^\d\d:\d\d$/ })
+const mail = createSmtpSender({
+  host: "127.0.0.1",
+  port: 1025, // a local Mailpit inbox
+  requireTls: false,
+  user: "jane@example.com",
+  pass: Deno.env.get("SMTP_PASSWORD")!,
+  from: "Jane Doe <jane@example.com>",
+})
+
+Deno.serve(async (request) => {
+  const { error, data } = validate(Booking, await request.json())
+  if (error) return Response.json(error.errors, { status: 400 })
+
+  const when = formatDateTimeLong(data.date, data.time, "Europe/Berlin")
+  const sent = await mail.send({ to: [data.email], subject: "Booked", text: `See you ${when}.` })
+  return sent.ok ? new Response("Booked") : new Response(sent.error, { status: 502 })
+})
