@@ -1,9 +1,14 @@
 import type { ComponentChildren } from "preact"
 import { Nav } from "./Nav.tsx"
 import { SCHEDULE_URL } from "../lib/config.ts"
-import { ROLE } from "../lib/head.ts"
 import { Footer } from "./Footer.tsx"
-import { navCurrent } from "../lib/nav.ts"
+import {
+  BOOK_HREF,
+  CONTACT_LABEL,
+  contactHref,
+  navCurrent,
+} from "../lib/nav.ts"
+import { eventAttrs } from "../lib/analytics.ts"
 
 interface LayoutProps {
   children: ComponentChildren
@@ -26,9 +31,10 @@ export function Layout({ children, currentPath }: LayoutProps) {
     >
       {
         /* Phone header (#185): scrolls away with the page; the desktop rail
-          carries the portrait from 768px up. The role replaces the bare UTC
-          offset (#293); the time zone is in the footer as "Da Nang, Vietnam
-          (UTC+7)". */
+          carries the portrait from 768px up. On the right a quiet Contact
+          link (#529) replaces the role, which repeated the home H1 and
+          wrapped onto two lines; the time zone is in the footer as "Da Nang,
+          Vietnam (UTC+7)". */
       }
       <header class="md:hidden flex items-center gap-2 h-13 px-4 border-b border-rule">
         <a
@@ -46,9 +52,15 @@ export function Layout({ children, currentPath }: LayoutProps) {
           />
           <span>Anton Shubin</span>
         </a>
-        <span class="ml-auto max-w-[11rem] text-right text-xs leading-tight text-graphite">
-          {ROLE}
-        </span>
+        <a
+          href={contactHref(SCHEDULE_URL)}
+          aria-current={currentPath === BOOK_HREF ? "page" : "false"}
+          data-header-contact
+          {...eventAttrs(SCHEDULE_URL ? "book" : "brief", { place: "nav" })}
+          class="ml-auto -mr-2 flex items-center min-h-11 px-2 rounded-lg text-sm text-graphite underline decoration-rule-strong underline-offset-4 hover:text-parchment hover:decoration-parchment aria-[current=page]:text-parchment aria-[current=page]:font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-parchment"
+        >
+          {CONTACT_LABEL}
+        </a>
       </header>
       <div
         id="main-content"

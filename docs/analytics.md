@@ -47,6 +47,13 @@ with every event, so no event has a `page` property.
 | `post-read`                          | the end of a post's body has been on screen, and the visitor has been on the page 15 s or more; once per view | `item` (post slug)                                                                                                                                                                                                                    |
 | `not-found`                          | the not-found page renders                                                                                    | none                                                                                                                                                                                                                                  |
 
+`place: nav` on `book` (or on `brief` when `SCHEDULE_URL` is unset) is the
+navigation's Contact entry since #529: the rail's bottom entry, the More sheet's
+last row and the phone header's link, all to `/book`. Before #529 it was the
+rail's orange Book, so a drop in `nav` clicks after 2026-10-21 is the change,
+not lost interest; on the home page compare `hero` plus `band`, and `brief-sent`
+plus `call-booked`, over four weeks before and after.
+
 The old event names (`nav-book`, `form-submit-audit`, `meet-embed-frame-load`
 and about 90 others) stopped on 2026-09-30. The weekly report says so until
 2026-10-14 instead of comparing across the rename.

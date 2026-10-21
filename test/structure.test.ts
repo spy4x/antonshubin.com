@@ -8,6 +8,7 @@ import {
   jsonLd,
   mainContent,
   pageBody,
+  railBottom,
   railColumn,
   visibleText,
 } from "./html.ts"
@@ -65,22 +66,22 @@ siteTest(
 )
 
 siteTest(
-  "the rail lists Book, then Work, Services, Tools, How I work and Writing",
+  "the rail lists Work, Services, Tools, Writing and How I work, then Contact last",
   async (site) => {
-    const links = [
-      ...railColumn(await site.html("/")).matchAll(
-        /<a[^>]*\bhref="([^"]*)"[^>]*>/g,
-      ),
-    ].map((m) => m[1])
-    // Book, or Write to `/book#brief` when this run has no SCHEDULE_URL.
-    assert(links[0]?.startsWith("/book"), `the rail opens on ${links[0]}`)
-    assertEquals(links.slice(1), [
+    const html = await site.html("/")
+    const hrefs = (part: string) =>
+      [...part.matchAll(/<a[^>]*\bhref="([^"]*)"[^>]*>/g)].map((m) => m[1])
+    assertEquals(hrefs(railColumn(html)), [
       "/work",
       "/catalog",
       "/tools",
-      "/how-i-work",
       "/blog",
+      "/how-i-work",
     ])
+    // `/book`, or `/book#brief` when this run has no SCHEDULE_URL.
+    const bottom = hrefs(railBottom(html))
+    assertEquals(bottom.length, 1, `rail bottom: ${bottom}`)
+    assert(bottom[0].startsWith("/book"), `the rail ends on ${bottom[0]}`)
   },
 )
 

@@ -80,7 +80,7 @@ function between(html: string, start: string, end: string): string {
   return html.slice(from, to < 0 ? undefined : to)
 }
 
-/** The desktop rail column's list: Book, then the destinations (components/Nav.tsx). */
+/** The desktop rail column's list: the destinations (components/Nav.tsx). */
 export function railColumn(html: string): string {
   return between(html, `data-e2e="rail-shell-rail"`, "</nav>")
 }
@@ -94,7 +94,17 @@ export function railTop(html: string): string {
   )
 }
 
-/** The phone tab bar: up to four entries with Book in the centre, then More. */
+/** The rail's bottom zone, under the destinations: Contact (#529). */
+export function railBottom(html: string): string {
+  return between(html, `data-e2e="rail-shell-bottom"`, "</aside>")
+}
+
+/** The phone header above the page: the portrait, the name and Contact. */
+export function phoneHeader(html: string): string {
+  return between(html, `<header class="md:hidden`, "</header>")
+}
+
+/** The phone tab bar: four entries, then More. */
 export function tabBar(html: string): string {
   return between(html, `data-e2e="rail-shell-tabbar"`, "</nav>")
 }

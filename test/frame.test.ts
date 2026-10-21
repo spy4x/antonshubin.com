@@ -87,9 +87,13 @@ siteTest(
         "/infrastructure",
         "/about",
         "/why-not-just-ai",
-        "/book",
       ]
     ) assert(hrefs.includes(href), `footer lacks ${href}`)
+    // The booking page, or its brief when this run has no SCHEDULE_URL.
+    assert(
+      hrefs.some((href) => href === "/book" || href === "/book#brief"),
+      "footer lacks /book",
+    )
     const text = visibleText(footer)
     assert(text.includes("Da Nang, Vietnam (UTC+7)"), text)
     assert(text.includes(ROLE), text)
@@ -98,13 +102,14 @@ siteTest(
 )
 
 siteTest(
-  "the phone header shows the role and no time zone, and the rail has no Links control",
+  "the phone header shows the name and Contact, no role or time zone, and the rail has no Links control",
   async (site) => {
     const html = await site.html("/")
     const start = html.indexOf("<header")
     const header = html.slice(start, html.indexOf("</header>", start))
     const text = visibleText(header)
-    assert(text.includes(ROLE), text)
+    assertEquals(text, "Anton Shubin Contact")
+    assert(!text.includes(ROLE), text)
     assert(!/UTC/.test(text), text)
     assert(!/popovertarget|nav-links/.test(html), "a Links control is back")
   },

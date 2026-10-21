@@ -652,9 +652,9 @@ Deno.test("More opens the sheet, Escape closes it and focus returns to More", as
       // Move focus into the menu before closing it, so the focus assertion
       // below actually proves Escape moves focus back to More rather than
       // merely leaving it where the earlier click put it.
-      const writing = menu.getByRole("link", { name: "Writing", exact: true })
-      await writing.focus()
-      assert(await isFocused(writing), "focus must be inside the open menu")
+      const about = menu.getByRole("link", { name: "About", exact: true })
+      await about.focus()
+      assert(await isFocused(about), "focus must be inside the open menu")
       await page.keyboard.press("Escape")
       await menu.waitFor({ state: "hidden" })
       assert(
@@ -720,12 +720,12 @@ Deno.test("Tabbing through the desktop rail goes top to bottom with upright labe
         stops.map((s) => s.label),
         [
           "Anton",
-          "Write",
           "Work",
           "Services",
           "Tools",
-          "How I work",
           "Writing",
+          "How I work",
+          "Contact",
         ],
         "the rail must be tabbed through in its visual order",
       )
@@ -786,7 +786,7 @@ Deno.test("neither the rail nor the More dialog has a Links control, and More li
       const names = await dialog.getByRole("link").allTextContents()
       assertEquals(
         names.map((n) => n.trim()),
-        ["Home", "About", "How I work", "Writing", "Infrastructure"],
+        ["Home", "About", "How I work", "Infrastructure", "Contact"],
       )
       assertEquals(
         await dialog.locator('a[href^="http"]').count(),
@@ -818,7 +818,7 @@ function tokenColour(
   }, [className, property])
 }
 
-Deno.test("a 390px phone shows five tabs with Book in the centre, the current section filled, and a backdrop tap closes the sheet", async () => {
+Deno.test("a 390px phone shows five tabs with no Book, the current section filled, and a backdrop tap closes the sheet", async () => {
   const site = await startSite({ env: { SCHEDULE_URL: "" } })
   let browser: Browser | undefined
   try {
@@ -837,7 +837,7 @@ Deno.test("a 390px phone shows five tabs with Book in the centre, the current se
       await load("/catalog")
       assertEquals(
         (await tabs.allInnerTexts()).map((t) => t.trim()),
-        ["Work", "Services", "Write", "Tools", "More"],
+        ["Work", "Services", "Tools", "Writing", "More"],
       )
       for (let i = 0; i < 5; i++) {
         const box = await tabs.nth(i).boundingBox()
@@ -848,12 +848,14 @@ Deno.test("a 390px phone shows five tabs with Book in the centre, the current se
           `tab ${i} must sit inside the 390px viewport: ${JSON.stringify(box)}`,
         )
       }
-      const book = await tabs.nth(2).boundingBox()
-      assert(book)
-      assert(
-        Math.abs(book.x + book.width / 2 - MOBILE_VIEWPORT.width / 2) < 2,
-        `Book must be centred: ${JSON.stringify(book)}`,
-      )
+      // No tab is filled with the accent (#529): Book lives in the page.
+      const accent = await tokenColour(page, "bg-accent", "backgroundColor")
+      for (let i = 0; i < 5; i++) {
+        assert(
+          (await fill(tabs.nth(i))) !== accent,
+          `tab ${i} is filled with the accent`,
+        )
+      }
 
       // The current page: a Lamp fill. An idle tab has none.
       const services = tabs.nth(1)
@@ -871,7 +873,7 @@ Deno.test("a 390px phone shows five tabs with Book in the centre, the current se
 
       // A page listed under More: More itself is filled, and inside the
       // sheet the page's own link is marked current.
-      await load("/blog")
+      await load("/how-i-work")
       const more = tabs.nth(4)
       assertEquals(
         await fill(more),
@@ -882,7 +884,7 @@ Deno.test("a 390px phone shows five tabs with Book in the centre, the current se
       const menu = page.getByRole("dialog", { name: "More" })
       await menu.waitFor({ state: "visible" })
       assertEquals(
-        await menu.getByRole("link", { name: "Writing", exact: true })
+        await menu.getByRole("link", { name: "How I work", exact: true })
           .getAttribute("aria-current"),
         "page",
         "the More sheet must mark the current page's link",

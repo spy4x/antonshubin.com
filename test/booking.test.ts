@@ -241,7 +241,8 @@ Deno.test("without SCHEDULE_URL the booking page leads with the written brief", 
     const html = await site.html("/book")
     assertEquals(h1s(html), ["Send a written brief"])
     // The form hides its own "Send a written brief" heading under this H1.
-    assertEquals(count(visibleText(html), /Send a written brief/g), 1)
+    // The footer's Contact group links the brief in the same words.
+    assertEquals(count(visibleText(pageBody(html)), /Send a written brief/g), 1)
     assert(
       /<section\b[^>]*id="brief"/.test(html) && html.includes("data-lead-form"),
       "/book: the brief form is not on the page without a scheduler",
