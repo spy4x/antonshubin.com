@@ -18,16 +18,29 @@ export const SAAS_MVP_SLUG = "zero-to-production-saas-mvp";
 /** The line above the H1: the phrase a buyer searches for. */
 export const SAAS_MVP_EYEBROW = "SaaS MVP development";
 
+/** The ownership promise as a clause: its title, decapitalized, then its `desc`. */
+function ownershipClause(): string {
+  const ownership = promise("ownership");
+  return `${decapitalize(ownership.title)}. ${ownership.desc}`;
+}
+
 /**
- * The page's opening answer: cost, time and ownership in two sentences an
- * answer engine can quote alone.
+ * The page's lead under the H1: what I build and who owns it. No price or
+ * time, because the price card right below says both (#501).
+ */
+export function saasMvpLead(): string {
+  return `I build SaaS MVPs on Seed, and ${ownershipClause()}`;
+}
+
+/**
+ * The answer an engine can quote alone: cost, time and ownership in two
+ * sentences, for the meta description and `llms-full.txt`.
  */
 export function saasMvpAnswer(): string {
   const item = catalogItem(SAAS_MVP_SLUG);
-  const ownership = promise("ownership");
   return `I build SaaS MVPs on Seed ${decapitalize(priceLabel(item))}, live ${
     decapitalize(item.delivery)
-  }. ${ownership.title}: ${decapitalize(ownership.desc)}`;
+  }, and ${ownershipClause()}`;
 }
 
 export const WHY_IT_COSTS_LESS_HEADING = "Why it costs less";
@@ -54,13 +67,13 @@ export function saasMvpFaqs(): Faq[] {
     {
       id: "technical",
       q: "Do I need to know anything technical?",
-      a: "No: I explain every decision in plain words, with its cost and its trade-off, and you choose.",
+      a: "No. I explain every decision in plain words, with its cost and its trade-off, and you choose.",
     },
     sharedFaq("pricing"),
     {
       id: "another-developer",
       q: "Can I hire another developer later?",
-      a: `Yes: Seed is public and documented, so any TypeScript developer can pick it up. ${
+      a: `Yes. Seed is public and documented, so any TypeScript developer can pick it up. ${
         promise("ownership").desc
       }`,
     },

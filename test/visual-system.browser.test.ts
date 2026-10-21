@@ -691,3 +691,95 @@ Deno.test("no class in routes, components or islands uses the accent except as a
   assert(scanned > 50, `only ${scanned} source files were scanned`);
   assertEquals(offenders, [], offenders.join("\n"));
 });
+
+/** The tops and bottoms of the SaaS MVP page's first screen, in CSS pixels. */
+function firstScreen(page: Page): Promise<Record<string, number[]>> {
+  return page.evaluate(() => {
+    const box = (selector: string) => {
+      const r = document.querySelector(selector)!.getBoundingClientRect();
+      return [Math.round(r.top), Math.round(r.bottom)];
+    };
+    return {
+      h1: box("h1"),
+      lead: box("[data-service-lead]"),
+      card: box("[data-service-card]"),
+      book: box("[data-service-card] [data-primary-book]"),
+    };
+  });
+}
+
+Deno.test("the SaaS MVP card's Book sits above the phone tab bar at 390 × 844 (#501)", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+  });
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    });
+    await page.goto(`${site.origin}/catalog/zero-to-production-saas-mvp`, {
+      waitUntil: "networkidle",
+    });
+    await page.evaluate(() => document.fonts.ready);
+    const { book, barTop } = await page.evaluate(() => ({
+      book: document.querySelector("[data-service-card] [data-primary-book]")!
+        .getBoundingClientRect().bottom,
+      barTop: document.querySelector('[data-e2e="rail-shell-tabbar"]')!
+        .getBoundingClientRect().top,
+    }));
+    assert(
+      book <= barTop,
+      `Book ends at ${book}px, the tab bar starts at ${barTop}px`,
+    );
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
+
+// Lighthouse's phone is 412px wide; 390px is the site's own phone check.
+for (const width of [390, 412]) {
+  Deno.test(`the SaaS MVP page's first screen stays put when the web fonts arrive, at ${width}px (#501)`, async () => {
+    const site = await startSite({
+      env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
+    });
+    let browser: Browser | undefined;
+    try {
+      browser = await launchChromium();
+      const shots: Record<string, number[]>[] = [];
+      for (const blockFonts of [true, false]) {
+        const page = await newPage(browser, {
+          viewport: { width, height: 844 },
+        });
+        if (blockFonts) await page.route(/\.woff2$/, (r) => r.abort());
+        await page.goto(`${site.origin}/catalog/zero-to-production-saas-mvp`, {
+          waitUntil: "networkidle",
+        });
+        await page.evaluate(() => document.fonts.ready);
+        if (blockFonts) {
+          // Fail loudly when no measured fallback face resolves here, so the
+          // comparison below never passes on plain serif or on DejaVu Serif,
+          // whose face reuses Georgia's numbers.
+          const used = await page.evaluate(() =>
+            [...document.fonts].filter((f) => f.status === "loaded")
+              .map((f) => f.family)
+          );
+          assert(
+            used.some((f) =>
+              f.startsWith("Literata Fallback") &&
+              f !== "Literata Fallback DejaVu"
+            ),
+            `no Literata fallback face resolved (needs Georgia, Times New Roman, Liberation Serif or Noto Serif): ${used}`,
+          );
+        }
+        shots.push(await firstScreen(page));
+        await page.close();
+      }
+      assertEquals(shots[0], shots[1], "fallback first, web fonts second");
+    } finally {
+      await browser?.close();
+      await site.stop();
+    }
+  });
+}

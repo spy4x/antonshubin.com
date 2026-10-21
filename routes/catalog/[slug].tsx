@@ -49,6 +49,7 @@ import {
   SAAS_MVP_SLUG,
   saasMvpAnswer,
   saasMvpFaqs,
+  saasMvpLead,
   WHY_IT_COSTS_LESS,
   WHY_IT_COSTS_LESS_HEADING,
 } from "../../lib/saas-mvp.ts";
@@ -90,8 +91,9 @@ export default define.page(function CatalogDetail(ctx) {
   }
 
   const canonical = `https://antonshubin.com/catalog/${item.slug}`;
-  // The SaaS MVP page is the one hire page (#484): it opens with a quotable
-  // answer and ends with questions.
+  // The SaaS MVP page is the one hire page (#484): it ends with questions,
+  // and its meta description is a quotable answer with the price and time,
+  // which the visible lead leaves to the price card (#501).
   const isMvp = item.slug === SAAS_MVP_SLUG;
   const answer = isMvp ? saasMvpAnswer() : undefined;
   const questions = isMvp ? saasMvpFaqs() : [];
@@ -189,7 +191,7 @@ export default define.page(function CatalogDetail(ctx) {
             data-service-lead
             class="mt-4 font-heading text-xl text-parchment leading-snug text-balance"
           >
-            {answer ?? item.outcome}
+            {isMvp ? saasMvpLead() : item.outcome}
           </p>
         </header>
 

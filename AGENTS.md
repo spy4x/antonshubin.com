@@ -593,21 +593,21 @@ for bandwidth. The hard "LCP no worse than before" rule beats issue #184's
 original preload suggestion here; see the #184 PR body for the numbers.
 
 **Fallback faces use real metrics, not guesses.** Each web font is followed
-immediately by its fallback face in the font stack
-(`"Literata", "Literata
-Fallback", serif`; same shape for Plex Sans), and each
-fallback face lists several `local()` names so it actually resolves on more than
-one OS (Georgia/Times New Roman/DejaVu Serif/Liberation Serif/Noto Serif for
-Literata; Arial/Helvetica/Liberation Sans/DejaVu Sans/Noto Sans for Plex Sans).
-The `size-adjust`/`ascent-override`/`descent-override`/ `line-gap-override`
-values are computed with the same formula Fontaine/ next/font use, from each web
-font's own OS/2 and hhea metrics (read straight from the `.woff2` files with
-`npm:fontkit`) against Georgia's and Arial's published metrics
-(`@capsizecss/metrics` — neither ships as a file this repo can read) — not
-guessed. Measured under the slow-network profile below, layout shift from the
-swap is effectively zero (cumulative layout shift ≈ 0.0004 on `/` at 390px).
-`lib/csp.ts`'s `font-src 'self'` already covered same-origin font files —
-self-hosting needed no CSP change.
+immediately by its fallback faces in the font stack, one face per group of local
+fonts that share metrics, so each resolves on more than one OS: Georgia, then
+Times New Roman or Liberation Serif, then Noto Serif, then DejaVu Serif for
+Literata; Arial, Helvetica, Liberation Sans or DejaVu Sans, then Noto Sans for
+Plex Sans. The Georgia and Arial faces' `size-adjust`/`ascent-override`/
+`descent-override`/`line-gap-override` values are computed with the same formula
+Fontaine/next/font use, from each web font's own OS/2 and hhea metrics (read
+straight from the `.woff2` files with `npm:fontkit`) against Georgia's and
+Arial's published metrics (`@capsizecss/metrics`). The Times, Noto Serif and
+Noto Sans faces' `size-adjust` is a measured width ratio (#501, see the comment
+in `assets/styles.css`), because Georgia's numbers made the SaaS MVP page's H1
+wrap differently and shift. Not guessed. Measured under the slow-network profile
+below, layout shift from the swap is effectively zero (cumulative layout shift ≈
+0.0004 on `/` at 390px). `lib/csp.ts`'s `font-src 'self'` already covered
+same-origin font files — self-hosting needed no CSP change.
 
 ### `scripts/lcp.ts`
 
