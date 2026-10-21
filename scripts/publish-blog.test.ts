@@ -190,11 +190,11 @@ Deno.test("a send that cannot start over ssh exits 1 after publishing on Dev.to"
 Deno.test("a second run updates the one Dev.to article and hands the container the same slug to refuse", async () => {
   // A Dev.to that remembers what it was given, behind the real publishOnDevTo.
   const articles: { id: number; canonical_url: string }[] = []
-  const methods: string[] = []
+  const calls: string[] = []
   const originalFetch = globalThis.fetch
-  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+  globalThis.fetch = ((url: string, init?: RequestInit) => {
     const method = init?.method ?? "GET"
-    methods.push(method)
+    calls.push(`${method} ${url.replace("https://dev.to/api", "")}`)
     if (method === "GET") return Promise.resolve(Response.json(articles))
     if (method === "POST") {
       const { article } = JSON.parse(String(init?.body))
@@ -224,7 +224,12 @@ Deno.test("a second run updates the one Dev.to article and hands the container t
     globalThis.fetch = originalFetch
   }
   assertEquals(articles.length, 1)
-  assertEquals(methods, ["GET", "POST", "GET", "PUT"])
+  assertEquals(calls, [
+    "GET /articles/me/all?per_page=1000",
+    "POST /articles",
+    "GET /articles/me/all?per_page=1000",
+    "PUT /articles/1",
+  ])
   assertEquals([...sent], ["a-test-post"])
 })
 
