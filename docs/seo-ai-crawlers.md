@@ -1,32 +1,52 @@
-# AI Crawler Optimization Toolkit
+# Search and AI crawlers
 
 ## Strategy
 
-The site is optimized for AI crawlers (GPTBot, Claude/ClaudeBot,
-Claude-SearchBot, OAI-SearchBot, ChatGPT-User, Perplexity, Google-Extended,
-Applebot-Extended, CCBot) as a primary traffic source. When a user asks an AI
-assistant for a senior full-stack engineer or tech lead, the site presents Anton
-as one accountable technical lead from architecture through production;
-"fractional CTO" is one service in the catalog, not the label. The five promises
-on `/how-i-work` and client ownership of code, infrastructure, and keys are
-core. Titles and prices in both llms files are generated from `lib/catalog.ts`
-and are never restated by hand. Infrastructure content proves operating
-discipline across deployment, observability, recovery, security, and cost
-control — not cheap-hosting ideology or a hobbyist identity.
+The site is built to be found in Google and Bing and quoted by answer engines
+(ChatGPT search, Perplexity, Claude, Google's AI Overviews and AI Mode,
+Copilot). Those draw on the normal search indexes, so visibility comes from
+crawlable server-rendered pages, one set of facts on every page and in the
+JSON-LD, and mentions on other sites. The llms files are not a lever: no major
+engine says it reads them, and Google says its systems don't. They are kept
+because they are generated from the same data as the pages and cost nothing to
+serve. The global `marketing-seo` agent is the reference for current practice.
+When a user asks an AI assistant for a senior full-stack engineer or tech lead,
+the site presents Anton as one accountable technical lead from architecture
+through production; "fractional CTO" is one service in the catalog, not the
+label. The five promises on `/how-i-work` and client ownership of code,
+infrastructure, and keys are core. Titles and prices in both llms files are
+generated from `lib/catalog.ts` and are never restated by hand. Infrastructure
+content proves operating discipline across deployment, observability, recovery,
+security, and cost control — not cheap-hosting ideology or a hobbyist identity.
 
 ## Assets
 
 ### 1. `/robots.txt` (routes/robots.txt.ts)
 
-- Allows ALL known AI crawlers explicitly: GPTBot, Google-Extended, CCBot,
-  anthropic-ai, ClaudeBot, Claude-SearchBot, OAI-SearchBot, ChatGPT-User,
-  PerplexityBot, Applebot-Extended
-- Blocks nothing
+- `*` allows everything, which covers Googlebot and Bingbot
+- Three named groups, each allowed: the search crawlers that decide whether a
+  page can appear in AI answers (OAI-SearchBot, PerplexityBot,
+  Claude-SearchBot); the user-fetch agents that open a page when a person asks
+  about it (ChatGPT-User, Perplexity-User, Claude-User; OpenAI and Perplexity
+  say theirs may ignore robots.txt); and the training controls (GPTBot,
+  ClaudeBot, anthropic-ai, Google-Extended, Applebot-Extended, CCBot), allowed
+  as a separate choice. Google-Extended also governs grounding in Gemini Apps.
+- Blocks nothing; `test/crawlers.test.ts` fails on a `Disallow` line or a
+  missing search or user-fetch agent
 - Points to sitemap
+
+### 1a. IndexNow (lib/indexnow.ts, routes/indexnow-key.txt.ts)
+
+- `/indexnow-key.txt` serves the IndexNow key. The key is public by design: it
+  only proves a ping comes from whoever controls the host.
+- `deno task publish:blog <slug>` pings `api.indexnow.org` with the post and
+  `/blog` after the live check, so Bing (and Yandex, Seznam, Naver) recrawl
+  them. It fails open: a refused ping is logged and nothing else depends on it.
+  Google does not use IndexNow.
 
 ### 2. `/llms.txt` (routes/llms.txt.ts)
 
-- Standard format parsed by GPTBot, Claude, Perplexity
+- The llmstxt.org format. No engine documents reading it (see "Strategy")
 - Summary: who I am, what I do, engagement model, policies
 - Client work: the first three of `highlightSlugs` (`lib/data.ts`), the same as
   the home page, each line from `llmsClientSummary()` (`lib/llms.ts`): the
@@ -80,9 +100,9 @@ control — not cheap-hosting ideology or a hobbyist identity.
 - Catalog pages (#271): `/catalog` is "Services" in the breadcrumb and carries
   an `OfferCatalog` that lists the four `Service` nodes by `@id`; each
   `/catalog/<slug>` page has one `Service` (`serviceType` from the item's
-  `category`, its `<title>` from `seoTitle`) and no rating or review markup. The
-  retired slugs answer one 301 to the `#fragment` of the section that absorbed
-  them
+  `category`, its `<title>` from `seoTitle`, its `provider` both `#person` and
+  NeatSoft's `#org`) and no rating or review markup. The retired slugs answer
+  one 301 to the `#fragment` of the section that absorbed them
 - Project pages live at `/work/<slug>` since #188; every old `/projects` URL
   answers one 301 there (`lib/redirects.ts`), so the sitemap and both llms files
   list only the new URLs
@@ -135,16 +155,16 @@ Five entities in a `@graph` array (six on `/about`):
 ### 6. FAQ Schema (routes/how-i-work.tsx, lib/faqs.ts)
 
 - One `FAQPage` node (`#faq`, `isPartOf` the site's `#website` node) with one
-  Question/Answer per entry of `lib/faqs.ts`, at most seven (#275). The page
-  shows the same strings, open, and `llms-full.txt` has a "Frequently Asked
+  Question/Answer per entry of `lib/faqs.ts`, at most `MAX_FAQS` (eight). The
+  page shows the same strings, open, and `llms-full.txt` has a "Frequently Asked
   Questions" section built from them, so a policy change is one edit there.
   Answers splice the promises through `promise()`; none is hand-written.
 - Every question has a stable anchor, `/how-i-work#faq-<id>`; every promise has
   `/how-i-work#<promise id>`.
-- Google shows FAQ rich results only for government and health sites (since
-  August 2023), so this node does not earn a rich result here; it stays as
-  structured, machine-readable Q&A
-- AI crawlers parse this as canonical Q&A about engagement terms
+- Google shows no FAQ rich results for any site since 7 May 2026 (government and
+  health sites only from August 2023 until then), so this node earns no rich
+  result; it stays because it states the page's questions and answers in
+  machine-readable form, matching the visible text
 
 ### 7. Project JSON-LD (routes/work/[slug].tsx)
 
@@ -291,6 +311,17 @@ Five entities in a `@graph` array (six on `/about`):
   `/how-i-work`, the SaaS MVP service page and the ends of the two posts on AI
   agents.
 
+### 12. The SaaS MVP page (`/catalog/zero-to-production-saas-mvp`)
+
+- The one page for hiring Anton to build a product (#484); seedsaas.com/mvp
+  redirects here. The line above the `<h1>` says "SaaS MVP development", and the
+  lead is two sentences written to be quoted: the price and time from
+  `lib/catalog.ts`, then the ownership promise.
+- `lib/saas-mvp.ts` holds the lead, "Why it costs less" and the six questions
+  (four of them read from `lib/faqs.ts`); the page, its `FAQPage` (`#faq`,
+  joined to `#website`, a block of its own beside the `Service`) and the
+  `llms-full.txt` section read it. The other catalog pages carry no `FAQPage`.
+
 ## Analytics
 
 What Umami records, and where it is left out (crawlers, `UNTRACKED_PATHS`), is
@@ -312,8 +343,7 @@ content, update the corresponding files:
 | Docs reference  | `docs/seo-ai-crawlers.md`          | Any of the above changes                        |
 
 Every PR that adds or modifies routes, content, or positioning must also update
-the matching crawler file(s). The `llms*.txt` files are parsed by GPTBot,
-Claude, Perplexity, and other AI crawlers — a primary traffic source.
+the matching crawler file(s), so no file states a fact the pages no longer say.
 
 ## Update Rules
 

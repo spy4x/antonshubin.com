@@ -12,8 +12,8 @@
  *
  * `--preview` needs no live post. The other runs first check that `https://antonshubin.com/blog/<slug>` answers
  * 200 and stop otherwise. The default run creates or updates the Dev.to draft, prints
- * every channel's tagged link and the newsletter's subject and body, and sends
- * nothing. `--send-newsletter` sends the announcement from the production
+ * every channel's tagged link and the newsletter's subject and body, pings
+ * IndexNow with the post and `/blog` (fail-open), and sends nothing else. `--send-newsletter` sends the announcement from the production
  * container over SSH, where `scripts/send-newsletter.ts --stdin-json` refuses
  * a slug it already sent.
  */
@@ -26,6 +26,7 @@ import { linkLines } from "./links.ts";
 import { articleCampaign } from "./utm.ts";
 import { postLetter } from "@/lib/letter.ts";
 import type { PostAnnouncement } from "./send-newsletter.ts";
+import { pingIndexNow } from "@/lib/indexnow.ts";
 
 /** Production, hardcoded like `scripts/devto.ts`: the live check and every link point here. */
 export const SITE = "https://antonshubin.com";
@@ -238,6 +239,7 @@ export async function publishBlog(
     post.campaign,
     post.article.coverImage,
   );
+  deps.log(await pingIndexNow(deps.fetch, SITE, [url, `${SITE}/blog`]));
 
   deps.log(`\nTagged links (campaign ${post.campaign}):`);
   for (const line of linkLines(SITE, `/blog/${args.slug}`, post.campaign)) {

@@ -7,35 +7,45 @@ export const handler = define.handlers({
 Allow: /
 Sitemap: ${BASE_URL}/sitemap.xml
 
-# AI crawlers — all welcome, index everything
-User-agent: GPTBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: anthropic-ai
+# Search crawlers: they decide whether a page can appear in an engine's
+# results and AI answers. Googlebot and Bingbot are covered by "*" above.
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: PerplexityBot
 Allow: /
 
-User-agent: Applebot-Extended
+User-agent: Claude-SearchBot
+Allow: /
+
+# User-fetch agents: they open a page when a person asks an assistant about it.
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# Training controls: a separate choice. This site allows them.
+# Google-Extended also governs grounding in Gemini Apps.
+User-agent: GPTBot
 Allow: /
 
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: Claude-SearchBot
+User-agent: anthropic-ai
 Allow: /
 
-User-agent: OAI-SearchBot
+User-agent: Google-Extended
 Allow: /
 
-User-agent: ChatGPT-User
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
 Allow: /
 `;
 
