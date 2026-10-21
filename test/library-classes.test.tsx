@@ -21,6 +21,7 @@ import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import { WindowFrame } from "@spy4x/preact-ui/window-frame";
 import { DemoVideo } from "@spy4x/preact-ui/demo-video";
 import { ComparisonTable } from "@spy4x/preact-ui/comparison-table";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -183,6 +184,16 @@ function renderedLibraryMarkup(): string {
     // on the server (#458).
     render(
       <OrbitSlice live={{ label: "Guide", href: "https://example.com" }} />,
+    ),
+    // /tools/zond's Ask zond request switch: a checked and an unchecked chip.
+    render(
+      <RadioChips
+        legend="Asks"
+        legendClass="font-semibold"
+        name="q"
+        defaultValue="a"
+        options={[{ value: "a", label: "A" }, { value: "b", label: "B" }]}
+      />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
     // and a page only the More sheet lists; with Book and with Write, and
