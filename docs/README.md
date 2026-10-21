@@ -3,6 +3,8 @@
 How antonshubin.com is built, deployed and published. `AGENTS.md` at the repo
 root holds the code structure, tasks and conventions.
 
+- [Design brief](design/brief.md): who the site is for, its job, voice, brand
+  and the reference products every design role reads first.
 - [Deploy](deploy.md): deploy to the cloudlab host, the Cloudflare purge,
   subscriber data, env files and the age key.
 - [Publishing a blog post](publishing.md): from idea to a live post, the Dev.to
