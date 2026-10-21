@@ -926,7 +926,7 @@ export const tools: Tool[] = [
       "You deploy to serverless functions rather than a server you run.",
     ],
     repo: "spy4x/seed",
-    live: { label: "Open the live demo", href: "https://app.seedsaas.com" },
+    live: { label: "Open the live demo", href: "https://seedsaas.com" },
     runtime: "Deno",
     programmingLanguage: "TypeScript",
     usedFor: "The base of every SaaS MVP I build for clients.",

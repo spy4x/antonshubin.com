@@ -64,8 +64,7 @@ export interface EventProps {
   item?: string
   /**
    * `outbound` only: a short name for where the link goes (`upwork`,
-   * `github`, `issues`, `live`, `website`, `registry`, `demo-app`,
-   * `demo-admin` …).
+   * `github`, `issues`, `live`, `website`, `registry`, `demo-app` …).
    */
   to?: string
   /** `cta` only: the internal path the link opens. */

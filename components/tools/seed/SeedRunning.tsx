@@ -1,7 +1,8 @@
 import { IconArrowUpRight } from "@spy4x/preact-icons"
 import { NewTabHint } from "../../NewTabHint.tsx"
 import { eventAttrs } from "../../../lib/analytics.ts"
-import { DEMO_ADMIN, DEMO_APP, DEMO_NOTE } from "./demo.ts"
+import ToolHeroClip from "../../../islands/ToolHeroClip.tsx"
+import { ADMIN_VIDEO, DEMO_APP, DEMO_NOTE } from "./demo.ts"
 
 /** One live surface of Seed: a host, what it is, and its shot. */
 interface Surface {
@@ -31,17 +32,6 @@ const SURFACES: Surface[] = [
       "Seed's demo app in the dark theme: the Notes page of the group Product team, with tag filters and notes such as Release notes for 2.4.",
   },
   {
-    id: "admin",
-    href: DEMO_ADMIN,
-    to: "demo-admin",
-    title: "The admin panel",
-    line: "It runs on a host of its own.",
-    linkLabel: "Open the admin panel",
-    shot: "running-admin",
-    alt:
-      "Seed's demo admin panel: the Users page with a search box, status and role filters, and a table of people with their role and status.",
-  },
-  {
     id: "site",
     href: "https://seedsaas.com",
     to: "website",
@@ -56,12 +46,18 @@ const SURFACES: Surface[] = [
 /** A card's shot `sizes`: a third from 1024px, a half from 640px. */
 const SIZES = "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
 
+/** The admin video's poster `sizes`: two thirds from 1024px, the content width below. */
+const VIDEO_SIZES = "(min-width: 1024px) 46rem, calc(100vw - 2rem)"
+
 /**
- * "See it running" (#455): Seed's three live surfaces, each one card that
- * is one link to the real thing in a new tab (`outbound`, `place: body`),
- * then the demo note. Three columns from 1024px, two from 640px. The shot
- * sits inside the link, so the lightbox leaves it alone; the link is
- * named by its "Open …" line and described by the card's title and line.
+ * "See it running" (#455): the app and the website, each one card that is
+ * one link to the real thing in a new tab (`outbound`, `place: body`), and
+ * Seed's admin panel as a video (#521: visitors get no admin sign-in), then
+ * the demo note. From 1024px the two cards stack in the first column and the
+ * video fills the other two; from 640px the cards sit side by side above
+ * it. A card's shot sits inside the link, so the lightbox leaves it alone;
+ * the link is named by its "Open …" line and described by the card's title
+ * and line.
  */
 export function SeedRunning() {
   return (
@@ -129,6 +125,31 @@ export function SeedRunning() {
             </li>
           )
         })}
+        <li
+          class="min-w-0 sm:col-span-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+          data-seed-admin-video
+        >
+          <figure
+            aria-labelledby="running-admin-title"
+            class="flex h-full flex-col overflow-hidden rounded-xl border border-rule bg-paper"
+          >
+            <div class="border-b border-rule">
+              <ToolHeroClip
+                item="seed"
+                place="body"
+                title={ADMIN_VIDEO.title}
+                sources={ADMIN_VIDEO.sources}
+                poster={{ ...ADMIN_VIDEO.poster, sizes: VIDEO_SIZES }}
+              />
+            </div>
+            <figcaption class="p-4 sm:p-5">
+              <h3 id="running-admin-title" class="text-lg text-parchment">
+                {ADMIN_VIDEO.title}
+              </h3>
+              <p class="mt-1 text-graphite">{ADMIN_VIDEO.caption}</p>
+            </figcaption>
+          </figure>
+        </li>
       </ul>
       <p data-seed-demo-note class="mt-4 max-w-3xl text-sm text-graphite">
         {DEMO_NOTE}
