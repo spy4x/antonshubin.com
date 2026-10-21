@@ -72,7 +72,20 @@ for (const javaScript of [true, false]) {
           await page.locator("label", { hasText: label }).click({
             timeout: WAIT_MS,
           });
-          await page.waitForLoadState("networkidle");
+          // The picture starts loading only after the click restyles it, so
+          // "networkidle" can resolve before its request; wait for the image.
+          await page.waitForFunction(
+            () => {
+              const img = [
+                ...document.querySelectorAll<HTMLImageElement>(
+                  "section[aria-labelledby=config-to-card] img",
+                ),
+              ].find((i) => i.checkVisibility());
+              return img?.complete && img.naturalWidth > 0;
+            },
+            undefined,
+            { timeout: WAIT_MS },
+          );
           assertEquals(await shown.count(), 1);
           assert(
             (await shown.getAttribute("src"))?.includes(`card-${state}.webp`),
