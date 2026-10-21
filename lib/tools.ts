@@ -503,6 +503,23 @@ export const tools: Tool[] = [
       "One page for every self-hosted service, with its status and 30-day uptime from gatus.",
     lede:
       "You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days.",
+    clip: {
+      title: "oko: add a service to config.json, reload, search the dashboard",
+      caption:
+        'A demo config: add a Speed test service to config.json, reload to see its card, search for "pho", and end on up, down and unknown cards. 26\u00a0s, no sound.',
+      frame: "browser",
+      frameTitle: "localhost:8080",
+      poster: {
+        src: "/video/tools/oko/poster.webp",
+        srcset:
+          "/video/tools/oko/poster-640.webp 640w, /video/tools/oko/poster.webp 1280w",
+        alt:
+          "The oko dashboard titled Jane Doe's servers, with a Home and a Cloud section of service cards with 30-day uptime pills, Email marked down with a red border, and File sync marked unknown.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT26S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "caldav-mcp",

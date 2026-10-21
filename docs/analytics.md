@@ -250,7 +250,13 @@ None yet.
 
 ### oko
 
-None yet.
+`routes/tools/oko.tsx` (#464) sends, besides the frame's events:
+
+- `tool-try` (`item: oko`, `part` `state:up`, `state:down` or `state:unknown`):
+  a state in "From config to card" is chosen. The attributes sit on the native
+  radio, which gets a click from a press on its label or from the arrow keys.
+- `tool-install-copy` (`item: oko`): the config entry or a quick-start block
+  (`compose.yml`, `config.json`) is copied.
 
 ### preact-components
 
