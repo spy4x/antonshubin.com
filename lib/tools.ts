@@ -939,18 +939,18 @@ export const tools: Tool[] = [
     clip: {
       title: "Seed, from cloning the repository to the app and the admin panel",
       caption:
-        "From an empty folder to the app and the admin panel in 37\u00a0s.",
+        "1\u00a0min, with captions and music: clone Seed, write the env file with one command, start every service, write a note the whole team can read, then find a teammate in the admin panel on its own host.",
       frame: "bare",
       poster: {
         src: "/video/tools/seed/poster.webp",
         srcset:
-          "/video/tools/seed/poster-544.webp 544w, /video/tools/seed/poster-1088.webp 1088w, /video/tools/seed/poster.webp 1440w",
+          "/video/tools/seed/poster-640.webp 640w, /video/tools/seed/poster.webp 1280w",
         alt:
-          "Seed's web app in the dark theme at app.localhost: the Notes page of the group Demo team, with the new note Launch checklist for Friday at the top, tagged Roadmap, above four older notes.",
-        width: 1440,
-        height: 900,
+          "Seed's web app in the dark theme: the Notes page of the group Product team, with the tag filters bug, done, idea and roadmap above notes such as Search is slow on large accounts and Ideas for the referral program.",
+        width: 1280,
+        height: 800,
       },
-      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+      video: { duration: "PT1M", uploadDate: "2026-10-21" },
     },
     quickStart: {
       label: "Start a product from it",

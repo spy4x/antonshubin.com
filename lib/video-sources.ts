@@ -34,11 +34,7 @@ function demo(slug: string, commit: string, repo = slug): VideoSource {
   }
 }
 
-/**
- * Every pulled clip. Seed's own demo is not here yet: its clip with captions
- * and music waits for spy4x/seed#357, so `static/video/tools/seed/demo.*`
- * stays the copy committed before #521. Seed's admin panel video is.
- */
+/** Every pulled clip, and Seed's admin panel video. */
 export const VIDEO_SOURCES: readonly VideoSource[] = [
   demo("mig", "90f50f33f6785efecf1d2fe8994546281866010f"),
   demo("oko", "d93c6b329fcd47d4a9bef91533fdbe0c52f45cf1"),
@@ -49,6 +45,7 @@ export const VIDEO_SOURCES: readonly VideoSource[] = [
   demo("rostok", "892f7057b71e6b7bdb7f167863a896db818c6ae1"),
   demo("ts-libs", "d58a2176f21c78a366aa13dfd837aefe5405362b"),
   demo("dotfiles", "435f9df29e506a555cd3c48e178fa460aac20376"),
+  demo("seed", "3a14e887ed99f2a269a5b9554d884fa537a16278"),
   {
     slug: "seed",
     repo: "seed",

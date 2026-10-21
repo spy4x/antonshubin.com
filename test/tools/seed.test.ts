@@ -56,7 +56,7 @@ seedTest(
     )
     assert(
       visibleText(page).includes(
-        "From an empty folder to the app and the admin panel in 37 s.",
+        "1 min, with captions and music: clone Seed, write the env file",
       ),
       "no clip caption",
     )
