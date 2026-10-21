@@ -1,85 +1,85 @@
-import { type BlogArticle, loadBlogArticles } from "./blog-posts.ts";
+import { type BlogArticle, loadBlogArticles } from "./blog-posts.ts"
 
-export type { BlogArticle };
+export type { BlogArticle }
 
 export interface Project {
-  title: string;
-  slug?: string;
-  externalURL?: string;
-  externalURLDead?: boolean;
-  description: string;
-  logoImageURL?: string;
+  title: string
+  slug?: string
+  externalURL?: string
+  externalURLDead?: boolean
+  description: string
+  logoImageURL?: string
   /**
    * The logo was drawn for a light background and nearly disappears on the
    * dark cards: render it on a light Parchment plate (`bg-parchment`).
    */
-  logoPlate?: boolean;
-  logoText?: string;
-  logoTextStyle?: string;
-  role?: string;
-  tags?: string[];
-  screenshotURLs?: string[];
+  logoPlate?: boolean
+  logoText?: string
+  logoTextStyle?: string
+  role?: string
+  tags?: string[]
+  screenshotURLs?: string[]
   /**
    * Intrinsic pixel size shared by every file in `screenshotURLs`, used to
    * set `width`/`height` on the `<img>` so the layout doesn't jump while it
    * loads. Optional — galleries whose files vary in size leave this unset.
    */
-  screenshotSize?: { width: number; height: number };
+  screenshotSize?: { width: number; height: number }
   /**
    * The picture on the project's `/work` highlight card (#270): a WebP about
    * 720px wide made from the first screenshot, with its pixel size. A phone
    * screenshot is its own narrow file, centred on a Lamp panel in the card's
    * 16:10 frame. Without one the frame shows the logo.
    */
-  cardImage?: { src: string; width: number; height: number };
-  videoURL?: string;
-  madeForName?: string;
-  madeForURL?: string;
-  archived?: boolean;
-  outcome?: string;
+  cardImage?: { src: string; width: number; height: number }
+  videoURL?: string
+  madeForName?: string
+  madeForURL?: string
+  archived?: boolean
+  outcome?: string
   /** Margin note id (`lib/notes.ts`) that sources `outcome`. */
-  outcomeNote?: string;
+  outcomeNote?: string
   /** Margin note id (`lib/notes.ts`) that sources the live `externalURL`. */
-  externalURLNote?: string;
+  externalURLNote?: string
   /**
    * The live link's text in the project page's fact card, when the link is
    * not the product itself (the code review's `externalURL` is the published
    * report). Without it the card shows the bare host.
    */
-  externalURLLabel?: string;
+  externalURLLabel?: string
   /**
    * The `lib/catalog.ts` item closest to this work today, by its role and
    * scope: the project page links it as "Similar work today". A typo throws
    * in `catalogItem()` when the page renders (`lib/data.test.ts` checks
    * every client project).
    */
-  catalogSlug?: string;
+  catalogSlug?: string
   /**
    * When the work happened, in whole years. Every client project carries
    * one (`lib/data.test.ts`); `formatPeriod()` renders it.
    */
-  period?: Period;
+  period?: Period
   /**
    * Something the client company achieved later, without Anton: shown on the
    * project's /work archive row, worded as the company's outcome.
    */
-  companyOutcome?: { text: string; href: string };
+  companyOutcome?: { text: string; href: string }
 }
 
 /** Years a project ran: `to` omitted means one year, `ongoing` means still running. */
 export interface Period {
-  from: number;
-  to?: number;
-  ongoing?: boolean;
+  from: number
+  to?: number
+  ongoing?: boolean
 }
 
 /** "2021", "2018–2019" or "2024–now", with an en dash. */
 export function formatPeriod(period: Period): string {
-  if (period.ongoing) return `${period.from}–now`;
+  if (period.ongoing) return `${period.from}–now`
   if (period.to && period.to !== period.from) {
-    return `${period.from}–${period.to}`;
+    return `${period.from}–${period.to}`
   }
-  return `${period.from}`;
+  return `${period.from}`
 }
 
 export const projects = {
@@ -473,7 +473,7 @@ export const projects = {
       screenshotURLs: ["1.webp", "2.webp", "3.webp"],
     },
   ] as Project[],
-};
+}
 
 /**
  * The client projects a buyer sees first, in the order /work shows them;
@@ -495,17 +495,17 @@ export const highlightSlugs: string[] = [
   "truth-or-dare",
   "roley",
   "connectful",
-];
+]
 
 /** The highlight projects in `highlightSlugs` order; throws on a typo. */
 export function highlightProjects(): Project[] {
   return highlightSlugs.map((slug) => {
-    const project = projects.freelance.find((p) => p.slug === slug);
+    const project = projects.freelance.find((p) => p.slug === slug)
     if (!project) {
-      throw new Error(`highlightSlugs: no client project "${slug}"`);
+      throw new Error(`highlightSlugs: no client project "${slug}"`)
     }
-    return project;
-  });
+    return project
+  })
 }
 
 /**
@@ -517,7 +517,7 @@ export function highlightProjects(): Project[] {
 export function archiveProjects(): Project[] {
   return projects.freelance
     .filter((p) => !highlightSlugs.includes(p.slug ?? ""))
-    .sort((a, b) => (b.period?.from ?? 0) - (a.period?.from ?? 0));
+    .sort((a, b) => (b.period?.from ?? 0) - (a.period?.from ?? 0))
 }
 
 /**
@@ -525,31 +525,31 @@ export function archiveProjects(): Project[] {
  * `lib/blog-posts.ts` (#191): `content/blog/<slug>.md` is the one place a
  * post's metadata is written.
  */
-export const blogArticles: BlogArticle[] = loadBlogArticles();
+export const blogArticles: BlogArticle[] = loadBlogArticles()
 
 export interface Hackathon {
-  slug: string;
-  title: string;
-  event: string;
-  date: string;
-  description: string;
-  projectIdea: string;
-  achievement: string;
-  won: boolean;
-  place?: string;
-  prize?: string;
-  photos: string[];
-  techStack: string[];
-  learnings: string;
+  slug: string
+  title: string
+  event: string
+  date: string
+  description: string
+  projectIdea: string
+  achievement: string
+  won: boolean
+  place?: string
+  prize?: string
+  photos: string[]
+  techStack: string[]
+  learnings: string
   /** Override default CTA ("Let's build something similar") link */
-  ctaLabel?: string;
-  ctaLink?: string;
+  ctaLabel?: string
+  ctaLink?: string
 }
 
 // Real hackathon entries only. The list is empty until they are written up,
 // and while it is empty /hackathons returns 404 and stays out of the sitemap
 // and llms files.
-export const hackathons: Hackathon[] = [];
+export const hackathons: Hackathon[] = []
 
 /**
  * A screenshot's caption, from its file name when the name says what it
@@ -567,9 +567,9 @@ export function screenshotCaption(
     .replace(/^\d+[-_]?/, "")
     .replace(/[-_]mobile$/i, " (mobile)")
     .replace(/[-_]+/g, " ")
-    .trim();
-  if (!/[a-z]/i.test(words)) return `Screenshot ${index + 1} of ${total}`;
-  return words.charAt(0).toUpperCase() + words.slice(1);
+    .trim()
+  if (!/[a-z]/i.test(words)) return `Screenshot ${index + 1} of ${total}`
+  return words.charAt(0).toUpperCase() + words.slice(1)
 }
 
 /**
@@ -582,14 +582,14 @@ export function screenshotCaption(
 export function projectScreenshots(
   project: Project,
 ): { src: string; alt: string; width?: number; height?: number }[] {
-  if (!project.screenshotURLs) return [];
-  const total = project.screenshotURLs.length;
+  if (!project.screenshotURLs) return []
+  const total = project.screenshotURLs.length
   return project.screenshotURLs.map((file, index) => ({
     src: `/img/projects/${project.slug}/${file}`,
     alt: screenshotCaption(file, index, total),
     width: project.screenshotSize?.width,
     height: project.screenshotSize?.height,
-  }));
+  }))
 }
 
 /**
@@ -599,14 +599,14 @@ export function projectScreenshots(
  * never in the list.
  */
 export function relatedProjects(project: Project, count = 3): Project[] {
-  const order = [...highlightProjects(), ...archiveProjects()];
-  const tags = new Set(project.tags ?? []);
+  const order = [...highlightProjects(), ...archiveProjects()]
+  const tags = new Set(project.tags ?? [])
   const shared = (p: Project) =>
-    (p.tags ?? []).filter((t) => tags.has(t)).length;
+    (p.tags ?? []).filter((t) => tags.has(t)).length
   return order
     .filter((p) => p.slug !== project.slug)
     .map((p, i) => ({ p, i, score: shared(p) }))
     .sort((a, b) => b.score - a.score || a.i - b.i)
     .slice(0, count)
-    .map(({ p }) => p);
+    .map(({ p }) => p)
 }

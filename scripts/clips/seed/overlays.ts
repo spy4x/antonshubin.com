@@ -11,18 +11,18 @@
  *
  * Usage: deno run -A scripts/clips/seed/overlays.ts <out-dir> <host>... -- <caption>...
  */
-import { chromium } from "playwright";
+import { chromium } from "playwright"
 
-const FONTS = new URL("../../../assets/fonts/", import.meta.url).href;
-const W = 1440;
-const H = 900;
+const FONTS = new URL("../../../assets/fonts/", import.meta.url).href
+const W = 1440
+const H = 900
 
 const base = `
 @font-face { font-family: Plex; font-weight: 400; src: url(${FONTS}ibm-plex-sans-latin-400-normal.woff2) }
 @font-face { font-family: Plex; font-weight: 600; src: url(${FONTS}ibm-plex-sans-latin-600-normal.woff2) }
 html, body { margin: 0; width: ${W}px; height: ${H}px; background: transparent; overflow: hidden }
 body { font-family: Plex, sans-serif; position: relative }
-`;
+`
 
 /** The window: 32 px margin, a 40 px bar, a transparent page area under it. */
 function frameHtml(host: string): string {
@@ -40,7 +40,7 @@ function frameHtml(host: string): string {
 <span class="dot" style="background:#ff5f58"></span>
 <span class="dot" style="background:#ffbd2e"></span>
 <span class="dot" style="background:#18c132"></span>
-<span class="url">http://<b>${host}</b></span></div></div>`;
+<span class="url">http://<b>${host}</b></span></div></div>`
 }
 
 function captionHtml(text: string): string {
@@ -48,37 +48,37 @@ function captionHtml(text: string): string {
 .cap { position: absolute; right: 56px; bottom: 52px; padding: 6px 14px; border-radius: 999px;
   background: #2f2a26; border: 1px solid #857f79; color: #efebe2; font-size: 18px;
   font-weight: 600; letter-spacing: .01em }
-</style><span class="cap">${text}</span>`;
+</style><span class="cap">${text}</span>`
 }
 
 async function main() {
-  const split = Deno.args.indexOf("--");
-  const [out, ...hosts] = split === -1 ? Deno.args : Deno.args.slice(0, split);
-  const captions = split === -1 ? [] : Deno.args.slice(split + 1);
+  const split = Deno.args.indexOf("--")
+  const [out, ...hosts] = split === -1 ? Deno.args : Deno.args.slice(0, split)
+  const captions = split === -1 ? [] : Deno.args.slice(split + 1)
   if (!out) {
-    throw new Error("usage: overlays.ts <out-dir> <host>... -- <caption>...");
+    throw new Error("usage: overlays.ts <out-dir> <host>... -- <caption>...")
   }
-  const dir = await Deno.makeTempDir();
-  const browser = await chromium.launch();
+  const dir = await Deno.makeTempDir()
+  const browser = await chromium.launch()
   try {
-    const page = await browser.newPage({ viewport: { width: W, height: H } });
+    const page = await browser.newPage({ viewport: { width: W, height: H } })
     const shoot = async (html: string, file: string) => {
-      const path = `${dir}/layer.html`;
-      await Deno.writeTextFile(path, html);
-      await page.goto(`file://${path}`);
-      await page.evaluate(() => document.fonts.ready);
-      await page.screenshot({ path: file, omitBackground: true });
-    };
+      const path = `${dir}/layer.html`
+      await Deno.writeTextFile(path, html)
+      await page.goto(`file://${path}`)
+      await page.evaluate(() => document.fonts.ready)
+      await page.screenshot({ path: file, omitBackground: true })
+    }
     for (const host of hosts) {
-      await shoot(frameHtml(host), `${out}/frame-${host}.png`);
+      await shoot(frameHtml(host), `${out}/frame-${host}.png`)
     }
     for (const [i, text] of captions.entries()) {
-      await shoot(captionHtml(text), `${out}/caption-${i}.png`);
+      await shoot(captionHtml(text), `${out}/caption-${i}.png`)
     }
   } finally {
-    await browser.close();
-    await Deno.remove(dir, { recursive: true });
+    await browser.close()
+    await Deno.remove(dir, { recursive: true })
   }
 }
 
-if (import.meta.main) await main();
+if (import.meta.main) await main()

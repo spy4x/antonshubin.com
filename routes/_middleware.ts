@@ -1,4 +1,4 @@
-import { referrerPolicyFor } from "../lib/referrer.ts";
+import { referrerPolicyFor } from "../lib/referrer.ts"
 
 // Sets X-Robots-Tag per path and status. Leaving analytics out for known bots
 // happens at render time in routes/_app.tsx (see lib/bots.ts), not here, so no
@@ -6,34 +6,34 @@ import { referrerPolicyFor } from "../lib/referrer.ts";
 export async function handler(
   ctx: { req: Request; url: URL; next: () => Promise<Response> },
 ): Promise<Response> {
-  const pathname = ctx.url.pathname;
+  const pathname = ctx.url.pathname
   // "/unsubscribe/" serves the same page as "/unsubscribe", so it gets the
   // same headers.
-  const page = pathname.replace(/\/+$/, "") || "/";
+  const page = pathname.replace(/\/+$/, "") || "/"
 
-  const res = await ctx.next();
+  const res = await ctx.next()
 
   // A page whose URL carries a token sends only its origin as Referer, so the token (which
   // holds the subscriber's address) never reaches the next page's analytics.
-  const referrer = referrerPolicyFor(pathname);
-  if (referrer) res.headers.set("Referrer-Policy", referrer);
+  const referrer = referrerPolicyFor(pathname)
+  if (referrer) res.headers.set("Referrer-Policy", referrer)
 
   // ── X-Robots-Tag per path ────────────────────────────
   if (
     pathname === "/pay" || pathname.startsWith("/pay/") ||
     page === "/unsubscribe" || page === "/subscribe/confirm"
   ) {
-    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    res.headers.set("X-Robots-Tag", "noindex, nofollow")
   } else if (res.status >= 400) {
     // routes/[...path].tsx sends every unmatched URL through here, so a 404
     // for /no-such-page or /img/nope.png must not invite indexing.
-    res.headers.set("X-Robots-Tag", "noindex");
+    res.headers.set("X-Robots-Tag", "noindex")
   } else {
     res.headers.set(
       "X-Robots-Tag",
       "index, follow, max-snippet:-1, max-image-preview:large",
-    );
+    )
   }
 
-  return res;
+  return res
 }

@@ -75,24 +75,24 @@
 // set, since /catalog's nested <details> already exercises the same class
 // edit's token. If either of these two regresses on its own, only the
 // full-sitemap audit script (see the PR body) would catch it, not this test.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import axeCore from "axe-core";
-import type { Browser, Page } from "playwright";
-import { startSite } from "./harness.ts";
-import { launchChromium, newPage } from "./browser.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import axeCore from "axe-core"
+import type { Browser, Page } from "playwright"
+import { startSite } from "./harness.ts"
+import { launchChromium, newPage } from "./browser.ts"
 
 interface AxeNode {
-  target: string[];
-  html: string;
-  failureSummary: string;
+  target: string[]
+  html: string
+  failureSummary: string
 }
 interface AxeViolation {
-  id: string;
-  nodes: AxeNode[];
+  id: string
+  nodes: AxeNode[]
 }
 interface AxeRunResult {
-  violations: AxeViolation[];
-  incomplete: AxeViolation[];
+  violations: AxeViolation[]
+  incomplete: AxeViolation[]
 }
 
 /** Runs axe-core's WCAG 2 A/AA rules against `context` (a selector, element,
@@ -116,21 +116,21 @@ async function colorContrastResult(
   page: Page,
   context: string,
 ): Promise<{ violations: AxeNode[]; gradientIncomplete: AxeNode[] }> {
-  await page.evaluate(axeCore.source);
+  await page.evaluate(axeCore.source)
   const results = await page.evaluate(async (sel) => {
     // deno-lint-ignore no-explicit-any
-    const axe = (globalThis as any).axe;
+    const axe = (globalThis as any).axe
     return await axe.run(document.querySelector(sel) ?? document, {
       runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-    });
-  }, context) as AxeRunResult;
+    })
+  }, context) as AxeRunResult
   return {
     violations:
       results.violations.find((v) => v.id === "color-contrast")?.nodes ?? [],
     gradientIncomplete:
       (results.incomplete.find((v) => v.id === "color-contrast")?.nodes ?? [])
         .filter((n) => n.failureSummary.includes("gradient")),
-  };
+  }
 }
 
 /** Navigates `page` to `path` and asserts zero axe color-contrast
@@ -142,21 +142,21 @@ async function assertNoContrastViolations(
   origin: string,
   path: string,
 ): Promise<void> {
-  await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });
+  await page.goto(`${origin}${path}`, { waitUntil: "networkidle" })
   const { violations, gradientIncomplete } = await colorContrastResult(
     page,
     "html",
-  );
+  )
   assertEquals(
     violations.map((n) => n.html),
     [],
     `${path} must have zero axe color-contrast violations`,
-  );
+  )
   assertEquals(
     gradientIncomplete.map((n) => n.html),
     [],
     `${path} must have no gradient-background text axe couldn't verify`,
-  );
+  )
 }
 
 /** Computes the WCAG 2 contrast ratio between the first element matching
@@ -188,66 +188,66 @@ function getContrastRatio(
   exactText?: string,
 ): Promise<number | null> {
   return page.evaluate(({ sel, text }) => {
-    const candidates = [...document.querySelectorAll(sel)];
+    const candidates = [...document.querySelectorAll(sel)]
     const el = text === undefined
       ? candidates[0]
-      : candidates.find((c) => c.textContent?.trim() === text);
-    if (!el) return null;
+      : candidates.find((c) => c.textContent?.trim() === text)
+    if (!el) return null
 
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    const ctx = canvas.getContext("2d")!;
-    const UNPARSEABLE_SENTINEL = "#010203";
+    const canvas = document.createElement("canvas")
+    canvas.width = 1
+    canvas.height = 1
+    const ctx = canvas.getContext("2d")!
+    const UNPARSEABLE_SENTINEL = "#010203"
 
     /** Parses any CSS colour Chromium can paint (oklch, rgb, hex, named,
      * ...) into 0-255 RGBA channels, via the canvas 2D context's own colour
      * parser. Throws if `color` isn't a valid CSS `<color>`. */
     function parseColor(color: string): [number, number, number, number] {
-      ctx.fillStyle = UNPARSEABLE_SENTINEL;
-      ctx.fillStyle = color;
+      ctx.fillStyle = UNPARSEABLE_SENTINEL
+      ctx.fillStyle = color
       if (ctx.fillStyle === UNPARSEABLE_SENTINEL) {
-        throw new Error(`getContrastRatio: could not parse colour "${color}"`);
+        throw new Error(`getContrastRatio: could not parse colour "${color}"`)
       }
-      ctx.clearRect(0, 0, 1, 1);
-      ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-      return [r, g, b, a];
+      ctx.clearRect(0, 0, 1, 1)
+      ctx.fillRect(0, 0, 1, 1)
+      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+      return [r, g, b, a]
     }
     function relativeLuminance(r: number, g: number, b: number): number {
       const chan = (c: number) => {
-        const s = c / 255;
-        return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-      };
-      return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
-    }
-
-    const [tr, tg, tb] = parseColor(getComputedStyle(el).color);
-
-    let bg: [number, number, number, number] = [0, 0, 0, 0];
-    let node: Element | null = el;
-    while (node) {
-      const parsed = parseColor(getComputedStyle(node).backgroundColor);
-      if (parsed[3] > 0) {
-        bg = parsed;
-        break;
+        const s = c / 255
+        return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
       }
-      node = node.parentElement;
+      return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b)
     }
-    const l1 = relativeLuminance(tr, tg, tb);
-    const l2 = relativeLuminance(bg[0], bg[1], bg[2]);
-    const lighter = Math.max(l1, l2);
-    const darker = Math.min(l1, l2);
-    return (lighter + 0.05) / (darker + 0.05);
-  }, { sel: selector, text: exactText });
+
+    const [tr, tg, tb] = parseColor(getComputedStyle(el).color)
+
+    let bg: [number, number, number, number] = [0, 0, 0, 0]
+    let node: Element | null = el
+    while (node) {
+      const parsed = parseColor(getComputedStyle(node).backgroundColor)
+      if (parsed[3] > 0) {
+        bg = parsed
+        break
+      }
+      node = node.parentElement
+    }
+    const l1 = relativeLuminance(tr, tg, tb)
+    const l2 = relativeLuminance(bg[0], bg[1], bg[2])
+    const lighter = Math.max(l1, l2)
+    const darker = Math.min(l1, l2)
+    return (lighter + 0.05) / (darker + 0.05)
+  }, { sel: selector, text: exactText })
 }
 
 Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch pairing", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser);
+    browser = await launchChromium()
+    const page = await newPage(browser)
     try {
       // white text on bg-sky-600 (Tailwind v4's oklch(58.8% .158 241.966),
       // #0084d1 once painted) is a known quantity: axe itself reports this
@@ -257,45 +257,45 @@ Deno.test("getContrastRatio matches axe's own reported ratio for a known oklch p
       // helper's own proof that routing colours through a <canvas> — needed
       // for oklch, see getContrastRatio's docs above — gives the same answer
       // as the browser's actual rendering, not just a plausible one.
-      await page.goto(site.origin, { waitUntil: "networkidle" });
+      await page.goto(site.origin, { waitUntil: "networkidle" })
       await page.evaluate(() => {
-        const el = document.createElement("span");
-        el.id = "contrast-probe-white-on-sky-600";
-        el.className = "bg-sky-600 text-white";
-        el.textContent = "probe";
-        document.body.appendChild(el);
-      });
+        const el = document.createElement("span")
+        el.id = "contrast-probe-white-on-sky-600"
+        el.className = "bg-sky-600 text-white"
+        el.textContent = "probe"
+        document.body.appendChild(el)
+      })
       const ratio = await getContrastRatio(
         page,
         "#contrast-probe-white-on-sky-600",
-      );
-      assert(ratio !== null, "probe element must be found");
+      )
+      assert(ratio !== null, "probe element must be found")
       assert(
         Math.abs(ratio - 4.02) < 0.01,
         `white on bg-sky-600 must be ~4.02, got ${ratio}`,
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 /** Placeholder booking URL: the booking buttons render only when
  * `SCHEDULE_URL` is set, which production does, so the scan must set it too
  * or it never sees them (#175). */
-const PLACEHOLDER_SCHEDULE_URL = "https://cal.example.com/book";
+const PLACEHOLDER_SCHEDULE_URL = "https://cal.example.com/book"
 
 Deno.test("no WCAG AA colour-contrast violations across nine representative pages", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: PLACEHOLDER_SCHEDULE_URL },
-  });
-  let browser: Browser | undefined;
+  })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser);
+    browser = await launchChromium()
+    const page = await newPage(browser)
     try {
       for (
         const path of [
@@ -313,7 +313,7 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
           "/tools/seed",
         ]
       ) {
-        await assertNoContrastViolations(page, site.origin, path);
+        await assertNoContrastViolations(page, site.origin, path)
       }
 
       // Every page in the loop above except /pay carries a booking button
@@ -322,15 +322,15 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       // this, a server that never received the placeholder would pass the
       // loop above vacuously.
       for (const path of ["/", "/book", "/blog/ship-it-today"]) {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
         const selector = path === "/book"
           ? `a[href="${PLACEHOLDER_SCHEDULE_URL}"]`
-          : `main a[data-primary-book][href="/book"]`;
-        const bookingLinks = await page.locator(selector).count();
+          : `main a[data-primary-book][href="/book"]`
+        const bookingLinks = await page.locator(selector).count()
         assert(
           bookingLinks > 0,
           `${path} must render a booking link with SCHEDULE_URL set`,
-        );
+        )
       }
 
       // components/Breadcrumb.tsx's "/" separator: aria-hidden, so axe never
@@ -341,19 +341,19 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       const breadcrumbSepRatio = await getContrastRatio(
         page,
         'nav[aria-label="Breadcrumb"] span[aria-hidden="true"]',
-      );
+      )
       assert(
         breadcrumbSepRatio !== null && breadcrumbSepRatio >= 4.5,
         `breadcrumb separator contrast ratio must be >= 4.5, got ${breadcrumbSepRatio}`,
-      );
+      )
 
-      await page.goto(`${site.origin}/catalog`, { waitUntil: "networkidle" });
-      const catalogResult = await colorContrastResult(page, "html");
+      await page.goto(`${site.origin}/catalog`, { waitUntil: "networkidle" })
+      const catalogResult = await colorContrastResult(page, "html")
       assertEquals(
         catalogResult.violations.map((n) => n.html),
         [],
         "/catalog must have zero axe color-contrast violations",
-      );
+      )
       // /catalog's "Talk about this" button was one of the nine gradient CTAs
       // (bg-gradient-to-r from-orange-600 to-amber-500, white text 2.13:1
       // against the gradient's amber-500 end) fixed to a solid bg-orange-600.
@@ -364,7 +364,7 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
         catalogResult.gradientIncomplete.map((n) => n.html),
         [],
         "/catalog must have no gradient-background text axe couldn't verify",
-      );
+      )
 
       // The "x" marker itself: axe classifies it as "non-text content" and
       // never puts it in `violations` regardless of colour (see the file
@@ -372,24 +372,24 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       // what a service leaves out (#271; the index no longer has the list).
       await page.goto(`${site.origin}/catalog/zero-to-production-saas-mvp`, {
         waitUntil: "networkidle",
-      });
+      })
       const catalogXRatio = await getContrastRatio(
         page,
         "[data-service-scope] span",
         "×",
-      );
+      )
       assert(
         catalogXRatio !== null && catalogXRatio >= 4.5,
         `service page "not included" x marker contrast ratio must be >= 4.5, got ${catalogXRatio}`,
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 // --- Visual-system tokens (#184) --------------------------------------
 //
@@ -447,53 +447,53 @@ const TOKEN_PROBES: { name: string; textClass: string; bgClass: string }[] = [
   // above.
   { name: "sage-on-lamp", textClass: "text-sage", bgClass: "bg-lamp" },
   { name: "mist-on-lamp", textClass: "text-mist", bgClass: "bg-lamp" },
-];
+]
 
 Deno.test("every visual-system token pairing passes WCAG AA (#184)", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser);
+    browser = await launchChromium()
+    const page = await newPage(browser)
     try {
       // Any built page carries the stylesheet with the tokens — home is as
       // good as any, and it's already covered above for the pre-existing set.
-      await page.goto(site.origin, { waitUntil: "networkidle" });
+      await page.goto(site.origin, { waitUntil: "networkidle" })
       for (const probe of TOKEN_PROBES) {
-        const id = `contrast-probe-${probe.name}`;
+        const id = `contrast-probe-${probe.name}`
         await page.evaluate(({ id, textClass, bgClass }) => {
-          const el = document.createElement("div");
-          el.id = id;
+          const el = document.createElement("div")
+          el.id = id
           // Padding so the element paints a real background rect for the
           // canvas-based ratio check below (a zero-size box has none).
-          el.className = `${bgClass} ${textClass}`;
-          el.style.padding = "8px";
-          el.textContent = "Sample text";
-          document.body.appendChild(el);
-        }, { id, textClass: probe.textClass, bgClass: probe.bgClass });
+          el.className = `${bgClass} ${textClass}`
+          el.style.padding = "8px"
+          el.textContent = "Sample text"
+          document.body.appendChild(el)
+        }, { id, textClass: probe.textClass, bgClass: probe.bgClass })
         try {
-          const result = await colorContrastResult(page, `#${id}`);
+          const result = await colorContrastResult(page, `#${id}`)
           assertEquals(
             result.violations.map((n) => n.html),
             [],
             `${probe.name} (${probe.textClass} on ${probe.bgClass}) must pass AA`,
-          );
-          const ratio = await getContrastRatio(page, `#${id}`);
+          )
+          const ratio = await getContrastRatio(page, `#${id}`)
           assert(
             ratio !== null && ratio >= 4.5,
             `${probe.name} ratio must be >= 4.5 (AA for normal text), got ${ratio}`,
-          );
+          )
         } finally {
           await page.evaluate((id) => {
-            document.getElementById(id)?.remove();
-          }, id);
+            document.getElementById(id)?.remove()
+          }, id)
         }
       }
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})

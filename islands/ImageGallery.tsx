@@ -1,12 +1,12 @@
-import { ImageGallery as LibraryGallery } from "@spy4x/preact-ui/image-gallery";
-import { webpForPng } from "../lib/image-path.ts";
+import { ImageGallery as LibraryGallery } from "@spy4x/preact-ui/image-gallery"
+import { webpForPng } from "../lib/image-path.ts"
 
 interface GalleryImageData {
-  src: string;
+  src: string
   /** The caption: shown under the slide and used as the `alt` text. */
-  alt: string;
-  width?: number;
-  height?: number;
+  alt: string
+  width?: number
+  height?: number
 }
 
 /**
@@ -41,5 +41,5 @@ export default function ImageGallery(
       stripPreviousLabel="Previous screenshot"
       stripNextLabel="Next screenshot"
     />
-  );
+  )
 }

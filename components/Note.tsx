@@ -1,4 +1,4 @@
-import type { Note as NoteData } from "../lib/notes.ts";
+import type { Note as NoteData } from "../lib/notes.ts"
 
 /** "2026-09-26" → "26 Sep 2026" (en-GB would print "Sept"). */
 export function formatCheckedOn(iso: string): string {
@@ -7,9 +7,9 @@ export function formatCheckedOn(iso: string): string {
     month: "short",
     year: "numeric",
     timeZone: "UTC",
-  }).formatToParts(new Date(`${iso}T00:00:00Z`));
-  const part = (type: string) => parts.find((p) => p.type === type)?.value;
-  return `${part("day")} ${part("month")} ${part("year")}`;
+  }).formatToParts(new Date(`${iso}T00:00:00Z`))
+  const part = (type: string) => parts.find((p) => p.type === type)?.value
+  return `${part("day")} ${part("month")} ${part("year")}`
 }
 
 /**
@@ -46,5 +46,5 @@ export function Note({ note }: { note: NoteData }) {
       )}
       {note.checkedOn && <>{" "}(checked {formatCheckedOn(note.checkedOn)})</>}
     </p>
-  );
+  )
 }

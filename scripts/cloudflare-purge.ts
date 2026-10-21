@@ -15,10 +15,10 @@
  * only this site needs.
  */
 
-import { purgeUrls } from "@spy4x/integrations/cloudflare";
+import { purgeUrls } from "@spy4x/integrations/cloudflare"
 
 /** The Cloudflare zone the site lives in. */
-export const ZONE_NAME = "antonshubin.com";
+export const ZONE_NAME = "antonshubin.com"
 
 /**
  * Reads the build id out of a served `/sw.js` (`const CACHE = "antonshubin-<id>"`,
@@ -26,8 +26,8 @@ export const ZONE_NAME = "antonshubin.com";
  * anything that is not a commit hash, because only a commit can be diffed.
  */
 export function parseBuildId(swScript: string): string | undefined {
-  const match = swScript.match(/const CACHE = "antonshubin-([0-9a-f]{7,40})"/);
-  return match?.[1];
+  const match = swScript.match(/const CACHE = "antonshubin-([0-9a-f]{7,40})"/)
+  return match?.[1]
 }
 
 /**
@@ -35,13 +35,13 @@ export function parseBuildId(swScript: string): string | undefined {
  * `static/<path>` is served at `/<path>`. Paths outside `static/` are ignored.
  */
 export function staticUrls(domain: string, paths: string[]): string[] {
-  const origin = `https://${domain}`;
+  const origin = `https://${domain}`
   return paths
     .map((path) => path.trim())
     .filter((path) =>
       path.startsWith("static/") && path.length > "static/".length
     )
-    .map((path) => new URL(path.slice("static".length), origin).href);
+    .map((path) => new URL(path.slice("static".length), origin).href)
 }
 
 /** The full purge list: `/sw.js` first, then each changed static file, once. */
@@ -51,28 +51,28 @@ export function purgeList(domain: string, changedPaths: string[]): string[] {
       `https://${domain}/sw.js`,
       ...staticUrls(domain, changedPaths),
     ]),
-  ];
+  ]
 }
 
 /** Returns the value of `key` in a dotenv-style text, or undefined when unset or empty. */
 export function envValue(text: string, key: string): string | undefined {
   for (const line of text.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith(`${key}=`)) continue;
+    const trimmed = line.trim()
+    if (!trimmed.startsWith(`${key}=`)) continue
     const value = trimmed.slice(key.length + 1).trim().replace(
       /^(["'])(.*)\1$/,
       "$2",
-    );
-    return value || undefined;
+    )
+    return value || undefined
   }
-  return undefined;
+  return undefined
 }
 
 /** How long one Cloudflare API call may take before it is abandoned. */
-export const API_TIMEOUT_MS = 10_000;
+export const API_TIMEOUT_MS = 10_000
 
 /** How long one read of the live `/sw.js` may take before it is abandoned. */
-export const SW_TIMEOUT_MS = 5_000;
+export const SW_TIMEOUT_MS = 5_000
 
 /**
  * Fetches `/sw.js` from `domain` and returns the build id it serves, if any.
@@ -89,27 +89,27 @@ export async function liveBuildId(
     const res = await fetch(
       `https://${domain}/sw.js?deploy-check=${Date.now()}`,
       { signal: AbortSignal.timeout(timeoutMs) },
-    );
+    )
     if (!res.ok) {
-      await res.body?.cancel();
-      return undefined;
+      await res.body?.cancel()
+      return undefined
     }
-    return parseBuildId(await res.text());
+    return parseBuildId(await res.text())
   } catch {
-    return undefined;
+    return undefined
   }
 }
 
 interface WaitOptions {
-  domain: string;
-  buildId: string;
-  timeoutMs?: number;
-  intervalMs?: number;
+  domain: string
+  buildId: string
+  timeoutMs?: number
+  intervalMs?: number
   /** Per-request limit, {@link SW_TIMEOUT_MS} by default. */
-  requestTimeoutMs?: number;
-  fetch?: typeof globalThis.fetch;
-  sleep?: (ms: number) => Promise<void>;
-  now?: () => number;
+  requestTimeoutMs?: number
+  fetch?: typeof globalThis.fetch
+  sleep?: (ms: number) => Promise<void>
+  now?: () => number
 }
 
 /**
@@ -127,21 +127,21 @@ export async function waitForBuild(options: WaitOptions): Promise<boolean> {
     fetch = globalThis.fetch,
     sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     now = Date.now,
-  } = options;
-  const deadline = now() + timeoutMs;
+  } = options
+  const deadline = now() + timeoutMs
   while (true) {
     if (await liveBuildId(domain, fetch, requestTimeoutMs) === buildId) {
-      return true;
+      return true
     }
-    if (now() + intervalMs > deadline) return false;
-    await sleep(intervalMs);
+    if (now() + intervalMs > deadline) return false
+    await sleep(intervalMs)
   }
 }
 
 /** Runs `git` with the given arguments; `deploy.ts` supplies the real one. */
 export type GitRunner = (
   args: string[],
-) => Promise<{ code: number; stdout: string }>;
+) => Promise<{ code: number; stdout: string }>
 
 /**
  * The static/ files changed between the previously deployed commit and this
@@ -153,9 +153,9 @@ export async function changedStaticFiles(
   previous: string | undefined,
   current: string,
 ): Promise<string[] | undefined> {
-  if (!previous) return undefined;
-  const known = await git(["cat-file", "-e", `${previous}^{commit}`]);
-  if (known.code !== 0) return undefined;
+  if (!previous) return undefined
+  const known = await git(["cat-file", "-e", `${previous}^{commit}`])
+  if (known.code !== 0) return undefined
   const diff = await git([
     "diff",
     "--name-only",
@@ -164,33 +164,33 @@ export async function changedStaticFiles(
     current,
     "--",
     "static/",
-  ]);
-  if (diff.code !== 0) return undefined;
-  return diff.stdout.split("\n").map((line) => line.trim()).filter(Boolean);
+  ])
+  if (diff.code !== 0) return undefined
+  return diff.stdout.split("\n").map((line) => line.trim()).filter(Boolean)
 }
 
 /** Everything step 4 of the deploy needs, injected so tests can stub it. */
 export interface PurgeAfterDeployOptions {
-  domain: string;
-  buildId: string;
+  domain: string
+  buildId: string
   /** The build live before the deploy, from {@link liveBuildId}. */
-  previousBuildId: string | undefined;
-  git: GitRunner;
+  previousBuildId: string | undefined
+  git: GitRunner
   /** Returns the Cloudflare API token, or undefined when there is none. */
-  token: () => string | undefined;
+  token: () => string | undefined
   /** Used for the `/sw.js` reads and passed on to `purge`. */
-  fetch?: typeof globalThis.fetch;
+  fetch?: typeof globalThis.fetch
   /** The Cloudflare purge client, `purgeUrls` by default. */
-  purge?: typeof purgeUrls;
-  log?: (message: string) => void;
-  warn?: (message: string) => void;
+  purge?: typeof purgeUrls
+  log?: (message: string) => void
+  warn?: (message: string) => void
   /** Overrides for the wait; production uses the defaults (60 s, 2 s). */
   wait?: Pick<
     WaitOptions,
     "timeoutMs" | "intervalMs" | "requestTimeoutMs" | "sleep" | "now"
-  >;
+  >
   /** Limit for each Cloudflare API call, {@link API_TIMEOUT_MS} by default. */
-  requestTimeoutMs?: number;
+  requestTimeoutMs?: number
 }
 
 /**
@@ -214,31 +214,31 @@ export async function purgeAfterDeploy(
     warn = console.warn,
     wait = {},
     requestTimeoutMs = API_TIMEOUT_MS,
-  } = options;
+  } = options
   try {
-    log("  waiting for the new build...");
+    log("  waiting for the new build...")
     if (!(await waitForBuild({ domain, buildId, fetch, ...wait }))) {
       warn(
         `  ⚠️  ${domain}/sw.js did not serve ${buildId} in time; purging anyway`,
-      );
+      )
     }
 
-    const changed = await changedStaticFiles(git, previousBuildId, buildId);
+    const changed = await changedStaticFiles(git, previousBuildId, buildId)
     if (!changed) {
       warn(
         `  ⚠️  previous build ${
           previousBuildId ?? "unknown"
         } cannot be diffed; purging /sw.js only`,
-      );
+      )
     }
-    const urls = purgeList(domain, changed ?? []);
+    const urls = purgeList(domain, changed ?? [])
 
-    const key = token();
+    const key = token()
     if (!key) {
       warn(
         "  ⚠️  CLOUDFLARE_API_TOKEN missing (run deno task env:decrypt for .env.deploy); skipped the Cloudflare purge",
-      );
-      return;
+      )
+      return
     }
     const result = await purge({
       token: key,
@@ -246,11 +246,11 @@ export async function purgeAfterDeploy(
       urls,
       fetch,
       requestTimeoutMs,
-    });
-    if (result.success) log(`  Cloudflare: ${result.output}`);
-    else warn(`  ⚠️  Cloudflare purge skipped: ${result.error}`);
+    })
+    if (result.success) log(`  Cloudflare: ${result.output}`)
+    else warn(`  ⚠️  Cloudflare purge skipped: ${result.error}`)
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    warn(`  ⚠️  Cloudflare purge skipped: ${message}`);
+    const message = error instanceof Error ? error.message : String(error)
+    warn(`  ⚠️  Cloudflare purge skipped: ${message}`)
   }
 }

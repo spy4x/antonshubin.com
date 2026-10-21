@@ -1,7 +1,7 @@
-import type { Project } from "../lib/data.ts";
-import { NewTabHint } from "./NewTabHint.tsx";
+import type { Project } from "../lib/data.ts"
+import { NewTabHint } from "./NewTabHint.tsx"
 
-const LINK = "text-graphite underline underline-offset-4 hover:text-parchment";
+const LINK = "text-graphite underline underline-offset-4 hover:text-parchment"
 
 /**
  * Who wrote a review and where: "<client> reviewed on Upwork", with the
@@ -20,9 +20,9 @@ export function ReviewSource(
         <NewTabHint />
       </a>
     )
-    : "Upwork";
+    : "Upwork"
   if (!project.madeForName) {
-    return <span data-review-source>Reviewed on {upwork}</span>;
+    return <span data-review-source>Reviewed on {upwork}</span>
   }
   const name = project.madeForURL
     ? (
@@ -36,6 +36,6 @@ export function ReviewSource(
         <NewTabHint />
       </a>
     )
-    : project.madeForName;
-  return <span data-review-source>{name} reviewed on {upwork}</span>;
+    : project.madeForName
+  return <span data-review-source>{name} reviewed on {upwork}</span>
 }

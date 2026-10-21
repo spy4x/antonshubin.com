@@ -9,19 +9,19 @@
  * `lib/tools.ts`.
  */
 
-export type PageSurface = "sitemap" | "edge";
+export type PageSurface = "sitemap" | "edge"
 
 export interface CorePage {
-  path: string;
+  path: string
   /** Sitemap priority. */
-  priority: string;
+  priority: string
   /** Sitemap change frequency. */
-  changefreq: "weekly" | "monthly";
+  changefreq: "weekly" | "monthly"
   /**
    * Surfaces this page is deliberately left out of, with the reason at the
    * entry. Everything else is in both.
    */
-  notIn?: readonly PageSurface[];
+  notIn?: readonly PageSurface[]
 }
 
 export const corePages: readonly CorePage[] = [
@@ -57,9 +57,9 @@ export const corePages: readonly CorePage[] = [
     // send search traffic to.
     notIn: ["sitemap"],
   },
-];
+]
 
 /** The pages in `surface`: every core page not listed under `notIn`. */
 export function pagesFor(surface: PageSurface): CorePage[] {
-  return corePages.filter((p) => !p.notIn?.includes(surface));
+  return corePages.filter((p) => !p.notIn?.includes(surface))
 }

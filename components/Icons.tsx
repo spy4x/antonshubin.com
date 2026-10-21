@@ -4,8 +4,8 @@ import {
   IconSearch,
   IconStar,
   IconTarget,
-} from "@spy4x/preact-icons";
-import type { CatalogIconName } from "../lib/catalog.ts";
+} from "@spy4x/preact-icons"
+import type { CatalogIconName } from "../lib/catalog.ts"
 
 /**
  * The library's star, filled with the text colour when `filled` (a review's
@@ -14,11 +14,11 @@ import type { CatalogIconName } from "../lib/catalog.ts";
  */
 export function StarIcon(
   { class: className = "", filled = false }: {
-    class?: string;
-    filled?: boolean;
+    class?: string
+    filled?: boolean
   },
 ) {
-  return <IconStar class={filled ? `fill-current ${className}` : className} />;
+  return <IconStar class={filled ? `fill-current ${className}` : className} />
 }
 
 /** Renders a catalog item's icon by name (#184) — see `CatalogIconName`. */
@@ -27,12 +27,12 @@ export function CatalogIcon(
 ) {
   switch (name) {
     case "target":
-      return <IconTarget class={className} />;
+      return <IconTarget class={className} />
     case "search":
-      return <IconSearch class={className} />;
+      return <IconSearch class={className} />
     case "rocket":
-      return <IconRocket class={className} />;
+      return <IconRocket class={className} />
     case "briefcase":
-      return <IconBriefcase class={className} />;
+      return <IconBriefcase class={className} />
   }
 }

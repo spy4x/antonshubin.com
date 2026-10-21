@@ -1,15 +1,11 @@
-import type { ComponentChildren } from "preact";
-import { WindowFrame } from "@spy4x/preact-ui/window-frame";
-import ToolHeroClip from "../../islands/ToolHeroClip.tsx";
-import {
-  clipSources,
-  type Tool,
-  type ToolScreenshot,
-} from "../../lib/tools.ts";
-import { heroStill } from "./tool-page.ts";
+import type { ComponentChildren } from "preact"
+import { WindowFrame } from "@spy4x/preact-ui/window-frame"
+import ToolHeroClip from "../../islands/ToolHeroClip.tsx"
+import { clipSources, type Tool, type ToolScreenshot } from "../../lib/tools.ts"
+import { heroStill } from "./tool-page.ts"
 
 /** The hero media's `sizes`: the right column from 1024px, the content width below. */
-export const HERO_SIZES = "(min-width: 1024px) 33rem, calc(100vw - 2rem)";
+export const HERO_SIZES = "(min-width: 1024px) 33rem, calc(100vw - 2rem)"
 
 /**
  * The page's one eager, high-priority image: the hero still. The frame's
@@ -28,7 +24,7 @@ function Still({ shot }: { shot: ToolScreenshot }) {
       fetchpriority="high"
       class="block w-full h-auto"
     />
-  );
+  )
 }
 
 /**
@@ -37,10 +33,10 @@ function Still({ shot }: { shot: ToolScreenshot }) {
  */
 export function MediaFrame(
   { variant, title, caption, children }: {
-    variant: "browser" | "terminal" | "bare";
-    title?: string;
-    caption?: string;
-    children: ComponentChildren;
+    variant: "browser" | "terminal" | "bare"
+    title?: string
+    caption?: string
+    children: ComponentChildren
   },
 ) {
   // The library's terminal frame lays its content out as scrollable text (a
@@ -58,13 +54,13 @@ export function MediaFrame(
           </figcaption>
         )}
       </figure>
-    );
+    )
   }
   return (
     <WindowFrame variant={variant} title={title} caption={caption}>
       {children}
     </WindowFrame>
-  );
+  )
 }
 
 /**
@@ -76,7 +72,7 @@ export function MediaFrame(
  * screenshot in a browser frame. Renders nothing for a tool with no picture.
  */
 export function ToolHeroMedia({ tool }: { tool: Tool }) {
-  const clip = tool.clip;
+  const clip = tool.clip
   if (clip) {
     return (
       <MediaFrame
@@ -103,10 +99,10 @@ export function ToolHeroMedia({ tool }: { tool: Tool }) {
           )
           : <Still shot={clip.poster} />}
       </MediaFrame>
-    );
+    )
   }
-  const still = heroStill(tool);
-  if (!still) return null;
+  const still = heroStill(tool)
+  if (!still) return null
   return (
     <MediaFrame
       variant="browser"
@@ -116,5 +112,5 @@ export function ToolHeroMedia({ tool }: { tool: Tool }) {
     >
       <Still shot={still} />
     </MediaFrame>
-  );
+  )
 }

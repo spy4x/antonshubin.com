@@ -1,7 +1,7 @@
-import { Card } from "@spy4x/preact-ui/card";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import type { ToolPageData } from "../../tool-frame/tool-page.ts";
+import { Card } from "@spy4x/preact-ui/card"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import type { ToolPageData } from "../../tool-frame/tool-page.ts"
 import {
   CHECK_LINE,
   HARNESS_MAP,
@@ -9,9 +9,9 @@ import {
   INSTALL_WARNING,
   SETUP_CARDS,
   WORKSTATION,
-} from "./content.ts";
+} from "./content.ts"
 
-const ITEM = "dotfiles";
+const ITEM = "dotfiles"
 
 /** A path in monospace that breaks anywhere rather than widen a 390px page. */
 function Path({ children }: { children: string }) {
@@ -19,7 +19,7 @@ function Path({ children }: { children: string }) {
     <code class="font-mono text-parchment [overflow-wrap:anywhere]">
       {children}
     </code>
-  );
+  )
 }
 
 /** The README's warning under the hero's quick start. */
@@ -30,7 +30,7 @@ export function InstallWarning() {
       {" "}
       {INSTALL_WARNING[1]}
     </p>
-  );
+  )
 }
 
 /**
@@ -119,7 +119,7 @@ export function HarnessMap() {
         <code class="font-mono text-parchment">--check</code> {CHECK_LINE}
       </p>
     </section>
-  );
+  )
 }
 
 /**
@@ -175,12 +175,12 @@ export function AgentSetup() {
         </ul>
       </details>
     </section>
-  );
+  )
 }
 
 /** "Where it stands" beside the facts card: `usedFor` and the open issues. */
 export function DotfilesStanding({ data }: { data: ToolPageData }) {
-  const { tool, repo } = data;
+  const { tool, repo } = data
   return (
     <section aria-labelledby="standing">
       <h2 id="standing" class="text-2xl sm:text-3xl text-parchment">
@@ -204,5 +204,5 @@ export function DotfilesStanding({ data }: { data: ToolPageData }) {
         </p>
       )}
     </section>
-  );
+  )
 }

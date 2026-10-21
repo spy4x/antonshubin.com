@@ -14,38 +14,38 @@
  * lift GitHub's anonymous rate limit. The token is only sent to
  * api.github.com and never written anywhere.
  */
-import { snapshotRepos } from "../lib/tools.ts";
-import type { GithubSnapshot, RepoSnapshot } from "../lib/github-snapshot.ts";
+import { snapshotRepos } from "../lib/tools.ts"
+import type { GithubSnapshot, RepoSnapshot } from "../lib/github-snapshot.ts"
 import {
   latestBranchPipeline,
   snapshotRepo,
   type WoodpeckerPipeline,
-} from "../lib/snapshot-fetch.ts";
+} from "../lib/snapshot-fetch.ts"
 
-const OUT = new URL("../lib/github-snapshot.json", import.meta.url);
+const OUT = new URL("../lib/github-snapshot.json", import.meta.url)
 
-export { latestBranchPipeline, type WoodpeckerPipeline };
+export { latestBranchPipeline, type WoodpeckerPipeline }
 
 async function main() {
-  const repos: Record<string, RepoSnapshot> = {};
+  const repos: Record<string, RepoSnapshot> = {}
   for (const { repo, ciRepoId } of snapshotRepos()) {
     repos[repo] = await snapshotRepo(
       fetch,
       repo,
       ciRepoId,
       Deno.env.get("GITHUB_TOKEN"),
-    );
-    const ci = repos[repo].ci;
-    console.log(`${repo}: CI ${ci ? `${ci.status} #${ci.pipeline}` : "none"}`);
+    )
+    const ci = repos[repo].ci
+    console.log(`${repo}: CI ${ci ? `${ci.status} #${ci.pipeline}` : "none"}`)
   }
   const snapshot: GithubSnapshot = {
     checkedOn: new Date().toISOString().slice(0, 10),
     repos,
-  };
-  await Deno.writeTextFile(OUT, `${JSON.stringify(snapshot, null, 2)}\n`);
-  console.log(`Wrote lib/github-snapshot.json`);
+  }
+  await Deno.writeTextFile(OUT, `${JSON.stringify(snapshot, null, 2)}\n`)
+  console.log(`Wrote lib/github-snapshot.json`)
 }
 
 if (import.meta.main) {
-  await main();
+  await main()
 }

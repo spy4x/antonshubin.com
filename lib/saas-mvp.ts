@@ -1,6 +1,6 @@
-import { catalogItem, priceLabel } from "./catalog.ts";
-import { decapitalize, promise } from "./promises.ts";
-import { type Faq, faqs } from "./faqs.ts";
+import { catalogItem, priceLabel } from "./catalog.ts"
+import { decapitalize, promise } from "./promises.ts"
+import { type Faq, faqs } from "./faqs.ts"
 
 /**
  * The SaaS MVP service page's own words (#484): the one page for hiring
@@ -13,15 +13,15 @@ import { type Faq, faqs } from "./faqs.ts";
  * `apps/mpa/routes/mvp.tsx`), which this page replaces.
  */
 
-export const SAAS_MVP_SLUG = "zero-to-production-saas-mvp";
+export const SAAS_MVP_SLUG = "zero-to-production-saas-mvp"
 
 /** The line above the H1: the phrase a buyer searches for. */
-export const SAAS_MVP_EYEBROW = "SaaS MVP development";
+export const SAAS_MVP_EYEBROW = "SaaS MVP development"
 
 /** The ownership promise as a clause: its title, decapitalized, then its `desc`. */
 function ownershipClause(): string {
-  const ownership = promise("ownership");
-  return `${decapitalize(ownership.title)}. ${ownership.desc}`;
+  const ownership = promise("ownership")
+  return `${decapitalize(ownership.title)}. ${ownership.desc}`
 }
 
 /**
@@ -29,7 +29,7 @@ function ownershipClause(): string {
  * time, because the price card right below says both (#501).
  */
 export function saasMvpLead(): string {
-  return `I build SaaS MVPs on Seed, and ${ownershipClause()}`;
+  return `I build SaaS MVPs on Seed, and ${ownershipClause()}`
 }
 
 /**
@@ -37,23 +37,23 @@ export function saasMvpLead(): string {
  * sentences, for the meta description and `llms-full.txt`.
  */
 export function saasMvpAnswer(): string {
-  const item = catalogItem(SAAS_MVP_SLUG);
+  const item = catalogItem(SAAS_MVP_SLUG)
   return `I build SaaS MVPs on Seed ${decapitalize(priceLabel(item))}, live ${
     decapitalize(item.delivery)
-  }, and ${ownershipClause()}`;
+  }, and ${ownershipClause()}`
 }
 
-export const WHY_IT_COSTS_LESS_HEADING = "Why it costs less";
+export const WHY_IT_COSTS_LESS_HEADING = "Why it costs less"
 
 export const WHY_IT_COSTS_LESS =
-  "Every product needs sign-in, teams, payments, emails, backups and a way to deploy. Built from scratch, that is weeks of work before your idea even starts. I keep those parts in Seed, with browser tests that run on every change. Your project starts from there, so the weeks you pay for go to your product, and because Seed is public, any developer you hire later can read how it works.";
+  "Every product needs sign-in, teams, payments, emails, backups and a way to deploy. Built from scratch, that is weeks of work before your idea even starts. I keep those parts in Seed, with browser tests that run on every change. Your project starts from there, so the weeks you pay for go to your product, and because Seed is public, any developer you hire later can read how it works."
 
 /** One `lib/faqs.ts` question by id, so its wording stays in one place. */
 function sharedFaq(id: string): Faq {
-  const f = faqs.find((x) => x.id === id);
-  if (!f) throw new Error(`lib/faqs.ts: no question "${id}"`);
+  const f = faqs.find((x) => x.id === id)
+  if (!f) throw new Error(`lib/faqs.ts: no question "${id}"`)
   // The page carries the brief twice already (card and band); no third link.
-  return { id: f.id, q: f.q, a: f.a };
+  return { id: f.id, q: f.q, a: f.a }
 }
 
 /**
@@ -79,10 +79,10 @@ export function saasMvpFaqs(): Faq[] {
     },
     sharedFaq("ai-and-your-code"),
     sharedFaq("no-clear-idea"),
-  ];
+  ]
 }
 
-export const SAAS_MVP_QUESTIONS_HEADING = "Questions before you book";
+export const SAAS_MVP_QUESTIONS_HEADING = "Questions before you book"
 
 /** The `llms-full.txt` section: the answer, then the questions. */
 export function saasMvpLlmsSection(baseUrl: string): string {
@@ -90,5 +90,5 @@ export function saasMvpLlmsSection(baseUrl: string): string {
 
 ${saasMvpAnswer()}
 
-${saasMvpFaqs().map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}`;
+${saasMvpFaqs().map((f) => `### ${f.q}\n${f.a}`).join("\n\n")}`
 }

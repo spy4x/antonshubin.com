@@ -1,35 +1,35 @@
-import { define } from "../lib/utils.ts";
-import { head } from "../lib/head.ts";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { Layout } from "../components/Layout.tsx";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { ComparisonTable } from "@spy4x/preact-ui/comparison-table";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { BookCallLink } from "../components/BookCallLink.tsx";
-import Button from "../components/Button.tsx";
-import { Questions } from "../components/Questions.tsx";
-import { ClosingBand } from "../components/ClosingBand.tsx";
-import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { WithNote } from "../components/WithNote.tsx";
+import { define } from "../lib/utils.ts"
+import { head } from "../lib/head.ts"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { Layout } from "../components/Layout.tsx"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { ComparisonTable } from "@spy4x/preact-ui/comparison-table"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { BookCallLink } from "../components/BookCallLink.tsx"
+import Button from "../components/Button.tsx"
+import { Questions } from "../components/Questions.tsx"
+import { ClosingBand } from "../components/ClosingBand.tsx"
+import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { WithNote } from "../components/WithNote.tsx"
 import {
   BOOK_HREF,
   BOOK_LABEL,
   BRIEF_LABEL,
   WRITE_FALLBACK_HREF,
-} from "../lib/nav.ts";
+} from "../lib/nav.ts"
 import {
   catalogItem,
   catalogItems,
   catalogPath,
   INTRO_CALL,
   priceLabel,
-} from "../lib/catalog.ts";
-import { formatPeriod } from "../lib/data.ts";
-import { clientProject, projectLead } from "../lib/llms.ts";
-import { workHref } from "../lib/work.ts";
-import { toJsonLd } from "../lib/json-ld.ts";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+} from "../lib/catalog.ts"
+import { formatPeriod } from "../lib/data.ts"
+import { clientProject, projectLead } from "../lib/llms.ts"
+import { workHref } from "../lib/work.ts"
+import { toJsonLd } from "../lib/json-ld.ts"
+import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 import {
   AI_FIGURES,
   AI_PROVIDER_LINK,
@@ -72,13 +72,13 @@ import {
   WHY_NOT_JUST_AI_PATH,
   WHY_NOT_JUST_AI_TITLE,
   whyNotJustAiFaqs,
-} from "../lib/why-not-just-ai.ts";
+} from "../lib/why-not-just-ai.ts"
 
-const CANONICAL = `https://antonshubin.com${WHY_NOT_JUST_AI_PATH}`;
+const CANONICAL = `https://antonshubin.com${WHY_NOT_JUST_AI_PATH}`
 
 /** A quiet text link with an arrow, as the FAQ links on /how-i-work. */
 const QUIET_LINK =
-  "inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment";
+  "inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
 
 /** A link to the public agent rules, in a new tab. */
 function DotfilesLink() {
@@ -93,7 +93,7 @@ function DotfilesLink() {
       spy4x/dotfiles
       <NewTabHint />
     </a>
-  );
+  )
 }
 
 /**
@@ -117,8 +117,8 @@ export default define.page(function WhyNotJustAi() {
     ogImage: "https://antonshubin.com/img/og/why-not-just-ai.png",
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
-  const faqs = whyNotJustAiFaqs();
+  }
+  const faqs = whyNotJustAiFaqs()
 
   return (
     <Layout currentPath={WHY_NOT_JUST_AI_PATH}>
@@ -320,7 +320,7 @@ export default define.page(function WhyNotJustAi() {
               </p>
               <ul class="mt-4 max-w-2xl space-y-3">
                 {BUILT_STEPS.map(({ slug, line }) => {
-                  const item = catalogItem(slug);
+                  const item = catalogItem(slug)
                   return (
                     <li key={slug}>
                       <a
@@ -335,7 +335,7 @@ export default define.page(function WhyNotJustAi() {
                       </span>
                       <span class="block text-graphite">{line}</span>
                     </li>
-                  );
+                  )
                 })}
               </ul>
             </section>
@@ -347,10 +347,10 @@ export default define.page(function WhyNotJustAi() {
               </p>
               <ul class="mt-4 max-w-2xl divide-y divide-rule border-y border-rule">
                 {SHIPPED.map(({ slug, status }) => {
-                  const p = clientProject(slug);
+                  const p = clientProject(slug)
                   const lead = (
                     <p class="mt-1 text-graphite">{projectLead(p)}</p>
-                  );
+                  )
                   return (
                     <li key={slug} class="py-4" data-shipped-row={slug}>
                       <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -382,7 +382,7 @@ export default define.page(function WhyNotJustAi() {
                         )
                         : lead}
                     </li>
-                  );
+                  )
                 })}
               </ul>
             </section>
@@ -410,13 +410,13 @@ export default define.page(function WhyNotJustAi() {
         </ClosingBand>
       </div>
     </Layout>
-  );
-});
+  )
+})
 
 /** The table's method sentence, with "my public agent rules" linking them. */
 const [METHOD_BEFORE, METHOD_AFTER] = COMPARISON_METHOD.split(
   COMPARISON_RULES_LINK,
-);
+)
 const COMPARISON_METHOD_NODE = (
   <>
     {METHOD_BEFORE}
@@ -432,4 +432,4 @@ const COMPARISON_METHOD_NODE = (
     </a>
     {METHOD_AFTER}
   </>
-);
+)

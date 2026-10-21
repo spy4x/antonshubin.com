@@ -1,5 +1,5 @@
-import { define } from "../lib/utils.ts";
-import { BASE_URL } from "../lib/config.ts";
+import { define } from "../lib/utils.ts"
+import { BASE_URL } from "../lib/config.ts"
 
 export const handler = define.handlers({
   GET() {
@@ -47,13 +47,13 @@ Allow: /
 
 User-agent: CCBot
 Allow: /
-`;
+`
 
     return new Response(txt, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "max-age=86400",
       },
-    });
+    })
   },
-});
+})

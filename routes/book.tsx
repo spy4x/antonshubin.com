@@ -1,34 +1,34 @@
-import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
-import { Head } from "fresh/runtime";
-import { define } from "../lib/utils.ts";
-import { Layout } from "../components/Layout.tsx";
-import { getBreadcrumb, head, ROLE } from "../lib/head.ts";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { Breadcrumb } from "../components/Breadcrumb.tsx";
-import { NewTabHint } from "../components/NewTabHint.tsx";
-import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx";
-import { TestimonialCard } from "../components/TestimonialCard.tsx";
-import { INVOICE_NOTE, SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts";
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts"
+import { Head } from "fresh/runtime"
+import { define } from "../lib/utils.ts"
+import { Layout } from "../components/Layout.tsx"
+import { getBreadcrumb, head, ROLE } from "../lib/head.ts"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { Breadcrumb } from "../components/Breadcrumb.tsx"
+import { NewTabHint } from "../components/NewTabHint.tsx"
+import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx"
+import { TestimonialCard } from "../components/TestimonialCard.tsx"
+import { INVOICE_NOTE, SCHEDULE_URL, TIMEZONE_LABEL } from "../lib/config.ts"
 import {
   EMAIL_ADDRESS,
   emailContact,
   profile,
   telegramContact,
-} from "../lib/profiles.ts";
-import { INTRO_CALL } from "../lib/catalog.ts";
-import { originOf } from "../lib/csp.ts";
-import { leadService } from "../lib/lead.ts";
-import { decapitalize, promise } from "../lib/promises.ts";
-import { COMPANY } from "../lib/company.ts";
+} from "../lib/profiles.ts"
+import { INTRO_CALL } from "../lib/catalog.ts"
+import { originOf } from "../lib/csp.ts"
+import { leadService } from "../lib/lead.ts"
+import { decapitalize, promise } from "../lib/promises.ts"
+import { COMPANY } from "../lib/company.ts"
 import {
   contactTestimonialId,
   testimonial,
   testimonialProject,
   visibleTestimonials,
-} from "../lib/testimonials.ts";
-import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx";
-import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx";
-import { eventAttrs } from "../lib/analytics.ts";
+} from "../lib/testimonials.ts"
+import MeetEmbed, { embedUrl, NEW_TAB_LABEL } from "../islands/MeetEmbed.tsx"
+import LeadForm, { BRIEF_PROMISE } from "../islands/LeadForm.tsx"
+import { eventAttrs } from "../lib/analytics.ts"
 
 /**
  * What happens when a visitor books, from mig's own behaviour: times in the
@@ -36,10 +36,10 @@ import { eventAttrs } from "../lib/analytics.ts";
  * link to both sides (#301, answers 4 and 5).
  */
 const BOOKING_FACTS =
-  "You talk to me, not a salesperson. The calendar shows times in your own time zone. Once you book, you and I each get an email with a calendar invite and a cancel link; reply to it with anything you want to cover.";
+  "You talk to me, not a salesperson. The calendar shows times in your own time zone. Once you book, you and I each get an email with a calendar invite and a cancel link; reply to it with anything you want to cover."
 
 /** The call, capitalised for a heading: "Book a free 30-minute intro call". */
-const BOOK_HEADING = `Book a ${INTRO_CALL}`;
+const BOOK_HEADING = `Book a ${INTRO_CALL}`
 
 /**
  * The booking page (#272, the merged spec on the issue). Every Book link
@@ -52,8 +52,8 @@ const BOOK_HEADING = `Book a ${INTRO_CALL}`;
  * other value is ignored.
  */
 export default define.page(function Book(ctx) {
-  const booking = Boolean(SCHEDULE_URL);
-  const service = leadService(ctx.url.searchParams.get("service"));
+  const booking = Boolean(SCHEDULE_URL)
+  const service = leadService(ctx.url.searchParams.get("service"))
   head.value = {
     ...head.value,
     title: booking
@@ -65,13 +65,13 @@ export default define.page(function Book(ctx) {
     canonical: "https://antonshubin.com/book",
     ogType: "website",
     pageName: "Contact",
-  };
-  const quote = visibleTestimonials([testimonial(contactTestimonialId)])[0];
-  const schedulerOrigin = originOf(SCHEDULE_URL);
+  }
+  const quote = visibleTestimonials([testimonial(contactTestimonialId)])[0]
+  const schedulerOrigin = originOf(SCHEDULE_URL)
   // What follows the call, in the promises' own words (#272, Psych 4): a
   // small first milestone either side can stop after, and the work is yours.
-  const milestone = promise("first-milestone");
-  const ownership = promise("ownership");
+  const milestone = promise("first-milestone")
+  const ownership = promise("ownership")
 
   return (
     <Layout currentPath="/book">
@@ -277,5 +277,5 @@ export default define.page(function Book(ctx) {
         )}
       </div>
     </Layout>
-  );
-});
+  )
+})

@@ -29,29 +29,29 @@
  * stable, deterministic name this script has for the video's subject.
  */
 
-import { BASE_URL } from "@/lib/config.ts";
-import { channelUrl } from "./utm.ts";
+import { BASE_URL } from "@/lib/config.ts"
+import { channelUrl } from "./utm.ts"
 
-const OUT_DIR = "videos";
-const CHAPTER_INTERVAL_SECONDS = 60;
+const OUT_DIR = "videos"
+const CHAPTER_INTERVAL_SECONDS = 60
 
 export interface TranscriptSegment {
-  startSeconds: number;
-  text: string;
+  startSeconds: number
+  text: string
 }
 
 export interface ChapterLine {
-  startSeconds: number;
-  label: string;
+  startSeconds: number
+  label: string
 }
 
 export interface VideoKitContext {
-  slug: string;
-  campaign: string;
-  titleOptions: string[];
-  chapters: ChapterLine[];
-  summary: string;
-  taggedBlogUrl: string;
+  slug: string
+  campaign: string
+  titleOptions: string[]
+  chapters: ChapterLine[]
+  summary: string
+  taggedBlogUrl: string
 }
 
 /**
@@ -61,15 +61,15 @@ export interface VideoKitContext {
  * unsupported transcript never silently produces empty chapters.
  */
 export function detectTranscriptFormat(path: string): "srt" | "plain" {
-  if (path.endsWith(".srt")) return "srt";
-  if (path.endsWith(".txt")) return "plain";
+  if (path.endsWith(".srt")) return "srt"
+  if (path.endsWith(".txt")) return "plain"
   throw new Error(
     `Unsupported transcript format for "${path}". Expected a ".txt" ` +
       `(plain, no timestamps) or ".srt" (SubRip, timestamped) file.`,
-  );
+  )
 }
 
-const SRT_TIMESTAMP = /(\d{2}):(\d{2}):(\d{2}),(\d{3})/;
+const SRT_TIMESTAMP = /(\d{2}):(\d{2}):(\d{2}),(\d{3})/
 
 /**
  * Parses SubRip (`.srt`) text into timestamped segments. Blocks are
@@ -79,42 +79,42 @@ const SRT_TIMESTAMP = /(\d{2}):(\d{2}):(\d{2}),(\d{3})/;
  * on, since a real Whisper `.srt` export is otherwise well-formed.
  */
 export function parseSrt(text: string): TranscriptSegment[] {
-  const blocks = text.replace(/\r\n/g, "\n").split(/\n\n+/);
-  const segments: TranscriptSegment[] = [];
+  const blocks = text.replace(/\r\n/g, "\n").split(/\n\n+/)
+  const segments: TranscriptSegment[] = []
   for (const block of blocks) {
-    const lines = block.split("\n").filter((line) => line.trim().length > 0);
-    const timeLineIndex = lines.findIndex((line) => line.includes("-->"));
-    if (timeLineIndex === -1) continue;
-    const match = lines[timeLineIndex].match(SRT_TIMESTAMP);
-    if (!match) continue;
-    const [, hh, mm, ss, ms] = match;
+    const lines = block.split("\n").filter((line) => line.trim().length > 0)
+    const timeLineIndex = lines.findIndex((line) => line.includes("-->"))
+    if (timeLineIndex === -1) continue
+    const match = lines[timeLineIndex].match(SRT_TIMESTAMP)
+    if (!match) continue
+    const [, hh, mm, ss, ms] = match
     const startSeconds = Number(hh) * 3600 + Number(mm) * 60 + Number(ss) +
-      Number(ms) / 1000;
-    const cueText = lines.slice(timeLineIndex + 1).join(" ").trim();
-    if (cueText) segments.push({ startSeconds, text: cueText });
+      Number(ms) / 1000
+    const cueText = lines.slice(timeLineIndex + 1).join(" ").trim()
+    if (cueText) segments.push({ startSeconds, text: cueText })
   }
   if (segments.length === 0) {
-    throw new Error("No timestamped cues found in the .srt transcript");
+    throw new Error("No timestamped cues found in the .srt transcript")
   }
-  return segments;
+  return segments
 }
 
 /** Formats seconds as a YouTube chapter timestamp: `0:00`, `2:14`, `1:02:14`. */
 export function formatTimestamp(totalSeconds: number): string {
-  const s = Math.floor(totalSeconds);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  const mm = h > 0 ? String(m).padStart(2, "0") : String(m);
-  const ss = String(sec).padStart(2, "0");
-  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+  const s = Math.floor(totalSeconds)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = s % 60
+  const mm = h > 0 ? String(m).padStart(2, "0") : String(m)
+  const ss = String(sec).padStart(2, "0")
+  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`
 }
 
 /** First few words of a cue, capitalized, used as a chapter's label. */
 function chapterLabel(cueText: string, wordCount = 6): string {
   const words = cueText.trim().split(/\s+/).slice(0, wordCount).join(" ")
-    .replace(/[.,;:!?]+$/, "");
-  return words.charAt(0).toUpperCase() + words.slice(1);
+    .replace(/[.,;:!?]+$/, "")
+  return words.charAt(0).toUpperCase() + words.slice(1)
 }
 
 /**
@@ -130,24 +130,24 @@ export function buildChaptersFromSegments(
   intervalSeconds = CHAPTER_INTERVAL_SECONDS,
 ): ChapterLine[] {
   if (segments.length === 0) {
-    throw new Error("No timestamped segments to build chapters from");
+    throw new Error("No timestamped segments to build chapters from")
   }
-  const chapters: ChapterLine[] = [{ startSeconds: 0, label: "Intro" }];
-  let nextThreshold = intervalSeconds;
+  const chapters: ChapterLine[] = [{ startSeconds: 0, label: "Intro" }]
+  let nextThreshold = intervalSeconds
   for (const segment of segments) {
     if (segment.startSeconds >= nextThreshold) {
       chapters.push({
         startSeconds: segment.startSeconds,
         label: chapterLabel(segment.text),
-      });
-      nextThreshold += intervalSeconds;
+      })
+      nextThreshold += intervalSeconds
     }
   }
-  return chapters;
+  return chapters
 }
 
 function formatChapterLine(chapter: ChapterLine): string {
-  return `${formatTimestamp(chapter.startSeconds)} ${chapter.label}`;
+  return `${formatTimestamp(chapter.startSeconds)} ${chapter.label}`
 }
 
 /**
@@ -162,14 +162,14 @@ export function extractTitleOptions(fullText: string, count = 5): string[] {
     .trim()
     .split(/(?<=[.!?])\s+/)
     .map((sentence) => sentence.trim())
-    .filter((sentence) => sentence.length >= 15 && sentence.length <= 90);
-  const options = sentences.slice(0, count);
+    .filter((sentence) => sentence.length >= 15 && sentence.length <= 90)
+  const options = sentences.slice(0, count)
   if (options.length === 0) {
     throw new Error(
       "Transcript has no sentence between 15 and 90 characters to use as a title candidate",
-    );
+    )
   }
-  return options;
+  return options
 }
 
 /** First few sentences of the transcript, joined into a description paragraph. */
@@ -179,17 +179,17 @@ export function buildSummary(fullText: string, sentenceCount = 3): string {
     .trim()
     .split(/(?<=[.!?])\s+/)
     .map((sentence) => sentence.trim())
-    .filter((sentence) => sentence.length > 0);
-  const summary = sentences.slice(0, sentenceCount).join(" ");
+    .filter((sentence) => sentence.length > 0)
+  const summary = sentences.slice(0, sentenceCount).join(" ")
   if (!summary) {
-    throw new Error("Transcript has no text to summarize");
+    throw new Error("Transcript has no text to summarize")
   }
-  return summary;
+  return summary
 }
 
 /** `<slug>-yt`, the `<topic>-yt` pattern from `docs/utm.md`, unless `override` is given. */
 export function deriveCampaign(slug: string, override?: string): string {
-  return override && override.length > 0 ? override : `${slug}-yt`;
+  return override && override.length > 0 ? override : `${slug}-yt`
 }
 
 /**
@@ -212,23 +212,23 @@ export function buildContext(
       : [{ startSeconds: 0, label: "Intro" }],
     summary: buildSummary(fullText),
     taggedBlogUrl: channelUrl(BASE_URL, `/blog/${slug}`, "youtube", campaign),
-  };
+  }
 }
 
 export function titlesDraft(ctx: VideoKitContext): string {
   const lines = ctx.titleOptions.map((title, i) => `${i + 1}. ${title}`).join(
     "\n",
-  );
-  return `# Title options\n\n${lines}\n`;
+  )
+  return `# Title options\n\n${lines}\n`
 }
 
 export function descriptionDraft(ctx: VideoKitContext): string {
-  return `${ctx.summary}\n\nFull write-up: ${ctx.taggedBlogUrl}\n`;
+  return `${ctx.summary}\n\nFull write-up: ${ctx.taggedBlogUrl}\n`
 }
 
 export function chaptersDraft(ctx: VideoKitContext): string {
-  const lines = ctx.chapters.map(formatChapterLine).join("\n");
-  return `${lines}\n`;
+  const lines = ctx.chapters.map(formatChapterLine).join("\n")
+  return `${lines}\n`
 }
 
 /**
@@ -250,32 +250,32 @@ topic: "founders | ai-mcp | self-hosting | scars"
 ${ctx.summary}
 
 <!-- Expand into the full companion post. -->
-`;
+`
 }
 
 /** Reads `path`, failing loudly (naming the file) instead of a raw stack trace. */
 async function readTranscriptFile(path: string): Promise<string> {
   try {
-    return await Deno.readTextFile(path);
+    return await Deno.readTextFile(path)
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {
-      throw new Error(`Transcript file not found: "${path}"`);
+      throw new Error(`Transcript file not found: "${path}"`)
     }
-    throw err;
+    throw err
   }
 }
 
 export interface RunVideoKitOptions {
-  transcriptPath: string;
-  slug: string;
-  campaign?: string;
+  transcriptPath: string
+  slug: string
+  campaign?: string
   /** Overrides `videos/<slug>` — the tests use this to avoid writing into the repo. */
-  outDir?: string;
+  outDir?: string
 }
 
 export interface RunVideoKitResult {
-  outDir: string;
-  files: string[];
+  outDir: string
+  files: string[]
 }
 
 /**
@@ -286,72 +286,72 @@ export interface RunVideoKitResult {
 export async function runVideoKit(
   options: RunVideoKitOptions,
 ): Promise<RunVideoKitResult> {
-  const format = detectTranscriptFormat(options.transcriptPath);
-  const raw = await readTranscriptFile(options.transcriptPath);
+  const format = detectTranscriptFormat(options.transcriptPath)
+  const raw = await readTranscriptFile(options.transcriptPath)
 
   const { fullText, segments } = format === "srt"
     ? (() => {
-      const parsedSegments = parseSrt(raw);
+      const parsedSegments = parseSrt(raw)
       return {
         fullText: parsedSegments.map((s) => s.text).join(" "),
         segments: parsedSegments,
-      };
+      }
     })()
-    : { fullText: raw.trim(), segments: [] as TranscriptSegment[] };
+    : { fullText: raw.trim(), segments: [] as TranscriptSegment[] }
 
   if (!fullText) {
-    throw new Error(`Transcript file "${options.transcriptPath}" is empty`);
+    throw new Error(`Transcript file "${options.transcriptPath}" is empty`)
   }
 
-  const campaign = deriveCampaign(options.slug, options.campaign);
-  const ctx = buildContext(options.slug, campaign, fullText, segments);
+  const campaign = deriveCampaign(options.slug, options.campaign)
+  const ctx = buildContext(options.slug, campaign, fullText, segments)
 
-  const outDir = options.outDir ?? `${OUT_DIR}/${options.slug}`;
-  await Deno.mkdir(outDir, { recursive: true });
+  const outDir = options.outDir ?? `${OUT_DIR}/${options.slug}`
+  await Deno.mkdir(outDir, { recursive: true })
 
   const drafts: [string, string][] = [
     ["titles.md", titlesDraft(ctx)],
     ["description.md", descriptionDraft(ctx)],
     ["chapters.md", chaptersDraft(ctx)],
     ["blog-draft.md", blogDraft(ctx)],
-  ];
+  ]
 
-  const files: string[] = [];
+  const files: string[] = []
   for (const [name, content] of drafts) {
-    const path = `${outDir}/${name}`;
-    await Deno.writeTextFile(path, content);
-    files.push(path);
+    const path = `${outDir}/${name}`
+    await Deno.writeTextFile(path, content)
+    files.push(path)
   }
 
-  return { outDir, files };
+  return { outDir, files }
 }
 
 async function main() {
-  const [transcriptPath, slug, campaign] = Deno.args;
+  const [transcriptPath, slug, campaign] = Deno.args
   if (!transcriptPath || !slug) {
     console.error(
       "Usage: deno task video-kit <transcript-path> <slug> [campaign]",
-    );
-    Deno.exit(1);
+    )
+    Deno.exit(1)
   }
 
-  let result: RunVideoKitResult;
+  let result: RunVideoKitResult
   try {
-    result = await runVideoKit({ transcriptPath, slug, campaign });
+    result = await runVideoKit({ transcriptPath, slug, campaign })
   } catch (err) {
-    console.error(`\n  ✗ ${(err as Error).message}\n`);
-    Deno.exit(1);
-    return;
+    console.error(`\n  ✗ ${(err as Error).message}\n`)
+    Deno.exit(1)
+    return
   }
 
   for (const path of result.files) {
-    console.log(`  ✓ ${path}`);
+    console.log(`  ✓ ${path}`)
   }
   console.log(
     `\n  ✅ Video kit ready in ${result.outDir}/ — drafts only, nothing was uploaded.\n`,
-  );
+  )
 }
 
 if (import.meta.main) {
-  await main();
+  await main()
 }

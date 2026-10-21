@@ -173,9 +173,9 @@ deno add jsr:@spy4x/preact-ui
 And render it:
 
 ```tsx
-import { Badge } from "@spy4x/preact-ui/badge";
+import { Badge } from "@spy4x/preact-ui/badge"
 
-<Badge text="Active" color="green" />;
+<Badge text="Active" color="green" />
 ```
 
 One honest catch: the components render Tailwind classes against the compiled

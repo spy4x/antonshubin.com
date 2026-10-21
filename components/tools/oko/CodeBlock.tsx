@@ -1,7 +1,7 @@
-import type { ComponentChildren } from "preact";
-import CopyButton from "../../../islands/CopyButton.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx";
+import type { ComponentChildren } from "preact"
+import CopyButton from "../../../islands/CopyButton.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx"
 
 /**
  * A file of oko's quick start or config, with its name and a Copy button
@@ -11,13 +11,13 @@ import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx";
  */
 export function CodeBlock(
   { id, file, code, aside, children }: {
-    id: string;
+    id: string
     /** The file name in the block's header. */
-    file: string;
+    file: string
     /** The text, copied as is; ignored when `children` draws it line by line. */
-    code?: string;
-    aside?: ComponentChildren;
-    children?: ComponentChildren;
+    code?: string
+    aside?: ComponentChildren
+    children?: ComponentChildren
   },
 ) {
   return (
@@ -45,5 +45,5 @@ export function CodeBlock(
         {aside}
       </div>
     </div>
-  );
+  )
 }

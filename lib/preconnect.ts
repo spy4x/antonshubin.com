@@ -16,11 +16,11 @@ export function crossOriginPreconnect(
   scriptUrl: string,
   siteUrl: string,
 ): string {
-  if (!scriptUrl) return "";
+  if (!scriptUrl) return ""
   try {
-    const scriptOrigin = new URL(scriptUrl).origin;
-    return scriptOrigin === new URL(siteUrl).origin ? "" : scriptOrigin;
+    const scriptOrigin = new URL(scriptUrl).origin
+    return scriptOrigin === new URL(siteUrl).origin ? "" : scriptOrigin
   } catch {
-    return "";
+    return ""
   }
 }

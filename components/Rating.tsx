@@ -1,4 +1,4 @@
-import { StarIcon } from "./Icons.tsx";
+import { StarIcon } from "./Icons.tsx"
 
 /**
  * A review's Upwork star rating: filled stars plus the number, e.g. "5.0".
@@ -7,7 +7,7 @@ import { StarIcon } from "./Icons.tsx";
 export function Rating(
   { value, class: className = "" }: { value: number; class?: string },
 ) {
-  const label = value.toFixed(1);
+  const label = value.toFixed(1)
   return (
     <span
       data-rating={label}
@@ -28,5 +28,5 @@ export function Rating(
         <span aria-hidden="true">{label}</span>
       </span>
     </span>
-  );
+  )
 }

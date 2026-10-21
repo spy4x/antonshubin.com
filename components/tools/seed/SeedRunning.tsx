@@ -1,21 +1,21 @@
-import { IconArrowUpRight } from "@spy4x/preact-icons";
-import { NewTabHint } from "../../NewTabHint.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import { DEMO_ADMIN, DEMO_APP, DEMO_NOTE } from "./demo.ts";
+import { IconArrowUpRight } from "@spy4x/preact-icons"
+import { NewTabHint } from "../../NewTabHint.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import { DEMO_ADMIN, DEMO_APP, DEMO_NOTE } from "./demo.ts"
 
 /** One live surface of Seed: a host, what it is, and its shot. */
 interface Surface {
-  id: string;
-  href: string;
+  id: string
+  href: string
   /** The `outbound` event's `to`. */
-  to: string;
-  title: string;
+  to: string
+  title: string
   /** Left out until the owner approves one (the website's). */
-  line?: string;
-  linkLabel: string;
+  line?: string
+  linkLabel: string
   /** The shot's file stem under `/img/tools/seed/`, at 360 and 720px wide. */
-  shot: string;
-  alt: string;
+  shot: string
+  alt: string
 }
 
 const SURFACES: Surface[] = [
@@ -51,10 +51,10 @@ const SURFACES: Surface[] = [
     alt:
       "The seedsaas.com home page: the headline The groundwork of your SaaS, already built, with Try the live demo and View on GitHub buttons.",
   },
-];
+]
 
 /** A card's shot `sizes`: a third from 1024px, a half from 640px. */
-const SIZES = "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw";
+const SIZES = "(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
 
 /**
  * "See it running" (#455): Seed's three live surfaces, each one card that
@@ -71,7 +71,7 @@ export function SeedRunning() {
       </h2>
       <ul class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {SURFACES.map((s) => {
-          const host = new URL(s.href).host;
+          const host = new URL(s.href).host
           return (
             <li key={s.id} class="min-w-0">
               <a
@@ -127,12 +127,12 @@ export function SeedRunning() {
                 </div>
               </a>
             </li>
-          );
+          )
         })}
       </ul>
       <p data-seed-demo-note class="mt-4 max-w-3xl text-sm text-graphite">
         {DEMO_NOTE}
       </p>
     </section>
-  );
+  )
 }

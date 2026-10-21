@@ -4,13 +4,13 @@ import {
   catalogPromises,
   formatPrice,
   priceRows,
-} from "../lib/catalog.ts";
-import { promise } from "../lib/promises.ts";
-import { BookCallLink } from "./BookCallLink.tsx";
-import { buttonClass } from "./Button.tsx";
-import { Fact, FactCard } from "./FactCard.tsx";
-import { eventAttrs } from "../lib/analytics.ts";
-import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
+} from "../lib/catalog.ts"
+import { promise } from "../lib/promises.ts"
+import { BookCallLink } from "./BookCallLink.tsx"
+import { buttonClass } from "./Button.tsx"
+import { Fact, FactCard } from "./FactCard.tsx"
+import { eventAttrs } from "../lib/analytics.ts"
+import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts"
 
 /**
  * The service page's price card (#271), built on the shared `FactCard` shell:
@@ -21,7 +21,7 @@ import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts";
  * first at 390px, like the project page's card.
  */
 export function ServicePriceCard({ item }: { item: CatalogItem }) {
-  const promiseIds = catalogPromises(item.slug);
+  const promiseIds = catalogPromises(item.slug)
   return (
     <div data-service-card={item.slug}>
       <FactCard label="Price and booking">
@@ -65,5 +65,5 @@ export function ServicePriceCard({ item }: { item: CatalogItem }) {
         </div>
       </FactCard>
     </div>
-  );
+  )
 }

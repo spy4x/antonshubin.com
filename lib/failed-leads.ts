@@ -12,30 +12,30 @@
  * flood of failing sends cannot fill the host's disk, which also holds the
  * subscriber list. At the cap a lead is not kept, and one log line says so.
  */
-import { dirname } from "@std/path";
-import type { Lead } from "./lead-mail.ts";
+import { dirname } from "@std/path"
+import type { Lead } from "./lead-mail.ts"
 
 /** Where failed leads go: `LEADS_FAILED_FILE`, or `data/leads-failed.jsonl`. */
 export function failedLeadsPath(): string {
-  return Deno.env.get("LEADS_FAILED_FILE") || "data/leads-failed.jsonl";
+  return Deno.env.get("LEADS_FAILED_FILE") || "data/leads-failed.jsonl"
 }
 
 /** Default size limit of the file: 10 MB. */
-export const FAILED_LEADS_DEFAULT_MAX_BYTES = 10 * 1024 * 1024;
+export const FAILED_LEADS_DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 
 /** The size limit: `LEADS_FAILED_MAX_BYTES` when it is a positive integer,
  * else {@link FAILED_LEADS_DEFAULT_MAX_BYTES}. */
 export function failedLeadsMaxBytes(): number {
-  const value = Number(Deno.env.get("LEADS_FAILED_MAX_BYTES"));
+  const value = Number(Deno.env.get("LEADS_FAILED_MAX_BYTES"))
   return Number.isSafeInteger(value) && value > 0
     ? value
-    : FAILED_LEADS_DEFAULT_MAX_BYTES;
+    : FAILED_LEADS_DEFAULT_MAX_BYTES
 }
 
 /** One line of the file: when the send failed, and the lead as validated. */
 export interface FailedLead {
-  failedAt: string;
-  lead: Lead;
+  failedAt: string
+  lead: Lead
 }
 
 /**
@@ -52,20 +52,20 @@ export async function appendFailedLead(
   maxBytes: number = failedLeadsMaxBytes(),
   log: { error(...args: unknown[]): void } = console,
 ): Promise<boolean> {
-  const line: FailedLead = { failedAt: now.toISOString(), lead };
-  const bytes = new TextEncoder().encode(JSON.stringify(line) + "\n");
-  await Deno.mkdir(dirname(path), { recursive: true });
-  const size = await Deno.stat(path).then((s) => s.size, () => 0);
+  const line: FailedLead = { failedAt: now.toISOString(), lead }
+  const bytes = new TextEncoder().encode(JSON.stringify(line) + "\n")
+  await Deno.mkdir(dirname(path), { recursive: true })
+  const size = await Deno.stat(path).then((s) => s.size, () => 0)
   if (size + bytes.length > maxBytes) {
     log.error(
       `[LEAD] failed-leads file is at its ${maxBytes}-byte cap, lead not kept`,
-    );
-    return false;
+    )
+    return false
   }
   await Deno.writeFile(path, bytes, {
     append: true,
     create: true,
     mode: 0o600,
-  });
-  return true;
+  })
+  return true
 }

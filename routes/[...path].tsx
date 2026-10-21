@@ -16,4 +16,4 @@
 // not, the same as it already does for any other method this site's routes
 // don't define (verified: POST to an unmatched URL and POST to a real
 // GET-only route both return identical bodies).
-export { default, handler } from "./_404.tsx";
+export { default, handler } from "./_404.tsx"

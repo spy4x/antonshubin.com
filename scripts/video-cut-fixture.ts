@@ -7,31 +7,31 @@
  * test run `deno`.
  */
 
-import { join } from "@std/path";
+import { join } from "@std/path"
 
-export const FIXTURE_SECONDS = 80;
+export const FIXTURE_SECONDS = 80
 /** Word `i` starts at 0.5 i seconds and lasts 0.4 s; a 3 s pause follows word 39. */
-const PAUSE_AFTER = 39;
-const PAUSE_SECONDS = 3;
+const PAUSE_AFTER = 39
+const PAUSE_SECONDS = 3
 
 /** The fixture's whisper.cpp JSON text; word 10 is "um". */
 export function fixtureWhisperJson(): string {
-  const segments = [];
+  const segments = []
   for (let s = 0; s < 30; s++) {
-    const tokens = [];
+    const tokens = []
     for (let w = s * 5; w < s * 5 + 5; w++) {
       const from = Math.round(
         (0.5 * w + (w > PAUSE_AFTER ? PAUSE_SECONDS : 0)) * 1000,
-      );
+      )
       tokens.push({
         text: ` ${w === 10 ? "um" : `word${w}`}${w % 5 === 4 ? "." : ""}`,
         offsets: { from, to: from + 400 },
-      });
+      })
     }
     tokens.unshift({
       text: "[_BEG_]",
       offsets: { from: tokens[0].offsets.from, to: tokens[0].offsets.from },
-    });
+    })
     segments.push({
       text: tokens.slice(1).map((t) => t.text).join(""),
       offsets: {
@@ -39,9 +39,9 @@ export function fixtureWhisperJson(): string {
         to: tokens[tokens.length - 1].offsets.to,
       },
       tokens,
-    });
+    })
   }
-  return JSON.stringify({ transcription: segments });
+  return JSON.stringify({ transcription: segments })
 }
 
 /** The fixture's edit list: a filler, a retake, three chapters, two Shorts. */
@@ -59,11 +59,11 @@ export const FIXTURE_EDIT_LIST = {
     { start: 6, end: 42, title: "First short" },
     { start: 45, end: 78, title: "Second short" },
   ],
-};
+}
 
 if (import.meta.main) {
-  const dir = Deno.args[0];
-  if (!dir) throw new Error("Usage: video-cut-fixture.ts <dir>");
+  const dir = Deno.args[0]
+  if (!dir) throw new Error("Usage: video-cut-fixture.ts <dir>")
   const r = await new Deno.Command("ffmpeg", {
     args: [
       "-y",
@@ -90,11 +90,11 @@ if (import.meta.main) {
     ],
     stdout: "piped",
     stderr: "piped",
-  }).output();
-  if (!r.success) throw new Error(new TextDecoder().decode(r.stderr));
-  await Deno.writeTextFile(join(dir, "whisper.json"), fixtureWhisperJson());
+  }).output()
+  if (!r.success) throw new Error(new TextDecoder().decode(r.stderr))
+  await Deno.writeTextFile(join(dir, "whisper.json"), fixtureWhisperJson())
   await Deno.writeTextFile(
     join(dir, "edit.json"),
     JSON.stringify(FIXTURE_EDIT_LIST),
-  );
+  )
 }

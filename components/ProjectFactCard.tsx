@@ -1,20 +1,20 @@
-import { cn } from "@spy4x/preact-cn";
-import { formatPeriod, type Project } from "../lib/data.ts";
-import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
-import { projectStatus } from "../lib/work.ts";
-import { BookCallLink } from "./BookCallLink.tsx";
+import { cn } from "@spy4x/preact-cn"
+import { formatPeriod, type Project } from "../lib/data.ts"
+import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts"
+import { projectStatus } from "../lib/work.ts"
+import { BookCallLink } from "./BookCallLink.tsx"
 import {
   IconArrowRight as ArrowRightIcon,
   IconExternalLink as ExternalLinkIcon,
-} from "@spy4x/preact-icons";
-import { Fact, FACT_LINK, FactCard } from "./FactCard.tsx";
-import { NewTabHint } from "./NewTabHint.tsx";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { WithNote } from "./WithNote.tsx";
-import { eventAttrs } from "../lib/analytics.ts";
-import { BOOK_LABEL } from "../lib/nav.ts";
+} from "@spy4x/preact-icons"
+import { Fact, FACT_LINK, FactCard } from "./FactCard.tsx"
+import { NewTabHint } from "./NewTabHint.tsx"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { WithNote } from "./WithNote.tsx"
+import { eventAttrs } from "../lib/analytics.ts"
+import { BOOK_LABEL } from "../lib/nav.ts"
 
-const LINK = FACT_LINK;
+const LINK = FACT_LINK
 
 /**
  * "Similar work today" link to the project's `catalogSlug` item, with its
@@ -23,13 +23,13 @@ const LINK = FACT_LINK;
  */
 export function SimilarWorkLink(
   { project, place, class: className = "" }: {
-    project: Project;
-    place: "card" | "bottom";
-    class?: string;
+    project: Project
+    place: "card" | "bottom"
+    class?: string
   },
 ) {
-  if (!project.catalogSlug) return null;
-  const item = catalogItem(project.catalogSlug);
+  if (!project.catalogSlug) return null
+  const item = catalogItem(project.catalogSlug)
   return (
     <a
       href={catalogPath(item.slug)}
@@ -44,7 +44,7 @@ export function SimilarWorkLink(
       <span class="price">{priceLabel(item)}</span>
       <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
     </a>
-  );
+  )
 }
 
 /**
@@ -54,10 +54,10 @@ export function SimilarWorkLink(
  * from 1024px and stays in view while the page scrolls.
  */
 export function ProjectFactCard({ project }: { project: Project }) {
-  const status = projectStatus(project);
+  const status = projectStatus(project)
   const live = project.externalURL && !project.externalURLDead
     ? project.externalURL
-    : undefined;
+    : undefined
   const liveLink = live && (
     <a
       href={live}
@@ -69,7 +69,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
       <ExternalLinkIcon class="inline w-3.5 h-3.5 ml-1" />
       <NewTabHint />
     </a>
-  );
+  )
 
   return (
     <FactCard label="Project facts" data-project-facts>
@@ -125,5 +125,5 @@ export function ProjectFactCard({ project }: { project: Project }) {
         <SimilarWorkLink project={project} place="card" />
       </div>
     </FactCard>
-  );
+  )
 }

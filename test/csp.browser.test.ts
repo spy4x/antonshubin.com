@@ -29,29 +29,29 @@
 //
 // Runs under `deno task test:browser` (its own -A task) — see docs/testing.md
 // "Browser-driven tests".
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import type { Browser, Page } from "playwright";
-import { type Site, startSite } from "./harness.ts";
-import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import type { Browser, Page } from "playwright"
+import { type Site, startSite } from "./harness.ts"
+import { launchChromium, newPage, WAIT_MS } from "./browser.ts"
 import {
   createConfirmToken,
   createUnsubscribeToken,
-} from "./subscription-tokens.ts";
+} from "./subscription-tokens.ts"
 
 // RFC 2606 reserved hosts: a real DNS lookup for these either fails or hits
 // no server this test controls, which is fine — a network failure is not a
 // CSP violation. The policy must allow them (script/connect-src for Umami,
 // frame-src for the booking widget) without ever letting the *browser*
 // refuse to even attempt the request.
-const SCHEDULE_URL = "https://meet.example.com";
-const UMAMI_URL = "https://umami.example.com/script.js";
-const UMAMI_ID = "00000000-0000-0000-0000-000000000000";
-const TEST_SECRET = "t".repeat(32);
-const MOBILE_VIEWPORT = { width: 390, height: 844 };
+const SCHEDULE_URL = "https://meet.example.com"
+const UMAMI_URL = "https://umami.example.com/script.js"
+const UMAMI_ID = "00000000-0000-0000-0000-000000000000"
+const TEST_SECRET = "t".repeat(32)
+const MOBILE_VIEWPORT = { width: 390, height: 844 }
 
 interface Violation {
-  directive: string;
-  blockedURI: string;
+  directive: string
+  blockedURI: string
 }
 
 /** Registers a `securitypolicyviolation` listener before any page script
@@ -59,23 +59,23 @@ interface Violation {
  * makes, so `violationsOn` below always reflects the current document. */
 async function registerViolationListener(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    (globalThis as unknown as { __cspViolations: Violation[] })
-      .__cspViolations = [];
+    ;(globalThis as unknown as { __cspViolations: Violation[] })
+      .__cspViolations = []
     document.addEventListener("securitypolicyviolation", (e) => {
-      (globalThis as unknown as { __cspViolations: Violation[] })
+      ;(globalThis as unknown as { __cspViolations: Violation[] })
         .__cspViolations.push({
           directive: e.violatedDirective,
           blockedURI: e.blockedURI,
-        });
-    });
-  });
+        })
+    })
+  })
 }
 
 function violationsOn(page: Page): Promise<Violation[]> {
   return page.evaluate(() =>
     (globalThis as unknown as { __cspViolations: Violation[] })
       .__cspViolations
-  );
+  )
 }
 
 async function assertNoViolations(page: Page, context: string): Promise<void> {
@@ -83,14 +83,14 @@ async function assertNoViolations(page: Page, context: string): Promise<void> {
     await violationsOn(page),
     [],
     `expected zero CSP violations ${context}`,
-  );
+  )
 }
 
 async function sitemapPaths(site: Site): Promise<string[]> {
-  const xml = await site.html("/sitemap.xml");
+  const xml = await site.html("/sitemap.xml")
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) =>
     new URL(m[1]).pathname
-  );
+  )
 }
 
 /**
@@ -109,27 +109,27 @@ async function sitemapPaths(site: Site): Promise<string[]> {
  * hold on, not just one instance of each.
  */
 function representativePaths(paths: string[]): string[] {
-  const dynamicPrefixes = ["/blog/", "/work/", "/catalog/", "/hackathons/"];
+  const dynamicPrefixes = ["/blog/", "/work/", "/catalog/", "/hackathons/"]
   const isDynamic = (p: string) =>
-    dynamicPrefixes.some((prefix) => p.startsWith(prefix));
-  const chosen = paths.filter((p) => !isDynamic(p));
+    dynamicPrefixes.some((prefix) => p.startsWith(prefix))
+  const chosen = paths.filter((p) => !isDynamic(p))
   for (const prefix of dynamicPrefixes) {
-    const example = paths.find((p) => p.startsWith(prefix));
-    if (example) chosen.push(example);
+    const example = paths.find((p) => p.startsWith(prefix))
+    if (example) chosen.push(example)
   }
-  return chosen;
+  return chosen
 }
 
 Deno.test("no CSP violations on any static page or representative dynamic page", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL, UMAMI_URL, UMAMI_ID },
-  });
-  let browser: Browser | undefined;
+  })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser);
+    browser = await launchChromium()
+    const page = await newPage(browser)
     try {
-      await registerViolationListener(page);
+      await registerViolationListener(page)
       // /no-such-page matches no sitemap entry and no route — see #177
       // R-001: it must get the same CSP-enforced middleware chain as every
       // page the sitemap lists, so it's added here explicitly rather than
@@ -137,115 +137,115 @@ Deno.test("no CSP violations on any static page or representative dynamic page",
       const paths = [
         ...representativePaths(await sitemapPaths(site)),
         "/no-such-page",
-      ];
+      ]
       assert(
         paths.length >= 5,
         "expected several representative paths, got too few to be a real check",
-      );
+      )
 
       for (const path of paths) {
-        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" });
-        await assertNoViolations(page, `on ${path}`);
+        await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
+        await assertNoViolations(page, `on ${path}`)
       }
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("the More sheet opens on an unmatched URL with no CSP violation", async () => {
   // Zero CSP violations alone doesn't prove the page works: this drives the
   // phone's More sheet open, as test/a11y.browser.test.ts does, and checks
   // again once it shows.
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser, { viewport: MOBILE_VIEWPORT });
+    browser = await launchChromium()
+    const page = await newPage(browser, { viewport: MOBILE_VIEWPORT })
     try {
-      await registerViolationListener(page);
+      await registerViolationListener(page)
       await page.goto(`${site.origin}/no-such-page`, {
         waitUntil: "networkidle",
-      });
-      await assertNoViolations(page, "on /no-such-page");
+      })
+      await assertNoViolations(page, "on /no-such-page")
 
-      const toggle = page.getByRole("button", { name: "More", exact: true });
-      await toggle.click();
+      const toggle = page.getByRole("button", { name: "More", exact: true })
+      await toggle.click()
       await page.getByRole("dialog", { name: "More" }).waitFor({
         state: "visible",
-      });
+      })
 
-      await assertNoViolations(page, "after opening the More sheet");
+      await assertNoViolations(page, "after opening the More sheet")
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("the booking calendar's iframe loads without a CSP violation", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL, UMAMI_URL, UMAMI_ID },
-  });
-  let browser: Browser | undefined;
+  })
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser);
+    browser = await launchChromium()
+    const page = await newPage(browser)
     try {
-      await registerViolationListener(page);
+      await registerViolationListener(page)
       await page.goto(`${site.origin}/book`, {
         waitUntil: "networkidle",
-      });
+      })
       // The calendar inserts its frame by itself after hydration; it stays
       // hidden here, since the RFC 2606 host never answers with a height.
       const frame = page.locator(
         'iframe[title="Schedule a call with Anton Shubin"]',
-      );
-      await frame.waitFor({ state: "attached" });
+      )
+      await frame.waitFor({ state: "attached" })
       assertEquals(
         await frame.getAttribute("src"),
         `${SCHEDULE_URL}/embed?theme=dark`,
-      );
+      )
 
-      await assertNoViolations(page, "after the booking iframe loaded");
+      await assertNoViolations(page, "after the booking iframe loaded")
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})
 
 Deno.test("a signed unsubscribe link loads and its form submits without a CSP violation", async () => {
-  const dir = await Deno.makeTempDir();
-  const file = `${dir}/subscribers.json`;
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/subscribers.json`
   try {
-    const email = "reader@example.com";
+    const email = "reader@example.com"
     await Deno.writeTextFile(
       file,
       JSON.stringify([{ email, subscribedAt: "2026-01-01T00:00:00.000Z" }]),
-    );
+    )
     const site = await startSite({
       env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: TEST_SECRET },
-    });
-    let browser: Browser | undefined;
+    })
+    let browser: Browser | undefined
     try {
-      browser = await launchChromium();
-      const page = await newPage(browser);
+      browser = await launchChromium()
+      const page = await newPage(browser)
       try {
-        await registerViolationListener(page);
-        const token = await createUnsubscribeToken(email, TEST_SECRET);
+        await registerViolationListener(page)
+        const token = await createUnsubscribeToken(email, TEST_SECRET)
         await page.goto(
           `${site.origin}/unsubscribe?token=${encodeURIComponent(token)}`,
           { waitUntil: "networkidle" },
-        );
-        await assertNoViolations(page, "on the unsubscribe confirm page");
+        )
+        await assertNoViolations(page, "on the unsubscribe confirm page")
 
         // The submit navigates (a POST back to /unsubscribe, same URL), so
         // wait for that navigation itself: a bare waitForLoadState right
@@ -253,94 +253,94 @@ Deno.test("a signed unsubscribe link loads and its form submits without a CSP vi
         await Promise.all([
           page.waitForNavigation({ waitUntil: "networkidle" }),
           page.getByRole("button", { name: "Unsubscribe" }).click(),
-        ]);
+        ])
         await page.getByRole("heading", { name: "You're unsubscribed" })
-          .waitFor({ state: "visible" });
-        await assertNoViolations(page, "after submitting the unsubscribe form");
+          .waitFor({ state: "visible" })
+        await assertNoViolations(page, "after submitting the unsubscribe form")
       } finally {
-        await page.close();
+        await page.close()
       }
     } finally {
-      await browser?.close();
-      await site.stop();
+      await browser?.close()
+      await site.stop()
     }
   } finally {
-    await Deno.remove(dir, { recursive: true });
+    await Deno.remove(dir, { recursive: true })
   }
-});
+})
 
 Deno.test("a signed subscription-confirmation link submits without a CSP violation and leaves no token in the address or the next referrer", async () => {
-  const dir = await Deno.makeTempDir();
-  const file = `${dir}/subscribers.json`;
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/subscribers.json`
   try {
-    await Deno.writeTextFile(file, "[]");
+    await Deno.writeTextFile(file, "[]")
     const site = await startSite({
       env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: TEST_SECRET },
-    });
-    let browser: Browser | undefined;
+    })
+    let browser: Browser | undefined
     try {
-      browser = await launchChromium();
-      const page = await newPage(browser);
+      browser = await launchChromium()
+      const page = await newPage(browser)
       try {
-        await registerViolationListener(page);
+        await registerViolationListener(page)
         const token = await createConfirmToken(
           "reader@example.com",
           TEST_SECRET,
-        );
+        )
         await page.goto(
           `${site.origin}/subscribe/confirm?token=${encodeURIComponent(token)}`,
           { waitUntil: "networkidle" },
-        );
-        await assertNoViolations(page, "on the subscription confirm page");
+        )
+        await assertNoViolations(page, "on the subscription confirm page")
         await Promise.all([
           page.waitForNavigation({ waitUntil: "networkidle" }),
           page.getByRole("button", { name: "Subscribe" }).click(),
-        ]);
+        ])
         await page.getByRole("heading", { name: "You're subscribed" })
-          .waitFor({ state: "visible" });
-        await assertNoViolations(page, "after submitting the confirm form");
+          .waitFor({ state: "visible" })
+        await assertNoViolations(page, "after submitting the confirm form")
         // The done page's URL holds no token, and neither does the referrer
         // of the page reached from it (Umami records both).
-        assertEquals(page.url().includes("token"), false, page.url());
+        assertEquals(page.url().includes("token"), false, page.url())
         await Promise.all([
           page.waitForNavigation({ waitUntil: "networkidle" }),
           page.getByRole("link", { name: /Back to home/ }).click(),
-        ]);
+        ])
         assertEquals(
           await page.evaluate(() => document.referrer),
           `${site.origin}/`,
-        );
+        )
         assertEquals(
           (JSON.parse(await Deno.readTextFile(file)) as { email: string }[])
             .map((s) => s.email),
           ["reader@example.com"],
-        );
+        )
       } finally {
-        await page.close();
+        await page.close()
       }
     } finally {
-      await browser?.close();
-      await site.stop();
+      await browser?.close()
+      await site.stop()
     }
   } finally {
-    await Deno.remove(dir, { recursive: true });
+    await Deno.remove(dir, { recursive: true })
   }
-});
+})
 
 /** Answers every request through `route.fetch()` with the header a proxy in
  * front of the site forces: rostok's Traefik `security-headers` sets
  * `Referrer-Policy: strict-origin-when-cross-origin` over the app's own. */
 async function forceProxyReferrerPolicy(page: Page): Promise<void> {
   await page.route("**/*", async (route) => {
-    const response = await route.fetch();
+    const response = await route.fetch()
     await route.fulfill({
       response,
       headers: {
         ...response.headers(),
         "referrer-policy": "strict-origin-when-cross-origin",
       },
-    });
-  });
+    })
+  })
 }
 
 /** Follows the first same-origin link to `href` on the page and returns the
@@ -352,97 +352,97 @@ async function referrerAfterFollowing(
   await Promise.all([
     page.waitForNavigation({ waitUntil: "networkidle" }),
     page.evaluate((h) => {
-      (document.querySelector(`a[href="${h}"]`) as HTMLAnchorElement).click();
+      ;(document.querySelector(`a[href="${h}"]`) as HTMLAnchorElement).click()
     }, href),
-  ]);
-  return await page.evaluate(() => document.referrer);
+  ])
+  return await page.evaluate(() => document.referrer)
 }
 
 Deno.test("a token page sends no token or path as referrer even when a proxy forces strict-origin-when-cross-origin", async () => {
-  const dir = await Deno.makeTempDir();
-  const file = `${dir}/subscribers.json`;
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/subscribers.json`
   try {
-    await Deno.writeTextFile(file, "[]");
+    await Deno.writeTextFile(file, "[]")
     const site = await startSite({
       env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: TEST_SECRET },
-    });
-    let browser: Browser | undefined;
+    })
+    let browser: Browser | undefined
     try {
-      browser = await launchChromium();
-      const page = await newPage(browser);
+      browser = await launchChromium()
+      const page = await newPage(browser)
       try {
-        await forceProxyReferrerPolicy(page);
+        await forceProxyReferrerPolicy(page)
         const confirm = await createConfirmToken(
           "reader@example.com",
           TEST_SECRET,
-        );
+        )
         const unsubscribe = await createUnsubscribeToken(
           "reader@example.com",
           TEST_SECRET,
-        );
+        )
         const tokenPages = [
           `/subscribe/confirm?token=${encodeURIComponent(confirm)}`,
           `/unsubscribe?token=${encodeURIComponent(unsubscribe)}`,
           "/unsubscribe?token=forged",
           "/subscribe/confirm?done=1",
-        ];
+        ]
         for (const path of tokenPages) {
           const res = await page.goto(site.origin + path, {
             waitUntil: "networkidle",
-          });
+          })
           // The proxy's header is really what the browser was sent.
           assertEquals(
             res?.headers()["referrer-policy"],
             "strict-origin-when-cross-origin",
             path,
-          );
+          )
           assertEquals(
             await referrerAfterFollowing(page, "/about"),
             `${site.origin}/`,
             path,
-          );
+          )
         }
         // Control: a page without the meta, behind the same proxy, does
         // send its URL, so the origin-only referrers above come from the meta.
         await page.goto(`${site.origin}/work?from=test`, {
           waitUntil: "networkidle",
-        });
+        })
         assertEquals(
           await referrerAfterFollowing(page, "/about"),
           `${site.origin}/work?from=test`,
-        );
+        )
       } finally {
-        await page.close();
+        await page.close()
       }
     } finally {
-      await browser?.close();
-      await site.stop();
+      await browser?.close()
+      await site.stop()
     }
   } finally {
-    await Deno.remove(dir, { recursive: true });
+    await Deno.remove(dir, { recursive: true })
   }
-});
+})
 
 Deno.test("negative controls: an unnonced inline script is blocked and reported, a disallowed iframe origin is reported", async () => {
-  const site = await startSite();
-  let browser: Browser | undefined;
+  const site = await startSite()
+  let browser: Browser | undefined
   try {
-    browser = await launchChromium();
-    const page = await newPage(browser);
+    browser = await launchChromium()
+    const page = await newPage(browser)
     try {
-      await registerViolationListener(page);
-      await page.goto(site.origin, { waitUntil: "networkidle" });
-      await assertNoViolations(page, "right after the home page loads");
+      await registerViolationListener(page)
+      await page.goto(site.origin, { waitUntil: "networkidle" })
+      await assertNoViolations(page, "right after the home page loads")
 
       // No `nonce` attribute at all — the CSP must refuse to run it, proving
       // this isn't `'unsafe-inline'` in disguise. The side effect
       // (`__negControlRan`) never happening is the actual proof it was
       // blocked, not just that a violation event fired for something else.
       await page.evaluate(() => {
-        const script = document.createElement("script");
-        script.textContent = "globalThis.__negControlRan = true;";
-        document.body.appendChild(script);
-      });
+        const script = document.createElement("script")
+        script.textContent = "globalThis.__negControlRan = true;"
+        document.body.appendChild(script)
+      })
       assertEquals(
         await page.evaluate(() =>
           (globalThis as unknown as { __negControlRan?: boolean })
@@ -450,37 +450,37 @@ Deno.test("negative controls: an unnonced inline script is blocked and reported,
         ),
         undefined,
         "an unnonced inline script must never execute",
-      );
-      const afterScript = await violationsOn(page);
+      )
+      const afterScript = await violationsOn(page)
       assert(
         afterScript.some((v) => v.directive.startsWith("script-src")),
         `expected a script-src violation, got: ${JSON.stringify(afterScript)}`,
-      );
+      )
 
       // frame-src only allows YouTube and (when set) the booking origin —
       // this host is neither.
       await page.evaluate(() => {
-        const iframe = document.createElement("iframe");
-        iframe.src = "https://blocked.example.org";
-        document.body.appendChild(iframe);
-      });
+        const iframe = document.createElement("iframe")
+        iframe.src = "https://blocked.example.org"
+        document.body.appendChild(iframe)
+      })
       await page.waitForFunction(
         () =>
           (globalThis as unknown as { __cspViolations: Violation[] })
             .__cspViolations.some((v) => v.directive.startsWith("frame-src")),
         undefined,
         { timeout: WAIT_MS },
-      ).catch(() => {});
-      const afterFrame = await violationsOn(page);
+      ).catch(() => {})
+      const afterFrame = await violationsOn(page)
       assert(
         afterFrame.some((v) => v.directive.startsWith("frame-src")),
         `expected a frame-src violation, got: ${JSON.stringify(afterFrame)}`,
-      );
+      )
     } finally {
-      await page.close();
+      await page.close()
     }
   } finally {
-    await browser?.close();
-    await site.stop();
+    await browser?.close()
+    await site.stop()
   }
-});
+})

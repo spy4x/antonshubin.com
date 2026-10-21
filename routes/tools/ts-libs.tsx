@@ -1,16 +1,16 @@
-import { define } from "../../lib/utils.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { FACT_LINK } from "../../components/FactCard.tsx";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
-import { loadToolPage } from "../../components/tool-frame/tool-page.ts";
+import { define } from "../../lib/utils.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { FACT_LINK } from "../../components/FactCard.tsx"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
+import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
 import {
   PackagePicker,
   Reasons,
   RunExample,
   type TsLibsUse,
   WhereIUseIt,
-} from "../../components/tools/ts-libs/TsLibsParts.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
+} from "../../components/tools/ts-libs/TsLibsParts.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
 
 // The custom /tools/ts-libs page (#459): the frame with the README example as
 // the clip, its quick start under the hero and in the band, and a middle that
@@ -39,12 +39,12 @@ const USES: TsLibsUse[] = [
       href: "https://github.com/spy4x/antonshubin.com/blob/main/deno.json",
     },
   },
-];
+]
 
 export default define.page(async function TsLibsPage(ctx) {
-  const data = await loadToolPage("ts-libs");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
-  const { tool, repo } = data;
+  const data = await loadToolPage("ts-libs")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
+  const { tool, repo } = data
   return (
     <ToolFrame
       data={data}
@@ -90,5 +90,5 @@ export default define.page(async function TsLibsPage(ctx) {
       <Reasons />
       <WhereIUseIt uses={USES} />
     </ToolFrame>
-  );
-});
+  )
+})

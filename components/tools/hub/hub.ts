@@ -6,17 +6,17 @@
  * forgotten; a tool that changes status moves here by an edit.
  */
 export interface HubSection {
-  id: string;
-  title: string;
+  id: string
+  title: string
   /** One line under the heading, when the section needs one. */
-  intro?: string;
+  intro?: string
   /** `media` cards with a clip or screenshot, `text` cards, or one `line` each. */
-  kind: "media" | "text" | "line";
-  slugs: string[];
+  kind: "media" | "text" | "line"
+  slugs: string[]
 }
 
 /** The tool the page opens on: whatever is being launched. */
-export const SPOTLIGHT = "seed";
+export const SPOTLIGHT = "seed"
 
 export const SECTIONS: HubSection[] = [
   {
@@ -44,12 +44,12 @@ export const SECTIONS: HubSection[] = [
     kind: "line",
     slugs: ["financy", "caldav-tasks-web"],
   },
-];
+]
 
 /** Behind the closed "Archived" disclosure at the end. */
-export const ARCHIVE = ["air-quality-sensor", "toread-today"];
+export const ARCHIVE = ["air-quality-sensor", "toread-today"]
 
 /** Every slug the hub shows, in page order: the `ItemList` order too. */
 export function hubOrder(): string[] {
-  return [SPOTLIGHT, ...SECTIONS.flatMap((s) => s.slugs), ...ARCHIVE];
+  return [SPOTLIGHT, ...SECTIONS.flatMap((s) => s.slugs), ...ARCHIVE]
 }

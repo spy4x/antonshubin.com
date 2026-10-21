@@ -1,6 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
-import Button from "../components/Button.tsx";
-import { analyticsOptedOut, setAnalyticsOptOut } from "../lib/analytics.ts";
+import { useEffect, useState } from "preact/hooks"
+import Button from "../components/Button.tsx"
+import { analyticsOptedOut, setAnalyticsOptOut } from "../lib/analytics.ts"
 
 /**
  * The privacy page's switch for Umami in this browser (`lib/analytics.ts`'s
@@ -8,16 +8,16 @@ import { analyticsOptedOut, setAnalyticsOptOut } from "../lib/analytics.ts";
  * server renders the "counted" state for everyone.
  */
 export default function AnalyticsOptOut() {
-  const [off, setOff] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [off, setOff] = useState(false)
+  const [failed, setFailed] = useState(false)
 
-  useEffect(() => setOff(analyticsOptedOut()), []);
+  useEffect(() => setOff(analyticsOptedOut()), [])
 
   const toggle = () => {
-    const saved = setAnalyticsOptOut(!off);
-    setFailed(!saved);
-    if (saved) setOff(!off);
-  };
+    const saved = setAnalyticsOptOut(!off)
+    setFailed(!saved)
+    if (saved) setOff(!off)
+  }
 
   return (
     <div data-analytics-opt-out>
@@ -32,5 +32,5 @@ export default function AnalyticsOptOut() {
           : "Visits from this browser are counted."}
       </p>
     </div>
-  );
+  )
 }

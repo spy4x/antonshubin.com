@@ -8,23 +8,23 @@
  * on its own.
  */
 
-import { channelUrl } from "./utm.ts";
-import { envValue } from "./cloudflare-purge.ts";
-import type { BlogArticle } from "@/lib/data.ts";
-import { postIntro } from "@/lib/blog-posts.ts";
-import { relatedToolLink } from "@/lib/blog.ts";
+import { channelUrl } from "./utm.ts"
+import { envValue } from "./cloudflare-purge.ts"
+import type { BlogArticle } from "@/lib/data.ts"
+import { postIntro } from "@/lib/blog-posts.ts"
+import { relatedToolLink } from "@/lib/blog.ts"
 
 // Hardcoded on purpose, never read from an env var: Dev.to's canonical_url
 // must point at production, since it tells search engines which copy is the
 // original. Pointing it at any other host would misattribute the source.
-const DEVTO_BASE_URL = "https://antonshubin.com";
+const DEVTO_BASE_URL = "https://antonshubin.com"
 
 /**
  * The line a Dev.to cross-post ends with: a link back to the original,
  * tagged as the `devto` channel so a reader who clicks through is counted.
  */
 export function firstPublishedLine(taggedUrl: string): string {
-  return `_First published on [antonshubin.com](${taggedUrl})._`;
+  return `_First published on [antonshubin.com](${taggedUrl})._`
 }
 
 /**
@@ -39,56 +39,56 @@ export function devToOpening(article: BlogArticle): string {
   const parts = [
     postIntro(article),
     `**TL;DR**\n\n${article.tldr.map((line) => `- ${line}`).join("\n")}`,
-  ];
-  const tool = relatedToolLink(article);
-  const links: string[] = [];
+  ]
+  const tool = relatedToolLink(article)
+  const links: string[] = []
   if (tool?.live) {
     // A live instance on this site (mig's /book) is a relative path; on Dev.to
     // it would resolve against dev.to.
     const href = tool.live.href.startsWith("/")
       ? `${DEVTO_BASE_URL}${tool.live.href}`
-      : tool.live.href;
-    links.push(`Live: [${tool.live.label}](${href})`);
+      : tool.live.href
+    links.push(`Live: [${tool.live.label}](${href})`)
   }
   if (tool?.repoUrl) {
     links.push(
       `Code: [${tool.repoUrl.replace(/^https:\/\//, "")}](${tool.repoUrl})`,
-    );
+    )
   }
   if (links.length > 0) {
-    parts.push(`**${tool!.name}**: ${links.join(" · ")}`);
+    parts.push(`**${tool!.name}**: ${links.join(" · ")}`)
   }
-  return parts.join("\n\n");
+  return parts.join("\n\n")
 }
 
 export interface DevToArticlePayload {
   article: {
-    title: string;
-    body_markdown: string;
-    published: boolean;
-    canonical_url: string;
+    title: string
+    body_markdown: string
+    published: boolean
+    canonical_url: string
     /** The cover Dev.to shows above the post (1000×420), a full URL. */
-    main_image?: string;
-  };
+    main_image?: string
+  }
 }
 
 /** The Dev.to API, hardcoded like {@linkcode DEVTO_BASE_URL}. */
-const DEVTO_API = "https://dev.to/api";
+const DEVTO_API = "https://dev.to/api"
 
 /** A fence delimiter line (``` or ~~~), parsed but not yet compared to any open fence. */
 interface FenceDelimiter {
   /** The fence character, `` ` `` or `~`. */
-  char: string;
+  char: string
   /** How many fence characters the line opens or closes with. */
-  length: number;
+  length: number
   /** Whatever follows the fence run on the line — an info string, or trailing whitespace. */
-  rest: string;
+  rest: string
 }
 
 /** An open fence: the character and length a closing line must match or exceed. */
 interface FenceState {
-  char: string;
-  length: number;
+  char: string
+  length: number
 }
 
 /**
@@ -98,9 +98,9 @@ interface FenceState {
  * the fence already open, if any, so it's the caller's job.
  */
 function matchFenceLine(line: string): FenceDelimiter | null {
-  const match = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
-  if (!match) return null;
-  return { char: match[1][0], length: match[1].length, rest: match[2] };
+  const match = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line)
+  if (!match) return null
+  return { char: match[1][0], length: match[1].length, rest: match[2] }
 }
 
 /**
@@ -114,12 +114,12 @@ function nextFenceState(
   line: string,
   state: FenceState | null,
 ): FenceState | null {
-  const fence = matchFenceLine(line);
-  if (!fence) return state;
-  if (state === null) return { char: fence.char, length: fence.length };
+  const fence = matchFenceLine(line)
+  if (!fence) return state
+  if (state === null) return { char: fence.char, length: fence.length }
   const closes = fence.char === state.char && fence.length >= state.length &&
-    fence.rest.trim() === "";
-  return closes ? null : state;
+    fence.rest.trim() === ""
+  return closes ? null : state
 }
 
 /**
@@ -131,15 +131,15 @@ function findMatchingBracketEnd(
   text: string,
   openIndex: number,
 ): number | null {
-  let depth = 0;
+  let depth = 0
   for (let i = openIndex; i < text.length; i++) {
-    if (text[i] === "[") depth++;
+    if (text[i] === "[") depth++
     else if (text[i] === "]") {
-      depth--;
-      if (depth === 0) return i;
+      depth--
+      if (depth === 0) return i
     }
   }
-  return null;
+  return null
 }
 
 /**
@@ -159,27 +159,27 @@ function findMatchingBracketEnd(
  * ![c](/img/y.png)`) is still rewritten normally.
  */
 function rewriteImagesInLine(line: string): string {
-  let result = "";
-  let i = 0;
+  let result = ""
+  let i = 0
   while (i < line.length) {
     if (line[i] === "!" && line[i + 1] === "[") {
-      const bracketEnd = findMatchingBracketEnd(line, i + 1);
+      const bracketEnd = findMatchingBracketEnd(line, i + 1)
       if (bracketEnd !== null && line[bracketEnd + 1] === "(") {
-        const alt = line.slice(i + 2, bracketEnd);
+        const alt = line.slice(i + 2, bracketEnd)
         const pathMatch = /^\(\/([^/)][^)]*)\)/.exec(
           line.slice(bracketEnd + 1),
-        );
+        )
         if (pathMatch) {
-          result += `![${alt}](${DEVTO_BASE_URL}/${pathMatch[1]})`;
-          i = bracketEnd + 1 + pathMatch[0].length;
-          continue;
+          result += `![${alt}](${DEVTO_BASE_URL}/${pathMatch[1]})`
+          i = bracketEnd + 1 + pathMatch[0].length
+          continue
         }
       }
     }
-    result += line[i];
-    i++;
+    result += line[i]
+    i++
   }
-  return result;
+  return result
 }
 
 /**
@@ -201,17 +201,17 @@ function rewriteImagesInLine(line: string): string {
  * — it can never contain an image, so rewriting it is always a no-op.
  */
 export function absolutizeImageUrls(markdown: string): string {
-  const lines = markdown.split("\n");
-  const out: string[] = [];
-  let state: FenceState | null = null;
+  const lines = markdown.split("\n")
+  const out: string[] = []
+  let state: FenceState | null = null
   for (const line of lines) {
-    const before = state;
-    state = nextFenceState(line, before);
+    const before = state
+    state = nextFenceState(line, before)
     out.push(
       before === null && state === null ? rewriteImagesInLine(line) : line,
-    );
+    )
   }
-  return out.join("\n");
+  return out.join("\n")
 }
 
 /**
@@ -231,7 +231,7 @@ export function buildDevToPayload(
   campaign: string = slug,
   coverImage?: string,
 ): DevToArticlePayload {
-  const tagged = channelUrl(DEVTO_BASE_URL, `/blog/${slug}`, "devto", campaign);
+  const tagged = channelUrl(DEVTO_BASE_URL, `/blog/${slug}`, "devto", campaign)
   const payload: DevToArticlePayload = {
     article: {
       title,
@@ -241,16 +241,16 @@ export function buildDevToPayload(
       published: false,
       canonical_url: `${DEVTO_BASE_URL}/blog/${slug}`,
     },
-  };
-  if (coverImage) payload.article.main_image = `${DEVTO_BASE_URL}${coverImage}`;
-  return payload;
+  }
+  if (coverImage) payload.article.main_image = `${DEVTO_BASE_URL}${coverImage}`
+  return payload
 }
 
 /** The fields of one of my Dev.to articles that the lookup below reads. */
 interface MyDevToArticle {
-  id: number;
-  canonical_url: string | null;
-  published: boolean;
+  id: number
+  canonical_url: string | null
+  published: boolean
 }
 
 /**
@@ -265,16 +265,16 @@ async function findMyArticle(
 ): Promise<MyDevToArticle | undefined> {
   const res = await fetch(`${DEVTO_API}/articles/me/all?per_page=1000`, {
     headers: { "api-key": apiKey, accept: "application/json" },
-  });
+  })
   if (!res.ok) {
-    await res.body?.cancel();
-    throw new Error(`listing my articles: ${res.status} ${res.statusText}`);
+    await res.body?.cancel()
+    throw new Error(`listing my articles: ${res.status} ${res.statusText}`)
   }
-  const list = await res.json();
+  const list = await res.json()
   if (!Array.isArray(list)) {
-    throw new Error("listing my articles: the answer is not a list");
+    throw new Error("listing my articles: the answer is not a list")
   }
-  return (list as MyDevToArticle[]).find((a) => a.canonical_url === canonical);
+  return (list as MyDevToArticle[]).find((a) => a.canonical_url === canonical)
 }
 
 /**
@@ -284,13 +284,13 @@ async function findMyArticle(
 export function devToApiKey(
   readDeployEnv: () => string = () => Deno.readTextFileSync(".env.deploy"),
 ): string | undefined {
-  const fromEnv = Deno.env.get("DEVTO_API_KEY");
-  if (fromEnv) return fromEnv;
+  const fromEnv = Deno.env.get("DEVTO_API_KEY")
+  if (fromEnv) return fromEnv
   try {
-    return envValue(readDeployEnv(), "DEVTO_API_KEY");
+    return envValue(readDeployEnv(), "DEVTO_API_KEY")
   } catch (err) {
-    if (err instanceof Deno.errors.NotFound) return undefined;
-    throw err;
+    if (err instanceof Deno.errors.NotFound) return undefined
+    throw err
   }
 }
 
@@ -314,8 +314,8 @@ export async function createDevToDraft(
   apiKey: string | undefined = devToApiKey(),
 ): Promise<void> {
   if (!apiKey) {
-    console.warn("  ⚠ DEVTO_API_KEY not set — skipped the Dev.to draft");
-    return;
+    console.warn("  ⚠ DEVTO_API_KEY not set — skipped the Dev.to draft")
+    return
   }
   try {
     const payload = buildDevToPayload(
@@ -324,13 +324,13 @@ export async function createDevToDraft(
       bodyMarkdown,
       campaign,
       coverImage,
-    );
-    const existing = await findMyArticle(apiKey, payload.article.canonical_url);
+    )
+    const existing = await findMyArticle(apiKey, payload.article.canonical_url)
     if (existing?.published) {
       console.warn(
         `  ⚠ Dev.to already has this post published (id ${existing.id}) — left it alone`,
-      );
-      return;
+      )
+      return
     }
     const res = await fetch(
       existing
@@ -344,15 +344,15 @@ export async function createDevToDraft(
         },
         body: JSON.stringify(payload),
       },
-    );
-    await res.body?.cancel();
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    )
+    await res.body?.cancel()
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
     console.log(
       existing
         ? `  ✓ Dev.to draft updated (id ${existing.id})`
         : "  ✓ Dev.to draft created",
-    );
+    )
   } catch (err) {
-    console.warn(`  ⚠ Dev.to draft failed: ${(err as Error).message}`);
+    console.warn(`  ⚠ Dev.to draft failed: ${(err as Error).message}`)
   }
 }

@@ -1,6 +1,6 @@
-import type { ComponentChildren } from "preact";
-import { note as lookupNote } from "../lib/notes.ts";
-import { Note } from "./Note.tsx";
+import type { ComponentChildren } from "preact"
+import { note as lookupNote } from "../lib/notes.ts"
+import { Note } from "./Note.tsx"
 
 /**
  * Wraps a claim with its margin note (#186). The note sits in a 240px margin
@@ -15,16 +15,16 @@ import { Note } from "./Note.tsx";
  */
 export function WithNote(
   { id, children, class: className = "" }: {
-    id: string;
-    children: ComponentChildren;
-    class?: string;
+    id: string
+    children: ComponentChildren
+    class?: string
   },
 ) {
-  const n = lookupNote(id);
+  const n = lookupNote(id)
   return (
     <div data-note-ref={id} class={`note-wrap ${className}`}>
       {children}
       <Note note={n} />
     </div>
-  );
+  )
 }

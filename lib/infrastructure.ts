@@ -13,29 +13,29 @@
  *
  * This module reads no environment variable, so tests can load it.
  */
-import { ciUrl, findTool, tool, toolRows } from "./tools.ts";
+import { ciUrl, findTool, tool, toolRows } from "./tools.ts"
 
-const BASE = "https://antonshubin.com";
+const BASE = "https://antonshubin.com"
 
 export interface InfraNode {
-  id: string;
+  id: string
   /** What the box says: a hostname or a tool name. */
-  label: string;
+  label: string
   /** One short line: what the box does. */
-  job: string;
+  job: string
   /** Where the box links. A public URL, or a `/tools/<slug>` page, or the tool's repository. */
-  href: string;
+  href: string
   /** True for a link that leaves this site. */
-  external: boolean;
+  external: boolean
   /** The `lib/tools.ts` entry the box stands for, when there is one. */
-  toolSlug?: string;
+  toolSlug?: string
 }
 
 export interface InfraEdge {
-  from: string;
-  to: string;
+  from: string
+  to: string
   /** The word on the arrow: "embeds", "runs", "draws". */
-  verb: string;
+  verb: string
 }
 
 /**
@@ -44,18 +44,18 @@ export interface InfraEdge {
  * slug that is in neither, so a typo fails the build.
  */
 export function toolLink(slug: string): { href: string; external: boolean } {
-  if (findTool(slug)) return { href: `/tools/${slug}`, external: false };
-  const row = toolRows.find((r) => r.slug === slug);
-  if (!row) throw new Error(`lib/infrastructure.ts: no tool "${slug}"`);
-  return { href: `https://github.com/${row.repo}`, external: true };
+  if (findTool(slug)) return { href: `/tools/${slug}`, external: false }
+  const row = toolRows.find((r) => r.slug === slug)
+  if (!row) throw new Error(`lib/infrastructure.ts: no tool "${slug}"`)
+  return { href: `https://github.com/${row.repo}`, external: true }
 }
 
 export interface LiveLink {
-  id: string;
-  label: string;
-  href: string;
+  id: string
+  label: string
+  href: string
   /** What a visitor sees there, in the words the page shows under the link. */
-  shows: string;
+  shows: string
 }
 
 /**
@@ -82,13 +82,13 @@ export const liveLinks: LiveLink[] = [
     href: "https://meet.antonshubin.com",
     shows: "the booking page",
   },
-];
+]
 
 /** A live link's URL by id, so the layers and the first screen never disagree. */
 export function liveHref(id: string): string {
-  const l = liveLinks.find((x) => x.id === id);
-  if (!l) throw new Error(`lib/infrastructure.ts: no live link "${id}"`);
-  return l.href;
+  const l = liveLinks.find((x) => x.id === id)
+  if (!l) throw new Error(`lib/infrastructure.ts: no live link "${id}"`)
+  return l.href
 }
 
 export const infraNodes: InfraNode[] = [
@@ -176,7 +176,7 @@ export const infraNodes: InfraNode[] = [
     href: "https://github.com/TwiN/gatus",
     external: true,
   },
-];
+]
 
 export const infraEdges: InfraEdge[] = [
   { from: "site", to: "meet", verb: "embeds" },
@@ -187,16 +187,16 @@ export const infraEdges: InfraEdge[] = [
   { from: "rostok", to: "stacks", verb: "holds" },
   { from: "ci", to: "woodpecker", verb: "runs" },
   { from: "woodpecker", to: "repos", verb: "builds" },
-];
+]
 
 export interface InfraLane {
-  id: string;
+  id: string
   /** The lane's heading. */
-  title: string;
+  title: string
   /** Box ids in drawing order. Neighbours must share an arrow, in either direction. */
-  nodes: string[];
+  nodes: string[]
   /** A post that covers the lane, linked under it. */
-  post?: { href: string; label: string };
+  post?: { href: string; label: string }
 }
 
 /**
@@ -221,13 +221,13 @@ export const infraLanes: InfraLane[] = [
   },
   { id: "builds", title: "Builds", nodes: ["ci", "woodpecker", "repos"] },
   { id: "deploys", title: "Deploys", nodes: ["rostok", "stacks"] },
-];
+]
 
 /** The arrow between two boxes, whichever way it runs; undefined when none is listed. */
 export function edgeBetween(a: string, b: string): InfraEdge | undefined {
   return infraEdges.find((e) =>
     (e.from === a && e.to === b) || (e.from === b && e.to === a)
-  );
+  )
 }
 
 /**
@@ -240,46 +240,46 @@ export function laneConnections(
   lane: InfraLane,
 ): { edge: InfraEdge; forward: boolean }[] {
   return lane.nodes.slice(1).map((to, i) => {
-    const from = lane.nodes[i];
-    const edge = edgeBetween(from, to);
+    const from = lane.nodes[i]
+    const edge = edgeBetween(from, to)
     if (!edge) {
       throw new Error(
         `lib/infrastructure.ts: lane ${lane.id} has no arrow ${from} - ${to}`,
-      );
+      )
     }
-    return { edge, forward: edge.from === from };
-  });
+    return { edge, forward: edge.from === from }
+  })
 }
 
 /** A node by id; throws on a typo. */
 export function infraNode(id: string): InfraNode {
-  const n = infraNodes.find((x) => x.id === id);
-  if (!n) throw new Error(`lib/infrastructure.ts: no node "${id}"`);
-  return n;
+  const n = infraNodes.find((x) => x.id === id)
+  if (!n) throw new Error(`lib/infrastructure.ts: no node "${id}"`)
+  return n
 }
 
 /** The arrows that leave a node. */
 export function edgesFrom(id: string): InfraEdge[] {
-  return infraEdges.filter((e) => e.from === id);
+  return infraEdges.filter((e) => e.from === id)
 }
 
 /** A place a visitor can check a layer: a link, or a sentence saying why there is none. */
 export type LayerCheck = string | {
-  label: string;
-  href: string;
-  external?: boolean;
-};
+  label: string
+  href: string
+  external?: boolean
+}
 
 export interface InfraLayer {
-  id: string;
+  id: string
   /** The job a founder cares about. The tools go on their own line. */
-  title: string;
+  title: string
   /** The tools behind it, so a search for a tool name still matches. */
-  tools: string;
-  text: string;
-  checks: LayerCheck[];
+  tools: string
+  text: string
+  checks: LayerCheck[]
   /** A post that covers the layer. */
-  post?: { href: string; label: string };
+  post?: { href: string; label: string }
 }
 
 /** The four blocks of "How risk is controlled", in the order a founder fears them. */
@@ -333,15 +333,15 @@ export const infraLayers: InfraLayer[] = [
       { label: "The pipelines", href: liveHref("ci"), external: true },
     ],
   },
-];
+]
 
 /** The sentence above the map: "my own servers", said before the boxes. */
 export const MAP_CAPTION =
-  "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing.";
+  "My own servers run on reusable infrastructure as code, Deno deployment automation, Docker Compose, and Traefik for TLS and routing."
 
 /** The `@id` of a tool page's `SoftwareSourceCode` node, for the `TechArticle`'s `mentions`. */
 export function toolNodeId(slug: string): string {
-  return `${BASE}/tools/${slug}#tool`;
+  return `${BASE}/tools/${slug}#tool`
 }
 
 /** The `@id`s of every node that has a tool page, without repeats. */
@@ -352,7 +352,7 @@ export function mentionedToolIds(): string[] {
         .filter((n) => n.toolSlug && findTool(n.toolSlug))
         .map((n) => toolNodeId(n.toolSlug!)),
     ),
-  ];
+  ]
 }
 
 /**
@@ -362,11 +362,11 @@ export function mentionedToolIds(): string[] {
  */
 export function infrastructureLines(baseUrl: string): string {
   const url = (n: InfraNode) =>
-    n.href.startsWith("/") ? `${baseUrl}${n.href}` : n.href;
-  const boxes = infraNodes.map((n) => `  - ${n.label} (${url(n)}): ${n.job}`);
+    n.href.startsWith("/") ? `${baseUrl}${n.href}` : n.href
+  const boxes = infraNodes.map((n) => `  - ${n.label} (${url(n)}): ${n.job}`)
   const arrows = infraEdges.map((e) =>
     `  - ${infraNode(e.from).label} ${e.verb} ${infraNode(e.to).label}`
-  );
+  )
   const layers = infraLayers.map((l) =>
     `  - ${l.title} (${l.tools}): ${l.text} ${
       l.checks.map((c) =>
@@ -375,7 +375,7 @@ export function infrastructureLines(baseUrl: string): string {
           : `${c.label}: ${c.href.startsWith("/") ? baseUrl : ""}${c.href}`
       ).join(" ")
     }${l.post ? ` Post: ${baseUrl}${l.post.href}` : ""}`
-  );
+  )
   return [
     "  Layers:",
     ...layers,
@@ -383,5 +383,5 @@ export function infrastructureLines(baseUrl: string): string {
     ...boxes,
     "  Connections:",
     ...arrows,
-  ].join("\n");
+  ].join("\n")
 }

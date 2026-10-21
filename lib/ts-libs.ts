@@ -6,21 +6,21 @@
 // when the tag is bumped.
 
 /** The ts-libs release whose READMEs these strings are copied from. */
-export const TS_LIBS_TAG = "v1.83.0";
+export const TS_LIBS_TAG = "v1.83.0"
 
 /** One package of ts-libs, as the "Pick a package" list shows it. */
 export interface TsLibsPackage {
   /** The JSR name without the `@spy4x/` scope; also the repository folder. */
-  name: string;
+  name: string
   /** The root README table's "What it holds" cell. */
-  holds: string;
+  holds: string
   /** The root README table's "Runs on" cell. */
-  runsOn: string;
+  runsOn: string
   /**
    * An example from `<name>/README.md`: its lines are, in order, lines of one
    * `ts` block there (a block may be trimmed, never added to), at most 15.
    */
-  example: string;
+  example: string
 }
 
 /** Every package, in the root README's table order. */
@@ -197,14 +197,14 @@ const typed = parseQuickAdd("Call Anna @phone #work tomorrow 3pm !high", {
 })
 typed.title // "Call Anna"`,
   },
-];
+]
 
 /** One point of the root README's "Why ts-libs", as a card on the page. */
 export interface TsLibsReason {
   /** The point's bold lead, without its full stop. */
-  title: string;
+  title: string
   /** The rest of the point, unwrapped. */
-  text: string;
+  text: string
 }
 
 /** Four of the README's five points; "Runs where the code allows" is "Where it stands". */
@@ -229,7 +229,7 @@ export const tsLibsReasons: TsLibsReason[] = [
     text:
       "Unit tests use fakes; an integration tier runs against a real Postgres, S3-compatible store, mail server and Redis, and fails instead of skipping. CI runs it on Postgres 18 and 17; the local containers run 18.",
   },
-];
+]
 
 /**
  * The root README's quick start, as "Run the example" shows it. Two changes,
@@ -243,4 +243,4 @@ deno add jsr:@spy4x/validation jsr:@spy4x/time jsr:@spy4x/email npm:arktype@2.2.
 # save the README's example as main.ts, then:
 SMTP_PASSWORD=not-real deno run --allow-net --allow-env --allow-sys main.ts
 curl -d '{"email":"nope","date":"2026-08-28","time":"10:00"}' localhost:8000
-# {"email":[{"code":"pattern","path":"email","message":"must be an email address (was \\"nope\\")"}]}`;
+# {"email":[{"code":"pattern","path":"email","message":"must be an email address (was \\"nope\\")"}]}`

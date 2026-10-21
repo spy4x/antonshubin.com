@@ -1,22 +1,22 @@
-import { BOOK_LABEL } from "../../lib/nav.ts";
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { Layout } from "../../components/Layout.tsx";
-import { NotFound } from "../../components/NotFound.tsx";
-import { type Hackathon, hackathons } from "../../lib/data.ts";
-import { getBreadcrumb, head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
+import { BOOK_LABEL } from "../../lib/nav.ts"
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { Layout } from "../../components/Layout.tsx"
+import { NotFound } from "../../components/NotFound.tsx"
+import { type Hackathon, hackathons } from "../../lib/data.ts"
+import { getBreadcrumb, head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
 import {
   IconCalendar as CalendarIcon,
   IconCode as CodeIcon,
-} from "@spy4x/preact-icons";
-import { StarIcon } from "../../components/Icons.tsx";
-import { BookCallLink } from "../../components/BookCallLink.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
+} from "@spy4x/preact-icons"
+import { StarIcon } from "../../components/Icons.tsx"
+import { BookCallLink } from "../../components/BookCallLink.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
 
 function getHackathonBySlug(slug: string): Hackathon | undefined {
-  return hackathons.find((h) => h.slug === slug);
+  return hackathons.find((h) => h.slug === slug)
 }
 
 // Unknown slugs answer with a real 404.
@@ -25,16 +25,16 @@ export const handler = define.handlers({
     return getHackathonBySlug(ctx.params.slug) ? page() : page(null, {
       status: 404,
       headers: { "Cache-Control": "no-store" },
-    });
+    })
   },
-});
+})
 
 export default define.page(function HackathonDetail(ctx) {
-  const { slug } = ctx.params;
-  const h = getHackathonBySlug(slug);
+  const { slug } = ctx.params
+  const h = getHackathonBySlug(slug)
 
   if (!h) {
-    return <NotFound pathname={ctx.url.pathname} />;
+    return <NotFound pathname={ctx.url.pathname} />
   }
 
   head.value = {
@@ -48,7 +48,7 @@ export default define.page(function HackathonDetail(ctx) {
     // inherited DEFAULTS size (1200x630, lib/head.ts) must not carry over.
     ogImageWidth: undefined,
     ogImageHeight: undefined,
-  };
+  }
 
   return (
     <Layout currentPath="/hackathons">
@@ -233,5 +233,5 @@ export default define.page(function HackathonDetail(ctx) {
         </div>
       </div>
     </Layout>
-  );
-});
+  )
+})

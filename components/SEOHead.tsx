@@ -1,19 +1,19 @@
-import { Head } from "fresh/runtime";
-import { type HeadTag, seoHeadTags } from "@spy4x/preact-system/seo-head";
+import { Head } from "fresh/runtime"
+import { type HeadTag, seoHeadTags } from "@spy4x/preact-system/seo-head"
 import {
   getBreadcrumb,
   head,
   type PageHead,
   ROLE,
   SITE_DESCRIPTION,
-} from "../lib/head.ts";
-import { breadcrumbListJsonLd } from "@spy4x/platform/universal/seo";
-import { LOCATION, X_HANDLE } from "../lib/config.ts";
-import { COMPANY } from "../lib/company.ts";
-import { EMAIL_ADDRESS, sameAsUrls } from "../lib/profiles.ts";
-import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts";
-import { proof } from "../lib/proof.ts";
-import { toJsonLd } from "../lib/json-ld.ts";
+} from "../lib/head.ts"
+import { breadcrumbListJsonLd } from "@spy4x/platform/universal/seo"
+import { LOCATION, X_HANDLE } from "../lib/config.ts"
+import { COMPANY } from "../lib/company.ts"
+import { EMAIL_ADDRESS, sameAsUrls } from "../lib/profiles.ts"
+import { ABOUT_NAME, ABOUT_PATH } from "../lib/about.ts"
+import { proof } from "../lib/proof.ts"
+import { toJsonLd } from "../lib/json-ld.ts"
 
 /**
  * The meta, canonical, Twitter card and Open Graph tags (#195): the library's
@@ -39,30 +39,30 @@ export function headTags(h: PageHead): HeadTag[] {
     locale: "en_US",
     twitterSite: X_HANDLE,
     twitterCreator: X_HANDLE,
-  });
+  })
 }
 
 /** Renders one tag, like the library's `SEOHead`, without a `key`. */
 function renderTag(tag: HeadTag) {
-  if (tag.tag === "title") return <title>{tag.text}</title>;
-  if (tag.tag === "link") return <link {...tag.attrs} />;
-  if (tag.tag === "meta") return <meta {...tag.attrs} />;
-  throw new Error(`headTags() emitted an unexpected <${tag.tag}>`);
+  if (tag.tag === "title") return <title>{tag.text}</title>
+  if (tag.tag === "link") return <link {...tag.attrs} />
+  if (tag.tag === "meta") return <meta {...tag.attrs} />
+  throw new Error(`headTags() emitted an unexpected <${tag.tag}>`)
 }
 
 export function SEOHead() {
-  const h = head.value;
-  const path = new URL(h.canonical).pathname;
+  const h = head.value
+  const path = new URL(h.canonical).pathname
   // `/about` is the one page that is Anton's profile (#294, SEO 1): it gets
   // the site's only ProfilePage. The home page is an offer page, so it gets a
   // plain WebPage about the Person and no BreadcrumbList, whose single "Home"
   // item says nothing (#269).
-  const isHome = path === "/";
-  const isAbout = path === ABOUT_PATH;
+  const isHome = path === "/"
+  const isAbout = path === ABOUT_PATH
   const breadcrumb = breadcrumbListJsonLd(
     h.canonical,
     getBreadcrumb(h.canonical, h.pageName ?? h.title),
-  );
+  )
   const pageNodes = isHome
     ? [{
       "@type": "WebPage",
@@ -82,10 +82,10 @@ export function SEOHead() {
       "isPartOf": { "@id": "https://antonshubin.com/#website" },
       "breadcrumb": { "@id": breadcrumb["@id"] },
     }, breadcrumb]
-    : [breadcrumb];
+    : [breadcrumb]
   // The booking page is the site's contact page (#272): a ContactPage node
   // says so to search engines and AI crawlers. No ScheduleAction, no review.
-  const isBooking = path === "/book";
+  const isBooking = path === "/book"
 
   return (
     <Head>
@@ -215,5 +215,5 @@ export function SEOHead() {
         }}
       />
     </Head>
-  );
+  )
 }

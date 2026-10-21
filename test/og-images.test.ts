@@ -2,27 +2,27 @@
 // every post and project page needs one, each exactly 1200x630. Reads the
 // files directly — deterministic and offline, no server or browser needed,
 // so it runs under the narrow `deno task test`, not `deno task test:browser`.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { blogArticles, projects } from "../lib/data.ts";
-import { tools } from "../lib/tools.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { blogArticles, projects } from "../lib/data.ts"
+import { tools } from "../lib/tools.ts"
 
-const OG_ROOT = new URL("../static/img/og/", import.meta.url);
+const OG_ROOT = new URL("../static/img/og/", import.meta.url)
 
-const WIDTH = 1200;
-const HEIGHT = 630;
+const WIDTH = 1200
+const HEIGHT = 630
 // Soft ceiling above the "aim under ~80KB each" in AGENTS.md/#193 — catches
 // a regen that stops compressing well, without being brittle to the exact
 // byte count Chromium's PNG encoder happens to produce.
-const MAX_BYTES = 150_000;
+const MAX_BYTES = 150_000
 
 interface PngInfo {
-  width: number;
-  height: number;
-  bytes: number;
+  width: number
+  height: number
+  bytes: number
 }
 
 /** The 8-byte magic every PNG file starts with. */
-const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
 
 /**
  * Reads a PNG's IHDR chunk (signature: 8 bytes, then length+"IHDR"+width+
@@ -33,148 +33,148 @@ const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
  * from whatever bytes happen to be at offsets 16/20.
  */
 async function pngInfo(relativePath: string): Promise<PngInfo> {
-  const url = new URL(relativePath, OG_ROOT);
-  let data: Uint8Array;
+  const url = new URL(relativePath, OG_ROOT)
+  let data: Uint8Array
   try {
-    data = await Deno.readFile(url);
+    data = await Deno.readFile(url)
   } catch {
     throw new Error(
       `missing OG image: static/img/og/${relativePath} — run \`deno task og\` to generate it`,
-    );
+    )
   }
   const isPng = data.length >= 8 &&
-    PNG_SIGNATURE.every((byte, i) => data[i] === byte);
-  assert(isPng, `static/img/og/${relativePath} is not a valid PNG file`);
-  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-  const width = view.getUint32(16);
-  const height = view.getUint32(20);
-  return { width, height, bytes: data.byteLength };
+    PNG_SIGNATURE.every((byte, i) => data[i] === byte)
+  assert(isPng, `static/img/og/${relativePath} is not a valid PNG file`)
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
+  const width = view.getUint32(16)
+  const height = view.getUint32(20)
+  return { width, height, bytes: data.byteLength }
 }
 
 Deno.test("every blog post has a 1200x630 OG preview PNG", async () => {
   for (const article of blogArticles) {
-    const relative = `blog/${article.slug}.png`;
-    const { width, height, bytes } = await pngInfo(relative);
-    assertEquals(width, WIDTH, `${relative}: width`);
-    assertEquals(height, HEIGHT, `${relative}: height`);
+    const relative = `blog/${article.slug}.png`
+    const { width, height, bytes } = await pngInfo(relative)
+    assertEquals(width, WIDTH, `${relative}: width`)
+    assertEquals(height, HEIGHT, `${relative}: height`)
     assert(
       bytes < MAX_BYTES,
       `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-    );
+    )
   }
-});
+})
 
 Deno.test("every project page has a 1200x630 OG preview PNG", async () => {
-  const withSlug = projects.freelance.filter((p) => p.slug);
-  assert(withSlug.length > 0, "no projects with a slug to check");
+  const withSlug = projects.freelance.filter((p) => p.slug)
+  assert(withSlug.length > 0, "no projects with a slug to check")
   for (const project of withSlug) {
-    const relative = `projects/${project.slug}.png`;
-    const { width, height, bytes } = await pngInfo(relative);
-    assertEquals(width, WIDTH, `${relative}: width`);
-    assertEquals(height, HEIGHT, `${relative}: height`);
+    const relative = `projects/${project.slug}.png`
+    const { width, height, bytes } = await pngInfo(relative)
+    assertEquals(width, WIDTH, `${relative}: width`)
+    assertEquals(height, HEIGHT, `${relative}: height`)
     assert(
       bytes < MAX_BYTES,
       `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-    );
+    )
   }
-});
+})
 
 Deno.test("the site has a 1200x630 landscape default OG PNG", async () => {
-  const relative = "default.png";
-  const { width, height, bytes } = await pngInfo(relative);
-  assertEquals(width, WIDTH, `${relative}: width`);
-  assertEquals(height, HEIGHT, `${relative}: height`);
+  const relative = "default.png"
+  const { width, height, bytes } = await pngInfo(relative)
+  assertEquals(width, WIDTH, `${relative}: width`)
+  assertEquals(height, HEIGHT, `${relative}: height`)
   assert(
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-  );
-});
+  )
+})
 
 Deno.test("every tool page and the tools hub have a 1200x630 OG preview PNG", async () => {
-  assert(tools.length > 0, "no tools to check");
+  assert(tools.length > 0, "no tools to check")
   for (
     const relative of [...tools.map((t) => `tools/${t.slug}.png`), "tools.png"]
   ) {
-    const { width, height, bytes } = await pngInfo(relative);
-    assertEquals(width, WIDTH, `${relative}: width`);
-    assertEquals(height, HEIGHT, `${relative}: height`);
+    const { width, height, bytes } = await pngInfo(relative)
+    assertEquals(width, WIDTH, `${relative}: width`)
+    assertEquals(height, HEIGHT, `${relative}: height`)
     assert(
       bytes < MAX_BYTES,
       `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-    );
+    )
   }
-});
+})
 
 Deno.test("the /work index has a 1200x630 OG preview PNG", async () => {
-  const relative = "work.png";
-  const { width, height, bytes } = await pngInfo(relative);
-  assertEquals(width, WIDTH, `${relative}: width`);
-  assertEquals(height, HEIGHT, `${relative}: height`);
+  const relative = "work.png"
+  const { width, height, bytes } = await pngInfo(relative)
+  assertEquals(width, WIDTH, `${relative}: width`)
+  assertEquals(height, HEIGHT, `${relative}: height`)
   assert(
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-  );
-});
+  )
+})
 
 Deno.test("the /about page has a 1200x630 OG preview PNG", async () => {
-  const relative = "about.png";
-  const { width, height, bytes } = await pngInfo(relative);
-  assertEquals(width, WIDTH, `${relative}: width`);
-  assertEquals(height, HEIGHT, `${relative}: height`);
+  const relative = "about.png"
+  const { width, height, bytes } = await pngInfo(relative)
+  assertEquals(width, WIDTH, `${relative}: width`)
+  assertEquals(height, HEIGHT, `${relative}: height`)
   assert(
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-  );
-});
+  )
+})
 
 Deno.test("the /infrastructure page has a 1200x630 OG preview PNG", async () => {
-  const relative = "infrastructure.png";
-  const { width, height, bytes } = await pngInfo(relative);
-  assertEquals(width, WIDTH, `${relative}: width`);
-  assertEquals(height, HEIGHT, `${relative}: height`);
+  const relative = "infrastructure.png"
+  const { width, height, bytes } = await pngInfo(relative)
+  assertEquals(width, WIDTH, `${relative}: width`)
+  assertEquals(height, HEIGHT, `${relative}: height`)
   assert(
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-  );
-});
+  )
+})
 
 Deno.test("the /how-i-work page has a 1200x630 OG preview PNG", async () => {
-  const relative = "how-i-work.png";
-  const { width, height, bytes } = await pngInfo(relative);
-  assertEquals(width, WIDTH, `${relative}: width`);
-  assertEquals(height, HEIGHT, `${relative}: height`);
+  const relative = "how-i-work.png"
+  const { width, height, bytes } = await pngInfo(relative)
+  assertEquals(width, WIDTH, `${relative}: width`)
+  assertEquals(height, HEIGHT, `${relative}: height`)
   assert(
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-  );
-});
+  )
+})
 
 Deno.test("the /why-not-just-ai page has a 1200x630 OG preview PNG", async () => {
-  const relative = "why-not-just-ai.png";
-  const { width, height, bytes } = await pngInfo(relative);
-  assertEquals(width, WIDTH, `${relative}: width`);
-  assertEquals(height, HEIGHT, `${relative}: height`);
+  const relative = "why-not-just-ai.png"
+  const { width, height, bytes } = await pngInfo(relative)
+  assertEquals(width, WIDTH, `${relative}: width`)
+  assertEquals(height, HEIGHT, `${relative}: height`)
   assert(
     bytes < MAX_BYTES,
     `${relative} is ${bytes} bytes, expected under ${MAX_BYTES}`,
-  );
-});
+  )
+})
 
 Deno.test("the GitHub social preview is a 1280x640 PNG", async () => {
-  const relative = "docs/social-preview.png";
-  let data: Uint8Array;
+  const relative = "docs/social-preview.png"
+  let data: Uint8Array
   try {
-    data = await Deno.readFile(new URL(`../${relative}`, import.meta.url));
+    data = await Deno.readFile(new URL(`../${relative}`, import.meta.url))
   } catch {
     throw new Error(
       `missing ${relative}: run deno task build, then deno task og`,
-    );
+    )
   }
   assert(
     PNG_SIGNATURE.every((byte, i) => data[i] === byte),
     `${relative} is not a valid PNG file`,
-  );
-  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-  assertEquals(view.getUint32(16), 1280, `${relative}: width`);
-  assertEquals(view.getUint32(20), 640, `${relative}: height`);
-});
+  )
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
+  assertEquals(view.getUint32(16), 1280, `${relative}: width`)
+  assertEquals(view.getUint32(20), 640, `${relative}: height`)
+})

@@ -1,38 +1,38 @@
-import { BOOK_LABEL } from "../lib/nav.ts";
-import { define } from "../lib/utils.ts";
-import { SEOHead } from "../components/SEOHead.tsx";
-import { Layout } from "../components/Layout.tsx";
-import { getBreadcrumb, head } from "../lib/head.ts";
-import { Breadcrumb } from "../components/Breadcrumb.tsx";
-import { highlightProjects } from "../lib/data.ts";
-import { SCHEDULE_URL } from "../lib/config.ts";
-import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts";
-import { proof } from "../lib/proof.ts";
-import { postHref, topicPosts } from "../lib/blog.ts";
-import type { BlogArticle } from "../lib/blog-posts.ts";
-import { firstSentence, projectLead } from "../lib/llms.ts";
-import { findTool } from "../lib/tools.ts";
-import { workHref } from "../lib/work.ts";
-import { BookCallLink } from "../components/BookCallLink.tsx";
-import { eventAttrs, linkEvent } from "../lib/analytics.ts";
+import { BOOK_LABEL } from "../lib/nav.ts"
+import { define } from "../lib/utils.ts"
+import { SEOHead } from "../components/SEOHead.tsx"
+import { Layout } from "../components/Layout.tsx"
+import { getBreadcrumb, head } from "../lib/head.ts"
+import { Breadcrumb } from "../components/Breadcrumb.tsx"
+import { highlightProjects } from "../lib/data.ts"
+import { SCHEDULE_URL } from "../lib/config.ts"
+import { catalogItem, catalogPath, priceLabel } from "../lib/catalog.ts"
+import { proof } from "../lib/proof.ts"
+import { postHref, topicPosts } from "../lib/blog.ts"
+import type { BlogArticle } from "../lib/blog-posts.ts"
+import { firstSentence, projectLead } from "../lib/llms.ts"
+import { findTool } from "../lib/tools.ts"
+import { workHref } from "../lib/work.ts"
+import { BookCallLink } from "../components/BookCallLink.tsx"
+import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 
-const audit = catalogItem("codebase-health-audit");
-const build = catalogItem("zero-to-production-saas-mvp");
+const audit = catalogItem("codebase-health-audit")
+const build = catalogItem("zero-to-production-saas-mvp")
 
 /** One thing to read: where it is and one line on why. */
 interface GuideLink {
-  href: string;
-  label: string;
+  href: string
+  label: string
   /** Read from the linked post, project, tool or catalog item, never written here. */
-  why?: string;
+  why?: string
 }
 
 /** One step of the reading order. */
 interface GuideStep {
-  id: string;
-  title: string;
-  intro: string;
-  links: GuideLink[];
+  id: string
+  title: string
+  intro: string
+  links: GuideLink[]
 }
 
 /** A current post and the first sentence of its own description. */
@@ -41,7 +41,7 @@ function postLink(a: BlogArticle): GuideLink {
     href: postHref(a.slug),
     label: a.title,
     why: firstSentence(a.description),
-  };
+  }
 }
 
 /**
@@ -51,9 +51,9 @@ function postLink(a: BlogArticle): GuideLink {
  * whole description.
  */
 function guideSteps(): GuideStep[] {
-  const rostok = findTool("rostok");
+  const rostok = findTool("rostok")
   if (!rostok) {
-    throw new Error("the guide links rostok, which lib/tools.ts lacks");
+    throw new Error("the guide links rostok, which lib/tools.ts lacks")
   }
   return [
     {
@@ -125,7 +125,7 @@ function guideSteps(): GuideStep[] {
         },
       ],
     },
-  ];
+  ]
 }
 
 export default define.page(function SaasArchGuide() {
@@ -139,7 +139,7 @@ export default define.page(function SaasArchGuide() {
       } projects.`,
     canonical: "https://antonshubin.com/saas-architecture-guide",
     ogType: "article",
-  };
+  }
 
   return (
     <Layout currentPath="/saas-architecture-guide">
@@ -205,5 +205,5 @@ export default define.page(function SaasArchGuide() {
         )}
       </div>
     </Layout>
-  );
-});
+  )
+})

@@ -1,6 +1,6 @@
-import { Marked, Parser, Renderer, TextRenderer } from "marked";
-import type { Tokens } from "marked";
-import { outboundTo } from "./analytics.ts";
+import { Marked, Parser, Renderer, TextRenderer } from "marked"
+import type { Tokens } from "marked"
+import { outboundTo } from "./analytics.ts"
 
 /** A fence's info string -> the name its code block's header shows. */
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -19,14 +19,14 @@ const LANGUAGE_NAMES: Record<string, string> = {
   javascript: "JavaScript",
   tsx: "TSX",
   dockerfile: "Dockerfile",
-};
+}
 
 /** One `h2` or `h3` of a post, for its contents list (#274). */
 export interface PostHeading {
-  depth: 2 | 3;
-  id: string;
+  depth: 2 | 3
+  id: string
   /** The heading's plain text, unescaped, for JSX to escape once. */
-  text: string;
+  text: string
 }
 
 /**
@@ -34,10 +34,10 @@ export interface PostHeading {
  * every parse, and a parse is synchronous (no async extension is
  * registered), so two posts can never share it.
  */
-let headingIds = new Map<string, number>();
-let headings: PostHeading[] = [];
+let headingIds = new Map<string, number>()
+let headings: PostHeading[] = []
 /** The latest h2/h3 text, the label of a table that follows it. */
-let lastHeading = "";
+let lastHeading = ""
 
 const ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
@@ -45,11 +45,11 @@ const ESCAPE_MAP: Record<string, string> = {
   ">": "&gt;",
   '"': "&quot;",
   "'": "&#39;",
-};
+}
 
 /** Escapes every `&<>"'`, as marked does for a code span. */
 function escapeEncode(text: string): string {
-  return text.replace(/[&<>"']/g, (c) => ESCAPE_MAP[c]);
+  return text.replace(/[&<>"']/g, (c) => ESCAPE_MAP[c])
 }
 
 /**
@@ -60,7 +60,7 @@ function escapeNoEncode(text: string): string {
   return text.replace(
     /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g,
     (c) => ESCAPE_MAP[c],
-  );
+  )
 }
 
 /**
@@ -70,7 +70,7 @@ function escapeNoEncode(text: string): string {
  * place to smuggle it from the token-walk to the `checkbox` renderer.
  */
 interface LabelledCheckbox extends Tokens.Checkbox {
-  _ariaLabel?: string;
+  _ariaLabel?: string
 }
 
 /**
@@ -85,15 +85,15 @@ interface LabelledCheckbox extends Tokens.Checkbox {
  * is a separate text token, so only the markup disappears.
  */
 class LabelRenderer extends TextRenderer {
-  declare parser: Parser;
+  declare parser: Parser
   /** True between an inline <script> or <style> tag and its closing tag. */
-  private inHiddenTag = false;
+  private inHiddenTag = false
 
   override text(token: Tokens.Text | Tokens.Escape): string {
     // A script or style body is never on screen, so it stays out of the label.
-    if (this.inHiddenTag) return "";
+    if (this.inHiddenTag) return ""
     if ("tokens" in token && token.tokens) {
-      return this.parser.parseInline(token.tokens, this as unknown as Renderer);
+      return this.parser.parseInline(token.tokens, this as unknown as Renderer)
     }
     // Marked marks text inside inline <kbd>, <code>, <pre> or <script> as
     // already escaped and prints it raw. That is fine on the page, not in a
@@ -101,36 +101,36 @@ class LabelRenderer extends TextRenderer {
     // entity still decodes to what the page shows.
     return "escaped" in token && token.escaped
       ? token.text.replace(/["<>]/g, (c) => ESCAPE_MAP[c])
-      : escapeNoEncode(token.text);
+      : escapeNoEncode(token.text)
   }
   override codespan({ text }: Tokens.Codespan): string {
-    return escapeEncode(text);
+    return escapeEncode(text)
   }
   override strong({ tokens }: Tokens.Strong): string {
-    return this.parser.parseInline(tokens, this as unknown as Renderer);
+    return this.parser.parseInline(tokens, this as unknown as Renderer)
   }
   override em({ tokens }: Tokens.Em): string {
-    return this.parser.parseInline(tokens, this as unknown as Renderer);
+    return this.parser.parseInline(tokens, this as unknown as Renderer)
   }
   override del({ tokens }: Tokens.Del): string {
-    return this.parser.parseInline(tokens, this as unknown as Renderer);
+    return this.parser.parseInline(tokens, this as unknown as Renderer)
   }
   override link({ tokens }: Tokens.Link): string {
-    return this.parser.parseInline(tokens, this as unknown as Renderer);
+    return this.parser.parseInline(tokens, this as unknown as Renderer)
   }
   override image({ text, tokens }: Tokens.Image): string {
     return tokens
       ? this.parser.parseInline(tokens, this as unknown as Renderer)
-      : escapeNoEncode(text);
+      : escapeNoEncode(text)
   }
   override html({ text }: Tokens.HTML | Tokens.Tag): string {
-    if (/^<(script|style)[\s>]/i.test(text)) this.inHiddenTag = true;
-    else if (/^<\/(script|style)\s*>/i.test(text)) this.inHiddenTag = false;
+    if (/^<(script|style)[\s>]/i.test(text)) this.inHiddenTag = true
+    else if (/^<\/(script|style)\s*>/i.test(text)) this.inHiddenTag = false
     // A <br>, with or without attributes, reads as a space; <br-x> does not.
-    return /^<br[\s/>]/i.test(text) ? " " : "";
+    return /^<br[\s/>]/i.test(text) ? " " : ""
   }
   override br(): string {
-    return " ";
+    return " "
   }
 }
 
@@ -141,7 +141,7 @@ class LabelRenderer extends TextRenderer {
 function ariaLabelText(tokens: Tokens.Generic[]): string {
   return Parser.parseInline(tokens, {
     renderer: new LabelRenderer() as unknown as Renderer,
-  }).replace(/\s+/g, " ").trim();
+  }).replace(/\s+/g, " ").trim()
 }
 
 /**
@@ -151,9 +151,9 @@ function ariaLabelText(tokens: Tokens.Generic[]): string {
  */
 function cleanUrl(href: string): string | null {
   try {
-    return encodeURI(href).replace(/%25/g, "%");
+    return encodeURI(href).replace(/%25/g, "%")
   } catch {
-    return null;
+    return null
   }
 }
 
@@ -163,7 +163,7 @@ function cleanUrl(href: string): string | null {
  * caller — routes/catalog/[slug].tsx renders catalog item descriptions
  * through the same package, and must render identically to `main`.
  */
-const blogMarked = new Marked();
+const blogMarked = new Marked()
 
 blogMarked.use({
   /**
@@ -185,25 +185,25 @@ blogMarked.use({
    * inside it.
    */
   walkTokens(token) {
-    const item = token as Tokens.Generic & Partial<Tokens.ListItem>;
-    if (item.type !== "list_item" || !item.task || !item.tokens) return;
-    const first = item.tokens[0] as Tokens.Generic;
-    let checkbox: LabelledCheckbox | undefined;
-    let inlineTokens: Tokens.Generic[] | undefined;
+    const item = token as Tokens.Generic & Partial<Tokens.ListItem>
+    if (item.type !== "list_item" || !item.task || !item.tokens) return
+    const first = item.tokens[0] as Tokens.Generic
+    let checkbox: LabelledCheckbox | undefined
+    let inlineTokens: Tokens.Generic[] | undefined
     if (first?.type === "checkbox") {
-      checkbox = first as LabelledCheckbox;
+      checkbox = first as LabelledCheckbox
       inlineTokens = (item.tokens[1] as { tokens?: Tokens.Generic[] })
-        ?.tokens;
+        ?.tokens
     } else if (first?.type === "paragraph") {
-      const paragraphTokens = (first as Tokens.Paragraph).tokens;
+      const paragraphTokens = (first as Tokens.Paragraph).tokens
       if (paragraphTokens?.[0]?.type === "checkbox") {
-        checkbox = paragraphTokens[0] as LabelledCheckbox;
-        inlineTokens = paragraphTokens.slice(1);
+        checkbox = paragraphTokens[0] as LabelledCheckbox
+        inlineTokens = paragraphTokens.slice(1)
       }
     }
-    if (!checkbox || !inlineTokens) return;
-    const label = ariaLabelText(inlineTokens);
-    if (label) checkbox._ariaLabel = label;
+    if (!checkbox || !inlineTokens) return
+    const label = ariaLabelText(inlineTokens)
+    if (label) checkbox._ariaLabel = label
   },
   renderer: {
     /**
@@ -216,17 +216,17 @@ blogMarked.use({
      * marked's own output.
      */
     heading({ tokens, depth }) {
-      if (depth !== 2 && depth !== 3) return false;
-      const html = this.parser.parseInline(tokens);
+      if (depth !== 2 && depth !== 3) return false
+      const html = this.parser.parseInline(tokens)
       const text = decodeEntities(
         this.parser.parseInline(tokens, this.parser.textRenderer),
-      ).replace(/\s+/g, " ").trim();
-      const id = uniqueId(slugify(text) || "section");
-      headings.push({ depth, id, text });
-      lastHeading = text;
+      ).replace(/\s+/g, " ").trim()
+      const id = uniqueId(slugify(text) || "section")
+      headings.push({ depth, id, text })
+      lastHeading = text
       return `<div class="heading-row heading-row--${depth}"><h${depth} id="${id}">${html}</h${depth}><a class="heading-anchor" href="#${id}"><span aria-hidden="true">#</span><span class="sr-only">Link to section: ${
         escapeEncode(text)
-      }</span></a></div>\n`;
+      }</span></a></div>\n`
     },
     /**
      * A table sits in a labelled, focusable scroll box (#334): a wide one
@@ -235,10 +235,10 @@ blogMarked.use({
      * The label is the nearest heading above it, or "Table".
      */
     table(token) {
-      const label = lastHeading || "Table";
+      const label = lastHeading || "Table"
       return `<div class="table-scroll" tabindex="0" role="region" aria-label="${
         escapeEncode(label)
-      }">${Renderer.prototype.table.call(this, token)}</div>\n`;
+      }">${Renderer.prototype.table.call(this, token)}</div>\n`
     },
     /**
      * A fenced code block (#274, UX 4): a header row with the language and a
@@ -249,19 +249,19 @@ blogMarked.use({
      * name says what it is, "Code, TypeScript", for a screen reader.
      */
     code({ text, lang }) {
-      const info = (lang ?? "").trim().split(/\s+/)[0].toLowerCase();
+      const info = (lang ?? "").trim().split(/\s+/)[0].toLowerCase()
       const name = LANGUAGE_NAMES[info] ??
-        (info ? info.toUpperCase() : undefined);
-      const codeClass = info ? ` class="language-${escapeEncode(info)}"` : "";
-      const label = name ? `Code, ${escapeEncode(name)}` : "Code";
+        (info ? info.toUpperCase() : undefined)
+      const codeClass = info ? ` class="language-${escapeEncode(info)}"` : ""
+      const label = name ? `Code, ${escapeEncode(name)}` : "Code"
       const langTag = name
         ? `<span class="code-lang" aria-hidden="true">${
           escapeEncode(name)
         }</span>`
-        : "<span></span>";
+        : "<span></span>"
       return `<div class="code-block" role="group" aria-label="${label}"><div class="code-head">${langTag}<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy</button></div><pre tabindex="0"><code${codeClass}>${
         escapeEncode(text)
-      }\n</code></pre></div>\n`;
+      }\n</code></pre></div>\n`
     },
     /**
      * A paragraph that holds only an image becomes a `<figure>` (#274, UX 5
@@ -273,24 +273,24 @@ blogMarked.use({
     paragraph({ tokens }) {
       const only = tokens.filter((t) =>
         !(t.type === "text" && t.raw.trim() === "")
-      );
-      if (only.length !== 1 || only[0].type !== "image") return false;
-      const image = only[0] as Tokens.Image;
-      if (cleanUrl(image.href) === null) return false;
+      )
+      if (only.length !== 1 || only[0].type !== "image") return false
+      const image = only[0] as Tokens.Image
+      if (cleanUrl(image.href) === null) return false
       const img = this.parser.parseInline([image]).replace(
         /^<img /,
         '<img loading="lazy" decoding="async" ',
-      );
+      )
       const alt = escapeNoEncode(
         image.tokens
           ? this.parser.parseInline(image.tokens, this.parser.textRenderer)
           : image.text,
-      );
-      const name = alt ? `View larger image: ${alt}` : "View larger image";
+      )
+      const name = alt ? `View larger image: ${alt}` : "View larger image"
       const caption = image.title
         ? `<figcaption>${escapeNoEncode(image.title)}</figcaption>`
-        : "";
-      return `<figure class="post-figure"><button type="button" class="post-image" data-lightbox aria-label="${name}">${img}</button>${caption}</figure>\n`;
+        : ""
+      return `<figure class="post-figure"><button type="button" class="post-image" data-lightbox aria-label="${name}">${img}</button>${caption}</figure>\n`
     },
     /**
      * The only renderer method this module overrides — everything else
@@ -305,10 +305,10 @@ blogMarked.use({
      * calls through to the built-in method).
      */
     checkbox(token) {
-      const label = (token as LabelledCheckbox)._ariaLabel;
-      if (!label) return false;
-      const checkedAttr = token.checked ? 'checked="" ' : "";
-      return `<input aria-label="${label}" ${checkedAttr}disabled="" type="checkbox"> `;
+      const label = (token as LabelledCheckbox)._ariaLabel
+      if (!label) return false
+      const checkedAttr = token.checked ? 'checked="" ' : ""
+      return `<input aria-label="${label}" ${checkedAttr}disabled="" type="checkbox"> `
     },
     /**
      * Plain marked's own `image` renderer (marked 17.0.1) writes the alt text
@@ -326,23 +326,23 @@ blogMarked.use({
         tokens
           ? this.parser.parseInline(tokens, this.parser.textRenderer)
           : text,
-      );
-      const cleanHref = cleanUrl(href);
-      if (cleanHref === null) return alt;
-      let out = `<img src="${cleanHref}" alt="${alt}"`;
-      if (title) out += ` title="${escapeNoEncode(title)}"`;
-      out += ">";
-      return out;
+      )
+      const cleanHref = cleanUrl(href)
+      if (cleanHref === null) return alt
+      let out = `<img src="${cleanHref}" alt="${alt}"`
+      if (title) out += ` title="${escapeNoEncode(title)}"`
+      out += ">"
+      return out
     },
   },
-});
+})
 
 /**
  * Same wording and markup as components/NewTabHint.tsx, duplicated here
  * (rather than imported) because this file has to stay usable from a plain
  * `.ts` module with no JSX — it's string-built HTML, not a Preact component.
  */
-const NEW_TAB_HINT = '<span class="sr-only">&nbsp;(opens in a new tab)</span>';
+const NEW_TAB_HINT = '<span class="sr-only">&nbsp;(opens in a new tab)</span>'
 
 /**
  * Blog posts embed raw `<a href="..." target="_blank">` HTML directly in
@@ -359,7 +359,7 @@ function addNewTabHints(html: string): string {
   return html.replace(
     /(<a\b[^>]*\btarget="_blank"[^>]*>[\s\S]*?)(<\/a>)/g,
     (_match, open: string, close: string) => `${open}${NEW_TAB_HINT}${close}`,
-  );
+  )
 }
 
 /**
@@ -371,14 +371,14 @@ function addNewTabHints(html: string): string {
  */
 function addOutboundEvents(html: string): string {
   return html.replace(/<a\b[^>]*>/g, (tag) => {
-    if (tag.includes("data-umami-event")) return tag;
-    const href = /\bhref="([^"]*)"/.exec(tag)?.[1];
-    const to = href ? outboundTo(href.replaceAll("&amp;", "&")) : null;
-    if (!to) return tag;
+    if (tag.includes("data-umami-event")) return tag
+    const href = /\bhref="([^"]*)"/.exec(tag)?.[1]
+    const to = href ? outboundTo(href.replaceAll("&amp;", "&")) : null
+    if (!to) return tag
     return `${
       tag.slice(0, -1)
-    } data-umami-event="outbound" data-umami-event-to="${escapeEncode(to)}">`;
-  });
+    } data-umami-event="outbound" data-umami-event-to="${escapeEncode(to)}">`
+  })
 }
 
 /**
@@ -395,7 +395,7 @@ function addOutboundEvents(html: string): string {
  * substring exists there.
  */
 function addPreTabIndex(html: string): string {
-  return html.replace(/<pre>/g, '<pre tabindex="0">');
+  return html.replace(/<pre>/g, '<pre tabindex="0">')
 }
 
 /**
@@ -407,13 +407,13 @@ function addPreTabIndex(html: string): string {
  * shared default `marked` export, untouched by this module.
  */
 export async function renderBlogMarkdown(markdown: string): Promise<string> {
-  return (await renderBlogPost(markdown)).html;
+  return (await renderBlogPost(markdown)).html
 }
 
 /** A rendered post: its HTML and its `h2`/`h3` headings in page order. */
 export interface RenderedPost {
-  html: string;
-  headings: PostHeading[];
+  html: string
+  headings: PostHeading[]
 }
 
 /**
@@ -421,16 +421,16 @@ export interface RenderedPost {
  * with the same ids the HTML carries, for the contents list.
  */
 export function renderBlogPost(markdown: string): Promise<RenderedPost> {
-  headingIds = new Map();
-  headings = [];
-  lastHeading = "";
-  const raw = blogMarked.parse(markdown, { async: false }) as string;
+  headingIds = new Map()
+  headings = []
+  lastHeading = ""
+  const raw = blogMarked.parse(markdown, { async: false }) as string
   const result = {
     html: addPreTabIndex(addOutboundEvents(addNewTabHints(raw))),
     headings,
-  };
-  headings = [];
-  return Promise.resolve(result);
+  }
+  headings = []
+  return Promise.resolve(result)
 }
 
 /** "Why Deno? (and not Node)" -> "why-deno-and-not-node". */
@@ -440,14 +440,14 @@ export function slugify(text: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/^-+|-+$/g, "")
 }
 
 /** `base`, or `base-2`, `base-3`, ... when this render already used it. */
 function uniqueId(base: string): string {
-  const seen = headingIds.get(base) ?? 0;
-  headingIds.set(base, seen + 1);
-  return seen === 0 ? base : `${base}-${seen + 1}`;
+  const seen = headingIds.get(base) ?? 0
+  headingIds.set(base, seen + 1)
+  return seen === 0 ? base : `${base}-${seen + 1}`
 }
 
 /** Decodes the few entities marked's text renderer can leave in a heading. */
@@ -457,5 +457,5 @@ function decodeEntities(text: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&");
+    .replace(/&amp;/g, "&")
 }

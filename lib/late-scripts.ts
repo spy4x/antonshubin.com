@@ -7,7 +7,7 @@
  * the hub about 250 ms of LCP. Without the header the scripts load when the
  * parser reaches Fresh's boot script at the end of the body.
  */
-export const LATE_SCRIPT_PATHS: ReadonlySet<string> = new Set(["/tools"]);
+export const LATE_SCRIPT_PATHS: ReadonlySet<string> = new Set(["/tools"])
 
 /**
  * Removes the `rel="modulepreload"` entries from a `Link` header and keeps
@@ -16,11 +16,11 @@ export const LATE_SCRIPT_PATHS: ReadonlySet<string> = new Set(["/tools"]);
  * (Fresh writes `/assets/<name>.js` paths).
  */
 export function dropModulePreload(headers: Headers): void {
-  const link = headers.get("link");
-  if (!link) return;
+  const link = headers.get("link")
+  if (!link) return
   const kept = link.split(/,\s*(?=<)/).filter((entry) =>
     !/rel="?modulepreload"?/i.test(entry)
-  );
-  if (kept.length === 0) headers.delete("link");
-  else headers.set("link", kept.join(", "));
+  )
+  if (kept.length === 0) headers.delete("link")
+  else headers.set("link", kept.join(", "))
 }

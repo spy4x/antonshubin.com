@@ -1,9 +1,9 @@
-import { define } from "../../lib/utils.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
-import { loadToolPage } from "../../components/tool-frame/tool-page.ts";
-import { ConfigToCard } from "../../components/tools/oko/ConfigToCard.tsx";
-import { CodeBlock } from "../../components/tools/oko/CodeBlock.tsx";
+import { define } from "../../lib/utils.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
+import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
+import { ConfigToCard } from "../../components/tools/oko/ConfigToCard.tsx"
+import { CodeBlock } from "../../components/tools/oko/CodeBlock.tsx"
 
 /** "What it is not": oko's docs/how-it-works.md "What Oko is NOT", shortened in its own words. */
 const NOT = [
@@ -11,7 +11,7 @@ const NOT = [
   "Not a metrics dashboard: oko reads gatus badges.",
   "Not a gatus replacement.",
   "Not a health-check tool: oko never probes services itself.",
-];
+]
 
 /** The README's quick start, verbatim. */
 const COMPOSE = `# compose.yml
@@ -24,7 +24,7 @@ services:
       DOMAIN: example.com                # replaces \${DOMAIN} in service URLs
       UPTIME_HOSTS: uptime.example.com   # your gatus host(s), comma-separated
       CONFIG_PATH: /config/config.json
-    volumes: ["./oko:/config:ro,z"]`;
+    volumes: ["./oko:/config:ro,z"]`
 
 /**
  * The README's config.json, verbatim but for the icon, written as its JSON
@@ -46,12 +46,12 @@ const CONFIG = `{
       ]
     }
   ]
-}`;
+}`
 
 /** /tools/oko (#464): the tool frame with "From config to card", "What it is not" and the quick start. */
 export default define.page(async function OkoPage(ctx) {
-  const data = await loadToolPage("oko");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
+  const data = await loadToolPage("oko")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
   return (
     <ToolFrame data={data} currentPath={ctx.url.pathname}>
       <ConfigToCard />
@@ -80,5 +80,5 @@ export default define.page(async function OkoPage(ctx) {
         </p>
       </section>
     </ToolFrame>
-  );
-});
+  )
+})

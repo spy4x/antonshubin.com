@@ -10,24 +10,24 @@
 
 /** One list and its tasks, as CalDAV property lines after the title. */
 interface DemoList {
-  name: string;
+  name: string
   /** `#RRGGBB`; written as Apple's `calendar-color`. */
-  color: string;
-  tasks: { uid: string; summary: string; lines: string[] }[];
+  color: string
+  tasks: { uid: string; summary: string; lines: string[] }[]
 }
 
 /** `YYYYMMDD` for the UTC day `offset` days from `today`. */
 function day(today: Date, offset: number): string {
   const d = new Date(
     Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()),
-  );
-  d.setUTCDate(d.getUTCDate() + offset);
-  return d.toISOString().slice(0, 10).replaceAll("-", "");
+  )
+  d.setUTCDate(d.getUTCDate() + offset)
+  return d.toISOString().slice(0, 10).replaceAll("-", "")
 }
 
 /** The three lists of the clip, with dates counted from `today`. */
 export function demoLists(today: Date): DemoList[] {
-  const due = (offset: number) => `DUE;VALUE=DATE:${day(today, offset)}`;
+  const due = (offset: number) => `DUE;VALUE=DATE:${day(today, offset)}`
   return [
     {
       name: "Errands",
@@ -101,7 +101,7 @@ export function demoLists(today: Date): DemoList[] {
         },
       ],
     },
-  ];
+  ]
 }
 
 /** One Tasks.org VTODO: the property lines Tasks.org writes, plus a default reminder. */
@@ -124,7 +124,7 @@ function vtodo(uid: string, summary: string, lines: string[]): string {
     "END:VTODO",
     "END:VCALENDAR",
     "",
-  ].join("\r\n");
+  ].join("\r\n")
 }
 
 /** Sends one CalDAV request and throws, naming the status, unless it is in `ok`. */
@@ -140,10 +140,10 @@ async function caldav(
     method,
     headers: { Authorization: auth, ...headers },
     body,
-  });
-  const text = await response.text();
+  })
+  const text = await response.text()
   if (!ok.includes(response.status)) {
-    throw new Error(`${method} ${url} answered ${response.status}: ${text}`);
+    throw new Error(`${method} ${url} answered ${response.status}: ${text}`)
   }
 }
 
@@ -154,11 +154,11 @@ export async function seed(
   today = new Date(),
 ): Promise<void> {
   // Radicale here runs with `--auth-type none`: any password works.
-  const auth = `Basic ${btoa(`${user}:demo`)}`;
+  const auth = `Basic ${btoa(`${user}:demo`)}`
   for (const [i, list] of demoLists(today).entries()) {
-    const href = `${base}/${user}/list-${i + 1}/`;
+    const href = `${base}/${user}/list-${i + 1}/`
     // A rerun starts from the same lists: drop what an earlier take changed.
-    await caldav(auth, "DELETE", href, {}, "", [200, 204, 404]);
+    await caldav(auth, "DELETE", href, {}, "", [200, 204, 404])
     await caldav(
       auth,
       "MKCALENDAR",
@@ -173,7 +173,7 @@ export async function seed(
   </prop></set>
 </C:mkcalendar>`,
       [201],
-    );
+    )
     for (const task of list.tasks) {
       await caldav(
         auth,
@@ -185,13 +185,13 @@ export async function seed(
         },
         vtodo(task.uid, task.summary, task.lines),
         [201],
-      );
+      )
     }
   }
 }
 
 if (import.meta.main) {
-  const [base, user] = Deno.args;
-  if (!base || !user) throw new Error("usage: seed.ts <radicale-url> <user>");
-  await seed(base, user);
+  const [base, user] = Deno.args
+  if (!base || !user) throw new Error("usage: seed.ts <radicale-url> <user>")
+  await seed(base, user)
 }

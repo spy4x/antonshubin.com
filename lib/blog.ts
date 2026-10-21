@@ -4,37 +4,37 @@
  * llms-file lines. Metadata itself is read by `lib/blog-posts.ts`; this file
  * writes no claim of its own beyond the fixed labels below.
  */
-import { dayLabel, monthLabel } from "@spy4x/time/locale";
-import { blogArticles } from "./data.ts";
-import { type BlogArticle, byNewest, topic, topics } from "./blog-posts.ts";
+import { dayLabel, monthLabel } from "@spy4x/time/locale"
+import { blogArticles } from "./data.ts"
+import { type BlogArticle, byNewest, topic, topics } from "./blog-posts.ts"
 import {
   type CatalogItem,
   catalogItem,
   catalogPath,
   priceLabel,
-} from "./catalog.ts";
-import { findTool, repoUrl, type ToolLink as LiveLink } from "./tools.ts";
+} from "./catalog.ts"
+import { findTool, repoUrl, type ToolLink as LiveLink } from "./tools.ts"
 
-export { topic, topics };
+export { topic, topics }
 
 /** Posts of this many minutes or more get a contents list (#191, #274). */
-export const TOC_MIN_MINUTES = 8;
+export const TOC_MIN_MINUTES = 8
 
 /** The post's path. */
 export function postHref(slug: string): string {
-  return `/blog/${slug}`;
+  return `/blog/${slug}`
 }
 
 /** The tool a post links to, resolved to a page and a repository. */
 export interface ToolLink {
   /** The tool's `lib/tools.ts` slug. */
-  slug: string;
-  name: string;
-  href: string;
+  slug: string
+  name: string
+  href: string
   /** The public repository, `https://github.com/<owner>/<repo>`. */
-  repoUrl?: string;
+  repoUrl?: string
   /** The tool's running instance or demo, its `lib/tools.ts` `live` link. */
-  live?: LiveLink;
+  live?: LiveLink
 }
 
 /**
@@ -46,13 +46,13 @@ export interface ToolLink {
  * instead of shipping a broken link.
  */
 export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
-  const slug = article.relatedTool;
-  if (!slug) return undefined;
-  const found = findTool(slug);
+  const slug = article.relatedTool
+  if (!slug) return undefined
+  const found = findTool(slug)
   if (!found) {
     throw new Error(
       `content/blog/${article.slug}.md: relatedTool "${slug}" is not a tool in lib/tools.ts`,
-    );
+    )
   }
   return {
     slug: found.slug,
@@ -60,25 +60,25 @@ export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
     href: `/tools/${found.slug}`,
     repoUrl: repoUrl(found),
     live: found.live,
-  };
+  }
 }
 
 /** The catalog item a post links to, or undefined; throws on a typo. */
 export function relatedService(article: BlogArticle): CatalogItem | undefined {
-  return article.catalogSlug ? catalogItem(article.catalogSlug) : undefined;
+  return article.catalogSlug ? catalogItem(article.catalogSlug) : undefined
 }
 
 /** The service link's text: "The same work for you: Strategy session, $150". */
 export function serviceLabel(item: CatalogItem): string {
-  const price = priceLabel(item);
+  const price = priceLabel(item)
   return `The same work for you: ${item.shortTitle}, ${
     price.charAt(0).toLowerCase() + price.slice(1)
-  }`;
+  }`
 }
 
 /** The service link's path. */
 export function serviceHref(item: CatalogItem): string {
-  return catalogPath(item.slug);
+  return catalogPath(item.slug)
 }
 
 /**
@@ -96,7 +96,7 @@ export function readNext(
       a.slug !== article.slug && !a.archived && a.topic === article.topic
     )
     .sort(byNewest)
-    .slice(0, count);
+    .slice(0, count)
 }
 
 /**
@@ -104,9 +104,9 @@ export function readNext(
  * written." plus the post's own `archiveNote` when Anton writes one (#301).
  */
 export function archiveNoteText(article: BlogArticle): string {
-  const written = monthLabel(article.publishedAt, "en-US");
-  const base = `Written in ${written}. Kept as written.`;
-  return article.archiveNote ? `${base} ${article.archiveNote}` : base;
+  const written = monthLabel(article.publishedAt, "en-US")
+  const base = `Written in ${written}. Kept as written.`
+  return article.archiveNote ? `${base} ${article.archiveNote}` : base
 }
 
 /**
@@ -115,9 +115,9 @@ export function archiveNoteText(article: BlogArticle): string {
  * search result shows (SEO 9).
  */
 export function postTitleTag(article: BlogArticle): string {
-  if (article.seoTitle) return article.seoTitle;
-  const withName = `${article.title} — Anton Shubin`;
-  return withName.length <= 55 ? withName : article.title;
+  if (article.seoTitle) return article.seoTitle
+  const withName = `${article.title} — Anton Shubin`
+  return withName.length <= 55 ? withName : article.title
 }
 
 /** The newest date any current post was published or updated, for feeds and the sitemap. */
@@ -128,7 +128,7 @@ export function latestPostDate(
     .filter((a) => !a.archived)
     .map((a) => a.updatedAt ?? a.publishedAt)
     .sort()
-    .at(-1)!;
+    .at(-1)!
 }
 
 /** Current posts of one topic, newest first. */
@@ -136,14 +136,14 @@ export function topicPosts(
   id: BlogArticle["topic"],
   list: readonly BlogArticle[] = blogArticles,
 ): BlogArticle[] {
-  return list.filter((a) => !a.archived && a.topic === id).sort(byNewest);
+  return list.filter((a) => !a.archived && a.topic === id).sort(byNewest)
 }
 
 /** Archived posts, newest first. */
 export function archivedPosts(
   list: readonly BlogArticle[] = blogArticles,
 ): BlogArticle[] {
-  return list.filter((a) => a.archived).sort(byNewest);
+  return list.filter((a) => a.archived).sort(byNewest)
 }
 
 /**
@@ -156,36 +156,36 @@ export function llmsBlogSections(
   detailed: boolean,
   headingLevel = 3,
 ): string {
-  const hashes = "#".repeat(headingLevel);
+  const hashes = "#".repeat(headingLevel)
   const line = (a: BlogArticle) => {
-    const tool = relatedToolLink(a);
+    const tool = relatedToolLink(a)
     const toolPart = tool
       ? ` Tool: [${tool.name}](${baseUrl}${tool.href}).`
-      : "";
+      : ""
     const detail = detailed
       ? ` — ${a.description} (${a.readTime} min read, ${a.publishedAt}${
         a.updatedAt ? `, updated ${a.updatedAt}` : ""
       })`
-      : "";
+      : ""
     // The full file lists the post's TL;DR under it, so a crawler reads the
     // same points a skimming visitor sees first.
     const tldr = detailed
       ? `\n  TL;DR:\n${a.tldr.map((l) => `  - ${l}`).join("\n")}`
-      : "";
+      : ""
     return `- [${a.title}](${baseUrl}${
       postHref(a.slug)
-    })${detail}${toolPart}${tldr}`;
-  };
+    })${detail}${toolPart}${tldr}`
+  }
   const sections = topics.map((t) =>
     `${hashes} ${t.title}\n${topicPosts(t.id).map(line).join("\n")}`
-  );
-  const archive = archivedPosts();
+  )
+  const archive = archivedPosts()
   if (archive.length > 0) {
     sections.push(
       `${hashes} Archive (kept as written)\n${archive.map(line).join("\n")}`,
-    );
+    )
   }
-  return sections.join("\n\n");
+  return sections.join("\n\n")
 }
 
 /**
@@ -193,7 +193,7 @@ export function llmsBlogSections(
  * the day never shifts with the server's time zone.
  */
 export function postDate(iso: string): string {
-  return dayLabel(iso, "en-GB");
+  return dayLabel(iso, "en-GB")
 }
 
 /**
@@ -202,7 +202,7 @@ export function postDate(iso: string): string {
  * his pool, full-stack, DevOps and architecture.
  */
 export const AUTHOR_LINE =
-  "I build greenfield SaaS on a modern, lightweight stack, alone or with a team of senior developers from my own pool, and I cover full-stack, DevOps and architecture.";
+  "I build greenfield SaaS on a modern, lightweight stack, alone or with a team of senior developers from my own pool, and I cover full-stack, DevOps and architecture."
 
 /**
  * What the newsletter covers (Anton, #301): the blog's topics in a reader's
@@ -213,43 +213,43 @@ export const NEWSLETTER_TOPICS = [
   "AI and MCP",
   "self-hosting",
   "my own mistakes",
-];
+]
 
 /** How often the newsletter comes (Anton, #301). */
 export const NEWSLETTER_CADENCE =
-  "about once a week at most, and only when there is one";
+  "about once a week at most, and only when there is one"
 
 /** `items` as "a, b, c, <word> d". */
 function listed(items: readonly string[], word: "and" | "or"): string {
-  return `${items.slice(0, -1).join(", ")}, ${word} ${items.at(-1)}`;
+  return `${items.slice(0, -1).join(", ")}, ${word} ${items.at(-1)}`
 }
 
 /** The sign-up box's promise (#274, Mkt 5): the topics and how often. */
 export const NEWSLETTER_LINE = `New posts on ${
   listed(NEWSLETTER_TOPICS, "and")
-}, ${NEWSLETTER_CADENCE}. Unsubscribe with one click.`;
+}, ${NEWSLETTER_CADENCE}. Unsubscribe with one click.`
 
 /** The welcome mail's opening (#390): the same topics and cadence, said to a new subscriber. */
 export const WELCOME_LINE =
   `You're in. You'll get a mail when I publish a post on ${
     listed(NEWSLETTER_TOPICS, "or")
-  }: ${NEWSLETTER_CADENCE}.`;
+  }: ${NEWSLETTER_CADENCE}.`
 
 /** The heading of the newsletter ask, and the words of a text link to it. */
-export const NEWSLETTER_HEADING = "Get the next post by email";
+export const NEWSLETTER_HEADING = "Get the next post by email"
 
 /** Where a text link to the newsletter ask goes: the sign-up box on `/blog`. */
-export const NEWSLETTER_HREF = "/blog#newsletter-heading";
+export const NEWSLETTER_HREF = "/blog#newsletter-heading"
 
 /** The one ask a post ends with (#390). */
-export type PostAsk = "book" | "newsletter";
+export type PostAsk = "book" | "newsletter"
 
 /**
  * Which ask ends a post (#390): Book on a "For founders" post; the
  * newsletter on every other topic, whose readers are mostly developers.
  */
 export function postAsk(article: BlogArticle): PostAsk {
-  return article.topic === "founders" ? "book" : "newsletter";
+  return article.topic === "founders" ? "book" : "newsletter"
 }
 
 /**
@@ -262,5 +262,5 @@ export function blogNode(site: string) {
     "@id": `${site}/blog#blog`,
     "name": "Writing",
     "url": `${site}/blog`,
-  };
+  }
 }

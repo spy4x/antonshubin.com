@@ -3,9 +3,9 @@ import {
   assertRejects,
   assertStringIncludes,
   assertThrows,
-} from "jsr:@std/assert@^1.0.0";
-import { extract as extractYaml } from "@std/front-matter/yaml";
-import { proof } from "../lib/proof.ts";
+} from "jsr:@std/assert@^1.0.0"
+import { extract as extractYaml } from "@std/front-matter/yaml"
+import { proof } from "../lib/proof.ts"
 import {
   context,
   devtoDraft,
@@ -23,7 +23,7 @@ import {
   redditDraft,
   selectBlogSlug,
   youtubeDraft,
-} from "./launch-kit.ts";
+} from "./launch-kit.ts"
 
 Deno.test("parseReadme extracts the title and skips a badge line for the description", () => {
   const readme = `# rostok
@@ -34,14 +34,14 @@ Deno.test("parseReadme extracts the title and skips a badge line for the descrip
 Scaffold a self-hosted homelab from a curated service catalog.
 
 ## Why
-`;
-  const result = parseReadme(readme);
-  assertEquals(result.title, "rostok");
+`
+  const result = parseReadme(readme)
+  assertEquals(result.title, "rostok")
   assertEquals(
     result.description,
     "Scaffold a self-hosted homelab from a curated service catalog.",
-  );
-});
+  )
+})
 
 Deno.test("parseReadme joins a hard-wrapped paragraph into one description", () => {
   const readme = `# rostok
@@ -50,37 +50,37 @@ Scaffold a self-hosted homelab from a curated service catalog. One wizard, a
 few prompts, and you go from a fresh folder to a deployable repo.
 
 ## Why
-`;
-  const result = parseReadme(readme);
+`
+  const result = parseReadme(readme)
   assertEquals(
     result.description,
     "Scaffold a self-hosted homelab from a curated service catalog. One wizard, a " +
       "few prompts, and you go from a fresh folder to a deployable repo.",
-  );
-});
+  )
+})
 
 Deno.test("parseReadme fails loudly when there is no H1 title", () => {
   assertThrows(
     () => parseReadme("Just some text, no heading.\n"),
     Error,
     "No H1 title",
-  );
-});
+  )
+})
 
 Deno.test("parseReadme fails loudly when the title has no description under it", () => {
   assertThrows(
     () => parseReadme("# rostok\n\n## Why\n"),
     Error,
     "No description paragraph",
-  );
-});
+  )
+})
 
 Deno.test("matchBlogSlugByName matches an exact slug", () => {
   assertEquals(
     matchBlogSlugByName("rostok", ["mig-scheduler", "rostok"]),
     "rostok",
-  );
-});
+  )
+})
 
 Deno.test("matchBlogSlugByName matches a repo-prefixed slug", () => {
   assertEquals(
@@ -89,59 +89,59 @@ Deno.test("matchBlogSlugByName matches a repo-prefixed slug", () => {
       "rostok-self-hosted-scaffolder",
     ]),
     "rostok-self-hosted-scaffolder",
-  );
-});
+  )
+})
 
 Deno.test("matchBlogSlugByName does not match a slug that merely contains the repo name", () => {
   assertEquals(
     matchBlogSlugByName("mig", ["config-migration-notes"]),
     undefined,
-  );
-});
+  )
+})
 
 Deno.test("mentionsRepo matches the repo name as a whole word", () => {
-  assertEquals(mentionsRepo("zond", "Introducing zond, a probe bridge."), true);
-});
+  assertEquals(mentionsRepo("zond", "Introducing zond, a probe bridge."), true)
+})
 
 Deno.test("mentionsRepo does not match a repo name that is a substring of another word", () => {
-  assertEquals(mentionsRepo("mig", "This is about migration tooling."), false);
-});
+  assertEquals(mentionsRepo("mig", "This is about migration tooling."), false)
+})
 
 Deno.test("findReadmePath fails loudly, naming every path it tried, when nothing exists", async () => {
-  const missingDir = await Deno.makeTempDir();
+  const missingDir = await Deno.makeTempDir()
   try {
     await assertRejects(
       () => findReadmePath("does-not-exist", `${missingDir}/does-not-exist`),
       Error,
       "Could not find a README.md",
-    );
+    )
   } finally {
-    await Deno.remove(missingDir, { recursive: true });
+    await Deno.remove(missingDir, { recursive: true })
   }
-});
+})
 
 Deno.test("findReadmePath returns the later candidate when the first is absent", async () => {
-  const tempDir = await Deno.makeTempDir();
-  const repo = "some-repo";
-  const reposDir = `${tempDir}/repos`;
-  await Deno.mkdir(`${reposDir}/${repo}`, { recursive: true });
-  await Deno.writeTextFile(`${reposDir}/${repo}/README.md`, "# some-repo\n");
-  const prevReposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR");
-  Deno.env.set("LAUNCH_KIT_REPOS_DIR", reposDir);
+  const tempDir = await Deno.makeTempDir()
+  const repo = "some-repo"
+  const reposDir = `${tempDir}/repos`
+  await Deno.mkdir(`${reposDir}/${repo}`, { recursive: true })
+  await Deno.writeTextFile(`${reposDir}/${repo}/README.md`, "# some-repo\n")
+  const prevReposDir = Deno.env.get("LAUNCH_KIT_REPOS_DIR")
+  Deno.env.set("LAUNCH_KIT_REPOS_DIR", reposDir)
   try {
     // The explicit path (checked first) does not exist, so this only passes
     // if the loop keeps going to the LAUNCH_KIT_REPOS_DIR candidate.
     const result = await findReadmePath(
       repo,
       `${tempDir}/missing-explicit-path`,
-    );
-    assertEquals(result, `${reposDir}/${repo}/README.md`);
+    )
+    assertEquals(result, `${reposDir}/${repo}/README.md`)
   } finally {
-    if (prevReposDir === undefined) Deno.env.delete("LAUNCH_KIT_REPOS_DIR");
-    else Deno.env.set("LAUNCH_KIT_REPOS_DIR", prevReposDir);
-    await Deno.remove(tempDir, { recursive: true });
+    if (prevReposDir === undefined) Deno.env.delete("LAUNCH_KIT_REPOS_DIR")
+    else Deno.env.set("LAUNCH_KIT_REPOS_DIR", prevReposDir)
+    await Deno.remove(tempDir, { recursive: true })
   }
-});
+})
 
 Deno.test("selectBlogSlug orders slugs so the mention scan can't depend on directory-listing order", () => {
   // No filesystem, no temp directory: the input list is handed in already
@@ -150,60 +150,60 @@ Deno.test("selectBlogSlug orders slugs so the mention scan can't depend on direc
   const result = selectBlogSlug("widget", [
     "zzz-widget-notes",
     "bbb-widget-notes",
-  ]);
-  assertEquals(result.slug, undefined); // neither name matches "widget" by name
-  assertEquals(result.orderedSlugs, ["bbb-widget-notes", "zzz-widget-notes"]);
-});
+  ])
+  assertEquals(result.slug, undefined) // neither name matches "widget" by name
+  assertEquals(result.orderedSlugs, ["bbb-widget-notes", "zzz-widget-notes"])
+})
 
 Deno.test("selectBlogSlug's by-name match also follows sorted order when more than one slug qualifies", () => {
-  const result = selectBlogSlug("widget", ["widget-zzz", "widget-bbb"]);
-  assertEquals(result.slug, "widget-bbb");
-});
+  const result = selectBlogSlug("widget", ["widget-zzz", "widget-bbb"])
+  assertEquals(result.slug, "widget-bbb")
+})
 
 Deno.test("findBlogSlug returns the override and never consults the directory", async () => {
-  const tempDir = await Deno.makeTempDir();
-  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  const tempDir = await Deno.makeTempDir()
+  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG")
   try {
-    Deno.env.set("LAUNCH_KIT_BLOG_SLUG", "some-override-slug");
+    Deno.env.set("LAUNCH_KIT_BLOG_SLUG", "some-override-slug")
     // The directory does not exist, so if findBlogSlug consulted it at all
     // — via Deno.readDir or otherwise — this would reject with NotFound
     // instead of returning the override.
-    const result = await findBlogSlug("whatever-repo", `${tempDir}/missing`);
-    assertEquals(result, "some-override-slug");
+    const result = await findBlogSlug("whatever-repo", `${tempDir}/missing`)
+    assertEquals(result, "some-override-slug")
   } finally {
-    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
-    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
-    await Deno.remove(tempDir, { recursive: true });
+    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG")
+    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride)
+    await Deno.remove(tempDir, { recursive: true })
   }
-});
+})
 
 Deno.test("findBlogSlug prefers a by-name match over a post that merely mentions the repo", async () => {
-  const tempDir = await Deno.makeTempDir();
-  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  const tempDir = await Deno.makeTempDir()
+  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG")
   try {
-    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG")
     await Deno.writeTextFile(
       `${tempDir}/widget-launch.md`,
       "A post named after widget.\n",
-    );
+    )
     await Deno.writeTextFile(
       `${tempDir}/unrelated-notes.md`,
       "This post just mentions widget in passing.\n",
-    );
-    const result = await findBlogSlug("widget", tempDir);
-    assertEquals(result, "widget-launch");
+    )
+    const result = await findBlogSlug("widget", tempDir)
+    assertEquals(result, "widget-launch")
   } finally {
-    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
-    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
-    await Deno.remove(tempDir, { recursive: true });
+    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG")
+    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride)
+    await Deno.remove(tempDir, { recursive: true })
   }
-});
+})
 
 Deno.test("findBlogSlug scans the injected candidate list, sorted, not the directory or the given order", async () => {
-  const tempDir = await Deno.makeTempDir();
-  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG");
+  const tempDir = await Deno.makeTempDir()
+  const prevOverride = Deno.env.get("LAUNCH_KIT_BLOG_SLUG")
   try {
-    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
+    Deno.env.delete("LAUNCH_KIT_BLOG_SLUG")
     // Three posts, none matching "gadget" by name, all mentioning it as a
     // whole word. The injected candidate list names only two of them, and in
     // reverse-of-sorted order, so three different implementation bugs each
@@ -217,42 +217,42 @@ Deno.test("findBlogSlug scans the injected candidate list, sorted, not the direc
     await Deno.writeTextFile(
       `${tempDir}/aaa-gadget-notes.md`,
       "More notes about gadget.\n",
-    );
+    )
     await Deno.writeTextFile(
       `${tempDir}/mmm-gadget-notes.md`,
       "Middle notes about gadget.\n",
-    );
+    )
     await Deno.writeTextFile(
       `${tempDir}/zzz-gadget-notes.md`,
       "Some notes about gadget.\n",
-    );
+    )
     const result = await findBlogSlug("gadget", tempDir, [
       "zzz-gadget-notes",
       "mmm-gadget-notes",
-    ]);
-    assertEquals(result, "mmm-gadget-notes");
+    ])
+    assertEquals(result, "mmm-gadget-notes")
   } finally {
-    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG");
-    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride);
-    await Deno.remove(tempDir, { recursive: true });
+    if (prevOverride === undefined) Deno.env.delete("LAUNCH_KIT_BLOG_SLUG")
+    else Deno.env.set("LAUNCH_KIT_BLOG_SLUG", prevOverride)
+    await Deno.remove(tempDir, { recursive: true })
   }
-});
+})
 
 Deno.test("listBlogSlugs lists only .md files directly under the directory, not subdirectories or other extensions", async () => {
-  const tempDir = await Deno.makeTempDir();
+  const tempDir = await Deno.makeTempDir()
   try {
-    await Deno.writeTextFile(`${tempDir}/real-post.md`, "content\n");
-    await Deno.writeTextFile(`${tempDir}/notes.txt`, "not markdown\n");
+    await Deno.writeTextFile(`${tempDir}/real-post.md`, "content\n")
+    await Deno.writeTextFile(`${tempDir}/notes.txt`, "not markdown\n")
     // A directory whose own name ends in ".md" — catches a filter that
     // dropped the isFile check, since entry.name.endsWith(".md") alone would
     // accept it.
-    await Deno.mkdir(`${tempDir}/widget.md`);
-    const result = await listBlogSlugs(tempDir);
-    assertEquals(result, ["real-post"]);
+    await Deno.mkdir(`${tempDir}/widget.md`)
+    const result = await listBlogSlugs(tempDir)
+    assertEquals(result, ["real-post"])
   } finally {
-    await Deno.remove(tempDir, { recursive: true });
+    await Deno.remove(tempDir, { recursive: true })
   }
-});
+})
 
 Deno.test("parseBlogFrontMatter names the file and says what to do when front matter is missing", () => {
   const err = assertThrows(
@@ -262,21 +262,21 @@ Deno.test("parseBlogFrontMatter names the file and says what to do when front ma
         "content/blog/no-front-matter.md",
       ),
     Error,
-  );
-  assertStringIncludes(err.message, "content/blog/no-front-matter.md");
-  assertStringIncludes(err.message, "LAUNCH_KIT_BLOG_SLUG");
-});
+  )
+  assertStringIncludes(err.message, "content/blog/no-front-matter.md")
+  assertStringIncludes(err.message, "LAUNCH_KIT_BLOG_SLUG")
+})
 
 Deno.test("parseBlogFrontMatter fills a {proof:<id>} placeholder with the lib/proof.ts figure", () => {
   const blog = parseBlogFrontMatter(
     '---\ntitle: "{proof:projects} projects"\ndescription: "After {proof:jobs} jobs."\n---\nBody.\n',
     "content/blog/x.md",
-  );
+  )
   assertEquals(blog, {
     title: `${proof("projects")} projects`,
     description: `After ${proof("jobs")} jobs.`,
-  });
-});
+  })
+})
 
 const ctx: DraftContext = {
   repo: "rostok",
@@ -290,45 +290,45 @@ const ctx: DraftContext = {
     "https://antonshubin.com/blog/rostok-self-hosted-scaffolder",
   taggedBlogUrl: "https://antonshubin.com/blog/rostok-self-hosted-scaffolder" +
     "?utm_source=reddit&utm_medium=social&utm_campaign=rostok-launch",
-};
+}
 
 Deno.test("redditDraft carries the tagged blog link and the README title", () => {
-  const draft = redditDraft(ctx);
-  assertStringIncludes(draft, ctx.readme.title);
-  assertStringIncludes(draft, ctx.taggedBlogUrl);
-  assertStringIncludes(draft, ctx.githubUrl);
-});
+  const draft = redditDraft(ctx)
+  assertStringIncludes(draft, ctx.readme.title)
+  assertStringIncludes(draft, ctx.taggedBlogUrl)
+  assertStringIncludes(draft, ctx.githubUrl)
+})
 
 Deno.test("hnDraft has a Show HN title and a first comment with the write-up link", () => {
-  const draft = hnDraft(ctx);
-  assertStringIncludes(draft, "Show HN: rostok");
-  assertStringIncludes(draft, ctx.taggedBlogUrl);
-});
+  const draft = hnDraft(ctx)
+  assertStringIncludes(draft, "Show HN: rostok")
+  assertStringIncludes(draft, ctx.taggedBlogUrl)
+})
 
 Deno.test("linkedinDraft carries the tagged blog link", () => {
-  assertStringIncludes(linkedinDraft(ctx), ctx.taggedBlogUrl);
-});
+  assertStringIncludes(linkedinDraft(ctx), ctx.taggedBlogUrl)
+})
 
 Deno.test("youtubeDraft carries the tagged blog link", () => {
-  assertStringIncludes(youtubeDraft(ctx), ctx.taggedBlogUrl);
-});
+  assertStringIncludes(youtubeDraft(ctx), ctx.taggedBlogUrl)
+})
 
 Deno.test("devtoDraft's canonical_url is clean, with no utm params", () => {
-  const draft = devtoDraft(ctx);
+  const draft = devtoDraft(ctx)
   const canonicalLine = draft.split("\n").find((l) =>
     l.startsWith("canonical_url:")
-  );
-  assertEquals(canonicalLine, `canonical_url: ${ctx.canonicalBlogUrl}`);
-  assertEquals(canonicalLine?.includes("utm_"), false);
-});
+  )
+  assertEquals(canonicalLine, `canonical_url: ${ctx.canonicalBlogUrl}`)
+  assertEquals(canonicalLine?.includes("utm_"), false)
+})
 
 Deno.test("devtoDraft ends with the First published line carrying the tagged link", () => {
-  const lines = devtoDraft(ctx).trimEnd().split("\n");
+  const lines = devtoDraft(ctx).trimEnd().split("\n")
   assertEquals(
     lines.at(-1),
     `_First published on [antonshubin.com](${ctx.taggedBlogUrl})._`,
-  );
-});
+  )
+})
 
 Deno.test("every launch draft's link is tagged with its channel's medium from the shared table", () => {
   const mediums = Object.fromEntries(
@@ -340,23 +340,23 @@ Deno.test("every launch draft's link is tagged with its channel's medium from th
         "rostok-self-hosted-scaffolder",
         d.source,
         "rostok-launch",
-      );
-      const params = new URL(c.taggedBlogUrl).searchParams;
-      assertEquals(params.get("utm_source"), d.source);
-      assertEquals(params.get("utm_campaign"), "rostok-launch");
-      return [d.source, params.get("utm_medium")];
+      )
+      const params = new URL(c.taggedBlogUrl).searchParams
+      assertEquals(params.get("utm_source"), d.source)
+      assertEquals(params.get("utm_campaign"), "rostok-launch")
+      return [d.source, params.get("utm_medium")]
     }),
-  );
+  )
   assertEquals(mediums, {
     reddit: "social",
     hn: "social",
     linkedin: "social",
     devto: "blog",
     youtube: "video",
-  });
-});
+  })
+})
 
 Deno.test("devtoDraft's front matter is valid YAML and the title round-trips, even with a colon in it", () => {
-  const { attrs } = extractYaml<{ title: string }>(devtoDraft(ctx));
-  assertEquals(attrs.title, ctx.blog.title);
-});
+  const { attrs } = extractYaml<{ title: string }>(devtoDraft(ctx))
+  assertEquals(attrs.title, ctx.blog.title)
+})

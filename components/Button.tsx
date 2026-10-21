@@ -1,29 +1,29 @@
-import type { ComponentChildren } from "preact";
+import type { ComponentChildren } from "preact"
 import {
   Button as LibraryButton,
   buttonClasses,
   type ButtonLinkProps as LibraryLinkProps,
   type ButtonProps as LibraryButtonProps,
-} from "@spy4x/preact-ui/button";
-import { join } from "@spy4x/preact-cn/join";
+} from "@spy4x/preact-ui/button"
+import { join } from "@spy4x/preact-cn/join"
 
-export type ButtonVariant = "primary" | "secondary";
+export type ButtonVariant = "primary" | "secondary"
 
 /** What the site sets itself and never takes from a call site: the size. */
-type SiteOwned = "variant" | "size" | "class" | "children";
+type SiteOwned = "variant" | "size" | "class" | "children"
 
 interface SharedProps {
-  variant?: ButtonVariant;
-  class?: string;
-  children: ComponentChildren;
+  variant?: ButtonVariant
+  class?: string
+  children: ComponentChildren
 }
 
-type AnchorProps = SharedProps & Omit<LibraryLinkProps, SiteOwned>;
+type AnchorProps = SharedProps & Omit<LibraryLinkProps, SiteOwned>
 
 type ButtonProps =
   & SharedProps
   & { href?: undefined }
-  & Omit<LibraryButtonProps, SiteOwned>;
+  & Omit<LibraryButtonProps, SiteOwned>
 
 /**
  * The `@spy4x/preact-ui/button` variant each site variant renders. The site's
@@ -34,7 +34,7 @@ type ButtonProps =
 export const LIBRARY_VARIANT = {
   primary: "primary",
   secondary: "ghost",
-} as const;
+} as const
 
 /**
  * What the site adds to the library's classes, per variant. Plex Sans, not
@@ -51,7 +51,7 @@ export const SITE_VARIANT: Record<ButtonVariant, string> = {
   // Rule strong, the control border colour. test/frame.test.ts finds the
   // not-found page's buttons by this class.
   secondary: "font-sans rounded-lg! border border-rule-strong",
-};
+}
 
 /**
  * The primary/secondary button classes as a plain string, for the call sites
@@ -69,7 +69,7 @@ export function buttonClass(
     LIBRARY_VARIANT[variant],
     "none",
     join(SITE_VARIANT[variant], extra),
-  );
+  )
 }
 
 /**
@@ -88,12 +88,12 @@ export default function Button(
     | AnchorProps
     | ButtonProps,
 ) {
-  const marker = variant === "primary" ? { "data-primary-book": true } : {};
+  const marker = variant === "primary" ? { "data-primary-book": true } : {}
   const look = {
     variant: LIBRARY_VARIANT[variant],
     size: "none" as const,
     class: join(SITE_VARIANT[variant], className),
-  };
+  }
   if (href !== undefined) {
     return (
       <LibraryButton
@@ -102,7 +102,7 @@ export default function Button(
         {...look}
         href={href}
       />
-    );
+    )
   }
   return (
     <LibraryButton
@@ -110,5 +110,5 @@ export default function Button(
       {...marker}
       {...look}
     />
-  );
+  )
 }

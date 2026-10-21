@@ -1,10 +1,10 @@
-import { FACT_LINK } from "../../FactCard.tsx";
-import CopyButton from "../../../islands/CopyButton.tsx";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import { CLIENTS_GUIDE, DESKTOP_CONFIG } from "./data.ts";
+import { FACT_LINK } from "../../FactCard.tsx"
+import CopyButton from "../../../islands/CopyButton.tsx"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import { CLIENTS_GUIDE, DESKTOP_CONFIG } from "./data.ts"
 
-const SLUG = "caldav-mcp";
-const FILE = "claude_desktop_config.json";
+const SLUG = "caldav-mcp"
+const FILE = "claude_desktop_config.json"
 
 /**
  * "Add it to Claude Desktop": the README's quick start, its config block with
@@ -54,5 +54,5 @@ export function DesktopConfig() {
         </a>.
       </p>
     </section>
-  );
+  )
 }

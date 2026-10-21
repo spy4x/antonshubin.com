@@ -26,16 +26,16 @@
  * `scripts/backfill-subscriber-keys.ts` first (docs/newsletter.md).
  */
 
-import { sendIssue, type Subscriber } from "@spy4x/server/subscribers";
-import { createMemorySendLog } from "@spy4x/server/subscribers/memory";
-import { BASE_URL, CONTACT_EMAIL } from "@/lib/config.ts";
-import { createSiteSender, smtpSettings } from "@/lib/mail.ts";
+import { sendIssue, type Subscriber } from "@spy4x/server/subscribers"
+import { createMemorySendLog } from "@spy4x/server/subscribers/memory"
+import { BASE_URL, CONTACT_EMAIL } from "@/lib/config.ts"
+import { createSiteSender, smtpSettings } from "@/lib/mail.ts"
 import {
   type Letter,
   renderLetter,
   SUBSCRIBED_REASON,
   UNSUBSCRIBE_PLACEHOLDER,
-} from "@/lib/letter.ts";
+} from "@/lib/letter.ts"
 import {
   newsletterLog,
   newsletterLogFile,
@@ -43,38 +43,38 @@ import {
   subscriberStore,
   subscriptionCrypto,
   unsubscribeUrl,
-} from "@/lib/mailing-list.ts";
-import { assertKebab } from "./utm.ts";
+} from "@/lib/mailing-list.ts"
+import { assertKebab } from "./utm.ts"
 
 /** A blog post announcement, as `publish:blog --send-newsletter` sends it. */
 export interface PostAnnouncement extends Letter {
-  slug: string;
-  subject: string;
+  slug: string
+  subject: string
 }
 
 /** Parses and checks the `--stdin-json` input; throws naming what is wrong. */
 export function parsePostAnnouncement(json: string): PostAnnouncement {
-  const value = JSON.parse(json) as Record<string, unknown>;
+  const value = JSON.parse(json) as Record<string, unknown>
   for (const field of ["slug", "subject", "html", "text"]) {
     if (typeof value?.[field] !== "string" || value[field] === "") {
-      throw new Error(`--stdin-json input needs a non-empty "${field}" string`);
+      throw new Error(`--stdin-json input needs a non-empty "${field}" string`)
     }
   }
-  const { slug, subject, html, text } = value as unknown as PostAnnouncement;
-  assertKebab("slug", slug);
-  return { slug, subject, html, text };
+  const { slug, subject, html, text } = value as unknown as PostAnnouncement
+  assertKebab("slug", slug)
+  return { slug, subject, html, text }
 }
 
 /** Turns the legacy "subject body" arguments into a letter; the text part is the body without tags. */
 export function legacyLetter(body: string): Letter {
-  const text = body.replace(/<[^>]*>/g, "").trim();
+  const text = body.replace(/<[^>]*>/g, "").trim()
   return renderLetter({
     baseUrl: BASE_URL,
     campaign: "newsletter",
     blocks: [{ html: body, text }],
     reason: SUBSCRIBED_REASON,
     unsubscribeLink: UNSUBSCRIBE_PLACEHOLDER,
-  });
+  })
 }
 
 /**
@@ -85,60 +85,60 @@ export function legacyLetter(body: string): Letter {
  */
 export function sendExitCode(
   { sent, failed, skipped = 0 }: {
-    sent: number;
-    failed: number;
-    skipped?: number;
+    sent: number
+    failed: number
+    skipped?: number
   },
 ): number {
-  return failed > 0 || (sent === 0 && skipped === 0) ? 1 : 0;
+  return failed > 0 || (sent === 0 && skipped === 0) ? 1 : 0
 }
 
 /** How many rows carry no `key`, so their unsubscribe link would not work. */
 export function rowsWithoutKey(rows: readonly Subscriber[]): number {
-  return rows.filter((row) => !row.key).length;
+  return rows.filter((row) => !row.key).length
 }
 
 /** The subject of the one copy `--test` sends to `CONTACT_EMAIL`. */
 export function testSubject(subject: string): string {
-  return `[Test] ${subject}`;
+  return `[Test] ${subject}`
 }
 
 function fail(message: string): never {
-  console.error(message);
-  Deno.exit(1);
+  console.error(message)
+  Deno.exit(1)
 }
 
 async function main() {
-  let announcement: PostAnnouncement | undefined;
-  let subject: string;
-  let letter: Letter;
-  const testOnly = Deno.args.includes("--test");
+  let announcement: PostAnnouncement | undefined
+  let subject: string
+  let letter: Letter
+  const testOnly = Deno.args.includes("--test")
   if (Deno.args[0] === "--stdin-json") {
     try {
       announcement = parsePostAnnouncement(
         await new Response(Deno.stdin.readable).text(),
-      );
+      )
     } catch (err) {
-      fail(err instanceof Error ? err.message : String(err));
+      fail(err instanceof Error ? err.message : String(err))
     }
-    ({ subject } = announcement);
-    letter = { html: announcement.html, text: announcement.text };
+    ;({ subject } = announcement)
+    letter = { html: announcement.html, text: announcement.text }
   } else {
-    const [subjectArg, bodyArg] = Deno.args;
+    const [subjectArg, bodyArg] = Deno.args
     if (!subjectArg || !bodyArg) {
       fail(
         "Usage: deno run -A scripts/send-newsletter.ts <subject> <body-file|body-text>\n" +
           "   or: deno run -A scripts/send-newsletter.ts --stdin-json < issue.json",
-      );
+      )
     }
-    subject = subjectArg;
-    let body: string;
+    subject = subjectArg
+    let body: string
     try {
-      body = Deno.readTextFileSync(bodyArg);
+      body = Deno.readTextFileSync(bodyArg)
     } catch {
-      body = bodyArg; // treat as inline text
+      body = bodyArg // treat as inline text
     }
-    letter = legacyLetter(body);
+    letter = legacyLetter(body)
   }
 
   // Port 465 is this script's default, as before; the routes default to 587.
@@ -149,32 +149,32 @@ async function main() {
     pass: Deno.env.get("SMTP_PASSWORD") || "",
     from: Deno.env.get("SMTP_FROM") || "",
     ehloName: new URL(BASE_URL).hostname,
-  });
+  })
 
   if (!smtp) {
-    fail("SMTP not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD.");
+    fail("SMTP not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD.")
   }
 
   // Fail before sending anything rather than partway through the list —
   // every unsubscribe link needs this to build.
-  let crypto;
+  let crypto
   try {
-    crypto = subscriptionCrypto();
+    crypto = subscriptionCrypto()
   } catch (err) {
-    fail(err instanceof Error ? err.message : String(err));
+    fail(err instanceof Error ? err.message : String(err))
   }
 
-  const sender = createSiteSender(smtp);
+  const sender = createSiteSender(smtp)
   const common = {
     letter,
     crypto,
     unsubscribeLink: unsubscribeUrl,
     sender,
-  };
+  }
 
   if (testOnly) {
     if (!CONTACT_EMAIL) {
-      fail("--test needs CONTACT_EMAIL, the address it sends to.");
+      fail("--test needs CONTACT_EMAIL, the address it sends to.")
     }
     // One row, with its key, into a log that lives only in this process.
     const result = await sendIssue({
@@ -186,76 +186,76 @@ async function main() {
         subscribedAt: new Date(),
         key: await crypto.subscriberKey(CONTACT_EMAIL),
       }],
-    }, createMemorySendLog());
+    }, createMemorySendLog())
     const counts = result.status === "sent"
       ? result
-      : { sent: 0, failed: 0, skipped: 0 };
+      : { sent: 0, failed: 0, skipped: 0 }
     console.log(
       `\nTest copy done. Sent: ${counts.sent}, Failed: ${counts.failed}`,
-    );
-    Deno.exit(sendExitCode(counts));
+    )
+    Deno.exit(sendExitCode(counts))
   }
 
-  let subs: Subscriber[];
+  let subs: Subscriber[]
   try {
-    subs = await subscriberStore().list();
+    subs = await subscriberStore().list()
   } catch (err) {
-    fail(err instanceof Error ? err.message : String(err));
+    fail(err instanceof Error ? err.message : String(err))
   }
-  const keyless = rowsWithoutKey(subs);
+  const keyless = rowsWithoutKey(subs)
   if (keyless > 0) {
     fail(
       `Refused: ${keyless} of ${subs.length} subscribers have no key yet, so ` +
         `their unsubscribe link would not work. Nothing was sent or recorded. ` +
         `Run scripts/backfill-subscriber-keys.ts first (docs/newsletter.md).`,
-    );
+    )
   }
 
   if (!announcement) {
     // The legacy arguments have no slug, so no sent log: one run, one issue.
-    console.log(`Sending to ${subs.length} subscribers...`);
+    console.log(`Sending to ${subs.length} subscribers...`)
     const result = await sendIssue({
       ...common,
       issue: `manual-${Date.now()}`,
       subject,
       subscribers: subs,
-    }, createMemorySendLog());
-    const counts = result.status === "sent" ? result : { sent: 0, failed: 0 };
-    console.log(`\nDone. Sent: ${counts.sent}, Failed: ${counts.failed}`);
-    return;
+    }, createMemorySendLog())
+    const counts = result.status === "sent" ? result : { sent: 0, failed: 0 }
+    console.log(`\nDone. Sent: ${counts.sent}, Failed: ${counts.failed}`)
+    return
   }
 
-  const logFile = newsletterLogFile();
+  const logFile = newsletterLogFile()
   const result = await sendIssue({
     ...common,
     issue: announcement.slug,
     subject,
     subscribers: subs,
-  }, newsletterLog());
+  }, newsletterLog())
   if (result.status === "already-sent") {
     fail(
       `Refused: the newsletter for "${announcement.slug}" was already sent ` +
         `(started ${result.entry.startedAt.toISOString()}, ${logFile}). Nothing was sent.`,
-    );
+    )
   }
   if (result.status === "in-progress") {
     fail(
       `Refused: another send is in progress (${logFile}.lock is held). ` +
         `Nothing was sent. Wait for it to finish, then run the same command again.`,
-    );
+    )
   }
   if (result.status === "no-subscribers") {
     fail(
       `Refused: no subscribers loaded (is ${subscribersFile()} missing or ` +
         `unreadable?). Nothing was sent or recorded.`,
-    );
+    )
   }
   console.log(
     `\nDone. Sent: ${result.sent}, Failed: ${result.failed}, Skipped: ${result.skipped}`,
-  );
-  Deno.exit(sendExitCode(result));
+  )
+  Deno.exit(sendExitCode(result))
 }
 
 if (import.meta.main) {
-  await main();
+  await main()
 }

@@ -1,11 +1,11 @@
-import { define } from "../../lib/utils.ts";
-import { eventAttrs } from "../../lib/analytics.ts";
-import { NotFound } from "../../components/NotFound.tsx";
-import { COPY_INSTALL_TITLE } from "../../components/tool-frame/ToolBand.tsx";
-import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx";
-import { loadToolPage } from "../../components/tool-frame/tool-page.ts";
-import { AskZond } from "../../components/tools/zond/AskZond.tsx";
-import CopyButton from "../../islands/CopyButton.tsx";
+import { define } from "../../lib/utils.ts"
+import { eventAttrs } from "../../lib/analytics.ts"
+import { NotFound } from "../../components/NotFound.tsx"
+import { COPY_INSTALL_TITLE } from "../../components/tool-frame/ToolBand.tsx"
+import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
+import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
+import { AskZond } from "../../components/tools/zond/AskZond.tsx"
+import CopyButton from "../../islands/CopyButton.tsx"
 
 // The zond page (#462): the shared frame (#454) with zond's own middle, its
 // diagram, the "Ask zond" simulator and the README's quick start. Every
@@ -18,7 +18,7 @@ const DIAGRAM = {
     "You reach metube through the SSO proxy. Gatus, in the cloud, asks zond for /health/metube instead. zond runs on the same Docker network as metube, sends it a plain HTTP GET without logging in, and answers Gatus with 200 ok or 503.",
   width: 1000,
   height: 400,
-};
+}
 
 /** README "Quick start" and "Point your monitor at it", verbatim. */
 const BLOCKS = {
@@ -40,7 +40,7 @@ targets:
   url: "https://zond.example.com/health/metube"
   conditions:
     - "[STATUS] == 200"`,
-};
+}
 
 function ProblemPicture() {
   return (
@@ -67,18 +67,18 @@ function ProblemPicture() {
         </figcaption>
       </figure>
     </section>
-  );
+  )
 }
 
 /** One copyable block: the text in a box that scrolls sideways on its own, and its copy button. */
 function CodeBlock(
   { id, label, text, wrap, class: className }: {
-    id: string;
-    label: string;
-    text: string;
+    id: string
+    label: string
+    text: string
     /** Wraps a one-line command instead of scrolling it. */
-    wrap?: boolean;
-    class?: string;
+    wrap?: boolean
+    class?: string
   },
 ) {
   return (
@@ -113,7 +113,7 @@ function CodeBlock(
           ><code id={id}>{text}</code></pre>
         )}
     </div>
-  );
+  )
 }
 
 function QuickStartBlocks() {
@@ -150,12 +150,12 @@ function QuickStartBlocks() {
         <CodeBlock id="zond-gatus" label="Gatus" text={BLOCKS.gatus} />
       </div>
     </section>
-  );
+  )
 }
 
 export default define.page(async function ZondPage(ctx) {
-  const data = await loadToolPage("zond");
-  if (!data) return <NotFound pathname={ctx.url.pathname} />;
+  const data = await loadToolPage("zond")
+  if (!data) return <NotFound pathname={ctx.url.pathname} />
   return (
     <ToolFrame
       data={data}
@@ -165,5 +165,5 @@ export default define.page(async function ZondPage(ctx) {
       <AskZond />
       <QuickStartBlocks />
     </ToolFrame>
-  );
-});
+  )
+})

@@ -1,17 +1,17 @@
-import { RadioChips } from "@spy4x/preact-ui/radio-chips";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import { CodeBlock } from "./CodeBlock.tsx";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import { CodeBlock } from "./CodeBlock.tsx"
 
 /** One state a card can be in, with its real crop from the staged oko (scripts/clips/oko/cards.ts). */
 interface CardState {
-  value: "up" | "down" | "unknown";
-  label: string;
-  note: string;
-  alt: string;
+  value: "up" | "down" | "unknown"
+  label: string
+  note: string
+  alt: string
 }
 
 /** The state chosen before any click: its picture and note show first. */
-const FIRST_STATE = "up";
+const FIRST_STATE = "up"
 
 const STATES: CardState[] = [
   {
@@ -36,7 +36,7 @@ const STATES: CardState[] = [
     alt:
       "An oko card for Audiobooks with a dashed border and an unknown marker instead of an uptime pill.",
   },
-];
+]
 
 /**
  * A field's number on the card and in the JSON, and where its marker sits on
@@ -49,7 +49,7 @@ const MARKERS = [
   { n: 4, left: 7, top: 62 },
   { n: 5, left: 17, top: 84 },
   { n: 6, left: 57, top: 17 },
-];
+]
 
 /**
  * The Audiobooks entry from oko's docs/configuration.md, line by line, with
@@ -71,7 +71,7 @@ const LINES: { text: string; field?: number }[] = [
   { text: '  "endpoint": "home_audiobookshelf",', field: 6 },
   { text: '  "gatus_host": "uptime-cloud"', field: 6 },
   { text: "}" },
-];
+]
 
 /** What each number means, from oko's docs/configuration.md. */
 const LEGEND = [
@@ -98,14 +98,14 @@ const LEGEND = [
     — the gatus lookup. Set both or neither; with neither, the card has no
     status pill.
   </span>,
-];
+]
 
 /** A small numbered circle; decorative, the legend carries the meaning. */
 function Marker(
   { n, class: extra = "", ...data }: {
-    n: number;
-    class?: string;
-    "data-oko-marker"?: number;
+    n: number
+    class?: string
+    "data-oko-marker"?: number
   },
 ) {
   return (
@@ -116,11 +116,11 @@ function Marker(
     >
       {n}
     </span>
-  );
+  )
 }
 
 /** The section's id, which scopes {@link PAGE_CSS}. */
-const ROOT = "oko-config-to-card";
+const ROOT = "oko-config-to-card"
 
 /**
  * This section's own CSS, rendered in a `<style>` here so it reaches
@@ -129,7 +129,7 @@ const ROOT = "oko-config-to-card";
  * is chosen) and the outline a marker gets while its JSON line is hovered or
  * focused.
  */
-const LATER = STATES.filter((s) => s.value !== FIRST_STATE);
+const LATER = STATES.filter((s) => s.value !== FIRST_STATE)
 export const PAGE_CSS = [
   `#${ROOT} [data-oko-state]{display:none}`,
   [
@@ -144,7 +144,7 @@ export const PAGE_CSS = [
   MARKERS.map((m) =>
     `#${ROOT}:has([data-line="${m.n}"]:is(:hover,:focus-visible)) [data-oko-marker="${m.n}"]`
   ).join(",") + "{outline:2px solid var(--color-sage);outline-offset:2px}",
-].join("");
+].join("")
 
 /**
  * oko's page, part 4 (#464): "From config to card". A `config.json` entry
@@ -257,5 +257,5 @@ export function ConfigToCard() {
         </div>
       </div>
     </section>
-  );
+  )
 }

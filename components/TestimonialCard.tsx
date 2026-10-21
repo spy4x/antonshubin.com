@@ -1,7 +1,7 @@
-import { formatPeriod, type Project } from "../lib/data.ts";
-import type { Testimonial } from "../lib/testimonials.ts";
-import { Rating } from "./Rating.tsx";
-import { ReviewSource } from "./ReviewSource.tsx";
+import { formatPeriod, type Project } from "../lib/data.ts"
+import type { Testimonial } from "../lib/testimonials.ts"
+import { Rating } from "./Rating.tsx"
+import { ReviewSource } from "./ReviewSource.tsx"
 
 /**
  * One review excerpt for the home page (#231, #269): the star rating and who
@@ -37,5 +37,5 @@ export function TestimonialCard(
         )}
       </figcaption>
     </figure>
-  );
+  )
 }

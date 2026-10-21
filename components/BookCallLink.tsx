@@ -1,8 +1,8 @@
-import type { ComponentChildren } from "preact";
-import Button, { type ButtonVariant } from "./Button.tsx";
-import { type EventAttrs, eventAttrs } from "../lib/analytics.ts";
-import { SCHEDULE_URL } from "../lib/config.ts";
-import { BOOK_HREF } from "../lib/nav.ts";
+import type { ComponentChildren } from "preact"
+import Button, { type ButtonVariant } from "./Button.tsx"
+import { type EventAttrs, eventAttrs } from "../lib/analytics.ts"
+import { SCHEDULE_URL } from "../lib/config.ts"
+import { BOOK_HREF } from "../lib/nav.ts"
 
 interface BookCallLinkProps {
   /**
@@ -12,15 +12,15 @@ interface BookCallLinkProps {
    * `/book` link on `/how-i-work`, a hackathon's own call to action) always
    * renders it.
    */
-  href?: string;
+  href?: string
   /** The Umami event and its properties (`eventAttrs()`); a bare `book` when omitted. */
-  event?: EventAttrs;
-  "data-e2e"?: string;
+  event?: EventAttrs
+  "data-e2e"?: string
   /** Bare boolean attribute marking the home page's one primary CTA —
    * `test/structure.test.ts` counts it, separately from `data-primary-book`
    * below (every primary-styled Book link gets that one; only the home
    * page's bottom CTA gets this one). */
-  "data-primary-cta"?: boolean;
+  "data-primary-cta"?: boolean
   /**
    * `"primary"` (the default): the site's one filled-Accent action, Ink
    * text — this is the Book action, so it's what nearly every call site
@@ -28,11 +28,11 @@ interface BookCallLinkProps {
    * second, less prominent way to book alongside the primary one (see
    * routes/hackathons/[slug].tsx).
    */
-  variant?: ButtonVariant;
+  variant?: ButtonVariant
   /** Page-specific layout classes (icon gap, padding, text size) appended
    * to the variant's own class string — never a colour override. */
-  class?: string;
-  children?: ComponentChildren;
+  class?: string
+  children?: ComponentChildren
 }
 
 /**
@@ -54,7 +54,7 @@ export function BookCallLink({
   class: extraClass,
   children,
 }: BookCallLinkProps) {
-  if (href === undefined && !SCHEDULE_URL) return null;
+  if (href === undefined && !SCHEDULE_URL) return null
   return (
     <Button
       href={href ?? BOOK_HREF}
@@ -66,7 +66,7 @@ export function BookCallLink({
     >
       {children}
     </Button>
-  );
+  )
 }
 
-export default BookCallLink;
+export default BookCallLink

@@ -1,25 +1,25 @@
-import data from "./rostok-catalog.json" with { type: "json" };
+import data from "./rostok-catalog.json" with { type: "json" }
 
 /** One stack of rostok's catalog, as `/tools/rostok` shows it. */
 export interface RostokStack {
-  name: string;
-  description: string;
+  name: string
+  description: string
   /** rostok's category id from the stack's `+meta.ts`, such as `monitoring`. */
-  category: string;
+  category: string
   /** Keys of the variables the stack requires. */
-  required: string[];
+  required: string[]
   /** Keys of the variables rostok encrypts as secrets. */
-  secret: string[];
+  secret: string[]
 }
 
 /** `lib/rostok-catalog.json`: the catalog of the pinned rostok version (`scripts/rostok-catalog.ts`). */
 export interface RostokCatalog {
   /** The rostok version the catalog was read from. */
-  version: string;
-  stacks: RostokStack[];
+  version: string
+  stacks: RostokStack[]
 }
 
-export const rostokCatalog: RostokCatalog = data;
+export const rostokCatalog: RostokCatalog = data
 
 /** rostok's category ids in the page's order, each with its readable label. */
 export const CATEGORY_LABELS: Record<string, string> = {
@@ -38,13 +38,13 @@ export const CATEGORY_LABELS: Record<string, string> = {
   storage: "Storage",
   tools: "Tools",
   web: "Web",
-};
+}
 
 /** One category of the catalog with its stacks, sorted by name. */
 export interface CatalogGroup {
-  id: string;
-  label: string;
-  stacks: RostokStack[];
+  id: string
+  label: string
+  stacks: RostokStack[]
 }
 
 /**
@@ -59,7 +59,7 @@ export function catalogGroups(
     if (!(s.category in CATEGORY_LABELS)) {
       throw new Error(
         `lib/rostok-catalog.ts: no label for category "${s.category}" (${s.name})`,
-      );
+      )
     }
   }
   return Object.entries(CATEGORY_LABELS)
@@ -69,5 +69,5 @@ export function catalogGroups(
       stacks: catalog.stacks.filter((s) => s.category === id)
         .sort((a, b) => a.name.localeCompare(b.name)),
     }))
-    .filter((g) => g.stacks.length > 0);
+    .filter((g) => g.stacks.length > 0)
 }

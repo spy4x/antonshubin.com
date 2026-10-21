@@ -13,20 +13,20 @@
 // port 443 is also reachable directly, bypassing Cloudflare, and there a
 // caller can write CF-Connecting-IP freely. So CF-Connecting-IP is trusted only
 // when X-Real-IP shows the connection came from Cloudflare.
-import { clientIp, clientIpBucket } from "@spy4x/platform/rate-limit/client-ip";
+import { clientIp, clientIpBucket } from "@spy4x/platform/rate-limit/client-ip"
 import {
   type Clock,
   createMemoryRateLimiter,
   type MemoryRateLimiter,
-} from "@spy4x/platform/rate-limit/memory";
-import { CLOUDFLARE_IP_RANGES, ipInRanges } from "@spy4x/net/ip";
+} from "@spy4x/platform/rate-limit/memory"
+import { CLOUDFLARE_IP_RANGES, ipInRanges } from "@spy4x/net/ip"
 
 /** True when `address` is one of Cloudflare's edge addresses
  * (`@spy4x/net/ip`'s `CLOUDFLARE_IP_RANGES`). A range missing there makes
  * those visitors share their edge's bucket, and never lets anyone skip the
  * limit. */
 export function isCloudflareAddress(address: string): boolean {
-  return ipInRanges(address, CLOUDFLARE_IP_RANGES);
+  return ipInRanges(address, CLOUDFLARE_IP_RANGES)
 }
 
 /**
@@ -35,7 +35,7 @@ export function isCloudflareAddress(address: string): boolean {
  * holds a whole /64 and can pick any address in it. An IPv4 or IPv4-mapped
  * address is keyed as the IPv4 address; any other value is kept as it is.
  */
-export const clientKey: (address: string) => string = clientIpBucket;
+export const clientKey: (address: string) => string = clientIpBucket
 
 /**
  * The key to rate-limit a request by ({@link clientKey}): X-Real-IP (written
@@ -46,25 +46,25 @@ export const clientKey: (address: string) => string = clientIpBucket;
  * address.
  */
 export function requestClientIp(req: Request, socketAddress?: string): string {
-  const peer = clientIp(req, socketAddress, "x-real-ip");
+  const peer = clientIp(req, socketAddress, "x-real-ip")
   return clientKey(
     clientIp(req, peer, "cf-connecting-ip", {
       trustedProxies: CLOUDFLARE_IP_RANGES,
     }),
-  );
+  )
 }
 
 /** The socket address from Deno's serve info, when the transport has one. */
 export function socketAddress(info: Deno.ServeHandlerInfo): string | undefined {
-  const addr = info.remoteAddr;
+  const addr = info.remoteAddr
   return addr.transport === "tcp" || addr.transport === "udp"
     ? addr.hostname
-    : undefined;
+    : undefined
 }
 
 /** The public forms' budget: three submissions per client per hour. */
-export const SUBMISSION_LIMIT = 3;
-export const SUBMISSION_WINDOW_MS = 3600_000;
+export const SUBMISSION_LIMIT = 3
+export const SUBMISSION_WINDOW_MS = 3600_000
 
 /**
  * A limiter for one form. It keeps a sliding one-hour window per client and
@@ -76,7 +76,7 @@ export function createSubmissionLimiter(clock?: Clock): MemoryRateLimiter {
     limit: SUBMISSION_LIMIT,
     windowMs: SUBMISSION_WINDOW_MS,
     clock,
-  });
+  })
 }
 
 /**
@@ -88,12 +88,12 @@ export function limitSubmission(
   req: Request,
   info: Deno.ServeHandlerInfo,
 ): Response | null {
-  const decision = limiter.check(requestClientIp(req, socketAddress(info)));
-  if (decision.allowed) return null;
+  const decision = limiter.check(requestClientIp(req, socketAddress(info)))
+  if (decision.allowed) return null
   return Response.json({ error: "Too many requests. Try again later." }, {
     status: 429,
     headers: {
       "Retry-After": String(Math.ceil(decision.retryAfterMs / 1000)),
     },
-  });
+  })
 }

@@ -5,26 +5,26 @@
 // letter layout (`lib/letter.ts`); the notice stays plain text. A reply to
 // either goes to the site's sender address, which is Anton's own mailbox, so
 // none sets `Reply-To`.
-import type { MailOutcome, SubscriberMail } from "@spy4x/server/subscribers";
-import type { EmailMessage, EmailSender, MailLog } from "./mail.ts";
-import { WELCOME_LINE } from "./blog.ts";
+import type { MailOutcome, SubscriberMail } from "@spy4x/server/subscribers"
+import type { EmailMessage, EmailSender, MailLog } from "./mail.ts"
+import { WELCOME_LINE } from "./blog.ts"
 import {
   button,
   emailLink,
   paragraph,
   renderLetter,
   SUBSCRIBED_REASON,
-} from "./letter.ts";
+} from "./letter.ts"
 
 /** The `utm_campaign` of the links in the sign-up mails (docs/utm.md). */
-export const SIGNUP_CAMPAIGN = "newsletter";
+export const SIGNUP_CAMPAIGN = "newsletter"
 
 /** What the sign-up mails are sent with; `sender` is `null` when SMTP is not configured. */
 export interface SubscribeMailDeps {
-  sender: EmailSender | null;
-  contactEmail: string;
-  baseUrl: string;
-  log?: MailLog;
+  sender: EmailSender | null
+  contactEmail: string
+  baseUrl: string
+  log?: MailLog
 }
 
 /**
@@ -38,31 +38,31 @@ export interface SubscribeMailDeps {
 export function subscriberMailer(
   deps: SubscribeMailDeps,
 ): (mail: SubscriberMail) => Promise<MailOutcome> {
-  const log = deps.log ?? console;
+  const log = deps.log ?? console
   return async (mail) => {
     if (!deps.sender) {
       log.log(
         mail.kind === "confirm"
           ? "[SUBSCRIBE] SMTP not configured, confirmation not sent"
           : "[SUBSCRIBE] SMTP not configured, welcome and notice not sent",
-      );
-      return;
+      )
+      return
     }
-    const sender = deps.sender;
+    const sender = deps.sender
     if (mail.kind === "confirm") {
-      return await sender.send(confirmationMessage(mail, deps.baseUrl));
+      return await sender.send(confirmationMessage(mail, deps.baseUrl))
     }
     const sent = await Promise.all([
       sender.send(welcomeMessage(mail, deps.baseUrl)),
       sender.send(ownerNotice(mail, deps.contactEmail)),
-    ]);
+    ])
     const failures = sent.flatMap((result, i) =>
       result.ok ? [] : [`${i === 0 ? "welcome" : "notify"}: ${result.error}`]
-    );
+    )
     return failures.length === 0
       ? { ok: true }
-      : { ok: false, error: failures.join("; ") };
-  };
+      : { ok: false, error: failures.join("; ") }
+  }
 }
 
 /** The double opt-in mail: one button, no unsubscribe link, no P.S. */
@@ -87,12 +87,12 @@ function confirmationMessage(
     ],
     ps: false,
     reason: "You get this once, because this address was entered on the site",
-  });
+  })
   return {
     to: mail.email,
     subject: "Confirm your subscription to Anton Shubin's newsletter",
     ...letter,
-  };
+  }
 }
 
 /** The welcome, with the subscriber's own one-click `List-Unsubscribe`. */
@@ -114,13 +114,13 @@ function welcomeMessage(
     psLead: "If you're working on something I could help with:",
     reason: SUBSCRIBED_REASON,
     unsubscribeLink: mail.unsubscribeLink,
-  });
+  })
   return {
     to: mail.email,
     subject: "Welcome to Anton Shubin's newsletter",
     ...letter,
     listUnsubscribe: { url: mail.unsubscribeLink, oneClick: true },
-  };
+  }
 }
 
 /** The owner's plain-text notice. The list size reads "unknown" when it could not be counted. */
@@ -134,5 +134,5 @@ function ownerNotice(
     text: `${mail.email} subscribed.\nTotal subscribers: ${
       mail.total ?? "unknown"
     }\n\nUnsubscribe: ${mail.unsubscribeLink}`,
-  };
+  }
 }

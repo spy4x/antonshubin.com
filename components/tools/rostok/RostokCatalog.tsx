@@ -1,24 +1,21 @@
-import { Fragment } from "preact";
-import { FACT_LINK } from "../../FactCard.tsx";
-import CopyButton from "../../../islands/CopyButton.tsx";
-import { eventAttrs, linkEvent } from "../../../lib/analytics.ts";
-import {
-  catalogGroups,
-  type RostokStack,
-} from "../../../lib/rostok-catalog.ts";
-import { findTool } from "../../../lib/tools.ts";
+import { Fragment } from "preact"
+import { FACT_LINK } from "../../FactCard.tsx"
+import CopyButton from "../../../islands/CopyButton.tsx"
+import { eventAttrs, linkEvent } from "../../../lib/analytics.ts"
+import { catalogGroups, type RostokStack } from "../../../lib/rostok-catalog.ts"
+import { findTool } from "../../../lib/tools.ts"
 
 const CHIP =
-  "rounded border border-rule bg-ink px-1.5 py-0.5 text-xs text-parchment break-all";
+  "rounded border border-rule bg-ink px-1.5 py-0.5 text-xs text-parchment break-all"
 
 /** A list of variable keys as code chips, or "none". */
 function Keys({ keys }: { keys: string[] }) {
-  if (keys.length === 0) return <span class="text-graphite">none</span>;
+  if (keys.length === 0) return <span class="text-graphite">none</span>
   return (
     <span class="inline-flex flex-wrap gap-1.5 align-middle">
       {keys.map((k) => <code key={k} class={CHIP}>{k}</code>)}
     </span>
-  );
+  )
 }
 
 /**
@@ -28,9 +25,9 @@ function Keys({ keys }: { keys: string[] }) {
  * Opening works without JavaScript; the summary click sends `tool-try`.
  */
 function Stack({ stack }: { stack: RostokStack }) {
-  const id = `add-${stack.name}`;
-  const own = findTool(stack.name);
-  const command = ["rostok", "stack", "add", stack.name, "--server=home"];
+  const id = `add-${stack.name}`
+  const own = findTool(stack.name)
+  const command = ["rostok", "stack", "add", stack.name, "--server=home"]
   return (
     <details
       data-stack={stack.name}
@@ -92,7 +89,7 @@ function Stack({ stack }: { stack: RostokStack }) {
         )}
       </div>
     </details>
-  );
+  )
 }
 
 /**
@@ -102,8 +99,8 @@ function Stack({ stack }: { stack: RostokStack }) {
  * from 1024px; it needs no JavaScript and tracks nothing.
  */
 export function RostokCatalog() {
-  const groups = catalogGroups();
-  const total = groups.reduce((n, g) => n + g.stacks.length, 0);
+  const groups = catalogGroups()
+  const total = groups.reduce((n, g) => n + g.stacks.length, 0)
   return (
     <section aria-labelledby="catalog" data-rostok-catalog>
       <h2 id="catalog" class="text-2xl text-parchment">The catalog</h2>
@@ -157,5 +154,5 @@ export function RostokCatalog() {
         </div>
       </div>
     </section>
-  );
+  )
 }

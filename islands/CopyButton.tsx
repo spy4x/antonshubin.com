@@ -1,53 +1,53 @@
-import { useSignal } from "@preact/signals";
-import { copyToClipboard } from "@spy4x/platform/browser/clipboard";
+import { useSignal } from "@preact/signals"
+import { copyToClipboard } from "@spy4x/platform/browser/clipboard"
 import {
   IconCheck as CheckIcon,
   IconClipboardCopy as CopyIcon,
-} from "@spy4x/preact-icons";
-import type { EventAttrs } from "../lib/analytics.ts";
+} from "@spy4x/preact-icons"
+import type { EventAttrs } from "../lib/analytics.ts"
 
 interface CopyButtonProps {
-  elementId: string;
+  elementId: string
   /**
    * Visible text. Defaults to `title`, so what a visitor reads is what a
    * screen reader announces (#236).
    */
-  label?: string;
-  class?: string;
-  title?: string;
+  label?: string
+  class?: string
+  title?: string
   /** The Umami event the press records (`eventAttrs()`), if any. */
-  analytics?: EventAttrs;
+  analytics?: EventAttrs
 }
 
 export default function CopyButton(
   { elementId, label, class: className, title, analytics }: CopyButtonProps,
 ) {
-  const copied = useSignal(false);
-  const failed = useSignal(false);
+  const copied = useSignal(false)
+  const failed = useSignal(false)
 
   const handleCopy = async () => {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    const txt = el.textContent?.trim() || "";
+    const el = document.getElementById(elementId)
+    if (!el) return
+    const txt = el.textContent?.trim() || ""
     if (!(await copyToClipboard(txt))) {
-      failed.value = true;
+      failed.value = true
       setTimeout(() => {
-        failed.value = false;
-      }, 3000);
-      return;
+        failed.value = false
+      }, 3000)
+      return
     }
-    copied.value = true;
+    copied.value = true
     setTimeout(() => {
-      copied.value = false;
-    }, 10000);
-  };
+      copied.value = false
+    }, 10000)
+  }
 
   // One colour class at a time: a failure reads in Brick (error), everything else in Sage.
   const colorClass = failed.value
     ? "text-brick hover:text-brick"
-    : "text-sage hover:text-sage";
+    : "text-sage hover:text-sage"
   const baseClass =
-    `inline-flex items-center min-h-11 sm:min-h-6 gap-1 text-xs ${colorClass} transition-colors`;
+    `inline-flex items-center min-h-11 sm:min-h-6 gap-1 text-xs ${colorClass} transition-colors`
 
   return (
     <button
@@ -73,5 +73,5 @@ export default function CopyButton(
           </>
         )}
     </button>
-  );
+  )
 }

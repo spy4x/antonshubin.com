@@ -1,14 +1,14 @@
-import type { ComponentChildren } from "preact";
-import { FeatureCard } from "@spy4x/preact-ui/feature-card";
-import { FACT_LINK } from "../../FactCard.tsx";
-import { NewTabHint } from "../../NewTabHint.tsx";
-import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx";
-import CopyButton from "../../../islands/CopyButton.tsx";
-import MigTryCalendar from "../../../islands/MigTryCalendar.tsx";
-import { embedUrl, NEW_TAB_LABEL } from "../../../lib/meet-embed.ts";
-import { eventAttrs } from "../../../lib/analytics.ts";
-import type { ToolPageData } from "../../tool-frame/tool-page.ts";
-import type { Tool } from "../../../lib/tools.ts";
+import type { ComponentChildren } from "preact"
+import { FeatureCard } from "@spy4x/preact-ui/feature-card"
+import { FACT_LINK } from "../../FactCard.tsx"
+import { NewTabHint } from "../../NewTabHint.tsx"
+import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx"
+import CopyButton from "../../../islands/CopyButton.tsx"
+import MigTryCalendar from "../../../islands/MigTryCalendar.tsx"
+import { embedUrl, NEW_TAB_LABEL } from "../../../lib/meet-embed.ts"
+import { eventAttrs } from "../../../lib/analytics.ts"
+import type { ToolPageData } from "../../tool-frame/tool-page.ts"
+import type { Tool } from "../../../lib/tools.ts"
 
 // The middle of /tools/mig (#457). Every sentence is mig's README's own
 // (spy4x/mig README.md: the tagline, "Why mig", "Quick start", "Embed it").
@@ -22,13 +22,13 @@ services:
     restart: unless-stopped
     ports: ["8080:8080"]
     volumes: ["./data:/data:z"]
-    env_file: .env`;
+    env_file: .env`
 }
 
 /** The README's iframe snippet. */
 export const EMBED_SNIPPET =
   `<iframe src="https://meet.example.com/embed?theme=dark" title="Book a meeting"
-  style="width:100%;max-width:36rem;border:0"></iframe>`;
+  style="width:100%;max-width:36rem;border:0"></iframe>`
 
 /**
  * A block of code that scrolls sideways inside its own box, with a copy
@@ -37,13 +37,13 @@ export const EMBED_SNIPPET =
  */
 function CodeBox(
   { id, label, name, title, code }: {
-    id: string;
+    id: string
     /** A visible label above the box; without one, `name` names the box. */
-    label?: string;
-    name: string;
+    label?: string
+    name: string
     /** The copy button's tooltip and accessible name. */
-    title: string;
-    code: string;
+    title: string
+    code: string
   },
 ) {
   return (
@@ -72,7 +72,7 @@ function CodeBox(
         <pre class="p-4 text-sm leading-relaxed text-parchment"><code id={id}>{code}</code></pre>
       </div>
     </div>
-  );
+  )
 }
 
 /** The hero's line under the actions: the README's compose file, pinned to the live version. */
@@ -85,7 +85,7 @@ export function ComposeQuickStart({ version }: { version: string }) {
       title={COPY_INSTALL_TITLE}
       code={composeFile(version)}
     />
-  );
+  )
 }
 
 /**
@@ -93,7 +93,7 @@ export function ComposeQuickStart({ version }: { version: string }) {
  * the README's warning. Renders nothing while `SCHEDULE_URL` is unset.
  */
 export function TryItHere({ scheduleUrl }: { scheduleUrl: string }) {
-  if (!scheduleUrl) return null;
+  if (!scheduleUrl) return null
   return (
     <section aria-labelledby="try" data-mig-try-section class="max-w-3xl">
       <h2 id="try" class="text-2xl sm:text-3xl text-parchment">Try it here</h2>
@@ -123,7 +123,7 @@ export function TryItHere({ scheduleUrl }: { scheduleUrl: string }) {
         </a>
       </div>
     </section>
-  );
+  )
 }
 
 /**
@@ -131,13 +131,13 @@ export function TryItHere({ scheduleUrl }: { scheduleUrl: string }) {
  * reason. "?theme=" stays plain: it ends a sentence, and a tag before the
  * full stop would split the sentence in the page's text.
  */
-const CODE_WORDS = /(\bcat\b|\.ics\b|\/embed\b)/;
+const CODE_WORDS = /(\bcat\b|\.ics\b|\/embed\b)/
 
 /** A reason's sentence with the README's code words set as `<code>`. */
 function withCode(text: string): ComponentChildren {
   return text.split(CODE_WORDS).map((part, i) =>
     i % 2 ? <code key={i} class="text-parchment">{part}</code> : part
-  );
+  )
 }
 
 /**
@@ -147,7 +147,7 @@ function withCode(text: string): ComponentChildren {
  * stack beside it.
  */
 export function WhyMig({ tool }: { tool: Tool }) {
-  if (!tool.features?.length) return null;
+  if (!tool.features?.length) return null
   return (
     <section aria-labelledby="why">
       <h2 id="why" class="text-2xl sm:text-3xl text-parchment">Why mig</h2>
@@ -179,7 +179,7 @@ export function WhyMig({ tool }: { tool: Tool }) {
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 /** "Embed it": the README's iframe snippet and what the frame tells its host page. */
@@ -201,12 +201,12 @@ export function EmbedIt() {
         booked calls.
       </p>
     </section>
-  );
+  )
 }
 
 /** The middle's last line: mig has no status list, so only where the rest lives. */
 export function OpenIssues({ data }: { data: ToolPageData }) {
-  if (!data.repo) return null;
+  if (!data.repo) return null
   return (
     <p data-not-yet class="text-graphite">
       What is not built yet is on the{" "}
@@ -222,5 +222,5 @@ export function OpenIssues({ data }: { data: ToolPageData }) {
         open issues
       </a>.
     </p>
-  );
+  )
 }

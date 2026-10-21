@@ -1,40 +1,40 @@
-import { useState } from "preact/hooks";
-import { track } from "../lib/analytics.ts";
+import { useState } from "preact/hooks"
+import { track } from "../lib/analytics.ts"
 
 /** The newsletter signup; a success counts as `newsletter-signup` (#274, #318). */
 export default function NewsletterForm() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("")
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     "idle",
-  );
-  const [msg, setMsg] = useState("");
+  )
+  const [msg, setMsg] = useState("")
 
   const submit = async (e: Event) => {
-    e.preventDefault();
-    if (!email) return;
-    setStatus("loading");
+    e.preventDefault()
+    if (!email) return
+    setStatus("loading")
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-      });
+      })
       if (res.ok) {
-        setStatus("done");
-        setMsg("Check your inbox to confirm.");
-        track("newsletter-signup");
+        setStatus("done")
+        setMsg("Check your inbox to confirm.")
+        track("newsletter-signup")
       } else {
-        const err = await res.json();
-        setStatus("error");
-        setMsg(err.error || "Error");
-        setTimeout(() => setStatus("idle"), 3000);
+        const err = await res.json()
+        setStatus("error")
+        setMsg(err.error || "Error")
+        setTimeout(() => setStatus("idle"), 3000)
       }
     } catch {
-      setStatus("error");
-      setMsg("Network error");
-      setTimeout(() => setStatus("idle"), 3000);
+      setStatus("error")
+      setMsg("Network error")
+      setTimeout(() => setStatus("idle"), 3000)
     }
-  };
+  }
 
   return (
     <form
@@ -81,5 +81,5 @@ export default function NewsletterForm() {
           </>
         )}
     </form>
-  );
+  )
 }

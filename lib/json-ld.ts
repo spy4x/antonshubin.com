@@ -30,12 +30,12 @@
  * JSON-LD blocks out of a rendered page.
  */
 export function toJsonLd(value: object): string {
-  const lineSeparator = String.fromCharCode(0x2028);
-  const paragraphSeparator = String.fromCharCode(0x2029);
+  const lineSeparator = String.fromCharCode(0x2028)
+  const paragraphSeparator = String.fromCharCode(0x2029)
   return JSON.stringify(value)
     .replaceAll("<", "\\u003c")
     .replaceAll(">", "\\u003e")
     .replaceAll("&", "\\u0026")
     .replaceAll(lineSeparator, "\\u2028")
-    .replaceAll(paragraphSeparator, "\\u2029");
+    .replaceAll(paragraphSeparator, "\\u2029")
 }

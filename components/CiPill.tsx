@@ -1,6 +1,6 @@
-import { badgeClasses } from "@spy4x/preact-ui/badge";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
+import { badgeClasses } from "@spy4x/preact-ui/badge"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts"
 
 /**
  * A tool's CI status from the committed snapshot (#189): a shape plus a word
@@ -17,13 +17,13 @@ import { ciReading, type CiSnapshot } from "../lib/github-snapshot.ts";
  */
 export function CiPill(
   { ci, pipelinesUrl, labelHidden = false }: {
-    ci: CiSnapshot | null;
-    pipelinesUrl: string;
+    ci: CiSnapshot | null
+    pipelinesUrl: string
     /** Keep "CI" for screen readers only, where a visible "CI" label already sits beside the pill. */
-    labelHidden?: boolean;
+    labelHidden?: boolean
   },
 ) {
-  const { word, mark } = ciReading(ci);
+  const { word, mark } = ciReading(ci)
   return (
     <a
       href={pipelinesUrl}
@@ -41,5 +41,5 @@ export function CiPill(
       }
       <StatusMark status={mark} label={word} />
     </a>
-  );
+  )
 }

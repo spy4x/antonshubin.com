@@ -7,15 +7,15 @@
 // Run by record.sh, with zond already listening on localhost:8080.
 //
 //   deno run -A scripts/clips/zond/browser.ts <out-dir>
-import { chromium } from "playwright";
-import type { Page } from "playwright";
-import { clickLike, moveLike } from "./human-mouse.ts";
+import { chromium } from "playwright"
+import type { Page } from "playwright"
+import { clickLike, moveLike } from "./human-mouse.ts"
 
-const W = 1280;
-const H = 800;
-const ZOND = "http://localhost:8080";
-const outDir = Deno.args[0];
-if (!outDir) throw new Error("usage: browser.ts <out-dir>");
+const W = 1280
+const H = 800
+const ZOND = "http://localhost:8080"
+const outDir = Deno.args[0]
+if (!outDir) throw new Error("usage: browser.ts <out-dir>")
 
 const frame = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -71,7 +71,7 @@ const frame = `<!doctype html>
       url.blur()
     })
   </script>
-</body></html>`;
+</body></html>`
 
 const server = Deno.serve(
   { hostname: "127.0.0.1", port: 0, onListen: () => {} },
@@ -79,8 +79,8 @@ const server = Deno.serve(
     new Response(frame, {
       headers: { "content-type": "text/html; charset=utf-8" },
     }),
-);
-const browser = await chromium.launch();
+)
+const browser = await chromium.launch()
 try {
   const context = await browser.newContext({
     viewport: { width: W, height: H },
@@ -88,42 +88,42 @@ try {
     colorScheme: "dark",
     locale: "en-GB",
     timezoneId: "UTC",
-  });
+  })
   try {
-    const pointer = { x: 900, y: 420 };
+    const pointer = { x: 900, y: 420 }
     await context.addInitScript(
       `window.__demoPointerStart = ${JSON.stringify(pointer)}`,
-    );
+    )
     await context.addInitScript({
       path: new URL("./pointer.js", import.meta.url).pathname,
-    });
-    const page = await context.newPage();
-    const t0 = Date.now();
-    const waits: number[] = [];
+    })
+    const page = await context.newPage()
+    const t0 = Date.now()
+    const waits: number[] = []
     page.on("response", async (res) => {
-      if (!res.url().startsWith(ZOND)) return;
-      const code = res.status();
-      const text = `${code} ${res.statusText()}`;
+      if (!res.url().startsWith(ZOND)) return
+      const code = res.status()
+      const text = `${code} ${res.statusText()}`
       await page.evaluate(([t, ok]) => {
-        const el = document.getElementById("status")!;
-        const took = el.textContent?.match(/([\d.]+ s)$/)?.[1];
-        el.innerHTML = "";
-        const b = document.createElement("b");
-        b.className = ok ? "ok" : "ko";
-        b.textContent = t as string;
-        el.append("HTTP ", b);
-        if (took) el.append(` · ${took}`);
-      }, [text, code < 400]).catch(() => {});
-    });
-    await page.goto(`http://127.0.0.1:${server.addr.port}/`);
-    await page.mouse.move(pointer.x, pointer.y);
-    await page.waitForTimeout(300);
-    const trim = (Date.now() - t0) / 1000;
-    await page.waitForTimeout(200);
+        const el = document.getElementById("status")!
+        const took = el.textContent?.match(/([\d.]+ s)$/)?.[1]
+        el.innerHTML = ""
+        const b = document.createElement("b")
+        b.className = ok ? "ok" : "ko"
+        b.textContent = t as string
+        el.append("HTTP ", b)
+        if (took) el.append(` · ${took}`)
+      }, [text, code < 400]).catch(() => {})
+    })
+    await page.goto(`http://127.0.0.1:${server.addr.port}/`)
+    await page.mouse.move(pointer.x, pointer.y)
+    await page.waitForTimeout(300)
+    const trim = (Date.now() - t0) / 1000
+    await page.waitForTimeout(200)
 
     // 5. One service that is down.
-    await visit(page, pointer, "localhost:8080/health/grafana", 0, waits);
-    await page.waitForTimeout(1700);
+    await visit(page, pointer, "localhost:8080/health/grafana", 0, waits)
+    await page.waitForTimeout(1700)
     // 6-7. Every service at once; held for the poster.
     await visit(
       page,
@@ -131,18 +131,18 @@ try {
       "localhost:8080/health",
       "/grafana".length,
       waits,
-    );
-    await moveLike(page, pointer, { x: 1100, y: 600 });
-    await page.waitForTimeout(2400);
-    await Deno.writeTextFile(`${outDir}/trim.txt`, `${trim}\n`);
-    const rel = waits.map((t) => ((t - t0) / 1000 - trim).toFixed(3));
-    await Deno.writeTextFile(`${outDir}/waits.txt`, `${rel.join(" ")}\n`);
+    )
+    await moveLike(page, pointer, { x: 1100, y: 600 })
+    await page.waitForTimeout(2400)
+    await Deno.writeTextFile(`${outDir}/trim.txt`, `${trim}\n`)
+    const rel = waits.map((t) => ((t - t0) / 1000 - trim).toFixed(3))
+    await Deno.writeTextFile(`${outDir}/waits.txt`, `${rel.join(" ")}\n`)
   } finally {
-    await context.close();
+    await context.close()
   }
 } finally {
-  await browser.close();
-  await server.shutdown();
+  await browser.close()
+  await server.shutdown()
 }
 
 /** Clicks the address bar, deletes `erase` characters from its end, types
@@ -155,17 +155,17 @@ async function visit(
   erase: number,
   waits: number[],
 ) {
-  const field = page.locator("#url");
-  await clickLike(page, pointer, field, H);
-  await page.keyboard.press("End");
+  const field = page.locator("#url")
+  await clickLike(page, pointer, field, H)
+  await page.keyboard.press("End")
   for (let i = 0; i < erase; i++) {
-    await page.keyboard.press("Backspace", { delay: 60 });
+    await page.keyboard.press("Backspace", { delay: 60 })
   }
-  const typed = await field.inputValue();
-  await page.keyboard.type(url.slice(typed.length), { delay: 60 });
-  await page.waitForTimeout(350);
-  await page.keyboard.press("Enter");
-  waits.push(Date.now() + 150);
-  await page.locator("#status b").waitFor({ timeout: 8000 });
-  waits.push(Date.now() - 100);
+  const typed = await field.inputValue()
+  await page.keyboard.type(url.slice(typed.length), { delay: 60 })
+  await page.waitForTimeout(350)
+  await page.keyboard.press("Enter")
+  waits.push(Date.now() + 150)
+  await page.locator("#status b").waitFor({ timeout: 8000 })
+  waits.push(Date.now() - 100)
 }

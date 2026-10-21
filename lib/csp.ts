@@ -19,36 +19,36 @@
  * the contract) — on every `ctx.render()` call, and injects the same value
  * as `nonce=` on every JSX `<script>`/`<style>` vnode it renders.
  */
-export const FRESH_NONCE_SYMBOL: unique symbol = Symbol.for("__freshNonce");
+export const FRESH_NONCE_SYMBOL: unique symbol = Symbol.for("__freshNonce")
 
 /** Symbol-keyed properties (like `FRESH_NONCE_SYMBOL`) aren't part of
  * `Response`'s type, so reading one needs a cast; this narrows it to exactly
  * that shape instead of `any`. */
-type ResponseWithSymbols = Record<symbol, string | undefined>;
+type ResponseWithSymbols = Record<symbol, string | undefined>
 
 /** Reads the render nonce Fresh attached to `res`, if any (see
  * `FRESH_NONCE_SYMBOL`). */
 export function readFreshNonce(res: Response): string | undefined {
-  return (res as unknown as ResponseWithSymbols)[FRESH_NONCE_SYMBOL];
+  return (res as unknown as ResponseWithSymbols)[FRESH_NONCE_SYMBOL]
 }
 
 export interface CspOptions {
   /** The current response's render nonce, if any (see `FRESH_NONCE_SYMBOL`). */
-  nonce?: string;
+  nonce?: string
   /** Umami script's origin, only when genuinely cross-origin (see
    * `lib/config.ts`'s `UMAMI_PRECONNECT_ORIGIN`) — "" adds nothing. */
-  umamiOrigin?: string;
+  umamiOrigin?: string
   /** `SCHEDULE_URL`'s origin, for the booking iframe — "" adds nothing. */
-  scheduleOrigin?: string;
+  scheduleOrigin?: string
 }
 
 /** Origin of `url`, or `""` when `url` is empty or not a parseable absolute URL. */
 export function originOf(url: string): string {
-  if (!url) return "";
+  if (!url) return ""
   try {
-    return new URL(url).origin;
+    return new URL(url).origin
   } catch {
-    return "";
+    return ""
   }
 }
 
@@ -66,17 +66,17 @@ export function originOf(url: string): string {
  *   and the directive would break the plain-http rendered-page tests.
  */
 export function buildCsp(options: CspOptions = {}): string {
-  const { nonce, umamiOrigin = "", scheduleOrigin = "" } = options;
+  const { nonce, umamiOrigin = "", scheduleOrigin = "" } = options
 
   const scriptSrc = ["'self'", nonce && `'nonce-${nonce}'`, umamiOrigin]
-    .filter(Boolean).join(" ");
+    .filter(Boolean).join(" ")
   const connectSrc = ["'self'", umamiOrigin]
-    .filter(Boolean).join(" ");
+    .filter(Boolean).join(" ")
   const frameSrc = [
     "https://www.youtube.com",
     "https://youtube.com",
     scheduleOrigin,
-  ].filter(Boolean).join(" ");
+  ].filter(Boolean).join(" ")
 
   return [
     `default-src 'self'`,
@@ -92,5 +92,5 @@ export function buildCsp(options: CspOptions = {}): string {
     `base-uri 'self'`,
     `form-action 'self'`,
     `frame-ancestors 'none'`,
-  ].join("; ");
+  ].join("; ")
 }

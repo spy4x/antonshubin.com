@@ -1,6 +1,6 @@
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import type { Faq } from "../lib/faqs.ts";
-import { linkEvent } from "../lib/analytics.ts";
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import type { Faq } from "../lib/faqs.ts"
+import { linkEvent } from "../lib/analytics.ts"
 
 /**
  * A page's questions, open, each an H3 at `#faq-<id>` with its answer under
@@ -28,5 +28,5 @@ export function Questions({ faqs }: { faqs: Faq[] }) {
         </div>
       ))}
     </div>
-  );
+  )
 }

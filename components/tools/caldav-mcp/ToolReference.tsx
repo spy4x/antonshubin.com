@@ -1,6 +1,6 @@
-import { IconChevronRight, IconLockClosed } from "@spy4x/preact-icons";
-import { RadioChips } from "@spy4x/preact-ui/radio-chips";
-import { eventAttrs } from "../../../lib/analytics.ts";
+import { IconChevronRight, IconLockClosed } from "@spy4x/preact-icons"
+import { RadioChips } from "@spy4x/preact-ui/radio-chips"
+import { eventAttrs } from "../../../lib/analytics.ts"
 import {
   GROUPS,
   isToolOffered,
@@ -9,17 +9,17 @@ import {
   MODES,
   splitDescription,
   type ToolMode,
-} from "./data.ts";
+} from "./data.ts"
 
-const SLUG = "caldav-mcp";
-const MODE_VALUES = MODES.map((m) => m.value);
+const SLUG = "caldav-mcp"
+const MODE_VALUES = MODES.map((m) => m.value)
 
 /** The radio id of a mode; the switch's CSS reads these. */
-const modeId = (mode: ToolMode) => `mcp-mode-${mode}`;
+const modeId = (mode: ToolMode) => `mcp-mode-${mode}`
 
 /** The modes that leave `name` out, space-separated, for `data-when` and `data-off`. */
 function offIn(name: string): string {
-  return MODE_VALUES.filter((m) => !isToolOffered(name, m)).join(" ");
+  return MODE_VALUES.filter((m) => !isToolOffered(name, m)).join(" ")
 }
 
 /**
@@ -30,16 +30,16 @@ function offIn(name: string): string {
  * classes: those would land in the stylesheet every page loads.
  */
 const SWITCH_CSS = MODE_VALUES.map((m) => {
-  const on = `[data-mcp-reference]:has(#${modeId(m)}:checked)`;
+  const on = `[data-mcp-reference]:has(#${modeId(m)}:checked)`
   return `${on} [data-when]:not([data-when~=${m}]){display:none}` +
-    `${on} [data-off~=${m}]{color:var(--color-graphite)}`;
-}).join("");
+    `${on} [data-off~=${m}]{color:var(--color-graphite)}`
+}).join("")
 
 /** One tool: a native `<details>` whose summary names it and gives its first sentence. */
 function ToolRow({ tool }: { tool: McpTool }) {
-  const { first, rest } = splitDescription(tool.description);
-  const off = offIn(tool.name);
-  const offered = MODE_VALUES.filter((m) => isToolOffered(tool.name, m));
+  const { first, rest } = splitDescription(tool.description)
+  const off = offIn(tool.name)
+  const offered = MODE_VALUES.filter((m) => isToolOffered(tool.name, m))
   return (
     <details data-mcp-tool={tool.name} class="group border-t border-rule">
       <summary
@@ -84,7 +84,7 @@ function ToolRow({ tool }: { tool: McpTool }) {
         <p>Offered with CALDAV_MCP_TOOLS set to {offered.join(", ")}.</p>
       </div>
     </details>
-  );
+  )
 }
 
 /**
@@ -134,8 +134,8 @@ export function ToolReference() {
       </p>
       <div class="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-6">
         {GROUPS.map((group) => {
-          const list = MCP_TOOLS.filter((t) => t.group === group);
-          const id = `mcp-group-${group.toLowerCase()}`;
+          const list = MCP_TOOLS.filter((t) => t.group === group)
+          const id = `mcp-group-${group.toLowerCase()}`
           return (
             <section
               key={group}
@@ -162,9 +162,9 @@ export function ToolReference() {
               </h3>
               {list.map((t) => <ToolRow key={t.name} tool={t} />)}
             </section>
-          );
+          )
         })}
       </div>
     </section>
-  );
+  )
 }

@@ -1,4 +1,5 @@
 {
+  "fmt": { "semiColons": false },
   "nodeModulesDir": "manual",
   "minimumDependencyAge": { "age": "1440", "exclude": ["jsr:@spy4x/*"] },
   "tasks": {

@@ -16,34 +16,34 @@ export type NavIcon =
   | "writing"
   | "home"
   | "about"
-  | "infrastructure";
+  | "infrastructure"
 
 export interface NavItem {
-  href: string;
-  label: string;
-  icon: NavIcon;
+  href: string
+  label: string
+  icon: NavIcon
 }
 
-const WORK: NavItem = { href: "/work", label: "Work", icon: "work" };
+const WORK: NavItem = { href: "/work", label: "Work", icon: "work" }
 const SERVICES: NavItem = {
   href: "/catalog",
   label: "Services",
   icon: "services",
-};
+}
 const HOW_I_WORK: NavItem = {
   href: "/how-i-work",
   label: "How I work",
   icon: "how",
-};
-const TOOLS: NavItem = { href: "/tools", label: "Tools", icon: "tools" };
-const WRITING: NavItem = { href: "/blog", label: "Writing", icon: "writing" };
-const HOME: NavItem = { href: "/", label: "Home", icon: "home" };
-const ABOUT: NavItem = { href: "/about", label: "About", icon: "about" };
+}
+const TOOLS: NavItem = { href: "/tools", label: "Tools", icon: "tools" }
+const WRITING: NavItem = { href: "/blog", label: "Writing", icon: "writing" }
+const HOME: NavItem = { href: "/", label: "Home", icon: "home" }
+const ABOUT: NavItem = { href: "/about", label: "About", icon: "about" }
 const INFRASTRUCTURE: NavItem = {
   href: "/infrastructure",
   label: "Infrastructure",
   icon: "infrastructure",
-};
+}
 
 /**
  * The rail's destinations, top to bottom under the portrait and Book (#433).
@@ -57,14 +57,14 @@ export const railItems: NavItem[] = [
   TOOLS,
   HOW_I_WORK,
   WRITING,
-];
+]
 
 /**
  * The phone "More" sheet's rows around the destinations that did not fit the
  * tab bar: Home and About above them, Infrastructure below. Pages only.
  */
-export const sheetTopItems: NavItem[] = [HOME, ABOUT];
-export const sheetBottomItems: NavItem[] = [INFRASTRUCTURE];
+export const sheetTopItems: NavItem[] = [HOME, ABOUT]
+export const sheetBottomItems: NavItem[] = [INFRASTRUCTURE]
 
 const allItems: NavItem[] = [
   HOME,
@@ -75,31 +75,31 @@ const allItems: NavItem[] = [
   WRITING,
   ABOUT,
   INFRASTRUCTURE,
-];
+]
 
 /**
  * Where Book goes: the booking page, with the calendar on it (#293). When
  * `SCHEDULE_URL` is unset the button reads "Write" and goes to that page's
  * written brief (`routes/book.tsx`'s `#brief`).
  */
-export const BOOK_HREF = "/book";
-export const WRITE_FALLBACK_HREF = `${BOOK_HREF}#brief`;
+export const BOOK_HREF = "/book"
+export const WRITE_FALLBACK_HREF = `${BOOK_HREF}#brief`
 
 /**
  * The one wording of the Book action on every page (#190): every button or
  * link that books the call says this, and only the nav says it shorter
  * (`NAV_BOOK_LABEL`). `test/action-wording.test.ts` fails on a third wording.
  */
-export const BOOK_LABEL = "Book a free 30-minute call";
+export const BOOK_LABEL = "Book a free 30-minute call"
 
 /** The one wording of the written-brief action on every page (#190). */
-export const BRIEF_LABEL = "Send a written brief";
+export const BRIEF_LABEL = "Send a written brief"
 
 /** The nav's short Book, where `BOOK_LABEL` does not fit a tab. */
-export const NAV_BOOK_LABEL = "Book";
+export const NAV_BOOK_LABEL = "Book"
 
 /** What Book reads, in the nav and the footer, when `SCHEDULE_URL` is unset. */
-export const NAV_WRITE_LABEL = "Write";
+export const NAV_WRITE_LABEL = "Write"
 
 /**
  * The nav's own word for a section, given the section's path: "Writing" for
@@ -108,7 +108,7 @@ export const NAV_WRITE_LABEL = "Write";
  * nav says "Writing". `undefined` for a path the nav doesn't list.
  */
 export function navLabel(href: string): string | undefined {
-  return allItems.find((item) => item.href === href)?.label;
+  return allItems.find((item) => item.href === href)?.label
 }
 
 /**
@@ -119,11 +119,11 @@ export function navLabel(href: string): string | undefined {
 export function navItemFor(pathname: string): NavItem | undefined {
   const trimmed = pathname.length > 1 && pathname.endsWith("/")
     ? pathname.slice(0, -1)
-    : pathname;
+    : pathname
   return allItems.find((item) =>
     item.href !== "/" &&
     (trimmed === item.href || trimmed.startsWith(`${item.href}/`))
-  );
+  )
 }
 
 /**
@@ -133,7 +133,7 @@ export function navItemFor(pathname: string): NavItem | undefined {
 export const WHY_NOT_JUST_AI: Pick<NavItem, "href" | "label"> = {
   href: "/why-not-just-ai",
   label: "Why not just AI?",
-};
+}
 
 /**
  * The footer's "Site" group: every page the nav lists except Home, then
@@ -145,7 +145,7 @@ export const siteItems: Pick<NavItem, "href" | "label">[] = [
   INFRASTRUCTURE,
   ABOUT,
   WHY_NOT_JUST_AI,
-];
+]
 
 /**
  * The `aria-current` value for a nav link to `href` on `currentPath`: `"page"`
@@ -159,12 +159,12 @@ export function navCurrent(
   currentPath: string,
   href: string,
 ): "page" | "true" | "false" {
-  const trim = (p: string) => p !== "/" && p.endsWith("/") ? p.slice(0, -1) : p;
-  const target = trim(new URL(href, "http://localhost").pathname);
-  const current = trim(currentPath);
-  if (current === target) return "page";
+  const trim = (p: string) => p !== "/" && p.endsWith("/") ? p.slice(0, -1) : p
+  const target = trim(new URL(href, "http://localhost").pathname)
+  const current = trim(currentPath)
+  if (current === target) return "page"
   // `${target}/` for `/` is `//`, which no path starts with: `/` never
   // becomes a section, unlike under Fresh's matching.
-  if (current.startsWith(`${target}/`)) return "true";
-  return "false";
+  if (current.startsWith(`${target}/`)) return "true"
+  return "false"
 }

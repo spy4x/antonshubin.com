@@ -1,5 +1,5 @@
-import { UPWORK_URL } from "./config.ts";
-import { type Project, projects } from "./data.ts";
+import { UPWORK_URL } from "./config.ts"
+import { type Project, projects } from "./data.ts"
 
 /**
  * Client reviews: the single source, like `lib/catalog.ts` is for prices.
@@ -20,27 +20,27 @@ import { type Project, projects } from "./data.ts";
  */
 export interface Testimonial {
   /** `<projectSlug>-<contract>`. */
-  id: string;
+  id: string
   /** The project the review is about; `testimonialProject()` throws on a typo. */
-  projectSlug: string;
+  projectSlug: string
   /** Which Upwork contract with this client the review closed, from 1. */
-  contract: number;
+  contract: number
   /**
    * The star rating the client gave on Upwork, out of 5. Anton confirmed on
    * 26 Sep 2026 that every review he has received since 2013 is 5.0.
    */
-  rating: number;
+  rating: number
   /** The full review, verbatim. Paragraphs are separated by `\n`. */
-  quote: string;
+  quote: string
   /** Exact pieces of `quote`, in order, joined by `EXCERPT_JOIN`. */
-  excerpt: string;
-  sourceHref?: string;
+  excerpt: string
+  sourceHref?: string
   /** True once Anton has confirmed the review may be quoted on the site. */
-  permission: boolean;
+  permission: boolean
 }
 
 /** What separates two verbatim pieces of a quote inside an excerpt. */
-export const EXCERPT_JOIN = " … ";
+export const EXCERPT_JOIN = " … "
 
 export const testimonials: Testimonial[] = [
   {
@@ -223,7 +223,7 @@ export const testimonials: Testimonial[] = [
     sourceHref: UPWORK_URL,
     permission: true,
   },
-];
+]
 
 /**
  * The three excerpts on the home page, in order: three different clients
@@ -233,36 +233,36 @@ export const homeTestimonialIds: string[] = [
   "roley-1",
   "corecircle-1",
   "foodrazor-2",
-];
+]
 
 /**
  * The two reviews on `/about` (#294): how Anton treats people and money
  * (psychologist 2), from clients the home page and `/book` don't quote.
  */
-export const aboutTestimonialIds: string[] = ["gopingu-1", "connectful-2"];
+export const aboutTestimonialIds: string[] = ["gopingu-1", "connectful-2"]
 
 /**
  * The client sentence beside the calendar on `/book` (#272, Psych 5):
  * not one the home page shows.
  */
-export const contactTestimonialId = "roley-2";
+export const contactTestimonialId = "roley-2"
 
 /** Looks a testimonial up by id and throws on a typo. */
 export function testimonial(id: string): Testimonial {
-  const t = testimonials.find((x) => x.id === id);
-  if (!t) throw new Error(`lib/testimonials.ts: no testimonial "${id}"`);
-  return t;
+  const t = testimonials.find((x) => x.id === id)
+  if (!t) throw new Error(`lib/testimonials.ts: no testimonial "${id}"`)
+  return t
 }
 
 /** The client project a review is about; throws when `projectSlug` resolves to none. */
 export function testimonialProject(t: Testimonial): Project {
-  const p = projects.freelance.find((x) => x.slug === t.projectSlug);
+  const p = projects.freelance.find((x) => x.slug === t.projectSlug)
   if (!p) {
     throw new Error(
       `lib/testimonials.ts: "${t.id}" names no client project "${t.projectSlug}"`,
-    );
+    )
   }
-  return p;
+  return p
 }
 
 /**
@@ -274,14 +274,14 @@ export function testimonialProject(t: Testimonial): Project {
 export function visibleTestimonials(
   list: Testimonial[] = testimonials,
 ): Testimonial[] {
-  return list.filter((t) => t.sourceHref && t.permission);
+  return list.filter((t) => t.sourceHref && t.permission)
 }
 
 /** Visible reviews of one project, in contract order. */
 export function projectTestimonials(slug: string): Testimonial[] {
   return visibleTestimonials()
     .filter((t) => t.projectSlug === slug)
-    .sort((a, b) => a.contract - b.contract);
+    .sort((a, b) => a.contract - b.contract)
 }
 
 /**
@@ -290,24 +290,24 @@ export function projectTestimonials(slug: string): Testimonial[] {
  * founder's pronoun, for the sentence `repeatClientsLine()` builds.
  */
 export interface FollowOnHire {
-  from: string;
-  to: string;
-  possessive: string;
+  from: string
+  to: string
+  possessive: string
 }
 
 /** Connectful's founder hired Anton again for Corecircle (#232). */
 export const followOnHires: FollowOnHire[] = [
   { from: "connectful", to: "corecircle", possessive: "her" },
-];
+]
 
 /** Who reviewed Anton, and who of them hired him again, from the review data. */
 export interface RepeatClients {
   /** Distinct clients with a visible review; a follow-on pair is one client. */
-  reviewed: number;
+  reviewed: number
   /** Projects whose client signed more than one contract on that project. */
-  rehiredOnSameProject: Project[];
+  rehiredOnSameProject: Project[]
   /** Follow-on pairs where either project has a visible review. */
-  followOn: { from: Project; to: Project; possessive: string }[];
+  followOn: { from: Project; to: Project; possessive: string }[]
 }
 
 /**
@@ -322,15 +322,15 @@ export function repeatClients(
   pairs: FollowOnHire[] = followOnHires,
 ): RepeatClients {
   const find = (slug: string) => {
-    const p = projects.freelance.find((x) => x.slug === slug);
-    if (!p) throw new Error(`lib/testimonials.ts: no client project "${slug}"`);
-    return p;
-  };
-  const inPair = new Set(pairs.flatMap((x) => [x.from, x.to]));
-  const reviewedSlugs = [...new Set(list.map((t) => t.projectSlug))];
+    const p = projects.freelance.find((x) => x.slug === slug)
+    if (!p) throw new Error(`lib/testimonials.ts: no client project "${slug}"`)
+    return p
+  }
+  const inPair = new Set(pairs.flatMap((x) => [x.from, x.to]))
+  const reviewedSlugs = [...new Set(list.map((t) => t.projectSlug))]
   const contracts = (slug: string) =>
     new Set(list.filter((t) => t.projectSlug === slug).map((t) => t.contract))
-      .size;
+      .size
   const followOn = pairs
     .filter((x) =>
       reviewedSlugs.includes(x.from) || reviewedSlugs.includes(x.to)
@@ -339,7 +339,7 @@ export function repeatClients(
       from: find(x.from),
       to: find(x.to),
       possessive: x.possessive,
-    }));
+    }))
   return {
     reviewed: reviewedSlugs.filter((s) => !inPair.has(s)).length +
       followOn.length,
@@ -347,7 +347,7 @@ export function repeatClients(
       .filter((s) => !inPair.has(s) && contracts(s) > 1)
       .map(find),
     followOn,
-  };
+  }
 }
 
 const NUMBER_WORDS = [
@@ -364,16 +364,16 @@ const NUMBER_WORDS = [
   "ten",
   "eleven",
   "twelve",
-];
+]
 
 /** A count as a word up to twelve, as digits above. */
 function numberWord(n: number): string {
-  return NUMBER_WORDS[n] ?? `${n}`;
+  return NUMBER_WORDS[n] ?? `${n}`
 }
 
 /** A project's name without its tagline: "Roley — Make a Movie!" → "Roley". */
 function shortTitle(p: Project): string {
-  return p.title.split(" — ")[0];
+  return p.title.split(" — ")[0]
 }
 
 /**
@@ -381,18 +381,18 @@ function shortTitle(p: Project): string {
  * (#232), with every count and name read from `repeatClients()`.
  */
 export function repeatClientsLine(r: RepeatClients = repeatClients()): string {
-  const repeat = r.rehiredOnSameProject.length + r.followOn.length;
-  const count = numberWord(repeat);
+  const repeat = r.rehiredOnSameProject.length + r.followOn.length
+  const count = numberWord(repeat)
   const pairs = r.followOn.map((x) =>
     `${shortTitle(x.from)}'s founder, for ${x.possessive} next product, ${
       shortTitle(x.to)
     }`
-  );
-  const items = [...r.rehiredOnSameProject.map(shortTitle), ...pairs];
+  )
+  const items = [...r.rehiredOnSameProject.map(shortTitle), ...pairs]
   const list = items.length > 1
     ? `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`
-    : items.join("");
+    : items.join("")
   return `${count[0].toUpperCase()}${count.slice(1)} of the ${
     numberWord(r.reviewed)
-  } clients who reviewed me hired me again: ${list}.`;
+  } clients who reviewed me hired me again: ${list}.`
 }

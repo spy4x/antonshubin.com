@@ -4,12 +4,12 @@
  * design: it only proves the ping comes from whoever controls this host,
  * which serves it at {@linkcode INDEXNOW_KEY_PATH}.
  */
-export const INDEXNOW_KEY = "db06b9177c65f37f5b7228895d1ac3ac";
-export const INDEXNOW_KEY_PATH = "/indexnow-key.txt";
-export const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
+export const INDEXNOW_KEY = "db06b9177c65f37f5b7228895d1ac3ac"
+export const INDEXNOW_KEY_PATH = "/indexnow-key.txt"
+export const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow"
 
 /** How long the ping waits before giving up; it never blocks a publish. */
-export const INDEXNOW_TIMEOUT_MS = 10_000;
+export const INDEXNOW_TIMEOUT_MS = 10_000
 
 /**
  * Submits `urls` (all on `site`) and resolves to one line for the log. Fails
@@ -31,14 +31,14 @@ export async function pingIndexNow(
         urlList: urls,
       }),
       signal: AbortSignal.timeout(INDEXNOW_TIMEOUT_MS),
-    });
-    await res.body?.cancel();
+    })
+    await res.body?.cancel()
     return res.ok
       ? `IndexNow: submitted ${urls.length} URL(s), answered ${res.status}.`
-      : `IndexNow: answered ${res.status}; nothing else depends on it.`;
+      : `IndexNow: answered ${res.status}; nothing else depends on it.`
   } catch (err) {
     return `IndexNow: ping failed (${
       (err as Error).message
-    }); nothing else depends on it.`;
+    }); nothing else depends on it.`
   }
 }

@@ -1,9 +1,9 @@
-import { FACT_LINK } from "../../FactCard.tsx";
-import { Spotlight, ToolHubCard, ToolHubLine } from "./HubParts.tsx";
-import { ARCHIVE, SECTIONS, SPOTLIGHT } from "./hub.ts";
-import { linkEvent } from "../../../lib/analytics.ts";
-import { tool as toolBySlug } from "../../../lib/tools.ts";
-import { type ToolsLive, withLiveVersion } from "../../../lib/tools-live.ts";
+import { FACT_LINK } from "../../FactCard.tsx"
+import { Spotlight, ToolHubCard, ToolHubLine } from "./HubParts.tsx"
+import { ARCHIVE, SECTIONS, SPOTLIGHT } from "./hub.ts"
+import { linkEvent } from "../../../lib/analytics.ts"
+import { tool as toolBySlug } from "../../../lib/tools.ts"
+import { type ToolsLive, withLiveVersion } from "../../../lib/tools-live.ts"
 
 /**
  * The hub's tools (#456), from the spotlight to the archive, in the order of
@@ -11,8 +11,8 @@ import { type ToolsLive, withLiveVersion } from "../../../lib/tools-live.ts";
  * install line shows the version the hourly refresh found.
  */
 export function HubTools({ live }: { live: ToolsLive }) {
-  const tool = (slug: string) => withLiveVersion(toolBySlug(slug), live);
-  const archived = ARCHIVE.map(tool);
+  const tool = (slug: string) => withLiveVersion(toolBySlug(slug), live)
+  const archived = ARCHIVE.map(tool)
   return (
     <>
       <Spotlight tool={tool(SPOTLIGHT)} />
@@ -79,5 +79,5 @@ export function HubTools({ live }: { live: ToolsLive }) {
         </ul>
       </details>
     </>
-  );
+  )
 }

@@ -1,17 +1,17 @@
-import { cn } from "@spy4x/preact-cn";
-import { type ComponentChildren, Fragment } from "preact";
-import { define } from "../../lib/utils.ts";
-import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { Layout } from "../../components/Layout.tsx";
+import { cn } from "@spy4x/preact-cn"
+import { type ComponentChildren, Fragment } from "preact"
+import { define } from "../../lib/utils.ts"
+import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { Layout } from "../../components/Layout.tsx"
 import {
   formatPeriod,
   type Project,
   projectScreenshots,
-} from "../../lib/data.ts";
-import { firstSentence, metaDescription, projectLead } from "../../lib/llms.ts";
-import { projectTestimonials } from "../../lib/testimonials.ts";
+} from "../../lib/data.ts"
+import { firstSentence, metaDescription, projectLead } from "../../lib/llms.ts"
+import { projectTestimonials } from "../../lib/testimonials.ts"
 import {
   type ArchiveEntry,
   archiveFrame,
@@ -26,20 +26,20 @@ import {
   workHref,
   workScopeLine,
   yearSpan,
-} from "../../lib/work.ts";
-import { toJsonLd } from "../../lib/json-ld.ts";
-import { NewTabHint } from "../../components/NewTabHint.tsx";
-import { ReviewSource } from "../../components/ReviewSource.tsx";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { eventAttrs } from "../../lib/analytics.ts";
+} from "../../lib/work.ts"
+import { toJsonLd } from "../../lib/json-ld.ts"
+import { NewTabHint } from "../../components/NewTabHint.tsx"
+import { ReviewSource } from "../../components/ReviewSource.tsx"
+import { ClosingBand } from "../../components/ClosingBand.tsx"
+import { IconArrowRight as ArrowRightIcon } from "@spy4x/preact-icons"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { eventAttrs } from "../../lib/analytics.ts"
 
-const BASE = "https://antonshubin.com";
+const BASE = "https://antonshubin.com"
 
 /** A project title as a link: Parchment, underlined, the underline brightens on hover. */
 const TITLE_LINK =
-  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment";
+  "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment focus-visible:decoration-parchment"
 
 /**
  * The `CollectionPage` and its `ItemList` (SEO 1 on #270): every client
@@ -77,7 +77,7 @@ function workJsonLd(list: Project[], canonical: string, description: string) {
         })),
       },
     ],
-  };
+  }
 }
 
 /**
@@ -88,12 +88,12 @@ function workJsonLd(list: Project[], canonical: string, description: string) {
  */
 function MetaLine(
   { project, hiredAgain, period = true }: {
-    project: Project;
-    hiredAgain: boolean;
-    period?: boolean;
+    project: Project
+    hiredAgain: boolean
+    period?: boolean
   },
 ) {
-  const status = projectStatus(project);
+  const status = projectStatus(project)
   const parts: ComponentChildren[] = [
     project.madeForName,
     period && project.period && (
@@ -104,7 +104,7 @@ function MetaLine(
     project.role,
     status && <StatusMark key="status" status={status} />,
     hiredAgain && <span key="hired" data-hired-again>Hired again</span>,
-  ].filter(Boolean);
+  ].filter(Boolean)
   return (
     <p class="text-sm text-graphite">
       {parts.map((part, i) => (
@@ -114,16 +114,16 @@ function MetaLine(
         </Fragment>
       ))}
     </p>
-  );
+  )
 }
 
 /** A review excerpt with who wrote it and where, as the archive rows show it. */
 function Excerpt(
   { project, excerpt, href, class: className = "" }: {
-    project: Project;
-    excerpt: string;
-    href?: string;
-    class?: string;
+    project: Project
+    excerpt: string
+    href?: string
+    class?: string
   },
 ) {
   return (
@@ -136,7 +136,7 @@ function Excerpt(
         <ReviewSource project={project} href={href} />
       </figcaption>
     </figure>
-  );
+  )
 }
 
 /**
@@ -146,8 +146,8 @@ function Excerpt(
  * asks for high priority: `/work` has no hero image.
  */
 function CardPicture({ project, eager }: { project: Project; eager: boolean }) {
-  const image = project.cardImage;
-  const alt = projectScreenshots(project)[0]?.alt ?? "";
+  const image = project.cardImage
+  const alt = projectScreenshots(project)[0]?.alt ?? ""
   return (
     <div class="aspect-[16/10] bg-lamp flex items-center justify-center overflow-hidden">
       {image
@@ -179,7 +179,7 @@ function CardPicture({ project, eager }: { project: Project; eager: boolean }) {
           />
         )}
     </div>
-  );
+  )
 }
 
 /**
@@ -190,12 +190,12 @@ function CardPicture({ project, eager }: { project: Project; eager: boolean }) {
  */
 function HighlightCard(
   { project, eager, hiredAgain }: {
-    project: Project;
-    eager: boolean;
-    hiredAgain: boolean;
+    project: Project
+    eager: boolean
+    hiredAgain: boolean
   },
 ) {
-  const review = projectTestimonials(project.slug ?? "")[0];
+  const review = projectTestimonials(project.slug ?? "")[0]
   return (
     <li
       data-highlight={project.slug}
@@ -255,7 +255,7 @@ function HighlightCard(
         )}
       </div>
     </li>
-  );
+  )
 }
 
 /**
@@ -268,7 +268,7 @@ function HighlightCard(
 function ArchiveRow(
   { entry, hiredAgain }: { entry: ArchiveEntry; hiredAgain: boolean },
 ) {
-  const { project, review } = entry;
+  const { project, review } = entry
   return (
     <li
       data-archive-row={project.slug}
@@ -329,7 +329,7 @@ function ArchiveRow(
         )}
       </div>
     </li>
-  );
+  )
 }
 
 /** The repeat-clients line, with every project it names linked to its page (Mkt 7). */
@@ -353,15 +353,15 @@ function RepeatClientsLead() {
           : s.text
       )}
     </p>
-  );
+  )
 }
 
 export default define.page(function Work(ctx) {
   // clientWork() throws on a highlightSlugs typo, so a bad slug fails loudly.
-  const work = clientWork();
-  const { highlights, archive } = work;
-  const all = clientWorkInOrder(work);
-  const description = metaDescription(workDescription(ROLE, work));
+  const work = clientWork()
+  const { highlights, archive } = work
+  const all = clientWorkInOrder(work)
+  const description = metaDescription(workDescription(ROLE, work))
   head.value = {
     ...head.value,
     title: "Client work and case studies — Anton Shubin",
@@ -372,8 +372,8 @@ export default define.page(function Work(ctx) {
     ogImage: `${BASE}/img/og/work.png`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
-  const breadcrumb = getBreadcrumb(head.value.canonical, "Work");
+  }
+  const breadcrumb = getBreadcrumb(head.value.canonical, "Work")
 
   if (all.length === 0) {
     return (
@@ -385,10 +385,10 @@ export default define.page(function Work(ctx) {
           <p class="text-graphite">No projects to display yet.</p>
         </div>
       </Layout>
-    );
+    )
   }
 
-  const hiredAgain = new Set(hiredAgainSlugs());
+  const hiredAgain = new Set(hiredAgainSlugs())
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -491,5 +491,5 @@ export default define.page(function Work(ctx) {
         </p>
       </div>
     </Layout>
-  );
-});
+  )
+})

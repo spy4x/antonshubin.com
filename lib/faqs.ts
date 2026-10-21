@@ -1,7 +1,7 @@
-import { PRICING_RULE } from "./how-i-work.ts";
-import { promise } from "./promises.ts";
-import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts";
-import { WEEKLY_AUDIT, WHY_NOT_JUST_AI_PATH } from "./why-not-just-ai.ts";
+import { PRICING_RULE } from "./how-i-work.ts"
+import { promise } from "./promises.ts"
+import { BRIEF_LABEL, WRITE_FALLBACK_HREF } from "./nav.ts"
+import { WEEKLY_AUDIT, WHY_NOT_JUST_AI_PATH } from "./why-not-just-ai.ts"
 
 /**
  * The How I work page's questions (#275): the only written copy. The page,
@@ -19,19 +19,19 @@ import { WEEKLY_AUDIT, WHY_NOT_JUST_AI_PATH } from "./why-not-just-ai.ts";
 
 export interface Faq {
   /** Stable anchor: the question is linkable as `/how-i-work#faq-<id>`. */
-  id: string;
-  q: string;
+  id: string
+  q: string
   /** Plain text: the same string is shown on the page and sent as FAQ JSON-LD. */
-  a: string;
-  link?: { href: string; label: string };
+  a: string
+  link?: { href: string; label: string }
 }
 
 /** How hourly work is billed with AI agents, from Anton's words on #516. */
 export const HOURLY_WORK_RULE =
-  "On hourly work I bill only the hours I spend on your project, never the time an AI agent runs on its own.";
+  "On hourly work I bill only the hours I spend on your project, never the time an AI agent runs on its own."
 
 /** The most questions the page carries. */
-export const MAX_FAQS = 8;
+export const MAX_FAQS = 8
 
 /** New information first, the fit question last. */
 export const faqs: Faq[] = [
@@ -86,4 +86,4 @@ export const faqs: Faq[] = [
       promise("first-milestone").phrase
     }. ${promise("first-milestone").desc}`,
   },
-];
+]

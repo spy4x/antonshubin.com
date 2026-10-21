@@ -1,21 +1,21 @@
-import { BOOK_HREF, BOOK_LABEL } from "../../lib/nav.ts";
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { Layout } from "../../components/Layout.tsx";
-import { NotFound } from "../../components/NotFound.tsx";
-import { type BlogArticle, blogArticles } from "../../lib/data.ts";
-import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts";
-import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx";
-import PostToc from "../../islands/PostToc.tsx";
-import PostRead from "../../islands/PostRead.tsx";
-import { NewsletterAsk } from "../../components/NewsletterBlock.tsx";
-import { getBreadcrumb, head, ROLE } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
-import { Breadcrumb } from "../../components/Breadcrumb.tsx";
-import { ClosingBand } from "../../components/ClosingBand.tsx";
-import { SCHEDULE_URL } from "../../lib/config.ts";
-import { EMAIL_ADDRESS, emailContact } from "../../lib/profiles.ts";
-import { toJsonLd } from "../../lib/json-ld.ts";
+import { BOOK_HREF, BOOK_LABEL } from "../../lib/nav.ts"
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { Layout } from "../../components/Layout.tsx"
+import { NotFound } from "../../components/NotFound.tsx"
+import { type BlogArticle, blogArticles } from "../../lib/data.ts"
+import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts"
+import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx"
+import PostToc from "../../islands/PostToc.tsx"
+import PostRead from "../../islands/PostRead.tsx"
+import { NewsletterAsk } from "../../components/NewsletterBlock.tsx"
+import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
+import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { ClosingBand } from "../../components/ClosingBand.tsx"
+import { SCHEDULE_URL } from "../../lib/config.ts"
+import { EMAIL_ADDRESS, emailContact } from "../../lib/profiles.ts"
+import { toJsonLd } from "../../lib/json-ld.ts"
 import {
   archiveNoteText,
   AUTHOR_LINE,
@@ -33,28 +33,28 @@ import {
   serviceLabel,
   TOC_MIN_MINUTES,
   topic,
-} from "../../lib/blog.ts";
-import { eventAttrs, linkEvent } from "../../lib/analytics.ts";
+} from "../../lib/blog.ts"
+import { eventAttrs, linkEvent } from "../../lib/analytics.ts"
 
-const SITE = "https://antonshubin.com";
+const SITE = "https://antonshubin.com"
 
 function getArticleBySlug(slug: string): BlogArticle | undefined {
-  return blogArticles.find((a) => a.slug === slug);
+  return blogArticles.find((a) => a.slug === slug)
 }
 
 async function getArticleContent(slug: string): Promise<string | null> {
   try {
-    return await Deno.readTextFile(`content/blog/${slug}.md`);
+    return await Deno.readTextFile(`content/blog/${slug}.md`)
   } catch {
-    return null;
+    return null
   }
 }
 
 interface PageData {
-  article: BlogArticle | null;
-  content: string | null;
-  headings: PostHeading[];
-  related: BlogArticle[];
+  article: BlogArticle | null
+  content: string | null
+  headings: PostHeading[]
+  related: BlogArticle[]
 }
 
 // Unknown slugs show the shared not-found page (components/NotFound.tsx), but must answer with
@@ -62,8 +62,8 @@ interface PageData {
 // empty 200.
 export const handler = define.handlers({
   async GET(ctx) {
-    const { slug } = ctx.params;
-    const article = getArticleBySlug(slug);
+    const { slug } = ctx.params
+    const article = getArticleBySlug(slug)
 
     if (!article) {
       return page<PageData>({
@@ -74,30 +74,30 @@ export const handler = define.handlers({
       }, {
         status: 404,
         headers: { "Cache-Control": "no-store" },
-      });
+      })
     }
 
-    const markdown = await getArticleContent(slug);
+    const markdown = await getArticleContent(slug)
     // Strip YAML front matter (between first pair of --- delimiters)
-    const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null;
-    const rendered = body ? await renderBlogPost(body) : null;
+    const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null
+    const rendered = body ? await renderBlogPost(body) : null
 
     return page<PageData>({
       article,
       content: rendered?.html ?? null,
       headings: rendered?.headings ?? [],
       related: readNext(article),
-    });
+    })
   },
-});
+})
 
 /** "15 June 2026" in a `<time>` element. */
 function PostTime({ iso }: { iso: string }) {
-  return <time datetime={iso}>{postDate(iso)}</time>;
+  return <time datetime={iso}>{postDate(iso)}</time>
 }
 
 const QUIET_LINK =
-  "text-parchment underline underline-offset-4 hover:text-graphite";
+  "text-parchment underline underline-offset-4 hover:text-graphite"
 
 /**
  * The author box at the end of every post (#191, #274, #390), built on the
@@ -109,8 +109,8 @@ const QUIET_LINK =
  * the newsletter is the ask on every post.
  */
 function AuthorBox({ article }: { article: BlogArticle }) {
-  const ask = SCHEDULE_URL ? postAsk(article) : "newsletter";
-  const service = relatedService(article);
+  const ask = SCHEDULE_URL ? postAsk(article) : "newsletter"
+  const service = relatedService(article)
   return (
     <ClosingBand
       heading={ask === "book"
@@ -195,26 +195,26 @@ function AuthorBox({ article }: { article: BlogArticle }) {
       </div>
       {ask === "newsletter" && <NewsletterAsk />}
     </ClosingBand>
-  );
+  )
 }
 
 export default define.page(function BlogPost(ctx) {
-  const { article, content, headings, related } = ctx.data as PageData;
+  const { article, content, headings, related } = ctx.data as PageData
 
   if (!article) {
-    return <NotFound pathname={ctx.url.pathname} />;
+    return <NotFound pathname={ctx.url.pathname} />
   }
 
-  const canonical = `${SITE}${postHref(article.slug)}`;
-  const tool = relatedToolLink(article);
-  const postTopic = topic(article.topic);
+  const canonical = `${SITE}${postHref(article.slug)}`
+  const tool = relatedToolLink(article)
+  const postTopic = topic(article.topic)
   const tocItems = article.readTime >= TOC_MIN_MINUTES
     ? headings.filter((h) => h.depth === 2).map(({ id, text }) => ({
       id,
       text,
     }))
-    : [];
-  const hasToc = tocItems.length > 0;
+    : []
+  const hasToc = tocItems.length > 0
 
   head.value = {
     ...head.value,
@@ -228,7 +228,7 @@ export default define.page(function BlogPost(ctx) {
     ogImage: `${SITE}/img/og/blog/${article.slug}.png`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
-  };
+  }
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -485,5 +485,5 @@ export default define.page(function BlogPost(ctx) {
         )}
       </div>
     </Layout>
-  );
-});
+  )
+})

@@ -1,40 +1,40 @@
-import type { ComponentChildren } from "preact";
-import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { IconArrowRight } from "@spy4x/preact-icons";
-import Button from "../Button.tsx";
-import { FACT_LINK } from "../FactCard.tsx";
-import { eventAttrs } from "../../lib/analytics.ts";
-import type { ToolLink } from "../../lib/tools.ts";
+import type { ComponentChildren } from "preact"
+import { StatusMark } from "@spy4x/preact-ui/status-mark"
+import { IconArrowRight } from "@spy4x/preact-icons"
+import Button from "../Button.tsx"
+import { FACT_LINK } from "../FactCard.tsx"
+import { eventAttrs } from "../../lib/analytics.ts"
+import type { ToolLink } from "../../lib/tools.ts"
 import {
   heroStill,
   sameWords,
   toolLede,
   type ToolPageData,
-} from "./tool-page.ts";
-import { ToolHeroMedia } from "./ToolHeroMedia.tsx";
+} from "./tool-page.ts"
+import { ToolHeroMedia } from "./ToolHeroMedia.tsx"
 
 /** What a page may change in {@link ToolHero}; every field has the frame's default. */
 export interface ToolHeroProps {
-  data: ToolPageData;
+  data: ToolPageData
   /**
    * The one secondary button for the live thing. Defaults to the entry's
    * `live`; `null` draws none. Never the accent: that is Book's alone.
    */
-  action?: (ToolLink & { to?: string }) | null;
+  action?: (ToolLink & { to?: string }) | null
   /**
    * False leaves the `job` out of the top line, for a page whose headline
    * already says it; the header then carries `data-tool-job-hidden`. A job
    * that restates the headline word for word is left out on its own.
    * Defaults to true. A page without a headline shows no job there anyway.
    */
-  showJob?: boolean;
+  showJob?: boolean
   /**
    * The first media. Defaults to `ToolHeroMedia` (the clip, else the still);
    * a page's own media marks the header `data-tool-own-media`.
    */
-  media?: ComponentChildren;
+  media?: ComponentChildren
   /** A page-specific line under the actions, such as a quick start. */
-  children?: ComponentChildren;
+  children?: ComponentChildren
 }
 
 /**
@@ -48,20 +48,20 @@ export interface ToolHeroProps {
 export function ToolHero(
   { data, action, showJob = true, media, children }: ToolHeroProps,
 ) {
-  const { tool, repo } = data;
+  const { tool, repo } = data
   const button: (ToolLink & { to?: string }) | null | undefined =
-    action === undefined ? tool.live : action;
+    action === undefined ? tool.live : action
   const hasMedia = media === undefined
     ? Boolean(heroStill(tool))
-    : media !== null && media !== false;
-  const lede = toolLede(tool);
+    : media !== null && media !== false
+  const lede = toolLede(tool)
   // Without a headline the H1 already reads "name: job", so the top line
   // carries the status only and says neither again.
-  const named = Boolean(tool.headline);
+  const named = Boolean(tool.headline)
   // A job that only restates the headline is left out, like `showJob: false`.
-  const jobShown = showJob && !sameWords(tool.job, tool.headline ?? "");
-  const words = named && jobShown ? tool.job.split(" ") : [];
-  const last = words.pop();
+  const jobShown = showJob && !sameWords(tool.job, tool.headline ?? "")
+  const words = named && jobShown ? tool.job.split(" ") : []
+  const last = words.pop()
   return (
     <header
       data-tool-hero
@@ -156,5 +156,5 @@ export function ToolHero(
         </div>
       )}
     </header>
-  );
+  )
 }

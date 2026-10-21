@@ -5,25 +5,25 @@
 // "Send me your idea") fails here, named with its page. The allowed
 // exceptions are listed below with their reason, and each must still be on
 // its page, so the list cannot go stale.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { startSite } from "./harness.ts";
-import { visibleText } from "./html.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { startSite } from "./harness.ts"
+import { visibleText } from "./html.ts"
 import {
   BOOK_LABEL,
   BRIEF_LABEL,
   NAV_BOOK_LABEL,
   NAV_WRITE_LABEL,
-} from "../lib/nav.ts";
-import { NEW_TAB_LABEL } from "../lib/meet-embed.ts";
-import { decapitalize } from "../lib/promises.ts";
+} from "../lib/nav.ts"
+import { NEW_TAB_LABEL } from "../lib/meet-embed.ts"
+import { decapitalize } from "../lib/promises.ts"
 
 /** RFC 2606 host — never a real scheduler. */
-const SCHEDULE = "https://meet.example.com";
-const SITE = "https://antonshubin.com";
+const SCHEDULE = "https://meet.example.com"
+const SITE = "https://antonshubin.com"
 
 /** Wordings any booking or brief control may use, on any page. */
-const BOOK_WORDINGS = [BOOK_LABEL, decapitalize(BOOK_LABEL), NAV_BOOK_LABEL];
-const BRIEF_WORDINGS = [BRIEF_LABEL, decapitalize(BRIEF_LABEL)];
+const BOOK_WORDINGS = [BOOK_LABEL, decapitalize(BOOK_LABEL), NAV_BOOK_LABEL]
+const BRIEF_WORDINGS = [BRIEF_LABEL, decapitalize(BRIEF_LABEL)]
 
 /**
  * Controls that reach the booking page or the brief with other words, on
@@ -50,49 +50,49 @@ const EXCEPTIONS: Record<string, string> = {
     "a post's own prose, in the words the brief's form uses",
   "/blog/mig-tiny-self-hosted-scheduler | /book":
     "a post's own prose, which prints the path",
-};
+}
 
-type Kind = "book" | "brief" | "other";
+type Kind = "book" | "brief" | "other"
 
 /** What a control does, from its href, or from its words when it has none. */
 function kind(href: string | undefined, label: string): Kind {
-  const path = href?.replace(SITE, "");
+  const path = href?.replace(SITE, "")
   if (path !== undefined) {
     if (/^\/book(\?[^#]*)?#brief$|^#brief$|^\/?#audit-form$/.test(path)) {
-      return "brief";
+      return "brief"
     }
     if (
       /^\/book(\?[^#]*)?(#book)?$|^#book$/.test(path) ||
       path.startsWith(SCHEDULE)
     ) {
-      return "book";
+      return "book"
     }
   }
-  if (/^book\b/i.test(label)) return "book";
-  if (/^send\b.*\bbrief\b/i.test(label)) return "brief";
-  return "other";
+  if (/^book\b/i.test(label)) return "book"
+  if (/^send\b.*\bbrief\b/i.test(label)) return "brief"
+  return "other"
 }
 
 /** Every `<a>` and `<button>` whose words or target book the call or open the brief. */
 function actionControls(html: string): Array<{ kind: Kind; label: string }> {
-  const found: Array<{ kind: Kind; label: string }> = [];
+  const found: Array<{ kind: Kind; label: string }> = []
   for (const m of html.matchAll(/<(a|button)\b([^>]*)>([\s\S]*?)<\/\1>/g)) {
-    const label = visibleText(m[3]).replace(/\s*\(opens in a new tab\)$/, "");
-    const href = m[2].match(/\shref="([^"]*)"/)?.[1];
-    const k = kind(href, label);
-    if (k !== "other") found.push({ kind: k, label });
+    const label = visibleText(m[3]).replace(/\s*\(opens in a new tab\)$/, "")
+    const href = m[2].match(/\shref="([^"]*)"/)?.[1]
+    const k = kind(href, label)
+    if (k !== "other") found.push({ kind: k, label })
   }
-  return found;
+  return found
 }
 
 /** The pages to scan: the sitemap, `/pay` and a not-found URL. */
 async function pagePaths(
   site: Awaited<ReturnType<typeof startSite>>,
 ): Promise<string[]> {
-  const sitemap = await site.html("/sitemap.xml");
+  const sitemap = await site.html("/sitemap.xml")
   const paths = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)]
-    .map((m) => new URL(m[1]).pathname);
-  return [...paths, "/pay", "/no-such-page"];
+    .map((m) => new URL(m[1]).pathname)
+  return [...paths, "/pay", "/no-such-page"]
 }
 
 /** Scans every page and returns the controls using a wording outside `allowed`. */
@@ -101,27 +101,27 @@ async function strayWordings(
   allowed: Record<Exclude<Kind, "other">, string[]>,
   seenExceptions: Set<string>,
 ): Promise<string[]> {
-  const stray: string[] = [];
+  const stray: string[] = []
   for (const path of await pagePaths(site)) {
-    const res = await site.get(path);
-    const html = await res.text();
+    const res = await site.get(path)
+    const html = await res.text()
     for (const { kind, label } of actionControls(html)) {
-      if (allowed[kind as "book" | "brief"].includes(label)) continue;
-      const key = `${path} | ${label}`;
+      if (allowed[kind as "book" | "brief"].includes(label)) continue
+      const key = `${path} | ${label}`
       if (key in EXCEPTIONS) {
-        seenExceptions.add(key);
-        continue;
+        seenExceptions.add(key)
+        continue
       }
-      stray.push(`${key} (${kind})`);
+      stray.push(`${key} (${kind})`)
     }
   }
-  return stray;
+  return stray
 }
 
 Deno.test("every booking and brief control uses one of the two wordings, with a scheduler", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } });
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } })
   try {
-    const seen = new Set<string>();
+    const seen = new Set<string>()
     const stray = await strayWordings(
       site,
       {
@@ -130,20 +130,20 @@ Deno.test("every booking and brief control uses one of the two wordings, with a 
         brief: BRIEF_WORDINGS,
       },
       seen,
-    );
-    assertEquals(stray, [], "a third booking or brief wording");
+    )
+    assertEquals(stray, [], "a third booking or brief wording")
     assertEquals(
       Object.keys(EXCEPTIONS).filter((k) => !seen.has(k)),
       [],
       "an exception no page shows any more: drop it from EXCEPTIONS",
-    );
+    )
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 Deno.test("without a scheduler, Book reads Write and the brief keeps its one wording", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: "" } });
+  const site = await startSite({ env: { SCHEDULE_URL: "" } })
   try {
     const stray = await strayWordings(
       site,
@@ -152,42 +152,42 @@ Deno.test("without a scheduler, Book reads Write and the brief keeps its one wor
         brief: [...BRIEF_WORDINGS, NAV_WRITE_LABEL],
       },
       new Set(),
-    );
-    assertEquals(stray, [], "a third booking or brief wording");
+    )
+    assertEquals(stray, [], "a third booking or brief wording")
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 Deno.test("both llms files book the call and send the brief in the two wordings only", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } });
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } })
   try {
-    const stray: string[] = [];
+    const stray: string[] = []
     for (const path of ["/llms.txt", "/llms-full.txt"]) {
       // Blog post descriptions are article text, not the site's actions.
       const text = (await site.html(path)).split("\n")
-        .filter((line) => !line.includes("/blog/")).join("\n");
+        .filter((line) => !line.includes("/blog/")).join("\n")
       for (const m of text.matchAll(/\bbook(?: [\w-]+){0,4} call\b/gi)) {
         if (m[0].toLowerCase() !== BOOK_LABEL.toLowerCase()) {
-          stray.push(`${path}: ${m[0]}`);
+          stray.push(`${path}: ${m[0]}`)
         }
       }
       for (const m of text.matchAll(/\bsend(?: [\w-]+){0,3} brief\b/gi)) {
         if (m[0].toLowerCase() !== BRIEF_LABEL.toLowerCase()) {
-          stray.push(`${path}: ${m[0]}`);
+          stray.push(`${path}: ${m[0]}`)
         }
       }
     }
-    assertEquals(stray, [], "a third booking or brief wording in an llms file");
+    assertEquals(stray, [], "a third booking or brief wording in an llms file")
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})
 
 /** The opening tag of every anchor that carries `data-primary-book`. */
 function primaryBookTags(html: string): string[] {
   return [...html.matchAll(/<a\b[^>]*>/g)].map((m) => m[0])
-    .filter((tag) => tag.includes("data-primary-book"));
+    .filter((tag) => tag.includes("data-primary-book"))
 }
 
 Deno.test("every primary Book link goes to /book in the same tab, on every page", async () => {
@@ -197,48 +197,48 @@ Deno.test("every primary Book link goes to /book in the same tab, on every page"
       "/book#brief",
     ]]] as const
   ) {
-    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } });
+    const site = await startSite({ env: { SCHEDULE_URL: scheduleUrl } })
     try {
-      let seen = 0;
+      let seen = 0
       for (const path of await pagePaths(site)) {
-        const res = await site.get(path);
+        const res = await site.get(path)
         for (const tag of primaryBookTags(await res.text())) {
-          seen++;
+          seen++
           assert(
             hrefs.some((href) => tag.includes(`href="${href}"`)),
             `${path} (SCHEDULE_URL "${scheduleUrl}"): Book does not go to /book: ${tag}`,
-          );
+          )
           assert(
             !tag.includes("target="),
             `${path}: Book opens a new tab: ${tag}`,
-          );
+          )
         }
       }
-      assert(seen > 20, `only ${seen} primary Book links found`);
+      assert(seen > 20, `only ${seen} primary Book links found`)
     } finally {
-      await site.stop();
+      await site.stop()
     }
   }
-});
+})
 
 Deno.test("no page or llms file calls the free offer an audit or links /#audit-form", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } });
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } })
   try {
-    const stray: string[] = [];
-    const paths = [...await pagePaths(site), "/llms.txt", "/llms-full.txt"];
+    const stray: string[] = []
+    const paths = [...await pagePaths(site), "/llms.txt", "/llms-full.txt"]
     for (const path of paths) {
-      const html = await (await site.get(path)).text();
+      const html = await (await site.get(path)).text()
       // The home page's own in-page `#audit-form` anchor is fine; a link to
       // the home page's form from anywhere else is not.
       if (/(?:^|[("'\s])(?:https?:\/\/[^/\s"')]+)?\/#audit-form/.test(html)) {
-        stray.push(`${path}: links /#audit-form`);
+        stray.push(`${path}: links /#audit-form`)
       }
       if (/free architecture audit/i.test(html)) {
-        stray.push(`${path}: says "free architecture audit"`);
+        stray.push(`${path}: says "free architecture audit"`)
       }
     }
-    assertEquals(stray, [], "the free offer has one name, the written brief");
+    assertEquals(stray, [], "the free offer has one name, the written brief")
   } finally {
-    await site.stop();
+    await site.stop()
   }
-});
+})

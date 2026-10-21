@@ -1,31 +1,31 @@
-import { INVOICE_NOTE, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts";
+import { INVOICE_NOTE, LOCATION, TIMEZONE_LABEL } from "../lib/config.ts"
 import {
   BOOK_HREF,
   BOOK_LABEL,
   NAV_WRITE_LABEL,
   siteItems,
-} from "../lib/nav.ts";
+} from "../lib/nav.ts"
 import {
   emailContact,
   footerProfiles,
   type Profile,
   telegramContact,
-} from "../lib/profiles.ts";
-import { ROLE } from "../lib/head.ts";
-import { NewTabHint } from "./NewTabHint.tsx";
+} from "../lib/profiles.ts"
+import { ROLE } from "../lib/head.ts"
+import { NewTabHint } from "./NewTabHint.tsx"
 
 interface FooterLink {
-  href: string;
-  label: string;
+  href: string
+  label: string
 }
 
 interface FooterGroup {
-  id: string;
-  label: string;
-  links: FooterLink[];
+  id: string
+  label: string
+  links: FooterLink[]
 }
 
-const fromProfile = ({ href, label }: Profile): FooterLink => ({ href, label });
+const fromProfile = ({ href, label }: Profile): FooterLink => ({ href, label })
 
 /**
  * The site's footer (#293): identity, then four labelled link groups. Every
@@ -70,7 +70,7 @@ export function Footer({ canBook }: { canBook: boolean }) {
         { href: "/sitemap.xml", label: "sitemap.xml" },
       ],
     },
-  ];
+  ]
 
   return (
     <footer class="site-footer bg-desk border-t border-rule px-4 py-8 text-sm text-graphite md:px-12 md:pr-[max(3rem,env(safe-area-inset-right))]">
@@ -88,7 +88,7 @@ export function Footer({ canBook }: { canBook: boolean }) {
             <p id={`footer-${g.id}`} class="pb-1">{g.label}</p>
             <ul aria-labelledby={`footer-${g.id}`}>
               {g.links.map((l) => {
-                const external = l.href.startsWith("http");
+                const external = l.href.startsWith("http")
                 return (
                   <li>
                     <a
@@ -100,7 +100,7 @@ export function Footer({ canBook }: { canBook: boolean }) {
                       {external && <NewTabHint />}
                     </a>
                   </li>
-                );
+                )
               })}
             </ul>
           </div>
@@ -108,5 +108,5 @@ export function Footer({ canBook }: { canBook: boolean }) {
       </div>
       <p class="mt-8">© {new Date().getFullYear()} Anton Shubin</p>
     </footer>
-  );
+  )
 }

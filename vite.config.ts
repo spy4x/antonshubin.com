@@ -1,10 +1,10 @@
-import { defineConfig, type Plugin } from "vite";
-import { fresh } from "@fresh/plugin-vite";
-import tailwindcss from "@tailwindcss/vite";
-import { PRESET_CSS } from "@spy4x/preact-theme";
+import { defineConfig, type Plugin } from "vite"
+import { fresh } from "@fresh/plugin-vite"
+import tailwindcss from "@tailwindcss/vite"
+import { PRESET_CSS } from "@spy4x/preact-theme"
 
-const STYLESHEET = "/assets/styles.css";
-const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
+const STYLESHEET = "/assets/styles.css"
+const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`
 
 /**
  * The `#region` blocks of the preset the site takes. "Colour atoms" holds
@@ -14,18 +14,18 @@ const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`;
  * (Typography, Buttons, Forms, ...) when a component that needs it is
  * adopted.
  */
-const PRESET_REGIONS = ["Colour atoms", "Spacing", "Surfaces"];
+const PRESET_REGIONS = ["Colour atoms", "Spacing", "Surfaces"]
 
 /** One `#region` block of the preset's text, or a thrown error naming it. */
 function presetRegion(css: string, name: string): string {
-  const start = `/* #region ${name} */`;
-  const end = `/* #endregion ${name} */`;
-  const from = css.indexOf(start);
-  const to = css.indexOf(end);
+  const start = `/* #region ${name} */`
+  const end = `/* #endregion ${name} */`
+  const from = css.indexOf(start)
+  const to = css.indexOf(end)
   if (from === -1 || to < from) {
-    throw new Error(`@spy4x/preact-theme's preset has no "${name}" region`);
+    throw new Error(`@spy4x/preact-theme's preset has no "${name}" region`)
   }
-  return css.slice(from, to + end.length);
+  return css.slice(from, to + end.length)
 }
 
 /**
@@ -49,23 +49,23 @@ function presetRegion(css: string, name: string): string {
  */
 function preactPreset(): Plugin {
   const preset = PRESET_REGIONS.map((name) => presetRegion(PRESET_CSS, name))
-    .join("\n");
+    .join("\n")
   return {
     name: "preact-preset",
     enforce: "pre",
     transform(code, id) {
-      if (!id.split("?")[0].endsWith(STYLESHEET)) return;
+      if (!id.split("?")[0].endsWith(STYLESHEET)) return
       if (!code.includes(PRESET_IMPORT)) {
-        throw new Error(`${STYLESHEET} must contain ${PRESET_IMPORT}`);
+        throw new Error(`${STYLESHEET} must contain ${PRESET_IMPORT}`)
       }
       return code.replace(
         PRESET_IMPORT,
         () => `@media reference {\n${preset}\n}`,
-      );
+      )
     },
-  };
+  }
 }
 
 export default defineConfig({
   plugins: [fresh(), preactPreset(), tailwindcss()],
-});
+})

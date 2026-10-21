@@ -1,35 +1,35 @@
-import { page } from "fresh";
-import { define } from "../../lib/utils.ts";
-import { Layout } from "../../components/Layout.tsx";
-import { head } from "../../lib/head.ts";
-import { SEOHead } from "../../components/SEOHead.tsx";
+import { page } from "fresh"
+import { define } from "../../lib/utils.ts"
+import { Layout } from "../../components/Layout.tsx"
+import { head } from "../../lib/head.ts"
+import { SEOHead } from "../../components/SEOHead.tsx"
 import {
   confirmSubscription,
   type FlowDeps,
   previewConfirmation,
-} from "@spy4x/server/subscribers";
-import { flowDeps } from "../../lib/mailing-list.ts";
-import { SITE_SENDER } from "../../lib/site-sender.ts";
-import { subscriberMailer } from "../../lib/subscribe-mail.ts";
-import { BASE_URL, CONTACT_EMAIL } from "../../lib/config.ts";
-import { readFormBody, SMALL_FORM_MAX_BYTES } from "../../lib/request-body.ts";
+} from "@spy4x/server/subscribers"
+import { flowDeps } from "../../lib/mailing-list.ts"
+import { SITE_SENDER } from "../../lib/site-sender.ts"
+import { subscriberMailer } from "../../lib/subscribe-mail.ts"
+import { BASE_URL, CONTACT_EMAIL } from "../../lib/config.ts"
+import { readFormBody, SMALL_FORM_MAX_BYTES } from "../../lib/request-body.ts"
 
 // Never cached: the page shows one visitor's address, and its URL carries a
 // working token.
-const NO_STORE = { "Cache-Control": "no-store" };
+const NO_STORE = { "Cache-Control": "no-store" }
 
 type PageData =
   | { state: "confirm"; email: string; token: string }
   | { state: "done" }
   | { state: "expired" }
   | { state: "invalid" }
-  | { state: "error" };
+  | { state: "error" }
 
 const SEND_MAIL = subscriberMailer({
   sender: SITE_SENDER,
   contactEmail: CONTACT_EMAIL,
   baseUrl: BASE_URL,
-});
+})
 
 /** The package's flow dependencies, or `undefined` when `UNSUBSCRIBE_SECRET`
  * is missing or unusable: that answers "invalid" like a bad token, so a
@@ -37,13 +37,13 @@ const SEND_MAIL = subscriberMailer({
  * `routes/unsubscribe.tsx`). */
 function deps(): FlowDeps | undefined {
   try {
-    return flowDeps(SEND_MAIL);
+    return flowDeps(SEND_MAIL)
   } catch (err) {
     console.error(
       "[SUBSCRIBE-CONFIRM]",
       err instanceof Error ? err.message : String(err),
-    );
-    return undefined;
+    )
+    return undefined
   }
 }
 
@@ -52,58 +52,58 @@ function deps(): FlowDeps | undefined {
 // address (the same shape as /unsubscribe).
 export const handler = define.handlers({
   async GET(ctx) {
-    const token = ctx.url.searchParams.get("token");
+    const token = ctx.url.searchParams.get("token")
     // Where the confirming POST lands: a URL with no token in it.
     if (!token && ctx.url.searchParams.get("done") === "1") {
-      return page<PageData>({ state: "done" }, { headers: NO_STORE });
+      return page<PageData>({ state: "done" }, { headers: NO_STORE })
     }
     if (!token) {
       return page<PageData>({ state: "invalid" }, {
         status: 400,
         headers: NO_STORE,
-      });
+      })
     }
-    const flow = deps();
+    const flow = deps()
     const checked = flow
       ? await previewConfirmation(token, flow)
-      : { state: "invalid" as const };
+      : { state: "invalid" as const }
     if (checked.state !== "confirm") {
       return page<PageData>({ state: checked.state }, {
         status: 400,
         headers: NO_STORE,
-      });
+      })
     }
     return page<PageData>(
       { state: "confirm", email: checked.email, token },
       { headers: NO_STORE },
-    );
+    )
   },
 
   async POST(ctx) {
-    let token = ctx.url.searchParams.get("token");
+    let token = ctx.url.searchParams.get("token")
     if (!token) {
-      const read = await readFormBody(ctx.req, SMALL_FORM_MAX_BYTES);
+      const read = await readFormBody(ctx.req, SMALL_FORM_MAX_BYTES)
       if (!read.ok && read.status !== 400) {
         return page<PageData>({ state: "invalid" }, {
           status: read.status,
           headers: NO_STORE,
-        });
+        })
       }
-      token = (read.ok && read.value.get("token")?.toString()) || null;
+      token = (read.ok && read.value.get("token")?.toString()) || null
     }
     if (!token) {
       return page<PageData>({ state: "invalid" }, {
         status: 400,
         headers: NO_STORE,
-      });
+      })
     }
-    const flow = deps();
+    const flow = deps()
     // The package adds the address and its key in one locked change, refuses
     // a link issued before the address last unsubscribed (#327), and mails
     // the welcome and the owner notice only for a new address.
     const outcome = flow
       ? await confirmSubscription(token, flow)
-      : { state: "invalid" as const };
+      : { state: "invalid" as const }
     switch (outcome.state) {
       case "confirmed":
         // 303 to a URL without the token, so the done page's address bar,
@@ -111,20 +111,20 @@ export const handler = define.handlers({
         return new Response(null, {
           status: 303,
           headers: { ...NO_STORE, Location: "/subscribe/confirm?done=1" },
-        });
+        })
       case "error":
         return page<PageData>({ state: "error" }, {
           status: 500,
           headers: NO_STORE,
-        });
+        })
       default:
         return page<PageData>({ state: outcome.state }, {
           status: 400,
           headers: NO_STORE,
-        });
+        })
     }
   },
-});
+})
 
 function Body(data: PageData) {
   switch (data.state) {
@@ -144,7 +144,7 @@ function Body(data: PageData) {
             </button>
           </form>
         </>
-      );
+      )
     case "done":
       return (
         <>
@@ -161,7 +161,7 @@ function Body(data: PageData) {
             ← Back to home
           </a>
         </>
-      );
+      )
     case "expired":
       return (
         <>
@@ -173,7 +173,7 @@ function Body(data: PageData) {
             from the site to get a new one.
           </p>
         </>
-      );
+      )
     case "invalid":
       return (
         <>
@@ -185,7 +185,7 @@ function Body(data: PageData) {
             one.
           </p>
         </>
-      );
+      )
     case "error":
       return (
         <>
@@ -194,12 +194,12 @@ function Body(data: PageData) {
           </h1>
           <p class="text-graphite">Try again in a moment.</p>
         </>
-      );
+      )
   }
 }
 
 export default define.page(function ConfirmSubscription(ctx) {
-  const data = ctx.data as PageData;
+  const data = ctx.data as PageData
 
   head.value = {
     ...head.value,
@@ -208,7 +208,7 @@ export default define.page(function ConfirmSubscription(ctx) {
     canonical: "https://antonshubin.com/subscribe/confirm",
     ogType: "website",
     noindex: true,
-  };
+  }
 
   return (
     <Layout currentPath="/subscribe/confirm">
@@ -217,5 +217,5 @@ export default define.page(function ConfirmSubscription(ctx) {
         {Body(data)}
       </div>
     </Layout>
-  );
-});
+  )
+})

@@ -9,8 +9,8 @@ export const COMPANY = {
   name: "NeatSoft PTE LTD",
   country: "Singapore",
   uen: "202300222R",
-} as const;
+} as const
 
 /** The company as one line: name, country and UEN. */
 export const COMPANY_LINE =
-  `${COMPANY.name}, ${COMPANY.country} (UEN ${COMPANY.uen})`;
+  `${COMPANY.name}, ${COMPANY.country} (UEN ${COMPANY.uen})`

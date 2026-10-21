@@ -2,24 +2,24 @@
 // site through test/harness.ts — see docs/testing.md "Rendered-page tests". Each
 // test gets its own temp SUBSCRIBERS_FILE and a throwaway
 // UNSUBSCRIBE_SECRET, never the repo's data/subscribers.json.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { type Site, startSite } from "./harness.ts";
-import { count, visibleText } from "./html.ts";
-import { createSubscriptionCrypto } from "@spy4x/server/subscribers";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { type Site, startSite } from "./harness.ts"
+import { count, visibleText } from "./html.ts"
+import { createSubscriptionCrypto } from "@spy4x/server/subscribers"
 import {
   createUnsubscribeToken,
   LEGACY_TOKEN_FIXTURE,
-} from "./subscription-tokens.ts";
+} from "./subscription-tokens.ts"
 
 /** One row as `data/subscribers.json` holds it. */
 interface Subscriber {
-  email: string;
-  subscribedAt: string;
-  key?: string;
+  email: string
+  subscribedAt: string
+  key?: string
 }
 
-const TEST_SECRET = "t".repeat(32);
-const FOREIGN_SECRET = "f".repeat(32);
+const TEST_SECRET = "t".repeat(32)
+const FOREIGN_SECRET = "f".repeat(32)
 
 /** Boots the site against a temp subscribers file seeded with `subs`, runs
  * `fn`, and always stops the server and removes the temp dir. */
@@ -28,183 +28,183 @@ async function withSubscribers(
   fn: (site: Site, file: string) => Promise<void>,
   secret = TEST_SECRET,
 ): Promise<void> {
-  const dir = await Deno.makeTempDir();
-  const file = `${dir}/subscribers.json`;
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/subscribers.json`
   try {
-    await Deno.writeTextFile(file, JSON.stringify(subs, null, 2));
+    await Deno.writeTextFile(file, JSON.stringify(subs, null, 2))
     const site = await startSite({
       env: { SUBSCRIBERS_FILE: file, UNSUBSCRIBE_SECRET: secret },
-    });
+    })
     try {
-      await fn(site, file);
+      await fn(site, file)
     } finally {
-      await site.stop();
+      await site.stop()
     }
   } finally {
-    await Deno.remove(dir, { recursive: true });
+    await Deno.remove(dir, { recursive: true })
   }
 }
 
 Deno.test("a version 1 link mailed before #405 still unsubscribes its row", async () => {
-  const { email, secret, token } = LEGACY_TOKEN_FIXTURE;
-  assertEquals(await createUnsubscribeToken(email, secret), token);
+  const { email, secret, token } = LEGACY_TOKEN_FIXTURE
+  assertEquals(await createUnsubscribeToken(email, secret), token)
   const subs: Subscriber[] = [
     { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
     { email, subscribedAt: "2026-01-02T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
-    const url = `/unsubscribe?token=${encodeURIComponent(token)}`;
-    assert(visibleText(await site.html(url)).includes(email));
-    const res = await site.get(url, { method: "POST" });
-    assertEquals(res.status, 200);
-    assert(visibleText(await res.text()).includes("unsubscribed"));
-    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
-  }, secret);
-});
+    const url = `/unsubscribe?token=${encodeURIComponent(token)}`
+    assert(visibleText(await site.html(url)).includes(email))
+    const res = await site.get(url, { method: "POST" })
+    assertEquals(res.status, 200)
+    assert(visibleText(await res.text()).includes("unsubscribed"))
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored.map((s) => s.email), ["keep@example.com"])
+  }, secret)
+})
 
 Deno.test("a version 2 link finds its row by key and unsubscribes it", async () => {
-  const crypto = createSubscriptionCrypto({ secret: TEST_SECRET });
-  const email = "keyed@example.com";
-  const key = await crypto.subscriberKey(email);
+  const crypto = createSubscriptionCrypto({ secret: TEST_SECRET })
+  const email = "keyed@example.com"
+  const key = await crypto.subscriberKey(email)
   const subs: Subscriber[] = [
     { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
     { email, subscribedAt: "2026-01-02T00:00:00.000Z", key },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
-    const token = await crypto.unsubscribeToken(email, key);
+    const token = await crypto.unsubscribeToken(email, key)
     const res = await site.get(
       `/unsubscribe?token=${encodeURIComponent(token)}`,
       { method: "POST" },
-    );
-    assertEquals(res.status, 200);
-    await res.body?.cancel();
-    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
-  });
-});
+    )
+    assertEquals(res.status, 200)
+    await res.body?.cancel()
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored.map((s) => s.email), ["keep@example.com"])
+  })
+})
 
 Deno.test("renders a markup-containing address escaped, and a GET never removes it", async () => {
-  const email = "<b>x</b>@example.com";
+  const email = "<b>x</b>@example.com"
   const subs: Subscriber[] = [
     { email, subscribedAt: "2026-01-01T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
-    const token = await createUnsubscribeToken(email, TEST_SECRET);
+    const token = await createUnsubscribeToken(email, TEST_SECRET)
     const html = await site.html(
       `/unsubscribe?token=${encodeURIComponent(token)}`,
-    );
+    )
     assertEquals(
       count(html, /<b>x<\/b>@example\.com/),
       0,
       "the stored address must never reach the response as raw markup",
-    );
+    )
     assert(
       visibleText(html).includes(email),
       "the address must still show, decoded back from its escaped form",
-    );
-    const stored = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored, subs, "GET must not change the stored list");
-  });
-});
+    )
+    const stored = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored, subs, "GET must not change the stored list")
+  })
+})
 
 Deno.test("the confirm page tells crawlers not to index it", async () => {
   // A 200, not one of the 400 states: those get noindex from their status
   // alone, so only this page proves the /unsubscribe path rule itself.
-  const email = "user@example.com";
+  const email = "user@example.com"
   await withSubscribers(
     [{ email, subscribedAt: "2026-01-01T00:00:00.000Z" }],
     async (site) => {
-      const token = await createUnsubscribeToken(email, TEST_SECRET);
+      const token = await createUnsubscribeToken(email, TEST_SECRET)
       const res = await site.get(
         `/unsubscribe?token=${encodeURIComponent(token)}`,
-      );
-      await res.body?.cancel();
-      assertEquals(res.status, 200);
-      assertEquals(res.headers.get("X-Robots-Tag"), "noindex, nofollow");
+      )
+      await res.body?.cancel()
+      assertEquals(res.status, 200)
+      assertEquals(res.headers.get("X-Robots-Tag"), "noindex, nofollow")
     },
-  );
-});
+  )
+})
 
 Deno.test("the confirm page answers no-store", async () => {
   // main.ts's cache middleware (lib/cache-control.ts) must leave this page's
   // own no-store in place: it shows one subscriber's address.
-  const email = "user@example.com";
+  const email = "user@example.com"
   await withSubscribers(
     [{ email, subscribedAt: "2026-01-01T00:00:00.000Z" }],
     async (site) => {
-      const token = await createUnsubscribeToken(email, TEST_SECRET);
+      const token = await createUnsubscribeToken(email, TEST_SECRET)
       const res = await site.get(
         `/unsubscribe?token=${encodeURIComponent(token)}`,
-      );
-      await res.body?.cancel();
-      assertEquals(res.status, 200);
-      assertEquals(res.headers.get("Cache-Control"), "no-store");
+      )
+      await res.body?.cancel()
+      assertEquals(res.status, 200)
+      assertEquals(res.headers.get("Cache-Control"), "no-store")
     },
-  );
-});
+  )
+})
 
 Deno.test("a token that doesn't verify — forged, or signed under a different secret — answers 'not recognised' and changes nothing", async () => {
   const subs: Subscriber[] = [
     { email: "user@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
     const foreignToken = await createUnsubscribeToken(
       "user@example.com",
       FOREIGN_SECRET,
-    );
+    )
     for (const token of ["not-a-real-token", foreignToken]) {
       const res = await site.get(
         `/unsubscribe?token=${encodeURIComponent(token)}`,
-      );
-      assertEquals(res.status, 400);
-      const html = await res.text();
+      )
+      assertEquals(res.status, 400)
+      const html = await res.text()
       assert(
         visibleText(html).includes("not recognised"),
         `expected "not recognised" copy for token ${token}`,
-      );
+      )
     }
-    const stored = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored, subs, "an unverified token must not change the list");
-  });
-});
+    const stored = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored, subs, "an unverified token must not change the list")
+  })
+})
 
 Deno.test("a valid POST removes only the matching subscriber", async () => {
   const subs: Subscriber[] = [
     { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
     { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
     const token = await createUnsubscribeToken(
       "leave@example.com",
       TEST_SECRET,
-    );
+    )
     const res = await site.get("/unsubscribe", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: `token=${encodeURIComponent(token)}`,
-    });
-    assertEquals(res.status, 200);
-    const html = await res.text();
-    assert(visibleText(html).includes("You're unsubscribed"));
+    })
+    assertEquals(res.status, 200)
+    const html = await res.text()
+    assert(visibleText(html).includes("You're unsubscribed"))
 
-    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
-  });
-});
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored.map((s) => s.email), ["keep@example.com"])
+  })
+})
 
 Deno.test("a one-click unsubscribe (RFC 8058) with the token in the query still works, with or without a body", async () => {
-  const bodies = [undefined, "", "List-Unsubscribe=One-Click"];
+  const bodies = [undefined, "", "List-Unsubscribe=One-Click"]
   for (const body of bodies) {
     const subs: Subscriber[] = [
       { email: "keep@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
       { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
-    ];
+    ]
     await withSubscribers(subs, async (site, file) => {
       const token = await createUnsubscribeToken(
         "leave@example.com",
         TEST_SECRET,
-      );
+      )
       const res = await site.get(
         `/unsubscribe?token=${encodeURIComponent(token)}`,
         {
@@ -212,40 +212,40 @@ Deno.test("a one-click unsubscribe (RFC 8058) with the token in the query still 
           headers: { "content-type": "application/x-www-form-urlencoded" },
           body,
         },
-      );
-      assertEquals(res.status, 200, JSON.stringify(body));
-      await res.body?.cancel();
-      const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-      assertEquals(stored.map((s) => s.email), ["keep@example.com"]);
-    });
+      )
+      assertEquals(res.status, 200, JSON.stringify(body))
+      await res.body?.cancel()
+      const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file))
+      assertEquals(stored.map((s) => s.email), ["keep@example.com"])
+    })
   }
-});
+})
 
 Deno.test("a POST with the token in a body that has no Content-Type answers 400 and removes nobody", async () => {
   const subs: Subscriber[] = [
     { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
     const token = await createUnsubscribeToken(
       "leave@example.com",
       TEST_SECRET,
-    );
+    )
     // A byte body, so fetch adds no Content-Type of its own.
     const res = await site.get("/unsubscribe", {
       method: "POST",
       body: new TextEncoder().encode(`token=${encodeURIComponent(token)}`),
-    });
-    assertEquals(res.status, 400);
-    await res.body?.cancel();
-    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored.map((s) => s.email), ["leave@example.com"]);
-  });
-});
+    })
+    assertEquals(res.status, 400)
+    await res.body?.cancel()
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored.map((s) => s.email), ["leave@example.com"])
+  })
+})
 
 Deno.test("a bare-signature token from the pre-#233 format is refused, changes nothing and answers 'not recognised'", async () => {
   const subs: Subscriber[] = [
     { email: "leave@example.com", subscribedAt: "2026-01-02T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
     // The old format, valid under the site's own secret: base64url(HMAC-SHA256
     // of "unsubscribe:<email>"), 43 characters, no dot.
@@ -255,72 +255,72 @@ Deno.test("a bare-signature token from the pre-#233 format is refused, changes n
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign"],
-    );
+    )
     const mac = new Uint8Array(
       await crypto.subtle.sign(
         "HMAC",
         key,
         new TextEncoder().encode("unsubscribe:leave@example.com"),
       ),
-    );
+    )
     const token = btoa(String.fromCharCode(...mac))
-      .replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
-    assertEquals(token.length, 43);
-    assert(!token.includes("."));
+      .replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "")
+    assertEquals(token.length, 43)
+    assert(!token.includes("."))
 
     const confirm = await site.get(
       `/unsubscribe?token=${encodeURIComponent(token)}`,
-    );
-    assert(visibleText(await confirm.text()).includes("not recognised"));
+    )
+    assert(visibleText(await confirm.text()).includes("not recognised"))
 
     const res = await site.get("/unsubscribe", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: `token=${encodeURIComponent(token)}`,
-    });
-    assert(visibleText(await res.text()).includes("not recognised"));
-    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored.map((s) => s.email), ["leave@example.com"]);
-  });
-});
+    })
+    assert(visibleText(await res.text()).includes("not recognised"))
+    const stored: Subscriber[] = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored.map((s) => s.email), ["leave@example.com"])
+  })
+})
 
 Deno.test("an old email-only link (no token at all) shows the outdated-link page, not the address form", async () => {
   const subs: Subscriber[] = [
     { email: "user@example.com", subscribedAt: "2026-01-01T00:00:00.000Z" },
-  ];
+  ]
   await withSubscribers(subs, async (site, file) => {
-    const res = await site.get("/unsubscribe");
-    assertEquals(res.status, 400);
-    const html = await res.text();
-    assert(visibleText(html).includes("older email"));
-    const stored = JSON.parse(await Deno.readTextFile(file));
-    assertEquals(stored, subs);
-  });
-});
+    const res = await site.get("/unsubscribe")
+    assertEquals(res.status, 400)
+    const html = await res.text()
+    assert(visibleText(html).includes("older email"))
+    const stored = JSON.parse(await Deno.readTextFile(file))
+    assertEquals(stored, subs)
+  })
+})
 
 Deno.test("GET /api/unsubscribe redirects to /unsubscribe, dropping any email and keeping only a token", async () => {
   await withSubscribers([], async (site) => {
     const withEmail = await site.get(
       "/api/unsubscribe?email=old@example.com",
-    );
-    assertEquals(withEmail.status, 301);
-    assertEquals(withEmail.headers.get("Location"), "/unsubscribe");
-    await withEmail.body?.cancel();
+    )
+    assertEquals(withEmail.status, 301)
+    assertEquals(withEmail.headers.get("Location"), "/unsubscribe")
+    await withEmail.body?.cancel()
 
     const withToken = await site.get(
       "/api/unsubscribe?token=abc123&email=old@example.com",
-    );
-    assertEquals(withToken.status, 301);
+    )
+    assertEquals(withToken.status, 301)
     assertEquals(
       withToken.headers.get("Location"),
       "/unsubscribe?token=abc123",
-    );
-    await withToken.body?.cancel();
-  });
-});
+    )
+    await withToken.body?.cancel()
+  })
+})
 
 const GOOGLEBOT_UA =
-  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 
 /** Fetches `path` from `site`, asserts the response carries a CSP header
  * whose `script-src` nonce equals every inline `<script>`'s own `nonce`
@@ -330,41 +330,41 @@ async function assertNoncePinned(
   path: string,
   init?: RequestInit,
 ): Promise<{ status: number; html: string }> {
-  const res = await site.get(path, init);
-  const csp = res.headers.get("Content-Security-Policy");
+  const res = await site.get(path, init)
+  const csp = res.headers.get("Content-Security-Policy")
   assert(
     csp,
     `every response must carry a Content-Security-Policy header (${path})`,
-  );
-  const nonceMatch = csp!.match(/'nonce-([^']+)'/);
+  )
+  const nonceMatch = csp!.match(/'nonce-([^']+)'/)
   assert(
     nonceMatch,
     `script-src must carry a nonce on a rendered page (${path})`,
-  );
-  const nonce = nonceMatch![1];
+  )
+  const nonce = nonceMatch![1]
 
-  const html = await res.text();
+  const html = await res.text()
   const scriptNonces = [...html.matchAll(/<script\b[^>]*\bnonce="([^"]+)"/g)]
-    .map((m) => m[1]);
+    .map((m) => m[1])
   assert(
     scriptNonces.length > 0,
     `expected at least one <script> to render on ${path}`,
-  );
+  )
   for (const found of scriptNonces) {
     assertEquals(
       found,
       nonce,
       `every inline script's nonce must equal the CSP header's nonce (${path})`,
-    );
+    )
   }
-  return { status: res.status, html };
+  return { status: res.status, html }
 }
 
 Deno.test("the CSP header's nonce equals every inline script's nonce", async () => {
   await withSubscribers([], async (site) => {
-    await assertNoncePinned(site, "/");
-  });
-});
+    await assertNoncePinned(site, "/")
+  })
+})
 
 Deno.test("the CSP header's nonce equals every inline script's nonce for a Googlebot-UA request", async () => {
   // Bots get a different render (routes/_app.tsx leaves Umami out, see
@@ -374,16 +374,16 @@ Deno.test("the CSP header's nonce equals every inline script's nonce for a Googl
   await withSubscribers([], async (site) => {
     await assertNoncePinned(site, "/", {
       headers: { "user-agent": GOOGLEBOT_UA },
-    });
-  });
-});
+    })
+  })
+})
 
 Deno.test("an unmatched URL still gets a nonce-pinned CSP and a 404 status", async () => {
   // See #177 R-001: routes/[...path].tsx routes an unmatched URL through
   // the same middleware chain as every other page, instead of Fresh's
   // error-handler path, which runs outside it.
   await withSubscribers([], async (site) => {
-    const { status } = await assertNoncePinned(site, "/no-such-page");
-    assertEquals(status, 404);
-  });
-});
+    const { status } = await assertNoncePinned(site, "/no-such-page")
+    assertEquals(status, 404)
+  })
+})

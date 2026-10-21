@@ -1,17 +1,17 @@
-import { define } from "../lib/utils.ts";
-import { blogArticles, hackathons } from "../lib/data.ts";
-import { workHref, workProjects } from "../lib/work.ts";
-import { BASE_URL } from "../lib/config.ts";
-import { catalogItems } from "../lib/catalog.ts";
-import { tools } from "../lib/tools.ts";
-import { proof } from "../lib/proof.ts";
-import { ROLE } from "../lib/head.ts";
-import { pagesFor } from "../lib/pages.ts";
-import { latestPostDate } from "../lib/blog.ts";
+import { define } from "../lib/utils.ts"
+import { blogArticles, hackathons } from "../lib/data.ts"
+import { workHref, workProjects } from "../lib/work.ts"
+import { BASE_URL } from "../lib/config.ts"
+import { catalogItems } from "../lib/catalog.ts"
+import { tools } from "../lib/tools.ts"
+import { proof } from "../lib/proof.ts"
+import { ROLE } from "../lib/head.ts"
+import { pagesFor } from "../lib/pages.ts"
+import { latestPostDate } from "../lib/blog.ts"
 
 export const handler = define.handlers({
   GET() {
-    const domain = BASE_URL;
+    const domain = BASE_URL
 
     // `lib/pages.ts`'s core pages. /hackathons answers 404 until there is a
     // hackathon, so it stays out until then.
@@ -25,7 +25,7 @@ export const handler = define.handlers({
         lastmod: (p.path === "/blog" ? latestPostDate() : undefined) as
           | string
           | undefined,
-      }));
+      }))
 
     // Archived posts stay indexed, one step down (#274, SEO 7).
     const blogUrls = blogArticles.map((a) => ({
@@ -33,7 +33,7 @@ export const handler = define.handlers({
       priority: a.archived ? "0.3" : "0.7",
       changefreq: "monthly" as const,
       lastmod: a.updatedAt ?? a.publishedAt,
-    }));
+    }))
 
     const projectUrls = workProjects()
       .map((p) => ({
@@ -41,14 +41,14 @@ export const handler = define.handlers({
         priority: "0.6",
         changefreq: "monthly" as const,
         lastmod: undefined as string | undefined,
-      }));
+      }))
 
     const catalogUrls = catalogItems.map((i) => i.slug).map((s) => ({
       loc: `/catalog/${s}`,
       priority: "0.7",
       changefreq: "monthly" as const,
       lastmod: undefined as string | undefined,
-    }));
+    }))
 
     // Generated from lib/tools.ts, like the catalog pages above.
     const toolUrls = tools.map((t) => ({
@@ -56,14 +56,14 @@ export const handler = define.handlers({
       priority: "0.7",
       changefreq: "monthly" as const,
       lastmod: undefined as string | undefined,
-    }));
+    }))
 
     const hackathonUrls = hackathons.map((h) => ({
       loc: `/hackathons/${h.slug}`,
       priority: "0.6",
       changefreq: "monthly" as const,
       lastmod: undefined as string | undefined,
-    }));
+    }))
 
     const all = [
       ...staticPages,
@@ -72,7 +72,7 @@ export const handler = define.handlers({
       ...catalogUrls,
       ...toolUrls,
       ...hackathonUrls,
-    ];
+    ]
 
     const urls = all.map((u) => `
     <url>
@@ -86,7 +86,7 @@ export const handler = define.handlers({
         }</lastmod>`
         : ""
     }
-    </url>`).join("");
+    </url>`).join("")
 
     // AI-friendly metadata in sitemap comments
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -99,13 +99,13 @@ export const handler = define.handlers({
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${urls}
-</urlset>`;
+</urlset>`
 
     return new Response(xml, {
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "max-age=3600",
       },
-    });
+    })
   },
-});
+})

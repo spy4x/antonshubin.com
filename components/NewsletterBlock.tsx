@@ -1,5 +1,5 @@
-import NewsletterForm from "../islands/NewsletterForm.tsx";
-import { NEWSLETTER_HEADING, NEWSLETTER_LINE } from "../lib/blog.ts";
+import NewsletterForm from "../islands/NewsletterForm.tsx"
+import { NEWSLETTER_HEADING, NEWSLETTER_LINE } from "../lib/blog.ts"
 
 /**
  * The newsletter ask itself: the topics as the promise, the form and the RSS
@@ -23,7 +23,7 @@ export function NewsletterAsk() {
         </a>
       </p>
     </div>
-  );
+  )
 }
 
 /** The newsletter block of `/blog` (#274, Mkt 5): a heading over the ask. */
@@ -38,5 +38,5 @@ export function NewsletterBlock() {
       </h2>
       <NewsletterAsk />
     </section>
-  );
+  )
 }

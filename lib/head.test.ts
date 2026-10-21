@@ -6,15 +6,15 @@
 // module (no runtime `Deno.env`/`Deno.readTextFile` call, so no
 // permission check) sidesteps that without granting the test suite env
 // access it otherwise has no need for.
-import { assert } from "jsr:@std/assert@^1.0.0";
-import headSource from "./head.ts" with { type: "text" };
+import { assert } from "jsr:@std/assert@^1.0.0"
+import headSource from "./head.ts" with { type: "text" }
 
 Deno.test("default description stays within the 160-char meta description limit", () => {
-  const match = headSource.match(/description:\s*\n?\s*"([^"]*)"/);
-  assert(match, "could not find `description:` in lib/head.ts's DEFAULTS");
-  const description = match[1];
+  const match = headSource.match(/description:\s*\n?\s*"([^"]*)"/)
+  assert(match, "could not find `description:` in lib/head.ts's DEFAULTS")
+  const description = match[1]
   assert(
     description.length <= 160,
     `description is ${description.length} chars, expected <= 160: "${description}"`,
-  );
-});
+  )
+})

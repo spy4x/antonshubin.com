@@ -103,7 +103,7 @@ export async function propfind(
         <d:displayname/>
         <d:resourcetype/>
       </d:prop>
-    </d:propfind>`;
+    </d:propfind>`
   const res = await fetch(url, {
     method: "PROPFIND",
     headers: {
@@ -112,9 +112,9 @@ export async function propfind(
       "Authorization": `Basic ${btoa(`${auth.user}:${auth.password}`)}`,
     },
     body,
-  });
-  if (!res.ok) throw new Error(`PROPFIND ${url}: ${res.status}`);
-  return await res.text();
+  })
+  if (!res.ok) throw new Error(`PROPFIND ${url}: ${res.status}`)
+  return await res.text()
 }
 ```
 
@@ -133,21 +133,21 @@ Standard CalDAV PROPFIND. Three things to note:
 
 ```typescript
 // tools/list_calendars.ts
-import { z } from "npm:zod@3.23.8";
-import { propfind } from "../caldav/client.ts";
+import { z } from "npm:zod@3.23.8"
+import { propfind } from "../caldav/client.ts"
 
-export const listCalendarsInput = z.object({});
+export const listCalendarsInput = z.object({})
 
-export type ListCalendarsInput = z.infer<typeof listCalendarsInput>;
+export type ListCalendarsInput = z.infer<typeof listCalendarsInput>
 
 export async function listCalendars(
   _input: ListCalendarsInput,
   ctx: { baseUrl: string; auth: { user: string; password: string } },
 ): Promise<{ calendars: Array<{ name: string; url: string }> }> {
-  const xml = await propfind(ctx.baseUrl, "1", ctx.auth);
+  const xml = await propfind(ctx.baseUrl, "1", ctx.auth)
   // Parse multistatus response, extract displayname + href
-  const calendars = parseMultistatus(xml);
-  return { calendars };
+  const calendars = parseMultistatus(xml)
+  return { calendars }
 }
 ```
 
@@ -166,24 +166,24 @@ Three things to note:
 
 ```typescript
 // mcp.ts
-import { Server } from "npm:@modelcontextprotocol/sdk@1.0/server/index.js";
-import { StdioServerTransport } from "npm:@modelcontextprotocol/sdk@1.0/server/stdio.js";
+import { Server } from "npm:@modelcontextprotocol/sdk@1.0/server/index.js"
+import { StdioServerTransport } from "npm:@modelcontextprotocol/sdk@1.0/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-} from "npm:@modelcontextprotocol/sdk@1.0/types.js";
+} from "npm:@modelcontextprotocol/sdk@1.0/types.js"
 
-import { listCalendars, listCalendarsInput } from "./tools/list_calendars.ts";
+import { listCalendars, listCalendarsInput } from "./tools/list_calendars.ts"
 
 const server = new Server(
   { name: "caldav-mcp", version: "0.1.0" },
   { capabilities: { tools: {} } },
-);
+)
 
 // Tool registry: name → { schema, handler }
 const tools = {
   list_calendars: { schema: listCalendarsInput, handler: listCalendars },
-} as const;
+} as const
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: Object.entries(tools).map(([name, { schema }]) => ({
@@ -191,22 +191,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     description: `…`, // human-readable
     inputSchema: zodToJsonSchema(schema),
   })),
-}));
+}))
 
 server.setRequestHandler(CallToolRequestSchema, async (req) => {
-  const tool = tools[req.params.name as keyof typeof tools];
-  if (!tool) throw new Error(`Unknown tool: ${req.params.name}`);
-  const args = tool.schema.parse(req.params.arguments ?? {});
+  const tool = tools[req.params.name as keyof typeof tools]
+  if (!tool) throw new Error(`Unknown tool: ${req.params.name}`)
+  const args = tool.schema.parse(req.params.arguments ?? {})
   const ctx = {
     baseUrl: Deno.env.get("CALDAV_URL")!,
     auth: {
       user: Deno.env.get("CALDAV_USERNAME")!,
       password: Deno.env.get("CALDAV_PASSWORD")!,
     },
-  };
-  const result = await tool.handler(args, ctx);
-  return { content: [{ type: "text", text: JSON.stringify(result) }] };
-});
+  }
+  const result = await tool.handler(args, ctx)
+  return { content: [{ type: "text", text: JSON.stringify(result) }] }
+})
 ```
 
 Two patterns worth stealing:
@@ -222,11 +222,11 @@ Two patterns worth stealing:
 
 ```typescript
 // main.ts — stdio transport (simplest case)
-import { StdioServerTransport } from "npm:@modelcontextprotocol/sdk@1.0/server/stdio.js";
-import { server } from "./mcp.ts";
+import { StdioServerTransport } from "npm:@modelcontextprotocol/sdk@1.0/server/stdio.js"
+import { server } from "./mcp.ts"
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+const transport = new StdioServerTransport()
+await server.connect(transport)
 ```
 
 For HTTP, swap in `StreamableHTTPServerTransport` and a `Deno.serve` handler.
@@ -254,8 +254,8 @@ export function log(
     level,
     msg,
     ctx,
-  });
-  console.error(line); // stderr — keep stdout clean for JSON-RPC
+  })
+  console.error(line) // stderr — keep stdout clean for JSON-RPC
 }
 ```
 
@@ -269,13 +269,13 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
   try {
     // … existing handler
   } catch (err) {
-    log("error", "tool failed", { tool: req.params.name, err: String(err) });
+    log("error", "tool failed", { tool: req.params.name, err: String(err) })
     return {
       isError: true,
       content: [{ type: "text", text: `Error: ${(err as Error).message}` }],
-    };
+    }
   }
-});
+})
 ```
 
 The AI gets a structured error message. The user sees a clear "tool failed:
@@ -301,7 +301,7 @@ async function withTimeout<T>(
         ms,
       )
     ),
-  ]);
+  ])
 }
 ```
 

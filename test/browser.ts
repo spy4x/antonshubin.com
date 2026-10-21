@@ -5,15 +5,15 @@
 // (docs/testing.md cites it too). See docs/testing.md "Browser-driven tests"
 // for why these tests need Chromium and their own `-A` task instead of the
 // plain `deno task test` glob.
-import { chromium } from "playwright";
-import type { Browser, BrowserContextOptions, Page } from "playwright";
+import { chromium } from "playwright"
+import type { Browser, BrowserContextOptions, Page } from "playwright"
 
 /**
  * Must match the `"playwright"` entry in deno.json's import map and the
  * install command in .woodpecker.yml — a version mismatch downloads a
  * different Chromium build than the one these tests launch.
  */
-export const PLAYWRIGHT_VERSION = "1.63.0";
+export const PLAYWRIGHT_VERSION = "1.63.0"
 
 /**
  * Launches Chromium, or throws an error naming the exact install command,
@@ -26,18 +26,18 @@ export async function launchChromium(): Promise<Browser> {
     // Chromium's own sandbox refuses to start as root without this flag.
     // Harmless here: the browser only ever loads the site the calling test
     // just booted, never third-party content.
-    return await chromium.launch({ args: ["--no-sandbox"] });
+    return await chromium.launch({ args: ["--no-sandbox"] })
   } catch (cause) {
     const installCmd =
-      `deno run -A npm:playwright@${PLAYWRIGHT_VERSION} install --with-deps chromium`;
-    const reason = cause instanceof Error ? cause.message : String(cause);
+      `deno run -A npm:playwright@${PLAYWRIGHT_VERSION} install --with-deps chromium`
+    const reason = cause instanceof Error ? cause.message : String(cause)
     throw new Error(
       `chromium.launch() failed — no compatible Chromium build found. ` +
         `Install one with \`${installCmd}\` ` +
         `(see docs/testing.md "Rendered-page tests" for why this test needs its ` +
         `own task). Original error: ${reason}`,
       { cause },
-    );
+    )
   }
 }
 
@@ -55,7 +55,7 @@ export function newPage(
   browser: Browser,
   options: BrowserContextOptions = {},
 ): Promise<Page> {
-  return browser.newPage({ ...options, serviceWorkers: "block" });
+  return browser.newPage({ ...options, serviceWorkers: "block" })
 }
 
 /**
@@ -66,10 +66,10 @@ export function newPage(
  * browser mid-wait. Use this for any wait on an expected event; a wait that
  * proves something does NOT happen is a fixed sleep, not a timeout.
  */
-export const WAIT_MS = 30_000;
+export const WAIT_MS = 30_000
 
 /** One `umami.track()` call the page made: the event name and its data, if any. */
-export type TrackedCall = [string, Record<string, string>?];
+export type TrackedCall = [string, Record<string, string>?]
 
 /**
  * Stands in for Umami's tracker on `page` before any page script runs, so a
@@ -79,19 +79,19 @@ export type TrackedCall = [string, Record<string, string>?];
  */
 export async function recordUmami(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    const calls: unknown[][] = [];
+    const calls: unknown[][] = []
     const g = globalThis as unknown as {
-      umami: { track: (...args: unknown[]) => void };
-      __umamiCalls: unknown[][];
-    };
-    g.__umamiCalls = calls;
-    g.umami = { track: (...args: unknown[]) => calls.push(args) };
-  });
+      umami: { track: (...args: unknown[]) => void }
+      __umamiCalls: unknown[][]
+    }
+    g.__umamiCalls = calls
+    g.umami = { track: (...args: unknown[]) => calls.push(args) }
+  })
 }
 
 /** Every `umami.track()` call recorded by `recordUmami()` so far. */
 export function trackedCalls(page: Page): Promise<TrackedCall[]> {
   return page.evaluate(() =>
     (globalThis as unknown as { __umamiCalls: TrackedCall[] }).__umamiCalls
-  );
+  )
 }

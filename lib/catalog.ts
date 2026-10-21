@@ -15,86 +15,86 @@
  * title instead of restating it).
  */
 
-import { promise } from "./promises.ts";
+import { promise } from "./promises.ts"
 
 /** Billing period of a price. Absent means a one-time price. */
-export type PricePeriod = "hour" | "month";
+export type PricePeriod = "hour" | "month"
 
 /**
  * Icon name for a catalog item, rendered through `components/Icons.tsx`
  * (#184) — the catalog used to carry a raw emoji here.
  */
-export type CatalogIconName = "target" | "search" | "rocket" | "briefcase";
+export type CatalogIconName = "target" | "search" | "rocket" | "briefcase"
 
 export interface CatalogPrice {
   /** Whole US dollars. Every price on the list is a whole number. */
-  usd: number;
+  usd: number
   /** True when the number is a starting price and larger scopes are quoted. */
-  from: boolean;
-  period?: PricePeriod;
+  from: boolean
+  period?: PricePeriod
 }
 
 export interface CatalogExample {
-  title: string;
-  desc: string;
+  title: string
+  desc: string
 }
 
 /** A kind of work sold under an item; its `id` is the page's `#fragment`. */
 export interface CatalogCover extends CatalogExample {
-  id: string;
+  id: string
 }
 
 export interface CatalogItem {
-  icon: CatalogIconName;
-  slug: string;
+  icon: CatalogIconName
+  slug: string
   /** Full title: page heading and JSON-LD name. */
-  title: string;
+  title: string
   /** What the page's `<title>` says, before " — Anton Shubin" (#271). */
-  seoTitle: string;
+  seoTitle: string
   /** schema.org `serviceType` (#271). */
-  category: string;
+  category: string
   /** Short title for cards and lists. */
-  shortTitle: string;
+  shortTitle: string
   /** One or two prices. Two means the client picks, as with the Ongoing item. */
-  prices: CatalogPrice[];
-  delivery: string;
+  prices: CatalogPrice[]
+  delivery: string
   /** One sentence for cards, the llms files and the guide page. */
-  summary: string;
-  desc: string;
-  outcome: string;
-  includes: string[];
-  exclusions?: string[];
-  tech: string[];
-  audience: string;
-  examples: string[];
+  summary: string
+  desc: string
+  outcome: string
+  includes: string[]
+  exclusions?: string[]
+  tech: string[]
+  audience: string
+  examples: string[]
   /** How the engagement starts, when that is worth spelling out. */
-  firstStep?: CatalogExample;
+  firstStep?: CatalogExample
   /** Kinds of work that are sold under this item rather than as their own. */
-  alsoCovers?: CatalogCover[];
+  alsoCovers?: CatalogCover[]
   /** A line under the price, when the price alone would mislead. */
-  priceNote?: string;
+  priceNote?: string
   /** The item a buyer usually looks at after this one (a `slug`). */
-  next?: string;
+  next?: string
   /**
    * True when `summary` already says what `outcome` says, so a card that
    * would show both (the index) shows the summary alone (#388).
    */
-  summaryStatesOutcome?: boolean;
+  summaryStatesOutcome?: boolean
 }
 
 /** Under a single "from" price: nothing is charged before the buyer has a number. */
 export const QUOTE_NOTE =
-  "You get a quote for your scope before any work starts.";
+  "You get a quote for your scope before any work starts."
 
 /**
  * What happens after the strategy session's brief: Anton's answer on #301.
  * Step 2 of "How it starts" and the line under the price (#388) both use it.
  */
 const SESSION_INVOICE =
-  "I reply with a Stripe invoice and times for the 60-minute call.";
+  "I reply with a Stripe invoice and times for the 60-minute call."
 
 /** The free intro call is a call to action, not a catalog item. */
-export const INTRO_CALL = "free 30-minute intro call";
+export const INTRO_CALL = "free 30-minute intro call"
 
 export const catalogItems: CatalogItem[] = [
   {
@@ -277,7 +277,7 @@ export const catalogItems: CatalogItem[] = [
       "You just launched and want server monitoring, verified backups and security patches handled while you focus on the business",
     ],
   },
-];
+]
 
 /**
  * Retired catalog slugs and where each one now lives. Answered with a 301 by
@@ -292,36 +292,36 @@ export const catalogRedirects: Record<string, string> = {
   "mcp-server-development": "/catalog/zero-to-production-saas-mvp#mcp-servers",
   "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
   "free-architecture-audit": "/book#brief",
-};
+}
 
-const usdFormat = new Intl.NumberFormat("en-US");
+const usdFormat = new Intl.NumberFormat("en-US")
 
 /** One price as people read it: "$150", "From $1,500", "$150/hour", "From $3,000/month". */
 export function formatPrice(price: CatalogPrice): string {
-  const amount = `$${usdFormat.format(price.usd)}`;
-  const period = price.period ? `/${price.period}` : "";
-  return `${price.from ? "From " : ""}${amount}${period}`;
+  const amount = `$${usdFormat.format(price.usd)}`
+  const period = price.period ? `/${price.period}` : ""
+  return `${price.from ? "From " : ""}${amount}${period}`
 }
 
 /** Every price of an item in one label, for example "$150/hour or from $3,000/month". */
 export function priceLabel(item: CatalogItem): string {
   return item.prices
     .map((p, i) => {
-      const label = formatPrice(p);
-      return i === 0 ? label : label.charAt(0).toLowerCase() + label.slice(1);
+      const label = formatPrice(p)
+      return i === 0 ? label : label.charAt(0).toLowerCase() + label.slice(1)
     })
-    .join(" or ");
+    .join(" or ")
 }
 
 /** Looks an item up by slug and throws on a typo, so a bad link fails the build, not a visitor. */
 export function catalogItem(slug: string): CatalogItem {
-  const item = catalogItems.find((i) => i.slug === slug);
-  if (!item) throw new Error(`lib/catalog.ts: no catalog item "${slug}"`);
-  return item;
+  const item = catalogItems.find((i) => i.slug === slug)
+  if (!item) throw new Error(`lib/catalog.ts: no catalog item "${slug}"`)
+  return item
 }
 
 export function catalogPath(slug: string): string {
-  return `/catalog/${catalogItem(slug).slug}`;
+  return `/catalog/${catalogItem(slug).slug}`
 }
 
 /**
@@ -335,29 +335,29 @@ export function catalogPath(slug: string): string {
 export function catalogPromises(slug: string): string[] {
   switch (catalogItem(slug).slug) {
     case "zero-to-production-saas-mvp":
-      return ["refund", "first-milestone", "ownership", "free-bugfixes"];
+      return ["refund", "first-milestone", "ownership", "free-bugfixes"]
     case "cto-advisory-retainer":
-      return ["refund", "first-milestone", "ownership"];
+      return ["refund", "first-milestone", "ownership"]
     case "strategy-call":
     case "codebase-health-audit":
-      return ["refund"];
+      return ["refund"]
     default:
-      return [];
+      return []
   }
 }
 
 /** One row of a price card: "Price", or "Hourly" and "Retainer" for two prices. */
 export interface PriceRow {
-  label: string;
-  price: CatalogPrice;
+  label: string
+  price: CatalogPrice
   /** `priceNote`, on the item's last row only. */
-  note?: string;
+  note?: string
 }
 
 const ROW_LABELS: Record<PricePeriod, string> = {
   hour: "Hourly",
   month: "Retainer",
-};
+}
 
 /** An item's prices as card rows, each labelled by its period. */
 export function priceRows(item: CatalogItem): PriceRow[] {
@@ -367,13 +367,13 @@ export function priceRows(item: CatalogItem): PriceRow[] {
     ...(i === item.prices.length - 1 && item.priceNote
       ? { note: item.priceNote }
       : {}),
-  }));
+  }))
 }
 
 /** One step of "How it starts". */
 export interface StartStep {
-  title: string;
-  desc: string;
+  title: string
+  desc: string
 }
 
 /**
@@ -384,13 +384,13 @@ export interface StartStep {
  * on #301, since mig takes no payment. The other two items have no steps.
  */
 export function startSteps(slug: string): StartStep[] | undefined {
-  const item = catalogItem(slug);
+  const item = catalogItem(slug)
   if (item.slug === "zero-to-production-saas-mvp" && item.firstStep) {
     return [
       { title: "We talk", desc: `A ${INTRO_CALL} about your project.` },
       { title: "You get a quote", desc: QUOTE_NOTE },
       { title: promise("first-milestone").title, desc: item.firstStep.desc },
-    ];
+    ]
   }
   if (item.slug === "strategy-call") {
     return [
@@ -404,9 +404,9 @@ export function startSteps(slug: string): StartStep[] | undefined {
       },
       { title: "We talk", desc: item.includes[0] },
       { title: "You get notes", desc: item.includes[4] },
-    ];
+    ]
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -416,10 +416,10 @@ export function startSteps(slug: string): StartStep[] | undefined {
  * own `desc` above is not repeated).
  */
 export function callVersusSession(): {
-  free: StartStep;
-  paid: StartStep;
+  free: StartStep
+  paid: StartStep
 } {
-  const session = catalogItem("strategy-call");
+  const session = catalogItem("strategy-call")
   return {
     free: {
       title: "Free 30-minute intro call",
@@ -430,15 +430,15 @@ export function callVersusSession(): {
       title: session.shortTitle,
       desc: session.summary,
     },
-  };
+  }
 }
 
 /** The written-brief form with this service chosen (`?service=` is read by the booking page, #272). */
 export function briefPath(slug: string): string {
-  return `/book?service=${catalogItem(slug).slug}#brief`;
+  return `/book?service=${catalogItem(slug).slug}#brief`
 }
 
-const UNIT_CODES: Record<PricePeriod, string> = { hour: "HUR", month: "MON" };
+const UNIT_CODES: Record<PricePeriod, string> = { hour: "HUR", month: "MON" }
 
 /**
  * schema.org `Offer` objects for an item, one per price. A "from" price is
@@ -464,5 +464,5 @@ export function catalogOffers(item: CatalogItem, baseUrl: string): unknown[] {
         ? { "unitCode": UNIT_CODES[p.period], "unitText": p.period }
         : {}),
     },
-  }));
+  }))
 }

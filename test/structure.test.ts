@@ -1,59 +1,59 @@
 // Guards for the site trim (#117), the single price list (#120), the label and
 // deadline fixes (#134) and the Offer schema (#133). They read the built site
 // through test/harness.ts. Assert structure and short phrases, never prose.
-import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
-import { type Site, startSite } from "./harness.ts";
-import { count, jsonLd, mainContent, railColumn, visibleText } from "./html.ts";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { type Site, startSite } from "./harness.ts"
+import { count, jsonLd, mainContent, railColumn, visibleText } from "./html.ts"
 import {
   catalogItems,
   catalogOffers,
   catalogRedirects,
   formatPrice,
-} from "../lib/catalog.ts";
-import { blogArticles, highlightProjects, projects } from "../lib/data.ts";
-import { firstSentence, projectLead } from "../lib/llms.ts";
-import { tools } from "../lib/tools.ts";
-import { visibleTestimonials } from "../lib/testimonials.ts";
-import { MAX_FAQS } from "../lib/faqs.ts";
-import { promises } from "../lib/promises.ts";
-import { redirectTable, redirectTarget } from "../lib/redirects.ts";
+} from "../lib/catalog.ts"
+import { blogArticles, highlightProjects, projects } from "../lib/data.ts"
+import { firstSentence, projectLead } from "../lib/llms.ts"
+import { tools } from "../lib/tools.ts"
+import { visibleTestimonials } from "../lib/testimonials.ts"
+import { MAX_FAQS } from "../lib/faqs.ts"
+import { promises } from "../lib/promises.ts"
+import { redirectTable, redirectTarget } from "../lib/redirects.ts"
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   Deno.test(name, async () => {
-    const site = await startSite();
+    const site = await startSite()
     try {
-      await fn(site);
+      await fn(site)
     } finally {
-      await site.stop();
+      await site.stop()
     }
-  });
+  })
 }
 
 /** Dollar figures that are not prices: Upwork earnings, a quote inside a sample question. */
-const NOT_A_PRICE = new Set(["$300K", "$50K"]);
+const NOT_A_PRICE = new Set(["$300K", "$50K"])
 
 /** Every "$1,500"-style token in a text, with its "K" suffix when it has one. */
 function dollarAmounts(text: string): string[] {
-  return text.match(/\$\d+(?:,\d{3})*K?/g) ?? [];
+  return text.match(/\$\d+(?:,\d{3})*K?/g) ?? []
 }
 
 const catalogAmounts = new Set(
   catalogItems.flatMap((i) => i.prices).map((p) =>
     formatPrice({ ...p, from: false, period: undefined })
   ),
-);
+)
 
 siteTest(
   "the catalog page lists exactly the four catalog items",
   async (site) => {
-    const html = await site.html("/catalog");
-    assertEquals(count(html, /data-catalog-item="/g), 4);
+    const html = await site.html("/catalog")
+    assertEquals(count(html, /data-catalog-item="/g), 4)
     for (const item of catalogItems) {
-      assert(html.includes(`data-catalog-item="${item.slug}"`), item.slug);
+      assert(html.includes(`data-catalog-item="${item.slug}"`), item.slug)
     }
   },
-);
+)
 
 siteTest(
   "the rail lists Book, then Work, Services, Tools, How I work and Writing",
@@ -62,18 +62,18 @@ siteTest(
       ...railColumn(await site.html("/")).matchAll(
         /<a[^>]*\bhref="([^"]*)"[^>]*>/g,
       ),
-    ].map((m) => m[1]);
+    ].map((m) => m[1])
     // Book, or Write to `/book#brief` when this run has no SCHEDULE_URL.
-    assert(links[0]?.startsWith("/book"), `the rail opens on ${links[0]}`);
+    assert(links[0]?.startsWith("/book"), `the rail opens on ${links[0]}`)
     assertEquals(links.slice(1), [
       "/work",
       "/catalog",
       "/tools",
       "/how-i-work",
       "/blog",
-    ]);
+    ])
   },
-);
+)
 
 /**
  * The six retired slugs and their new homes, written out here on purpose. The
@@ -89,49 +89,49 @@ const EXPECTED_REDIRECTS: Record<string, string> = {
   "mcp-server-development": "/catalog/zero-to-production-saas-mvp#mcp-servers",
   "post-launch-support-maintenance": "/catalog/cto-advisory-retainer",
   "free-architecture-audit": "/book#brief",
-};
+}
 
 siteTest(
   "each retired catalog slug answers 301 to its new home",
   async (site) => {
-    assertEquals(catalogRedirects, EXPECTED_REDIRECTS);
+    assertEquals(catalogRedirects, EXPECTED_REDIRECTS)
     for (const [slug, target] of Object.entries(EXPECTED_REDIRECTS)) {
-      const res = await site.get(`/catalog/${slug}`);
-      await res.body?.cancel();
-      assertEquals(res.status, 301, slug);
-      const location = res.headers.get("location") ?? "";
-      assertEquals(location.replace(site.origin, ""), target, slug);
+      const res = await site.get(`/catalog/${slug}`)
+      await res.body?.cancel()
+      assertEquals(res.status, 301, slug)
+      const location = res.headers.get("location") ?? ""
+      assertEquals(location.replace(site.origin, ""), target, slug)
     }
   },
-);
+)
 
 siteTest("a redirect keeps the query string", async (site) => {
-  const res = await site.get("/catalog/free-architecture-audit?utm_source=x");
-  await res.body?.cancel();
+  const res = await site.get("/catalog/free-architecture-audit?utm_source=x")
+  await res.body?.cancel()
   assertEquals(
     (res.headers.get("location") ?? "").replace(site.origin, ""),
     "/book?utm_source=x#brief",
-  );
-});
+  )
+})
 
 siteTest(
   "the old booking page /contact-me answers one 301 to /book, query string kept",
   async (site) => {
     for (const from of ["/contact-me", "/contact-me/"]) {
-      const res = await site.get(`${from}?service=codebase-health-audit`);
-      await res.body?.cancel();
-      assertEquals(res.status, 301, from);
+      const res = await site.get(`${from}?service=codebase-health-audit`)
+      await res.body?.cancel()
+      assertEquals(res.status, 301, from)
       const location = (res.headers.get("location") ?? "").replace(
         site.origin,
         "",
-      );
-      assertEquals(location, "/book?service=codebase-health-audit", from);
-      const landed = await site.get(location);
-      await landed.body?.cancel();
-      assertEquals(landed.status, 200, `${from} -> ${location}`);
+      )
+      assertEquals(location, "/book?service=codebase-health-audit", from)
+      const landed = await site.get(location)
+      await landed.body?.cancel()
+      assertEquals(landed.status, 200, `${from} -> ${location}`)
     }
   },
-);
+)
 
 siteTest("the free audit carries no deadline anywhere", async (site) => {
   for (
@@ -146,10 +146,10 @@ siteTest("the free audit carries no deadline anywhere", async (site) => {
       ...catalogItems.map((i) => `/catalog/${i.slug}`),
     ]
   ) {
-    const text = visibleText(await site.html(path));
-    assert(!/48[\s-]?(hours?|h\b)/i.test(text), `${path} promises 48 hours`);
+    const text = visibleText(await site.html(path))
+    assert(!/48[\s-]?(hours?|h\b)/i.test(text), `${path} promises 48 hours`)
   }
-});
+})
 
 siteTest(
   "every price in the llms files equals lib/catalog.ts",
@@ -157,20 +157,20 @@ siteTest(
     for (const path of ["/llms.txt", "/llms-full.txt"]) {
       // Blog post descriptions are article text, not my prices, so they are left out.
       const text = (await site.html(path))
-        .split("\n").filter((line) => !line.includes("/blog/")).join("\n");
-      const amounts = dollarAmounts(text);
+        .split("\n").filter((line) => !line.includes("/blog/")).join("\n")
+      const amounts = dollarAmounts(text)
       for (const amount of amounts) {
         assert(
           catalogAmounts.has(amount) || NOT_A_PRICE.has(amount),
           `${path} states ${amount}, which is not a price in lib/catalog.ts`,
-        );
+        )
       }
       for (const amount of catalogAmounts) {
-        assert(amounts.includes(amount), `${path} does not state ${amount}`);
+        assert(amounts.includes(amount), `${path} does not state ${amount}`)
       }
     }
   },
-);
+)
 
 /**
  * Every page that shows a catalog price, with the dollar figures on it that are
@@ -201,26 +201,26 @@ const PRICE_PAGES: Record<string, string[]> = {
       .filter((a) => a.catalogSlug)
       .map((a) => [`/blog/${a.slug}`, []]),
   ),
-};
+}
 
 siteTest(
   "every price shown on a page equals lib/catalog.ts",
   async (site) => {
     for (const [path, notPrices] of Object.entries(PRICE_PAGES)) {
-      const amounts = dollarAmounts(visibleText(await site.html(path)));
+      const amounts = dollarAmounts(visibleText(await site.html(path)))
       assert(
         amounts.some((a) => catalogAmounts.has(a)),
         `${path} is listed as a price page but shows no catalog price`,
-      );
+      )
       for (const amount of amounts) {
         assert(
           catalogAmounts.has(amount) || notPrices.includes(amount),
           `${path} shows ${amount}, which is not a price in lib/catalog.ts`,
-        );
+        )
       }
     }
   },
-);
+)
 
 // Doesn't use `siteTest`: `SCHEDULE_URL` has to be set before `startSite()`
 // spawns the server, since the server reads it once at process start. The
@@ -230,12 +230,12 @@ siteTest(
 Deno.test(
   "the home page has at most six sections and one primary call to action",
   async () => {
-    const previous = Deno.env.get("SCHEDULE_URL");
-    Deno.env.set("SCHEDULE_URL", "https://meet.example.com");
-    const site = await startSite();
+    const previous = Deno.env.get("SCHEDULE_URL")
+    Deno.env.set("SCHEDULE_URL", "https://meet.example.com")
+    const site = await startSite()
     try {
-      const html = await site.html("/");
-      const main = mainContent(html);
+      const html = await site.html("/")
+      const main = mainContent(html)
       // The prices sit inside the hero (#269); "testimonials" shows only
       // while a review is cleared for the site.
       assertEquals(
@@ -245,37 +245,37 @@ Deno.test(
         visibleTestimonials().length > 0
           ? ["hero", "work", "testimonials", "how-it-works", "tools", "cta"]
           : ["hero", "work", "how-it-works", "tools", "cta"],
-      );
+      )
       assert(
         count(main, /<section[\s>]/g) <= 6,
         "more than six <section> elements",
-      );
-      assertEquals(count(main, /data-primary-cta/g), 1);
+      )
+      assertEquals(count(main, /data-primary-cta/g), 1)
     } finally {
-      await site.stop();
-      if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-      else Deno.env.set("SCHEDULE_URL", previous);
+      await site.stop()
+      if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
+      else Deno.env.set("SCHEDULE_URL", previous)
     }
   },
-);
+)
 
 siteTest(
   "the label leads and 'fractional CTO' is only the Ongoing service",
   async (site) => {
-    const html = await site.html("/");
-    const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
-    assert(title.includes("Senior Full-Stack Engineer &amp; Tech Lead"), title);
+    const html = await site.html("/")
+    const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ""
+    assert(title.includes("Senior Full-Stack Engineer &amp; Tech Lead"), title)
     const person = jsonLd(html)
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
       .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
         | { jobTitle: string; description: string }
-        | undefined;
-    assert(person, "no Person in the JSON-LD");
-    assertEquals(person.jobTitle, "Senior Full-Stack Engineer & Tech Lead");
-    assert(!/fractional/i.test(person.description), person.description);
+        | undefined
+    assert(person, "no Person in the JSON-LD")
+    assertEquals(person.jobTitle, "Senior Full-Stack Engineer & Tech Lead")
+    assert(!/fractional/i.test(person.description), person.description)
     // The one allowed mention is the Ongoing item's own title, wherever it is linked.
     const ongoingTitle =
-      catalogItems.find((i) => i.slug === "cto-advisory-retainer")!.title;
+      catalogItems.find((i) => i.slug === "cto-advisory-retainer")!.title
     for (
       const path of [
         "/",
@@ -289,107 +289,107 @@ siteTest(
       const text = visibleText(await site.html(path)).replaceAll(
         ongoingTitle,
         "",
-      );
+      )
       assert(
         !/fractional/i.test(text),
         `${path} mentions "fractional" outside the Ongoing service`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "how-i-work has at most MAX_FAQS entries and the JSON-LD comes from them",
   async (site) => {
-    const html = await site.html("/how-i-work");
-    const shown = count(html, /<div[^>]*\bdata-faq\b/g);
-    assert(shown >= 1 && shown <= MAX_FAQS, `${shown} FAQ entries`);
+    const html = await site.html("/how-i-work")
+    const shown = count(html, /<div[^>]*\bdata-faq\b/g)
+    assert(shown >= 1 && shown <= MAX_FAQS, `${shown} FAQ entries`)
     const faq = jsonLd(html).find((d) =>
       (d as { "@type"?: string })["@type"] === "FAQPage"
-    ) as { mainEntity: unknown[] } | undefined;
-    assert(faq, "no FAQPage JSON-LD");
-    assertEquals(faq.mainEntity.length, shown);
+    ) as { mainEntity: unknown[] } | undefined
+    assert(faq, "no FAQPage JSON-LD")
+    assertEquals(faq.mainEntity.length, shown)
   },
-);
+)
 
 siteTest(
   "each catalog page carries the Offers built from lib/catalog.ts",
   async (site) => {
     for (const item of catalogItems) {
-      const html = await site.html(`/catalog/${item.slug}`);
+      const html = await site.html(`/catalog/${item.slug}`)
       const service = jsonLd(html).find((d) =>
         (d as { "@type"?: string })["@type"] === "Service"
-      ) as { offers: unknown[] } | undefined;
-      assert(service, `${item.slug}: no Service JSON-LD`);
+      ) as { offers: unknown[] } | undefined
+      assert(service, `${item.slug}: no Service JSON-LD`)
       const expected = JSON.parse(
         JSON.stringify(catalogOffers(item, "https://antonshubin.com")),
-      );
-      assertEquals(service.offers, expected, item.slug);
+      )
+      assertEquals(service.offers, expected, item.slug)
     }
   },
-);
+)
 
 siteTest(
   "no internal link answers 404 or points at a redirected slug",
   async (site) => {
-    const sitemap = await site.html("/sitemap.xml");
+    const sitemap = await site.html("/sitemap.xml")
     const queue = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)]
-      .map((m) => new URL(m[1]).pathname);
-    assert(queue.length > 10, "sitemap looks empty");
-    const seen = new Set<string>();
-    const bad: string[] = [];
-    const redirected = new Set<string>();
+      .map((m) => new URL(m[1]).pathname)
+    assert(queue.length > 10, "sitemap looks empty")
+    const seen = new Set<string>()
+    const bad: string[] = []
+    const redirected = new Set<string>()
     while (queue.length > 0) {
-      const path = queue.pop()!;
-      if (seen.has(path)) continue;
-      seen.add(path);
-      const res = await site.get(path);
+      const path = queue.pop()!
+      if (seen.has(path)) continue
+      seen.add(path)
+      const res = await site.get(path)
       const isHtml = (res.headers.get("content-type") ?? "").includes(
         "text/html",
-      );
+      )
       if (res.status !== 200) {
-        bad.push(`${path} -> ${res.status}`);
-        await res.body?.cancel();
-        continue;
+        bad.push(`${path} -> ${res.status}`)
+        await res.body?.cancel()
+        continue
       }
       if (!isHtml) {
-        await res.body?.cancel();
-        continue;
+        await res.body?.cancel()
+        continue
       }
-      const html = await res.text();
+      const html = await res.text()
       for (const m of html.matchAll(/<a\s[^>]*href="(\/[^"#?]*)[^"]*"/g)) {
-        if (m[1].startsWith("//")) continue;
+        if (m[1].startsWith("//")) continue
         // Read the redirect table itself, so a link to an old URL is named
         // as such instead of as a bare 301.
-        const target = redirectTarget(m[1]);
+        const target = redirectTarget(m[1])
         if (target) {
-          redirected.add(`${path} links ${m[1]}, which redirects to ${target}`);
-          continue;
+          redirected.add(`${path} links ${m[1]}, which redirects to ${target}`)
+          continue
         }
-        if (!seen.has(m[1])) queue.push(m[1]);
+        if (!seen.has(m[1])) queue.push(m[1])
       }
     }
-    assertEquals([...redirected], [], "internal links that hit a redirect");
-    assertEquals(bad, [], "internal links that do not answer 200");
+    assertEquals([...redirected], [], "internal links that hit a redirect")
+    assertEquals(bad, [], "internal links that do not answer 200")
   },
-);
+)
 
 // Since routes/[...path].tsx (#177), every unmatched URL runs through
 // routes/_middleware.ts, which used to invite indexing on all of them.
 siteTest("a missing page tells crawlers not to index it", async (site) => {
   for (const path of ["/no-such-page", "/img/nope.png", "/blog/no-such-post"]) {
-    const res = await site.get(path);
-    await res.body?.cancel();
-    assertEquals(res.status, 404, path);
-    assertEquals(res.headers.get("X-Robots-Tag"), "noindex", path);
+    const res = await site.get(path)
+    await res.body?.cancel()
+    assertEquals(res.status, 404, path)
+    assertEquals(res.headers.get("X-Robots-Tag"), "noindex", path)
   }
-  const home = await site.get("/");
-  await home.body?.cancel();
+  const home = await site.get("/")
+  await home.body?.cancel()
   assert(
     home.headers.get("X-Robots-Tag")?.startsWith("index"),
     "a real page must still invite indexing",
-  );
-});
+  )
+})
 
 siteTest("no page emits an aggregateRating", async (site) => {
   for (
@@ -400,25 +400,25 @@ siteTest("no page emits an aggregateRating", async (site) => {
       `/blog/${blogArticles[0].slug}`,
     ]
   ) {
-    const html = await site.html(path);
+    const html = await site.html(path)
     assert(
       !html.includes("aggregateRating"),
       `${path} still emits aggregateRating (#193)`,
-    );
+    )
   }
-});
+})
 
 siteTest(
   "trailing-slash post and project URLs redirect to the slash-free form",
   async (site) => {
-    const post = blogArticles[0].slug;
-    const res = await site.get(`/blog/${post}/?utm_source=x`);
-    await res.body?.cancel();
-    assertEquals(res.status, 301);
+    const post = blogArticles[0].slug
+    const res = await site.get(`/blog/${post}/?utm_source=x`)
+    await res.body?.cancel()
+    assertEquals(res.status, 301)
     assertEquals(
       (res.headers.get("location") ?? "").replace(site.origin, ""),
       `/blog/${post}?utm_source=x`,
-    );
+    )
     // Guards main.ts's middleware order: the redirect middleware sits after
     // the CSP middleware, so a 301 still gets a CSP header set on whatever
     // ctx.next() returned. Moving the redirect middleware ahead of the CSP
@@ -427,76 +427,76 @@ siteTest(
     assert(
       res.headers.get("Content-Security-Policy"),
       "a redirect response has no Content-Security-Policy header",
-    );
+    )
 
-    const project = projects.freelance[0].slug;
-    const res2 = await site.get(`/work/${project}/`);
-    await res2.body?.cancel();
-    assertEquals(res2.status, 301);
+    const project = projects.freelance[0].slug
+    const res2 = await site.get(`/work/${project}/`)
+    await res2.body?.cancel()
+    assertEquals(res2.status, 301)
     assertEquals(
       (res2.headers.get("location") ?? "").replace(site.origin, ""),
       `/work/${project}`,
-    );
+    )
   },
-);
+)
 
 siteTest(
   "every old /projects URL answers one 301 to its /work twin, query string kept",
   async (site) => {
     const old = [...redirectTable].filter(([from]) =>
       from.startsWith("/projects")
-    );
+    )
     // 23 paths (the index, 21 project pages, homelab), each with and without
     // a trailing slash; lib/redirects.test.ts lists them one by one.
-    assertEquals(old.length, 46);
+    assertEquals(old.length, 46)
     for (const [from, to] of old) {
-      const res = await site.get(`${from}?utm_source=x&utm_campaign=y`);
-      await res.body?.cancel();
-      assertEquals(res.status, 301, from);
+      const res = await site.get(`${from}?utm_source=x&utm_campaign=y`)
+      await res.body?.cancel()
+      assertEquals(res.status, 301, from)
       const location = (res.headers.get("location") ?? "").replace(
         site.origin,
         "",
-      );
-      assertEquals(location, `${to}?utm_source=x&utm_campaign=y`, from);
+      )
+      assertEquals(location, `${to}?utm_source=x&utm_campaign=y`, from)
       // One hop: the target answers 200 itself, not another redirect.
-      const landed = await site.get(location);
-      await landed.body?.cancel();
-      assertEquals(landed.status, 200, `${from} -> ${location}`);
+      const landed = await site.get(location)
+      await landed.body?.cancel()
+      assertEquals(landed.status, 200, `${from} -> ${location}`)
     }
   },
-);
+)
 
 siteTest("an old /projects URL with no new home answers 404", async (site) => {
   for (const path of ["/projects/no-such-project", "/projects/no-such/"]) {
-    const res = await site.get(path);
-    await res.body?.cancel();
-    assertEquals(res.status, 404, path);
+    const res = await site.get(path)
+    await res.body?.cancel()
+    assertEquals(res.status, 404, path)
   }
-});
+})
 
 siteTest(
   "the retired CalDAV slug redirects to the post that absorbed it",
   async (site) => {
-    const res = await site.get("/blog/self-hosted-caldav-pwa-architecture");
-    await res.body?.cancel();
-    assertEquals(res.status, 301);
+    const res = await site.get("/blog/self-hosted-caldav-pwa-architecture")
+    await res.body?.cancel()
+    assertEquals(res.status, 301)
     assertEquals(
       (res.headers.get("location") ?? "").replace(site.origin, ""),
       "/blog/self-hosted-caldav-web-ui-tasks-org",
-    );
+    )
 
     // The trailing-slash form resolves in one hop, not a 301-to-a-301.
     const res2 = await site.get(
       "/blog/self-hosted-caldav-pwa-architecture/",
-    );
-    await res2.body?.cancel();
-    assertEquals(res2.status, 301);
+    )
+    await res2.body?.cancel()
+    assertEquals(res2.status, 301)
     assertEquals(
       (res2.headers.get("location") ?? "").replace(site.origin, ""),
       "/blog/self-hosted-caldav-web-ui-tasks-org",
-    );
+    )
   },
-);
+)
 
 siteTest(
   "the old template post URL answers one 301 to the Seed post, query string kept",
@@ -507,90 +507,90 @@ siteTest(
         "/blog/deno-platform-template/",
       ]
     ) {
-      const res = await site.get(`${from}?utm_source=x`);
-      await res.body?.cancel();
-      assertEquals(res.status, 301, from);
+      const res = await site.get(`${from}?utm_source=x`)
+      await res.body?.cancel()
+      assertEquals(res.status, 301, from)
       const location = (res.headers.get("location") ?? "").replace(
         site.origin,
         "",
-      );
-      assertEquals(location, "/blog/seed-saas-starter?utm_source=x", from);
-      const landed = await site.get(location);
-      await landed.body?.cancel();
-      assertEquals(landed.status, 200, from);
+      )
+      assertEquals(location, "/blog/seed-saas-starter?utm_source=x", from)
+      const landed = await site.get(location)
+      await landed.body?.cancel()
+      assertEquals(landed.status, 200, from)
     }
   },
-);
+)
 
 siteTest("the home page itself never redirects", async (site) => {
-  const res = await site.get("/");
-  await res.body?.cancel();
-  assertEquals(res.status, 200);
-});
+  const res = await site.get("/")
+  await res.body?.cancel()
+  assertEquals(res.status, 200)
+})
 
 siteTest(
   "every post and project page points og:image at its 1200x630 PNG",
   async (site) => {
     for (const article of blogArticles) {
-      const html = await site.html(`/blog/${article.slug}`);
+      const html = await site.html(`/blog/${article.slug}`)
       assert(
         html.includes(
           `property="og:image" content="https://antonshubin.com/img/og/blog/${article.slug}.png"`,
         ),
         `/blog/${article.slug}: og:image is not its PNG`,
-      );
-      assert(html.includes('property="og:image:width" content="1200"'));
-      assert(html.includes('property="og:image:height" content="630"'));
+      )
+      assert(html.includes('property="og:image:width" content="1200"'))
+      assert(html.includes('property="og:image:height" content="630"'))
     }
     for (const project of projects.freelance) {
-      if (!project.slug) continue;
-      const html = await site.html(`/work/${project.slug}`);
+      if (!project.slug) continue
+      const html = await site.html(`/work/${project.slug}`)
       assert(
         html.includes(
           `property="og:image" content="https://antonshubin.com/img/og/projects/${project.slug}.png"`,
         ),
         `/work/${project.slug}: og:image is not its PNG`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the home page's og:image is the landscape default, not the portrait photo",
   async (site) => {
-    const html = await site.html("/");
+    const html = await site.html("/")
     assert(
       html.includes(
         'property="og:image" content="https://antonshubin.com/img/og/default.png"',
       ),
       "home page og:image is not the new default PNG",
-    );
+    )
     const ogImageTag = html.match(/<meta property="og:image" content="[^"]*"/)
-      ?.[0] ?? "";
+      ?.[0] ?? ""
     assert(
       !ogImageTag.includes("photo-big.webp"),
       "home page og:image still points at the old portrait photo",
-    );
+    )
   },
-);
+)
 
 siteTest(
   "twitter:site names Anton's confirmed X handle, and the Person sameAs lists his X profile (#193)",
   async (site) => {
-    const html = await site.html("/");
+    const html = await site.html("/")
     assert(
       html.includes('<meta name="twitter:site" content="@spy4x"/>'),
       "twitter:site should be @spy4x",
-    );
+    )
     assert(
       html.includes('<meta name="twitter:creator" content="@spy4x"/>'),
       "twitter:creator should be @spy4x",
-    );
+    )
     const person = jsonLd(html)
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
       .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
         | { sameAs?: string[] }
-        | undefined;
+        | undefined
     for (
       const url of [
         "https://www.upwork.com/freelancers/ashubin",
@@ -600,191 +600,191 @@ siteTest(
         "https://x.com/spy4x",
       ]
     ) {
-      assert(person?.sameAs?.includes(url), `Person sameAs lacks ${url}`);
+      assert(person?.sameAs?.includes(url), `Person sameAs lacks ${url}`)
     }
   },
-);
+)
 
 siteTest(
   "no head tag on a page carries a Fresh data-key (#195)",
   async (site) => {
     for (const path of ["/", "/book", "/work"]) {
-      const head = (await site.html(path)).split("</head>")[0];
+      const head = (await site.html(path)).split("</head>")[0]
       assertEquals(
         count(head, /data-key=/),
         0,
         `${path}: a head tag has a data-key`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the breadcrumb's last item is the bare page name, not the full <title>",
   async (site) => {
     async function lastBreadcrumbName(path: string): Promise<string> {
-      const html = await site.html(path);
+      const html = await site.html(path)
       const breadcrumb = jsonLd(html)
         .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
         .find((n) =>
           (n as { "@type"?: string })["@type"] === "BreadcrumbList"
-        ) as { itemListElement: { name: string }[] } | undefined;
-      assert(breadcrumb, `${path}: no BreadcrumbList JSON-LD`);
-      return breadcrumb.itemListElement.at(-1)!.name;
+        ) as { itemListElement: { name: string }[] } | undefined
+      assert(breadcrumb, `${path}: no BreadcrumbList JSON-LD`)
+      return breadcrumb.itemListElement.at(-1)!.name
     }
 
-    const article = blogArticles[0];
+    const article = blogArticles[0]
     assertEquals(
       await lastBreadcrumbName(`/blog/${article.slug}`),
       article.title,
-    );
+    )
 
-    const project = projects.freelance[0];
+    const project = projects.freelance[0]
     assertEquals(
       await lastBreadcrumbName(`/work/${project.slug}`),
       project.title,
-    );
+    )
 
-    assertEquals(await lastBreadcrumbName("/work"), "Work");
+    assertEquals(await lastBreadcrumbName("/work"), "Work")
   },
-);
+)
 
 siteTest(
   "a nested page's back link says the nav's word for its section, and its JSON-LD trail is unchanged",
   async (site) => {
     async function back(path: string): Promise<{ href: string; text: string }> {
-      const html = await site.html(path);
-      const start = html.indexOf('aria-label="Breadcrumb"');
-      assert(start > 0, `${path}: no back link`);
+      const html = await site.html(path)
+      const start = html.indexOf('aria-label="Breadcrumb"')
+      assert(start > 0, `${path}: no back link`)
       const nav = html.slice(
         html.lastIndexOf("<nav", start),
         html.indexOf("</nav>", start),
-      );
-      assertEquals(count(nav, /<a\b/g), 1, `${path}: more than one link`);
+      )
+      assertEquals(count(nav, /<a\b/g), 1, `${path}: more than one link`)
       return {
         href: nav.match(/href="([^"]+)"/)![1],
         text: visibleText(nav).replace(/^‹\s*/, ""),
-      };
+      }
     }
-    const project = projects.freelance[0];
+    const project = projects.freelance[0]
     assertEquals(await back(`/work/${project.slug}`), {
       href: "/work",
       text: "Work",
-    });
+    })
     assertEquals(await back(`/blog/${blogArticles[0].slug}`), {
       href: "/blog",
       text: "Writing",
-    });
+    })
     assertEquals(await back(`/catalog/${catalogItems[0].slug}`), {
       href: "/catalog",
       text: "Services",
-    });
+    })
     assertEquals(await back(`/tools/${tools[0].slug}`), {
       href: "/tools",
       text: "Tools",
-    });
+    })
     const trail = jsonLd(await site.html(`/work/${project.slug}`))
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
       .find((n) => (n as { "@type"?: string })["@type"] === "BreadcrumbList") as
         | { itemListElement: { name: string }[] }
-        | undefined;
+        | undefined
     assertEquals(
       trail?.itemListElement.map((i) => i.name),
       ["Home", "Work", project.title],
-    );
+    )
   },
-);
+)
 
 siteTest(
   "the BreadcrumbList items are absolute addresses that end on the page's own canonical address",
   async (site) => {
-    const path = `/work/${projects.freelance[0].slug}`;
-    const html = await site.html(path);
-    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
-    assert(canonical, `${path}: no canonical link`);
+    const path = `/work/${projects.freelance[0].slug}`
+    const html = await site.html(path)
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]
+    assert(canonical, `${path}: no canonical link`)
     const trail = jsonLd(html)
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d])
       .find((n) => (n as { "@type"?: string })["@type"] === "BreadcrumbList") as
         | {
-          "@id": string;
-          itemListElement: { position: number; item: string }[];
+          "@id": string
+          itemListElement: { position: number; item: string }[]
         }
-        | undefined;
-    assert(trail, `${path}: no BreadcrumbList JSON-LD`);
-    assertEquals(trail["@id"], `${canonical}#breadcrumb`);
-    assertEquals(trail.itemListElement.map((i) => i.position), [1, 2, 3]);
-    const origin = new URL(canonical).origin;
+        | undefined
+    assert(trail, `${path}: no BreadcrumbList JSON-LD`)
+    assertEquals(trail["@id"], `${canonical}#breadcrumb`)
+    assertEquals(trail.itemListElement.map((i) => i.position), [1, 2, 3])
+    const origin = new URL(canonical).origin
     assertEquals(
       trail.itemListElement.map((i) => i.item),
       [`${origin}/`, `${origin}/work`, canonical],
-    );
+    )
   },
-);
+)
 
 siteTest(
   "the WebSite JSON-LD description is the same on every page",
   async (site) => {
-    const paths = ["/", "/catalog", `/blog/${blogArticles[0].slug}`];
-    const descriptions = new Set<string>();
+    const paths = ["/", "/catalog", `/blog/${blogArticles[0].slug}`]
+    const descriptions = new Set<string>()
     for (const path of paths) {
-      const html = await site.html(path);
+      const html = await site.html(path)
       const website = jsonLd(html)
         .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
         .find((n) => (n as { "@type"?: string })["@type"] === "WebSite") as
           | { description: string }
-          | undefined;
-      assert(website, `${path}: no WebSite JSON-LD`);
-      descriptions.add(website.description);
+          | undefined
+      assert(website, `${path}: no WebSite JSON-LD`)
+      descriptions.add(website.description)
     }
-    assertEquals(descriptions.size, 1, "WebSite description differs by page");
+    assertEquals(descriptions.size, 1, "WebSite description differs by page")
   },
-);
+)
 
 siteTest(
   "the Person JSON-LD states Anton's role at NeatSoft",
   async (site) => {
-    const html = await site.html("/");
+    const html = await site.html("/")
     const person = jsonLd(html)
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [])
       .find((n) => (n as { "@type"?: string })["@type"] === "Person") as
         | { worksFor: { roleName?: string } }
-        | undefined;
-    assert(person, "no Person in the JSON-LD");
-    assertEquals(person.worksFor.roleName, "Co-Founder and CEO");
+        | undefined
+    assert(person, "no Person in the JSON-LD")
+    assertEquals(person.worksFor.roleName, "Co-Founder and CEO")
   },
-);
+)
 
 /** One step of the guide's reading order, by its `data-guide-step` id. */
 function guideStep(html: string, id: string): string {
-  const start = html.indexOf(`data-guide-step="${id}"`);
-  assert(start > 0, `the guide has no "${id}" step`);
-  const next = html.indexOf("data-guide-step=", start + 1);
-  return html.slice(start, next === -1 ? html.indexOf("</ol>", start) : next);
+  const start = html.indexOf(`data-guide-step="${id}"`)
+  assert(start > 0, `the guide has no "${id}" step`)
+  const next = html.indexOf("data-guide-step=", start + 1)
+  return html.slice(start, next === -1 ? html.indexOf("</ol>", start) : next)
 }
 
 siteTest(
   "/saas-architecture-guide's project step lists the highlight case studies with their one-line lead only, and no tool",
   async (site) => {
-    const html = await site.html("/saas-architecture-guide");
-    const step = guideStep(html, "projects");
-    const text = visibleText(step);
-    const flat = (t: string) => t.replace(/\s+/g, " ");
+    const html = await site.html("/saas-architecture-guide")
+    const step = guideStep(html, "projects")
+    const text = visibleText(step)
+    const flat = (t: string) => t.replace(/\s+/g, " ")
     for (const project of highlightProjects()) {
       assert(
         step.includes(`href="/work/${project.slug}"`),
         `the step does not link case study ${project.slug}`,
-      );
-      const lead = projectLead(project);
-      assert(text.includes(lead), `${project.slug}: no lead "${lead}"`);
+      )
+      const lead = projectLead(project)
+      assert(text.includes(lead), `${project.slug}: no lead "${lead}"`)
       // What follows the first sentence of the description is never printed.
       const rest = flat(project.description).slice(
         firstSentence(flat(project.description)).length,
-      ).trim();
+      ).trim()
       if (rest) {
         assert(
           !text.includes(firstSentence(rest)),
           `${project.slug}: the step prints the whole description`,
-        );
+        )
       }
     }
     for (const t of tools) {
@@ -792,36 +792,36 @@ siteTest(
         !step.includes(`href="/work/${t.slug}"`) &&
           !step.includes(`href="/tools/${t.slug}"`),
         `the step links tool ${t.slug}, expected only client work`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "/saas-architecture-guide links current posts only, each with a line on why to read it, and never an archived one",
   async (site) => {
-    const html = await site.html("/saas-architecture-guide");
-    const main = html.slice(html.indexOf("<h1"), html.indexOf("<footer"));
+    const html = await site.html("/saas-architecture-guide")
+    const main = html.slice(html.indexOf("<h1"), html.indexOf("<footer"))
     const linked = [...main.matchAll(/href="\/blog\/([^"#?]+)"/g)]
-      .map((m) => m[1]);
-    assert(linked.length > 0, "the guide links no post");
+      .map((m) => m[1])
+    assert(linked.length > 0, "the guide links no post")
     for (const slug of linked) {
-      const article = blogArticles.find((a) => a.slug === slug);
-      assert(article, `the guide links unknown post ${slug}`);
-      assert(!article.archived, `the guide links archived post ${slug}`);
+      const article = blogArticles.find((a) => a.slug === slug)
+      assert(article, `the guide links unknown post ${slug}`)
+      assert(!article.archived, `the guide links archived post ${slug}`)
     }
-    const archived = blogArticles.filter((a) => a.archived);
-    assert(archived.length > 0, "no archived post to check");
+    const archived = blogArticles.filter((a) => a.archived)
+    assert(archived.length > 0, "no archived post to check")
     // Each post's link is followed, inside its list item, by its own line.
     for (const slug of linked) {
-      const from = main.indexOf(`href="/blog/${slug}"`);
-      const item = main.slice(from, main.indexOf("</li>", from));
-      const why = visibleText(item.slice(item.indexOf("</a>")));
-      assert(why.length > 20, `no reason to read under ${slug}: "${why}"`);
+      const from = main.indexOf(`href="/blog/${slug}"`)
+      const item = main.slice(from, main.indexOf("</li>", from))
+      const why = visibleText(item.slice(item.indexOf("</a>")))
+      assert(why.length > 20, `no reason to read under ${slug}: "${why}"`)
     }
-    assertEquals(count(html, /<h1\b/g), 1);
+    assertEquals(count(html, /<h1\b/g), 1)
   },
-);
+)
 
 siteTest(
   "a catalog icon name never appears as visible text on / or /catalog",
@@ -831,19 +831,19 @@ siteTest(
     // back to printing the bare string ("target", "search", ...)
     // would otherwise slip through unnoticed, since the names read as
     // plausible words rather than obviously broken markup.
-    const iconNames = catalogItems.map((i) => i.icon);
+    const iconNames = catalogItems.map((i) => i.icon)
     for (const path of ["/", "/catalog"]) {
-      const html = await site.html(path);
-      const text = visibleText(html).toLowerCase();
+      const html = await site.html(path)
+      const text = visibleText(html).toLowerCase()
       for (const name of iconNames) {
         assert(
           !new RegExp(`\\b${name}\\b`).test(text),
           `${path} renders the catalog icon name "${name}" as visible text`,
-        );
+        )
       }
     }
   },
-);
+)
 
 siteTest(
   "the visible breadcrumb shows only on pages two levels deep, and every page keeps its BreadcrumbList",
@@ -856,63 +856,63 @@ siteTest(
       "/how-i-work",
       "/infrastructure",
       "/why-not-just-ai",
-    ];
+    ]
     const deep = [
       "/work/smartlite",
       "/tools/ts-libs",
       `/blog/${blogArticles[0].slug}`,
-    ];
+    ]
     for (const path of [...shallow, ...deep]) {
-      const html = await site.html(path);
+      const html = await site.html(path)
       assertEquals(
         count(html, /aria-label="Breadcrumb"/g),
         deep.includes(path) ? 1 : 0,
         `${path}: visible breadcrumb`,
-      );
+      )
       assert(
         html.includes('"BreadcrumbList"'),
         `${path}: no BreadcrumbList JSON-LD`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the home page has one H1 that holds the name, and all four catalog prices in the hero",
   async (site) => {
-    const html = await site.html("/");
-    assertEquals(count(html, /<h1[\s>]/g), 1);
+    const html = await site.html("/")
+    assertEquals(count(html, /<h1[\s>]/g), 1)
     const h1 = visibleText(
       html.slice(html.indexOf("<h1"), html.indexOf("</h1>")),
-    );
-    assert(h1.includes("Anton Shubin") && h1.includes("Tech Lead"), h1);
-    const start = html.indexOf('data-home-section="hero"');
-    const hero = html.slice(start, html.indexOf("</section>", start));
+    )
+    assert(h1.includes("Anton Shubin") && h1.includes("Tech Lead"), h1)
+    const start = html.indexOf('data-home-section="hero"')
+    const hero = html.slice(start, html.indexOf("</section>", start))
     for (const item of catalogItems) {
       assert(
         hero.includes(`href="/catalog/${item.slug}"`),
         `no ${item.slug} row in the hero`,
-      );
+      )
     }
   },
-);
+)
 
 siteTest(
   "the home page JSON-LD is a WebPage about Anton, with no profile, breadcrumb, review or rating",
   async (site) => {
     const nodes = jsonLd(await site.html("/"))
       .flatMap((d) => (d as { "@graph"?: unknown[] })["@graph"] ?? [d]) as {
-        "@type"?: string;
-        name?: string;
-        about?: { "@id": string };
-      }[];
-    const pages = nodes.filter((n) => n["@type"] === "WebPage");
-    assertEquals(pages.length, 1);
-    assertEquals(pages[0].about, { "@id": "https://antonshubin.com/#person" });
+        "@type"?: string
+        name?: string
+        about?: { "@id": string }
+      }[]
+    const pages = nodes.filter((n) => n["@type"] === "WebPage")
+    assertEquals(pages.length, 1)
+    assertEquals(pages[0].about, { "@id": "https://antonshubin.com/#person" })
     assertEquals(
       nodes.find((n) => n["@type"] === "WebSite")?.name,
       "Anton Shubin",
-    );
+    )
     for (
       const type of [
         "ProfilePage",
@@ -921,79 +921,79 @@ siteTest(
         "AggregateRating",
       ]
     ) {
-      assert(!nodes.some((n) => n["@type"] === type), `${type} on /`);
+      assert(!nodes.some((n) => n["@type"] === type), `${type} on /`)
     }
   },
-);
+)
 
 siteTest(
   "the home page portrait is the one eager image and its <img> holds no photo URL",
   async (site) => {
-    const html = await site.html("/");
-    const media = html.slice(html.indexOf("data-hero-media"));
-    const img = media.match(/<img[^>]*>/)![0];
-    assert(img.includes('fetchpriority="high"'), img);
+    const html = await site.html("/")
+    const media = html.slice(html.indexOf("data-hero-media"))
+    const img = media.match(/<img[^>]*>/)![0]
+    assert(img.includes('fetchpriority="high"'), img)
     assert(
       !/photo-(big|mobile)/.test(img),
       `a phone would fetch the photo: ${img}`,
-    );
-    assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source");
+    )
+    assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source")
     // The photo is 2:3 cut to 4:3: the /about crop keeps the face and
     // shoulders, a top crop cuts them off.
     assert(
       img.includes("object-[50%_30%]"),
       `portrait crop differs from /about: ${img}`,
-    );
-    const main = mainContent(html);
-    assertEquals(count(main, /fetchpriority="high"/g), 1);
+    )
+    const main = mainContent(html)
+    assertEquals(count(main, /fetchpriority="high"/g), 1)
   },
-);
+)
 
 siteTest(
   "the home page shows the five promises as a timeline of steps linking how-i-work",
   async (site) => {
-    const html = await site.html("/");
-    const start = html.indexOf('data-promise-timeline="compact"');
-    assert(start > 0, "no compact promise timeline on /");
-    const timeline = html.slice(start, html.indexOf("</ol>", start));
-    assertEquals(count(timeline, /<li /g), 5);
+    const html = await site.html("/")
+    const start = html.indexOf('data-promise-timeline="compact"')
+    assert(start > 0, "no compact promise timeline on /")
+    const timeline = html.slice(start, html.indexOf("</ol>", start))
+    assertEquals(count(timeline, /<li /g), 5)
     for (const p of promises) {
-      assert(timeline.includes(`id="${p.id}"`), `no step ${p.id}`);
+      assert(timeline.includes(`id="${p.id}"`), `no step ${p.id}`)
       assert(
         timeline.includes(`href="/how-i-work#${p.id}"`),
         `${p.id} does not link how-i-work`,
-      );
-      assert(visibleText(timeline).includes(p.when), `no "${p.when}" label`);
+      )
+      assert(visibleText(timeline).includes(p.when), `no "${p.when}" label`)
     }
-    assert(!/accent/.test(timeline), "the timeline uses the accent colour");
+    assert(!/accent/.test(timeline), "the timeline uses the accent colour")
   },
-);
+)
 
 Deno.test(
   "the home closing band holds the brief form and the page's one primary Book",
   async () => {
-    const previous = Deno.env.get("SCHEDULE_URL");
-    Deno.env.set("SCHEDULE_URL", "https://meet.example.com");
-    const site = await startSite();
+    const previous = Deno.env.get("SCHEDULE_URL")
+    Deno.env.set("SCHEDULE_URL", "https://meet.example.com")
+    const site = await startSite()
     try {
-      const html = await site.html("/");
-      const start = html.indexOf("<section data-closing-band");
-      assert(start > 0, "no closing band on /");
-      const band = html.slice(start, html.indexOf("</section>", start));
+      const html = await site.html("/")
+      const start = html.indexOf("<section data-closing-band")
+      assert(start > 0, "no closing band on /")
+      const band = html.slice(start, html.indexOf("</section>", start))
       assert(
         band.includes('data-home-section="cta"'),
         "band is not the cta section",
-      );
+      )
       assert(
         band.includes('id="audit-form"'),
         "the brief form is not in the band",
-      );
-      assertEquals(count(band, /data-primary-cta/g), 1);
-      assertEquals(count(html, /data-primary-cta/g), 1);
+      )
+      assertEquals(count(band, /data-primary-cta/g), 1)
+      assertEquals(count(html, /data-primary-cta/g), 1)
     } finally {
-      await site.stop();
-      if (previous === undefined) Deno.env.delete("SCHEDULE_URL");
-      else Deno.env.set("SCHEDULE_URL", previous);
+      await site.stop()
+      if (previous === undefined) Deno.env.delete("SCHEDULE_URL")
+      else Deno.env.set("SCHEDULE_URL", previous)
     }
   },
-);
+)

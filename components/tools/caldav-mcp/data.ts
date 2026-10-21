@@ -4,14 +4,14 @@
 // README. Nothing here is written for the site.
 
 /** caldav-mcp's `CALDAV_MCP_TOOLS` values, in the README's order. */
-export type ToolMode = "all" | "no-delete" | "read-only";
+export type ToolMode = "all" | "no-delete" | "read-only"
 
 /** One position of the page's permission switch. */
 export interface ModeOption {
-  value: ToolMode;
-  label: string;
+  value: ToolMode
+  label: string
   /** The one line under the switch while this mode is chosen. */
-  note: string;
+  note: string
 }
 
 export const MODES: ModeOption[] = [
@@ -33,20 +33,20 @@ export const MODES: ModeOption[] = [
     note:
       "Also leaves out every tool that creates or changes something. Only read-only stops a stolen token from changing data.",
   },
-];
+]
 
 /** The groups of the tool reference, in page order. */
-export type McpToolGroup = "Tasks" | "Events" | "Calendars";
-export const GROUPS: McpToolGroup[] = ["Tasks", "Events", "Calendars"];
+export type McpToolGroup = "Tasks" | "Events" | "Calendars"
+export const GROUPS: McpToolGroup[] = ["Tasks", "Events", "Calendars"]
 
 /** One MCP tool the server offers. */
 export interface McpTool {
-  name: string;
-  group: McpToolGroup;
+  name: string
+  group: McpToolGroup
   /** The server's own description, verbatim. */
-  description: string;
+  description: string
   /** A call from docs/features.md; absent where the docs show none. */
-  example?: string;
+  example?: string
 }
 
 /** Every tool caldav-mcp 1.6.0 registers, grouped and ordered as the page lists them. */
@@ -145,7 +145,7 @@ export const MCP_TOOLS: McpTool[] = [
     description:
       "Delete a calendar and every event and task in it. Only a URL that list_calendars returns is accepted.",
   },
-];
+]
 
 /** The tools `read-only` keeps: caldav-mcp's own allowlist (`READ_TOOLS` in tools/index.ts). */
 const READ_TOOLS = new Set([
@@ -154,27 +154,27 @@ const READ_TOOLS = new Set([
   "get_event",
   "query_todos",
   "get_todo",
-]);
+])
 
 /** Whether `mode` offers the tool called `name`, by caldav-mcp's rule (`isToolOffered`). */
 export function isToolOffered(name: string, mode: ToolMode): boolean {
-  if (mode === "no-delete") return !name.startsWith("delete_");
-  if (mode === "read-only") return READ_TOOLS.has(name);
-  return true;
+  if (mode === "no-delete") return !name.startsWith("delete_")
+  if (mode === "read-only") return READ_TOOLS.has(name)
+  return true
 }
 
 /** A description split into its first sentence and the rest, for a row's summary and body. */
 export function splitDescription(
   text: string,
 ): { first: string; rest: string } {
-  const at = text.search(/\.\s/);
+  const at = text.search(/\.\s/)
   return at === -1
     ? { first: text, rest: "" }
-    : { first: text.slice(0, at + 1), rest: text.slice(at + 2) };
+    : { first: text.slice(0, at + 1), rest: text.slice(at + 2) }
 }
 
 /** The README's quick start for Claude Desktop, pinned to the version its README names. */
-export const CONFIG_VERSION = "1.6.0";
+export const CONFIG_VERSION = "1.6.0"
 export const DESKTOP_CONFIG = `{
   "mcpServers": {
     "caldav": {
@@ -192,7 +192,7 @@ export const DESKTOP_CONFIG = `{
       }
     }
   }
-}`;
+}`
 
 /** The `query_todos` answer docs/features.md prints under "AI-First Design". */
 export const ANSWER_SHAPE = `{
@@ -213,8 +213,8 @@ export const ANSWER_SHAPE = `{
       "calendar": "Work"
     }
   ]
-}`;
+}`
 
 /** The repository's clients guide, linked under the config block. */
 export const CLIENTS_GUIDE =
-  "https://github.com/spy4x/caldav-mcp/blob/main/docs/clients.md";
+  "https://github.com/spy4x/caldav-mcp/blob/main/docs/clients.md"

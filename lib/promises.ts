@@ -11,19 +11,19 @@
  * without environment access — same reason `lib/catalog.ts` has none.
  */
 
-export type PromiseIcon = "shield" | "target" | "key" | "calendar" | "wrench";
+export type PromiseIcon = "shield" | "target" | "key" | "calendar" | "wrench"
 
 export interface PromiseItem {
-  id: string;
-  icon: PromiseIcon;
-  title: string;
+  id: string
+  icon: PromiseIcon
+  title: string
   /** When the promise bites, in a project's own time: the timeline's label. */
-  when: string;
+  when: string
   /** The promise as a noun phrase for use mid-sentence ("a five-day refund"). */
-  phrase: string;
-  desc: string;
+  phrase: string
+  desc: string
   /** "Why this matters", shown under the promise on /how-i-work. */
-  why: string;
+  why: string
 }
 
 export const promises: PromiseItem[] = [
@@ -80,16 +80,16 @@ export const promises: PromiseItem[] = [
     why:
       "I stand behind what I build. If something I shipped breaks, I fix it on my time, not yours.",
   },
-];
+]
 
 /** Looks a promise up by id and throws on a typo, so a bad id fails the build, not a visitor. */
 export function promise(id: string): PromiseItem {
-  const p = promises.find((x) => x.id === id);
-  if (!p) throw new Error(`lib/promises.ts: no promise "${id}"`);
-  return p;
+  const p = promises.find((x) => x.id === id)
+  if (!p) throw new Error(`lib/promises.ts: no promise "${id}"`)
+  return p
 }
 
 /** Lowercases the first letter — for splicing a promise's `desc` after an em dash or a colon. */
 export function decapitalize(text: string): string {
-  return text.charAt(0).toLowerCase() + text.slice(1);
+  return text.charAt(0).toLowerCase() + text.slice(1)
 }
