@@ -6,6 +6,7 @@ import { cacheControlFor } from "./lib/cache-control.ts";
 import { redirectTarget } from "./lib/redirects.ts";
 import { siteCsrf } from "./lib/csrf.ts";
 import { serveVideo } from "./lib/video-files.ts";
+import { dropModulePreload, LATE_SCRIPT_PATHS } from "./lib/late-scripts.ts";
 
 export const app = new App<State>();
 
@@ -36,6 +37,14 @@ app.use(async (ctx) => {
       scheduleOrigin: SCHEDULE_ORIGIN,
     }),
   );
+  return res;
+});
+
+// Pages whose scripts wait for the HTML instead of racing the stylesheet
+// (lib/late-scripts.ts).
+app.use(async (ctx) => {
+  const res = await ctx.next();
+  if (LATE_SCRIPT_PATHS.has(ctx.url.pathname)) dropModulePreload(res.headers);
   return res;
 });
 

@@ -6,13 +6,15 @@ adding an entry there. Every field except the name, the job line, the summary,
 the status, the group and the kind is optional, and the page shows only the
 blocks an entry has data for: no registry means no install line, no `ci` means
 no CI pill, no `repo` means no repository row. A project with no page yet would
-be a `toolRows` entry, a hub line with links, not in the sitemap or the llms
-files; there is none today. A status is written down for every entry, never
-guessed from its link: `in-use`, `ready`, `beta`, `wip`, `paused` or `archived`,
-and "Live" is only ever a link to a running public instance. A tool's
-`registry.published` decides whether its pinned install command is offered with
-a copy button or marked "Not yet available"; flip it to `true` the day that
-version is really on its registry.
+be a `toolRows` entry, not in the sitemap or the llms files; there is none
+today. The hub cannot show one: `components/tools/hub/hub.ts` names tools only
+(`tool()` throws on any other slug), and `test/tools/hub.test.ts` fails while a
+row exists, so such a project gets a `tools` entry before it reaches the hub. A
+status is written down for every entry, never guessed from its link: `in-use`,
+`ready`, `beta`, `wip`, `paused` or `archived`, and "Live" is only ever a link
+to a running public instance. A tool's `registry.published` decides whether its
+pinned install command is offered with a copy button or marked "Not yet
+available"; flip it to `true` the day that version is really on its registry.
 
 Numbers that change on their own — stars, licence GitHub detected, last push,
 and the latest push pipeline's status on the default branch in Woodpecker — live
@@ -43,10 +45,10 @@ tool's `posts` link each post to its page (the post header shows "The tool:
 <name>", then its `live` link and its repository); its `catalogSlug` picks the
 catalog item the band's "Have me build it" column names; `deployable` adds
 `SoftwareApplication` JSON-LD, whose `url` is only ever its running `live`
-instance. The hub carries `CollectionPage` and `ItemList` JSON-LD. A tool page's
-links send `outbound` (`to` `live` or `github`, `item` the slug), `cta` and
-`book` with `item`, and its copy button `tool-install-copy`; see "Analytics in
-the code" in [analytics.md](analytics.md).
+instance. A tool page's links send `outbound` (`to` `live` or `github`, `item`
+the slug), `cta` and `book` with `item`, and its copy button
+`tool-install-copy`; see "Analytics in the code" in
+[analytics.md](analytics.md).
 
 **The tool frame (#454).** Every tool page wears one shared frame from
 `components/tool-frame/`, so a visitor who has read one page can read the next;
@@ -130,3 +132,30 @@ project's own README or docs, and "Where it stands" only from its status
 section. Screenshots live in `static/img/tools/<slug>/` (see
 [images.md](images.md)). A starter's catalog item (`kind: "starter"`) says
 "Built on" and links the starter's page.
+
+**The hub (#456).** `/tools` (`routes/tools/index.tsx`) is arranged by hand, not
+in registry order: `components/tools/hub/hub.ts` names the spotlight (the tool
+being launched, Seed today) and the slugs of each section in page order (Running
+right now, In the terminal, Under the hood, Being built), then the archive, and
+`HubTools.tsx` draws them, each entry read with its live registry version.
+`test/tools/hub.test.ts` fails when a tool is in none of them, so a new tool, or
+one that changes status, is placed there by an edit. The entry's group (`group`,
+`toolGroups`) no longer decides anything on the page. The spotlight shows the
+tool's headline as an `<h2>`, its lede and its clip, whose poster is the page's
+one eager image. A "Running right now" or "In the terminal" card
+(`components/tools/hub/HubParts.tsx`) shows the tool's clip, looping once
+pressed, else its poster, `hero` shot or first screenshot at 16:10, so a tool
+gets its picture on the hub the day its entry gets one; then its name (linking
+its page), `StatusMark`, `job`, the first sentence of `usedFor`, and one action:
+`live`, else the install line with Copy, else "View on GitHub". An "Under the
+hood" card is the same without the picture; a "Being built" or archive line
+shows `standing` or the `job`. The hub shows no CI pill and no licence: those
+are on each tool's page. It carries `CollectionPage` and `ItemList` JSON-LD in
+page order, and no `VideoObject`.
+
+The hub is kept light for its first paint: a card's picture is the narrowest
+file its `srcset` names (`smallestFile()`, about 640px; give a new screenshot a
+copy about 720px wide), loaded lazily without a `srcset`, so a 3x phone does not
+fetch the 1280px copies; a screenshot only shows, with no lightbox; and its
+response carries no `modulepreload` `Link` header (`lib/late-scripts.ts`), so
+the clip and Copy scripts load after the HTML instead of beside the stylesheet.

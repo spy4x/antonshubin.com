@@ -1,5 +1,7 @@
 // A card opens its page from anywhere on it, not only from its title (#336):
-// the /work archive rows, the /tools cards and the /catalog cards. A click in
+// the /work archive rows, a tool page's More tools cards and the /catalog
+// cards. (The /tools hub's cards are not one big link: each holds a play
+// button of its own, #456.) A click in
 // a card's top-right corner, away from any text, must land on the page its
 // one link names, and a link inside the card must keep its own target. Needs a
 // built site and Chromium; see docs/testing.md "Browser-driven tests".
@@ -10,7 +12,11 @@ import { launchChromium, newPage, WAIT_MS } from "./browser.ts";
 
 const CARDS = [
   { path: "/work", card: "[data-archive-row]", link: "a[data-work-link]" },
-  { path: "/tools", card: "li[data-tool].bg-paper", link: "h3 a" },
+  {
+    path: "/tools/mig",
+    card: "[data-tool-more] li[data-tool]",
+    link: "h3 a",
+  },
   {
     path: "/catalog",
     card: "[data-catalog-item]",
@@ -52,8 +58,7 @@ Deno.test("a click anywhere on a card opens the card's page", async () => {
 const INNER_LINKS = [
   { path: "/work", link: "[data-archive-row] figure a" },
   { path: "/work", link: "[data-archive-row] [data-company-outcome] a" },
-  { path: "/tools", link: "li[data-tool] [data-credit] a" },
-  { path: "/tools", link: "li[data-tool] a[data-ci-status]" },
+  { path: "/tools/ts-libs", link: "[data-tool-more] [data-credit] a" },
 ];
 
 Deno.test("links inside archive rows and tool cards stay above the card's link", async () => {

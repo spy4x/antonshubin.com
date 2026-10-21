@@ -128,7 +128,7 @@ ${promisesList}
     } (${BASE_URL}${WRITE_FALLBACK_HREF}), or email ${EMAIL_ADDRESS}, or Telegram @spy4x
 - [Writing](${BASE_URL}/blog) — Posts on decisions for founders, AI and MCP, self-hosting, and Scars (my own mistakes and what I changed after them)
 - [Work](${BASE_URL}/work) — ${workLine}
-- [Tools](${BASE_URL}/tools) — Open-source tools I build and use, with status, CI status and install
+- [Tools](${BASE_URL}/tools) — Open-source tools I build and use, led by demo clips, each with its status and its own page
 - [Privacy](${BASE_URL}/privacy) — What the brief form, the newsletter and analytics collect${hackathonsLink}
 
 ## Tools

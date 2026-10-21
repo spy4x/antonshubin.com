@@ -31,8 +31,11 @@ function Still({ shot }: { shot: ToolScreenshot }) {
   );
 }
 
-/** The window a clip or still sits in: the library's frame, or a Rule border for a `bare` clip. */
-function Frame(
+/**
+ * The window a clip or still sits in: the library's frame, or a Rule border
+ * for a `bare` or `terminal` clip. The `/tools` hub's cards use it too.
+ */
+export function MediaFrame(
   { variant, title, caption, children }: {
     variant: "browser" | "terminal" | "bare";
     title?: string;
@@ -76,7 +79,7 @@ export function ToolHeroMedia({ tool }: { tool: Tool }) {
   const clip = tool.clip;
   if (clip) {
     return (
-      <Frame
+      <MediaFrame
         variant={clip.frame}
         title={clip.frameTitle}
         caption={clip.caption}
@@ -99,19 +102,19 @@ export function ToolHeroMedia({ tool }: { tool: Tool }) {
             />
           )
           : <Still shot={clip.poster} />}
-      </Frame>
+      </MediaFrame>
     );
   }
   const still = heroStill(tool);
   if (!still) return null;
   return (
-    <Frame
+    <MediaFrame
       variant="browser"
       title={tool.live?.href.startsWith("http")
         ? new URL(tool.live.href).host
         : undefined}
     >
       <Still shot={still} />
-    </Frame>
+    </MediaFrame>
   );
 }

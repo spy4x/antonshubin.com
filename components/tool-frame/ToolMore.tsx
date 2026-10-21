@@ -41,9 +41,7 @@ export function ToolMore(
     <section aria-labelledby="more" data-tool-more class="mt-12">
       <h2 id="more" class="text-2xl text-parchment">More tools</h2>
       <ul class="mt-4 grid gap-4 sm:grid-cols-3">
-        {shown.map((t) => (
-          <ToolCard key={t.slug} tool={t} live={data.live} variant="more" />
-        ))}
+        {shown.map((t) => <ToolCard key={t.slug} tool={t} />)}
       </ul>
       <p class="mt-4 text-sm">
         <a

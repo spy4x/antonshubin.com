@@ -47,7 +47,11 @@ export type ToolKind =
   | "device"
   | "starter";
 
-/** The `/tools` group a tool is listed under, in `toolGroups` order. */
+/**
+ * The group a tool belongs to, in `toolGroups` order. Since #456 the `/tools`
+ * hub is arranged by hand (`components/tools/hub/hub.ts`), so it no longer
+ * decides where a tool shows.
+ */
 export type ToolGroupId = "tools" | "products" | "archive";
 
 export interface ToolGroup {
@@ -60,9 +64,8 @@ export interface ToolGroup {
 }
 
 /**
- * The three groups the merged spec of #273 sets, in page order: what I run
- * and use first, then the products still being built, then what is paused or
- * archived. A group with no entry is not rendered.
+ * The three groups the merged spec of #273 set: what I run and use, the
+ * products still being built, and what is paused or archived.
  */
 export const toolGroups: ToolGroup[] = [
   {
@@ -1224,7 +1227,7 @@ export function findTool(slug: string): Tool | undefined {
   return tools.find((t) => t.slug === slug);
 }
 
-/** One `/tools` group: its page tools first, then its rows with no page. */
+/** One group: its page tools first, then its rows with no page. */
 export interface HubGroup {
   group: ToolGroup;
   tools: Tool[];

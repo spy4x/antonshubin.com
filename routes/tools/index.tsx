@@ -3,12 +3,15 @@ import { getBreadcrumb, head } from "../../lib/head.ts";
 import { SEOHead } from "../../components/SEOHead.tsx";
 import { Breadcrumb } from "../../components/Breadcrumb.tsx";
 import { Layout } from "../../components/Layout.tsx";
+import { ClosingBand } from "../../components/ClosingBand.tsx";
+import { HubTools } from "../../components/tools/hub/HubTools.tsx";
+import { hubOrder } from "../../components/tools/hub/hub.ts";
 import { StatusMark } from "@spy4x/preact-ui/status-mark";
-import { ToolCard, ToolRowCard } from "../../components/ToolCard.tsx";
+import { IconArrowRight } from "@spy4x/preact-icons";
 import { toJsonLd } from "../../lib/json-ld.ts";
 import {
-  groupedTools,
   statusMeanings,
+  tool as toolBySlug,
   type ToolStatus,
 } from "../../lib/tools.ts";
 import { checkedLabel, toolsLive } from "../../lib/tools-live.ts";
@@ -18,10 +21,12 @@ import { eventAttrs } from "../../lib/analytics.ts";
 const TITLE = "Tools I build and run myself";
 const CANONICAL = "https://antonshubin.com/tools";
 
+// The curated hub (#456): Seed's clip first, then what runs live, what runs
+// in a terminal, the building blocks, the work in progress and the archive,
+// in the hand-set order of components/tools/hub/hub.ts.
 export default define.page(async function ToolsIndex(ctx) {
   const live = await toolsLive();
-  const groups = groupedTools();
-  const pageTools = groups.flatMap((g) => g.tools);
+  const order = hubOrder().map(toolBySlug);
 
   head.value = {
     ...head.value,
@@ -45,8 +50,8 @@ export default define.page(async function ToolsIndex(ctx) {
     "author": { "@id": "https://antonshubin.com/#person" },
     "mainEntity": {
       "@type": "ItemList",
-      "numberOfItems": pageTools.length,
-      "itemListElement": pageTools.map((t, i) => ({
+      "numberOfItems": order.length,
+      "itemListElement": order.map((t, i) => ({
         "@type": "ListItem",
         "position": i + 1,
         "name": t.name,
@@ -64,69 +69,38 @@ export default define.page(async function ToolsIndex(ctx) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: toJsonLd(jsonLd) }}
       />
-      <div class="max-w-5xl mx-auto px-2 sm:px-4 py-8 sm:py-12">
+      <div class="max-w-6xl mx-auto">
         <Breadcrumb items={getBreadcrumb(head.value.canonical, "Tools")} />
-        <h1 class="text-3xl sm:text-4xl text-parchment mb-4">{TITLE}</h1>
-        <p class="text-graphite text-base sm:text-lg max-w-2xl">
+        <h1 class="text-3xl sm:text-5xl text-parchment leading-tight">
+          {TITLE}
+        </h1>
+        <p class="mt-4 max-w-2xl text-graphite text-base sm:text-lg leading-relaxed">
           I build small tools that each do one job, and I use them in my own
-          work. Each entry says where it stands. Need something like this for
-          your team? That's my day job.{" "}
-          <a
-            href="/catalog"
-            {...eventAttrs("cta", { place: "body", target: "/catalog" })}
-            class="text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
-          >
-            Services
-          </a>
+          work. Each entry says where it stands.
         </p>
 
-        {groups.map(({ group, tools, rows }) => (
-          <section
-            key={group.id}
-            aria-labelledby={`group-${group.id}`}
-            data-tool-group={group.id}
-            class="mt-12"
-          >
-            <h2 id={`group-${group.id}`} class="text-2xl text-parchment">
-              {group.title}
-            </h2>
-            <p class="mt-1 text-graphite">{group.intro}</p>
-            <ul
-              class={group.layout === "compact"
-                ? "mt-4"
-                : group.layout === "grid"
-                ? "mt-4 grid gap-4 sm:grid-cols-2"
-                : "mt-4 grid gap-4"}
+        <HubTools live={live} />
+
+        <ClosingBand
+          promiseIds={[]}
+          catalogLink={
+            <a
+              href="/catalog"
+              {...eventAttrs("cta", { place: "band", target: "/catalog" })}
+              class="inline-flex items-center gap-1 text-sm text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
             >
-              {tools.map((t) => (
-                <ToolCard
-                  key={t.slug}
-                  tool={t}
-                  live={live}
-                  variant={group.layout === "grid"
-                    ? "card"
-                    : group.layout === "wide"
-                    ? "wide"
-                    : "compact"}
-                />
-              ))}
-              {rows.map((r) => (
-                <ToolRowCard
-                  key={r.slug}
-                  row={r}
-                  variant={group.layout === "compact"
-                    ? "compact"
-                    : group.layout === "wide"
-                    ? "wide"
-                    : "card"}
-                />
-              ))}
-            </ul>
-          </section>
-        ))}
+              Services
+              <IconArrowRight class="w-3.5 h-3.5" />
+            </a>
+          }
+        >
+          <p class="mb-6 font-heading text-xl text-parchment">
+            Need something like this for your team? That's my day job.
+          </p>
+        </ClosingBand>
 
         <p data-checked class="mt-10 text-sm text-graphite">
-          CI status and versions: {checkedLabel(live)}.
+          Versions: {checkedLabel(live)}.
         </p>
 
         <details data-status-key class="mt-6 border-t border-rule pt-4">
