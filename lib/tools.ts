@@ -738,9 +738,9 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "3.1.0",
+      version: "8.10.0",
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@3.1.0",
+      install: "deno add jsr:@spy4x/preact-ui@8.10.0",
       latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
     },
     licence: "MIT",
@@ -754,6 +754,27 @@ export const tools: Tool[] = [
         href: "https://spy4x.github.io/preact-components",
       },
     ],
+    headline:
+      "Server-rendered Preact and Tailwind components, with a live guide that runs every one.",
+    lede:
+      "You install one package, import a component, and it renders with the shared design tokens: the same button, table, chart and CRUD scaffold in every app, written once.",
+    clip: {
+      title: "A tour of the preact-components live guide",
+      caption:
+        "The live guide: a dashboard built only from the library, light and dark, three accent colours, keyboard search, and a component with its code.",
+      frame: "browser",
+      frameTitle: "spy4x.github.io/preact-components",
+      poster: {
+        src: "/video/tools/preact-components/poster.webp",
+        srcset:
+          "/video/tools/preact-components/poster-640.webp 640w, /video/tools/preact-components/poster.webp 1280w",
+        alt:
+          "The live UI guide's overview in dark with the rose accent: the headline Preact components that render on the server and work from the keyboard, the Browse components and Star on GitHub buttons, the install command deno add jsr:@spy4x/preact-ui with its copy button, and the counts 123 components, 124 icons and 10 packages.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT38S", uploadDate: "2026-10-19" },
+    },
     live: {
       label: "Open the live UI guide",
       href: "https://spy4x.github.io/preact-components",
@@ -780,49 +801,6 @@ export const tools: Tool[] = [
       "Your app is React: these are Preact components.",
       "You need components checked with a screen reader: none has been run against them yet.",
       "You do not use Tailwind: every component renders Tailwind classes.",
-    ],
-    fits: [
-      {
-        text:
-          "Imports @spy4x/platform, @spy4x/time and @spy4x/validation from ts-libs.",
-        href: "/tools/ts-libs",
-        planned: false,
-      },
-      {
-        text:
-          "Publishes under the same @spy4x scope on JSR as ts-libs, as @spy4x/preact-*.",
-        href: "/tools/ts-libs",
-        planned: false,
-      },
-      {
-        text:
-          "Seed, my SaaS starter, builds its signed-in layout on Shell from @spy4x/preact-system and its styles on @spy4x/preact-theme.",
-        href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
-        planned: false,
-      },
-      {
-        text: "This site will replace its own components with it.",
-        href: "https://github.com/spy4x/antonshubin.com/issues/195",
-        planned: true,
-      },
-    ],
-    screenshots: [
-      {
-        src: "/img/tools/preact-components/guide-overview-dark.webp",
-        srcset:
-          "/img/tools/preact-components/guide-overview-dark-720.webp 720w, /img/tools/preact-components/guide-overview-dark.webp 2560w",
-        alt:
-          "The live UI guide's overview page: a side navigation listing every package, and one card per package — UI, System, CRUD, Charts, Map, Signals, Theme, Icons and cn — each with its import name, a one-line summary and a count of its live cards or icons, or the words Examples coming for a package that has none yet.",
-        width: 2560,
-        height: 1600,
-      },
-      {
-        src: "/img/tools/preact-components/guide-ui-ink.webp",
-        alt:
-          "The UI package's page in the opt-in ink dark palette: the side navigation lists the UI components by group, the Badge and StatusMark cards show their live examples, and the CiStatusPill card's description starts below them.",
-        width: 2560,
-        height: 1600,
-      },
     ],
     credit: {
       text:

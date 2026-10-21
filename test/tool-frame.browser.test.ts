@@ -1,6 +1,6 @@
 // #454: the shared browser check a custom tool page's own test calls
 // (`toolPageProblems()` in test/tool-frame.ts), run here on a frame page with
-// no hero media (oko) and on one with a hero still (preact-components).
+// no hero media (oko) and on one with a hero still (toread-today).
 // test/a11y.browser.test.ts runs axe and the sideways-scroll check over every
 // tool page. Needs a built site and Chromium; see docs/testing.md
 // "Browser-driven tests".
@@ -28,7 +28,7 @@ Deno.test("the shared tool page check finds no axe violation, sideways scroll or
     const page = await newPage(browser);
     try {
       const problems: string[] = [];
-      for (const slug of ["oko", "preact-components"]) {
+      for (const slug of ["oko", "toread-today"]) {
         problems.push(
           ...await toolPageProblems(page, site.origin, `/tools/${slug}`),
         );
@@ -53,7 +53,7 @@ Deno.test("pressing a tool page's hero screenshot opens it full size and sends z
     });
     try {
       await recordUmami(page);
-      await page.goto(`${site.origin}/tools/preact-components`, {
+      await page.goto(`${site.origin}/tools/toread-today`, {
         waitUntil: "networkidle",
       });
       const still = page.locator("[data-tool-media] img");
@@ -66,7 +66,7 @@ Deno.test("pressing a tool page's hero screenshot opens it full size and sends z
       );
       assertEquals(
         (await trackedCalls(page)).filter(([name]) => name === "zoom"),
-        [["zoom", { item: "preact-components" }]],
+        [["zoom", { item: "toread-today" }]],
       );
     } finally {
       await page.close();
@@ -86,10 +86,10 @@ Deno.test("a screenshot below the hero opens full size from the keyboard", async
       viewport: { width: 1440, height: 900 },
     });
     try {
-      // preact-components' screenshot grid and Seed's "What you get" cards.
+      // toread-today's screenshot grid and Seed's "What you get" cards.
       // An image inside a link (Seed's "See it running" cards) keeps its
       // link, so the first zoomable image is the first one outside a link.
-      for (const slug of ["preact-components", "seed"]) {
+      for (const slug of ["toread-today", "seed"]) {
         await page.goto(`${site.origin}/tools/${slug}`, {
           waitUntil: "networkidle",
         });
@@ -152,9 +152,10 @@ Deno.test("a focused screenshot, dark or white, draws a Parchment and Ink ring i
   let browser: Browser | undefined;
   try {
     browser = await launchChromium();
-    // preact-components' hero is a dark screenshot; toread-today's are white.
+    // oko's status cards below the hero are dark screenshots; toread-today's
+    // are white. Every other hero is a clip poster now, which is a link.
     const cases = [
-      { slug: "preact-components", shot: "[data-tool-media] img", width: 1440 },
+      { slug: "oko", shot: "[data-tool-middle] img", width: 1440 },
       { slug: "toread-today", shot: "[data-tool-media] img", width: 1440 },
       { slug: "toread-today", shot: "[data-tool-middle] img", width: 390 },
     ];
