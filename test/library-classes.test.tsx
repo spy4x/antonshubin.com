@@ -179,7 +179,7 @@ function renderedLibraryMarkup(): string {
         fit="Who."
       />,
     ),
-    // /tools/caldav-tasks-web (#465): RadioChips as the site renders it (its
+    // /tools/caldav-tasks-web (#465), /tools/zond: RadioChips as the site renders it (its
     // own legend classes: the library's default `pc-label` is a preset class
     // the site does not load), a checked chip and a disabled one, and a
     // hidden legend.

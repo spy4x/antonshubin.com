@@ -438,12 +438,35 @@ export const tools: Tool[] = [
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
-      "Your monitoring tool has no SSO support and the services it checks sit behind Authelia.",
+      "An SSO proxy stands between your monitor and your self-hosted services.",
+    ],
+    dontUseIf: [
+      "Your monitor already runs inside that network, or you need response times, metrics or content checks.",
     ],
     repo: "spy4x/zond",
     runtime: "Go, as a single distroless binary",
     programmingLanguage: "Go",
     ci: { provider: "woodpecker", repoId: 5 },
+    headline:
+      "Health checks for self-hosted services behind an SSO proxy, without a monitoring login.",
+    lede:
+      "Your monitor asks https://zond.example.com/health/metube. zond, running on the same Docker network as metube, sends metube a plain HTTP GET and answers 200 ok or 503 unreachable.",
+    clip: {
+      title: "zond: add targets, start it, read ok and KO in the browser",
+      caption:
+        "37 s, no sound: add ollama and grafana to zond.yml, start zond, ask it about metube, then read unreachable and the OK and KO lines in the browser.",
+      frame: "bare",
+      poster: {
+        src: "/video/tools/zond/poster.webp",
+        srcset:
+          "/video/tools/zond/poster-640.webp 640w, /video/tools/zond/poster.webp 1280w",
+        alt:
+          "zond's /health page in a browser, answered with HTTP 503 Service Unavailable: OK metube, OK ollama, KO grafana.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "oko",
