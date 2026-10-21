@@ -5,23 +5,25 @@
  * script writes no file. See `docs/publishing.md` for the whole flow.
  *
  * Usage:
- *   deno task publish:blog <slug>                     # Dev.to draft + links + newsletter preview
+ *   deno task publish:blog <slug>                     # Dev.to, IndexNow, links, newsletter
  *   deno task publish:blog <slug> --preview mail.html # write the mail's HTML (and mail.txt), nothing else
  *   deno task publish:blog <slug> --test-newsletter   # one copy to CONTACT_EMAIL, no log
- *   deno task publish:blog <slug> --send-newsletter   # only after Anton says yes in chat
  *
- * `--preview` needs no live post. The other runs first check that `https://antonshubin.com/blog/<slug>` answers
- * 200 and stop otherwise. The default run creates or updates the Dev.to draft, prints
- * every channel's tagged link and the newsletter's subject and body, pings
- * IndexNow with the post and `/blog` (fail-open), and sends nothing else. `--send-newsletter` sends the announcement from the production
- * container over SSH, where `scripts/send-newsletter.ts --stdin-json` refuses
- * a slug it already sent.
+ * `--preview` needs no live post. The other runs first check that
+ * `https://antonshubin.com/blog/<slug>` answers 200 and stop otherwise. The
+ * default run publishes the post on Dev.to (creating the article or updating
+ * the one with its `canonical_url`), pings IndexNow with the post and `/blog`
+ * (fail-open), prints every channel's tagged link, then sends the newsletter
+ * from the production container over SSH, where
+ * `scripts/send-newsletter.ts --stdin-json` refuses a slug it already sent.
+ * Neither a Dev.to failure nor a failed send stops the other; the run exits
+ * non-zero when either failed.
  */
 
 import { extract as extractYaml } from "@std/front-matter/yaml"
 import { test as hasFrontMatter } from "@std/front-matter/test"
 import { type BlogArticle, blogArticles } from "@/lib/data.ts"
-import { createDevToDraft, devToOpening } from "./devto.ts"
+import { devToOpening, publishOnDevTo } from "./devto.ts"
 import { linkLines } from "./links.ts"
 import { articleCampaign } from "./utm.ts"
 import { postLetter } from "@/lib/letter.ts"
@@ -39,27 +41,24 @@ export const REMOTE_SEND_COMMAND =
 export const LIVE_CHECK_TIMEOUT_MS = 10_000
 
 const USAGE =
-  "Usage: deno task publish:blog <slug> [--send-newsletter | --test-newsletter | --preview <file>]"
+  `Usage: deno task publish:blog <slug> [--test-newsletter | --preview <file>]`
 
 export interface PublishArgs {
   slug: string
-  sendNewsletter: boolean
   /** Send one copy to `CONTACT_EMAIL` from the container; no log. */
   testNewsletter?: boolean
   /** Write the mail's HTML to this file and its plain text beside it. */
   preview?: string
 }
 
-/** Parses `<slug>` and at most one of `--send-newsletter`, `--test-newsletter`, `--preview <file>`. */
+/** Parses `<slug>` and at most one of `--test-newsletter`, `--preview <file>`. */
 export function parsePublishArgs(args: string[]): PublishArgs {
   let slug: string | undefined
-  let sendNewsletter = false
   let testNewsletter = false
   let preview: string | undefined
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
-    if (arg === "--send-newsletter") sendNewsletter = true
-    else if (arg === "--test-newsletter") testNewsletter = true
+    if (arg === "--test-newsletter") testNewsletter = true
     else if (arg === "--preview") {
       preview = args[++i]
       if (!preview || preview.startsWith("-")) {
@@ -71,16 +70,11 @@ export function parsePublishArgs(args: string[]): PublishArgs {
     else throw new Error(`Unexpected argument ${arg}. ${USAGE}`)
   }
   if (!slug) throw new Error(USAGE)
-  const modes = [sendNewsletter, testNewsletter, preview !== undefined]
-    .filter(Boolean).length
-  if (modes > 1) {
-    throw new Error(
-      `Pick one of --send-newsletter, --test-newsletter and --preview. ${USAGE}`,
-    )
+  if (testNewsletter && preview !== undefined) {
+    throw new Error(`Pick one of --test-newsletter and --preview. ${USAGE}`)
   }
   return {
     slug,
-    sendNewsletter,
     ...(testNewsletter ? { testNewsletter } : {}),
     ...(preview !== undefined ? { preview } : {}),
   }
@@ -145,13 +139,14 @@ export function newsletterFor(post: Post): PostAnnouncement {
 /** Everything the script touches outside its own process, so a test can fake it. */
 export interface PublishDeps {
   fetch: typeof fetch
-  createDraft: (
+  /** Publishes the post on Dev.to; resolves to whether Dev.to accepted it. */
+  publishDevTo: (
     title: string,
     slug: string,
     body: string,
     campaign: string,
     coverImage?: string,
-  ) => Promise<void>
+  ) => Promise<boolean>
   /** Runs `command` on the server with `stdin`; resolves to its exit code. */
   runRemote: (command: string, stdin: string) => Promise<number>
   readPost: (slug: string) => Promise<Post>
@@ -216,29 +211,31 @@ export async function publishBlog(
 
   const newsletter = newsletterFor(post)
 
-  if (args.sendNewsletter || args.testNewsletter) {
+  if (args.testNewsletter) {
     deps.log(
-      args.testNewsletter
-        ? `Sending one test copy of "${args.slug}" to CONTACT_EMAIL from the production container...`
-        : `Sending the newsletter for "${args.slug}" from the production container...`,
+      `Sending one test copy of "${args.slug}" to CONTACT_EMAIL from the production container...`,
     )
-    const code = await deps.runRemote(
-      args.testNewsletter
-        ? `${REMOTE_SEND_COMMAND} --test`
-        : REMOTE_SEND_COMMAND,
-      JSON.stringify(newsletter),
+    const code = await remoteSend(
+      deps,
+      `${REMOTE_SEND_COMMAND} --test`,
+      newsletter,
     )
     if (code !== 0) deps.error(`The remote send exited with ${code}.`)
     return code
   }
 
-  await deps.createDraft(
-    post.article.title,
-    args.slug,
-    `${devToOpening(post.article)}\n\n${post.body}`,
-    post.campaign,
-    post.article.coverImage,
-  )
+  let devTo = false
+  try {
+    devTo = await deps.publishDevTo(
+      post.article.title,
+      args.slug,
+      `${devToOpening(post.article)}\n\n${post.body}`,
+      post.campaign,
+      post.article.coverImage,
+    )
+  } catch (err) {
+    deps.error(`Dev.to: ${(err as Error).message}`)
+  }
   deps.log(await pingIndexNow(deps.fetch, SITE, [url, `${SITE}/blog`]))
 
   deps.log(`\nTagged links (campaign ${post.campaign}):`)
@@ -249,15 +246,34 @@ export async function publishBlog(
     `\nPer subreddit: deno task links /blog/${args.slug} --content r-<subreddit>`,
   )
 
-  deps.log(`\nNewsletter subject: ${newsletter.subject}`)
-  deps.log(`Newsletter text part:\n${newsletter.text}`)
   deps.log(
-    `\nNothing was sent. See it first: deno task publish:blog ${args.slug} --preview mail.html\n` +
-      `One copy to CONTACT_EMAIL: deno task publish:blog ${args.slug} --test-newsletter\n` +
-      `Only after Anton says yes in chat for this post:\n` +
-      `  deno task publish:blog ${args.slug} --send-newsletter`,
+    `\nSending the newsletter "${newsletter.subject}" from the production container...`,
   )
-  return 0
+  const sendCode = await remoteSend(deps, REMOTE_SEND_COMMAND, newsletter)
+
+  if (!devTo) deps.error(`Failed: the post is not published on Dev.to.`)
+  if (sendCode !== 0) {
+    deps.error(`Failed: the newsletter send exited with ${sendCode}.`)
+  }
+  if (devTo && sendCode === 0) return 0
+  return sendCode !== 0 ? sendCode : 1
+}
+
+/**
+ * Pipes `newsletter` to `command` on the server; resolves to its exit code, or
+ * to 1 when the command could not run at all.
+ */
+async function remoteSend(
+  deps: PublishDeps,
+  command: string,
+  newsletter: PostAnnouncement,
+): Promise<number> {
+  try {
+    return await deps.runRemote(command, JSON.stringify(newsletter))
+  } catch (err) {
+    deps.error(`The remote send could not run: ${(err as Error).message}`)
+    return 1
+  }
 }
 
 /** Pipes `stdin` into `ssh cloudlab <command>`, showing the remote output as it runs. */
@@ -285,7 +301,7 @@ if (import.meta.main) {
   Deno.exit(
     await publishBlog(args, {
       fetch,
-      createDraft: createDevToDraft,
+      publishDevTo: publishOnDevTo,
       runRemote: sshRun,
       readPost: (slug) => readPost(slug),
       writeFile: (path, content) => Deno.writeTextFile(path, content),

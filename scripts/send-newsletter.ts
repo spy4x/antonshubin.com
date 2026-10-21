@@ -12,8 +12,8 @@
  * The body file/text supports HTML; it goes into the letter layout
  * (`lib/letter.ts`) with each subscriber's unsubscribe link in the footer.
  *
- * `--stdin-json` is the blog post announcement `deno task publish:blog <slug>
- * --send-newsletter` pipes in over SSH: `{ "slug", "subject", "html", "text"
+ * `--stdin-json` is the blog post announcement `deno task publish:blog <slug>`
+ * pipes in over SSH: `{ "slug", "subject", "html", "text"
  * }`, already rendered, with `UNSUBSCRIBE_PLACEHOLDER` where each link goes.
  * It sends at most once per slug, to each subscriber at most once, guarded by
  * the sent log (`@spy4x/server/subscribers`'s `sendIssue` over
@@ -46,7 +46,7 @@ import {
 } from "@/lib/mailing-list.ts"
 import { assertKebab } from "./utm.ts"
 
-/** A blog post announcement, as `publish:blog --send-newsletter` sends it. */
+/** A blog post announcement, as `publish:blog` sends it. */
 export interface PostAnnouncement extends Letter {
   slug: string
   subject: string
