@@ -190,12 +190,14 @@ own.
 ### The hub (`/tools`)
 
 `demo-play` (`item`; `place: hero` for the spotlight's clip, `card` for a
-card's), `zoom` (`item`, the tool whose folder holds the screenshot), `cta`
-(`place: hero` for "See Seed", `card` for a card's name, `body` for a Being
-built or archive line's name, `band` for Services), `outbound` (`to: live` or
-`github`, `item`, `place: hero` or `card`), `tool-install-copy` (`item`) and
-`book` (`place: band`). The number the hub should move: the share of hub visits
-with a `cta` to a tool page or a `demo-play`.
+card's), `cta` (`place: hero` for "See Seed", `card` for a card's name, `body`
+for a Being built or archive line's name, `band` for Services), `outbound`
+(`to: live` or `github`, `item`, `place: hero` or `card`) for a link to another
+site, `book` for an on-site link to `/book` (`place: card` and `item: mig` for
+mig's "Open the booking page", `place: band` for the band's Book), and
+`tool-install-copy` (`item`). The hub has no lightbox, so no `zoom`. The number
+the hub should move: the share of hub visits with a `cta` to a tool page or a
+`demo-play`.
 
 ### caldav-mcp
 

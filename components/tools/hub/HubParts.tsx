@@ -8,7 +8,7 @@ import { InstallLine } from "../../InstallLine.tsx";
 import { MediaFrame } from "../../tool-frame/ToolHeroMedia.tsx";
 import { heroStill, toolLede } from "../../tool-frame/tool-page.ts";
 import ToolHeroClip from "../../../islands/ToolHeroClip.tsx";
-import { eventAttrs, type Place } from "../../../lib/analytics.ts";
+import { eventAttrs, linkEvent, type Place } from "../../../lib/analytics.ts";
 import { firstSentence } from "../../../lib/llms.ts";
 import {
   clipSources,
@@ -133,11 +133,13 @@ function CardAction({ tool }: { tool: Tool }) {
     return (
       <a
         href={tool.live.href}
-        {...eventAttrs("outbound", {
-          to: "live",
-          item: tool.slug,
-          place: "card",
-        })}
+        {...(external
+          ? eventAttrs("outbound", {
+            to: "live",
+            item: tool.slug,
+            place: "card",
+          })
+          : linkEvent(tool.live.href, { item: tool.slug, place: "card" }))}
         class={`inline-flex items-center gap-1 ${FACT_LINK}`}
       >
         {tool.live.label}
