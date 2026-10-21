@@ -28,18 +28,18 @@ const STATUS_WORDS = {
 } as const;
 
 /**
- * The tools drawn by `routes/tools/[slug].tsx`'s default middle: a tool with
- * its own `routes/tools/<slug>.tsx` (#454) draws a middle of its own, which
- * its own test in `test/tools/` checks instead.
+ * True when the tool has its own route (`routes/tools/<slug>.tsx`, #454): its
+ * middle is its own, so the default middle's parts (What it is, How it fits,
+ * the pinned install line) need not be there.
  */
-const defaultPageTools = tools.filter((t) => {
+function hasCustomPage(slug: string): boolean {
   try {
-    Deno.statSync(new URL(`../routes/tools/${t.slug}.tsx`, import.meta.url));
-    return false;
-  } catch {
-    return true;
+    return Deno.statSync(`routes/tools/${slug}.tsx`).isFile;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
   }
-});
+}
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -205,7 +205,7 @@ siteTest(
     for (const t of tools.filter((t) => t.registry)) {
       const html = await site.html(`/tools/${t.slug}`);
       assert(
-        html.includes(t.registry!.install),
+        hasCustomPage(t.slug) || html.includes(t.registry!.install),
         `${t.slug} shows no install command`,
       );
       const copyButtons = count(html, /aria-label="Copy the install command/g);
@@ -460,7 +460,7 @@ siteTest(
 siteTest(
   "each link between repos is labelled Planned or Today, as lib/tools.ts says",
   async (site) => {
-    for (const t of defaultPageTools) {
+    for (const t of tools) {
       const html = await site.html(`/tools/${t.slug}`);
       const labels = [
         ...html.matchAll(
@@ -470,7 +470,9 @@ siteTest(
         .map((m) => visibleText(m[1]).split(" ")[0]);
       assertEquals(
         labels,
-        (t.fits ?? []).map((f) => (f.planned ? "Planned" : "Today")),
+        hasCustomPage(t.slug)
+          ? []
+          : (t.fits ?? []).map((f) => (f.planned ? "Planned" : "Today")),
         t.slug,
       );
     }
@@ -761,10 +763,10 @@ siteTest(
 );
 
 siteTest(
-  "the dotfiles page shows its summary and links its repository",
+  "the dotfiles page shows its lede and links its repository",
   async (site) => {
     const html = await site.html("/tools/dotfiles");
-    assert(visibleText(html).includes(tool("dotfiles").summary), "no summary");
+    assert(visibleText(html).includes(tool("dotfiles").lede!), "no lede");
     assert(
       html.includes('href="https://github.com/spy4x/dotfiles"'),
       "no repository link",
@@ -851,7 +853,7 @@ siteTest(
 siteTest(
   "a tool page draws a feature card, quick start or works card only from its own data, and What it is only with summary left after the lede",
   async (site) => {
-    for (const t of defaultPageTools) {
+    for (const t of tools) {
       const page = pageBody(await site.html(`/tools/${t.slug}`));
       const markers: [string, boolean][] = [
         ['data-e2e="feature-card"', Boolean(t.features?.length)],
@@ -859,7 +861,7 @@ siteTest(
         ["data-works", Boolean(t.works?.length)],
         [
           'id="what"',
-          !t.features &&
+          !hasCustomPage(t.slug) && !t.features &&
           (Boolean(!t.lede && summaryAfterLede(t)) || Boolean(t.packages)),
         ],
       ];
