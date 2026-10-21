@@ -140,3 +140,45 @@ Deno.test("Where it stands names #210 as the one not yet, links the open issues 
   assert(credit.includes("by Eirene."), credit);
   assert(credit.includes("Eirene on GitHub"), credit);
 });
+
+Deno.test("the Orbit slice sits in a ThemePreview with Dark checked and the guide's two buttons, and only this page carries the preview's palettes", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  });
+  try {
+    const page = pageBody(await site.html(`/tools/${SLUG}`));
+    const slice = part(page, "data-orbit-slice", "</section>");
+    const radios = slice.match(/<input[^>]*name="orbit-theme"[^>]*>/g) ?? [];
+    assertEquals(radios.length, 2, "not one Dark / Light pair");
+    const [dark = "", light = ""] = radios;
+    assert(dark.includes(`value="dark"`) && /\schecked/.test(dark), dark);
+    assert(!/\schecked/.test(light), "Light starts checked");
+    const frame = part(slice, "data-preview-frame", "</figure>");
+    const buttons = [...frame.matchAll(/<button[^>]*>([\s\S]*?)<\/button>/g)]
+      .map((m) => visibleText(m[1]));
+    assertEquals(buttons, ["Run checks", "New project"]);
+    assert(
+      frame.includes("Orbit · Demo"),
+      "the frame does not say it is a demo",
+    );
+    assert(
+      slice.includes("[data-preview-frame]") && slice.includes("<style"),
+      "the slice does not carry the preview's palettes",
+    );
+    // Every page downloads the site stylesheet: the palettes stay out of it.
+    const html = await site.html("/");
+    const cssHref = html.match(/href="(\/assets\/client-entry-[^"?]+\.css)/)
+      ?.[1];
+    assert(cssHref, "no client stylesheet on /");
+    assert(
+      !(await site.html(cssHref)).includes("data-preview-theme"),
+      "the site stylesheet carries the preview's palettes",
+    );
+    assert(
+      !(await site.html("/tools/oko")).includes("data-preview-theme"),
+      "another tool page carries the preview's palettes",
+    );
+  } finally {
+    await site.stop();
+  }
+});

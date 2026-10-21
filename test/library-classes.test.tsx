@@ -336,7 +336,12 @@ Deno.test("a site button carries no library size or fill and the site's radius",
     "bg-surface",
     "border-control",
   ];
-  const html = renderedLibraryMarkup();
+  // A ThemePreview frame (/tools/preact-components, #458) shows the library's
+  // own buttons in the library's own look, so its subtree is not a site button.
+  const html = renderedLibraryMarkup().replace(
+    /<div data-preview-frame[^>]*>[\s\S]*?<\/figure><\/div>/g,
+    "",
+  );
   const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
     .map(([, list]) => list.split(" "))
     .filter((list) => list.includes("transition-colors"));

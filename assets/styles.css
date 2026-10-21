@@ -151,6 +151,9 @@ div:has(> [data-gallery-counter]) > button {
 /* @spy4x/preact-charts/kpi and @spy4x/preact-ui/table: the Orbit slice on
    /tools/preact-components (#458). Their `dark:` classes stay out. */
 @source inline("pb-px divide-subtle *:whitespace-nowrap *:px-6 *:py-3 *:py-4 pc-focus-offset-surface");
+/* @spy4x/preact-ui/radio-chips and theme-preview: the preview's Dark / Light
+   chips and its frame on /tools/preact-components (#458). */
+@source inline("sm:min-h-8 normal-case has-[:checked]:border-transparent has-[:checked]:bg-selected has-[:checked]:text-selected-foreground has-[:checked]:hover:bg-selected has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-focus has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-focus has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50 size-3.5 group-has-[:checked]/chip:block rounded-card");
 /* @spy4x/preact-ui/honeypot: the off-screen box. */
 @source inline("absolute h-px w-px overflow-hidden");
 /* @spy4x/preact-system/rail: the labels variant's column, cells, primary

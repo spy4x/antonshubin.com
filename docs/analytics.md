@@ -234,6 +234,9 @@ None yet.
 - `outbound` (`to: live`, `place: body`): "Open the live UI guide" under the
   slice; (`to: issues`, `place: body`): the #210 link and "open issues" in
   "Where it stands".
+- The preview's Dark and Light radios send nothing yet: the library's
+  `ThemePreview` takes no attributes for its radios, so the spec's `tool-try`
+  with `part: theme-light` / `theme-dark` waits for that option.
 
 ### rostok
 

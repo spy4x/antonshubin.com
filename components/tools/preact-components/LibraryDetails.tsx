@@ -34,7 +34,7 @@ export function LibraryDetails({ data }: { data: ToolPageData }) {
         <h2 id="standing" class="text-2xl sm:text-3xl text-parchment">
           Where it stands
         </h2>
-        <Card data-works class="mt-6">
+        <Card data-standing class="mt-6">
           <p class="p-6 text-parchment">
             Status: beta. Breaking changes still ship often, and each one bumps
             the major version.
