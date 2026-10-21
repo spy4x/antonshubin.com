@@ -15,7 +15,6 @@ import { IconChevronLeft } from "@spy4x/preact-icons"
 import { Lightbox } from "@spy4x/preact-ui/lightbox"
 import { Card } from "@spy4x/preact-ui/card"
 import { FeatureCard } from "@spy4x/preact-ui/feature-card"
-import { WindowFrame } from "@spy4x/preact-ui/window-frame"
 import { DemoVideo } from "@spy4x/preact-ui/demo-video"
 import { ComparisonTable } from "@spy4x/preact-ui/comparison-table"
 import { RadioChips } from "@spy4x/preact-ui/radio-chips"
@@ -132,13 +131,8 @@ function renderedLibraryMarkup(): string {
     ...CI_STATES.map((ci) =>
       render(<CiPill ci={ci} pipelinesUrl="https://ci.example.com" />)
     ),
-    // A showcase tool page (#448): the hero's frame, the feature cards with
-    // and without a picture, the "Where it stands" cards.
-    render(
-      <WindowFrame variant="browser" title="app.example.com">
-        <img src="/a.webp" alt="A" />
-      </WindowFrame>,
-    ),
+    // A showcase tool page (#448): the feature cards with and without a
+    // picture, the "Where it stands" cards.
     render(
       <FeatureCard
         id="f1"

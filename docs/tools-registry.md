@@ -97,13 +97,13 @@ carries `data-tool-job-hidden` when a page passes `showJob: false` and
 `data-tool-own-media` when it passes its own `media`; `assertToolFrame()` reads
 both, so a custom page's test passes no options. The hero media is
 `ToolHeroMedia`: the `clip` (`islands/ToolHeroClip.tsx`, the library's
-`DemoVideo`, sending `demo-play`) in its window (the library's `WindowFrame` for
-`browser`, a bordered figure for `terminal` and `bare`), or its poster as a
-still until the files exist, else the `hero` shot or the first screenshot; that
-still is the page's only eager, `fetchpriority="high"` image. The hero and the
-middle sit in the frame's one `data-lightbox` box, because the library's
-`ZoomableImages` wires only the first such box on a page: the frame's one
-`islands/ToolZoom.tsx` makes every image in it that is not inside a link a
+`DemoVideo`, sending `demo-play`) in `MediaFrame`, a bordered figure with the
+caption under it and no drawn browser window or address bar (#539), or its
+poster as a still until the files exist, else the `hero` shot or the first
+screenshot; that still is the page's only eager, `fetchpriority="high"` image.
+The hero and the middle sit in the frame's one `data-lightbox` box, because the
+library's `ZoomableImages` wires only the first such box on a page: the frame's
+one `islands/ToolZoom.tsx` makes every image in it that is not inside a link a
 keyboard-reachable button that opens full size (sending `zoom`), with a
 Parchment focus ring drawn inside the image so its window does not clip it; a
 crop opens the full file named in its `data-lightbox-src`. A middle adds no

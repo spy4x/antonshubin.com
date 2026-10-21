@@ -164,28 +164,18 @@ export interface ToolFeature {
 }
 
 /**
- * A tool's demo clip, the first media on its page (#454): `DemoVideo` inside
- * the library's `WindowFrame`. Its files live at
- * `/video/tools/<slug>/demo.webm` and `demo.mp4` (`clipSources()`, see
- * docs/images.md "Videos"); until they exist, `video` is absent and the
- * poster shows as a still in the same frame, so nothing moves when the clip
- * arrives.
+ * A tool's demo clip, the first media on its page (#454): `DemoVideo` in
+ * `MediaFrame`, a plain bordered frame with no drawn browser window (#539).
+ * Its files live at `/video/tools/<slug>/demo.webm` and `demo.mp4`
+ * (`clipSources()`, see docs/images.md "Videos"); until they exist, `video`
+ * is absent and the poster shows as a still in the same frame, so nothing
+ * moves when the clip arrives.
  */
 export interface ToolClip {
   /** What the clip shows: the play link's and the video's accessible name. */
   title: string
   /** One visible sentence under the frame, the clip's text alternative. */
   caption: string
-  /**
-   * The window drawn around it: `browser` for something with a URL, `bare`
-   * (a Rule border and the card radius) for a clip that draws its own
-   * windows. `terminal` renders as `bare` for now: the library's terminal
-   * frame is built for text, not video, so a CLI clip records its terminal
-   * window itself.
-   */
-  frame: "browser" | "terminal" | "bare"
-  /** The address or title in the frame's bar. */
-  frameTitle?: string
   /** The clip's poster from its repository, under `/video/tools/<slug>/`; `alt` describes it as a still. */
   poster: ToolScreenshot
   /**
@@ -414,8 +404,6 @@ export const tools: Tool[] = [
       title: "Booking a meeting with mig",
       caption:
         "49\u00a0s, with captions and music: a guest picks a day and a time shown in their own time zone, types a name and an email, books with one click, and you both get an email with the meeting link, a cancel link and a calendar invite.",
-      frame: "browser",
-      frameTitle: "meet.example.com",
       poster: {
         src: "/video/tools/mig/poster.webp",
         srcset:
@@ -458,7 +446,6 @@ export const tools: Tool[] = [
       title: "zond: add services, start it, ask which ones are up",
       caption:
         "58\u00a0s, with captions and music: add ollama and grafana to zond.yml, start zond, ask it about metube, then about the stopped grafana, which answers 503 unreachable, and last /health about every service at once.",
-      frame: "bare",
       poster: {
         src: "/video/tools/zond/poster.webp",
         srcset:
@@ -507,8 +494,6 @@ export const tools: Tool[] = [
       title: "oko: add a service to config.json, reload, search the dashboard",
       caption:
         "A demo dashboard of Jane Doe's servers: paste a new service into config.json, reload to see its card with no restart, filter with /, and read the down and unknown cards. 44\u00a0s, with captions and music.",
-      frame: "browser",
-      frameTitle: "localhost:8080",
       poster: {
         src: "/video/tools/oko/poster.webp",
         srcset:
@@ -552,7 +537,6 @@ export const tools: Tool[] = [
       title: "caldav-mcp: an assistant answers what is on today's task list",
       caption:
         "51 s · with captions and music · a real exchange with a demo calendar",
-      frame: "bare",
       poster: {
         src: "/video/tools/caldav-mcp/poster.webp",
         srcset:
@@ -591,7 +575,6 @@ export const tools: Tool[] = [
       title: "rostok: install, run the wizard, deploy, open the service",
       caption:
         "1\u00a0min 28\u00a0s, with captions and music: install rostok, answer the wizard, pick Traefik and OmniTools from the catalog, deploy to the server, then use OmniTools at its own HTTPS address.",
-      frame: "bare",
       poster: {
         src: "/video/tools/rostok/poster.webp",
         srcset:
@@ -685,8 +668,6 @@ export const tools: Tool[] = [
       title: "ts-libs: time zones, money and form input",
       caption:
         "Three packages, run for real: one meeting shown in each person's own time zone, money kept in whole cents with each currency's decimals, and what a user typed checked against a schema, with one plain message per field.",
-      frame: "terminal",
-      frameTitle: "ts-libs",
       poster: {
         src: "/video/tools/ts-libs/poster.webp",
         alt:
@@ -763,8 +744,6 @@ export const tools: Tool[] = [
       title: "A tour of the preact-components live guide",
       caption:
         "The live guide: Orbit, a dashboard built only from the library, a filter on its table, light and dark, the accent colour, / to search, arrow keys between tabs, and a component's code to copy.",
-      frame: "browser",
-      frameTitle: "spy4x.github.io/preact-components",
       poster: {
         src: "/video/tools/preact-components/poster.webp",
         srcset:
@@ -829,8 +808,6 @@ export const tools: Tool[] = [
       title: "Keeping three AI harnesses in sync",
       caption:
         "One folder of rules rendered for Claude Code, OpenCode and DSH: a one-line edit reaches all three, a hand edit to one copy fails the check, and deno task ai puts it back in sync.",
-      frame: "terminal",
-      frameTitle: "dotfiles",
       poster: {
         src: "/video/tools/dotfiles/poster.webp",
         srcset:
@@ -940,7 +917,6 @@ export const tools: Tool[] = [
       title: "Seed, from cloning the repository to the app and the admin panel",
       caption:
         "1\u00a0min, with captions and music: clone Seed, write the env file with one command, start every service, write a note the whole team can read, then find a teammate in the admin panel on its own host.",
-      frame: "bare",
       poster: {
         src: "/video/tools/seed/poster.webp",
         srcset:
@@ -1128,8 +1104,6 @@ export const tools: Tool[] = [
         "caldav-tasks-web: quick add, subtasks, a repeating task, complete and undo",
       caption:
         "1 min 2 s · with captions and music · demo tasks on a local Radicale",
-      frame: "browser",
-      frameTitle: "localhost:38466",
       poster: {
         src: "/video/tools/caldav-tasks-web/poster.webp",
         srcset:

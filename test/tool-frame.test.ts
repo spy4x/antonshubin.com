@@ -70,3 +70,27 @@ Deno.test("no tool page repeats its lede under What it is", async () => {
     await site.stop()
   }
 })
+
+// #539: the owner does not want media in a drawn browser window with a fake
+// address bar. The library's `WindowFrame variant="browser"` draws that bar as
+// a `bg-surface` pill, so any page carrying it draws one.
+const ADDRESS_BAR =
+  /class="[^"]*\brounded-md bg-surface px-3 py-1 text-center\b/
+
+Deno.test("no page draws a browser window's address bar around media", async () => {
+  const site = await startSite()
+  try {
+    const sitemap = await site.html("/sitemap.xml")
+    const paths = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname)
+    assert(paths.includes("/tools"), "the sitemap lost /tools")
+    const framed = []
+    for (const path of paths) {
+      const html = await site.html(path)
+      if (ADDRESS_BAR.test(html)) framed.push(path)
+    }
+    assertEquals(framed, [])
+  } finally {
+    await site.stop()
+  }
+})
