@@ -759,13 +759,17 @@ for (const width of [390, 412]) {
         await page.evaluate(() => document.fonts.ready);
         if (blockFonts) {
           // Fail loudly when no measured fallback face resolves here, so the
-          // comparison below never passes on a machine that draws plain serif.
+          // comparison below never passes on plain serif or on DejaVu Serif,
+          // whose face reuses Georgia's numbers.
           const used = await page.evaluate(() =>
             [...document.fonts].filter((f) => f.status === "loaded")
               .map((f) => f.family)
           );
           assert(
-            used.some((f) => f.startsWith("Literata Fallback")),
+            used.some((f) =>
+              f.startsWith("Literata Fallback") &&
+              f !== "Literata Fallback DejaVu"
+            ),
             `no Literata fallback face resolved (needs Georgia, Times New Roman, Liberation Serif or Noto Serif): ${used}`,
           );
         }
