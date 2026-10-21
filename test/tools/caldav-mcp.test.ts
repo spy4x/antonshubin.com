@@ -111,10 +111,10 @@ Deno.test("the caldav-mcp page renders the frame, the 13 tool rows with their No
       "the copy button is not named after the file it copies",
     )
 
-    // The clip's caption says it is a real exchange with a demo calendar.
+    // The clip's caption says it has captions and music and is a real exchange.
     assert(
       visibleText(page).includes(
-        "no sound · a real exchange with a demo calendar",
+        "with captions and music · a real exchange with a demo calendar",
       ),
       "clip caption",
     )

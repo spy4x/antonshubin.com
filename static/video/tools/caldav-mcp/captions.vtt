@@ -1,0 +1,22 @@
+WEBVTT
+
+00:02.000 --> 00:05.814
+An AI assistant with caldav-mcp and a demo calendar
+
+00:05.814 --> 00:10.688
+Ask what is on today's list
+
+00:10.688 --> 00:19.910
+It asks caldav-mcp for the events and tasks
+
+00:19.910 --> 00:29.290
+One meeting and four tasks today, one of them overdue
+
+00:29.290 --> 00:34.655
+Ask it to move the overdue task to tomorrow
+
+00:34.655 --> 00:42.063
+caldav-mcp saves the new due date on the server
+
+00:42.063 --> 00:49.120
+Done: the task is due tomorrow at the same time

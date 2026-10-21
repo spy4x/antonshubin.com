@@ -186,7 +186,7 @@ export interface ToolClip {
   frame: "browser" | "terminal" | "bare"
   /** The address or title in the frame's bar. */
   frameTitle?: string
-  /** The clip's last frame (the result), under `/video/tools/<slug>/`; `alt` describes it as a still. */
+  /** The clip's poster from its repository, under `/video/tools/<slug>/`; `alt` describes it as a still. */
   poster: ToolScreenshot
   /**
    * Set once `demo.webm` and `demo.mp4` are committed, with the real values
@@ -413,7 +413,7 @@ export const tools: Tool[] = [
     clip: {
       title: "Booking a meeting with mig",
       caption:
-        'A visitor books a meeting: picks a date, picks 15:30, types a name and email, confirms, lands on the "You\'re booked" page, and gets the confirmation email.',
+        "49\u00a0s, with captions and music: a guest picks a day and a time shown in their own time zone, types a name and an email, books with one click, and you both get an email with the meeting link, a cancel link and a calendar invite.",
       frame: "browser",
       frameTitle: "meet.example.com",
       poster: {
@@ -421,11 +421,11 @@ export const tools: Tool[] = [
         srcset:
           "/video/tools/mig/poster-640.webp 640w, /video/tools/mig/poster.webp 1280w",
         alt:
-          'Left, mig\'s "You\'re booked" page for a 30-minute call with Jane Doe on Tuesday, 20 October 2026 at 15:30 Berlin time; right, the guest\'s "Booking confirmed" email with the meeting link and a cancel link.',
+          "mig's booking page: Book a meeting with Jane Doe, a 30-minute call, with step 1, Choose a date, above the October 2026 calendar.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT34S", uploadDate: "2026-10-19" },
+      video: { duration: "PT49S", uploadDate: "2026-10-21" },
     },
   },
   {
@@ -455,20 +455,20 @@ export const tools: Tool[] = [
     lede:
       "Your monitor asks https://zond.example.com/health/metube. zond, running on the same Docker network as metube, sends metube a plain HTTP GET and answers 200 ok or 503 unreachable.",
     clip: {
-      title: "zond: add targets, start it, read ok and KO in the browser",
+      title: "zond: add services, start it, ask which ones are up",
       caption:
-        "37 s, no sound: add ollama and grafana to zond.yml, start zond, ask it about metube, then read unreachable and the OK and KO lines in the browser.",
+        "58\u00a0s, with captions and music: add ollama and grafana to zond.yml, start zond, ask it about metube, then about the stopped grafana, which answers 503 unreachable, and last /health about every service at once.",
       frame: "bare",
       poster: {
         src: "/video/tools/zond/poster.webp",
         srcset:
           "/video/tools/zond/poster-640.webp 640w, /video/tools/zond/poster.webp 1280w",
         alt:
-          "zond's /health page in a browser, answered with HTTP 503 Service Unavailable: OK metube, OK ollama, KO grafana.",
+          "A terminal in ~/stack showing zond.yml: port 8080 and one target, metube at http://hl-metube:8081/.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+      video: { duration: "PT58S", uploadDate: "2026-10-21" },
     },
   },
   {
@@ -506,7 +506,7 @@ export const tools: Tool[] = [
     clip: {
       title: "oko: add a service to config.json, reload, search the dashboard",
       caption:
-        'A demo config: add a Speed test service to config.json, reload to see its card, search for "pho", and end on up, down and unknown cards. 26\u00a0s, no sound.',
+        "A demo dashboard of Jane Doe's servers: paste a new service into config.json, reload to see its card with no restart, filter with /, and read the down and unknown cards. 44\u00a0s, with captions and music.",
       frame: "browser",
       frameTitle: "localhost:8080",
       poster: {
@@ -514,11 +514,11 @@ export const tools: Tool[] = [
         srcset:
           "/video/tools/oko/poster-640.webp 640w, /video/tools/oko/poster.webp 1280w",
         alt:
-          "The oko dashboard titled Jane Doe's servers, with a Home and a Cloud section of service cards with 30-day uptime pills, Email marked down with a red border, and File sync marked unknown.",
+          "The oko dashboard titled Jane Doe's servers, with its search box and the Home section at 5/5 healthy and 100.00% over 30 days, above the cards Audiobooks, Git service and Photo library, each with its uptime.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT26S", uploadDate: "2026-10-19" },
+      video: { duration: "PT44S", uploadDate: "2026-10-21" },
     },
   },
   {
@@ -550,18 +550,19 @@ export const tools: Tool[] = [
       "Connect it to Claude Desktop, OpenCode, Cursor, OpenWebUI or any other MCP client, and your assistant can list your calendars, find events and tasks, and create, update or delete them on your own CalDAV server.",
     clip: {
       title: "caldav-mcp: an assistant answers what is on today's task list",
-      caption: "36 s · no sound · a real exchange with a demo calendar",
+      caption:
+        "51 s · with captions and music · a real exchange with a demo calendar",
       frame: "bare",
       poster: {
         src: "/video/tools/caldav-mcp/poster.webp",
         srcset:
           "/video/tools/caldav-mcp/poster-640.webp 640w, /video/tools/caldav-mcp/poster.webp 1280w",
         alt:
-          "A chat with an assistant connected to caldav-mcp. Asked what is on the list for today, it called query_events and query_todos and listed a call with Jane Doe at 11:00, an overdue task and three tasks due today. Asked to move the overdue one to tomorrow, it called update_todo and confirmed the new due date.",
+          "A chat app named Assistant, connected to caldav-mcp with 13 tools and a demo calendar, before the first question: What can I help with? Its footer says it is a replay of a real exchange with claude-sonnet-5-5, caldav-mcp 1.6.0 and a demo Radicale calendar.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT36S", uploadDate: "2026-10-19" },
+      video: { duration: "PT51S", uploadDate: "2026-10-21" },
     },
   },
   {
@@ -589,18 +590,18 @@ export const tools: Tool[] = [
     clip: {
       title: "rostok: install, run the wizard, deploy, open the service",
       caption:
-        "39 s, no sound: install rostok, answer the wizard, deploy to a fresh server, then run the speed test it now serves.",
+        "1\u00a0min 28\u00a0s, with captions and music: install rostok, answer the wizard, pick Traefik and OmniTools from the catalog, deploy to the server, then use OmniTools at its own HTTPS address.",
       frame: "bare",
       poster: {
         src: "/video/tools/rostok/poster.webp",
         srcset:
           "/video/tools/rostok/poster-640.webp 640w, /video/tools/rostok/poster.webp 1280w",
         alt:
-          "LibreSpeed at speedtest.159-69-252-98.sslip.io after a finished test: ping 219 ms, download 174 Mbit/s, upload 100 Mbit/s.",
+          "rostok's wizard in a terminal: server 'home' created at /home/jane/homelab/servers/home, then the stack picker with omni-tools and traefik selected among open-webui, pangolin, piped, playwright, searxng, stalwart, syncthing and traggo.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT39S", uploadDate: "2026-10-19" },
+      video: { duration: "PT1M28S", uploadDate: "2026-10-21" },
     },
     useIf: [
       "You run Docker on one to a few machines (an old PC, a homelab, or a small company replacing SaaS) and want the setup in a Git repo.",
@@ -681,21 +682,21 @@ export const tools: Tool[] = [
     ],
     notYet: ["Tested Node.js support."],
     clip: {
-      title: "ts-libs: from a request to an inbox",
+      title: "ts-libs: time zones, money and form input",
       caption:
-        "The README example, run: an invalid email is refused with a typed error, a valid one is booked and its confirmation lands in a local inbox.",
+        "Three packages, run for real: one meeting shown in each person's own time zone, money kept in whole cents with each currency's decimals, and what a user typed checked against a schema, with one plain message per field.",
       frame: "terminal",
-      frameTitle: "main.ts",
+      frameTitle: "ts-libs",
       poster: {
         src: "/video/tools/ts-libs/poster.webp",
         alt:
-          'A terminal above a mail client: the request with the email nope is refused with "must be an email address", the one with jane@example.com answers Booked, and the inbox shows the mail Booked: See you Friday, 28 August 2026 at 10:00.',
+          "A terminal on part 1/3, @spy4x/time, Dates and time zones: time.ts prints one call on Thursday, 5 November 2026 at 10:00 in New York, 16:00 in Berlin and 23:00 in Singapore.",
         width: 1280,
-        height: 720,
+        height: 800,
         srcset:
           "/video/tools/ts-libs/poster-640.webp 640w, /video/tools/ts-libs/poster.webp 1280w",
       },
-      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+      video: { duration: "PT52S", uploadDate: "2026-10-21" },
     },
     fits: [
       {
@@ -761,7 +762,7 @@ export const tools: Tool[] = [
     clip: {
       title: "A tour of the preact-components live guide",
       caption:
-        "The live guide: a dashboard built only from the library, light and dark, three accent colours, keyboard search, and a component with its code.",
+        "The live guide: Orbit, a dashboard built only from the library, a filter on its table, light and dark, the accent colour, / to search, arrow keys between tabs, and a component's code to copy.",
       frame: "browser",
       frameTitle: "spy4x.github.io/preact-components",
       poster: {
@@ -769,11 +770,11 @@ export const tools: Tool[] = [
         srcset:
           "/video/tools/preact-components/poster-640.webp 640w, /video/tools/preact-components/poster.webp 1280w",
         alt:
-          "The live UI guide's overview in dark with the rose accent: the headline Preact components that render on the server and work from the keyboard, the Browse components and Star on GitHub buttons, the install command deno add jsr:@spy4x/preact-ui with its copy button, and the counts 123 components, 124 icons and 10 packages.",
+          "The live UI guide's overview in dark with the purple accent, at version 9.0.0: the headline Preact components that render on the server and work from the keyboard, with the Browse components and Star on GitHub buttons.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT38S", uploadDate: "2026-10-19" },
+      video: { duration: "PT1M", uploadDate: "2026-10-21" },
     },
     live: {
       label: "Open the live UI guide",
@@ -827,7 +828,7 @@ export const tools: Tool[] = [
     clip: {
       title: "Keeping three AI harnesses in sync",
       caption:
-        "deno task ai --check finds an edited rule in all three harnesses, deno task ai applies it, and the check prints All targets in sync.",
+        "One folder of rules rendered for Claude Code, OpenCode and DSH: a one-line edit reaches all three, a hand edit to one copy fails the check, and deno task ai puts it back in sync.",
       frame: "terminal",
       frameTitle: "dotfiles",
       poster: {
@@ -835,11 +836,11 @@ export const tools: Tool[] = [
         srcset:
           "/video/tools/dotfiles/poster-640.webp 640w, /video/tools/dotfiles/poster.webp 1280w",
         alt:
-          "A terminal after deno task ai applied three changes: deno task ai --check lists the Claude Code, OpenCode and DSH homes and prints All targets in sync.",
+          "A terminal split in three: the same reviewer agent as Claude Code's reviewer.md, OpenCode's reviewer.md and DSH's agent.cordis.yml, each in its tool's own format.",
         width: 1280,
-        height: 720,
+        height: 800,
       },
-      video: { duration: "PT27S", uploadDate: "2026-10-19" },
+      video: { duration: "PT58S", uploadDate: "2026-10-21" },
     },
     quickStart: {
       label: "Compare your harnesses with mine (writes nothing)",
@@ -938,7 +939,7 @@ export const tools: Tool[] = [
     clip: {
       title: "Seed, from cloning the repository to the app and the admin panel",
       caption:
-        "From an empty folder to the app and the admin panel. 37\u00a0s, no sound.",
+        "From an empty folder to the app and the admin panel in 37\u00a0s.",
       frame: "bare",
       poster: {
         src: "/video/tools/seed/poster.webp",
@@ -1125,19 +1126,20 @@ export const tools: Tool[] = [
     clip: {
       title:
         "caldav-tasks-web: quick add, subtasks, a repeating task, complete and undo",
-      caption: "37 s · no sound · demo tasks on a local Radicale",
+      caption:
+        "1 min 2 s · with captions and music · demo tasks on a local Radicale",
       frame: "browser",
-      frameTitle: "localhost:38465",
+      frameTitle: "localhost:38466",
       poster: {
         src: "/video/tools/caldav-tasks-web/poster.webp",
         srcset:
           "/video/tools/caldav-tasks-web/poster-640.webp 640w, /video/tools/caldav-tasks-web/poster.webp 1280w",
         alt:
-          "The Today view of caldav-tasks-web with demo tasks: two overdue (Fix the gate, Call the plumber) and, due today, the new task Order compost at 17:00 with the tag garden and high priority, above Send the invoice to Example Co and Plan the garden.",
+          "The Today view of caldav-tasks-web on Wednesday, 21 October 2026: the Add a task box above two flagged overdue tasks, Fix the gate in Home and Call the plumber in Errands.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+      video: { duration: "PT1M2S", uploadDate: "2026-10-21" },
     },
   },
   {

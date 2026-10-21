@@ -29,6 +29,18 @@ Deno.test("every tool clip is pulled from its repository's media/demo/", () => {
   }
 })
 
+Deno.test("no tool clip is described as silent", () => {
+  for (const tool of tools.filter((t) => t.clip)) {
+    const { title, caption, poster } = tool.clip!
+    for (const text of [title, caption, poster.alt]) {
+      assert(
+        !/no sound|silent|muted|without sound/i.test(text),
+        `${tool.slug}: "${text}"`,
+      )
+    }
+  }
+})
+
 Deno.test("rawUrl reads a file at the pinned commit", () => {
   const source = VIDEO_SOURCES.find((s) => s.slug === "mig")!
   assertEquals(
