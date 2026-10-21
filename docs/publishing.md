@@ -258,6 +258,49 @@ Report the result to Anton in chat: the `Sent`, `Failed` and `Skipped` counts
 the command printed, or its refusal. A non-zero exit is not a success, whatever
 it printed.
 
+## Interactive components
+
+A post can embed a component the reader can try (#537), such as a calculator.
+
+**Embedding one.** Write its tag alone on a line, at the top level of the post
+(not inside a list or a quote), with props as JSON literals in braces or text in
+double quotes:
+
+```markdown
+<RunsCalculator saving={15} label="My run" marks={[10, 32]} />
+```
+
+Say every claim and number in the prose above it too: the component is extra,
+and Dev.to, search engines and readers without JavaScript see only the prose and
+the fallback. The default props must show the case the prose describes. The post
+renders the component in a box whose `id` is the entry's anchor, so
+`/blog/<slug>#<anchor>` links to it. An unknown tag, a prop that fails the
+schema, a tag that is not alone on its line or an anchor used twice on the page
+fails the render, and `lib/post-components.test.ts` renders every post in
+`content/blog/`, so `deno task check` fails naming the post, the tag and the
+reason. A tag inside a code block is code and stays as written.
+
+**Adding one.** Write the component in `islands/` (or `components/` when it
+needs no JavaScript), then add an entry to `POST_COMPONENTS` in
+`lib/post-components.ts` through `postComponent()`:
+
+- `props`: an arktype schema with `"+": "reject"`, so a mistyped prop fails;
+- `component`: it gets the props plus `post`, the post's slug;
+- `anchor`: a stable id, or a function of the props when a post can embed the
+  component twice;
+- `toMarkdown(props, postUrl)`: the Dev.to fallback, usually a table. The Dev.to
+  body, from `lib/markdown.ts`'s `toDevToMarkdown(body, postUrl)`, puts it in
+  the tag's place and adds "Try it on antonshubin.com" with the tagged link to
+  the anchor.
+
+On the reader's first input the component calls
+`trackPostTry(post, "<TagName>")` from `lib/analytics.ts`, which sends one
+`post-try` per component per page view ([analytics.md](analytics.md)). It never
+sends, stores or puts in the URL a value the reader entered. Render it in full
+on the server at a fixed size, so nothing shifts when it hydrates. Fresh 2.3
+hydrates every island as the page loads (there is no lazy hydration), so keep
+its code small.
+
 ## The flow in short, and its hard rules
 
 This file is the whole flow, from "I want a blog post about X" to a live post: a
