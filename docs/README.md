@@ -5,9 +5,9 @@ root holds the code structure, tasks and conventions.
 
 - [Deploy](deploy.md): deploy to the cloudlab host, the Cloudflare purge,
   subscriber data, env files and the age key.
-- [Publishing a blog post](publishing.md): from idea to a live post, the Dev.to
-  draft and the newsletter on Anton's yes. The voice to write in is in
-  [voice.md](voice.md).
+- [Publishing a blog post](publishing.md): from idea to a live post, then the
+  Dev.to article and the newsletter, both sent automatically. The voice to write
+  in is in [voice.md](voice.md).
 - [Tagged links](utm.md): the UTM channel table shared with `scripts/utm.ts`,
   campaign names and posting windows (`deno task links`).
 - [Analytics](analytics.md): the Umami events, properties and saved reports.

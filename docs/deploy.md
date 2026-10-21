@@ -72,7 +72,7 @@ and `deno task env:decrypt` restores it. It stays on the deploying machine:
 rsync names only `.env` and the target's env file. `scripts/deploy.test.ts`
 guards both. `.env.deploy.example` lists the key. The same file holds
 `DEVTO_API_KEY`, which `deno task publish:blog` reads locally for the Dev.to
-draft (`scripts/devto.ts`).
+article (`scripts/devto.ts`).
 
 To purge by hand, in the Cloudflare dashboard: antonshubin.com → Caching →
 Configuration → Custom Purge → URL.
@@ -175,7 +175,7 @@ cp "$SRC/subscribers.json" "$DST/subscribers.json.restore"
 flock "$DST/subscribers.json.lock" \
   mv "$DST/subscribers.json.restore" "$DST/subscribers.json"
 # The sent log only if it was lost too: last night's copy would forget a post
-# announced since then, and a later --send-newsletter would mail it again.
+# announced since then, and a later publish:blog run would mail it again.
 [ -f "$SRC/newsletter-log.json" ] && [ ! -f "$DST/newsletter-log.json" ] &&
   cp "$SRC/newsletter-log.json" "$DST/newsletter-log.json"
 rm -rf /tmp/antonshubin-restore

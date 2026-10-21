@@ -43,7 +43,7 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | `deno task env:encrypt`          | Every `.env*` → its `.env*.age` (age64)                                    |
 | `deno task env:decrypt`          | Every `.env*.age` → its plaintext (age64)                                  |
 | `deno task env:status`           | Key presence + which env/age files exist                                   |
-| `deno task publish:blog`         | Live check, Dev.to draft, IndexNow, tagged links (docs/publishing.md)      |
+| `deno task publish:blog`         | Live check, Dev.to, IndexNow, links, newsletter (docs/publishing.md)       |
 | `deno task launch-kit`           | Draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts              |
 | `deno task video-kit`            | Transcript → titles, description, chapters, blog draft                     |
 | `deno task weekly-numbers`       | Umami/GitHub/YouTube numbers → markdown + NTFY                             |
