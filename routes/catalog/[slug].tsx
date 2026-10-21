@@ -55,6 +55,8 @@ import {
   WHY_IT_COSTS_LESS_HEADING,
 } from "../../lib/saas-mvp.ts"
 import { Questions } from "../../components/Questions.tsx"
+import { PromiseTimeline } from "../../components/PromiseTimeline.tsx"
+import { promise } from "../../lib/promises.ts"
 
 function getItemBySlug(slug: string): CatalogItem | undefined {
   return catalogItems.find((i) => i.slug === slug)
@@ -120,7 +122,56 @@ export default define.page(function CatalogDetail(ctx) {
   const next = item.next ? catalogItem(item.next) : undefined
   const isStrategy = item.slug === "strategy-call"
   const versus = callVersusSession()
-  const bandPromises = catalogPromises(item.slug).slice(0, 2)
+  const promiseIds = catalogPromises(item.slug)
+  const bandPromises = promiseIds.slice(0, 2)
+  // Build and Ongoing carry several promises, so their main column opens with
+  // them, before any feature (#541); a one-promise page keeps its order.
+  const promisesFirst = promiseIds.length >= 2
+
+  const descBlock = (
+    <div class="space-y-3">
+      <p class="max-w-2xl text-lg text-graphite leading-relaxed">
+        {item.desc}
+      </p>
+      {/* The SaaS starter this service builds on (#448). */}
+      {tools
+        .filter((t) => t.kind === "starter" && t.catalogSlug === item.slug)
+        .map((t) => (
+          <p key={t.slug} data-built-on class="text-graphite">
+            Built on{" "}
+            <a
+              href={`/tools/${t.slug}`}
+              {...eventAttrs("cta", {
+                place: "body",
+                target: `/tools/${t.slug}`,
+              })}
+              class={FACT_LINK}
+            >
+              {t.name}
+            </a>, my {t.job}.
+          </p>
+        ))}
+    </div>
+  )
+
+  const stepsSection = steps && (
+    <section aria-labelledby="how-it-starts">
+      <h2 id="how-it-starts" class="text-2xl text-parchment mb-4">
+        How it starts
+      </h2>
+      <ol class="space-y-4 max-w-2xl" data-service-steps>
+        {steps.map((step, i) => (
+          <li key={step.title} class="grid grid-cols-[2rem_minmax(0,1fr)]">
+            <span class="font-heading text-lg text-graphite">{i + 1}</span>
+            <div>
+              <h3 class="text-lg text-parchment">{step.title}</h3>
+              <p class="mt-1 text-graphite">{step.desc}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
 
   return (
     <Layout currentPath={ctx.url.pathname}>
@@ -199,35 +250,26 @@ export default define.page(function CatalogDetail(ctx) {
         <div class="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
           {/* The price card: first at 390px, the right column from 1024px */}
           <div class="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-8">
-            <ServicePriceCard item={item} />
+            <ServicePriceCard item={item} promisesInBody={promisesFirst} />
           </div>
 
           <div class="lg:col-start-1 lg:row-start-1 min-w-0 space-y-12">
-            <div class="space-y-3">
-              <p class="max-w-2xl text-lg text-graphite leading-relaxed">
-                {item.desc}
-              </p>
-              {/* The SaaS starter this service builds on (#448). */}
-              {tools
-                .filter((t) =>
-                  t.kind === "starter" && t.catalogSlug === item.slug
-                )
-                .map((t) => (
-                  <p key={t.slug} data-built-on class="text-graphite">
-                    Built on{" "}
-                    <a
-                      href={`/tools/${t.slug}`}
-                      {...eventAttrs("cta", {
-                        place: "body",
-                        target: `/tools/${t.slug}`,
-                      })}
-                      class={FACT_LINK}
-                    >
-                      {t.name}
-                    </a>, my {t.job}.
-                  </p>
-                ))}
-            </div>
+            {promisesFirst && (
+              <section aria-labelledby="service-promises">
+                <h2 id="service-promises" class="text-2xl text-parchment mb-6">
+                  What you can count on
+                </h2>
+                <div class="max-w-2xl" data-service-promises-body>
+                  <PromiseTimeline
+                    variant="compact"
+                    layout="stack"
+                    headingLevel={3}
+                    items={promiseIds.map(promise)}
+                  />
+                </div>
+              </section>
+            )}
+            {promisesFirst ? stepsSection : descBlock}
 
             {isMvp && (
               <section aria-labelledby="service-why">
@@ -264,6 +306,7 @@ export default define.page(function CatalogDetail(ctx) {
               <h2 id="service-scope" class="text-2xl text-parchment mb-4">
                 What's included
               </h2>
+              {promisesFirst && <div class="mb-6">{descBlock}</div>}
               <div
                 data-service-scope
                 class={item.exclusions?.length
@@ -307,29 +350,7 @@ export default define.page(function CatalogDetail(ctx) {
               </div>
             </section>
 
-            {steps && (
-              <section aria-labelledby="how-it-starts">
-                <h2 id="how-it-starts" class="text-2xl text-parchment mb-4">
-                  How it starts
-                </h2>
-                <ol class="space-y-4 max-w-2xl" data-service-steps>
-                  {steps.map((step, i) => (
-                    <li
-                      key={step.title}
-                      class="grid grid-cols-[2rem_minmax(0,1fr)]"
-                    >
-                      <span class="font-heading text-lg text-graphite">
-                        {i + 1}
-                      </span>
-                      <div>
-                        <h3 class="text-lg text-parchment">{step.title}</h3>
-                        <p class="mt-1 text-graphite">{step.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            )}
+            {!promisesFirst && stepsSection}
 
             {item.alsoCovers && item.alsoCovers.length > 0 && (
               <section aria-labelledby="service-also">

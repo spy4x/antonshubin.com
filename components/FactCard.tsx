@@ -6,14 +6,21 @@ export const FACT_LINK =
 
 /** One `<dt>`/`<dd>` pair of a fact card, wrapped in a `<div>` as `<dl>` allows. */
 export function Fact(
-  { term, children, ...rest }: {
+  { term, children, class: extra, ...rest }: {
     term: string
     children: ComponentChildren
+    /** Extra classes for the row, such as a breakpoint that hides it. */
+    class?: string
     "data-project-period"?: boolean
   },
 ) {
   return (
-    <div class="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3" {...rest}>
+    <div
+      class={`grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3${
+        extra ? ` ${extra}` : ""
+      }`}
+      {...rest}
+    >
       <dt class="text-graphite">{term}</dt>
       <dd class="text-parchment min-w-0">{children}</dd>
     </div>
