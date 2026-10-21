@@ -33,12 +33,12 @@ export const faqs: Faq[] = [
   {
     id: "who-does-the-work",
     q: "Who does the work?",
-    a: "I do. I build greenfield SaaS solo, or with a team I assemble for the project from my own pool of senior developers, and only seniors. I also join existing teams.",
+    a: "I do: I build greenfield SaaS solo, or with a team I assemble for the project from my own pool of senior developers, and only seniors. I also join existing teams.",
   },
   {
     id: "pricing",
     q: "Do you work fixed price or hourly, and what happens when the scope changes?",
-    a: `Both. ${PRICING_RULE} If the scope changes once we have started, you get a quote for the change before I start on it — no surprise costs.`,
+    a: `Both: ${PRICING_RULE} If the scope changes once we have started, you get a quote for the change before I start on it — no surprise costs.`,
   },
   {
     id: "ownership",
@@ -66,7 +66,7 @@ export const faqs: Faq[] = [
   {
     id: "ai-and-your-code",
     q: "Does my code go to an AI provider?",
-    a: `Yes. I work with AI coding agents, so the code I work on is sent to an AI model provider. The agents work to my written rules and my definition of quality, a separate reviewer agent checks every change, and nothing reaches you until it passes that review. ${WEEKLY_AUDIT} If your company has its own AI account, I can work through that one, so your code stays under your contract. If your policy rules out AI tools, tell me on the call and we agree how to handle it before any work starts.`,
+    a: `Yes: I work with AI coding agents, so the code I work on is sent to an AI model provider. The agents work to my written rules and my definition of quality, a separate reviewer agent checks every change, and nothing reaches you until it passes that review. ${WEEKLY_AUDIT} If your company has its own AI account, I can work through that one, so your code stays under your contract. If your policy rules out AI tools, tell me on the call and we agree how to handle it before any work starts.`,
   },
   {
     id: "not-a-good-fit",

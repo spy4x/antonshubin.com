@@ -79,8 +79,8 @@ Deno.test("every ld+json block under routes/, components/, islands/ uses toJsonL
   }
   assertEquals(
     totalBlocks,
-    12,
-    "expected exactly 12 ld+json blocks (#172, #189, #270, #271, #273, #295, #274's Blog on /blog, #486's /why-not-just-ai; #454 draws every tool page's blocks through one tag in components/tool-frame/ToolJsonLd.tsx)",
+    13,
+    "expected exactly 13 ld+json blocks (#172, #189, #270, #271, #273, #295, #274's Blog on /blog, #486's /why-not-just-ai, #484's FAQPage on the SaaS MVP page; #454 draws every tool page's blocks through one tag in components/tool-frame/ToolJsonLd.tsx)",
   );
 });
 

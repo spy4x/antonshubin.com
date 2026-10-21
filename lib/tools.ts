@@ -334,20 +334,18 @@ export const tools: Tool[] = [
     posts: ["mig-tiny-self-hosted-scheduler"],
     deployable: true,
     appCategory: "BusinessApplication",
-    useIf: [
-      "You want a static meeting link without a Next.js + Postgres deployment.",
-    ],
+    // "Use it if" and "Skip it if" are the README's own lines (#457).
+    useIf: ["You want one booking link for yourself."],
     dontUseIf: [
-      "You need more than one owner or more than one feature: it books a time slot for one owner.",
-      "You need a database: storage is a JSON file.",
+      "You need teams, payments, several event types, calendar sync or thousands of bookings a day.",
     ],
     repo: "spy4x/mig",
     registry: {
       name: "Docker Hub",
       url: "https://hub.docker.com/r/antonshubin/mig",
-      version: "v0.12.0",
+      version: "v2.0.0",
       published: true,
-      install: "docker pull antonshubin/mig:v0.12.0",
+      install: "docker pull antonshubin/mig:v2.0.0",
       latestFrom: { registry: "docker", name: "antonshubin/mig" },
     },
     runtime: "Deno, as a single binary",
@@ -358,6 +356,69 @@ export const tools: Tool[] = [
     ],
     live: { label: "Open the booking page", href: "/book" },
     ci: { provider: "woodpecker", repoId: 12 },
+    headline: "One owner, one link, no database.",
+    // The README's "Why mig", less "Web standards" (#457 keeps six).
+    features: [
+      {
+        title: "Nothing to operate",
+        text:
+          "One small container, bookings in one JSON file you can cat and back up. No database, no accounts, no admin UI.",
+      },
+      {
+        title: "Config is code",
+        text:
+          "Working hours, days off, slot length and the meeting link are environment variables. Change them, restart, done.",
+      },
+      {
+        title: "Both clocks, everywhere",
+        text:
+          "Guests see times in their own time zone. Your emails show your time and the guest's side by side.",
+      },
+      {
+        title: "Invite and cancel built in",
+        text:
+          "Every confirmation carries an .ics invite and a signed cancel link. Optional push notifications through NTFY.",
+        size: "wide",
+        shot: {
+          src: "/img/tools/mig/email-confirmation.webp",
+          srcset:
+            "/img/tools/mig/email-confirmation-760.webp 760w, /img/tools/mig/email-confirmation.webp 1200w",
+          alt:
+            "The guest's confirmation email: subject \"Booking confirmed\", the meeting's date and time in Berlin time, the meeting link, a note about the attached calendar invite, and a cancel link.",
+          width: 1200,
+          height: 987,
+        },
+      },
+      {
+        title: "No stranger's text in the guest's inbox",
+        text:
+          "Anyone can type any address into the form, so mail to that address says only when the meeting is, with whom, where and how to cancel. The name, the notes and the cancel reason reach you alone.",
+      },
+      {
+        title: "Embeds anywhere",
+        text:
+          "/embed drops the whole flow into an iframe on your site, resizes itself and takes your site's theme with ?theme=.",
+      },
+    ],
+    lede:
+      "A visitor picks a free slot, and you both get an email with a calendar invite and a cancel link. That's the whole product.",
+    clip: {
+      title: "Booking a meeting with mig",
+      caption:
+        'A visitor books a meeting: picks a date, picks 15:30, types a name and email, confirms, lands on the "You\'re booked" page, and gets the confirmation email.',
+      frame: "browser",
+      frameTitle: "meet.example.com",
+      poster: {
+        src: "/video/tools/mig/poster.webp",
+        srcset:
+          "/video/tools/mig/poster-640.webp 640w, /video/tools/mig/poster.webp 1280w",
+        alt:
+          'Left, mig\'s "You\'re booked" page for a 30-minute call with Jane Doe on Tuesday, 20 October 2026 at 15:30 Berlin time; right, the guest\'s "Booking confirmed" email with the meeting link and a cancel link.',
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT34S", uploadDate: "2026-10-19" },
+    },
   },
   {
     slug: "zond",
@@ -470,11 +531,36 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@rostok/cli",
-      version: "1.7.0",
+      version: "1.20.1",
       published: true,
-      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.7.0",
+      install: "deno install -g -A -n rostok jsr:@rostok/cli@1.20.1",
       latestFrom: { registry: "jsr", name: "@rostok/cli" },
     },
+    headline: "Scaffold a self-hosted homelab from a curated catalog.",
+    lede:
+      "Run rostok in an empty folder and answer a few questions: the server's name, its SSH address, your domain and email. The wizard turns that into a Git repo with one folder per server, and a deploy copies the files to the server over SSH and starts them with Docker Compose.",
+    clip: {
+      title: "rostok: install, run the wizard, deploy, open the service",
+      caption:
+        "39 s, no sound: install rostok, answer the wizard, deploy to a fresh server, then run the speed test it now serves.",
+      frame: "bare",
+      poster: {
+        src: "/video/tools/rostok/poster.webp",
+        srcset:
+          "/video/tools/rostok/poster-640.webp 640w, /video/tools/rostok/poster.webp 1280w",
+        alt:
+          "LibreSpeed at speedtest.159-69-252-98.sslip.io after a finished test: ping 219 ms, download 174 Mbit/s, upload 100 Mbit/s.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT39S", uploadDate: "2026-10-19" },
+    },
+    useIf: [
+      "You run Docker on one to a few machines (an old PC, a homelab, or a small company replacing SaaS) and want the setup in a Git repo.",
+    ],
+    dontUseIf: [
+      "You run a big company's fleet: rostok stays small and homelab-shaped.",
+    ],
     programmingLanguage: "TypeScript",
     usedFor:
       "Deploys my own servers: four instances in different regions, each running a different set of services.",
@@ -485,7 +571,11 @@ export const tools: Tool[] = [
     name: "ts-libs",
     job: "tested TypeScript building blocks for web-standards back ends",
     summary:
-      "Eight framework-agnostic packages built on web standards: ES modules, Fetch, Web Crypto and Streams. Sign-in, Postgres access, SMTP, safe outbound requests, time zones and validation, each with a one-line install. Every package is tested on Deno, the runtime I build with.",
+      "Eleven framework-agnostic packages built on web standards: ES modules, Fetch, Web Crypto and Streams. Sign-in, Postgres access, SMTP, safe outbound requests, time zones and validation, each with a one-line install. Every package is tested on Deno, the runtime I build with.",
+    headline:
+      "Small TypeScript libraries on web standards, for the server and the browser.",
+    lede:
+      "The example in the clip validates a booking request, formats its time in Berlin and sends a confirmation by SMTP: three packages, no framework.",
     kind: "library",
     status: "ready",
     group: "tools",
@@ -494,47 +584,72 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "1.31.0",
+      version: "1.83.0",
       published: true,
-      install: "deno add jsr:@spy4x/server@1.31.0",
+      install: "deno add jsr:@spy4x/server@1.83.0",
       latestFrom: { registry: "jsr", name: "@spy4x/server" },
     },
     licence: "MIT",
     runtime:
       "Deno on the server; @spy4x/time, @spy4x/validation, @spy4x/platform's browser entry points and @spy4x/realtime's client run in a browser, untested there",
     usedFor:
-      "Seed, my SaaS starter, imports @spy4x/validation, @spy4x/platform and @spy4x/server, and this site encrypts its environment files with @spy4x/server's age64 module. More of the site is moving over to these packages now.",
+      "Seed, my SaaS starter, imports nine of these packages; mig, my meeting scheduler, and this site import six each.",
     proofLinks: [
       {
         label: "Seed's imports in deno.jsonc",
         href: "https://github.com/spy4x/seed/blob/main/deno.jsonc",
       },
       {
-        label: "This site's env tasks in deno.json",
+        label: "mig's imports in deno.json",
+        href: "https://github.com/spy4x/mig/blob/main/deno.json",
+      },
+      {
+        label: "This site's imports in deno.json",
         href: "https://github.com/spy4x/antonshubin.com/blob/main/deno.json",
       },
     ],
     ci: { provider: "woodpecker", repoId: 10 },
     packages: [
-      "@spy4x/email",
-      "@spy4x/integrations",
-      "@spy4x/net",
-      "@spy4x/platform",
-      "@spy4x/realtime",
-      "@spy4x/server",
-      "@spy4x/time",
       "@spy4x/validation",
+      "@spy4x/platform",
+      "@spy4x/server",
+      "@spy4x/net",
+      "@spy4x/integrations",
+      "@spy4x/time",
+      "@spy4x/email",
+      "@spy4x/realtime",
+      "@spy4x/billing",
+      "@spy4x/caldav",
+      "@spy4x/tasks",
     ],
     useIf: [
-      "You build TypeScript services on web standards and want sign-in, Postgres access, SMTP or SSRF-safe outbound requests without writing them again.",
-      "You validate data with arktype and want one result shape for it.",
-      "You want small packages you install one at a time, not a framework.",
+      "You build on Deno or ship a browser bundle and want small, typed primitives without a framework.",
     ],
     dontUseIf: [
-      "You validate with zod and want to keep it: these packages use arktype only.",
-      "You need a package tested on Node or Bun: every package is tested on Deno only.",
-      "You want an app framework: there are no app shells and no UI here.",
+      "You need tested Node.js support or UI components (those live in preact-components).",
     ],
+    works: [
+      "Every package is tested on Deno.",
+      "@spy4x/time, @spy4x/validation and @spy4x/caldav use no Deno.* API, so they also run in a browser, untested there.",
+    ],
+    notYet: ["Tested Node.js support."],
+    clip: {
+      title: "ts-libs: from a request to an inbox",
+      caption:
+        "The README example, run: an invalid email is refused with a typed error, a valid one is booked and its confirmation lands in a local inbox.",
+      frame: "terminal",
+      frameTitle: "main.ts",
+      poster: {
+        src: "/video/tools/ts-libs/poster.webp",
+        alt:
+          'A terminal above a mail client: the request with the email nope is refused with "must be an email address", the one with jane@example.com answers Booked, and the inbox shows the mail Booked: See you Friday, 28 August 2026 at 10:00.',
+        width: 1280,
+        height: 720,
+        srcset:
+          "/video/tools/ts-libs/poster-640.webp 640w, /video/tools/ts-libs/poster.webp 1280w",
+      },
+      video: { duration: "PT37S", uploadDate: "2026-10-19" },
+    },
     fits: [
       {
         text:
@@ -679,6 +794,31 @@ export const tools: Tool[] = [
     status: "in-use",
     group: "tools",
     repo: "spy4x/dotfiles",
+    headline: "One rules file, every harness.",
+    lede:
+      "I run several AI coding agents at once, in Claude Code, OpenCode and DSH (a DeepSeek harness). Their rules, skills, agents and settings are written once, and one command renders them into the format each harness reads.",
+    clip: {
+      title: "Keeping three AI harnesses in sync",
+      caption:
+        "deno task ai --check finds an edited rule in all three harnesses, deno task ai applies it, and the check prints All targets in sync.",
+      frame: "terminal",
+      frameTitle: "dotfiles",
+      poster: {
+        src: "/video/tools/dotfiles/poster.webp",
+        srcset:
+          "/video/tools/dotfiles/poster-640.webp 640w, /video/tools/dotfiles/poster.webp 1280w",
+        alt:
+          "A terminal after deno task ai applied three changes: deno task ai --check lists the Claude Code, OpenCode and DSH homes and prints All targets in sync.",
+        width: 1280,
+        height: 720,
+      },
+      video: { duration: "PT27S", uploadDate: "2026-10-19" },
+    },
+    quickStart: {
+      label: "Compare your harnesses with mine (writes nothing)",
+      command:
+        "git clone https://github.com/spy4x/dotfiles && cd dotfiles && deno task ai --check",
+    },
     usedFor:
       "This is how I run AI agents on real work, on my own machine. It is that machine's live config: a merged change is not done until it is applied there.",
     proofLinks: [
