@@ -32,11 +32,23 @@ Deno.test("the oko page wears the tool frame and plays its committed clip", asyn
   assert(html.includes("/video/tools/oko/demo.webm"), "no clip");
 });
 
-Deno.test("From config to card offers up, down and no answer, with Up chosen and only its picture shown", async () => {
+Deno.test("From config to card offers up, down and no answer, with Up chosen, only its picture shown and each choice counted on its radio alone", async () => {
   const page = await okoPage();
   const radios = [...page.matchAll(/<input[^>]*name="oko-card-state"[^>]*>/g)]
     .map(([tag]) => tag);
   assertEquals(radios.length, 3);
+  // A label click is passed on to its radio as a second click, so an event
+  // on the label would count every choice twice.
+  const labels = [
+    ...page.matchAll(
+      /<label[^>]*>(?:(?!<\/label>)[\s\S])*?name="oko-card-state"/g,
+    ),
+  ]
+    .map(([match]) => match.slice(0, match.indexOf(">") + 1));
+  assertEquals(labels.length, 3);
+  for (const label of labels) {
+    assert(!label.includes("data-umami"), `label sends an event: ${label}`);
+  }
   for (const state of ["up", "down", "unknown"]) {
     const radio = radios.find((r) => r.includes(`value="${state}"`));
     assert(radio, `no ${state} radio`);

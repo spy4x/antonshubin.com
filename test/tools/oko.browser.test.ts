@@ -96,3 +96,37 @@ for (const javaScript of [true, false]) {
     }
   });
 }
+
+Deno.test("the card states take one tab stop, and the arrow keys move the choice and swap the picture", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    });
+    try {
+      await page.goto(`${site.origin}/tools/oko`);
+      const shown = page.locator(
+        "section[aria-labelledby=config-to-card] img:visible",
+      );
+      await page.locator("#oko-state-up").focus();
+      await page.keyboard.press("ArrowRight");
+      assert(await page.locator("#oko-state-down").isChecked(), "Down");
+      assert(
+        (await shown.getAttribute("src"))?.includes("card-down.webp"),
+        "ArrowRight: wrong picture",
+      );
+      await page.keyboard.press("Tab");
+      const next = await page.evaluate(() =>
+        document.activeElement?.getAttribute("name") ?? ""
+      );
+      assert(next !== "oko-card-state", "Tab stayed in the card states");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});

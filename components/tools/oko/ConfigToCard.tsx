@@ -1,3 +1,4 @@
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import { eventAttrs } from "../../../lib/analytics.ts";
 import { CodeBlock } from "./CodeBlock.tsx";
 
@@ -147,7 +148,7 @@ function Marker({ n, class: extra = "" }: { n: number; class?: string }) {
 /**
  * oko's page, part 4 (#464): "From config to card". A `config.json` entry
  * beside the card oko renders from it, with numbered markers on both and a
- * numbered legend; three native radios swap the card between its real up,
+ * numbered legend; the library's `RadioChips` (native radios) swap the card between its real up,
  * down and unknown crops. No island: the swap is CSS `:has()`, and the two
  * hidden pictures are `display: none` with `loading="lazy"`, so the browser
  * fetches each only once it is chosen. Hovering a JSON line outlines its
@@ -161,31 +162,21 @@ export function ConfigToCard() {
       </h2>
       <div class="mt-6 grid gap-8 lg:grid-cols-12 lg:items-start">
         <div class="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-start-1">
-          <fieldset>
-            <legend class="text-sm text-graphite">What gatus says</legend>
-            <div class="mt-2 flex flex-wrap gap-2">
-              {STATES.map((s) => (
-                <label
-                  key={s.value}
-                  class="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-rule px-4 text-sm text-graphite hover:text-parchment has-[:checked]:border-rule-strong has-[:checked]:bg-lamp has-[:checked]:text-parchment has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-parchment"
-                >
-                  <input
-                    type="radio"
-                    name="oko-card-state"
-                    id={`oko-state-${s.value}`}
-                    value={s.value}
-                    checked={s.initial}
-                    class="sr-only"
-                    {...eventAttrs("tool-try", {
-                      item: "oko",
-                      part: `state:${s.value}`,
-                    })}
-                  />
-                  {s.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <RadioChips
+            legend="What gatus says"
+            legendClass="mb-2 text-sm text-graphite"
+            name="oko-card-state"
+            defaultValue="up"
+            options={STATES.map((s) => ({
+              value: s.value,
+              label: s.label,
+              id: `oko-state-${s.value}`,
+              inputAttributes: eventAttrs("tool-try", {
+                item: "oko",
+                part: `state:${s.value}`,
+              }),
+            }))}
+          />
           <div class="relative mt-4 max-w-sm">
             {STATES.map((s) => (
               <img

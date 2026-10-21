@@ -21,6 +21,7 @@ import { FeatureCard } from "@spy4x/preact-ui/feature-card";
 import { WindowFrame } from "@spy4x/preact-ui/window-frame";
 import { DemoVideo } from "@spy4x/preact-ui/demo-video";
 import { ComparisonTable } from "@spy4x/preact-ui/comparison-table";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
@@ -176,6 +177,19 @@ function renderedLibraryMarkup(): string {
         checkedOn={new Date("2026-10-20")}
         method="How."
         fit="Who."
+      />,
+    ),
+    // /tools/oko's card states (#464): a checked and an unchecked chip.
+    render(
+      <RadioChips
+        legend="State"
+        legendClass="mb-2 text-sm text-graphite"
+        name="state"
+        defaultValue="up"
+        options={[{ value: "up", label: "Up" }, {
+          value: "down",
+          label: "Down",
+        }]}
       />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
