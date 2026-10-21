@@ -124,3 +124,31 @@ Deno.test("the caldav-tasks-web page shows the known issue from caldav-tasks-web
     await site.stop();
   }
 });
+
+Deno.test("the field switch's rules are in one style element on the caldav-tasks-web page and never in the shared stylesheet", async () => {
+  const site = await startSite();
+  try {
+    const home = await site.html("/");
+    const cssHref = home.match(/href="(\/assets\/client-entry-[^"?]+\.css)/)
+      ?.[1];
+    assert(cssHref, "no shared stylesheet linked from /");
+    const css = await site.html(cssHref);
+    assert(css.length > 10_000, "the shared stylesheet looks empty");
+    assert(!css.includes("ctw-field"), "a ctw-field rule is in the shared CSS");
+    assert(!home.includes("ctw-field"), "a ctw-field rule is on /");
+
+    const page = await site.html("/tools/caldav-tasks-web");
+    const styles = [...page.matchAll(/<style([^>]*)>([^<]*)<\/style>/g)]
+      .filter((m) => m[2].includes("#ctw-field-"));
+    assertEquals(styles.length, 1, "one style element for the switch");
+    // Fresh sets the nonce itself (a nonce="" in the page is overwritten);
+    // test/csp.browser.test.ts finds no violation on this page, and the
+    // browser test sees the rules light the lines.
+    assert(/\snonce="[^"]+"/.test(styles[0][1]), "the style has no nonce");
+    for (const f of TASK_FIELDS) {
+      assert(styles[0][2].includes(`#ctw-field-${f.id}:checked`), f.id);
+    }
+  } finally {
+    await site.stop();
+  }
+});

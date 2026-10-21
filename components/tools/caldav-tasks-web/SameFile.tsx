@@ -8,33 +8,19 @@ const COMPATIBILITY =
   "https://github.com/spy4x/caldav-tasks-web/blob/main/docs/compatibility.md#which-tasksorg-fields-round-trip";
 
 /**
- * The switch's whole behaviour, in CSS on the section (no island): while a
- * field's radio is checked, the file lines marked with its id get the Lamp
- * fill, a Parchment rule and Parchment text (the rest is Graphite), and only
- * its note shows. Written out in full so Tailwind finds every class.
+ * The switch's whole behaviour, in CSS (no island): while a field's radio is
+ * checked, the file lines marked with its id get the Lamp fill, a Parchment
+ * rule and Parchment text (the rest is Graphite), and only its note shows.
+ * It is a page-only `<style>`, not Tailwind classes, so the shared stylesheet
+ * every page loads carries none of it (#465: 3.4 KB there slowed the home
+ * page's LCP). Fresh gives the element the render's CSP nonce.
  */
-const SWITCH_CSS = [
-  "[&:has(#ctw-field-title:checked)_[data-line~=title]]:bg-lamp",
-  "[&:has(#ctw-field-title:checked)_[data-line~=title]]:border-parchment",
-  "[&:has(#ctw-field-title:checked)_[data-line~=title]]:text-parchment",
-  "[&:has(#ctw-field-title:checked)_[data-note]:not([data-note=title])]:hidden",
-  "[&:has(#ctw-field-priority:checked)_[data-line~=priority]]:bg-lamp",
-  "[&:has(#ctw-field-priority:checked)_[data-line~=priority]]:border-parchment",
-  "[&:has(#ctw-field-priority:checked)_[data-line~=priority]]:text-parchment",
-  "[&:has(#ctw-field-priority:checked)_[data-note]:not([data-note=priority])]:hidden",
-  "[&:has(#ctw-field-parent:checked)_[data-line~=parent]]:bg-lamp",
-  "[&:has(#ctw-field-parent:checked)_[data-line~=parent]]:border-parchment",
-  "[&:has(#ctw-field-parent:checked)_[data-line~=parent]]:text-parchment",
-  "[&:has(#ctw-field-parent:checked)_[data-note]:not([data-note=parent])]:hidden",
-  "[&:has(#ctw-field-order:checked)_[data-line~=order]]:bg-lamp",
-  "[&:has(#ctw-field-order:checked)_[data-line~=order]]:border-parchment",
-  "[&:has(#ctw-field-order:checked)_[data-line~=order]]:text-parchment",
-  "[&:has(#ctw-field-order:checked)_[data-note]:not([data-note=order])]:hidden",
-  "[&:has(#ctw-field-reminder:checked)_[data-line~=reminder]]:bg-lamp",
-  "[&:has(#ctw-field-reminder:checked)_[data-line~=reminder]]:border-parchment",
-  "[&:has(#ctw-field-reminder:checked)_[data-line~=reminder]]:text-parchment",
-  "[&:has(#ctw-field-reminder:checked)_[data-note]:not([data-note=reminder])]:hidden",
-].join(" ");
+const SWITCH_CSS = TASK_FIELDS.map(({ id }) => {
+  const on = `[data-same-file]:has(#ctw-field-${id}:checked)`;
+  return `${on} [data-line~=${id}]{background-color:var(--color-lamp);` +
+    `border-color:var(--color-parchment);color:var(--color-parchment)}` +
+    `${on} [data-note]:not([data-note=${id}]){display:none}`;
+}).join("");
 
 /**
  * A compatibility.md cell: text with its `backtick` spans as `<code>`. Plain
@@ -65,8 +51,9 @@ export function SameFile() {
     <section
       aria-labelledby="same-file"
       data-same-file
-      class={`max-w-5xl ${SWITCH_CSS}`}
+      class="max-w-5xl"
     >
+      <style>{SWITCH_CSS}</style>
       <h2 id="same-file" class="text-2xl sm:text-3xl text-parchment">
         Same file, two apps
       </h2>
