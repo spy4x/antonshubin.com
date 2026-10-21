@@ -120,11 +120,11 @@ https://antonshubin.com/how-i-work?utm_source=upwork&utm_medium=dm&utm_campaign=
 
 ## The Dev.to cross-post
 
-`deno task publish:blog` creates a Dev.to draft whose `canonical_url` is the
+`deno task publish:blog` publishes a Dev.to article whose `canonical_url` is the
 clean post URL, with no parameters, because it tells search engines which copy
-is the original. The draft body ends with a "First published on antonshubin.com"
-line whose link carries the `devto` channel's tags and the article's campaign,
-so readers who click through are counted.
+is the original. The article body ends with a "First published on
+antonshubin.com" line whose link carries the `devto` channel's tags and the
+article's campaign, so readers who click through are counted.
 
 ## Campaign log
 
@@ -161,7 +161,7 @@ report. Its "Umami — top campaigns (7 days)" section ranks the week's
 
 Never hand-write a tagged (UTM) URL. `deno task links <path> [--campaign …]`
 (optionally `--content …`) prints a page's tagged URL for every channel, and
-`launch-kit`, `video-kit` and `publish:blog`'s Dev.to draft build theirs from
+`launch-kit`, `video-kit` and `publish:blog`'s Dev.to article build theirs from
 the same channel table in `scripts/utm.ts`. The convention, the campaign names
 and the log of campaigns already used are in this file; its channel table must
 match the code's (`scripts/utm.test.ts` checks it).

@@ -11,6 +11,7 @@ import {
   type PublishDeps,
   readPost,
 } from "./publish-blog.ts"
+import { publishOnDevTo } from "./devto.ts"
 import { parsePostAnnouncement } from "./send-newsletter.ts"
 import { CHANNELS } from "./utm.ts"
 import { INDEXNOW_ENDPOINT } from "@/lib/indexnow.ts"
@@ -35,7 +36,7 @@ interface Recorder {
   deps: PublishDeps
   fetched: string[]
   inits: (RequestInit | undefined)[]
-  drafts: {
+  devTo: {
     title: string
     slug: string
     body: string
@@ -52,17 +53,21 @@ function fakes(
   {
     status = 200,
     remoteCode = 0,
+    devToOk = true,
     readPost: read = () => Promise.resolve(POST),
   }: {
     status?: number | "network-error"
-    remoteCode?: number
+    /** The remote send's exit code, or "throws" when ssh cannot run. */
+    remoteCode?: number | "throws"
+    /** What the Dev.to publish resolves to, or "throws". */
+    devToOk?: boolean | "throws"
     readPost?: (slug: string) => Promise<Post>
   } = {},
 ): Recorder {
   const r: Recorder = {
     fetched: [],
     inits: [],
-    drafts: [],
+    devTo: [],
     remote: [],
     writes: {},
     out: [],
@@ -78,12 +83,16 @@ function fakes(
       }
       return Promise.resolve(new Response("page", { status }))
     }) as typeof fetch,
-    createDraft: (title, slug, body, campaign, coverImage) => {
-      r.drafts.push({ title, slug, body, campaign, coverImage })
-      return Promise.resolve()
+    publishDevTo: (title, slug, body, campaign, coverImage) => {
+      r.devTo.push({ title, slug, body, campaign, coverImage })
+      if (devToOk === "throws") return Promise.reject(new Error("boom"))
+      return Promise.resolve(devToOk)
     },
     runRemote: (command, stdin) => {
       r.remote.push({ command, stdin })
+      if (remoteCode === "throws") {
+        return Promise.reject(new Error("ssh not found"))
+      }
       return Promise.resolve(remoteCode)
     },
     readPost: read,
@@ -97,16 +106,18 @@ function fakes(
   return r
 }
 
-const DEFAULT_RUN = { slug: "a-test-post", sendNewsletter: false }
-const SEND_RUN = { slug: "a-test-post", sendNewsletter: true }
+const DEFAULT_RUN = { slug: "a-test-post" }
+const TEST_RUN = { slug: "a-test-post", testNewsletter: true }
+const SEND_COMMAND =
+  "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json"
 
-Deno.test("a post that answers anything but 200 exits 1 with no Dev.to draft and no send", async () => {
+Deno.test("a post that answers anything but 200 exits 1 with no Dev.to publish and no send", async () => {
   for (const status of [301, 404, 503]) {
-    for (const args of [DEFAULT_RUN, SEND_RUN]) {
+    for (const args of [DEFAULT_RUN, TEST_RUN]) {
       const r = fakes({ status })
       assertEquals(await publishBlog(args, r.deps), 1)
       assertEquals(r.fetched, ["https://antonshubin.com/blog/a-test-post"])
-      assertEquals(r.drafts.length, 0)
+      assertEquals(r.devTo.length, 0)
       assertEquals(r.remote.length, 0)
       assertStringIncludes(r.err.join("\n"), `answered ${status}`)
     }
@@ -123,7 +134,7 @@ Deno.test("the live check does not follow redirects and gives fetch an abort sig
 Deno.test("a live check that fails to connect counts as not live", async () => {
   const r = fakes({ status: "network-error" })
   assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 1)
-  assertEquals(r.drafts.length, 0)
+  assertEquals(r.devTo.length, 0)
   assertEquals(r.remote.length, 0)
 })
 
@@ -131,17 +142,18 @@ Deno.test("a missing post or data entry exits 1 before any request", async () =>
   const r = fakes({
     readPost: () => Promise.reject(new Error("No post at x")),
   })
-  assertEquals(await publishBlog(SEND_RUN, r.deps), 1)
+  assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 1)
   assertEquals(r.fetched.length, 0)
   assertEquals(r.remote.length, 0)
   assertEquals(r.err, ["No post at x"])
 })
 
-Deno.test("a live post without --send-newsletter creates the draft and sends nothing", async () => {
+Deno.test("one default run publishes the post on Dev.to and sends the newsletter once", async () => {
   const r = fakes()
   assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 0)
-  assertEquals(r.remote.length, 0)
-  assertEquals(r.drafts, [{
+  assertEquals(r.remote.map((c) => c.command), [SEND_COMMAND])
+  assertEquals(r.err, [])
+  assertEquals(r.devTo, [{
     title: "A <test> post",
     slug: "a-test-post",
     body:
@@ -149,10 +161,76 @@ Deno.test("a live post without --send-newsletter creates the draft and sends not
     campaign: "a-campaign",
     coverImage: undefined,
   }])
-  assertStringIncludes(
-    r.out.join("\n"),
-    "deno task publish:blog a-test-post --send-newsletter",
-  )
+})
+
+Deno.test("a Dev.to failure still sends the newsletter, exits 1 and names Dev.to", async () => {
+  for (const devToOk of [false, "throws"] as const) {
+    const r = fakes({ devToOk })
+    assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 1, String(devToOk))
+    assertEquals(r.remote.map((c) => c.command), [SEND_COMMAND])
+    assertStringIncludes(r.err.join("\n"), "not published on Dev.to")
+  }
+})
+
+Deno.test("a failed newsletter send still publishes on Dev.to and exits with the send's code", async () => {
+  const r = fakes({ remoteCode: 3 })
+  assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 3)
+  assertEquals(r.devTo.length, 1)
+  assertStringIncludes(r.err.join("\n"), "newsletter send exited with 3")
+  assertEquals(r.err.join("\n").includes("Dev.to"), false)
+})
+
+Deno.test("a send that cannot start over ssh exits 1 after publishing on Dev.to", async () => {
+  const r = fakes({ remoteCode: "throws" })
+  assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 1)
+  assertEquals(r.devTo.length, 1)
+  assertStringIncludes(r.err.join("\n"), "ssh not found")
+})
+
+Deno.test("a second run updates the one Dev.to article and hands the container the same slug to refuse", async () => {
+  // A Dev.to that remembers what it was given, behind the real publishOnDevTo.
+  const articles: { id: number; canonical_url: string }[] = []
+  const calls: string[] = []
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = ((url: string, init?: RequestInit) => {
+    const method = init?.method ?? "GET"
+    calls.push(`${method} ${url.replace("https://dev.to/api", "")}`)
+    if (method === "GET") return Promise.resolve(Response.json(articles))
+    if (method === "POST") {
+      const { article } = JSON.parse(String(init?.body))
+      articles.push({
+        id: articles.length + 1,
+        canonical_url: article.canonical_url,
+      })
+    }
+    return Promise.resolve(new Response("{}", { status: 200 }))
+  }) as typeof fetch
+  const sent = new Set<string>()
+  const r = fakes()
+  r.deps.publishDevTo = (title, slug, body, campaign, cover) =>
+    publishOnDevTo(title, slug, body, campaign, cover, "test-key")
+  // The container's send-newsletter.ts refuses a slug it already sent (its own tests).
+  r.deps.runRemote = (_command, stdin) => {
+    const { slug } = parsePostAnnouncement(stdin)
+    if (sent.has(slug)) return Promise.resolve(1)
+    sent.add(slug)
+    return Promise.resolve(0)
+  }
+  try {
+    assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 0)
+    // The refused send makes the rerun exit 1; nothing new went out.
+    assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 1)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+  assertEquals(articles.length, 1)
+  assertEquals(calls, [
+    "GET /articles/me/all?per_page=1000",
+    "POST /articles",
+    "GET /articles/me/all?per_page=1000",
+    "PUT /articles/1",
+  ])
+  assertEquals([...sent], ["a-test-post"])
 })
 
 Deno.test("the default run prints every channel's tagged link with the post's campaign", async () => {
@@ -167,7 +245,7 @@ Deno.test("the default run prints every channel's tagged link with the post's ca
   }
 })
 
-Deno.test("the default run pings IndexNow with the post and /blog; a send does not", async () => {
+Deno.test("the default run pings IndexNow with the post and /blog; a test send does not", async () => {
   const r = fakes()
   await publishBlog(DEFAULT_RUN, r.deps)
   const i = r.fetched.indexOf(INDEXNOW_ENDPOINT)
@@ -177,14 +255,14 @@ Deno.test("the default run pings IndexNow with the post and /blog; a send does n
   ])
   assertStringIncludes(r.out.join("\n"), "IndexNow: submitted 2 URL(s)")
   const send = fakes()
-  await publishBlog(SEND_RUN, send.deps)
+  await publishBlog(TEST_RUN, send.deps)
   assertEquals(send.fetched.includes(INDEXNOW_ENDPOINT), false)
 })
 
-/** The announcement `--send-newsletter` pipes to the container, for `article`. */
+/** The announcement the default run pipes to the container, for `article`. */
 async function announcementFor(article: BlogArticle) {
   const r = fakes({ readPost: () => Promise.resolve({ ...POST, article }) })
-  await publishBlog(SEND_RUN, r.deps)
+  await publishBlog(DEFAULT_RUN, r.deps)
   return parsePostAnnouncement(r.remote[0].stdin)
 }
 
@@ -252,7 +330,7 @@ Deno.test("the newsletter's hidden preview line is the first TL;DR line, and the
   assertStringIncludes(mail.text, "Unsubscribe: {{unsubscribe-link}}")
 })
 
-Deno.test("the Dev.to draft body starts with the intro, then the TL;DR, then the project's links, then the post", async () => {
+Deno.test("the Dev.to article body starts with the intro, then the TL;DR, then the project's links, then the post", async () => {
   const post: Post = {
     ...POST,
     article: {
@@ -263,7 +341,7 @@ Deno.test("the Dev.to draft body starts with the intro, then the TL;DR, then the
   }
   const r = fakes({ readPost: () => Promise.resolve(post) })
   await publishBlog(DEFAULT_RUN, r.deps)
-  const body = r.drafts[0].body
+  const body = r.devTo[0].body
   const tldr = body.indexOf("- Another point.")
   const links = body.indexOf("https://github.com/")
   assertEquals(
@@ -276,14 +354,14 @@ Deno.test("the Dev.to draft body starts with the intro, then the TL;DR, then the
   )
 })
 
-Deno.test("the Dev.to draft gets the post's coverImage", async () => {
+Deno.test("the Dev.to article gets the post's coverImage", async () => {
   const post: Post = {
     ...POST,
     article: { ...ARTICLE, coverImage: "/img/blog/a-test-post/cover.png" },
   }
   const r = fakes({ readPost: () => Promise.resolve(post) })
   await publishBlog(DEFAULT_RUN, r.deps)
-  assertEquals(r.drafts[0].coverImage, "/img/blog/a-test-post/cover.png")
+  assertEquals(r.devTo[0].coverImage, "/img/blog/a-test-post/cover.png")
 })
 
 Deno.test("every link the newsletter makes into the site is the email channel's tagged url", async () => {
@@ -312,15 +390,11 @@ Deno.test("every link the newsletter makes into the site is the email channel's 
   }
 })
 
-Deno.test("--send-newsletter pipes the tagged announcement to the container's send and makes no second draft", async () => {
+Deno.test("the default run pipes the tagged announcement to the container's send", async () => {
   const r = fakes()
-  assertEquals(await publishBlog(SEND_RUN, r.deps), 0)
-  assertEquals(r.drafts.length, 0)
+  assertEquals(await publishBlog(DEFAULT_RUN, r.deps), 0)
   assertEquals(r.remote.length, 1)
-  assertEquals(
-    r.remote[0].command,
-    "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json",
-  )
+  assertEquals(r.remote[0].command, SEND_COMMAND)
   const sent = parsePostAnnouncement(r.remote[0].stdin)
   assertEquals(sent.slug, "a-test-post")
   assertEquals(sent.subject, "A <test> post")
@@ -330,17 +404,14 @@ Deno.test("--send-newsletter pipes the tagged announcement to the container's se
   )
 })
 
-Deno.test("--test-newsletter asks the container for one test copy with --test and makes no draft", async () => {
+Deno.test("--test-newsletter asks the container for one test copy with --test and publishes nothing on Dev.to", async () => {
   const r = fakes()
-  assertEquals(
-    await publishBlog({ ...DEFAULT_RUN, testNewsletter: true }, r.deps),
-    0,
-  )
-  assertEquals(r.drafts.length, 0)
+  assertEquals(await publishBlog(TEST_RUN, r.deps), 0)
+  assertEquals(r.devTo.length, 0)
   assertEquals(r.remote.length, 1)
   assertEquals(
     r.remote[0].command,
-    "docker exec -i antonshubincom-web deno run -A scripts/send-newsletter.ts --stdin-json --test",
+    `${SEND_COMMAND} --test`,
   )
   assertEquals(parsePostAnnouncement(r.remote[0].stdin).slug, "a-test-post")
 })
@@ -355,13 +426,13 @@ Deno.test("--preview writes the HTML and the plain text beside it, needs no live
   assertStringIncludes(r.writes["out/mail.html"], "<!doctype html>")
   assertStringIncludes(r.writes["out/mail.txt"], "IN SHORT")
   assertEquals(r.fetched, [])
-  assertEquals(r.drafts.length, 0)
+  assertEquals(r.devTo.length, 0)
   assertEquals(r.remote.length, 0)
 })
 
-Deno.test("a refused or failed remote send exits with the remote's code", async () => {
+Deno.test("a refused or failed test send exits with the remote's code", async () => {
   const r = fakes({ remoteCode: 1 })
-  assertEquals(await publishBlog(SEND_RUN, r.deps), 1)
+  assertEquals(await publishBlog(TEST_RUN, r.deps), 1)
   assertStringIncludes(r.err.join("\n"), "exited with 1")
 })
 
@@ -384,7 +455,7 @@ Deno.test("readPost takes the campaign from the post's utmCampaign, else its slu
 
     const r = fakes({ readPost: () => Promise.resolve(tagged) })
     await publishBlog(DEFAULT_RUN, r.deps)
-    assertEquals(r.drafts[0].campaign, "tagged-campaign")
+    assertEquals(r.devTo[0].campaign, "tagged-campaign")
 
     const old = await readPost("old-post", [ARTICLE, other], dir)
     assertEquals(old.campaign, "old-post")
@@ -428,38 +499,31 @@ Deno.test("a full run writes nothing to lib/data.ts or content/blog", async () =
     blog: await snapshot("content/blog"),
   }
   const r = fakes({ readPost: (slug) => readPost(slug) })
+  assertEquals(await publishBlog({ slug: "ship-it-today" }, r.deps), 0)
   assertEquals(
-    await publishBlog({ slug: "ship-it-today", sendNewsletter: false }, r.deps),
+    await publishBlog({ slug: "ship-it-today", testNewsletter: true }, r.deps),
     0,
   )
-  assertEquals(
-    await publishBlog({ slug: "ship-it-today", sendNewsletter: true }, r.deps),
-    0,
-  )
-  assertEquals(r.drafts.length, 1)
+  assertEquals(r.devTo.length, 1)
   assertEquals(await Deno.readTextFile("lib/data.ts"), before.data)
   assertEquals(await snapshot("content/blog"), before.blog)
 })
 
-Deno.test("parsePublishArgs takes a slug and one of --send-newsletter, --test-newsletter and --preview <file>, and rejects anything else", () => {
-  assertEquals(parsePublishArgs(["a-post"]), {
-    slug: "a-post",
-    sendNewsletter: false,
-  })
-  assertEquals(parsePublishArgs(["a-post", "--send-newsletter"]), {
-    slug: "a-post",
-    sendNewsletter: true,
-  })
+Deno.test("parsePublishArgs takes a slug and one of --test-newsletter and --preview <file>, and rejects anything else", () => {
+  assertEquals(parsePublishArgs(["a-post"]), { slug: "a-post" })
   assertEquals(parsePublishArgs(["a-post", "--test-newsletter"]), {
     slug: "a-post",
-    sendNewsletter: false,
     testNewsletter: true,
   })
   assertEquals(parsePublishArgs(["--preview", "m.html", "a-post"]), {
     slug: "a-post",
-    sendNewsletter: false,
     preview: "m.html",
   })
+  assertThrows(
+    () => parsePublishArgs(["a-post", "--send-newsletter"]),
+    Error,
+    "Unknown option --send-newsletter",
+  )
   assertThrows(() => parsePublishArgs([]), Error, "Usage")
   assertThrows(
     () => parsePublishArgs(["a-post", "--send"]),
@@ -478,7 +542,7 @@ Deno.test("parsePublishArgs takes a slug and one of --send-newsletter, --test-ne
   )
   assertThrows(
     () =>
-      parsePublishArgs(["a-post", "--send-newsletter", "--test-newsletter"]),
+      parsePublishArgs(["a-post", "--test-newsletter", "--preview", "m.html"]),
     Error,
     "Pick one",
   )

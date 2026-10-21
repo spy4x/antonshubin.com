@@ -1,11 +1,11 @@
 /**
- * Dev.to draft creation, used by `scripts/publish-blog.ts` after a post is
- * published on antonshubin.com. A second run updates the draft the first one
- * made instead of adding another (see {@linkcode createDevToDraft}).
+ * Dev.to cross-posting, used by `scripts/publish-blog.ts` after a post is
+ * published on antonshubin.com. The article goes out published, never as a
+ * draft, and a second run updates the article the first one made instead of
+ * adding another (see {@linkcode publishOnDevTo}).
  *
- * Non-critical: a missing `DEVTO_API_KEY` or a failed request only warns —
- * it never throws, so the blog publish it rides along with always succeeds
- * on its own.
+ * A missing `DEVTO_API_KEY` or a failed request warns and reports failure;
+ * it never throws, so the newsletter send that runs next is never blocked.
  */
 
 import { channelUrl } from "./utm.ts"
@@ -28,7 +28,7 @@ export function firstPublishedLine(taggedUrl: string): string {
 }
 
 /**
- * What a Dev.to draft opens with: the post's intro (`postIntro()`: why the
+ * What a Dev.to article opens with: the post's intro (`postIntro()`: why the
  * post exists and who it is for), then what the post's page opens with, the
  * TL;DR list and, for a post with `relatedTool`, the project's live and
  * repository links. All come from the data the page reads (`intro`, `tldr`,
@@ -186,7 +186,7 @@ function rewriteImagesInLine(line: string): string {
  * Rewrites site-relative markdown image paths to absolute production URLs.
  * Dev.to resolves a relative path against dev.to, not antonshubin.com, so a
  * post image written as `![alt](/img/blog/x.png)` renders broken on the
- * draft. Walks the document line by line tracking fence state (``` or ~~~,
+ * article. Walks the document line by line tracking fence state (``` or ~~~,
  * including a longer fence around a shorter one, and one left unclosed to
  * the end of the document) and leaves every line inside a fence untouched,
  * so a post that documents markdown image syntax in a code sample doesn't
@@ -215,7 +215,7 @@ export function absolutizeImageUrls(markdown: string): string {
 }
 
 /**
- * Builds the Dev.to API payload for a draft cross-post. `canonical_url` is
+ * Builds the Dev.to API payload for a published cross-post. `canonical_url` is
  * the clean blog URL, with no UTM params — it is Dev.to's canonicalization
  * field, not a tracked link, so tagging it would point the canonical at a
  * URL that isn't the one search engines should treat as the source. The
@@ -238,7 +238,7 @@ export function buildDevToPayload(
       body_markdown: `${absolutizeImageUrls(bodyMarkdown)}\n\n---\n\n${
         firstPublishedLine(tagged)
       }\n`,
-      published: false,
+      published: true,
       canonical_url: `${DEVTO_BASE_URL}/blog/${slug}`,
     },
   }
@@ -250,14 +250,13 @@ export function buildDevToPayload(
 interface MyDevToArticle {
   id: number
   canonical_url: string | null
-  published: boolean
 }
 
 /**
  * Finds my Dev.to article whose `canonical_url` is `canonical`, published or
  * not, among the newest 1000 (`/articles/me/all`, one page). Throws when the
  * request fails or the answer is not a list, so the caller never mistakes a
- * failed lookup for "no draft yet" and makes a second one.
+ * failed lookup for "not on Dev.to yet" and makes a second article.
  */
 async function findMyArticle(
   apiKey: string,
@@ -295,27 +294,26 @@ export function devToApiKey(
 }
 
 /**
- * Creates the post's Dev.to draft, or updates the unpublished draft that
- * already has its `canonical_url` (`PUT /articles/{id}`), so running
- * `publish:blog` twice never leaves two drafts. An article with that
- * `canonical_url` that is already published is left alone: Anton published
- * it himself, and a draft run must not rewrite a live post.
+ * Publishes the post on Dev.to: creates the article, or updates the one that
+ * already has its `canonical_url` (`PUT /articles/{id}`), published or not,
+ * so running `publish:blog` twice never leaves two articles.
  *
- * Fails open: logs a warning and returns normally when `DEVTO_API_KEY` is
- * unset or a request fails. A failed lookup creates nothing, since creating
- * then could be the duplicate this function exists to prevent.
+ * Resolves to `true` once Dev.to accepted the article. Never throws: when
+ * `DEVTO_API_KEY` is unset or a request fails it warns and resolves to
+ * `false`. A failed lookup creates nothing, since creating then could be the
+ * duplicate this function exists to prevent.
  */
-export async function createDevToDraft(
+export async function publishOnDevTo(
   title: string,
   slug: string,
   bodyMarkdown: string,
   campaign: string = slug,
   coverImage?: string,
   apiKey: string | undefined = devToApiKey(),
-): Promise<void> {
+): Promise<boolean> {
   if (!apiKey) {
-    console.warn("  ⚠ DEVTO_API_KEY not set — skipped the Dev.to draft")
-    return
+    console.warn(`  ⚠ DEVTO_API_KEY not set — not published on Dev.to`)
+    return false
   }
   try {
     const payload = buildDevToPayload(
@@ -326,21 +324,15 @@ export async function createDevToDraft(
       coverImage,
     )
     const existing = await findMyArticle(apiKey, payload.article.canonical_url)
-    if (existing?.published) {
-      console.warn(
-        `  ⚠ Dev.to already has this post published (id ${existing.id}) — left it alone`,
-      )
-      return
-    }
     const res = await fetch(
       existing
         ? `${DEVTO_API}/articles/${existing.id}`
         : `${DEVTO_API}/articles`,
       {
-        method: existing ? "PUT" : "POST",
+        method: existing ? `PUT` : `POST`,
         headers: {
           "api-key": apiKey,
-          "content-type": "application/json",
+          "content-type": `application/json`,
         },
         body: JSON.stringify(payload),
       },
@@ -349,10 +341,12 @@ export async function createDevToDraft(
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
     console.log(
       existing
-        ? `  ✓ Dev.to draft updated (id ${existing.id})`
-        : "  ✓ Dev.to draft created",
+        ? `  ✓ Dev.to article updated and published (id ${existing.id})`
+        : `  ✓ Dev.to article published`,
     )
+    return true
   } catch (err) {
-    console.warn(`  ⚠ Dev.to draft failed: ${(err as Error).message}`)
+    console.warn(`  ⚠ Dev.to publish failed: ${(err as Error).message}`)
+    return false
   }
 }

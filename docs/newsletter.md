@@ -120,13 +120,11 @@ Any link to the site in it is a tagged `email` link from
 ## Announcing a new blog post
 
 Do not hand-write a post announcement. After the post is merged, deployed and
-live, `deno task publish:blog <slug>` prints the announcement's subject (the
-post's title) and plain-text part, with the tagged `email` links, and sends
-nothing. `--preview <file>` writes the rendered HTML and text locally,
+live, `deno task publish:blog <slug>` sends it from the production container,
+with no one asked first; the sent log below keeps a rerun from mailing anyone
+twice. `--preview <file>` writes the rendered HTML and text locally, and
 `--test-newsletter` sends one copy to `CONTACT_EMAIL` only (a "[Test]" subject,
-no log), and only after Anton says yes in chat to that post,
-`deno task publish:blog <slug> --send-newsletter` sends it from the production
-container. The whole flow is in [publishing.md](publishing.md).
+no log). The whole flow is in [publishing.md](publishing.md).
 
 The guard is a per-recipient sent log, `data/newsletter-log.json`, next to
 `subscribers.json` in the same bind-mounted directory, so it survives deploys

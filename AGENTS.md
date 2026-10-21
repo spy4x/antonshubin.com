@@ -99,7 +99,7 @@ deno task deploy                # production → antonshubin.com
 deno task env:encrypt           # every .env* → its .env*.age (age64)
 deno task env:decrypt           # every .env*.age → its plaintext (age64)
 deno task env:status            # key presence + which env/age files exist
-deno task publish:blog          # after deploy: live check, Dev.to draft, IndexNow, links; --send-newsletter only on Anton's yes
+deno task publish:blog          # after deploy: live check, Dev.to publish, IndexNow, links, newsletter send
 deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.to/YouTube posts
 deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
@@ -151,7 +151,7 @@ registered the old one, and the purge reads the build id from its
 lives in `.env.deploy` (gitignored, committed as `.env.deploy.age`, restored by
 `deno task env:decrypt`), which the deploy reads locally and never uploads; the
 container does not need it. The same file holds `DEVTO_API_KEY` for
-`publish:blog`'s Dev.to draft, read locally the same way. See `docs/deploy.md`
+`publish:blog`'s Dev.to article, read locally the same way. See `docs/deploy.md`
 "Cloudflare purge after a deploy".
 
 The newsletter subscriber list (`data/subscribers.json`) lives on the host:

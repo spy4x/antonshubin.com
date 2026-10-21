@@ -1,14 +1,16 @@
 # Publishing a blog post
 
-The whole flow from "I want a blog post about X" to a live post, a Dev.to draft,
-tagged links and channel texts (#260). An agent follows it in order. Three rules
-hold throughout:
+The whole flow from "I want a blog post about X" to a live post, the Dev.to
+article, the newsletter, tagged links and channel texts (#260). An agent follows
+it in order. Three rules hold throughout:
 
 1. **Agents never post to X, LinkedIn, Reddit, Hacker News or Telegram.** They
    write the text; Anton pastes it.
-2. **The newsletter goes out only after the post is live, and only when Anton
-   says yes in chat to that post.** A newsletter cannot be unsent.
-3. **Dev.to gets an unpublished draft only.** Anton publishes it with one click.
+2. **The newsletter goes out automatically once the post is live.**
+   `publish:blog` sends it right after the live check, with no one asked first;
+   the container refuses a post it already sent, so it never goes out twice.
+3. **Dev.to gets the post published, never a draft.** `publish:blog` publishes
+   it, or updates the article that already has the post's `canonical_url`.
 
 ## 0. Brief: four lenses
 
@@ -110,8 +112,8 @@ draft against the brief before the pull request opens.
    the update changed. **The `intro`** is written by the agent, last, from the
    finished post, in Anton's voice ([voice.md](voice.md)): two or three
    sentences on why the post exists and who it is for. It is not the description
-   and not the TL;DR. It opens the newsletter mail and the Dev.to draft, and can
-   open the LinkedIn text. Like the TL;DR it says only what the post says
+   and not the TL;DR. It opens the newsletter mail and the Dev.to article, and
+   can open the LinkedIn text. Like the TL;DR it says only what the post says
    (AGENTS.md "Content rule"). **The `coverAlt`** says what the cover shows, in
    one plain sentence.
 4. **A post about a project opens with its links.** Set `relatedTool` to its
@@ -136,10 +138,10 @@ draft against the brief before the pull request opens.
    and sits next to the text that talks about it. Real screenshots only,
    captured at 2x with the repo's Chromium (`test/browser.ts`'s
    `launchChromium()`), never a mockup.
-7. **A cover**, used by the Dev.to draft and the newsletter mail. Set
+7. **A cover**, used by the Dev.to article and the newsletter mail. Set
    `coverImage` to a site path of a 1000×420 PNG under
    `static/img/blog/<slug>/`, cropped from the hero screenshot with no text
-   added; `publish:blog` sends it as the draft's `main_image`.
+   added; `publish:blog` sends it as the article's `main_image`.
    `lib/blog-posts.ts` fails on a path outside `/img/`, a non-PNG or a missing
    file, and `lib/blog-posts.test.ts` on a cover that is not 1000×420. It is
    required for a new post; an older post's mail uses its OG preview PNG.
@@ -165,30 +167,34 @@ exactly as AGENTS.md "Deploy" says. Never push to `main` directly.
 deno task publish:blog <slug>
 ```
 
-It writes no file. It:
+It writes no file, and needs no one's go-ahead. It:
 
 1. Reads `content/blog/<slug>.md` and its `blogArticles` entry, and stops if
    either is missing.
 2. Fetches `https://antonshubin.com/blog/<slug>` and stops unless it answers
    200. Nothing below runs for a post that is not live.
-3. Creates the Dev.to draft (`published: false`, a clean `canonical_url`, the
+3. Publishes the post on Dev.to (`published: true`, a clean `canonical_url`, the
    post's campaign, the `coverImage` as `main_image`), opening with the `intro`,
    then the TL;DR and, for a post with `relatedTool`, the project's live and
-   repository links. When one of Anton's unpublished Dev.to drafts already has
-   that `canonical_url`, it updates that draft instead of creating a second; one
-   already published is left alone, and a failed lookup creates nothing. It
-   needs `DEVTO_API_KEY`, from the environment or the local `.env.deploy`
-   (restored by `deno task env:decrypt`, never uploaded); without it, it warns
-   and goes on.
+   repository links. When one of Anton's Dev.to articles already has that
+   `canonical_url`, published or not, it updates and publishes that one instead
+   of creating a second, and a failed lookup creates nothing. It needs
+   `DEVTO_API_KEY`, from the environment or the local `.env.deploy` (restored by
+   `deno task env:decrypt`, never uploaded); without it, or when Dev.to refuses,
+   it says so and goes on to the newsletter.
 4. Pings IndexNow with the post and `/blog` (`lib/indexnow.ts`), which asks Bing
    to recrawl them; Bing's index also feeds ChatGPT search and Copilot. It fails
    open and prints the answer. Google does not use IndexNow: it finds the post
    through the sitemap, or Anton can request indexing in Search Console's URL
    Inspection.
-5. Prints the post's tagged link for every channel, and the newsletter's subject
-   (the post's title alone) and plain-text part, whose links are the `email`
-   channel's tagged URLs.
-6. Sends nothing else, and prints the commands that preview, test and send.
+5. Prints the post's tagged link for every channel.
+6. Sends the newsletter (step 5 below) from the production container.
+
+A Dev.to failure does not stop the newsletter, and a failed send does not undo
+Dev.to. The command exits non-zero when either failed, and its last lines say
+which. Running it again is safe: Dev.to gets the same article updated, and the
+container refuses a newsletter it already sent (that rerun exits non-zero with
+the refusal, and nothing goes out).
 
 ## 4. Channel texts
 
@@ -221,7 +227,8 @@ subject is the post's title alone; the hidden preview line is the first TL;DR
 line. Every link into the site is the `email` channel's tagged URL, and every
 mail carries the subscriber's own one-click `List-Unsubscribe`.
 
-Before asking Anton, look at it and test it:
+`publish:blog <slug>` sends it. To look at it or test it first, before the
+deploy or without sending to the list:
 
 ```bash
 deno task publish:blog <slug> --preview mail.html   # writes mail.html and mail.txt, sends nothing
@@ -230,26 +237,22 @@ deno task publish:blog <slug> --test-newsletter     # one copy to CONTACT_EMAIL,
 
 `--preview` needs no live post. `--test-newsletter` runs the container's send
 with `--test`: one mail with a "[Test]" subject to `CONTACT_EMAIL` only, and the
-sent log is untouched. Show Anton the preview, and ask whether to send. Only
-after an explicit yes for this post:
+sent log is untouched.
 
-```bash
-deno task publish:blog <slug> --send-newsletter
-```
-
-It repeats the live check, then pipes the rendered announcement over SSH into
-`scripts/send-newsletter.ts --stdin-json` inside the production container, the
-only place with the subscriber list and the SMTP settings
+The send itself, in the default run, pipes the rendered announcement over SSH
+into `scripts/send-newsletter.ts --stdin-json` inside the production container,
+the only place with the subscriber list and the SMTP settings
 ([newsletter.md](newsletter.md)). The container keeps a per-recipient sent log
 in `data/newsletter-log.json`: it records the post before the first mail and
 each subscriber, as a keyed hash of the address, right after their mail is
 accepted. A post whose run finished with no failure is refused, so a second run
 cannot mail anyone twice. A run that crashed or had a failure is resumed by
-running the same command again, and mails only the people the first run meant it
-for who were missed, never a later subscriber. A second run started while one is
-going is refused. To resend on purpose, remove the post's entry from the log on
-the server by hand. An empty subscriber list is refused before anything is
-recorded, and the command exits non-zero when any mail failed or none went out.
+running `publish:blog <slug>` again, and mails only the people the first run
+meant it for who were missed, never a later subscriber. A second run started
+while one is going is refused. To resend on purpose, remove the post's entry
+from the log on the server by hand. An empty subscriber list is refused before
+anything is recorded, and the command exits non-zero when any mail failed or
+none went out.
 
 Report the result to Anton in chat: the `Sent`, `Failed` and `Skipped` counts
 the command printed, or its refusal. A non-zero exit is not a success, whatever
@@ -264,22 +267,22 @@ site's role", a draft in Anton's voice (`docs/voice.md`, learned from the five
 oldest posts), a pull request with the post file and its front matter (no
 `lib/data.ts` entry: the metadata is read from the file), review, merge, deploy,
 then `deno task publish:blog <slug>`. That script writes no file: it checks the
-post answers 200 live, creates the Dev.to draft, pings IndexNow and prints every
-channel's tagged link and the newsletter preview. Every post opens with a TL;DR,
-two to four short lines in its required `tldr` front matter (`lib/blog-posts.ts`
-fails the build without it, and `llms-full.txt` lists it), and a post about a
-project sets `relatedTool`, so its header shows that tool's demo (`live`) and
-repository (`repo`) from `lib/tools.ts`, never hand-written links;
-`test/blog.test.ts` checks both on every post. A post about something visual
-opens with a real screenshot right under its TL;DR (lazy like every post image:
-eager, it made the post's phone LCP slower), and its `coverImage` (a 1000×420
-PNG under `static/img/`) becomes the Dev.to cover and the newsletter's picture;
-`publish:blog` updates an existing unpublished draft with the same
+post answers 200 live, publishes the post on Dev.to, pings IndexNow, prints
+every channel's tagged link and sends the newsletter. Every post opens with a
+TL;DR, two to four short lines in its required `tldr` front matter
+(`lib/blog-posts.ts` fails the build without it, and `llms-full.txt` lists it),
+and a post about a project sets `relatedTool`, so its header shows that tool's
+demo (`live`) and repository (`repo`) from `lib/tools.ts`, never hand-written
+links; `test/blog.test.ts` checks both on every post. A post about something
+visual opens with a real screenshot right under its TL;DR (lazy like every post
+image: eager, it made the post's phone LCP slower), and its `coverImage` (a
+1000×420 PNG under `static/img/`) becomes the Dev.to cover and the newsletter's
+picture; `publish:blog` updates the Dev.to article that already has the same
 `canonical_url` instead of adding a second. Since #364 a post published on or
 after 2026-10-02 (`LETTER_FIELDS_FROM` in `lib/blog-posts.ts`) must also carry
 `intro` (two or three sentences in Anton's voice on why the post exists and who
 it is for, written by the agent last, from the finished post; it opens the
-newsletter and the Dev.to draft and can open a LinkedIn post) and `coverAlt`,
+newsletter and the Dev.to article and can open a LinkedIn post) and `coverAlt`,
 and the build fails without any of the three; older posts fall back to their
 `description`, their OG preview PNG and their title. The newsletter is that
 letter with the cover, the intro, "In short", one button and the P.S.; its
@@ -290,13 +293,11 @@ its HTML and text locally and `--test-newsletter` sends one copy to
 - **Agents never post to X, LinkedIn, Reddit, Hacker News or Telegram.** They
   write one text per channel with its tagged link and show it in chat; Anton
   pastes it.
-- **The newsletter is sent only after the post is live and only when Anton says
-  yes in chat to that post** —
-  `deno task publish:blog <slug>
-  --send-newsletter`. The production container
-  keeps a per-recipient sent log, `data/newsletter-log.json` (a keyed hash of
-  each address, never the address): it refuses a post whose run finished with no
-  failure, a rerun after a partial failure mails only the people the first run
-  meant it for who were missed (never a later subscriber), and a second run
-  started while one is going is refused by a lock file.
-- **Dev.to gets an unpublished draft only.** Anton publishes it himself.
+- **The newsletter goes out automatically once the post is live**, sent by
+  `deno task publish:blog <slug>` with no one asked first. The production
+  container keeps a per-recipient sent log, `data/newsletter-log.json` (a keyed
+  hash of each address, never the address): it refuses a post whose run finished
+  with no failure, a rerun after a partial failure mails only the people the
+  first run meant it for who were missed (never a later subscriber), and a
+  second run started while one is going is refused by a lock file.
+- **Dev.to gets the post published, never a draft**, by the same run.

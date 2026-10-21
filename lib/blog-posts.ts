@@ -86,7 +86,7 @@ export interface BlogArticle {
   /**
    * Two or three sentences in Anton's voice on why the post exists and who it
    * is for (docs/publishing.md). It opens the newsletter mail and the Dev.to
-   * draft, and can open a LinkedIn post. Required from
+   * article, and can open a LinkedIn post. Required from
    * {@linkcode LETTER_FIELDS_FROM}; see {@linkcode postIntro}.
    */
   intro?: string
