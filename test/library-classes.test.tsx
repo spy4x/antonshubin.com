@@ -179,17 +179,14 @@ function renderedLibraryMarkup(): string {
         fit="Who."
       />,
     ),
-    // /tools/oko's card states (#464): a checked and an unchecked chip.
+    // /tools/zond's Ask zond request switch: a checked and an unchecked chip.
     render(
       <RadioChips
-        legend="State"
-        legendClass="mb-2 text-sm text-graphite"
-        name="state"
-        defaultValue="up"
-        options={[{ value: "up", label: "Up" }, {
-          value: "down",
-          label: "Down",
-        }]}
+        legend="Asks"
+        legendClass="font-semibold"
+        name="q"
+        defaultValue="a"
+        options={[{ value: "a", label: "A" }, { value: "b", label: "B" }]}
       />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
