@@ -4,7 +4,13 @@ import { define } from "../../lib/utils.ts"
 import { Layout } from "../../components/Layout.tsx"
 import { NotFound } from "../../components/NotFound.tsx"
 import { type BlogArticle, blogArticles } from "../../lib/data.ts"
-import { type PostHeading, renderBlogPost } from "../../lib/markdown.ts"
+import {
+  postBody,
+  type PostHeading,
+  type PostSegment,
+  renderBlogPost,
+} from "../../lib/markdown.ts"
+import { PostBody } from "../../components/PostBody.tsx"
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx"
 import PostToc from "../../islands/PostToc.tsx"
 import PostRead from "../../islands/PostRead.tsx"
@@ -52,7 +58,8 @@ async function getArticleContent(slug: string): Promise<string | null> {
 
 interface PageData {
   article: BlogArticle | null
-  content: string | null
+  /** The body around its components (#537), or null without a file. */
+  segments: PostSegment[] | null
   headings: PostHeading[]
   related: BlogArticle[]
 }
@@ -68,7 +75,7 @@ export const handler = define.handlers({
     if (!article) {
       return page<PageData>({
         article: null,
-        content: null,
+        segments: null,
         headings: [],
         related: [],
       }, {
@@ -78,13 +85,12 @@ export const handler = define.handlers({
     }
 
     const markdown = await getArticleContent(slug)
-    // Strip YAML front matter (between first pair of --- delimiters)
-    const body = markdown ? markdown.replace(/^---[\s\S]*?---\n*/, "") : null
-    const rendered = body ? await renderBlogPost(body) : null
+    const body = markdown ? postBody(markdown) : null
+    const rendered = body ? await renderBlogPost(body, { slug }) : null
 
     return page<PageData>({
       article,
-      content: rendered?.html ?? null,
+      segments: rendered?.segments ?? null,
       headings: rendered?.headings ?? [],
       related: readNext(article),
     })
@@ -199,7 +205,7 @@ function AuthorBox({ article }: { article: BlogArticle }) {
 }
 
 export default define.page(function BlogPost(ctx) {
-  const { article, content, headings, related } = ctx.data as PageData
+  const { article, segments, headings, related } = ctx.data as PageData
 
   if (!article) {
     return <NotFound pathname={ctx.url.pathname} />
@@ -419,13 +425,10 @@ export default define.page(function BlogPost(ctx) {
             </div>
           )}
 
-          {content
+          {segments?.length
             ? (
               <>
-                <div
-                  class="blog-content mt-10 text-parchment"
-                  dangerouslySetInnerHTML={{ __html: content }}
-                />
+                <PostBody segments={segments} slug={article.slug} />
                 <PostRead slug={article.slug} />
                 <BlogImageEnhancer />
               </>

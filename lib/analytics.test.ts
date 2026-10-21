@@ -6,6 +6,7 @@ import {
   linkEvent,
   outboundTo,
   track,
+  trackPostTry,
 } from "./analytics.ts"
 
 Deno.test("eventAttrs puts each set property in its own data-umami-event-<key> attribute", () => {
@@ -88,6 +89,26 @@ Deno.test("track sends properties to Umami and never throws when Umami does", ()
     track("call-booked")
     delete g.umami
     track("call-booked")
+  } finally {
+    delete g.umami
+  }
+})
+
+Deno.test("trackPostTry sends post-try once per post and component in a page view", () => {
+  const g = globalThis as { umami?: unknown }
+  const calls: unknown[][] = []
+  try {
+    g.umami = { track: (...args: unknown[]) => calls.push(args) }
+    trackPostTry("post-a", "Gauge")
+    trackPostTry("post-a", "Gauge")
+    trackPostTry("post-a", "Meter")
+    trackPostTry("post-b", "Gauge")
+    trackPostTry("post-a", "Meter")
+    assertEquals(calls, [
+      ["post-try", { item: "post-a", part: "Gauge" }],
+      ["post-try", { item: "post-a", part: "Meter" }],
+      ["post-try", { item: "post-b", part: "Gauge" }],
+    ])
   } finally {
     delete g.umami
   }

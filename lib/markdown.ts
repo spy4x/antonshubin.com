@@ -1,6 +1,13 @@
 import { Marked, Parser, Renderer, TextRenderer } from "marked"
 import type { Tokens } from "marked"
 import { outboundTo } from "./analytics.ts"
+import {
+  POST_COMPONENTS,
+  type PostComponentRegistry,
+  type PostComponentUse,
+  readComponentTag,
+  TAG_START,
+} from "./post-components.ts"
 
 /** A fence's info string -> the name its code block's header shows. */
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -38,6 +45,23 @@ let headingIds = new Map<string, number>()
 let headings: PostHeading[] = []
 /** The latest h2/h3 text, the label of a table that follows it. */
 let lastHeading = ""
+/** The post being read, and the components it may embed (#537). */
+let componentSlug = ""
+let componentRegistry: PostComponentRegistry = POST_COMPONENTS
+/** The components this render met, in page order. */
+let componentUses: PostComponentUse[] = []
+/** The first bad component tag this render met. */
+let componentError: Error | undefined
+
+/** Stands for the component at index `n` in the rendered HTML. */
+const PLACEHOLDER = /<!--post-component:(\d+)-->\n?/
+
+/** A component tag, read by the tokenizer below. */
+interface ComponentToken extends Tokens.Generic {
+  type: "postComponent"
+  raw: string
+  use: PostComponentUse
+}
 
 const ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
@@ -166,6 +190,49 @@ function cleanUrl(href: string): string | null {
 const blogMarked = new Marked()
 
 blogMarked.use({
+  /**
+   * A component tag (#537): a line that starts with `<` and a capital is
+   * read as one, at the top level of the post only, and fails the render
+   * when it is not a registered tag with valid props. A tag in a code block
+   * is code and never gets here. It renders as a placeholder comment that
+   * `renderBlogPost()` splits the HTML on. This is a tokenizer rather than
+   * an `html()` override because CommonMark only treats a line as HTML when
+   * its attributes are valid HTML, and a JSON prop with a space or a quote
+   * (`{"a b"}`) is not: it would turn into paragraph text without an error.
+   */
+  extensions: [{
+    name: "postComponent",
+    level: "block",
+    // Marked calls this on the paragraph minus its first character, so
+    // only a match after a newline is a real line start.
+    start(src) {
+      return /\n {0,3}<[A-Z]/.exec(src)?.index
+    },
+    tokenizer(src, tokens) {
+      if (!TAG_START.test(src)) return undefined
+      const raw = /^[^\n]*(?:\n|$)/.exec(src)![0]
+      // Marked appends "Please report this to marked" to an error thrown
+      // here, so the first one is kept and thrown after the parse instead.
+      try {
+        const use = readComponentTag(raw, componentSlug, componentRegistry)
+        if (tokens !== this.lexer.tokens) {
+          throw new Error(
+            `content/blog/${componentSlug}.md: <${use.tag}>: a component must sit at the top level of the post, not inside a list or a quote`,
+          )
+        }
+        return { type: "postComponent", raw, use } as ComponentToken
+      } catch (err) {
+        componentError ??= err as Error
+        return { type: "postComponent", raw }
+      }
+    },
+    renderer(token) {
+      const { use } = token as Partial<ComponentToken>
+      if (!use) return ""
+      componentUses.push(use)
+      return `<!--post-component:${componentUses.length - 1}-->\n`
+    },
+  }],
   /**
    * Finds each markdown checklist item's own checkbox token and tags it
    * with the item's plain-text label, before anything is rendered.
@@ -410,27 +477,116 @@ export async function renderBlogMarkdown(markdown: string): Promise<string> {
   return (await renderBlogPost(markdown)).html
 }
 
+/** A piece of a post's body: HTML, or a component between two pieces. */
+export type PostSegment =
+  | { kind: "html"; html: string }
+  | ({ kind: "component" } & PostComponentUse)
+
 /** A rendered post: its HTML and its `h2`/`h3` headings in page order. */
 export interface RenderedPost {
+  /** The whole body; a component stands as a placeholder comment. */
   html: string
   headings: PostHeading[]
+  /** The body in page order, HTML chunks with the components between. */
+  segments: PostSegment[]
+}
+
+/** Which post is rendered, and the components it may embed. */
+export interface RenderOptions {
+  /** Named in every error about a component tag. */
+  slug?: string
+  /** The components a tag may name; `POST_COMPONENTS` unless a test passes its own. */
+  components?: PostComponentRegistry
 }
 
 /**
  * Renders a post like `renderBlogMarkdown()` and also returns its headings,
- * with the same ids the HTML carries, for the contents list.
+ * with the same ids the HTML carries, for the contents list, and its body as
+ * segments around its components (#537). Throws on a component tag that is
+ * unknown, has invalid props, or repeats another anchor or a heading id.
  */
-export function renderBlogPost(markdown: string): Promise<RenderedPost> {
+export function renderBlogPost(
+  markdown: string,
+  { slug = "post", components = POST_COMPONENTS }: RenderOptions = {},
+): Promise<RenderedPost> {
   headingIds = new Map()
   headings = []
   lastHeading = ""
-  const raw = blogMarked.parse(markdown, { async: false }) as string
-  const result = {
-    html: addPreTabIndex(addOutboundEvents(addNewTabHints(raw))),
-    headings,
+  componentSlug = slug
+  componentRegistry = components
+  componentUses = []
+  componentError = undefined
+  try {
+    const raw = blogMarked.parse(markdown, { async: false }) as string
+    if (componentError) throw componentError
+    const html = addPreTabIndex(addOutboundEvents(addNewTabHints(raw)))
+    const uses = componentUses
+    const ids = new Set(headings.map((h) => h.id))
+    for (const use of uses) {
+      if (ids.has(use.anchor)) {
+        throw new Error(
+          `content/blog/${slug}.md: <${use.tag}>: anchor "${use.anchor}" is already used on this page`,
+        )
+      }
+      ids.add(use.anchor)
+    }
+    const parts = html.split(PLACEHOLDER)
+    const segments: PostSegment[] = []
+    parts.forEach((part, i) => {
+      if (i % 2 === 0) {
+        if (part.trim()) segments.push({ kind: "html", html: part })
+        return
+      }
+      const use = uses[Number(part)]
+      if (!use) throw new Error(`content/blog/${slug}.md: stray placeholder`)
+      segments.push({ kind: "component", ...use })
+    })
+    return Promise.resolve({ html, headings, segments })
+  } finally {
+    headings = []
+    componentUses = []
+    componentError = undefined
+    componentRegistry = POST_COMPONENTS
   }
-  headings = []
-  return Promise.resolve(result)
+}
+
+/** A post file's body: everything after its front matter. */
+export function postBody(markdown: string): string {
+  return markdown.replace(/^---[\s\S]*?---\n*/, "")
+}
+
+/**
+ * The post body for Dev.to (#537): each component tag becomes its entry's
+ * Markdown fallback, then "Try it on antonshubin.com" with a link to the
+ * component on the post. `postUrl` is the post's link as Dev.to readers get
+ * it, already tagged for the `devto` channel (`scripts/utm.ts`'s
+ * `channelUrl()`); the component's anchor is set as its fragment. Everything
+ * else in the body, code blocks included, stays byte for byte.
+ */
+export function toDevToMarkdown(
+  body: string,
+  postUrl: string,
+  components: PostComponentRegistry = POST_COMPONENTS,
+): string {
+  const url = new URL(postUrl)
+  componentSlug = url.pathname.split("/").filter(Boolean).at(-1) ?? "post"
+  componentRegistry = components
+  try {
+    componentError = undefined
+    const tokens = blogMarked.lexer(body)
+    if (componentError) throw componentError
+    return tokens.map((token) => {
+      if (token.type !== "postComponent") return token.raw
+      const { entry, props, anchor } = (token as ComponentToken).use
+      const link = new URL(url)
+      link.hash = anchor
+      const fallback = entry.toMarkdown(props, url.toString()).trim()
+      return `${fallback}\n\nTry it on antonshubin.com: <${link}>\n\n`
+    }).join("")
+  } finally {
+    componentError = undefined
+    componentRegistry = POST_COMPONENTS
+  }
 }
 
 /** "Why Deno? (and not Node)" -> "why-deno-and-not-node". */
