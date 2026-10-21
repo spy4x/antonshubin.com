@@ -126,6 +126,11 @@ seedTest(
   (page) => {
     const cards = page.split('data-e2e="feature-card"').slice(1)
     assertEquals(cards.length, seed.features!.length)
+    assertEquals(
+      seed.features!.filter((f) => !TRY_LINKS[f.title]).map((f) => f.title),
+      ["Billing per member", "An admin area"],
+      "cards without a try link",
+    )
     for (const [i, card] of cards.entries()) {
       const f = seed.features![i]
       const link = TRY_LINKS[f.title]
