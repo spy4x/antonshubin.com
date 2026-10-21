@@ -10,6 +10,7 @@ import { faqs, MAX_FAQS } from "../lib/faqs.ts"
 import { HOW_I_WORK_TITLE, PRICING_RULE } from "../lib/how-i-work.ts"
 import { promises } from "../lib/promises.ts"
 import { repeatClientsLine } from "../lib/testimonials.ts"
+import { WEEKLY_AUDIT } from "../lib/why-not-just-ai.ts"
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -51,7 +52,7 @@ siteTest(
       const name of [
         "Who this suits",
         "Five promises",
-        "My AI-agent setup",
+        "How I use AI",
         "Frequently asked questions",
       ]
     ) {
@@ -171,17 +172,36 @@ siteTest(
 )
 
 siteTest(
-  "how-i-work's AI-agent section names the setup, links the public rules repository and drops the vs cards",
+  "how-i-work's AI section says who answers for the work in plain words and links the public rules",
   async (site) => {
     const html = await site.html("/how-i-work")
     const ai = slice(html, '<section aria-labelledby="hiw-ai"', "</section>")
     assert(ai.includes('href="https://github.com/spy4x/dotfiles"'), "dotfiles")
-    assertEquals(count(ai, /<p[ >]/g), 1)
+    assert(ai.includes('href="/infrastructure"'), "infrastructure")
+    assert(ai.includes('href="#faq-ai-and-your-code"'), "AI-provider answer")
+    assert(ai.includes("data-why-not-just-ai-link"), "why-not-just-ai link")
     const text = visibleText(ai)
     for (
-      const w of ["Claude Code", "OpenCode", "DSH", "worktree", "reviewer"]
+      const w of [
+        "separate reviewer agent",
+        "security included",
+        WEEKLY_AUDIT,
+        "I answer for the result",
+      ]
     ) {
       assert(text.includes(w), `AI section does not say "${w}"`)
+    }
+    for (
+      const w of [
+        "Claude Code",
+        "OpenCode",
+        "DSH",
+        "worktree",
+        "diff",
+        "Valkey",
+      ]
+    ) {
+      assert(!text.includes(w), `AI section still says "${w}"`)
     }
     const all = visibleText(html)
     assert(!/Vs vibe-coding|Vs code-first/i.test(all), "a vs card is back")

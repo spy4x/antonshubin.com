@@ -308,9 +308,9 @@ Five entities in a `@graph` array (six on `/about`):
   questions, both joined to `#website`, plus the `BreadcrumbList`. No `Review`,
   `AggregateRating` or `Article`.
 - Linked from the footer's Site group, the home page under the prices,
-  `/catalog` under the services, the "My AI-agent setup" paragraph and the
-  pricing answer on `/how-i-work`, the SaaS MVP and Ongoing service pages and
-  the ends of the two posts on AI agents.
+  `/catalog` under the services, the "How I use AI" section and the pricing
+  answer on `/how-i-work`, the SaaS MVP and Ongoing service pages and the ends
+  of the two posts on AI agents.
 
 ### 12. The SaaS MVP page (`/catalog/zero-to-production-saas-mvp`)
 
