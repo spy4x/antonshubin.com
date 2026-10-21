@@ -179,17 +179,28 @@ function renderedLibraryMarkup(): string {
         fit="Who."
       />,
     ),
-    // /tools/caldav-mcp (#463): the permission switch, one chip checked.
+    // /tools/caldav-tasks-web (#465), /tools/zond, /tools/caldav-mcp: RadioChips as the site renders it (its
+    // own legend classes: the library's default `pc-label` is a preset class
+    // the site does not load), a checked chip and a disabled one, and a
+    // hidden legend.
     render(
       <RadioChips
-        legend="Mode"
-        legendClass="mb-3 text-parchment"
-        name="mode"
+        legend="Pick"
+        legendClass="text-parchment font-semibold"
+        name="pick"
         defaultValue="a"
-        options={[{ value: "a", label: "A", id: "m-a" }, {
-          value: "b",
-          label: "B",
-        }]}
+        options={[
+          { value: "a", label: "A" },
+          { value: "b", label: "B", disabled: true },
+        ]}
+      />,
+    ),
+    render(
+      <RadioChips
+        legend="Pick"
+        hideLegend
+        name="pick2"
+        options={[{ value: "a", label: "A" }]}
       />,
     ),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,

@@ -201,7 +201,13 @@ own.
 
 ### caldav-tasks-web
 
-None yet.
+- `tool-try` with `part` `field:title`, `field:priority`, `field:parent`,
+  `field:order` or `field:reminder`: a field of "Same file, two apps" was picked
+  (on its radio, so a click on the chip or an arrow key counts once).
+- `outbound` (`to: github`, `place: body`): "Every field" under the task file
+  and "The compatibility guide" under "What was tested".
+- `outbound` (`to: issues`, `place: body`): "Issue #119" in the known-issue line
+  of "Where it stands" (the entry's `knownIssue`).
 
 ### dotfiles
 
@@ -275,7 +281,13 @@ the MVP offer with `item: seed` are the number the page should move.
 
 ### zond
 
-None yet.
+| Event               | When                                                              | Properties                                        |
+| ------------------- | ----------------------------------------------------------------- | ------------------------------------------------- |
+| `tool-try`          | a request chip in "Ask zond" is picked (on its radio)             | `item=zond`, `part=ask:{path}` (`ask:/health`, …) |
+| `tool-install-copy` | any Quick start block is copied (Compose, config, command, Gatus) | `item=zond`                                       |
+
+Changing a service's answer sends nothing: a `<select>` reports a change, not a
+click, and an island only for that event would cost more than it tells.
 
 ### air-quality-sensor, toread-today
 
