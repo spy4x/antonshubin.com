@@ -623,7 +623,7 @@ export const tools: Tool[] = [
     headline:
       "Small TypeScript libraries on web standards, for the server and the browser.",
     lede:
-      "The example in the clip validates a booking request, formats its time in Berlin and sends a confirmation by SMTP: three packages, no framework.",
+      "The clip shows one meeting in each person's own time zone, money kept in whole cents, and form input checked against a schema.",
     kind: "library",
     status: "ready",
     group: "tools",
