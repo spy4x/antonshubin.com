@@ -148,6 +148,9 @@ div:has(> [data-gallery-counter]) > button {
    table with its sticky capability column and the highlighted first product,
    and the method and fit list (/why-not-just-ai, #486). */
 @source inline("flex min-w-0 max-w-full flex-col gap-4 font-semibold text-foreground flex-wrap gap-x-6 gap-y-2 text-sm inline-flex items-center gap-2 text-muted overflow-x-auto rounded-lg bg-surface ring-1 ring-subtle focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus min-w-full border-separate border-spacing-0 [&_tbody>tr:last-child>*]:border-b-0 sr-only border-b border-subtle px-3 py-3 sm:px-4 sticky left-0 z-10 text-left font-medium whitespace-nowrap bg-selected-soft block text-xs min-w-32 font-normal size-4 text-success text-warning gap-3 min-w-24 min-w-28 align-top sm:whitespace-nowrap shadow-[inset_-1.5rem_0_1rem_-1rem_color-mix(in_oklab,var(--color-foreground)_30%,transparent)] shadow-[inset_-1.5rem_0_0_0_var(--color-surface)]");
+/* @spy4x/preact-ui/radio-chips: the chip, checked, focused and disabled, and
+   its check mark (the permission switch on /tools/caldav-mcp, #463). */
+@source inline("group/chip sm:min-h-8 normal-case has-[:checked]:border-transparent has-[:checked]:bg-selected has-[:checked]:text-selected-foreground has-[:checked]:hover:bg-selected has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-focus has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-focus has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50 group-has-[:checked]/chip:block");
 /* @spy4x/preact-ui/honeypot: the off-screen box. */
 @source inline("absolute h-px w-px overflow-hidden");
 /* @spy4x/preact-system/rail: the labels variant's column, cells, primary

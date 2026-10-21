@@ -1,4 +1,5 @@
 import { IconChevronRight, IconLockClosed } from "@spy4x/preact-icons";
+import { RadioChips } from "@spy4x/preact-ui/radio-chips";
 import { eventAttrs } from "../../../lib/analytics.ts";
 import {
   GROUPS,
@@ -91,8 +92,8 @@ function ToolRow({ tool }: { tool: McpTool }) {
  * The page's unique middle (#463): all 13 MCP tools, grouped, under a
  * three-way switch that mirrors `CALDAV_MCP_TOOLS`. The tools the chosen
  * mode leaves out stay in the list, marked "Not offered", so a reader sees
- * what is withheld. Native radios and `<details>`, so it works without
- * JavaScript; the CSS is {@link SWITCH_CSS}.
+ * what is withheld. The library's `RadioChips` (native radios) and `<details>`,
+ * so it works without JavaScript; the CSS is {@link SWITCH_CSS}.
  */
 export function ToolReference() {
   return (
@@ -104,31 +105,22 @@ export function ToolReference() {
       <h2 id="mcp-tools" class="text-2xl sm:text-3xl text-parchment">
         What the assistant can do
       </h2>
-      <fieldset class="mt-5">
-        <legend class="text-parchment">Which tools the server offers</legend>
-        <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
-          {MODES.map((m) => (
-            <label
-              key={m.value}
-              {...eventAttrs("tool-try", {
-                item: SLUG,
-                part: `mode:${m.value}`,
-              })}
-              class="inline-flex min-h-11 cursor-pointer items-center gap-2 text-parchment sm:min-h-8"
-            >
-              <input
-                type="radio"
-                name="mcp-mode"
-                id={modeId(m.value)}
-                value={m.value}
-                checked={m.value === "all"}
-                class="size-4 accent-parchment"
-              />
-              {m.label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <RadioChips
+        class="mt-5"
+        legend="Which tools the server offers"
+        legendClass="mb-3 text-parchment"
+        name="mcp-mode"
+        defaultValue="all"
+        options={MODES.map((m) => ({
+          value: m.value,
+          label: m.label,
+          id: modeId(m.value),
+          inputAttributes: eventAttrs("tool-try", {
+            item: SLUG,
+            part: `mode:${m.value}`,
+          }),
+        }))}
+      />
       <p aria-hidden="true" data-mode-echo class="mt-3 text-sm text-graphite">
         {MODES.map((m) => (
           <code key={m.value} data-when={m.value}>

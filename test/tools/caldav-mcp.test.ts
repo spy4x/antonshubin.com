@@ -66,15 +66,23 @@ Deno.test("the caldav-mcp page renders the frame, the 13 tool rows with their No
       );
     }
 
-    // The switch: three radios, All checked, each label sending its mode.
+    // The switch: three radios, All checked, each radio (never its label,
+    // whose click reaches the radio as a second click) sending its mode.
     assertEquals(count(page, /name="mcp-mode"/g), 3);
     assert(/id="mcp-mode-all"[^>]*checked/.test(page), "All is not checked");
     for (const mode of ["all", "no-delete", "read-only"]) {
       assert(
-        page.includes(`data-umami-event-part="mode:${mode}"`),
-        `mode ${mode}: no tool-try`,
+        new RegExp(`<input[^>]*data-umami-event-part="mode:${mode}"`).test(
+          page,
+        ),
+        `mode ${mode}: no tool-try on its radio`,
       );
     }
+    assertEquals(
+      count(page, /<label[^>]*data-umami-event/g),
+      0,
+      "a label sends an event, which counts twice per click",
+    );
 
     // A Not offered mark lists the modes that leave its tool out.
     const marks = [...page.matchAll(/data-when="([^"]+)"\s+data-not-offered/g)]
@@ -99,6 +107,10 @@ Deno.test("the caldav-mcp page renders the frame, the 13 tool rows with their No
       /data-umami-event="tool-install-copy"[^>]*data-umami-event-item="caldav-mcp"/
         .test(page),
       "the config block's copy sends no tool-install-copy",
+    );
+    assert(
+      page.includes('aria-label="Copy claude_desktop_config.json"'),
+      "the copy button is not named after the file it copies",
     );
 
     // The clip's caption says it is a real exchange with a demo calendar.

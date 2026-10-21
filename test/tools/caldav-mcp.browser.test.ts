@@ -1,6 +1,7 @@
 // #463: /tools/caldav-mcp in a browser: the frame's shared check, and the
 // permission switch marking exactly the tools a mode leaves out, with
-// JavaScript on and off (the switch is CSS on native radios). Needs a built
+// JavaScript on and off (the switch is CSS on the library's RadioChips),
+// and its keyboard: one tab stop, arrow keys. Needs a built
 // site and Chromium; see docs/testing.md "Browser-driven tests".
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import type { Browser, Page } from "playwright";
@@ -18,6 +19,20 @@ function markedTools(page: Page): Promise<string[]> {
         return mark && getComputedStyle(mark).display !== "none";
       }).map((row) => row.getAttribute("data-mcp-tool")!),
   );
+}
+
+/**
+ * Picks a mode the way a visitor does: a click on its chip (the label; the
+ * radio inside is visually hidden), then waits for the radio to be checked.
+ */
+async function pick(page: Page, mode: string): Promise<void> {
+  await page.locator(`label:has(#mcp-mode-${mode})`).click({
+    timeout: WAIT_MS,
+  });
+  await page.locator(`#mcp-mode-${mode}:checked`).waitFor({
+    state: "attached",
+    timeout: WAIT_MS,
+  });
 }
 
 /** The visible text of the switch's note line. */
@@ -66,9 +81,7 @@ for (const javaScriptEnabled of [true, false]) {
           "the All note",
         );
 
-        await page.getByLabel("No delete", { exact: true }).check({
-          timeout: WAIT_MS,
-        });
+        await pick(page, "no-delete");
         assertEquals(await markedTools(page), [
           "delete_todo",
           "delete_event",
@@ -79,9 +92,7 @@ for (const javaScriptEnabled of [true, false]) {
           true,
         );
 
-        await page.getByLabel("Read-only", { exact: true }).check({
-          timeout: WAIT_MS,
-        });
+        await pick(page, "read-only");
         assertEquals(await markedTools(page), [
           "create_todo",
           "update_todo",
@@ -94,9 +105,7 @@ for (const javaScriptEnabled of [true, false]) {
         ]);
         assertEquals((await note(page)).startsWith("Also leaves out"), true);
 
-        await page.getByLabel("All", { exact: true }).check({
-          timeout: WAIT_MS,
-        });
+        await pick(page, "all");
         assertEquals(await markedTools(page), []);
       } finally {
         await page.close();
@@ -107,3 +116,45 @@ for (const javaScriptEnabled of [true, false]) {
     }
   });
 }
+
+Deno.test("the permission switch is one tab stop and the arrow keys move the choice", async () => {
+  const site = await startSite();
+  let browser: Browser | undefined;
+  try {
+    browser = await launchChromium();
+    const page = await newPage(browser);
+    try {
+      await page.goto(`${site.origin}/tools/caldav-mcp`);
+      // The value of the focused radio inside the switch, else null.
+      const focusedMode = () =>
+        page.evaluate(() => {
+          const el = document.activeElement;
+          return el instanceof HTMLInputElement && el.type === "radio" &&
+              el.closest("[data-mcp-reference]")
+            ? el.value
+            : null;
+        });
+      await page.locator("#mcp-mode-all").focus();
+      await page.keyboard.press("ArrowRight");
+      assertEquals(await focusedMode(), "no-delete");
+      assertEquals(await markedTools(page), [
+        "delete_todo",
+        "delete_event",
+        "delete_calendar",
+      ]);
+      await page.keyboard.press("ArrowRight");
+      assertEquals(await focusedMode(), "read-only");
+      await page.keyboard.press("Shift+Tab");
+      assertEquals(await focusedMode(), null, "Shift+Tab stayed in the group");
+      await page.keyboard.press("Tab");
+      assertEquals(await focusedMode(), "read-only");
+      await page.keyboard.press("Tab");
+      assertEquals(await focusedMode(), null, "Tab stayed in the group");
+    } finally {
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await site.stop();
+  }
+});
