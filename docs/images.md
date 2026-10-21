@@ -64,12 +64,12 @@ change it in its repository, then move the pin and run the task. Seed is the one
 exception until spy4x/seed#357 merges: its `demo.*` and posters are the silent
 copy committed before #521. Seed's admin panel video (`admin-panel.*`, shown in
 "See it running") comes from spy4x/seed's `apps/mpa/` through the same task. A
-clip has burned-in captions and its own quiet music, shows staged demo data
-only, and each file is at most 2.5 MB. Nothing downloads before the visitor
-presses play (`DemoVideo`), so the budget protects only the person who pressed.
-Its `lib/tools.ts` entry names it in `clip` (title, caption, frame, poster); set
-`clip.video` (`duration` as ISO 8601, `uploadDate` the commit day) only once
-both files are committed, which also adds the `VideoObject` JSON-LD.
+clip is 20 to 40 seconds, has burned-in captions and its own quiet music, shows
+staged demo data only, and each file is at most 2.5 MB. Nothing downloads before
+the visitor presses play (`DemoVideo`), so the budget protects only the person
+who pressed. Its `lib/tools.ts` entry names it in `clip` (title, caption, frame,
+poster); set `clip.video` (`duration` as ISO 8601, `uploadDate` the commit day)
+only once both files are committed, which also adds the `VideoObject` JSON-LD.
 `test/tool-frame.test.ts` fails when an entry marks a clip committed and a file
 is missing. `/video/*` is cached like `/img/*` (docs/cache-control.md).
 `main.ts` answers a `Range` request for `/video/*` with 206 Partial Content
