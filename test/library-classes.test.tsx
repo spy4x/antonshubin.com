@@ -26,6 +26,7 @@ import Button, { buttonClass } from "../components/Button.tsx";
 import { BookCallLink } from "../components/BookCallLink.tsx";
 import { CiPill } from "../components/CiPill.tsx";
 import { Nav } from "../components/Nav.tsx";
+import { OrbitSlice } from "../components/tools/preact-components/OrbitSlice.tsx";
 import type { CiSnapshot } from "../lib/github-snapshot.ts";
 import { startSite } from "./harness.ts";
 
@@ -178,6 +179,11 @@ function renderedLibraryMarkup(): string {
         method="How."
         fit="Who."
       />,
+    ),
+    // /tools/preact-components renders the library's Kpi, KpiGrid and Table
+    // on the server (#458).
+    render(
+      <OrbitSlice live={{ label: "Guide", href: "https://example.com" }} />,
     ),
     // /tools/caldav-tasks-web (#465), /tools/zond, /tools/caldav-mcp: RadioChips as the site renders it (its
     // own legend classes: the library's default `pc-label` is a preset class
@@ -355,7 +361,12 @@ Deno.test("a site button carries no library size or fill and the site's radius",
     "bg-surface",
     "border-control",
   ];
-  const html = renderedLibraryMarkup();
+  // A ThemePreview frame (/tools/preact-components, #458) shows the library's
+  // own buttons in the library's own look, so its subtree is not a site button.
+  const html = renderedLibraryMarkup().replace(
+    /<div data-preview-frame[^>]*>[\s\S]*?<\/figure><\/div>/g,
+    "",
+  );
   const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
     .map(([, list]) => list.split(" "))
     .filter((list) => list.includes("transition-colors"));

@@ -25,6 +25,8 @@ const PAGES = [
   "/tools",
   "/tools/ts-libs",
   "/tools/seed",
+  // The ThemePreview frame repaints its buttons in the library's own brand.
+  "/tools/preact-components",
 ];
 
 Deno.test("no monospace font renders in a heading, nav item or button (#184)", async () => {
