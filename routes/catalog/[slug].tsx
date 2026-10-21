@@ -170,7 +170,7 @@ export default define.page(function CatalogDetail(ctx) {
       <div class="max-w-6xl mx-auto">
         <Breadcrumb items={getBreadcrumb(canonical, item.shortTitle)} />
 
-        <header class="mb-8">
+        <header class="mb-8 max-md:mb-4">
           {isMvp && (
             <p
               data-service-eyebrow
@@ -190,7 +190,7 @@ export default define.page(function CatalogDetail(ctx) {
           </div>
           <p
             data-service-lead
-            class="mt-4 font-heading text-xl text-parchment leading-snug text-balance"
+            class="mt-4 max-md:mt-2 font-heading text-xl text-parchment leading-snug text-balance"
           >
             {isMvp ? saasMvpLead() : item.outcome}
           </p>

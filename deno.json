@@ -21,6 +21,7 @@
     "links": "deno run -R --allow-env scripts/links.ts",
     "weekly-numbers": "deno run -A scripts/weekly-numbers.ts",
     "umami-reports": "deno run --allow-env --allow-net scripts/umami-reports.ts",
+    "pull:videos": "deno run --allow-read=static/video --allow-write=static/video --allow-net=raw.githubusercontent.com scripts/pull-videos.ts",
     "optimize:screenshots": "deno run -A scripts/optimize-screenshots.ts",
     "reshoot:caldav": "deno run -A scripts/reshoot-caldav-demo.ts",
     "lcp": "deno run -A scripts/lcp.ts",

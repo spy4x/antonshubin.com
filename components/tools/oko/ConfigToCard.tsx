@@ -2,7 +2,7 @@ import { RadioChips } from "@spy4x/preact-ui/radio-chips"
 import { eventAttrs } from "../../../lib/analytics.ts"
 import { CodeBlock } from "./CodeBlock.tsx"
 
-/** One state a card can be in, with its real crop from the staged oko (scripts/clips/oko/cards.ts). */
+/** One state a card can be in, with its real crop from the staged oko demo. */
 interface CardState {
   value: "up" | "down" | "unknown"
   label: string

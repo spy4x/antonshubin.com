@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:02.200 --> 00:00:05.600
+Every service on one page, with its 30-day uptime
+
+2
+00:00:05.600 --> 00:00:09.500
+Each server counts what is healthy, down or unknown
+
+3
+00:00:09.500 --> 00:00:12.300
+To add a service, open its config.json
+
+4
+00:00:12.300 --> 00:00:15.900
+Paste the new service in
+
+5
+00:00:15.900 --> 00:00:19.200
+Save the file. No restart, no database
+
+6
+00:00:19.200 --> 00:00:24.333
+Reload the page: the new card is already there
+
+7
+00:00:24.333 --> 00:00:30.013
+Press / and type to filter by name, product or description
+
+8
+00:00:30.013 --> 00:00:33.980
+A red border: gatus says this service is down
+
+9
+00:00:33.980 --> 00:00:37.380
+No data from gatus: unknown, never a false green
+
+10
+00:00:37.380 --> 00:00:40.947
+Self-hosted, open source, one small Go binary

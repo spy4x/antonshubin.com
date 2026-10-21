@@ -104,6 +104,7 @@ deno task launch-kit            # draft a repo launch's Reddit/HN/LinkedIn/Dev.t
 deno task video-kit             # transcript → titles, description, chapters, blog draft
 deno task weekly-numbers        # Umami/GitHub/YouTube numbers → markdown + NTFY
 deno task umami-reports         # create, update or retire the Umami goals and funnels (--dry-run to preview)
+deno task pull:videos           # copy each tool clip from its repository at the pinned commit
 deno task optimize:screenshots  # compress portfolio screenshots
 deno task og                    # regenerate the 1200x630 OG link-preview PNGs
 deno task social-preview        # build, then regenerate docs/social-preview.png (1280x640, GitHub)
@@ -572,11 +573,13 @@ Every `/tools/<slug>` page is built on the shared frame in
 body's only Book, and three "More tools" (`MORE_TOOLS` in `ToolMore.tsx`). A
 custom page is `routes/tools/<slug>.tsx`, which Fresh matches before
 `[slug].tsx` (the page of every other tool); it renders `ToolFrame` with its own
-middle as children. Demo clips are in `static/video/tools/<slug>/`
-(docs/images.md "Videos") and are served with byte ranges by
-`lib/video-files.ts`. Each page's events are listed in docs/analytics.md "Tool
-pages". The shared checks are `test/tool-frame.ts`'s `assertToolFrame()` and
-`toolPageProblems()`. The API is in docs/tools-registry.md "The tool frame".
+middle as children. Demo clips are in `static/video/tools/<slug>/`, copied from
+each tool's own repository at the commit `lib/video-sources.ts` pins by
+`deno task pull:videos` (docs/images.md "Videos"), and are served with byte
+ranges by `lib/video-files.ts`. Each page's events are listed in
+docs/analytics.md "Tool pages". The shared checks are `test/tool-frame.ts`'s
+`assertToolFrame()` and `toolPageProblems()`. The API is in
+docs/tools-registry.md "The tool frame".
 
 ### Type
 

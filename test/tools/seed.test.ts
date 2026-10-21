@@ -8,7 +8,7 @@ import { assertToolFrame } from "../tool-frame.ts"
 import { tool } from "../../lib/tools.ts"
 import { NEXT_COMMANDS } from "../../components/tools/seed/SeedStart.tsx"
 import {
-  DEMO_ADMIN,
+  ADMIN_VIDEO,
   DEMO_APP,
   DEMO_NOTE,
   TRY_LINKS,
@@ -56,7 +56,7 @@ seedTest(
     )
     assert(
       visibleText(page).includes(
-        "From an empty folder to the app and the admin panel. 37 s, no sound.",
+        "1 min, with captions and music: clone Seed, write the env file",
       ),
       "no clip caption",
     )
@@ -64,14 +64,25 @@ seedTest(
 )
 
 seedTest(
-  "See it running links the app, the admin panel and the website, each in a new tab with its outbound event, then the demo note",
+  "every live demo link goes to seedsaas.com, not the app",
+  (page) => {
+    const live = linksWith(page, 'data-umami-event-to="live"')
+    assert(live.length > 0, "no live demo link")
+    for (const tag of live) {
+      assert(tag.includes('href="https://seedsaas.com"'), tag)
+    }
+  },
+)
+
+seedTest(
+  "See it running links the app and the website, each in a new tab with its outbound event, shows the admin panel as a video, then the demo note",
   (page) => {
     const cards = linksWith(page, "data-seed-surface=")
     assertEquals(
       cards.map((tag) => tag.match(/href="([^"]*)"/)?.[1]),
-      [DEMO_APP, DEMO_ADMIN, "https://seedsaas.com"],
+      [DEMO_APP, "https://seedsaas.com"],
     )
-    for (const [i, to] of ["demo-app", "demo-admin", "website"].entries()) {
+    for (const [i, to] of ["demo-app", "website"].entries()) {
       assert(cards[i].includes('target="_blank"'), cards[i])
       assert(cards[i].includes('data-umami-event="outbound"'), cards[i])
       assert(cards[i].includes(`data-umami-event-to="${to}"`), cards[i])
@@ -81,17 +92,45 @@ seedTest(
       page.indexOf("data-seed-running"),
       page.indexOf('id="features"'),
     )
-    // Each card is one link: nothing else in the section takes focus.
+    // Each card is one link and the video one play link: nothing else takes focus.
     assertEquals(count(section, /<(a|button)\b/g), 3, "focus stops")
     assert(visibleText(section).includes(DEMO_NOTE), "no demo note")
+    const video = section.slice(section.indexOf("data-seed-admin-video"))
+    assert(
+      video.includes(`Play video: ${ADMIN_VIDEO.title}`),
+      "no play link for the admin panel video",
+    )
+    assert(
+      video.includes('href="/video/tools/seed/admin-panel.webm"'),
+      "the play link does not open the admin panel video",
+    )
+    assert(
+      visibleText(video).includes(
+        ADMIN_VIDEO.caption.replaceAll("\u00a0", " "),
+      ),
+      "no caption under the admin panel video",
+    )
   },
 )
 
 seedTest(
-  "each What you get card but billing has a try link into the demo",
+  "the Seed page sends no visitor to the admin panel",
+  (page) => {
+    assert(!page.includes("admin.seedsaas.com"), "a link to the admin panel")
+    assert(!page.includes("demo-admin"), "a demo-admin event")
+  },
+)
+
+seedTest(
+  "each What you get card but billing and the admin area has a try link into the demo",
   (page) => {
     const cards = page.split('data-e2e="feature-card"').slice(1)
     assertEquals(cards.length, seed.features!.length)
+    assertEquals(
+      seed.features!.filter((f) => !TRY_LINKS[f.title]).map((f) => f.title),
+      ["Billing per member", "An admin area"],
+      "cards without a try link",
+    )
     for (const [i, card] of cards.entries()) {
       const f = seed.features![i]
       const link = TRY_LINKS[f.title]

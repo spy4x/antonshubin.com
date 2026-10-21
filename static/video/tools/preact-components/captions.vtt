@@ -1,0 +1,28 @@
+WEBVTT
+
+00:02.000 --> 00:06.500
+A live guide runs every component, with its code beside it
+
+00:06.500 --> 00:13.500
+Orbit: a real dashboard built only from the library
+
+00:13.500 --> 00:20.000
+Pick a filter and the table keeps only the failing project
+
+00:20.000 --> 00:26.500
+Light and dark themes repaint every component
+
+00:26.500 --> 00:31.500
+Change the accent colour and the whole guide follows
+
+00:31.500 --> 00:37.000
+Press / to search, then open a component
+
+00:37.000 --> 00:42.500
+Arrow keys move between tabs, as in every widget here
+
+00:42.500 --> 00:50.000
+Open the component's code and copy it into your app
+
+00:50.000 --> 00:57.500
+Install the library with one command

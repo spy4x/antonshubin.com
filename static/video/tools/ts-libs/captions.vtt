@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:02.000 --> 00:00:09.850
+Show one meeting in each person's own time zone
+
+00:00:09.850 --> 00:00:14.366
+Real output, with no offset maths written by hand
+
+00:00:14.366 --> 00:00:22.331
+Keep money in whole cents, never in a float
+
+00:00:22.331 --> 00:00:26.832
+Each currency's decimals, each language's marks
+
+00:00:26.832 --> 00:00:34.917
+Check what a user typed against a schema
+
+00:00:34.917 --> 00:00:39.432
+One plain message per field, ready for a form
+
+00:00:39.432 --> 00:00:44.807
+Add only the packages you need, from JSR
+
+00:00:44.807 --> 00:00:49.298
+Small, typed and built on web standards
