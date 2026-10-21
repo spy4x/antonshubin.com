@@ -474,7 +474,8 @@ export const tools: Tool[] = [
       "You list your services in one JSON file. oko renders them as one searchable page, and for each service that gatus watches, it shows whether it is up and its uptime over the last 30 days.",
     clip: {
       title: "oko: add a service to config.json, reload, search the dashboard",
-      caption: "26 s · no sound · a demo config",
+      caption:
+        'A demo config: add a Speed test service to config.json, reload to see its card, search for "pho", and end on up, down and unknown cards. 26\u00a0s, no sound.',
       frame: "browser",
       frameTitle: "localhost:8080",
       poster: {
