@@ -12,7 +12,9 @@ const VIEWPORTS = [
   { width: 375, height: 812 },
   { width: 1440, height: 900 },
 ]
-const PROJECTS = ["truth-or-dare", "roley", "smartlite", "corecircle"]
+// Connectful's strip holds the tall 460x996 phone captures that #333 was
+// about; Corecircle's same-sized ones moved into a tour (#523).
+const PROJECTS = ["truth-or-dare", "roley", "smartlite", "connectful"]
 
 interface Rect {
   top: number
