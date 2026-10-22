@@ -85,7 +85,7 @@ export default define.page(function RoleyPage(ctx) {
           </p>
           <CaseScreenTour
             item="roley"
-            steps={tourSteps(project, TOUR_PICKS)}
+            steps={tourSteps(project, TOUR_PICKS, "phone")}
             frame="phone"
             label={TOUR_HEADING}
             hero
