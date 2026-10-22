@@ -122,10 +122,11 @@ one run got 11% dearer and the other 15% cheaper.
 A 10% saving when nothing reached the agent in 8 tasks out of 10? That can't be
 the tool.
 
-On the first four tasks I ran the baseline twice: two identical runs, same
-model, same brief, differed by 7–12% in cost. Across all 10 tasks, **the cost
-change with the map has a spread of about 13% from task to task,** in both
-modes. That spread is the noise any saving has to beat.
+On the first four tasks I ran the baseline twice. On the three where both runs
+did the job, two identical runs, same model, same brief, differed by 7–12% in
+cost. Across the compared tasks, **the cost change with the map has a spread of
+about 13% from task to task,** in both modes. That spread is the noise any
+saving has to beat.
 
 > If two identical runs differ by 10%, a tool that saves 10% looks exactly like
 > no tool at all.
@@ -146,9 +147,9 @@ promised you.
 
 I don't think Trail-code's numbers are wrong. They measure something else:
 
-- **Their tasks were questions about code**, answered by Sonnet 5. Mine were
-  full implementations: read the issue, change the code, write tests, run
-  checks.
+- **Their headline numbers come from questions about code**, answered by
+  Sonnet 5. Mine were full implementations: read the issue, change the code,
+  write tests, run checks.
 - **Their agents started cold.** Mine read a repo with a detailed AGENTS.md, and
   Opus 5.5 navigates with grep quickly and cheaply. A map saves little when
   finding the file was never the expensive part.
