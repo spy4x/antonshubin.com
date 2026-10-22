@@ -40,8 +40,11 @@ server never call out; tests build a refresher with a stub `fetch`
 (`lib/tools-live.test.ts`). Pages say when the CI status was checked and whether
 it is the committed file (`checkedLabel()`; a repository counts as live only
 when its GitHub and Woodpecker calls both succeeded). `/tools` and `/tools/*`
-are cached for an hour so a refresh reaches visitors (`lib/cache-control.ts`). A
-tool's `posts` link each post to its page (the post header shows "The tool:
+are cached for an hour so a refresh reaches visitors (`lib/cache-control.ts`).
+preact-components has no `latestFrom`: its version and install command are the
+`@spy4x/preact-ui` pin in `deno.json` (`importedVersion()`), the release the
+site runs and its palette demo indexes. A tool's `posts` link each post to its
+page (the post header shows "The tool:
 <name>", then its `live` link and its repository); its `catalogSlug` picks the
 catalog item the band's "Have me build it" column names; `deployable` adds
 `SoftwareApplication` JSON-LD, whose `url` is only ever its running `live`
