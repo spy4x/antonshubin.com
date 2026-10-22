@@ -95,7 +95,7 @@ Deno.test("the short name drops a subtitle after a dash or a bracket", () => {
   assertEquals(shortName(base), "Lamp")
 })
 
-Deno.test("the hero is the first screenshot as WebP, sized, in a phone frame only when it is a phone screen", () => {
+Deno.test("the hero is the first screenshot as WebP, sized, in a phone frame only when it is a bare phone screen", () => {
   const desk = heroShot({
     ...base,
     screenshotURLs: ["01-home.png"],
@@ -107,13 +107,20 @@ Deno.test("the hero is the first screenshot as WebP, sized, in a phone frame onl
     width: 1600,
     height: 1000,
     phone: false,
+    portrait: false,
   })
   const phone = heroShot({
+    ...base,
+    screenshotURLs: ["01-home-mobile.webp"],
+    screenshotSize: { width: 780, height: 1688 },
+  })
+  assertEquals([phone?.phone, phone?.portrait], [true, true])
+  const store = heroShot({
     ...base,
     screenshotURLs: ["1.webp"],
     screenshotSize: { width: 460, height: 996 },
   })
-  assertEquals(phone?.phone, true)
+  assertEquals([store?.phone, store?.portrait], [false, true])
   assertEquals(heroShot(base), undefined)
 })
 

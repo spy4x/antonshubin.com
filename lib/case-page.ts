@@ -94,15 +94,18 @@ export interface HeroShot {
   alt: string
   width?: number
   height?: number
-  /** A phone screenshot (taller than wide), drawn in a phone frame. */
+  /** A bare phone screen (its file name ends in `-mobile`), drawn in a phone frame. */
   phone: boolean
+  /** Taller than wide: the hero keeps it narrow so it never towers over the title. */
+  portrait: boolean
 }
 
 /**
  * The hero picture (#523): the project's first screenshot, its WebP when the
- * listed file is a PNG, sized from `screenshotSize` or `heroSize`. A phone
- * screenshot is one taller than wide. Undefined for a project with no
- * screenshot.
+ * listed file is a PNG, sized from `screenshotSize` or `heroSize`. Only a
+ * bare phone screen gets the phone frame: a store graphic that already draws
+ * a phone (Corecircle's, Connectful's) stays in the plain frame. Undefined
+ * for a project with no screenshot.
  */
 export function heroShot(p: Project): HeroShot | undefined {
   const first = projectScreenshots(p)[0]
@@ -113,7 +116,8 @@ export function heroShot(p: Project): HeroShot | undefined {
     alt: first.alt,
     width: size?.width,
     height: size?.height,
-    phone: size ? size.height > size.width * 1.5 : false,
+    phone: /[-_]mobile\.[a-z]+$/i.test(first.src),
+    portrait: size ? size.height > size.width : false,
   }
 }
 

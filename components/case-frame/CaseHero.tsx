@@ -38,7 +38,7 @@ function LogoMark({ project }: { project: Project }) {
 
 /**
  * The first screenshot in the library's `plain` frame, or its phone frame
- * for a phone screen (#523): the page's one eager, high-priority image, with
+ * for a bare phone screen, kept narrow when it is taller than wide (#523): the page's one eager, high-priority image, with
  * its caption (the `alt`) under it.
  */
 export function CaseHeroMedia({ shot }: { shot: HeroShot }) {
@@ -46,14 +46,14 @@ export function CaseHeroMedia({ shot }: { shot: HeroShot }) {
     <WindowFrame
       variant={shot.phone ? "phone" : "plain"}
       caption={shot.alt}
-      class={shot.phone ? "mx-auto w-full max-w-60 lg:max-w-64" : undefined}
+      class={shot.portrait ? "mx-auto w-full max-w-60 lg:max-w-64" : undefined}
     >
       <img
         src={shot.src}
         alt={shot.alt}
         width={shot.width}
         height={shot.height}
-        sizes={shot.phone ? undefined : HERO_SIZES}
+        sizes={shot.portrait ? undefined : HERO_SIZES}
         loading="eager"
         fetchpriority="high"
         data-case-hero
@@ -111,11 +111,7 @@ export function CaseHero(
   )
   const side = shot
     ? (
-      <div
-        class={shot.phone
-          ? "lg:col-start-2 lg:row-start-1"
-          : "lg:col-start-2 lg:row-start-1 min-w-0"}
-      >
+      <div class="lg:col-start-2 lg:row-start-1 min-w-0">
         <CaseHeroMedia shot={shot} />
       </div>
     )
@@ -125,7 +121,7 @@ export function CaseHero(
       data-case-hero-block
       class={shot
         ? `grid gap-8 lg:items-center ${
-          shot.phone
+          shot.portrait
             ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,18rem)]"
             : "lg:grid-cols-[minmax(0,1fr)_minmax(0,33rem)]"
         }`
