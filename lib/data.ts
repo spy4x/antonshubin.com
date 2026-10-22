@@ -422,7 +422,7 @@ export const projects = {
     {
       title: "Microwork",
       slug: "microwork",
-      kind: "human text classification freelance platform",
+      kind: "earn money by classifying things",
       heroSize: { width: 1600, height: 1049 },
       catalogSlug: "cto-advisory-retainer",
       externalURL: "https://microwork.io",
@@ -473,7 +473,7 @@ export const projects = {
     {
       title: "Sajari",
       slug: "sajari",
-      kind: "dashboard for a search and recommendations engine",
+      kind: "single-page AngularJS app",
       heroSize: { width: 1600, height: 998 },
       role: "Frontend",
       externalURL: "https://sajari.com",

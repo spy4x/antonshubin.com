@@ -11,7 +11,7 @@ import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, mainContent, visibleText } from "./html.ts"
 import { formatPeriod, projects } from "../lib/data.ts"
 import { catalogItems } from "../lib/catalog.ts"
-import { firstSentence } from "../lib/llms.ts"
+import { firstSentence, projectLead } from "../lib/llms.ts"
 import { projectTestimonials } from "../lib/testimonials.ts"
 import {
   CASE_DESCRIPTION_MAX,
@@ -522,3 +522,18 @@ siteTest(
     }
   },
 )
+
+Deno.test("Microwork's and Sajari's kind lines say something their leads do not (#562)", () => {
+  const words = (text: string) =>
+    text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean)
+  for (const slug of ["microwork", "sajari"]) {
+    const p = clients.find((c) => c.slug === slug)!
+    const lead = new Set(words(projectLead(p)))
+    const kind = words(p.kind!)
+    const shared = kind.filter((w) => lead.has(w))
+    assert(
+      shared.length <= kind.length / 2,
+      `${slug}: "${p.kind}" repeats the lead (${shared.join(", ")})`,
+    )
+  }
+})
