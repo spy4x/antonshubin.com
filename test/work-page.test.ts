@@ -191,12 +191,13 @@ siteTest(
       assertEquals([...order].sort((a, b) => a - b), order, p.slug)
       if (projectTestimonials(p.slug!).length === 0) continue
       const reviews = at("data-project-reviews")
-      // A page with its own middle (routes/work/<slug>.tsx) shows the
-      // reviews right after it, whatever its years.
-      const ownMiddle = existsSync(
-        new URL(`../routes/work/${p.slug}.tsx`, import.meta.url),
-      )
-      if (reviewsFirst(p) && !ownMiddle) {
+      // A page with its own middle (routes/work/<slug>.tsx) gets the
+      // frame's reviews right after it, whatever its years, unless it
+      // places them itself (`ownReviews`, as CaseFrame does).
+      const route = new URL(`../routes/work/${p.slug}.tsx`, import.meta.url)
+      const frameReviewsAfterMiddle = existsSync(route) &&
+        !Deno.readTextFileSync(route).includes("ownReviews")
+      if (reviewsFirst(p) && !frameReviewsAfterMiddle) {
         assert(reviews < at(`id="project-built"`), `${p.slug}: reviews late`)
       } else {
         assert(reviews > at(`id="project-built"`), `${p.slug}: reviews early`)
