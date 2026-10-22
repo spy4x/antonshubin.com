@@ -79,6 +79,8 @@ export interface EventProps {
   /**
    * `tool-try`: which of a tool page's own interactions was used.
    * `post-try`: which component of a post was used (its tag name).
+   * `tool-install-copy`: which line was copied, where a page has more than
+   * one (`install`, `import`).
    */
   part?: string
 }

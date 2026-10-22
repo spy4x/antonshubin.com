@@ -1,16 +1,16 @@
 // #458: /tools/preact-components wears the shared frame and shows its own
-// middle, a slice of the live guide's Orbit demo rendered by the library on
-// the server, with the README's packages, status and credit beside the facts.
+// middle, with the README's packages, status and credit beside the facts.
+// #522: the middle is the library's CommandPalette over the library's own
+// components (islands/PaletteDemo.tsx).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "../harness.ts"
 import { assertToolFrame } from "../tool-frame.ts"
 import { pageBody, visibleText } from "../html.ts"
 import { findTool } from "../../lib/tools.ts"
-import {
-  LIBRARY_PACKAGES,
-  ORBIT_PROJECTS,
-  ORBIT_STATUS,
-} from "../../components/tools/preact-components/orbit.ts"
+import { LIBRARY_PACKAGES } from "../../components/tools/preact-components/packages.ts"
+import { PALETTE_COMPONENTS } from "../../components/tools/preact-components/palette-index.ts"
+import { PALETTE_EXAMPLES } from "../../components/tools/preact-components/palette.ts"
+import { PALETTE_SNIPPET } from "../../components/tools/preact-components/PaletteSlice.tsx"
 
 const SLUG = "preact-components"
 
@@ -57,47 +57,84 @@ Deno.test("the preact-components page wears the tool frame with the README's lin
   }
 })
 
-Deno.test("the Orbit slice shows the guide's four tiles and five projects, each status as a shape and a word, with no island", async () => {
+Deno.test("the palette section renders the search and its four examples disabled until the island runs, the empty stage and the no-script line", async () => {
   const page = await builtPage()
-  const slice = part(page, "data-orbit-slice", "</section>")
-  assert(!slice.includes("<island"), "the slice hydrates")
-  assert(!/<script/i.test(slice), "the slice carries a script")
-  const text = visibleText(slice)
-  for (
-    const tile of [
-      "Projects 5",
-      "Builds 494 all time",
-      "Failing 1",
-      "Median build 2m 41s",
-    ]
-  ) {
-    assert(text.includes(tile), `no tile "${tile}" in: ${text}`)
-  }
-  const rows = [...slice.matchAll(/<tr[\s>][\s\S]*?<\/tr>/g)].slice(1)
+  const slice = part(page, "data-palette-slice", "</section>")
   assertEquals(
-    rows.map((r) => visibleText(r[0])),
-    ORBIT_PROJECTS.map((p) =>
-      `${p.name} ${ORBIT_STATUS[p.status].label} ${p.builds}`
-    ),
+    visibleText(part(slice, "<h2", "</h2>")),
+    "Search the library from the keyboard",
   )
-  for (const [row] of rows) {
-    assert(/<svg/.test(row), `a status without its shape: ${visibleText(row)}`)
+  assert(slice.includes("<!--frsh:island:PaletteDemo"), "the demo is no island")
+  // The demo's own fieldset, after the preview's radio group.
+  const fieldset = part(
+    part(slice, "data-palette-demo", "</fieldset>"),
+    "<fieldset",
+    "</fieldset>",
+  )
+  assert(
+    // The attribute, not the `disabled:opacity-70` class.
+    /<fieldset[^>]*\sdisabled[\s=>]/.test(fieldset),
+    "the controls are live before hydration",
+  )
+  assert(
+    fieldset.includes(
+      `aria-label="Search ${PALETTE_COMPONENTS.length} components…"`,
+    ),
+    "the trigger does not count the components",
+  )
+  for (const { query, caption } of PALETTE_EXAMPLES) {
+    assert(
+      visibleText(fieldset).includes(`Search for ${query} ${caption}`),
+      `no example ${query}`,
+    )
   }
-  assert(text.includes("Orbit · Demo"), "the frame does not say it is a demo")
+  assert(
+    visibleText(part(slice, "data-palette-stage", "</div>")).includes(
+      "Pick a result and it lands here.",
+    ),
+    "the stage is not empty",
+  )
+  const noscript = part(slice, "<noscript", "</noscript>")
+  assert(
+    visibleText(noscript).includes(
+      "The search needs JavaScript. The live UI guide lists every component.",
+    ),
+    noscript,
+  )
+  assert(noscript.includes(`href="${findTool(SLUG)!.live!.href}"`), noscript)
 })
 
-Deno.test("Show the code is a details element that counts tool-try with part code", async () => {
+Deno.test("Show the code is a details element that counts tool-try with part code and shows the island's own palette call", async () => {
   const page = await builtPage()
-  const details = part(page, "data-orbit-code", "</details>")
+  const details = part(page, "data-palette-code", "</details>")
   const summary = part(details, "<summary", "</summary>")
   assert(summary.includes(`data-umami-event="tool-try"`), summary)
   assert(summary.includes(`data-umami-event-part="code"`), summary)
   assert(summary.includes(`data-umami-event-item="${SLUG}"`), summary)
-  assert(
-    visibleText(details).includes(
-      `import { Kpi, KpiGrid } from "@spy4x/preact-charts/kpi"`,
+  const source = await Deno.readTextFile(
+    new URL(
+      "../../components/tools/preact-components/PaletteDemoLive.tsx",
+      import.meta.url,
     ),
-    "the code is not the guide's dashboard",
+  )
+  const lines = source.split("\n")
+  const from = lines.findIndex((l) => l.includes("palette:start"))
+  const to = lines.findIndex((l) => l.includes("palette:end"))
+  assert(from !== -1 && to > from, "no palette:start / palette:end markers")
+  const region = lines.slice(from + 1, to)
+  const indent = Math.min(
+    ...region.filter((l) => l.trim()).map((l) =>
+      l.length - l.trimStart().length
+    ),
+  )
+  assertEquals(
+    PALETTE_SNIPPET,
+    region.map((l) => l.slice(indent)).join("\n"),
+    "the shown code is not the island's",
+  )
+  assert(
+    visibleText(details).includes(`trigger="field"`),
+    "the code is not shown",
   )
 })
 
@@ -141,25 +178,28 @@ Deno.test("Where it stands names #210 as the one not yet, links the open issues 
   assert(credit.includes("Eirene on GitHub"), credit)
 })
 
-Deno.test("the Orbit slice sits in a ThemePreview with Dark checked and the guide's two buttons, and only this page carries the preview's palettes", async () => {
+Deno.test("the palette sits in a ThemePreview with Dark checked, each radio counts tool-try, and only this page carries the preview's palettes", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
   })
   try {
     const page = pageBody(await site.html(`/tools/${SLUG}`))
-    const slice = part(page, "data-orbit-slice", "</section>")
-    const radios = slice.match(/<input[^>]*name="orbit-theme"[^>]*>/g) ?? []
+    const slice = part(page, "data-palette-slice", "</section>")
+    const radios = slice.match(/<input[^>]*name="pc-theme"[^>]*>/g) ?? []
     assertEquals(radios.length, 2, "not one Dark / Light pair")
     const [dark = "", light = ""] = radios
     assert(dark.includes(`value="dark"`) && /\schecked/.test(dark), dark)
     assert(!/\schecked/.test(light), "Light starts checked")
-    const frame = part(slice, "data-preview-frame", "</figure>")
-    const buttons = [...frame.matchAll(/<button[^>]*>([\s\S]*?)<\/button>/g)]
-      .map((m) => visibleText(m[1]))
-    assertEquals(buttons, ["Run checks", "New project"])
+    for (const [radio, theme] of [[dark, "dark"], [light, "light"]]) {
+      assert(radio.includes(`data-umami-event="tool-try"`), radio)
+      assert(radio.includes(`data-umami-event-part="theme-${theme}"`), radio)
+      assert(radio.includes(`data-umami-event-item="${SLUG}"`), radio)
+    }
     assert(
-      frame.includes("Orbit · Demo"),
-      "the frame does not say it is a demo",
+      part(slice, "<div data-preview-frame", "</fieldset>").includes(
+        "data-palette-demo",
+      ),
+      "the demo is not inside the preview frame",
     )
     assert(
       slice.includes("[data-preview-frame]") && slice.includes("<style"),
