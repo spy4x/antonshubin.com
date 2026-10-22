@@ -314,6 +314,17 @@ Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, an
         await firstResult(page, name)
         await page.keyboard.press("Enter")
         await dialog.waitFor({ state: "detached", timeout: WAIT_MS })
+        // Wait for the close event to move focus back, or it can land after
+        // the next chip's focus and send its Enter to the field.
+        await page.waitForFunction(
+          () =>
+            document.activeElement ===
+              document.querySelector(
+                "[data-palette-demo] [aria-haspopup=dialog]",
+              ),
+          undefined,
+          { timeout: WAIT_MS },
+        )
         const stage = page.locator("[data-palette-stage=filled]")
         assertEquals(await stage.locator("h3").textContent(), name, part)
         assertEquals(
