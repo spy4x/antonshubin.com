@@ -72,7 +72,8 @@ Deno.test("the palette section renders the search and its four examples disabled
     "</fieldset>",
   )
   assert(
-    /<fieldset[^>]*\sdisabled/.test(fieldset),
+    // The attribute, not the `disabled:opacity-70` class.
+    /<fieldset[^>]*\sdisabled[\s=>]/.test(fieldset),
     "the controls are live before hydration",
   )
   assert(
