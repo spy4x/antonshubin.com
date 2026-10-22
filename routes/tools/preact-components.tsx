@@ -3,12 +3,12 @@ import { NotFound } from "../../components/NotFound.tsx"
 import { InstallLine } from "../../components/InstallLine.tsx"
 import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
 import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
-import { OrbitSlice } from "../../components/tools/preact-components/OrbitSlice.tsx"
+import { PaletteSlice } from "../../components/tools/preact-components/PaletteSlice.tsx"
 import { LibraryDetails } from "../../components/tools/preact-components/LibraryDetails.tsx"
 
 // /tools/preact-components (#458): the shared tool frame with its own
-// middle, a slice of the live guide's Orbit demo rendered by the library on
-// this page, and its own column beside the facts card.
+// middle, the library's CommandPalette searching the library's own
+// components on this page (#522), and its own column beside the facts card.
 export default define.page(async function PreactComponentsPage(ctx) {
   const data = await loadToolPage("preact-components")
   if (!data) return <NotFound pathname={ctx.url.pathname} />
@@ -23,7 +23,7 @@ export default define.page(async function PreactComponentsPage(ctx) {
       }}
       beside={<LibraryDetails data={data} />}
     >
-      <OrbitSlice live={data.tool.live} />
+      <PaletteSlice tool={data.tool} />
     </ToolFrame>
   )
 })

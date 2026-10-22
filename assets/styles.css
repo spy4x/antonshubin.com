@@ -94,6 +94,16 @@
   --color-nav-active: var(--color-parchment);
   --color-accent-100: var(--color-lamp);
   --color-surface-card: var(--color-paper);
+
+  /* The palette demo on /tools/preact-components (#522): the search field's
+     placeholder, and the success and error toasts' fills. It runs inside a
+     ThemePreview frame, which sets the library's own palette; these are the
+     site's answer where no frame does. */
+  --color-placeholder: var(--color-graphite);
+  --color-success-fill: var(--color-sage);
+  --color-success-foreground: var(--color-ink);
+  --color-danger-fill: var(--color-brick);
+  --color-danger-fill-foreground: var(--color-ink);
 }
 
 /* The rail's column, tab bar and sheet (everything the library's `Rail` draws
@@ -150,9 +160,11 @@ div:has(> [data-gallery-counter]) > button {
    table with its sticky capability column and the highlighted first product,
    and the method and fit list (/why-not-just-ai, #486). */
 @source inline("flex min-w-0 max-w-full flex-col gap-4 font-semibold text-foreground flex-wrap gap-x-6 gap-y-2 text-sm inline-flex items-center gap-2 text-muted overflow-x-auto rounded-lg bg-surface ring-1 ring-subtle focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus min-w-full border-separate border-spacing-0 [&_tbody>tr:last-child>*]:border-b-0 sr-only border-b border-subtle px-3 py-3 sm:px-4 sticky left-0 z-10 text-left font-medium whitespace-nowrap bg-selected-soft block text-xs min-w-32 font-normal size-4 text-success text-warning gap-3 min-w-24 min-w-28 align-top sm:whitespace-nowrap shadow-[inset_-1.5rem_0_1rem_-1rem_color-mix(in_oklab,var(--color-foreground)_30%,transparent)] shadow-[inset_-1.5rem_0_0_0_var(--color-surface)]");
-/* @spy4x/preact-charts/kpi and @spy4x/preact-ui/table: the Orbit slice on
-   /tools/preact-components (#458). Their `dark:` classes stay out. */
-@source inline("pb-px divide-subtle *:whitespace-nowrap *:px-6 *:py-3 *:py-4 pc-focus-offset-surface");
+/* @spy4x/preact-ui/command-palette, toastr, copy-button and kbd: the palette
+   demo on /tools/preact-components (#522): the field trigger and its hotkey
+   hint, the dialog (a sheet on a phone), its rows, the success and error
+   toasts with Undo, and the stage's copy button. */
+@source inline("max-sm:min-h-11 pointer-fine:inline-flex min-w-6 shadow-raised top-16 bottom-auto my-0 w-[min(36rem,calc(100vw-2rem))] shadow-2xl backdrop:backdrop-blur-sm max-sm:inset-0 max-sm:m-0 max-sm:h-dvh max-sm:max-h-none max-sm:w-full max-sm:rounded-none max-sm:border-0 max-sm:open:flex max-sm:open:flex-col outline-none placeholder:text-placeholder sm:size-9 max-sm:flex-1 m-2 py-6 max-h-96 max-sm:min-h-0 z-50 [--toastr-gap:1rem] [--toastr-far:1rem] [--toastr-width:auto] [--toastr-max:none] sm:[--toastr-gap:2rem] sm:[--toastr-far:auto] sm:[--toastr-width:100%] sm:[--toastr-max:20rem] md:[--toastr-max:24rem] w-(--toastr-width) max-w-(--toastr-max) top-(--toastr-gap) right-(--toastr-gap) left-(--toastr-far) bottom-(--toastr-gap) max-sm:items-center text-selected line-clamp-1 transition-[translate,opacity] duration-300 motion-safe:starting:translate-x-8 motion-safe:starting:opacity-0 bg-success text-(--color-success-foreground) min-w-11 sm:min-h-9 sm:min-w-9 -my-3 -mr-3 self-start sm:-my-2 sm:-mr-2 focus-visible:outline-current bg-danger-fill text-danger-fill-foreground");
 /* @spy4x/preact-ui/radio-chips: the hidden legend, the row, the chip in every state
    and its check (/tools/caldav-tasks-web, #465; /tools/zond; /tools/caldav-mcp, #463; /tools/oko). */
 @source inline("sr-only flex flex-wrap gap-2 group/chip relative inline-flex items-center gap-1 min-h-11 sm:min-h-8 px-3 py-1 border rounded-md text-xs font-medium normal-case whitespace-nowrap cursor-pointer transition-colors bg-surface text-foreground border-subtle hover:bg-hover has-[:checked]:border-transparent has-[:checked]:bg-selected has-[:checked]:text-selected-foreground has-[:checked]:hover:bg-selected has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-focus has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-focus has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50 hidden size-3.5 group-has-[:checked]/chip:block");

@@ -22,7 +22,11 @@ import Button, { buttonClass } from "../components/Button.tsx"
 import { BookCallLink } from "../components/BookCallLink.tsx"
 import { CiPill } from "../components/CiPill.tsx"
 import { Nav } from "../components/Nav.tsx"
-import { OrbitSlice } from "../components/tools/preact-components/OrbitSlice.tsx"
+import { PaletteSlice } from "../components/tools/preact-components/PaletteSlice.tsx"
+import { CommandPalette } from "@spy4x/preact-ui/command-palette"
+import { CopyButton } from "@spy4x/preact-ui/copy-button"
+import { Toastr } from "@spy4x/preact-ui/toastr"
+import { findTool } from "../lib/tools.ts"
 import type { CiSnapshot } from "../lib/github-snapshot.ts"
 import { startSite } from "./harness.ts"
 
@@ -171,11 +175,6 @@ function renderedLibraryMarkup(): string {
         fit="Who."
       />,
     ),
-    // /tools/preact-components renders the library's Kpi, KpiGrid and Table
-    // on the server (#458).
-    render(
-      <OrbitSlice live={{ label: "Guide", href: "https://example.com" }} />,
-    ),
     // /tools/caldav-tasks-web (#465), /tools/zond, /tools/caldav-mcp: RadioChips as the site renders it (its
     // own legend classes: the library's default `pc-label` is a preset class
     // the site does not load), a checked chip and a disabled one, and a
@@ -219,6 +218,51 @@ function renderedLibraryMarkup(): string {
   ].join("\n")
 }
 
+/**
+ * The palette demo on /tools/preact-components (#522): the section as the
+ * server renders it (the ThemePreview frame, the closed palette, the keys
+ * line in `Kbd`), plus what only shows after a press: result rows under a
+ * heading, the stage's copy button and a toast of each kind the demo shows,
+ * with its Undo. Apart from `renderedLibraryMarkup()`: inside the preview
+ * frame the library's buttons keep the library's own look.
+ */
+function renderedPaletteMarkup(): string {
+  return [
+    render(<PaletteSlice tool={findTool("preact-components")!} />),
+    render(
+      <CommandPalette
+        trigger="field"
+        options={[{
+          id: "a",
+          label: "A",
+          detail: "One.",
+          hint: "ui",
+          group: "G",
+        }]}
+        onSelect={() => {}}
+      />,
+    ),
+    render(<CopyButton textToCopy="x" title="Copy" copyLabel="Copy it" />),
+    render(
+      <Toastr
+        toasts={[
+          {
+            id: 1,
+            title: "",
+            body: "One",
+            type: "success",
+            action: { label: "Undo", onAction: () => {} },
+          },
+          { id: 2, title: "", body: "Two", type: "error" },
+        ]}
+        onDismiss={() => {}}
+        corner="bottom-right"
+      />,
+    ),
+    render(<Toastr toasts={[]} onDismiss={() => {}} corner="top-right" />),
+  ].join("\n")
+}
+
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
   return "." + className.replace(/[:.!\[\]\/(),+=&>*%]/g, (c) => `\\${c}`)
@@ -250,6 +294,7 @@ function renderedClasses(): { light: Set<string>; dark: Set<string> } {
     const [, list] of [
       renderedLibraryMarkup(),
       renderedGalleryMarkup(),
+      renderedPaletteMarkup(),
     ].join("\n")
       .matchAll(/class="([^"]*)"/g)
   ) {
@@ -352,12 +397,7 @@ Deno.test("a site button carries no library size or fill and the site's radius",
     "bg-surface",
     "border-control",
   ]
-  // A ThemePreview frame (/tools/preact-components, #458) shows the library's
-  // own buttons in the library's own look, so its subtree is not a site button.
-  const html = renderedLibraryMarkup().replace(
-    /<div data-preview-frame[^>]*>[\s\S]*?<\/figure><\/div>/g,
-    "",
-  )
+  const html = renderedLibraryMarkup()
   const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
     .map(([, list]) => list.split(" "))
     .filter((list) => list.includes("transition-colors"))
