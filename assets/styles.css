@@ -81,6 +81,7 @@
      dark scrim over a photo (Ink at an alpha, text on it Parchment). */
   --color-border-subtle: var(--color-rule);
   --color-border-control: var(--color-rule-strong);
+  --color-border-button: var(--color-rule-strong);
   --color-scrim: color-mix(in oklab, var(--color-ink) 70%, transparent);
   --color-scrim-strong: color-mix(in oklab, var(--color-ink) 95%, transparent);
   --color-scrim-foreground: var(--color-parchment);
@@ -142,6 +143,10 @@ div:has(> [data-gallery-counter]) > button {
 @source inline("bg-scrim bg-scrim-strong backdrop:bg-scrim-strong text-on-scrim-muted hover:text-scrim-foreground focus-visible:ring-(--color-scrim-foreground) top-[max(--spacing(4),env(safe-area-inset-top,0px))] right-[max(--spacing(4),env(safe-area-inset-right,0px))] bottom-[max(--spacing(4),env(safe-area-inset-bottom,0px))] left-[max(--spacing(4),env(safe-area-inset-left,0px))] top-[calc(max(--spacing(4),env(safe-area-inset-top,0px))+--spacing(12))] pointer-events-none pointer-events-auto m-auto max-h-full max-w-[90vw] max-h-[90vh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-fit");
 /* DemoVideo (tool pages' hero clip, #454): the poster, the playing video and the failed message. */
 @source inline("relative block w-full overflow-hidden group cursor-pointer focus-visible:outline-hidden h-full object-cover flex flex-col items-center justify-center gap-2 bg-canvas p-4 text-center text-sm text-foreground rounded-sm font-medium underline focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus pointer-events-none absolute inset-0 group-focus-visible:ring-2 group-focus-visible:ring-inset group-focus-visible:ring-focus size-16 rounded-full bg-scrim text-scrim-foreground shadow-lg group-focus-visible:ring-(--color-scrim-foreground) motion-safe:transition-transform motion-safe:group-hover:scale-110 motion-safe:group-focus-visible:scale-110 bg-scrim-strong size-8 translate-x-px");
+/* @spy4x/preact-ui/window-frame and screen-tour: a case page's hero frame,
+   plain or phone, and Sogroya's walkthrough (#523, components/case-frame/,
+   islands/CaseScreenTour.tsx). Their `dark:` classes stay out. */
+@source inline("shadow-2xl aspect-[9/19] max-w-xs rounded-[2.5rem] bg-foreground rounded-[2rem] top-2 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:overflow-visible lg:p-0 lg:w-full lg:whitespace-normal border-selected text-selected border-current lg:mx-auto [grid-area:1/1] opacity-100 motion-safe:transition-opacity [@media(scripting:enabled)]:grid motion-safe:transition-[opacity,visibility] [@media(scripting:enabled)]:invisible [@media(scripting:enabled)]:opacity-0 border-button bg-hover hover:bg-track self-start sm:min-h-9");
 /* @spy4x/preact-ui/feature-card and card: the tool showcase (#448,
    components/ToolShowcase.tsx). Their `dark:` classes stay out, as the
    button's do. */

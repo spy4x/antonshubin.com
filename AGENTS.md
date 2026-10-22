@@ -456,30 +456,35 @@ pages.
 
 ### Project page
 
-`routes/work/[slug].tsx` (#246) is a two-column case study from 1024px: a real
-Literata `<h1>` with a small logo mark, the lead line under it (`projectLead()`
-in `lib/llms.ts`: the `outcome`, or the description's first sentence, with its
-`outcomeNote`), then the fact card (`components/ProjectFactCard.tsx`, sticky in
-the right column, first at 390px) beside the main column: the screenshot gallery
-as the hero, the pull quote, "What I built", "Client reviews", "Video" and "More
-work" (`relatedProjects()` in `lib/data.ts`: three client projects ranked by
-shared tags). A closing band on Desk ends the page with two promises through
-`promise()`, Book, the catalog link and How I work. The band is
-`components/ClosingBand.tsx`, shared with `/work`, which passes `/catalog` as
-its catalog link and adds Infrastructure. Book appears twice, once in the card
-and once in the band, and nowhere else on the page. `islands/ImageGallery.tsx`
-is a thin wrapper over `@spy4x/preact-ui/image-gallery`'s
-`ImageGallery layout="strip"` (#396), which holds all the gallery behaviour:
-slides sized by width (narrower for a portrait first image) with centre snap,
-visible captions that equal the `alt` (`screenshotCaption()`), a "n / N"
-counter, named Previous/Next buttons that show only while the row overflows,
-`width`/`height` on every image so nothing shifts, and only the first image
-eager with `fetchpriority="high"`. The wrapper exists because function props
-(`label`, `counterLabel`) cannot cross an island boundary; it also maps `.png`
-sources to their WebP. The strip's classes are in `assets/styles.css`'s
-`@source inline` lines, and `test/library-classes.test.tsx` renders the strip
-and its lightbox. A margin note inside the narrow fact card uses `WithNote`'s
-`note-stack` class, which keeps the note under its claim at every width.
+Every `/work/<slug>` page is built on the shared case frame in
+`components/case-frame/` (#523), like the tool frame: `routes/work/[slug].tsx`
+renders `CaseFrame` with its default middle, and a custom page is
+`routes/work/<slug>.tsx` (Fresh matches it first) with its own middle as
+children. The order: "‹ Work"; the hero (`CaseHero.tsx`: the top line "For
+{client} · {years}" with role and `StatusMark`, a real `<h1>` with the logo mark
+and the project's `kind` line (`lib/data.ts`, words only from its description,
+`lib/data.test.ts` checks) on a second line, the outcome as the lead
+(`projectLead()`) with its note, one secondary link to the live product or the
+report, and the first screenshot in the library's `WindowFrame`, `plain`, or the
+phone frame for a phone screen; it is the page's one eager,
+`fetchpriority="high"` image, sized from `screenshotSize` or `heroSize`); the
+middle; the client's reviews ("What {client} said"); "How it is built" (the
+stack) beside the fact card (`components/ProjectFactCard.tsx`: Client, Role,
+When, Status, Live site, Book, "Similar work today"); "More client work"
+(`relatedProjects()`, three cards) and the closing band ("Building something
+like {name}?", the project's first review or one promise above Book, the catalog
+link, the brief with `?service=` and How I work). Book appears in the card and
+the band only. The default middle is the strip of the other screenshots
+(`islands/ImageGallery.tsx`, every image lazy except the strip's first, which
+the library leaves unset; the counter numbers them among all the screenshots),
+then "What I built", then the video; the 2014–2018 projects put the reviews
+between them (`reviewsFirst()`). `/work/sogroya` shows its four steps as the
+library's `ScreenTour` (`islands/CaseScreenTour.tsx`, the hero, sends
+`case-try`) and "What I built". The `<title>`, meta description, OG card and
+llms lines come from `lib/case-page.ts` (docs/seo-ai-crawlers.md §7). The
+strip's and the tour's classes are in `assets/styles.css`'s `@source inline`
+lines, and `test/library-classes.test.tsx` renders them. A margin note inside
+the narrow fact card uses `WithNote`'s `note-stack` class.
 `test/work-page.test.ts` checks the built pages.
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
