@@ -84,6 +84,10 @@ Deno.test("the runs calculator follows its sliders and counts one post-try per v
       })
       await noise.focus()
       await page.keyboard.press("End")
+      assertEquals(
+        await result.textContent(),
+        "With runs that differ by 30%, you need 20 tasks to prove a 20% saving.",
+      )
       await saving.focus()
       await page.keyboard.press("Home")
       assertEquals(
