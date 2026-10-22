@@ -101,6 +101,15 @@ export function CaseHero(
 ) {
   const status = projectStatus(project)
   const shot = media === undefined ? heroShot(project) : undefined
+  const topParts = [
+    caseTopLine(project),
+    project.role,
+    status && (
+      <span data-case-status class="whitespace-nowrap text-parchment">
+        <StatusMark status={status} />
+      </span>
+    ),
+  ].filter(Boolean)
   const lead = (
     <p
       data-project-lead
@@ -120,7 +129,7 @@ export function CaseHero(
     <header
       data-case-hero-block
       class={shot
-        ? `grid gap-8 lg:items-center ${
+        ? `grid gap-8 lg:items-start ${
           shot.portrait
             ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,18rem)]"
             : "lg:grid-cols-[minmax(0,1fr)_minmax(0,33rem)]"
@@ -128,20 +137,27 @@ export function CaseHero(
         : ""}
     >
       <div class="min-w-0 lg:col-start-1 lg:row-start-1">
-        <p
-          data-case-top
-          class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-graphite"
-        >
-          <span>{caseTopLine(project)}</span>
-          {project.role && <span aria-hidden="true">·</span>}
-          {project.role && <span>{project.role}</span>}
-          {status && <span aria-hidden="true">·</span>}
-          {status && (
-            <span class="text-parchment">
-              <StatusMark status={status} />
-            </span>
-          )}
-        </p>
+        {
+          /* Every part after the first starts with its "·", and the row sits
+            one dot's width left of a box that clips it, so a part that wraps
+            to a new line drops its dot: no line starts or ends with one, and
+            no word wraps alone (#562). */
+        }
+        <div class="overflow-hidden">
+          <p
+            data-case-top
+            class="-ml-6 flex flex-wrap items-center gap-y-1 text-sm text-graphite"
+          >
+            {topParts.map((part, i) => (
+              <span key={i} class="flex items-center">
+                <span aria-hidden="true" class="w-6 shrink-0 text-center">
+                  ·
+                </span>
+                {part}
+              </span>
+            ))}
+          </p>
+        </div>
         <div class="mt-4 flex items-start gap-4">
           <LogoMark project={project} />
           <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
