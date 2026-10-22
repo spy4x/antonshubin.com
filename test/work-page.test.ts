@@ -523,17 +523,28 @@ siteTest(
   },
 )
 
-Deno.test("Microwork's and Sajari's kind lines say something their leads do not (#562)", () => {
+Deno.test("no client project's kind line repeats its lead (#562)", () => {
   const words = (text: string) =>
     text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean)
-  for (const slug of ["microwork", "sajari"]) {
-    const p = clients.find((c) => c.slug === slug)!
+  for (const p of clients) {
     const lead = new Set(words(projectLead(p)))
     const kind = words(p.kind!)
     const shared = kind.filter((w) => lead.has(w))
     assert(
       shared.length <= kind.length / 2,
-      `${slug}: "${p.kind}" repeats the lead (${shared.join(", ")})`,
+      `${p.slug}: "${p.kind}" repeats the lead (${shared.join(", ")})`,
+    )
+  }
+})
+
+Deno.test("Microwork's and Sajari's kind lines are not a phrase of What I built either (#562)", () => {
+  for (const slug of ["microwork", "sajari"]) {
+    const p = clients.find((c) => c.slug === slug)!
+    const lead = projectLead(p)
+    const built = p.description.replace(/\s+/g, " ").replace(lead, "")
+    assert(
+      !built.toLowerCase().includes(p.kind!.toLowerCase()),
+      `${slug}: "${p.kind}" is printed again under What I built`,
     )
   }
 })

@@ -422,7 +422,7 @@ export const projects = {
     {
       title: "Microwork",
       slug: "microwork",
-      kind: "earn money by classifying things",
+      kind: "earn money classifying text",
       heroSize: { width: 1600, height: 1049 },
       catalogSlug: "cto-advisory-retainer",
       externalURL: "https://microwork.io",
@@ -448,7 +448,7 @@ export const projects = {
     {
       title: "CallTrack",
       slug: "calltrack",
-      kind: "call-analytics SaaS for call data and phone numbers",
+      kind: "AngularJS call-analytics SaaS",
       heroSize: { width: 1600, height: 1749 },
       externalURL: "https://ctrk.net",
       externalURLDead: true,
@@ -473,7 +473,7 @@ export const projects = {
     {
       title: "Sajari",
       slug: "sajari",
-      kind: "single-page AngularJS app",
+      kind: "AngularJS dashboard",
       heroSize: { width: 1600, height: 998 },
       role: "Frontend",
       externalURL: "https://sajari.com",
@@ -495,7 +495,7 @@ export const projects = {
     {
       title: "Code Review & Architecture Audit",
       slug: "code-review",
-      kind: "report for a Node.js REST API codebase",
+      kind: "developers interviewed and hired after the report",
       heroSize: { width: 1600, height: 1090 },
       catalogSlug: "codebase-health-audit",
       externalURL: "https://spy4x.github.io/pb-code-review",
