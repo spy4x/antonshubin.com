@@ -235,14 +235,15 @@ Deno.test("at 390px the first screen shows the h1, the lede and at least half of
   }
 })
 
-/** The search's trigger, once the island has enabled it. */
+/** The search's trigger, once the island has enabled its fieldset. */
 async function liveTrigger(page: Page) {
   const trigger = page.locator("[data-palette-demo] [aria-haspopup=dialog]")
   await page.waitForFunction(
     () =>
-      !document.querySelector<HTMLButtonElement>(
-        "[data-palette-demo] [aria-haspopup=dialog]",
-      )?.disabled,
+      // The server render disables the fieldset, not the button.
+      document.querySelector(
+        "[data-palette-demo] [aria-haspopup=dialog]:enabled",
+      ) !== null,
     undefined,
     { timeout: WAIT_MS },
   )

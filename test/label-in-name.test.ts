@@ -55,7 +55,12 @@ Deno.test("every aria-labelled button and link contains its visible text in its 
       for (const m of html.matchAll(/<(button|a)\b([^>]*)>([\s\S]*?)<\/\1>/g)) {
         const label = m[2].match(/\baria-label="([^"]*)"/)?.[1]
         if (label === undefined) continue
-        const text = norm(visibleText(withoutHidden(m[3])))
+        // Only a control that announces its hint through `aria-keyshortcuts`
+        // may hide part of its visible text from the name.
+        const inner = /\baria-keyshortcuts=/.test(m[2])
+          ? withoutHidden(m[3])
+          : m[3]
+        const text = norm(visibleText(inner))
         if (!text) continue
         checked++
         if (!norm(visibleText(label)).includes(text)) {
