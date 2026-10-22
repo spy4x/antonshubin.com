@@ -372,6 +372,14 @@ interaction sends `case-try`:
   when a step of "The four steps" is picked, by a tab, the arrow keys or the
   lightbox's Previous and Next. The first step, shown when the page opens, sends
   nothing until it is picked again after another.
+- `/work/smartlite`: the same for "What an operator sees" (`item: smartlite`,
+  `part: tour`, `step` `smartlite-` plus the screen's caption in kebab case:
+  `smartlite-dashboard`, `smartlite-alerts`, … `smartlite-lamp-profiles`,
+  `smartlite-profile`; 12 in all). "How a click reaches a pole" is static and
+  sends nothing.
+- `/work/roley`: the same for "Make a movie in four steps" (`item: roley`,
+  `part: tour`, `step` one of `roley-scripts-mobile`, `roley-recorder-mobile`,
+  `roley-processing-mobile`, `roley-watch-mobile`).
 
 "Funnel: case page → /book → call-booked" (above) reads these pages as one entry
 step.
