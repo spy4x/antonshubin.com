@@ -7,7 +7,7 @@ import { AxeBuilder } from "@axe-core/playwright"
 import type { Browser, Page } from "playwright"
 import { startSite } from "../harness.ts"
 import { launchChromium } from "../browser.ts"
-import { dareEdges, flowNodes } from "../../lib/darechat-map.ts"
+import { dareEdges, dareFlows, flowNodes } from "../../lib/darechat-map.ts"
 
 // @axe-core/playwright types its page with its own playwright-core.
 type AxePage = ConstructorParameters<typeof AxeBuilder>[0]["page"]
@@ -102,7 +102,7 @@ Deno.test("picking a flow from the keyboard lights exactly its boxes and arrows 
           at,
         )
         await page.locator("#dare-flow-requests").focus()
-        for (const flow of ["chat"] as const) {
+        for (const { id: flow } of dareFlows.slice(1)) {
           await page.keyboard.press("ArrowRight")
           assertEquals(
             await litState(page),

@@ -8,38 +8,10 @@ import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 import {
   DARECHAT_API_DOCS,
   dareEdges,
-  type DareFlow,
   dareFlows,
   type DareNode,
   dareTiers,
 } from "../lib/darechat-map.ts"
-
-const R = "[data-dare-map]"
-
-/** The selector that is true while `flow` is the picked chip. */
-const picked = (flow: DareFlow) => `${R}:has(#dare-flow-${flow}:checked)`
-
-/** One selector per flow, joined, so a rule's bytes grow by a selector per flow, not by a rule. */
-const each = (part: (id: DareFlow) => string) =>
-  dareFlows.map(({ id }) => `${picked(id)} ${part(id)}`).join(",")
-
-/**
- * The page's own rules (no island): every flow's sentence and every box's
- * "In this flow" tag stay invisible until their flow's radio is checked,
- * and a lit box or arrow gets the Lamp fill and a Parchment edge.
- * `visibility`, not `display`, so the hidden ones keep their space and
- * nothing below moves when the pick changes. No quotes and no `>`, so the
- * text needs no escaping.
- */
-const CSS = [
-  `${R} [data-dare-sentence],${R} [data-dare-lit]{visibility:hidden}`,
-  `${each((id) => `[data-dare-sentence=${id}]`)},${
-    each((id) => `[data-flows~=${id}] [data-dare-lit]`)
-  }{visibility:visible}`,
-  `${
-    each((id) => `[data-flows~=${id}]`)
-  }{background:var(--color-lamp);border-color:var(--color-parchment);box-shadow:inset 0 0 0 1px var(--color-parchment)}`,
-].join("\n")
 
 /** One box: its name, its note, and a check ("In this flow") while a flow that uses it is picked. */
 function Box({ node }: { node: DareNode }) {
@@ -69,15 +41,14 @@ function Box({ node }: { node: DareNode }) {
 /**
  * DareChat's architecture as server HTML (#523), like the infrastructure
  * map: three rows of boxes, from the apps to the services behind the APIs.
- * A `RadioChips` row picks a flow; the page's `<style>` lights the boxes
- * and arrows it uses and shows the description's sentence about it, so it works without
+ * A `RadioChips` row picks a flow; `assets/styles.css`'s map rules light
+ * the boxes and arrows it uses and shows the description's sentence about it, so it works without
  * JavaScript and ships no island. Every word comes from
  * `lib/darechat-map.ts`.
  */
 export function DareChatMap({ item }: { item: string }) {
   return (
     <section aria-labelledby="dare-map-heading" data-dare-map>
-      <style>{CSS}</style>
       <h2 id="dare-map-heading" class="text-2xl text-parchment mb-6">
         One backend for every app
       </h2>
@@ -135,7 +106,9 @@ export function DareChatMap({ item }: { item: string }) {
                 >
                   <path d="M0 0h10L5 10z" />
                 </svg>
-                {e.verb}
+                <span>
+                  <span class="text-parchment">{e.from}</span> {e.verb}
+                </span>
               </p>
             ))}
           </li>

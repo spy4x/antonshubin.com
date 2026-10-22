@@ -26,9 +26,17 @@ Deno.test("every DareChat flow lights at least one box, and box ids are unique",
   assertEquals(new Set(ids).size, ids.length)
 })
 
-Deno.test("every DareChat arrow joins a box its flow lights in its row to one in the next row", () => {
+Deno.test("every DareChat arrow starts at its row or a lit box in it and joins a lit box in its row to one in the next row", () => {
   for (const edge of dareEdges) {
     const row = dareTiers.findIndex((t) => t.id === edge.after)
+    const tier = dareTiers[row]
+    assert(
+      edge.from === tier.title ||
+        tier.nodes.some((n) =>
+          n.label === edge.from && n.flows.includes(edge.flow)
+        ),
+      `${edge.id}: starts at ${edge.from}, not this row or a lit box in it`,
+    )
     const lit = (i: number) =>
       dareTiers[i]?.nodes.some((n) => n.flows.includes(edge.flow)) ?? false
     assert(lit(row), `${edge.id}: nothing lit above`)
@@ -39,5 +47,21 @@ Deno.test("every DareChat arrow joins a box its flow lights in its row to one in
 Deno.test("every DareChat flow lights an arrow, so no flow is a lone box", () => {
   for (const flow of dareFlows) {
     assert(dareEdges.some((e) => e.flow === flow.id), flow.id)
+  }
+})
+
+Deno.test("the stylesheet lights every DareChat flow's sentence, ticks and boxes", () => {
+  const css = Deno.readTextFileSync(
+    new URL("../assets/styles.css", import.meta.url),
+  )
+  for (const { id } of dareFlows) {
+    const picked = `[data-dare-map]:has(#dare-flow-${id}:checked)`
+    for (
+      const rule of [
+        `${picked} [data-dare-sentence=${id}]`,
+        `${picked} [data-flows~=${id}] [data-dare-lit]`,
+        `${picked} [data-flows~=${id}]`,
+      ]
+    ) assert(css.includes(rule), rule)
   }
 })

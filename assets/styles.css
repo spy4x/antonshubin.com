@@ -960,3 +960,27 @@ dialog::backdrop {
     opacity: 1;
   }
 }
+
+/*
+ * The DareChat map on /work/truth-or-dare (components/DareChatMap.tsx): a
+ * picked flow shows its sentence, ticks its boxes and lights its boxes and
+ * arrows, with no island. These rules live here, not in an inline <style> on
+ * the page: the inline element cost the page about 150 ms of Lighthouse LCP.
+ * One selector per flow in lib/darechat-map.ts's `dareFlows`.
+ */
+[data-dare-map] [data-dare-sentence],
+[data-dare-map] [data-dare-lit] {
+  visibility: hidden;
+}
+[data-dare-map]:has(#dare-flow-requests:checked) [data-dare-sentence=requests],
+[data-dare-map]:has(#dare-flow-chat:checked) [data-dare-sentence=chat],
+[data-dare-map]:has(#dare-flow-requests:checked) [data-flows~=requests] [data-dare-lit],
+[data-dare-map]:has(#dare-flow-chat:checked) [data-flows~=chat] [data-dare-lit] {
+  visibility: visible;
+}
+[data-dare-map]:has(#dare-flow-requests:checked) [data-flows~=requests],
+[data-dare-map]:has(#dare-flow-chat:checked) [data-flows~=chat] {
+  background: var(--color-lamp);
+  border-color: var(--color-parchment);
+  box-shadow: inset 0 0 0 1px var(--color-parchment);
+}

@@ -107,12 +107,14 @@ export const dareTiers: DareTier[] = [
 ]
 
 /**
- * An arrow between two rows of the map, drawn under the row `after`; its
- * verb is a phrase of the description that links the two boxes.
+ * An arrow between two rows of the map, drawn under the row `after`: `from`
+ * (that row's title or one of its boxes) then the verb, a phrase of the
+ * description that links the two boxes.
  */
 export interface DareEdge {
   id: string
   after: string
+  from: string
   verb: string
   flow: DareFlow
 }
@@ -122,12 +124,14 @@ export const dareEdges: DareEdge[] = [
   {
     id: "apps-rest",
     after: "apps",
+    from: "Apps",
     verb: "consume the same public REST API",
     flow: "requests",
   },
   {
     id: "socket-redis",
     after: "backend",
+    from: "Socket.IO chat",
     verb: "scaled across nodes via the Redis pub/sub adapter",
     flow: "chat",
   },

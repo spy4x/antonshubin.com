@@ -50,7 +50,7 @@ pageTest(
         new RegExp(`<p\\b[^>]*data-dare-edge="${edge.id}"[^>]*>`),
       )
       assert(tag?.[0].includes(`data-flows="${edge.flow}"`), edge.id)
-      assert(text.includes(edge.verb), edge.id)
+      assert(text.includes(`${edge.from} ${edge.verb}`), edge.id)
     }
     for (const flow of dareFlows) {
       assert(text.includes(`${flow.label}: ${flow.sentence}.`), flow.id)
@@ -88,6 +88,16 @@ pageTest(
       count(html, /\b(?:src|action|data|poster)="https?:\/\/darechat\.me/g),
       0,
     )
+  },
+)
+
+pageTest(
+  "the map carries no inline <style>, whose element alone slows the page's LCP",
+  (html) => {
+    const start = html.indexOf("data-dare-map")
+    const map = html.slice(start, html.indexOf("</section>", start))
+    assert(start > 0, "no map")
+    assert(!map.includes("<style"), "an inline <style> in the map")
   },
 )
 
