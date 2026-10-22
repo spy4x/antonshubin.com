@@ -272,18 +272,65 @@ function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
-/** The client stylesheet of the built site, read off the home page. */
-async function builtCss(): Promise<string> {
-  const site = await startSite()
+/**
+ * The built site's stylesheets: `site`, the one every page links (read off
+ * the home page), and `palette`, the palette demo's own, which the demo's
+ * island loads with its chunk on /tools/preact-components only.
+ */
+async function builtCss(): Promise<{ site: string; palette: string }> {
+  const server = await startSite()
   try {
-    const html = await site.html("/")
+    const html = await server.html("/")
     const cssHref = html.match(/href="(\/assets\/client-entry-[^"?]+\.css)/)
       ?.[1]
     assert(cssHref, "could not find the client CSS href in / 's HTML")
-    return await site.html(cssHref)
+    const page = await server.html("/tools/preact-components")
+    const island = page.match(
+      /"(\/assets\/fresh-island__PaletteDemo-[^"]+\.js)"/,
+    )?.[1]
+    assert(island, "no PaletteDemo island on /tools/preact-components")
+    const paletteHref = (await server.html(island)).match(
+      /assets\/palette-demo-[\w-]+\.css/,
+    )?.[0]
+    assert(paletteHref, "the PaletteDemo island loads no palette-demo CSS")
+    return {
+      site: await server.html(cssHref),
+      palette: await server.html(`/${paletteHref}`),
+    }
   } finally {
-    await site.stop()
+    await server.stop()
   }
+}
+
+/**
+ * The stylesheet a class must find its rule in: the site's, plus the palette
+ * demo's for a class only the demo renders.
+ */
+function cssFor(
+  className: string,
+  css: { site: string; palette: string },
+): string {
+  return paletteOnly().has(className) ? css.site + css.palette : css.site
+}
+
+/** The classes the palette demo renders and no other library markup does. */
+function paletteOnly(): Set<string> {
+  const others = classesIn(
+    [renderedLibraryMarkup(), renderedGalleryMarkup()].join("\n"),
+  )
+  return new Set(
+    [...classesIn(renderedPaletteMarkup())].filter((c) => !others.has(c)),
+  )
+}
+
+function classesIn(html: string): Set<string> {
+  return new Set(
+    [...html.matchAll(/class="([^"]*)"/g)].flatMap(([, list]) =>
+      list.split(/\s+/).map((c) =>
+        c.replaceAll("&amp;", "&").replaceAll("&gt;", ">")
+      )
+    ),
+  )
 }
 
 /** Every class in the rendered library markup, `dark:` ones apart. */
@@ -319,12 +366,23 @@ Deno.test("every class a library component renders on the site has a rule in the
   const { light: classes } = renderedClasses()
   assert(classes.size > 20, `only ${classes.size} classes rendered`)
   const css = await builtCss()
-  const missing = [...classes].filter((c) => !hasRule(css, c))
+  const missing = [...classes].filter((c) => !hasRule(cssFor(c, css), c))
   assert(
     missing.length === 0,
     `no rule in the built CSS for: ${missing.join(", ")} — add them to ` +
-      `assets/styles.css's @source inline(...) lines`,
+      `the @source inline(...) lines of assets/styles.css, or of ` +
+      `assets/palette-demo.css for a class only the palette demo renders`,
   )
+})
+
+// The palette demo's stylesheet loads with its island on one page; its rules
+// in the site stylesheet would cost every page's first paint.
+Deno.test("the palette demo's rules are in its own stylesheet, not the site's", async () => {
+  const css = await builtCss()
+  const only = [...paletteOnly()].filter((c) => hasRule(css.palette, c))
+  assert(only.length > 20, `only ${only.length} palette-only classes ruled`)
+  assertEquals(only.filter((c) => hasRule(css.site, c)), [])
+  assert(!css.site.includes("--toastr-gap"), "Toastr's rules reached the site")
 })
 
 /** The `--color-*` names a rule for `className` reads through `var()`. */
@@ -357,20 +415,22 @@ Deno.test("every colour a library class reads is a token the site's stylesheet s
   const css = await builtCss()
   const unset = new Map<string, string[]>()
   for (const className of classes) {
-    for (const name of colourVars(css, className)) {
-      if (!new RegExp(`${escapeRegExp(name)}\\s*:`).test(css)) {
+    const sheet = cssFor(className, css)
+    for (const name of colourVars(sheet, className)) {
+      if (!new RegExp(`${escapeRegExp(name)}\\s*:`).test(sheet)) {
         unset.set(name, [...(unset.get(name) ?? []), className])
       }
     }
   }
   assert(
-    [...classes].some((c) => colourVars(css, c).length > 0),
+    [...classes].some((c) => colourVars(cssFor(c, css), c).length > 0),
     "no rendered class reads a colour token: the guard finds nothing",
   )
   assertEquals(
     [...unset].map(([name, by]) => `${name} (${by[0]})`),
     [],
-    "set these in assets/styles.css's :root block",
+    "set these in the :root block of assets/styles.css (or of " +
+      "assets/palette-demo.css for the palette demo)",
   )
 })
 
@@ -382,7 +442,7 @@ Deno.test("no dark: class a library component renders has a rule in the built st
   const { dark } = renderedClasses()
   assert(dark.size > 0, "the library button rendered no dark: class")
   const css = await builtCss()
-  const ruled = [...dark].filter((c) => hasRule(css, c))
+  const ruled = [...dark].filter((c) => hasRule(css.site + css.palette, c))
   assertEquals(ruled, [], "a dark: class reached the built CSS")
 })
 
