@@ -6,6 +6,7 @@ import {
   linkEvent,
   outboundTo,
   track,
+  trackCaseTry,
   trackPostTry,
 } from "./analytics.ts"
 
@@ -108,6 +109,26 @@ Deno.test("trackPostTry sends post-try once per post and component in a page vie
       ["post-try", { item: "post-a", part: "Gauge" }],
       ["post-try", { item: "post-a", part: "Meter" }],
       ["post-try", { item: "post-b", part: "Gauge" }],
+    ])
+  } finally {
+    delete g.umami
+  }
+})
+
+Deno.test("trackCaseTry sends case-try once per project, part and step in a page view", () => {
+  const g = globalThis as { umami?: unknown }
+  const calls: unknown[][] = []
+  try {
+    g.umami = { track: (...args: unknown[]) => calls.push(args) }
+    trackCaseTry("sogroya", "tour", "consent")
+    trackCaseTry("sogroya", "tour", "consent")
+    trackCaseTry("sogroya", "tour", "schedule")
+    trackCaseTry("roley", "tour", "consent")
+    trackCaseTry("sogroya", "tour", "schedule")
+    assertEquals(calls, [
+      ["case-try", { item: "sogroya", part: "tour", step: "consent" }],
+      ["case-try", { item: "sogroya", part: "tour", step: "schedule" }],
+      ["case-try", { item: "roley", part: "tour", step: "consent" }],
     ])
   } finally {
     delete g.umami

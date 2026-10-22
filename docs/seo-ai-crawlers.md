@@ -166,7 +166,7 @@ Five entities in a `@graph` array (six on `/about`):
   result; it stays because it states the page's questions and answers in
   machine-readable form, matching the visible text
 
-### 7. Project JSON-LD (routes/work/[slug].tsx)
+### 7. Project JSON-LD (components/case-frame/CaseFrame.tsx)
 
 - One `CreativeWork` node, built only from fields already on the `Project`
   record in `lib/data.ts` (issue #167) — no invented dates or ratings
@@ -182,9 +182,19 @@ Five entities in a `@graph` array (six on `/about`):
 - No `Review` or `AggregateRating`: the reviews on the page are the client's
   words on Upwork, and self-served review markup is not eligible for rich
   results
-- The page's meta description is `clientSummary()` cut to 160 characters at a
-  word boundary (`metaDescription()` in `lib/llms.ts`); the `<title>` stays
-  `<project> — Anton Shubin`
+- `alternativeHeadline` is the project's `kind` line (`lib/data.ts`, words only
+  from its description) and `alternateName` its other name (DareChat: "Truth or
+  Dare"), #523
+- The `<title>` is the headline, `<project>: <kind>` (`projectHeadline()` in
+  `lib/case-page.ts`), with " — Anton Shubin" only while the whole stays within
+  60 characters; the `<h1>` holds the name with the kind line under it, and the
+  OG card and the llms files read the same headline
+- The meta description is `caseDescription()` (`lib/case-page.ts`): the outcome
+  first, then the description's first sentence or the kind line, who it was
+  built for and when, and further sentences while they fit in 155 characters. A
+  part that does not fit is left out whole, so it is never cut with "…"
+- No `VideoObject` yet for FoodRazor: Google requires `uploadDate`, and it must
+  come from YouTube, not a guess
 - `sameAs` when the project has a live, non-dead `externalURL`;
   `creativeWorkStatus: "Archived"` when `archived` is true
 - No `sourceOrganization`: `madeForName` is mostly a person (a LinkedIn

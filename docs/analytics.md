@@ -46,6 +46,7 @@ with every event, so no event has a `page` property.
 | `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                                                                                                                                                |
 | `post-read`                          | the end of a post's body has been on screen, and the visitor has been on the page 15 s or more; once per view | `item` (post slug)                                                                                                                                                                                                                                     |
 | `post-try`                           | a reader first uses one of a post's interactive components; once per component per view                       | `item` (post slug), `part` (the component's tag name, `RunsCalculator` …); never a value the reader entered                                                                                                                                            |
+| `case-try`                           | a visitor picks a step of a case page's interaction; once per step per view                                   | `item` (project slug), `part` (the interaction: `tour`), `step` (the step's id, `sogroya-consent` …)                                                                                                                                                   |
 | `not-found`                          | the not-found page renders                                                                                    | none                                                                                                                                                                                                                                                   |
 
 `place: nav` on `book` (or on `brief` when `SCHEDULE_URL` is unset) is the
@@ -65,16 +66,17 @@ and about 90 others) stopped on 2026-09-30. The weekly report says so until
 `scripts/umami-reports.ts` keeps these saved reports in Umami. Each one answers
 one question:
 
-| Report                                 | Question                                                                     |
-| -------------------------------------- | ---------------------------------------------------------------------------- |
-| Goal: book                             | How many Book clicks, across every place they sit?                           |
-| Goal: brief-sent                       | How many written briefs actually reached Anton?                              |
-| Goal: call-booked                      | How many intro calls were actually booked?                                   |
-| Goal: newsletter-signup                | How many newsletter signups succeeded?                                       |
-| Goal: post-read                        | How many post views reached the end of the post?                             |
-| Funnel: any page → /book → call-booked | Of all visitors, how many open the booking page, and how many of those book? |
-| Funnel: /book → call-booked            | Of the visitors who open the booking page, how many book?                    |
-| Funnel: any page → brief-sent          | How many visitors send a written brief?                                      |
+| Report                                  | Question                                                                                                                  |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Goal: book                              | How many Book clicks, across every place they sit?                                                                        |
+| Goal: brief-sent                        | How many written briefs actually reached Anton?                                                                           |
+| Goal: call-booked                       | How many intro calls were actually booked?                                                                                |
+| Goal: newsletter-signup                 | How many newsletter signups succeeded?                                                                                    |
+| Goal: post-read                         | How many post views reached the end of the post?                                                                          |
+| Funnel: any page → /book → call-booked  | Of all visitors, how many open the booking page, and how many of those book?                                              |
+| Funnel: /book → call-booked             | Of the visitors who open the booking page, how many book?                                                                 |
+| Funnel: case page → /book → call-booked | Of the visitors who open a client case page (`/work/<slug>`), how many open the booking page, and how many of those book? |
+| Funnel: any page → brief-sent           | How many visitors send a written brief?                                                                                   |
 
 Every funnel gives a visitor 60 minutes from its first step. A step may match
 the same page view or event as the step before it (Umami's `getFunnel.ts`
@@ -150,9 +152,9 @@ instance answers `/api/websites/<id>/goals`, which only 3.4 has.
 
 `lib/analytics.ts` is the only list of Umami events (#318): `ANALYTICS_EVENTS`
 is a closed list, and detail goes into `data-umami-event-<key>` properties
-(`place`, `item`, `to`, `target`, `field`, `reason`, `service`, `part`), never
-into the name, so Umami can add up every Book click across pages. A link or
-button spreads `eventAttrs(name, props)`; `linkEvent(href, props)` picks
+(`place`, `item`, `to`, `target`, `field`, `reason`, `service`, `part`, `step`),
+never into the name, so Umami can add up every Book click across pages. A link
+or button spreads `eventAttrs(name, props)`; `linkEvent(href, props)` picks
 `outbound`, `brief`, `book` or `cta` from the href (the closing band and the
 promise timeline use it); an island calls `track()`, which never throws. Never
 write a `data-umami-event` string or call `umami.track` by hand.
@@ -168,9 +170,12 @@ not an event; `islands/MeetEmbed.tsx` sends `calendar-shown` on the first valid
 as `mig:height`; `islands/NewsletterForm.tsx` sends `newsletter-signup`;
 `islands/PostRead.tsx` sends `post-read`; a post's component (#537) calls
 `trackPostTry(post, tag)` on every input and the helper sends `post-try` once
-per page view; `components/NotFound.tsx` sends `not-found` through
-`islands/TrackPageEvent.tsx`. Links to other sites inside a post get `outbound`
-from `lib/markdown.ts`.
+per page view; `islands/CaseScreenTour.tsx` calls
+`trackCaseTry(item, part,
+step)` when a step is picked and the helper sends
+`case-try` once per step per page view (#523); `components/NotFound.tsx` sends
+`not-found` through `islands/TrackPageEvent.tsx`. Links to other sites inside a
+post get `outbound` from `lib/markdown.ts`.
 
 `routes/_app.tsx` loads no tracker for crawlers or on `UNTRACKED_PATHS`
 (`/unsubscribe` and `/subscribe/confirm`, whose URLs carry a token, and `/pay`).
@@ -352,3 +357,21 @@ click, and an island only for that event would cost more than it tells.
 ### air-quality-sensor, toread-today
 
 Archived: the frame's events only.
+
+## Case pages
+
+Every `/work/<slug>` page (#523, `components/case-frame/`) sends the frame's
+events: `book` (`place` `card` or `band`, `item`), `brief` (`place: band`, the
+link carries `?service=<catalog slug>`), `outbound` (`to: live`, `item`, and
+`place: hero` on the secondary link under the lead), `cta` (Similar work today,
+the More client work cards, All client work, How I work). A page's own
+interaction sends `case-try`:
+
+- `/work/sogroya`: `case-try` (`item: sogroya`, `part: tour`, `step` one of
+  `sogroya-home`, `sogroya-consent`, `sogroya-schedule`, `sogroya-download`)
+  when a step of "The four steps" is picked, by a tab, the arrow keys or the
+  lightbox's Previous and Next. The first step, shown when the page opens, sends
+  nothing until it is picked again after another.
+
+"Funnel: case page → /book → call-booked" (above) reads these pages as one entry
+step.

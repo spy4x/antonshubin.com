@@ -19,6 +19,7 @@ const PROP_KEYS: Record<keyof EventProps, true> = {
   reason: true,
   service: true,
   part: true,
+  step: true,
 }
 
 /** The properties each clicked event must carry, per the table in #318. */

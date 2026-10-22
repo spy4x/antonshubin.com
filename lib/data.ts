@@ -37,6 +37,22 @@ export interface Project {
   madeForURL?: string
   archived?: boolean
   outcome?: string
+  /**
+   * What the product is, in a few words taken from its own `description`,
+   * starting in lower case: "real-time IoT control for about 200 lamp poles"
+   * (#523). The case page's `<title>`, the second line of its `<h1>`, its OG
+   * image, its JSON-LD `alternativeHeadline` and the llms files read it
+   * through `projectHeadline()`. Every client project has one.
+   */
+  kind?: string
+  /** Another name the product goes by, published as JSON-LD `alternateName`. */
+  alternateName?: string
+  /**
+   * Pixel size of the first screenshot's served file (the WebP for a PNG),
+   * for a project whose files differ in size, so it has no `screenshotSize`:
+   * the case page's hero sets it as `width` and `height`.
+   */
+  heroSize?: { width: number; height: number }
   /** Margin note id (`lib/notes.ts`) that sources `outcome`. */
   outcomeNote?: string
   /** Margin note id (`lib/notes.ts`) that sources the live `externalURL`. */
@@ -99,6 +115,7 @@ export const projects = {
     {
       title: "SmartLite",
       slug: "smartlite",
+      kind: "real-time IoT control for about 200 lamp poles",
       cardImage: {
         src: "/img/projects/smartlite/card.webp",
         width: 720,
@@ -108,7 +125,7 @@ export const projects = {
       role: "Full-stack (web app + backend + infrastructure)",
       logoImageURL: "/img/projects/smartlite/logo.svg",
       description:
-        "Real-time IoT control platform running in production at Gardens by the Bay, Singapore — about 200 lamp poles managed across the public-facing park, live since 2024 and still under my maintenance. Yumetronics handled the hardware and on-site pole integrations; I built the software side end-to-end: the operator web app, the backend services, the AWS infrastructure, and the deploy pipeline. Three months from kickoff to production, no prior code.\n\nThe platform bridges MQTT-driven hardware control with an operator-friendly web dashboard. Pole state, sensor readings, and command acknowledgements flow over MQTT for low-latency control; database changes propagate to connected clients via PostgreSQL LISTEN/NOTIFY for a live multi-user dashboard without polling. Operators see a geographic map of every pole, scheduled automation (time-of-day, sensor-triggered, manual override), motion and ambient-light triggers, failure detection with automatic alerts through PWA push, Telegram, and WhatsApp — plus CSV and Excel exports, charts for incident reporting, role-based access (admin / operator / viewer), TOTP 2FA, and a mobile PWA so on-site staff can act from the field.\n\nThe screenshots above cover every operator page.",
+        "Real-time IoT control platform running in production at Gardens by the Bay, Singapore — about 200 lamp poles managed across the public-facing park, live since 2024 and still under my maintenance. Yumetronics handled the hardware and on-site pole integrations; I built the software side end-to-end: the operator web app, the backend services, the AWS infrastructure, and the deploy pipeline. Three months from kickoff to production, no prior code.\n\nThe platform bridges MQTT-driven hardware control with an operator-friendly web dashboard. Pole state, sensor readings, and command acknowledgements flow over MQTT for low-latency control; database changes propagate to connected clients via PostgreSQL LISTEN/NOTIFY for a live multi-user dashboard without polling. Operators see a geographic map of every pole, scheduled automation (time-of-day, sensor-triggered, manual override), motion and ambient-light triggers, failure detection with automatic alerts through PWA push, Telegram, and WhatsApp — plus CSV and Excel exports, charts for incident reporting, role-based access (admin / operator / viewer), TOTP 2FA, and a mobile PWA so on-site staff can act from the field.\n\nThe screenshots on this page cover every operator page.",
       tags: [
         "IoT",
         "Real-time",
@@ -147,6 +164,9 @@ export const projects = {
     {
       title: "Truth or Dare (DareChat)",
       slug: "truth-or-dare",
+      kind: "real-time multiplayer game for Russian-speaking audiences",
+      alternateName: "Truth or Dare",
+      heroSize: { width: 1600, height: 2021 },
       cardImage: {
         src: "/img/projects/truth-or-dare/card.webp",
         width: 720,
@@ -193,6 +213,8 @@ export const projects = {
     {
       title: "FoodRazor",
       slug: "foodrazor",
+      kind: "paper invoices, orders to suppliers and price tracking",
+      heroSize: { width: 1600, height: 801 },
       cardImage: {
         src: "/img/projects/foodrazor/card.webp",
         width: 720,
@@ -237,6 +259,7 @@ export const projects = {
     {
       title: "Corecircle",
       slug: "corecircle",
+      kind: "fitness social network with exercise tracking",
       cardImage: {
         src: "/img/projects/corecircle/card.webp",
         width: 208,
@@ -268,6 +291,7 @@ export const projects = {
     {
       title: "Roley — Make a Movie!",
       slug: "roley",
+      kind: "multi-video recorder for kids",
       cardImage: {
         src: "/img/projects/roley/card.webp",
         width: 208,
@@ -277,7 +301,7 @@ export const projects = {
       externalURL: "https://makearoley.com",
       externalURLLabel: "Client's site",
       description:
-        "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Postgres, AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The screenshots above are a portfolio re-imagination I built later; the original client's branding wasn't mine to share.",
+        "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Postgres, AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The screenshots on this page are a portfolio re-imagination I built later; the original client's branding wasn't mine to share.",
       role: "Full-stack",
       tags: [
         "SvelteKit",
@@ -315,6 +339,7 @@ export const projects = {
     {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
+      kind: "multilingual web app for weekly medication reminders",
       catalogSlug: "zero-to-production-saas-mvp",
       logoImageURL: "/img/projects/sogroya/logo.svg",
       logoPlate: true,
@@ -346,6 +371,7 @@ export const projects = {
     {
       title: "Connectful",
       slug: "connectful",
+      kind: "networking app to match like-minded people",
       cardImage: {
         src: "/img/projects/connectful/card.webp",
         width: 208,
@@ -376,6 +402,8 @@ export const projects = {
     {
       title: "GoPingu",
       slug: "gopingu",
+      kind: "Trello-like app for marketing teams",
+      heroSize: { width: 1600, height: 1000 },
       catalogSlug: "cto-advisory-retainer",
       role: "Team lead & tech lead (full-stack)",
       tags: ["Angular", "Node.js", "Firebase", "Firestore"],
@@ -394,6 +422,8 @@ export const projects = {
     {
       title: "Microwork",
       slug: "microwork",
+      kind: "human text classification freelance platform",
+      heroSize: { width: 1600, height: 1049 },
       catalogSlug: "cto-advisory-retainer",
       externalURL: "https://microwork.io",
       externalURLDead: true,
@@ -418,6 +448,8 @@ export const projects = {
     {
       title: "CallTrack",
       slug: "calltrack",
+      kind: "call-analytics SaaS for call data and phone numbers",
+      heroSize: { width: 1600, height: 1749 },
       externalURL: "https://ctrk.net",
       externalURLDead: true,
       description:
@@ -441,6 +473,8 @@ export const projects = {
     {
       title: "Sajari",
       slug: "sajari",
+      kind: "dashboard for a search and recommendations engine",
+      heroSize: { width: 1600, height: 998 },
       role: "Frontend",
       externalURL: "https://sajari.com",
       externalURLDead: true,
@@ -461,6 +495,8 @@ export const projects = {
     {
       title: "Code Review & Architecture Audit",
       slug: "code-review",
+      kind: "report for a Node.js REST API codebase",
+      heroSize: { width: 1600, height: 1090 },
       catalogSlug: "codebase-health-audit",
       externalURL: "https://spy4x.github.io/pb-code-review",
       externalURLLabel: "Read the audit report",

@@ -10,8 +10,12 @@ interface GalleryImageData {
 }
 
 /**
- * A project's screenshots as `@spy4x/preact-ui`'s strip: the first image is
- * the page's eager, high-priority hero, every slide shows its caption (the
+ * A project's screenshots as `@spy4x/preact-ui`'s strip, after the case
+ * page's hero (#523), which shows the first screenshot: every image in the
+ * strip is lazy (`lazy`), so none competes with the hero for bandwidth, and
+ * the counter numbers each slide among all the project's screenshots
+ * (`first` is the number of the strip's first one), so it matches the
+ * "Screenshot 2 of 12" captions. Every slide shows its caption (the
  * `alt`), a "3 / 12" counter sits under the row with Previous and Next
  * buttons while it overflows (`ghost`: transparent inside a Rule strong
  * border, like the site's secondary Button), and a click opens the lightbox. This island
@@ -19,12 +23,17 @@ interface GalleryImageData {
  * function props cannot cross an island boundary, so they are set here.
  */
 export default function ImageGallery(
-  { images }: { images: GalleryImageData[] },
+  { images, first = 1 }: {
+    images: GalleryImageData[]
+    /** The number of the first image among all the project's screenshots. */
+    first?: number
+  },
 ) {
+  const shift = first - 1
   return (
     <LibraryGallery
       layout="strip"
-      hero
+      lazy
       captions
       navigation
       navigationVariant="ghost"
@@ -37,7 +46,8 @@ export default function ImageGallery(
         webpSrc: webpForPng(image.src) ?? undefined,
       }))}
       label={(image) => image.alt}
-      counterLabel={(position, total) => `${position} / ${total}`}
+      counterLabel={(position, total) =>
+        `${position + shift} / ${total + shift}`}
       stripPreviousLabel="Previous screenshot"
       stripNextLabel="Next screenshot"
     />

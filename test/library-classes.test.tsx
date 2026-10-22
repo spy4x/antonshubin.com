@@ -18,6 +18,8 @@ import { FeatureCard } from "@spy4x/preact-ui/feature-card"
 import { DemoVideo } from "@spy4x/preact-ui/demo-video"
 import { ComparisonTable } from "@spy4x/preact-ui/comparison-table"
 import { RadioChips } from "@spy4x/preact-ui/radio-chips"
+import { WindowFrame } from "@spy4x/preact-ui/window-frame"
+import { ScreenTour } from "@spy4x/preact-ui/screen-tour"
 import Button, { buttonClass } from "../components/Button.tsx"
 import { BookCallLink } from "../components/BookCallLink.tsx"
 import { CiPill } from "../components/CiPill.tsx"
@@ -89,6 +91,27 @@ function renderedGalleryMarkup(): string {
         slideWidth="orientation"
         images={GALLERY_IMAGES.map((i) => ({ ...i, width: 1200, height: 600 }))}
       />,
+    ),
+    // Sogroya's walkthrough (#523, islands/CaseScreenTour.tsx): numbered
+    // steps in the phone frame, the selected tab and an idle one.
+    ...(["phone", "plain"] as const).map((frame) =>
+      render(
+        <ScreenTour
+          frame={frame}
+          numbered
+          steps={[1, 2].map((n) => ({
+            id: `${frame}-${n}`,
+            label: `Step ${n}`,
+            text: "Text.",
+            image: {
+              src: `/${n}.webp`,
+              alt: `Step ${n}`,
+              width: 780,
+              height: 1688,
+            },
+          }))}
+        />,
+      )
     ),
     // Previous/Next exist only after hydration (the strip measures its row
     // first), so the server render has none: render them with the class list
@@ -164,6 +187,15 @@ function renderedLibraryMarkup(): string {
       />,
     ),
     render(<Card class="p-6">Card</Card>),
+    // A case page's hero (#523): the plain frame and the phone frame, with
+    // the caption, as components/case-frame/CaseHero.tsx renders them.
+    ...(["plain", "phone"] as const).map((variant) =>
+      render(
+        <WindowFrame variant={variant} caption="Dashboard" class="max-w-60">
+          <img src="/a.webp" alt="Dashboard" />
+        </WindowFrame>,
+      )
+    ),
     // /why-not-just-ai (#486): every value, a row with and one without a
     // note, and the fit paragraph.
     render(
@@ -284,7 +316,7 @@ function renderedPaletteMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/(),+=&>*%#]/g, (c) => `\\${c}`)
+  return "." + className.replace(/[:.!\[\]\/(),+=&>*%@#]/g, (c) => `\\${c}`)
 }
 
 function escapeRegExp(text: string): string {

@@ -1,3 +1,4 @@
+import { headlineBefore } from "../lib/case-page.ts"
 import { HOME_INTRO } from "../lib/home.ts"
 import { define } from "../lib/utils.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
@@ -64,9 +65,10 @@ export const handler = define.handlers({
       .slice(0, 3)
       .map((slug) => {
         const p = clientProject(slug)
-        return `- [${p.title}](${BASE_URL}/work/${p.slug}) — ${
-          llmsClientSummary(p)
-        }`
+        const summary = llmsClientSummary(p)
+        return `- [${
+          headlineBefore(p, summary)
+        }](${BASE_URL}/work/${p.slug}) — ${summary}`
       })
       .join("\n")
 

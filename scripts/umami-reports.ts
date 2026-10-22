@@ -130,6 +130,20 @@ export const REPORTS: ReportDefinition[] = [
     },
   },
   {
+    name: "Funnel: case page → /book → call-booked",
+    type: "funnel",
+    description:
+      `Of the visitors who open a client case page, how many open the booking page, and how many of those book a call? ${MANAGED}`,
+    parameters: {
+      window: FUNNEL_WINDOW_MINUTES,
+      steps: [
+        { type: "path", value: "/work/*" },
+        { type: "path", value: "/book" },
+        { type: "event", value: "call-booked" },
+      ],
+    },
+  },
+  {
     name: "Funnel: any page → brief-sent",
     type: "funnel",
     description: `How many visitors send a written brief? ${MANAGED}`,

@@ -48,10 +48,10 @@ export function SimilarWorkLink(
 }
 
 /**
- * The project page's fact card (#246): who it was for, the role, the period,
- * the status as shape plus word, the stack, the live link and GitHub, then
- * the Book action and the matching catalog item. It sits beside the story
- * from 1024px and stays in view while the page scrolls.
+ * The case page's fact card (#246, #523): who it was for, the role, when,
+ * the status as shape plus word and the live link, then the Book action and
+ * the matching catalog item. It sits beside "How it is built", after the
+ * story, which holds the stack.
  */
 export function ProjectFactCard({ project }: { project: Project }) {
   const status = projectStatus(project)
@@ -89,7 +89,7 @@ export function ProjectFactCard({ project }: { project: Project }) {
         )}
         {project.role && <Fact term="Role">{project.role}</Fact>}
         {project.period && (
-          <Fact term="Period" data-project-period>
+          <Fact term="When" data-project-period>
             {formatPeriod(project.period)}
           </Fact>
         )}
@@ -98,13 +98,8 @@ export function ProjectFactCard({ project }: { project: Project }) {
             <StatusMark status={status} />
           </Fact>
         )}
-        {project.tags && project.tags.length > 0 && (
-          <Fact term="Stack">
-            <span class="text-graphite">{project.tags.join(" · ")}</span>
-          </Fact>
-        )}
         {liveLink && (
-          <Fact term="Link">
+          <Fact term={project.externalURLLabel ? "Link" : "Live site"}>
             {project.externalURLNote
               ? (
                 <WithNote id={project.externalURLNote} class="note-stack">

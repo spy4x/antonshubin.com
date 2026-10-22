@@ -1,14 +1,28 @@
-// #246: the project page as a case study. Checked on the built pages, since
-// the wiring lives in routes/work/[slug].tsx and its components: a real
-// <h1>, the lead line, the fact card, one Book in the card and one in the
-// closing band, the catalog link, the meta description, the JSON-LD fields
-// and the one high-priority hero image.
+// #246, #523: the project page as a case study on the shared case frame.
+// Checked on the built pages, since the wiring lives in
+// components/case-frame/ and the routes: a real <h1> with the kind line, the
+// top line, the lead, the order of the parts, the fact card, one Book in the
+// card and one in the closing band, the band's proof and brief link, the
+// catalog link, the meta description, the JSON-LD fields and the one
+// high-priority hero image.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, mainContent, visibleText } from "./html.ts"
 import { formatPeriod, projects } from "../lib/data.ts"
 import { catalogItems } from "../lib/catalog.ts"
 import { firstSentence } from "../lib/llms.ts"
+import { projectTestimonials } from "../lib/testimonials.ts"
+import {
+  CASE_DESCRIPTION_MAX,
+  caseDescription,
+  caseTitle,
+  caseTopLine,
+  heroShot,
+  kindRepeatsFigure,
+  projectHeadline,
+  reviewsFirst,
+  upperFirst,
+} from "../lib/case-page.ts"
 
 /** Registers a test that gets a running copy of the built site, served with a booking URL. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -43,14 +57,24 @@ function metaDescription(html: string): string {
 }
 
 siteTest(
-  "every client project page has one real <h1> holding its title",
+  "every client project page has one real <h1> holding its title and its kind line",
   async (site) => {
     assert(clients.length > 0)
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
       const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)]
       assertEquals(h1s.length, 1, `/work/${p.slug} has ${h1s.length} <h1>`)
-      assertEquals(visibleText(h1s[0][1]), p.title, p.slug)
+      assertEquals(
+        // The ":" is a screen-reader-only span right after the name.
+        visibleText(h1s[0][1]).replace(" :", ":"),
+        `${p.title}: ${upperFirst(p.kind!)}`,
+        p.slug,
+      )
+      assertEquals(
+        visibleText(html.match(/<title>([^<]*)<\/title>/)![1]),
+        caseTitle(p),
+        p.slug,
+      )
       assert(!/role="heading"/.test(html), `${p.slug} fakes a heading`)
     }
   },
@@ -73,7 +97,7 @@ siteTest(
 )
 
 siteTest(
-  "the fact card shows client, role, period, status and stack",
+  "the fact card shows client, role, when and status, and How it is built lists the stack",
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
@@ -81,7 +105,7 @@ siteTest(
       const text = visibleText(card)
       assert(/data-project-period/.test(card), `${p.slug}: no period marker`)
       assert(
-        text.includes(`Period ${formatPeriod(p.period!)}`),
+        text.includes(`When ${formatPeriod(p.period!)}`),
         `${p.slug}: no period`,
       )
       if (p.madeForName) {
@@ -97,15 +121,104 @@ siteTest(
         const word = p.externalURLDead ? "Offline" : "Live"
         assert(text.includes(`Status ${word}`), `${p.slug}: not ${word}`)
       }
+      if (p.externalURL && !p.externalURLDead && !p.externalURLLabel) {
+        assert(text.includes("Live site"), `${p.slug}: no Live site row`)
+      }
       if (p.externalURLDead) {
         assert(
-          !card.includes(`href="${p.externalURL}"`),
+          !html.includes(`href="${p.externalURL}"`),
           `${p.slug}: links its offline site`,
         )
       }
+      const stack = visibleText(region(html, "data-case-stack", "ul"))
       for (const tag of p.tags ?? []) {
-        assert(text.includes(tag), `${p.slug}: stack lacks ${tag}`)
+        assert(stack.includes(tag), `${p.slug}: How it is built lacks ${tag}`)
       }
+    }
+  },
+)
+
+siteTest(
+  "the top line names the client, the years, the role and the status above the <h1>",
+  async (site) => {
+    for (const p of clients) {
+      const html = await site.html(`/work/${p.slug}`)
+      const top = region(html, "data-case-top", "p")
+      const text = visibleText(top)
+      assert(text.includes(caseTopLine(p)), `${p.slug}: ${text}`)
+      assert(text.includes(p.role!), `${p.slug}: no role in ${text}`)
+      assert(html.indexOf("data-case-top") < html.indexOf("<h1"), p.slug)
+    }
+  },
+)
+
+siteTest(
+  "the hero's one secondary link is the live product or the report, never an offline site",
+  async (site) => {
+    let none = 0
+    for (const p of clients) {
+      const html = await site.html(`/work/${p.slug}`)
+      const links = [...html.matchAll(/<a\b[^>]*data-case-secondary[^>]*>/g)]
+      if (!p.externalURL || p.externalURLDead) {
+        none++
+        assertEquals(links.length, 0, `${p.slug}: a secondary link`)
+        continue
+      }
+      assertEquals(links.length, 1, p.slug)
+      assert(links[0][0].includes(`href="${p.externalURL}"`), links[0][0])
+      assert(!links[0][0].includes("data-primary-book"), p.slug)
+    }
+    assert(none > 0, "no project without a live link was checked")
+  },
+)
+
+siteTest(
+  "the parts follow the spec's order: hero, middle, reviews, How it is built, More client work, band",
+  async (site) => {
+    for (const p of clients) {
+      const html = await site.html(`/work/${p.slug}`)
+      const at = (marker: string) => html.indexOf(marker)
+      const order = [
+        at("data-case-hero-block"),
+        at(`id="project-built"`),
+        at("data-case-built"),
+        at(`id="project-more-work"`),
+        at("data-closing-band"),
+      ]
+      assert(order.every((i) => i > 0), `${p.slug}: a part is missing`)
+      assertEquals([...order].sort((a, b) => a - b), order, p.slug)
+      if (projectTestimonials(p.slug!).length === 0) continue
+      const reviews = at("data-project-reviews")
+      if (reviewsFirst(p)) {
+        assert(reviews < at(`id="project-built"`), `${p.slug}: reviews late`)
+      } else {
+        assert(reviews > at(`id="project-built"`), `${p.slug}: reviews early`)
+        assert(reviews < at("data-case-built"), `${p.slug}: reviews too late`)
+      }
+    }
+  },
+)
+
+siteTest(
+  "the closing band puts the project's own review, or one promise, above Book, and its brief link names the service",
+  async (site) => {
+    for (const p of clients) {
+      const html = await site.html(`/work/${p.slug}`)
+      const band = region(html, "data-closing-band", "section")
+      const book = band.indexOf("data-primary-book")
+      const quote = band.indexOf("data-pull-quote")
+      const review = projectTestimonials(p.slug!)[0]
+      if (review) {
+        assert(quote > 0 && quote < book, `${p.slug}: no review above Book`)
+        assert(visibleText(band).includes(review.excerpt), p.slug)
+      } else {
+        assertEquals(quote, -1, `${p.slug}: a review without one`)
+        assertEquals(count(band, /<li\b/), 1, `${p.slug}: not one promise`)
+      }
+      const brief = p.catalogSlug
+        ? `href="/book?service=${p.catalogSlug}#brief"`
+        : `href="/book#brief"`
+      assert(band.includes(brief), `${p.slug}: no ${brief}`)
     }
   },
 )
@@ -184,7 +297,7 @@ siteTest(
 )
 
 siteTest(
-  "a project page's meta description is one line of at most 160 characters",
+  "a project page's meta description leads with the outcome, is one line of at most 155 characters, and is never cut",
   async (site) => {
     for (const p of clients.filter((x) => x.slug)) {
       const raw = metaDescription(await site.html(`/work/${p.slug}`))
@@ -192,15 +305,18 @@ siteTest(
       const description = visibleText(raw)
       assert(description.length > 0, `${p.slug}: empty description`)
       assert(
-        description.length <= 160,
+        description.length <= CASE_DESCRIPTION_MAX,
         `${p.slug}: ${description.length} characters`,
       )
+      assertEquals(description, caseDescription(p), p.slug)
+      assert(!description.includes("…"), `${p.slug}: cut`)
+      if (p.outcome) assert(description.startsWith(p.outcome), p.slug)
     }
   },
 )
 
 siteTest(
-  "a project page's JSON-LD has temporalCoverage and isPartOf, and no review markup",
+  "a project page's JSON-LD has temporalCoverage, isPartOf and the kind line, and no review markup",
   async (site) => {
     const expected: Record<string, string> = {
       smartlite: "2024/..",
@@ -222,6 +338,8 @@ siteTest(
       })
       assertEquals(node.creator, { "@id": "https://antonshubin.com/#person" })
       assert(typeof node.abstract === "string" && node.abstract.length > 0)
+      assertEquals(node.alternativeHeadline, p.kind, p.slug)
+      assertEquals(node.alternateName, p.alternateName, p.slug)
       assert(!/"Review"|"AggregateRating"|aggregateRating/.test(html), p.slug)
       if (p.screenshotURLs?.length) {
         assert(
@@ -236,14 +354,15 @@ siteTest(
 )
 
 siteTest(
-  "only the hero screenshot loads eagerly with high priority",
+  "only the hero, the first screenshot, loads with high priority, and it is not lazy",
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
       assertEquals(count(html, /fetchpriority="high"/), 1, p.slug)
       const tag = html.match(/<img\b[^>]*fetchpriority="high"[^>]*>/)![0]
-      assert(tag.includes(`/${p.slug}/${p.screenshotURLs![0]}`), tag)
-      assert(/loading="eager"/.test(tag), `${p.slug}: hero is not eager`)
+      // Fresh may append a cache key (`?__frsh_c=`) to the path.
+      assert(tag.includes(`src="${heroShot(p)!.src}`), tag)
+      assert(!/loading="lazy"/.test(tag), `${p.slug}: hero is lazy`)
       const images = count(
         html,
         /<img\b[^>]*src="\/img\/projects\/[^"]+\/(?!logo)/,
@@ -252,6 +371,8 @@ siteTest(
         html,
         /<img\b[^>]*src="\/img\/projects\/[^"]+\/(?!logo)[^"]*"[^>]*loading="lazy"/,
       )
+      // The strip is `lazy` (preact-ui 10.3.0), so no screenshot but the
+      // hero competes for bandwidth.
       assertEquals(
         lazy,
         images - 1,
@@ -262,7 +383,29 @@ siteTest(
 )
 
 siteTest(
-  "More work shows three other client projects with their periods",
+  "Sogroya's four steps are a walkthrough whose every step text is in the server HTML",
+  async (site) => {
+    const html = await site.html("/work/sogroya")
+    const tabs = [...html.matchAll(/role="tab"[^>]*>([\s\S]*?)<\/button>/g)]
+      .map((m) => visibleText(m[1]))
+    assertEquals(tabs, ["1 Home", "2 Consent", "3 Schedule", "4 Download"])
+    const text = visibleText(html)
+    for (
+      const line of [
+        "Five languages: English, French, German, Portuguese and Japanese.",
+        "Privacy consent.",
+        "Dose, day and time selection.",
+        "In-browser ICS generation for mobile and desktop calendars.",
+      ]
+    ) {
+      assert(text.includes(line), line)
+    }
+    assert(!html.includes("data-gallery-strip"), "a second gallery")
+  },
+)
+
+siteTest(
+  "More client work shows three other client projects with their periods",
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
@@ -330,5 +473,22 @@ siteTest(
     const text = visibleText(await site.html("/work/code-review"))
     assert(!text.includes("Callback hell"), "the joke is back")
     assert(text.includes("deeply nested callbacks"), "the rewrite is missing")
+  },
+)
+
+siteTest(
+  "llms-full.txt names every client project by its headline, or by its name alone when its line already says the kind's figure",
+  async (site) => {
+    const text = await site.html("/llms-full.txt")
+    for (const p of clients) {
+      const line = text.split("\n").find((l) =>
+        l.startsWith("- **") && l.includes(`/work/${p.slug})`)
+      )
+      assert(line, `${p.slug}: no line`)
+      const headline = line.includes(`**${projectHeadline(p)}** (`)
+      const nameOnly = line.includes(`**${p.title}** (`) &&
+        kindRepeatsFigure(p, line)
+      assert(headline || nameOnly, `${p.slug}: no headline in ${line}`)
+    }
   },
 )

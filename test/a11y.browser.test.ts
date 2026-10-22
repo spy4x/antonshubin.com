@@ -18,21 +18,22 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import axeCore from "axe-core"
 import type { Browser, Locator, Page } from "playwright"
 import { startSite } from "./harness.ts"
-import { launchChromium, newPage, WAIT_MS } from "./browser.ts"
+import {
+  launchChromium,
+  newPage,
+  recordUmami,
+  trackedCalls,
+  WAIT_MS,
+} from "./browser.ts"
 import { tools } from "../lib/tools.ts"
+import { projects } from "../lib/data.ts"
 
 const MOBILE_VIEWPORT = { width: 390, height: 844 }
 const DESKTOP_VIEWPORT = { width: 1440, height: 900 }
 
 /** The six project pages #246 was designed and reviewed against. */
-const SAMPLE_PROJECTS = [
-  "smartlite",
-  "foodrazor",
-  "corecircle",
-  "roley",
-  "microwork",
-  "code-review",
-]
+/** Every client project page: each is on the case frame (#523). */
+const CASE_PAGES = projects.freelance.map((p) => p.slug!)
 
 /** Rule ids and offending markup of every axe-core WCAG 2 A/AA violation on the loaded page. */
 async function axeViolations(page: Page): Promise<string[]> {
@@ -67,11 +68,12 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
         waitUntil: "networkidle",
       })
 
+      // The hero shows screenshot 1; the strip starts at 2 (#523).
       const firstThumb = page.locator(
-        'button:has(img[alt="Screenshot 1 of 7"])',
+        'button:has(img[alt="Screenshot 2 of 7"])',
       )
       const secondThumb = page.locator(
-        'button:has(img[alt="Screenshot 2 of 7"])',
+        'button:has(img[alt="Screenshot 3 of 7"])',
       )
 
       // Open, check the dialog's accessible name, and that Close, Previous
@@ -79,7 +81,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
       // icon inside them).
       await firstThumb.click()
       const dialog = page.getByRole("dialog", {
-        name: "Screenshot 1 of 7",
+        name: "Screenshot 2 of 7",
       })
       await dialog.waitFor({ state: "visible" })
 
@@ -94,7 +96,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
 
       // Next moves to the next image and renames the dialog.
       await nextButton.click()
-      await page.getByRole("dialog", { name: "Screenshot 2 of 7" })
+      await page.getByRole("dialog", { name: "Screenshot 3 of 7" })
         .waitFor({ state: "visible" })
 
       // Escape closes the dialog and returns focus to the thumbnail that
@@ -110,7 +112,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
       // Close button does the same, from a different trigger.
       await secondThumb.click()
       const dialog2 = page.getByRole("dialog", {
-        name: "Screenshot 2 of 7",
+        name: "Screenshot 3 of 7",
       })
       await dialog2.waitFor({ state: "visible" })
       await dialog2.getByRole("button", { name: "Close" }).click()
@@ -139,7 +141,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
         waitUntil: "networkidle",
       })
       const counter = page.locator("[data-gallery-counter]")
-      assertEquals((await counter.innerText()).trim(), "1 / 12")
+      assertEquals((await counter.innerText()).trim(), "2 / 12")
       const next = page.getByRole("button", { name: "Next screenshot" })
       const prev = page.getByRole("button", { name: "Previous screenshot" })
       await next.waitFor({ state: "visible" })
@@ -148,7 +150,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
       await next.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
-          ?.trim() === "2 / 12"
+          ?.trim() === "3 / 12"
       )
       const scrolled = await page.locator("[data-gallery-strip]").evaluate(
         (el) => el.scrollLeft,
@@ -158,7 +160,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
       await prev.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
-          ?.trim() === "1 / 12"
+          ?.trim() === "2 / 12"
       )
     } finally {
       await page.close()
@@ -215,13 +217,14 @@ Deno.test("a portrait gallery's Next walks to the last screenshot and Previous w
       await next.waitFor({ state: "visible" })
       assert(await prev.isDisabled(), "Previous is enabled at the start")
 
-      const forward = await walk(page, next, 9)
-      assertEquals(forward[0], "1 / 9")
+      const forward = await walk(page, next, 8)
+      // The hero shows screenshot 1; the strip starts at 2 (#523).
+      assertEquals(forward[0], "2 / 9")
       assertEquals(forward[forward.length - 1], "9 / 9", forward.join(", "))
       assert(await next.isDisabled(), "Next is still enabled at the end")
 
-      const back = await walk(page, prev, 9)
-      assertEquals(back[back.length - 1], "1 / 9", back.join(", "))
+      const back = await walk(page, prev, 8)
+      assertEquals(back[back.length - 1], "2 / 9", back.join(", "))
       assert(await prev.isDisabled(), "Previous is still enabled at the start")
     } finally {
       await page.close()
@@ -263,7 +266,7 @@ Deno.test("a gallery that fits without scrolling offers no Next or Previous", as
   }
 })
 
-Deno.test("the six sample project pages have no horizontal scroll and no axe violations at 390 and 1440px", async () => {
+Deno.test("every client project page has no horizontal scroll and no axe violations at 390 and 1440px", async () => {
   const previous = Deno.env.get("SCHEDULE_URL")
   // The Book buttons render only with a booking URL; RFC 2606 host.
   Deno.env.set("SCHEDULE_URL", "https://meet.example.com/book")
@@ -274,7 +277,7 @@ Deno.test("the six sample project pages have no horizontal scroll and no axe vio
     for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
       const page: Page = await newPage(browser, { viewport })
       try {
-        for (const slug of SAMPLE_PROJECTS) {
+        for (const slug of CASE_PAGES) {
           const where = `/work/${slug} at ${viewport.width}px`
           await page.goto(`${site.origin}/work/${slug}`, {
             waitUntil: "networkidle",
@@ -1024,6 +1027,54 @@ Deno.test("/infrastructure map lanes stay inside the content column and labels b
         assert(
           scrollWidth <= width,
           `/infrastructure scrolls sideways at ${width}px`,
+        )
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("Sogroya's four steps move with the arrow keys, Home and End, and send case-try once per step", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of [MOBILE_VIEWPORT, DESKTOP_VIEWPORT]) {
+      const page: Page = await newPage(browser, { viewport })
+      try {
+        await recordUmami(page)
+        await page.goto(`${site.origin}/work/sogroya`, {
+          waitUntil: "networkidle",
+        })
+        const tabs = page.getByRole("tablist", { name: "The four steps" })
+          .getByRole("tab")
+        const selected = () =>
+          page.getByRole("tab", { selected: true }).innerText()
+        await tabs.first().focus()
+        await page.keyboard.press("ArrowRight")
+        assert((await selected()).includes("Consent"), await selected())
+        assert(await isFocused(tabs.nth(1)), "focus did not follow")
+        await page.keyboard.press("End")
+        assert((await selected()).includes("Download"), await selected())
+        await page.keyboard.press("Home")
+        assert((await selected()).includes("Home"), await selected())
+        await page.keyboard.press("ArrowRight")
+        await page.locator('img[data-screen-tour-image="sogroya-consent"]')
+          .waitFor({ state: "visible" })
+        const tries = (await trackedCalls(page)).filter(([name]) =>
+          name === "case-try"
+        )
+        assertEquals(
+          tries,
+          ["consent", "download", "home"].map((step) => [
+            "case-try",
+            { item: "sogroya", part: "tour", step: `sogroya-${step}` },
+          ]),
+          `${viewport.width}px`,
         )
       } finally {
         await page.close()

@@ -186,6 +186,7 @@ Deno.test("REPORTS holds the five goals and a funnel for each outcome, with uniq
   assertEquals(funnels, [
     ["/*", "/book", "call-booked"],
     ["/book", "call-booked"],
+    ["/work/*", "/book", "call-booked"],
     ["/*", "brief-sent"],
   ])
 })

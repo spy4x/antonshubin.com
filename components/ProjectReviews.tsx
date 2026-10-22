@@ -9,7 +9,8 @@ import { ReviewSource } from "./ReviewSource.tsx"
  * project's one client, so when they also share a source link the
  * attribution ("<client> reviewed on Upwork") is printed once above the group
  * and each card carries only its rating. The period lives in the fact card,
- * so it is not repeated under each review.
+ * so it is not repeated under each review. The heading names the client
+ * ("What Lila King said", #523).
  */
 export function ProjectReviews(
   { project, reviews }: { project: Project; reviews: Testimonial[] },
@@ -19,7 +20,9 @@ export function ProjectReviews(
   return (
     <section data-project-reviews aria-labelledby="project-reviews">
       <h2 id="project-reviews" class="text-2xl text-parchment mb-2">
-        Client reviews
+        {project.madeForName
+          ? `What ${project.madeForName} said`
+          : "What the client said"}
       </h2>
       {once && (
         <p class="mb-4 text-sm text-graphite">

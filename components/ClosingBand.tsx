@@ -21,8 +21,9 @@ export const DEFAULT_BAND_PROMISES = ["refund", "first-milestone"]
  * What a page puts in its closing band. Every slot is optional and defaults
  * to what the project page and `/work` show.
  *
- * Who uses which slot today: the project page passes `catalogLink` (its
- * "Similar work today") and How I work in `links`; `/work` passes a
+ * Who uses which slot today: the case page passes a heading, its review as
+ * `children` (or one promise), `catalogLink` (its "Similar work today") and
+ * the brief and How I work in `links`; `/work` passes a
  * `/catalog` link and How I work plus Infrastructure in `links`. `children`
  * is for a page that needs its own block inside the band (the home page's
  * lead form, the tools page's two halves, the blog's author box), and

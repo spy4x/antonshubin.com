@@ -37,7 +37,7 @@ siteTest(
       const text = visibleText(html)
       const period = formatPeriod(project.period!)
       assert(
-        /data-project-period/.test(html) && text.includes(`Period ${period}`),
+        /data-project-period/.test(html) && text.includes(`When ${period}`),
         `/work/${project.slug} does not show its period ${period}`,
       )
       const reviews = projectTestimonials(project.slug!)
