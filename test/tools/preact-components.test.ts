@@ -111,7 +111,10 @@ Deno.test("Show the code is a details element that counts tool-try with part cod
   assert(summary.includes(`data-umami-event-part="code"`), summary)
   assert(summary.includes(`data-umami-event-item="${SLUG}"`), summary)
   const source = await Deno.readTextFile(
-    new URL("../../islands/PaletteDemo.tsx", import.meta.url),
+    new URL(
+      "../../components/tools/preact-components/PaletteDemoLive.tsx",
+      import.meta.url,
+    ),
   )
   const lines = source.split("\n")
   const from = lines.findIndex((l) => l.includes("palette:start"))

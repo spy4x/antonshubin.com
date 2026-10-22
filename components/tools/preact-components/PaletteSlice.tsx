@@ -5,18 +5,22 @@ import PaletteDemo from "../../../islands/PaletteDemo.tsx"
 import { FACT_LINK } from "../../FactCard.tsx"
 import { eventAttrs } from "../../../lib/analytics.ts"
 import type { Tool } from "../../../lib/tools.ts"
+import { PaletteDemoLive } from "./PaletteDemoLive.tsx"
 import { PREVIEW_THEME_NAME } from "./palette.ts"
 import { PALETTE_COMPONENTS } from "./palette-index.ts"
 
 const ITEM = "preact-components"
 
 /**
- * The library's preview palettes, the stage's 150 ms fade, and both instant
- * under reduced motion.
+ * The library's preview palettes, the stage's 150 ms fade, the keys line's
+ * ⌘ once the demo knows it runs on Apple, and no motion under reduced motion.
  */
 const PREVIEW_CSS = `${THEME_PREVIEW_CSS}
 @keyframes palette-stage-in { from { opacity: 0; } }
 .palette-stage-in { animation: palette-stage-in 150ms ease-out; }
+[data-keys=cmd] { display: none; }
+[data-preview-frame]:has([data-apple=true]) [data-keys=cmd] { display: inline; }
+[data-preview-frame]:has([data-apple=true]) [data-keys=ctrl] { display: none; }
 @media (prefers-reduced-motion: reduce) {
   [data-preview-frame] * { transition: none; }
   .palette-stage-in { animation: none; }
@@ -24,7 +28,7 @@ const PREVIEW_CSS = `${THEME_PREVIEW_CSS}
 
 /**
  * The island's `CommandPalette` call, as "Show the code" shows it: the
- * lines between `palette:start` and `palette:end` in islands/PaletteDemo.tsx,
+ * lines between `palette:start` and `palette:end` in PaletteDemoLive.tsx,
  * which test/tools/preact-components.test.ts holds equal.
  */
 export const PALETTE_SNIPPET = `<CommandPalette<Row>
@@ -54,14 +58,14 @@ export const PALETTE_SNIPPET = `<CommandPalette<Row>
   class="h-12! text-base!"
 />`
 
-/** The keys line, in the library's `Kbd`: Ctrl K, or ⌘K once the island knows it runs on Apple. */
+/** The keys line, in the library's `Kbd`: Ctrl K, or ⌘K once the demo knows it runs on Apple. */
 function KeysLine() {
   return (
     <>
-      <span class="group-data-[apple=true]/demo:hidden">
+      <span data-keys="ctrl">
         <Kbd keys="ctrl+k" />
       </span>
-      <span class="hidden group-data-[apple=true]/demo:inline">
+      <span data-keys="cmd">
         <Kbd keys="mod+k" apple />
       </span>{" "}
       or <Kbd keys="/" /> opens it. <Kbd keys="arrowup" />{" "}
@@ -74,12 +78,18 @@ function KeysLine() {
 /**
  * "Search the library from the keyboard" (#522): the library's
  * `CommandPalette`, `Toastr` and `ThemePreview` running on this page, the
- * palette over the library's own components (islands/PaletteDemo.tsx), then
+ * palette over the library's own components (PaletteDemoLive.tsx, loaded by
+ * islands/PaletteDemo.tsx), then
  * the demo's code in a `<details>` and the link to the guide.
  */
 export function PaletteSlice({ tool }: { tool: Tool }) {
   const { live, registry } = tool
   const guideHref = live?.href ?? ""
+  const demo = {
+    count: PALETTE_COMPONENTS.length,
+    guideHref,
+    install: registry?.install ?? "",
+  }
   return (
     <section aria-labelledby="palette-demo" data-palette-slice>
       <h2 id="palette-demo" class="text-2xl sm:text-3xl text-parchment">
@@ -107,11 +117,15 @@ export function PaletteSlice({ tool }: { tool: Tool }) {
         }}
       >
         <PaletteDemo
-          count={PALETTE_COMPONENTS.length}
-          guideHref={guideHref}
-          install={registry?.install ?? ""}
-          keys={<KeysLine />}
+          {...demo}
+          ssr={<PaletteDemoLive {...demo} />}
         />
+        <p
+          data-palette-keys
+          class="mt-4 text-sm text-muted pointer-coarse:hidden"
+        >
+          <KeysLine />
+        </p>
       </ThemePreview>
       <noscript>
         <p data-palette-noscript class="mt-4 text-parchment">
