@@ -90,7 +90,7 @@ Constraints every review and spec keeps:
 ```bash
 deno task check                 # fmt --check + lint + type check + test + test:browser
 deno task test                  # build, then deno test (see docs/testing.md)
-deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow, safe-area and tool-frame tests; needs a built site and Chromium
+deno task test:browser          # Playwright lead-form, a11y, contrast, CSP, retired-service-worker, visual-system, notes, meet-embed, blog-overflow, safe-area, tool-frame and post-components tests; needs a built site and Chromium
 deno task dev                   # dev server (Vite, HMR)
 deno task build                 # production build (Vite)
 deno task start                 # run the production server

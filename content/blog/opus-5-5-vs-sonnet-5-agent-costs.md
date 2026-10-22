@@ -68,7 +68,11 @@ implementers, cached reads were about three quarters of the bill (the median
 lane), so the same call costs only about 25% more on Opus 5.5, not twice as
 much.
 
-![The same agent call priced on each model. Cached reads, three quarters of Sonnet's cost, are the same price on both, so Opus 5.5 costs 1.25 times as much per call, not 2 times](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/per-call-price.svg)
+Priced on each model, the same agent call looks like this: cached reads, three
+quarters of Sonnet's cost, are the same price on both, so Opus 5.5 costs 1.25
+times as much per call, not 2 times.
+
+<CachedShareSlider />
 
 ## Implementers: fewer steps beat a cheaper token
 

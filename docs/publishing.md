@@ -278,7 +278,10 @@ renders the component in a box whose `id` is the entry's anchor, so
 schema, a tag that is not alone on its line or an anchor used twice on the page
 fails the render, and `lib/post-components.test.ts` renders every post in
 `content/blog/`, so `deno task check` fails naming the post, the tag and the
-reason. A tag inside a code block is code and stays as written.
+reason. A tag inside a code block is code and stays as written. `deno fmt` wraps
+a tag longer than 80 columns onto several lines, which then fails the render, so
+put `<!-- deno-fmt-ignore -->` on the line above a long tag (the Trail-code
+post's `RunsCalculator` does).
 
 **Adding one.** Write the component in `islands/` (or `components/` when it
 needs no JavaScript), then add an entry to `POST_COMPONENTS` in
@@ -292,6 +295,15 @@ needs no JavaScript), then add an entry to `POST_COMPONENTS` in
   body, from `lib/markdown.ts`'s `toDevToMarkdown(body, postUrl)`, puts it in
   the tag's place and adds "Try it on antonshubin.com" with the tagged link to
   the anchor.
+
+Registered today: `CachedShareSlider` (the Opus 5.5 post), `FrameworkChecklist`
+(the cost laboratory post), `RunsCalculator` and `TaskCostChart` (the Trail-code
+post). Each sits in the library's `Explorable` frame. `TaskCostChart` is a
+server component with no island; it reads the post's dated data file,
+`content/blog/data/<slug>.json`, through `lib/task-cost.ts`, which also writes
+its summary sentence and its Dev.to table, so no number in the chart is typed by
+hand. The arithmetic of the other three lives in `lib/post-math.ts` and
+`lib/framework-checklist.ts`, next to their fallbacks.
 
 On the reader's first input the component calls
 `trackPostTry(post, "<TagName>")` from `lib/analytics.ts`, which sends one

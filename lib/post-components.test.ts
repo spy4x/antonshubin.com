@@ -1,6 +1,7 @@
 // The embed mechanism for interactive components in posts (#537). The
-// registry ships empty in this round, so every test registers its own
-// fixture component instead of relying on a real one.
+// mechanism's tests register their own fixture component, so they do not
+// depend on what the real registry holds; the tests at the end check the
+// real components in the real posts.
 import {
   assert,
   assertEquals,
@@ -192,12 +193,77 @@ Deno.test("toDevToMarkdown swaps each tag for its fallback and a link to its anc
   )
 })
 
+/** Posts that embed a component, and the tags each one uses. */
+const POSTS_WITH_COMPONENTS: Record<string, string[]> = {
+  "opus-5-5-vs-sonnet-5-agent-costs": ["CachedShareSlider"],
+  "cost-optimization-laboratory": ["FrameworkChecklist"],
+  "trail-code-claude-code-test": [
+    "TaskCostChart",
+    "TaskCostChart",
+    "RunsCalculator",
+  ],
+}
+
 Deno.test("toDevToMarkdown leaves a post without components byte for byte", async () => {
+  let checked = 0
   for await (const file of Deno.readDir("content/blog")) {
     if (!file.name.endsWith(".md")) continue
+    const slug = file.name.slice(0, -3)
+    if (Object.hasOwn(POSTS_WITH_COMPONENTS, slug)) continue
     const body = postBody(await Deno.readTextFile(`content/blog/${file.name}`))
-    const url = `https://antonshubin.com/blog/${file.name.slice(0, -3)}`
+    const url = `https://antonshubin.com/blog/${slug}`
     assertEquals(toDevToMarkdown(body, url), body, file.name)
+    checked++
+  }
+  assert(checked > 10, `only ${checked} posts checked`)
+})
+
+Deno.test("each post with components embeds exactly the components listed for it", async () => {
+  for await (const file of Deno.readDir("content/blog")) {
+    if (!file.name.endsWith(".md")) continue
+    const slug = file.name.slice(0, -3)
+    const body = postBody(await Deno.readTextFile(`content/blog/${file.name}`))
+    const { segments } = await renderBlogPost(body, { slug })
+    assertEquals(
+      segments.flatMap((s) => s.kind === "component" ? [s.tag] : []),
+      POSTS_WITH_COMPONENTS[slug] ?? [],
+      slug,
+    )
+  }
+})
+
+Deno.test("the Dev.to body of each post with components has its fallback and a Try it link instead of every tag", async () => {
+  const expected: Record<string, string[]> = {
+    "opus-5-5-vs-sonnet-5-agent-costs": [
+      "| 75% | 1.25× |",
+      "#per-call-price>",
+    ],
+    "cost-optimization-laboratory": [
+      "as a checklist you can tick",
+      "#decision-framework>",
+    ],
+    "trail-code-claude-code-test": [
+      "| Cache static assets | $1.92 | $2.42 | +26% | 0 |",
+      "#cost-pull>",
+      "| Connection pooling | $3.63 | $2.64 | −27.3% | 0 |",
+      "#cost-push>",
+      "| 12% | 48 | 14 | 5 | 3 |",
+      "#how-many-tasks>",
+    ],
+  }
+  for (const [slug, parts] of Object.entries(expected)) {
+    const body = postBody(await Deno.readTextFile(`content/blog/${slug}.md`))
+    const md = toDevToMarkdown(body, `https://antonshubin.com/blog/${slug}`)
+    for (const part of parts) assertStringIncludes(md, part, slug)
+    const tags = POSTS_WITH_COMPONENTS[slug]
+    for (const tag of tags) {
+      assert(!md.includes(`<${tag}`), `${slug} still has <${tag}`)
+    }
+    assertEquals(
+      md.split("Try it on antonshubin.com: ").length - 1,
+      tags.length,
+      slug,
+    )
   }
 })
 
