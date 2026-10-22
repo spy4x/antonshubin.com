@@ -101,3 +101,21 @@ pageTest(
     assertEquals(node.sameAs, ["https://foodrazor.com"])
   },
 )
+
+pageTest(
+  "the walkthrough's captions number its own steps, not all twelve screenshots (#562)",
+  (html) => {
+    const tour = html.slice(html.indexOf('id="fr-tour-heading"'))
+    const captions = [...tour.matchAll(/Screenshot (\d+) of (\d+)/g)]
+      .map((m) => `${m[1]} of ${m[2]}`)
+    // The phone tour has three steps; the desktop one, in the island's
+    // props, two.
+    assertEquals([...new Set(captions)], [
+      "1 of 3",
+      "2 of 3",
+      "3 of 3",
+      "1 of 2",
+      "2 of 2",
+    ])
+  },
+)
