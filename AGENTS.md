@@ -480,12 +480,20 @@ competes with the hero; the counter numbers them among all the screenshots),
 then "What I built", then the video; the 2014–2018 projects put the reviews
 between them (`reviewsFirst()`). `/work/sogroya` shows its four steps as the
 library's `ScreenTour` (`islands/CaseScreenTour.tsx`, the hero, sends
-`case-try`) and "What I built". The `<title>`, meta description, OG card and
-llms lines come from `lib/case-page.ts` (docs/seo-ai-crawlers.md §7). The
-strip's and the tour's classes are in `assets/styles.css`'s `@source inline`
-lines, and `test/library-classes.test.tsx` renders them. A margin note inside
-the narrow fact card uses `WithNote`'s `note-stack` class.
-`test/work-page.test.ts` checks the built pages.
+`case-try`) and "What I built". `/work/truth-or-dare` shows "One backend for
+every app", an architecture map in server HTML (`components/DareChatMap.tsx`, no
+island): a `RadioChips` pick lights the boxes and arrows of a flow through
+`:has()` rules, and every label, verb and sentence is a phrase of the
+description (`lib/darechat-map.ts`, checked by its test). `/work/foodrazor`'s
+hero is the library's `YouTubeVideo` (`islands/CaseYouTube.tsx`) behind a
+self-hosted poster, which loads the `youtube-nocookie.com` player only on press,
+then a Phone/Desktop switch over the walkthrough (`islands/CaseDeviceTour.tsx`,
+`lib/foodrazor-tour.ts`). The `<title>`, meta description, OG card and llms
+lines come from `lib/case-page.ts` (docs/seo-ai-crawlers.md §7). The strip's and
+the tour's classes are in `assets/styles.css`'s `@source inline` lines, and
+`test/library-classes.test.tsx` renders them. A margin note inside the narrow
+fact card uses `WithNote`'s `note-stack` class. `test/work-page.test.ts` checks
+the built pages.
 
 A project logo drawn for a light background (a near-black wordmark, a navy mark)
 gets `logoPlate: true` in `lib/data.ts`: the /work card and the project page
