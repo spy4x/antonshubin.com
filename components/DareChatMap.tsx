@@ -1,5 +1,8 @@
 import { RadioChips } from "@spy4x/preact-ui/radio-chips"
-import { IconExternalLink as ExternalLinkIcon } from "@spy4x/preact-icons"
+import {
+  IconCheck,
+  IconExternalLink as ExternalLinkIcon,
+} from "@spy4x/preact-icons"
 import { NewTabHint } from "./NewTabHint.tsx"
 import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 import {
@@ -36,22 +39,26 @@ const CSS = [
   ]),
 ].join("\n")
 
-/** One box: its name, its note, and "In this flow" while a flow that uses it is picked. */
+/** One box: its name, its note, and a check ("In this flow") while a flow that uses it is picked. */
 function Box({ node }: { node: DareNode }) {
   return (
     <li
       data-dare-node={node.id}
       data-flows={node.flows.join(" ") || undefined}
-      class={`min-w-0 rounded-lg border bg-paper px-3 py-2 ${
+      class={`relative min-w-0 rounded-lg border bg-paper py-2 pl-3 pr-8 ${
         node.elsewhere ? "border-dashed border-rule-strong" : "border-rule"
       }`}
     >
       <p class="font-semibold text-parchment break-words">{node.label}</p>
       {node.note && <p class="text-xs text-graphite">{node.note}</p>}
       {node.flows.length > 0 && (
-        <p data-dare-lit class="mt-1 text-xs font-semibold text-parchment">
-          In this flow
-        </p>
+        <span
+          data-dare-lit
+          class="absolute right-2 top-2 text-parchment"
+        >
+          <IconCheck class="w-4 h-4" />
+          <span class="sr-only">In this flow</span>
+        </span>
       )}
     </li>
   )
@@ -113,7 +120,7 @@ export function DareChatMap({ item }: { item: string }) {
           >
             <h3 class="text-base sm:text-lg text-parchment">{tier.title}</h3>
             {tier.note && <p class="text-sm text-graphite">{tier.note}</p>}
-            <ul class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
               {tier.nodes.map((n) => <Box key={n.id} node={n} />)}
             </ul>
             {i === 0 && (
