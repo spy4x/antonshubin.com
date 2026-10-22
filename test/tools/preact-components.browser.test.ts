@@ -263,7 +263,7 @@ Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, an
     try {
       await recordUmami(page)
       await page.goto(`${site.origin}${PATH}`, { waitUntil: "networkidle" })
-      const trigger = await liveTrigger(page)
+      await liveTrigger(page)
       const dialog = page.locator("dialog[open]")
 
       for (const keys of ["Control+k", "/"]) {
@@ -272,10 +272,18 @@ Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, an
         await dialog.waitFor({ timeout: WAIT_MS })
         await page.keyboard.press("Escape")
         await dialog.waitFor({ state: "detached", timeout: WAIT_MS })
-        assert(
-          await trigger.evaluate((el) => el === document.activeElement),
-          `${keys}: Escape did not put focus back on the field`,
-        )
+        // The dialog's close event, which moves focus, runs after `open` goes.
+        await page.waitForFunction(
+          () =>
+            document.activeElement ===
+              document.querySelector(
+                "[data-palette-demo] [aria-haspopup=dialog]",
+              ),
+          undefined,
+          { timeout: WAIT_MS },
+        ).catch(() => {
+          throw new Error(`${keys}: Escape did not put focus back on the field`)
+        })
       }
 
       const examples: [string, string, string][] = [
