@@ -104,7 +104,7 @@ Deno.test("no palette row's line shows a markdown backtick", () => {
   }
 })
 
-Deno.test("typing a theme command's word puts that command first, ahead of a component whose name starts with it, and moves no component", () => {
+Deno.test("typing a theme command's word puts that command first, ahead of a component whose name only starts with it, never ahead of a name typed in full, and moves no component", () => {
   const theme = (to: string) => ({
     label: `Switch the preview to ${to}`,
     aliases: ["theme", to.toLowerCase(), "тема"],
@@ -120,6 +120,17 @@ Deno.test("typing a theme command's word puts that command first, ahead of a com
       query,
     )
   }
+  // A component's name typed in full stays ahead of a command's alias.
+  const toast = {
+    label: "Show a toast",
+    aliases: ["toastr", "notification"],
+    run: () => {},
+  }
+  assertEquals(
+    commandWordFirst(matchOptions([...rows, toast], "toastr"), "toastr")[0]
+      ?.label,
+    "Toastr",
+  )
   // A component's alias never jumps it ahead: "tab" keeps Table before Tabs.
   assertEquals(
     commandWordFirst(matchOptions(rows, "tab"), "tab").slice(0, 2).map((o) =>
