@@ -1,6 +1,5 @@
 import type { ComponentChildren, ComponentType } from "preact"
 import { useEffect, useRef, useState } from "preact/hooks"
-import "../assets/palette-demo.css"
 import type { PaletteDemoProps } from "../components/tools/preact-components/PaletteDemoLive.tsx"
 
 /**
@@ -23,8 +22,11 @@ export default function PaletteDemo(
     const load = () => {
       if (started) return
       started = true
-      import("../components/tools/preact-components/PaletteDemoLive.tsx")
-        .then((m) => setLive(() => m.PaletteDemoLive))
+      // The demo's stylesheet comes with it, so no other page carries its rules.
+      Promise.all([
+        import("../components/tools/preact-components/PaletteDemoLive.tsx"),
+        import("../assets/palette-demo.css"),
+      ]).then(([m]) => setLive(() => m.PaletteDemoLive))
         // A failed load leaves the disabled demo; the next approach retries.
         .catch(() => started = false)
     }
