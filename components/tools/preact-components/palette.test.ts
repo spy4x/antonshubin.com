@@ -96,3 +96,9 @@ Deno.test("every guide link is the live guide's card for that component", () => 
     assertEquals(guide, cards.get(name), name)
   }
 })
+
+Deno.test("no palette row's line shows a markdown backtick", () => {
+  for (const { name, line } of PALETTE_COMPONENTS) {
+    assert(!line.includes("`"), `${name}: ${line}`)
+  }
+})

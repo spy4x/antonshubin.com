@@ -85,13 +85,6 @@ function loadRows(): Promise<Row[]> {
   })
 }
 
-/** The library's line with its `backticked` names set as code. */
-function withCode(line: string) {
-  return line.split("`").map((part, i) =>
-    i % 2 ? <code key={i} class="font-mono text-sm">{part}</code> : part
-  )
-}
-
 function importLine({ name, from }: PaletteComponent): string {
   return `import { ${name} } from "${from}"`
 }
@@ -378,7 +371,7 @@ export function PaletteDemoLive(
               <h3 class="mt-1 text-xl text-foreground">
                 {shown.component.name}
               </h3>
-              <p class="mt-2">{withCode(shown.component.line)}</p>
+              <p class="mt-2">{shown.component.line}</p>
               <div class="mt-4 flex items-center gap-2 rounded-lg border border-subtle bg-canvas py-1 pl-3 pr-1">
                 <code
                   ref={importCode}
