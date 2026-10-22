@@ -46,7 +46,7 @@ with every event, so no event has a `page` property.
 | `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                                                                                                                                                |
 | `post-read`                          | the end of a post's body has been on screen, and the visitor has been on the page 15 s or more; once per view | `item` (post slug)                                                                                                                                                                                                                                     |
 | `post-try`                           | a reader first uses one of a post's interactive components; once per component per view                       | `item` (post slug), `part` (the component's tag name, `RunsCalculator` …); never a value the reader entered                                                                                                                                            |
-| `case-try`                           | a visitor picks a step of a case page's interaction; once per step per view                                   | `item` (project slug), `part` (the interaction: `tour`, `map`), `step` (the step's id, `sogroya-consent` …)                                                                                                                                            |
+| `case-try`                           | a visitor picks a step of a case page's interaction; once per step per view                                   | `item` (project slug), `part` (the interaction: `tour`, `map`, `device`), `step` (the step's id, `sogroya-consent` …)                                                                                                                                  |
 | `not-found`                          | the not-found page renders                                                                                    | none                                                                                                                                                                                                                                                   |
 
 `place: nav` on `book` (or on `brief` when `SCHEDULE_URL` is unset) is the
@@ -390,6 +390,13 @@ interaction sends `case-try`:
   every app" is picked. The map has no island: the event is the radio's own
   `data-umami-event` attribute, so it counts every pick, not once per step per
   view. `outbound` (`to: darechat.me`, `item`) on "Open the public API docs".
+- `/work/foodrazor`: `demo-play` (`item: foodrazor`, `place: hero`) once per
+  view when the video's play link is pressed (`islands/CaseYouTube.tsx`, sent
+  with `track()`, like a tool clip); `case-try` (`item: foodrazor`,
+  `part: device`, `step` `phone` or `desktop`) when the walkthrough's device
+  switch is picked, and (`part: tour`, `step` such as `foodrazor-phone-orders`)
+  when a step of "From a paper invoice to a price alert" is picked, each once
+  per step per view.
 
 "Funnel: case page → /book → call-booked" (above) reads these pages as one entry
 step.
