@@ -14,16 +14,14 @@ import CaseScreenTour from "../../islands/CaseScreenTour.tsx"
 /** The review that tells the story, word for word. */
 const STORY_REVIEW = "corecircle-1"
 
-/** The labels over the review's first two paragraphs: the problem, then the fix. */
-const STORY_PARTS = ["Before the fix", "After the fix"]
-
-const LABEL = "mb-2 text-sm font-semibold text-graphite"
 const QUOTE = "font-heading text-lg text-parchment leading-snug"
 
 /**
  * "When the app broke for its users" (#523): the client's review as the
- * story, its paragraphs whole and unedited. The first says what was broken,
- * the second what Anton did, side by side from 1024px; the rest closes it.
+ * story, its paragraphs whole, unedited and in order, so the review reads
+ * as one text (no label between its paragraphs). The first says what was
+ * broken, the second what Anton did, side by side from 1024px; the rest
+ * closes it.
  */
 function Story({ project, review }: { project: Project; review: Testimonial }) {
   const [problem, fix, ...rest] = review.quote.split(/\n+/)
@@ -35,12 +33,9 @@ function Story({ project, review }: { project: Project; review: Testimonial }) {
       <figure data-project-reviews class="bg-lamp rounded-xl p-5 sm:p-8">
         <div class="grid gap-8 lg:grid-cols-2">
           {[problem, fix].map((para, i) => (
-            <div key={i}>
-              <p class={LABEL}>{STORY_PARTS[i]}</p>
-              <blockquote cite={review.sourceHref} class={QUOTE}>
-                <p>{para}</p>
-              </blockquote>
-            </div>
+            <blockquote key={i} cite={review.sourceHref} class={QUOTE}>
+              <p>{para}</p>
+            </blockquote>
           ))}
         </div>
         <blockquote
