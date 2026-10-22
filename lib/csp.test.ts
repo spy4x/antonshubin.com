@@ -56,19 +56,19 @@ Deno.test("adds the Umami origin to script-src and connect-src only when given",
   )
 })
 
-Deno.test("frame-src always allows YouTube and adds the booking origin only when SCHEDULE_URL is set", () => {
+Deno.test("frame-src always allows YouTube, its nocookie player included, and adds the booking origin only when SCHEDULE_URL is set", () => {
   const withSchedule = buildCsp({
     scheduleOrigin: "https://meet.antonshubin.com",
   })
   assertEquals(
     directive(withSchedule, "frame-src"),
-    "frame-src https://www.youtube.com https://youtube.com https://meet.antonshubin.com",
+    "frame-src https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://meet.antonshubin.com",
   )
 
   const withoutSchedule = buildCsp({})
   assertEquals(
     directive(withoutSchedule, "frame-src"),
-    "frame-src https://www.youtube.com https://youtube.com",
+    "frame-src https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com",
   )
 })
 

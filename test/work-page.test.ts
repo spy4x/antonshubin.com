@@ -6,6 +6,7 @@
 // catalog link, the meta description, the JSON-LD fields and the one
 // high-priority hero image.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { existsSync } from "jsr:@std/fs@^1.0.0/exists"
 import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, mainContent, visibleText } from "./html.ts"
 import { formatPeriod, projects } from "../lib/data.ts"
@@ -23,6 +24,7 @@ import {
   reviewsFirst,
   upperFirst,
 } from "../lib/case-page.ts"
+import { FOODRAZOR_POSTER } from "../lib/foodrazor-tour.ts"
 
 /** Registers a test that gets a running copy of the built site, served with a booking URL. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -189,7 +191,13 @@ siteTest(
       assertEquals([...order].sort((a, b) => a - b), order, p.slug)
       if (projectTestimonials(p.slug!).length === 0) continue
       const reviews = at("data-project-reviews")
-      if (reviewsFirst(p)) {
+      // A page with its own middle (routes/work/<slug>.tsx) gets the
+      // frame's reviews right after it, whatever its years, unless it
+      // places them itself (`ownReviews`, as CaseFrame does).
+      const route = new URL(`../routes/work/${p.slug}.tsx`, import.meta.url)
+      const frameReviewsAfterMiddle = existsSync(route) &&
+        !Deno.readTextFileSync(route).includes("ownReviews")
+      if (reviewsFirst(p) && !frameReviewsAfterMiddle) {
         assert(reviews < at(`id="project-built"`), `${p.slug}: reviews late`)
       } else {
         assert(reviews > at(`id="project-built"`), `${p.slug}: reviews early`)
@@ -367,7 +375,10 @@ siteTest(
       )![0]
       assertEquals(tag, first, `${p.slug}: the hero is not the first picture`)
       // Fresh may append a cache key (`?__frsh_c=`) to the path.
-      if (p.slug !== "roley") {
+      // FoodRazor's hero is its video's poster, not a screenshot.
+      if (p.slug === "foodrazor") {
+        assert(tag.includes(`src="${FOODRAZOR_POSTER}`), tag)
+      } else if (p.slug !== "roley") {
         assert(tag.includes(`src="${heroShot(p)!.src}`), tag)
       }
       assert(!/loading="lazy"/.test(tag), `${p.slug}: hero is lazy`)
@@ -380,10 +391,12 @@ siteTest(
         /<img\b[^>]*src="\/img\/projects\/[^"]+\/(?!logo)[^"]*"[^>]*loading="lazy"/,
       )
       // The strip is `lazy` (preact-ui 10.3.0), so no screenshot but the
-      // hero competes for bandwidth.
+      // hero competes for bandwidth. FoodRazor's walkthrough, under its
+      // video, renders its first screenshot without `loading`, since
+      // ScreenTour has no lazy option.
       assertEquals(
         lazy,
-        images - 1,
+        images - (p.slug === "foodrazor" ? 2 : 1),
         `${p.slug}: not every other screenshot is lazy`,
       )
     }
