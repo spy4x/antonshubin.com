@@ -353,7 +353,7 @@ siteTest(
 )
 
 siteTest(
-  "only the hero, the first screenshot, loads with high priority, and every screenshot after the strip's first is lazy",
+  "only the hero, the first screenshot, loads with high priority, and it is not lazy",
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
@@ -370,8 +370,10 @@ siteTest(
         html,
         /<img\b[^>]*src="\/img\/projects\/[^"]+\/(?!logo)[^"]*"[^>]*loading="lazy"/,
       )
-      // The library strip sets no `loading` on its first image unless it is
-      // the hero (preact-ui 10.1.0), so that one loads at the default.
+      // This count pins the library's loading, not the site's: the strip sets
+      // no `loading` on its first image unless it is the hero (preact-ui
+      // 10.1.0), so that one loads at the default and competes with the hero.
+      // A library release that lazy-loads it fails this line on purpose.
       const strip = html.includes("data-gallery-strip") ? 1 : 0
       assertEquals(
         lazy,
