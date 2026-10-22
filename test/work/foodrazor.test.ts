@@ -1,5 +1,5 @@
 // /work/foodrazor (#523) on the built site: the real video behind a
-// self-hosted poster as the hero, and "From a paper invoice to a price alert",
+// self-hosted poster as the hero, and "From a paper invoice to a price change",
 // the description's three verbs as a walkthrough, in the server HTML.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "../harness.ts"
@@ -64,7 +64,7 @@ pageTest(
       "2 Automating orders to suppliers",
       "3 Tracking price fluctuations",
     ])
-    assert(visibleText(html).includes("From a paper invoice to a price alert"))
+    assert(visibleText(html).includes("From a paper invoice to a price change"))
     assert(html.includes('src="/img/projects/foodrazor/9.webp'))
     assert(!html.includes('src="/img/projects/foodrazor/3.webp'))
   },

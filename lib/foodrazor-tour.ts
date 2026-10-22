@@ -1,5 +1,5 @@
 /**
- * "From a paper invoice to a price alert" on `/work/foodrazor` (#523): the
+ * "From a paper invoice to a price change" on `/work/foodrazor` (#523): the
  * description's three verbs as steps, each with the real screenshot that
  * shows it on a phone and, where one exists, on a desktop. The tab names are
  * the description's own words (`lib/foodrazor-tour.test.ts`); the files are

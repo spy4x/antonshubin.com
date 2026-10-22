@@ -149,7 +149,7 @@ Deno.test("the device switch shows the desktop walkthrough, loads its screens on
       const phone = page.locator("label:has(#foodrazor-device-phone)")
       await desktop.click()
       const tabs = page.getByRole("tablist", {
-        name: "From a paper invoice to a price alert, desktop",
+        name: "From a paper invoice to a price change, desktop",
       }).getByRole("tab")
       const names = (await tabs.allInnerTexts()).map((t) =>
         t.replace(/\s+/g, " ").trim()

@@ -16,7 +16,7 @@ import CaseDeviceTour from "../../islands/CaseDeviceTour.tsx"
 import CaseYouTube from "../../islands/CaseYouTube.tsx"
 
 const ITEM = "foodrazor"
-const HEADING = "From a paper invoice to a price alert"
+const HEADING = "From a paper invoice to a price change"
 
 /** The line under a device's tour naming the steps it has no screenshot for. */
 function missingOn(device: FoodRazorDevice): string | undefined {
@@ -28,7 +28,7 @@ function missingOn(device: FoodRazorDevice): string | undefined {
 /**
  * `/work/foodrazor` (#523): the case frame with the project's real YouTube
  * video as the hero, behind a self-hosted poster, then "From a paper invoice
- * to a price alert", the description's three verbs as a walkthrough of the
+ * to a price change", the description's three verbs as a walkthrough of the
  * real screenshots with a Phone and Desktop switch, and "What I built".
  */
 export default define.page(function FoodRazorPage(ctx) {
