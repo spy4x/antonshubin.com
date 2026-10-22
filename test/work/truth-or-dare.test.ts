@@ -92,7 +92,7 @@ pageTest(
 )
 
 pageTest(
-  "the map carries no inline <style>, whose element alone slows the page's LCP",
+  "the map carries no inline <style>",
   (html) => {
     const start = html.indexOf("data-dare-map")
     const map = html.slice(start, html.indexOf("</section>", start))
