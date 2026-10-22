@@ -7,14 +7,14 @@ import { AxeBuilder } from "@axe-core/playwright"
 import type { Browser, Page } from "playwright"
 import { startSite } from "../harness.ts"
 import { launchChromium } from "../browser.ts"
-import { flowNodes } from "../../lib/darechat-map.ts"
+import { dareEdges, flowNodes } from "../../lib/darechat-map.ts"
 
 // @axe-core/playwright types its page with its own playwright-core.
 type AxePage = ConstructorParameters<typeof AxeBuilder>[0]["page"]
 
 const PATH = "/work/truth-or-dare"
 
-/** The ids of the boxes drawn lit (the Lamp fill), and the flow sentence shown. */
+/** The ids of the boxes and arrows drawn lit (the Lamp fill), and the flow sentence shown. */
 function litState(page: Page) {
   return page.evaluate(() => {
     const lamp = getComputedStyle(document.documentElement)
@@ -24,14 +24,16 @@ function litState(page: Page) {
     document.body.append(probe)
     const lampRgb = getComputedStyle(probe).backgroundColor
     probe.remove()
-    const lit = [...document.querySelectorAll<HTMLElement>("[data-dare-node]")]
-      .filter((el) => getComputedStyle(el).backgroundColor === lampRgb)
-      .map((el) => el.dataset.dareNode!)
+    const filled = (selector: string) =>
+      [...document.querySelectorAll<HTMLElement>(selector)]
+        .filter((el) => getComputedStyle(el).backgroundColor === lampRgb)
+    const lit = filled("[data-dare-node]").map((el) => el.dataset.dareNode!)
+    const arrows = filled("[data-dare-edge]").map((el) => el.dataset.dareEdge!)
     const shown = [
       ...document.querySelectorAll<HTMLElement>("[data-dare-sentence]"),
     ].filter((el) => getComputedStyle(el).visibility === "visible")
       .map((el) => el.dataset.dareSentence!)
-    return { lit, shown }
+    return { lit, arrows, shown }
   })
 }
 
@@ -72,7 +74,7 @@ Deno.test("/work/truth-or-dare has no axe violations and no sideways scroll at 3
   }
 })
 
-Deno.test("picking a flow from the keyboard lights exactly its boxes and shows its sentence, with JavaScript on and off", async () => {
+Deno.test("picking a flow from the keyboard lights exactly its boxes and arrows and shows its sentence, with JavaScript on and off", async () => {
   const site = await startSite()
   let browser: Browser | undefined
   try {
@@ -87,18 +89,24 @@ Deno.test("picking a flow from the keyboard lights exactly its boxes and shows i
         await page.goto(site.origin + PATH, { waitUntil: "load" })
         const ids = (flow: Parameters<typeof flowNodes>[0]) =>
           flowNodes(flow).map((n) => n.id)
+        const arrows = (flow: Parameters<typeof flowNodes>[0]) =>
+          dareEdges.filter((e) => e.flow === flow).map((e) => e.id)
         const at = `JavaScript ${javaScriptEnabled ? "on" : "off"}`
         assertEquals(
           await litState(page),
-          { lit: ids("requests"), shown: ["requests"] },
+          {
+            lit: ids("requests"),
+            arrows: arrows("requests"),
+            shown: ["requests"],
+          },
           at,
         )
         await page.locator("#dare-flow-requests").focus()
-        for (const flow of ["chat", "image", "push"] as const) {
+        for (const flow of ["chat"] as const) {
           await page.keyboard.press("ArrowRight")
           assertEquals(
             await litState(page),
-            { lit: ids(flow), shown: [flow] },
+            { lit: ids(flow), arrows: arrows(flow), shown: [flow] },
             `${at}, ${flow}`,
           )
         }

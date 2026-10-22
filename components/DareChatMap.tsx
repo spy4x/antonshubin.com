@@ -7,11 +7,11 @@ import { NewTabHint } from "./NewTabHint.tsx"
 import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 import {
   DARECHAT_API_DOCS,
+  dareEdges,
   type DareFlow,
   dareFlows,
   type DareNode,
   dareTiers,
-  flowNodes,
 } from "../lib/darechat-map.ts"
 
 const R = "[data-dare-map]"
@@ -19,24 +19,26 @@ const R = "[data-dare-map]"
 /** The selector that is true while `flow` is the picked chip. */
 const picked = (flow: DareFlow) => `${R}:has(#dare-flow-${flow}:checked)`
 
+/** One selector per flow, joined, so a rule's bytes grow by a selector per flow, not by a rule. */
+const each = (part: (id: DareFlow) => string) =>
+  dareFlows.map(({ id }) => `${picked(id)} ${part(id)}`).join(",")
+
 /**
  * The page's own rules (no island): every flow's sentence and every box's
  * "In this flow" tag stay invisible until their flow's radio is checked,
- * and a lit box gets the Lamp fill and a Parchment edge. `visibility`, not
- * `display`, so the hidden ones keep their space and nothing below moves
- * when the pick changes. One rule per selector, so a
- * browser that rejects one keeps the rest. No quotes and no `>`, so the text
- * needs no escaping.
+ * and a lit box or arrow gets the Lamp fill and a Parchment edge.
+ * `visibility`, not `display`, so the hidden ones keep their space and
+ * nothing below moves when the pick changes. No quotes and no `>`, so the
+ * text needs no escaping.
  */
 const CSS = [
   `${R} [data-dare-sentence],${R} [data-dare-lit]{visibility:hidden}`,
-  ...dareFlows.flatMap(({ id }) => [
-    `${picked(id)} [data-dare-sentence=${id}]{visibility:visible}`,
-    `${picked(id)} [data-flows~=${id}] [data-dare-lit]{visibility:visible}`,
-    `${
-      picked(id)
-    } [data-flows~=${id}]{background:var(--color-lamp);border-color:var(--color-parchment);box-shadow:inset 0 0 0 1px var(--color-parchment)}`,
-  ]),
+  `${each((id) => `[data-dare-sentence=${id}]`)},${
+    each((id) => `[data-flows~=${id}] [data-dare-lit]`)
+  }{visibility:visible}`,
+  `${
+    each((id) => `[data-flows~=${id}]`)
+  }{background:var(--color-lamp);border-color:var(--color-parchment);box-shadow:inset 0 0 0 1px var(--color-parchment)}`,
 ].join("\n")
 
 /** One box: its name, its note, and a check ("In this flow") while a flow that uses it is picked. */
@@ -67,13 +69,12 @@ function Box({ node }: { node: DareNode }) {
 /**
  * DareChat's architecture as server HTML (#523), like the infrastructure
  * map: three rows of boxes, from the apps to the services behind the APIs.
- * A `RadioChips` row picks a flow; the page's `<style>` lights the boxes it
- * uses and shows the description's sentence about it, so it works without
+ * A `RadioChips` row picks a flow; the page's `<style>` lights the boxes
+ * and arrows it uses and shows the description's sentence about it, so it works without
  * JavaScript and ships no island. Every word comes from
  * `lib/darechat-map.ts`.
  */
 export function DareChatMap({ item }: { item: string }) {
-  const [apps, ...rest] = dareTiers
   return (
     <section aria-labelledby="dare-map-heading" data-dare-map>
       <style>{CSS}</style>
@@ -104,15 +105,12 @@ export function DareChatMap({ item }: { item: string }) {
             data-dare-sentence={f.id}
             class="col-start-1 row-start-1"
           >
-            <span class="font-semibold">{f.label}:</span> {f.sentence}.{" "}
-            <span class="text-graphite">
-              Lit: {flowNodes(f.id).map((n) => n.label).join(", ")}.
-            </span>
+            <span class="font-semibold">{f.label}:</span> {f.sentence}.
           </p>
         ))}
       </div>
       <ol class="mt-6 grid gap-3">
-        {[apps, ...rest].map((tier, i) => (
+        {dareTiers.map((tier) => (
           <li
             key={tier.id}
             data-dare-tier={tier.id}
@@ -123,22 +121,23 @@ export function DareChatMap({ item }: { item: string }) {
             <ul class="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
               {tier.nodes.map((n) => <Box key={n.id} node={n} />)}
             </ul>
-            {i === 0 && (
+            {dareEdges.filter((e) => e.after === tier.id).map((e) => (
               <p
-                data-dare-edge="requests"
-                data-flows="requests"
+                key={e.id}
+                data-dare-edge={e.id}
+                data-flows={e.flow}
                 class="mt-3 flex items-center gap-2 rounded-lg border border-transparent px-3 py-1 text-xs font-semibold text-graphite"
               >
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 10 10"
-                  class="w-2.5 h-2.5 fill-rule-strong"
+                  class="w-2.5 h-2.5 shrink-0 fill-rule-strong"
                 >
                   <path d="M0 0h10L5 10z" />
                 </svg>
-                consume the same public REST API
+                {e.verb}
               </p>
-            )}
+            ))}
           </li>
         ))}
       </ol>

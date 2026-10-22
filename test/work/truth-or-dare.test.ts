@@ -3,7 +3,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "../harness.ts"
 import { count, jsonLd, visibleText } from "../html.ts"
-import { dareFlows, dareTiers } from "../../lib/darechat-map.ts"
+import { dareEdges, dareFlows, dareTiers } from "../../lib/darechat-map.ts"
 
 const PATH = "/work/truth-or-dare"
 
@@ -34,7 +34,7 @@ pageTest(
 )
 
 pageTest(
-  "the map's every row, box and flow sentence is in the server HTML",
+  "the map's every row, box, arrow and flow sentence is in the server HTML",
   (html) => {
     const text = visibleText(html)
     assert(text.includes("One backend for every app"))
@@ -44,6 +44,13 @@ pageTest(
         assert(html.includes(`data-dare-node="${node.id}"`), node.id)
         assert(text.includes(node.label), node.label)
       }
+    }
+    for (const edge of dareEdges) {
+      const tag = html.match(
+        new RegExp(`<p\\b[^>]*data-dare-edge="${edge.id}"[^>]*>`),
+      )
+      assert(tag?.[0].includes(`data-flows="${edge.flow}"`), edge.id)
+      assert(text.includes(edge.verb), edge.id)
     }
     for (const flow of dareFlows) {
       assert(text.includes(`${flow.label}: ${flow.sentence}.`), flow.id)

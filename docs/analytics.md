@@ -386,16 +386,16 @@ interaction sends `case-try`:
   `part: tour`, `step` one of `roley-scripts-mobile`, `roley-recorder-mobile`,
   `roley-processing-mobile`, `roley-watch-mobile`).
 - `/work/truth-or-dare`: `case-try` (`item: truth-or-dare`, `part: map`, `step`
-  one of `requests`, `chat`, `image`, `push`) when a flow of "One backend for
-  every app" is picked. The map has no island: the event is the radio's own
-  `data-umami-event` attribute, so it counts every pick, not once per step per
-  view. `outbound` (`to: darechat.me`, `item`) on "Open the public API docs".
+  `requests` or `chat`) when a flow of "One backend for every app" is picked.
+  The map has no island: the event is the radio's own `data-umami-event`
+  attribute, so it counts every pick, not once per step per view. `outbound`
+  (`to: darechat.me`, `item`) on "Open the public API docs".
 - `/work/foodrazor`: `demo-play` (`item: foodrazor`, `place: hero`) once per
   view when the video's play link is pressed (`islands/CaseYouTube.tsx`, sent
   with `track()`, like a tool clip); `case-try` (`item: foodrazor`,
   `part: device`, `step` `phone` or `desktop`) when the walkthrough's device
   switch is picked, and (`part: tour`, `step` such as `foodrazor-phone-orders`)
-  when a step of "From a paper invoice to a price alert" is picked, each once
+  when a step of "From a paper invoice to a price change" is picked, each once
   per step per view.
 
 "Funnel: case page → /book → call-booked" (above) reads these pages as one entry

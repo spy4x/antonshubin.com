@@ -5,8 +5,13 @@
  * fails otherwise), so the map shows nothing the description does not say.
  */
 
-/** A flow a visitor can pick; the boxes it uses light up. */
-export type DareFlow = "requests" | "chat" | "image" | "push"
+/**
+ * A flow a visitor can pick; the boxes and arrows it uses light up. Only
+ * flows whose path the description states: it says which part sends image
+ * uploads to Vision or push notifications to FCM nowhere, so neither is a
+ * flow.
+ */
+export type DareFlow = "requests" | "chat"
 
 /** One box of the map. */
 export interface DareNode {
@@ -88,16 +93,43 @@ export const dareTiers: DareTier[] = [
         id: "firebase",
         label: "Firebase",
         note: "auth + storage + FCM push notifications",
-        flows: ["image", "push"],
+        flows: [],
       },
       {
         id: "vision",
         label: "Google Cloud Vision",
         note: "user-uploaded image moderation",
-        flows: ["image"],
+        flows: [],
       },
       { id: "media", label: "MinIO-compatible media storage", flows: [] },
     ],
+  },
+]
+
+/**
+ * An arrow between two rows of the map, drawn under the row `after`; its
+ * verb is a phrase of the description that links the two boxes.
+ */
+export interface DareEdge {
+  id: string
+  after: string
+  verb: string
+  flow: DareFlow
+}
+
+/** The arrows the description states, each lit with its flow. */
+export const dareEdges: DareEdge[] = [
+  {
+    id: "apps-rest",
+    after: "apps",
+    verb: "consume the same public REST API",
+    flow: "requests",
+  },
+  {
+    id: "socket-redis",
+    after: "backend",
+    verb: "scaled across nodes via the Redis pub/sub adapter",
+    flow: "chat",
   },
 ]
 
@@ -124,16 +156,6 @@ export const dareFlows: DareFlowInfo[] = [
     label: "Chat message",
     sentence:
       "Socket.IO chat scaled across nodes via the Redis pub/sub adapter",
-  },
-  {
-    id: "image",
-    label: "Image upload",
-    sentence: "Google Cloud Vision for user-uploaded image moderation",
-  },
-  {
-    id: "push",
-    label: "Push notification",
-    sentence: "Firebase auth + storage + FCM push notifications",
   },
 ]
 
