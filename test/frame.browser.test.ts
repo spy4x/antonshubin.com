@@ -1,6 +1,7 @@
 // Browser guards for the site's frame (#293): the skip link shows when it is
 // focused, and the frame (footer, back link, 404, /privacy) has no axe
-// violations and no sideways scroll at 390 and 1440px. Needs a built site and
+// violations and no sideways scroll at 390 and 1440px, and no link half under
+// the phone tab bar is too small a tap target (#531). Needs a built site and
 // Chromium; see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import axeCore from "axe-core"
@@ -203,6 +204,59 @@ Deno.test("the back link sits at the same top offset on a tool page as on a case
         }
       } finally {
         await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+const PHONES = [{ width: 390, height: 844 }, { width: 412, height: 915 }]
+/** An iPhone's bottom safe-area inset, as test/safe-area.browser.test.ts emulates it. */
+const INSET_BOTTOM = 34
+
+Deno.test("no link the phone tab bar half covers is too small a tap target on first load, at 390 and 412px, with and without a bottom inset", async () => {
+  // Without a calendar: /book then leads with the brief, which puts its email
+  // link at the bar's edge on a 412×915 screen (#531).
+  const site = await startSite({ env: { SCHEDULE_URL: "" } })
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of PHONES) {
+      for (const inset of [0, INSET_BOTTOM]) {
+        const page: Page = await newPage(browser, { viewport })
+        try {
+          const cdp = await page.context().newCDPSession(page)
+          // Experimental CDP method, missing from Playwright's protocol types.
+          await cdp.send(
+            "Emulation.setSafeAreaInsetsOverride" as never,
+            { insets: { bottom: inset } } as never,
+          )
+          for (const path of ["/", "/book", "/tools", "/about"]) {
+            await page.goto(`${site.origin}${path}`, {
+              waitUntil: "networkidle",
+            })
+            await page.evaluate(axeCore.source)
+            const tooSmall = await page.evaluate(async () => {
+              // deno-lint-ignore no-explicit-any
+              const axe = (globalThis as any).axe
+              const results = await axe.run(document, {
+                runOnly: ["target-size"],
+              })
+              return results.violations.flatMap((
+                v: { nodes: { html: string }[] },
+              ) => v.nodes.map((n) => n.html.slice(0, 120)))
+            }) as string[]
+            assertEquals(
+              tooSmall,
+              [],
+              `${path} at ${viewport.width}×${viewport.height}, ${inset}px inset`,
+            )
+          }
+        } finally {
+          await page.close()
+        }
       }
     }
   } finally {
