@@ -345,7 +345,6 @@ export default function PaletteDemo(
                   <button
                     type="button"
                     data-palette-example={example.part}
-                    aria-label={`Search for ${example.query}, ${example.caption}`}
                     onClick={() => {
                       track("tool-try", {
                         item: ITEM,
@@ -355,6 +354,7 @@ export default function PaletteDemo(
                     }}
                     class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-subtle bg-surface px-3 text-sm text-foreground hover:border-control focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-focus"
                   >
+                    <span class="sr-only">Search for</span>
                     <span class="font-mono">{example.query}</span>
                     <span class="text-muted">{example.caption}</span>
                   </button>

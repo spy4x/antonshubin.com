@@ -83,7 +83,7 @@ Deno.test("the palette section renders the search and its four examples disabled
   )
   for (const { query, caption } of PALETTE_EXAMPLES) {
     assert(
-      fieldset.includes(`aria-label="Search for ${query}, ${caption}"`),
+      visibleText(fieldset).includes(`Search for ${query} ${caption}`),
       `no example ${query}`,
     )
   }
