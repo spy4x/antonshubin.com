@@ -42,7 +42,7 @@ export function clientSummary(p: Project): string {
 }
 
 /** A figure with its noun: "200 lamp poles", "10 countries", "200K+ users". */
-const FIGURE = /\d[\d.,]*[Kk]?\+?\s+\p{L}+(?:\s\p{L}+)?/gu
+export const FIGURE = /\d[\d.,]*[Kk]?\+?\s+\p{L}+(?:\s\p{L}+)?/gu
 
 /**
  * `clientSummary` for the llms files: when the product sentence and the

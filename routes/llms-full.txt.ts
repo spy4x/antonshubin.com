@@ -1,3 +1,4 @@
+import { projectHeadline } from "../lib/case-page.ts"
 import { HOME_INTRO } from "../lib/home.ts"
 import { define } from "../lib/utils.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
@@ -110,7 +111,7 @@ export const handler = define.handlers({
     const clientList = highlightSlugs
       .map((slug) => {
         const p = clientProject(slug)
-        return `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
+        return `- **${projectHeadline(p)}** (${BASE_URL}/work/${p.slug}) — ${
           llmsClientSummary(p)
         }`
       })
@@ -123,7 +124,7 @@ export const handler = define.handlers({
         const company = p.companyOutcome
           ? ` The company's outcome: ${p.companyOutcome.text} (${p.companyOutcome.href}).`
           : ""
-        return `- **${p.title}** (${BASE_URL}/work/${p.slug}) — ${
+        return `- **${projectHeadline(p)}** (${BASE_URL}/work/${p.slug}) — ${
           formatPeriod(p.period!)
         }, ${p.role}. ${firstSentence(p.description)}${company}`
       })

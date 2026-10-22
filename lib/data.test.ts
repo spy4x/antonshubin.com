@@ -85,6 +85,20 @@ Deno.test("every client project has a period", () => {
   }
 })
 
+/** The words of `text`, lower case, split at spaces, hyphens and punctuation (a dot inside "Node.js" stays). */
+function words(text: string): string[] {
+  return text.toLowerCase().split(/[^\p{L}\p{N}.+]+|\.(?!\w)/u).filter(Boolean)
+}
+
+Deno.test("every client project has a kind line made only of words from its description and outcome (#523)", () => {
+  for (const p of projects.freelance) {
+    assert(p.kind, `${p.slug} has no kind`)
+    const source = new Set(words(`${p.description} ${p.outcome ?? ""}`))
+    const added = words(p.kind).filter((w) => !source.has(w))
+    assertEquals(added, [], `${p.slug}: "${p.kind}" adds words`)
+  }
+})
+
 Deno.test("a period renders as one year, a range with an en dash, or a year to now", () => {
   assertEquals(formatPeriod({ from: 2021 }), "2021")
   assertEquals(formatPeriod({ from: 2021, to: 2021 }), "2021")
