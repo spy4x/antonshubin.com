@@ -13,6 +13,13 @@
  */
 import type { ComponentType } from "preact"
 import { type Type, type } from "arktype"
+import CachedShareSlider from "../islands/CachedShareSlider.tsx"
+import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
+import RunsCalculator from "../islands/RunsCalculator.tsx"
+import { TaskCostChart } from "../components/TaskCostChart.tsx"
+import { cachedShareMarkdown, runsMarkdown } from "./post-math.ts"
+import { checklistMarkdown } from "./framework-checklist.ts"
+import { taskCostMarkdown } from "./task-cost.ts"
 
 /** What the post page passes to every component besides its own props. */
 export interface PostComponentContext {
@@ -48,8 +55,47 @@ export function postComponent<P extends object>(
 /** Tag name → entry. A tag a post uses must be listed here. */
 export type PostComponentRegistry = Readonly<Record<string, AnyPostComponent>>
 
+const noProps = type({ "+": "reject" })
+
+const sliderMark = type({
+  "+": "reject",
+  value: "number",
+  label: "string > 0",
+})
+
 /** Every component a post can embed. */
-export const POST_COMPONENTS: PostComponentRegistry = {}
+export const POST_COMPONENTS: PostComponentRegistry = {
+  CachedShareSlider: postComponent({
+    props: noProps,
+    component: CachedShareSlider,
+    anchor: "per-call-price",
+    toMarkdown: () => cachedShareMarkdown(),
+  }),
+  FrameworkChecklist: postComponent({
+    props: noProps,
+    component: FrameworkChecklist,
+    anchor: "decision-framework",
+    toMarkdown: () => checklistMarkdown(),
+  }),
+  RunsCalculator: postComponent({
+    props: type({
+      "+": "reject",
+      noise: "1 <= number.integer <= 30",
+      saving: "1 <= number.integer <= 50",
+      experimentTasks: "number.integer >= 1",
+      "marks?": sliderMark.array().atMostLength(2),
+    }),
+    component: RunsCalculator,
+    anchor: "how-many-tasks",
+    toMarkdown: () => runsMarkdown(),
+  }),
+  TaskCostChart: postComponent({
+    props: type({ "+": "reject", round: "'pull' | 'push'" }),
+    component: TaskCostChart,
+    anchor: (p) => `cost-${p.round}`,
+    toMarkdown: (p) => taskCostMarkdown(p.round),
+  }),
+}
 
 /** One tag in a post, read and checked. */
 export interface PostComponentUse {

@@ -14,7 +14,13 @@ const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`
  * (Typography, Buttons, Forms, ...) when a component that needs it is
  * adopted.
  */
-const PRESET_REGIONS = ["Colour atoms", "Spacing", "Surfaces"]
+const PRESET_REGIONS = [
+  "Colour atoms",
+  "Spacing",
+  "Surfaces",
+  "Forms",
+  "Data display",
+]
 
 /** One `#region` block of the preset's text, or a thrown error naming it. */
 function presetRegion(css: string, name: string): string {
