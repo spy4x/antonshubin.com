@@ -475,8 +475,8 @@ When, Status, Live site, Book, "Similar work today"); "More client work"
 like {name}?", the project's first review or one promise above Book, the catalog
 link, the brief with `?service=` and How I work). Book appears in the card and
 the band only. The default middle is the strip of the other screenshots
-(`islands/ImageGallery.tsx`, every image lazy except the strip's first, which
-the library leaves unset; the counter numbers them among all the screenshots),
+(`islands/ImageGallery.tsx`, every image lazy, the first included, so none
+competes with the hero; the counter numbers them among all the screenshots),
 then "What I built", then the video; the 2014–2018 projects put the reviews
 between them (`reviewsFirst()`). `/work/sogroya` shows its four steps as the
 library's `ScreenTour` (`islands/CaseScreenTour.tsx`, the hero, sends

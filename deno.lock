@@ -46,7 +46,7 @@
     "jsr:@spy4x/server@1.37.0": "1.37.0",
     "jsr:@spy4x/time@1.37.0": "1.37.0",
     "jsr:@spy4x/time@1.88.0": "1.88.0",
-    "jsr:@spy4x/time@^1.37.0": "1.37.0",
+    "jsr:@spy4x/time@^1.37.0": "1.88.0",
     "jsr:@spy4x/time@^1.88.0": "1.88.0",
     "jsr:@spy4x/validation@1.88.0": "1.88.0",
     "jsr:@spy4x/validation@^1.37.0": "1.88.0",
@@ -66,6 +66,7 @@
     "jsr:@std/fmt@^1.0.7": "1.0.10",
     "jsr:@std/fmt@^1.0.8": "1.0.10",
     "jsr:@std/front-matter@^1.0.9": "1.0.9",
+    "jsr:@std/fs@1": "1.0.24",
     "jsr:@std/fs@^1.0.19": "1.0.24",
     "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/html@^1.0.5": "1.0.7",
@@ -470,6 +471,7 @@
     "@std/fs@1.0.24": {
       "integrity": "f3061b45b81673a2bece689da041df32d174be064c89eb6397fb5718d3fb7877",
       "dependencies": [
+        "jsr:@std/internal@^1.0.14",
         "jsr:@std/path@^1.1.5"
       ]
     },
