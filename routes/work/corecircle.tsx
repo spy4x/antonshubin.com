@@ -7,7 +7,10 @@ import { Rating } from "../../components/Rating.tsx"
 import { ReviewSource } from "../../components/ReviewSource.tsx"
 import { findWorkProject } from "../../lib/work.ts"
 import { type Project, projectScreenshots } from "../../lib/data.ts"
-import { type Testimonial, testimonial } from "../../lib/testimonials.ts"
+import {
+  type Testimonial,
+  visibleTestimonials,
+} from "../../lib/testimonials.ts"
 import { webpForPng } from "../../lib/image-path.ts"
 import CaseScreenTour from "../../islands/CaseScreenTour.tsx"
 
@@ -62,6 +65,7 @@ function Story({ project, review }: { project: Project; review: Testimonial }) {
  */
 export default define.page(function CorecirclePage(ctx) {
   const project = findWorkProject("corecircle")
+  const story = visibleTestimonials().find((t) => t.id === STORY_REVIEW)
   if (!project) return <NotFound pathname={ctx.url.pathname} />
   const label = `${project.title} screens`
   const steps = projectScreenshots(project).map((shot, i) => ({
@@ -81,7 +85,8 @@ export default define.page(function CorecirclePage(ctx) {
       hero={null}
       ownReviews
     >
-      <Story project={project} review={testimonial(STORY_REVIEW)} />
+      {/* Only a review with a public source and permission is printed. */}
+      {story && <Story project={project} review={story} />}
       <div class="space-y-8">
         <WhatIBuilt project={project} />
         <div class="mx-auto max-w-72 lg:mx-0 lg:max-w-[36rem]">
