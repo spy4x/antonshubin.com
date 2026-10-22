@@ -39,12 +39,16 @@ export const PALETTE_SNIPPET = `<CommandPalette<Row>
     const rows = await loadRows()
     return query.trim() === ""
       ? [...commands, ...rows.filter((r) => r.group === "Start here")]
-      // Components first, so a tie goes to the component, not a command.
-      : matchOptions(
-        [
-          ...rows.filter((r) => r.group === "Components"),
-          ...commands,
-        ],
+      // Components first, so a tie goes to the component, not a
+      // command, unless the query is one of the command's words.
+      : commandWordFirst(
+        matchOptions(
+          [
+            ...rows.filter((r) => r.group === "Components"),
+            ...commands,
+          ],
+          query,
+        ),
         query,
       )
   }}

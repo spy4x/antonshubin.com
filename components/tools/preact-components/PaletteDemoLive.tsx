@@ -14,6 +14,7 @@ import { Toastr } from "@spy4x/preact-ui/toastr"
 import { track } from "../../../lib/analytics.ts"
 import type { PaletteComponent } from "./palette-index.ts"
 import {
+  commandWordFirst,
   isForgiving,
   matchReason,
   PALETTE_ALIASES,
@@ -83,13 +84,6 @@ function loadRows(): Promise<Row[]> {
     rowsLoading = undefined
     throw error
   })
-}
-
-/** The library's line with its `backticked` names set as code. */
-function withCode(line: string) {
-  return line.split("`").map((part, i) =>
-    i % 2 ? <code key={i} class="font-mono text-sm">{part}</code> : part
-  )
 }
 
 function importLine({ name, from }: PaletteComponent): string {
@@ -316,12 +310,16 @@ export function PaletteDemoLive(
               const rows = await loadRows()
               return query.trim() === ""
                 ? [...commands, ...rows.filter((r) => r.group === "Start here")]
-                // Components first, so a tie goes to the component, not a command.
-                : matchOptions(
-                  [
-                    ...rows.filter((r) => r.group === "Components"),
-                    ...commands,
-                  ],
+                // Components first, so a tie goes to the component, not a
+                // command, unless the query is one of the command's words.
+                : commandWordFirst(
+                  matchOptions(
+                    [
+                      ...rows.filter((r) => r.group === "Components"),
+                      ...commands,
+                    ],
+                    query,
+                  ),
                   query,
                 )
             }}
@@ -378,7 +376,7 @@ export function PaletteDemoLive(
               <h3 class="mt-1 text-xl text-foreground">
                 {shown.component.name}
               </h3>
-              <p class="mt-2">{withCode(shown.component.line)}</p>
+              <p class="mt-2">{shown.component.line}</p>
               <div class="mt-4 flex items-center gap-2 rounded-lg border border-subtle bg-canvas py-1 pl-3 pr-1">
                 <code
                   ref={importCode}

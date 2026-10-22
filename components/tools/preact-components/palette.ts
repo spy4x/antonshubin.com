@@ -79,6 +79,28 @@ export const PALETTE_LABELS = {
   empty: "No component matches. Try “toast”, “date” or “kanban”.",
 }
 
+/**
+ * `ranked` with each command that has the whole query as one of its words
+ * moved up, ahead of everything but a name typed in full: "light" runs
+ * "Switch the preview to Light" instead of picking Lightbox, whose name only
+ * starts with it, while "toastr" still picks Toastr over "Show a toast". The
+ * library's matcher ranks a name's prefix above an exact alias.
+ */
+export function commandWordFirst<
+  T extends { label: string; aliases?: readonly string[]; run?: () => void },
+>(ranked: readonly T[], query: string): T[] {
+  const word = query.trim().toLowerCase()
+  const named = (row: T) => row.label.toLowerCase() === word
+  const command = (row: T) =>
+    !named(row) && row.run !== undefined &&
+    (row.aliases ?? []).includes(word)
+  return [
+    ...ranked.filter(named),
+    ...ranked.filter(command),
+    ...ranked.filter((row) => !named(row) && !command(row)),
+  ]
+}
+
 /** The kinds of match that took more than reading the name as typed. */
 const FORGIVING: readonly CommandPaletteMatchKind[] = [
   "words",

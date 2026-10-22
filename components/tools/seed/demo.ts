@@ -59,11 +59,12 @@ export const ADMIN_VIDEO = {
     { src: "/video/tools/seed/admin-panel.webm", type: "video/webm" },
     { src: "/video/tools/seed/admin-panel.mp4", type: "video/mp4" },
   ],
+  // Seed's own poster for this video: the Dashboard the clip opens on. The
+  // pulled admin-panel-poster-1280.webp is another picture (Seed's Users
+  // still for its /features page), so it is no smaller size of this one.
   poster: {
-    src: "/video/tools/seed/admin-panel-poster-1280.webp",
-    srcset:
-      "/video/tools/seed/admin-panel-poster-1280.webp 1280w, /video/tools/seed/admin-panel-poster-1920.webp 1920w",
-    width: 1280,
-    height: 800,
+    src: "/video/tools/seed/admin-panel-poster-1920.webp",
+    width: 1920,
+    height: 1200,
   },
 }

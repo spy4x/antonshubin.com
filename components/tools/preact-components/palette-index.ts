@@ -7,7 +7,7 @@ export interface PaletteComponent {
   name: string
   /** The import specifier, `@spy4x/preact-ui` and so on. */
   from: string
-  /** The library's one-line summary of it. */
+  /** The library's one-line summary of it, as plain text. */
   line: string
   /** The live guide's card for it, a hash route, when the guide has one. */
   guide?: string
@@ -27,7 +27,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "DonutChart",
     "from": "@spy4x/preact-charts",
-    "line": "Server-rendered donut built from a single CSS `conic-gradient`.",
+    "line": "Server-rendered donut built from a single CSS conic-gradient.",
     "guide": "#/charts/donut-chart",
   },
   {
@@ -47,7 +47,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "KpiGrid",
     "from": "@spy4x/preact-charts",
     "line":
-      "Responsive grid for `Kpi` cards: two columns on a phone, as many as fit on a desktop.",
+      "Responsive grid for Kpi cards: two columns on a phone, as many as fit on a desktop.",
     "guide": "#/charts/kpi-grid",
   },
   {
@@ -67,7 +67,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "CheckboxField",
     "from": "@spy4x/preact-crud",
     "line":
-      "One labelled checkbox, on `ui`'s `Checkbox`: the label is the checkbox's own, after the box.",
+      "One labelled checkbox, on ui's Checkbox: the label is the checkbox's own, after the box.",
     "guide": "#/crud/checkbox-field",
   },
   {
@@ -104,7 +104,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "SelectField",
     "from": "@spy4x/preact-crud",
-    "line": "One labelled select, on `ui`'s `Select`.",
+    "line": "One labelled select, on ui's Select.",
     "guide": "#/crud/select-field",
   },
   {
@@ -129,19 +129,19 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "AccountMenu",
     "from": "@spy4x/preact-system",
     "line":
-      'The account menu: a `Dropdown` whose trigger shows the signed-in person, holding the caller\'s items, then the theme choice, then "Sign out" after a divider.',
+      'The account menu: a Dropdown whose trigger shows the signed-in person, holding the caller\'s items, then the theme choice, then "Sign out" after a divider.',
     "guide": "#/system/account-menu",
   },
   {
     "name": "AccountTag",
     "from": "@spy4x/preact-system",
-    "line": "The neutral role badge `AccountMenuProps.tag` draws.",
+    "line": "The neutral role badge AccountMenuProps.tag draws.",
   },
   {
     "name": "AppShell",
     "from": "@spy4x/preact-system",
     "line":
-      "The frame every app draws: a skip link, the 72 px rail from `md`, the page in one centred column, and on a phone the tab bar and its sheet.",
+      "The frame every app draws: a skip link, the 72 px rail from md, the page in one centred column, and on a phone the tab bar and its sheet.",
     "guide": "#/system/app-shell",
   },
   {
@@ -182,26 +182,26 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Rail",
     "from": "@spy4x/preact-system",
     "line":
-      "The frame: a skip link, the desktop column from `md` up, the page in `<main>`, the phone tab bar below `md`, and the sheet.",
+      "The frame: a skip link, the desktop column from md up, the page in <main>, the phone tab bar below md, and the sheet.",
     "guide": "#/system/rail",
   },
   {
     "name": "RailCell",
     "from": "@spy4x/preact-system",
     "line":
-      "A desktop cell for caller content in `Rail`'s `top` or `bottom` slot, drawn like the rail's own: the control with the rail's tooltip beside it, placed by `Rail` 8 px past the column, shown 300 ms after the pointer rests or at once on keyboard focus, and hidden after Escape, while the control's menu is open (`aria-expanded=\"true\"`) and on a screen with no hover.",
+      "A desktop cell for caller content in Rail's top or bottom slot, drawn like the rail's own: the control with the rail's tooltip beside it, placed by Rail 8 px past the column, shown 300 ms after the pointer rests or at once on keyboard focus, and hidden after Escape, while the control's menu is open (aria-expanded=\"true\") and on a screen with no hover.",
   },
   {
     "name": "RailEntry",
     "from": "@spy4x/preact-system",
     "line":
-      "One rail entry for a caller's own slot content, drawn exactly as `Rail` draws its items: in the column a cell of the given variant (with its tooltip in the icons variant), in the sheet a 44 px row, with the rail's current fill, hover, focus ring and `aria-current`.",
+      "One rail entry for a caller's own slot content, drawn exactly as Rail draws its items: in the column a cell of the given variant (with its tooltip in the icons variant), in the sheet a 44 px row, with the rail's current fill, hover, focus ring and aria-current.",
   },
   {
     "name": "RailShell",
     "from": "@spy4x/preact-system",
     "line":
-      '`<Rail variant="icons">` with `sidebarTop` and `sidebarBottom` as its `top` and `bottom`.',
+      '<Rail variant="icons"> with sidebarTop and sidebarBottom as its top and bottom.',
     "guide": "#/system/rail-shell",
   },
   {
@@ -235,28 +235,28 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Shell",
     "from": "@spy4x/preact-system",
     "line":
-      "The frame for a signed-in app: a header (menu button, brand, status, user menu) that is always in view, a sidebar below it from `lg` up, and the same navigation in a `<details>`-built drawer below `lg` — see `mobile-panel.ts`.",
+      "The frame for a signed-in app: a header (menu button, brand, status, user menu) that is always in view, a sidebar below it from lg up, and the same navigation in a <details>-built drawer below lg — see mobile-panel.ts.",
     "guide": "#/system/shell",
   },
   {
     "name": "SiteFooter",
     "from": "@spy4x/preact-system",
     "line":
-      "A footer for a public site: `brand` on top, then `groups` as named `<nav>` columns with `aside` beside them, then `bottom` under a border.",
+      "A footer for a public site: brand on top, then groups as named <nav> columns with aside beside them, then bottom under a border.",
     "guide": "#/system/site-footer",
   },
   {
     "name": "SiteHeader",
     "from": "@spy4x/preact-system",
     "line":
-      "A top bar for a public site: `brand` on the left; `links` on the right from `lg` up, and in a `<details>`-built disclosure below it; `actions` and the menu button always in view, beside whichever form `links` is currently taking.",
+      "A top bar for a public site: brand on the left; links on the right from lg up, and in a <details>-built disclosure below it; actions and the menu button always in view, beside whichever form links is currently taking.",
     "guide": "#/system/site-header",
   },
   {
     "name": "StateInit",
     "from": "@spy4x/preact-system",
     "line":
-      "Write `data` into the page as JSON, for `readStateInit` to read back on the client.",
+      "Write data into the page as JSON, for readStateInit to read back on the client.",
     "guide": "#/system/state-init",
   },
   {
@@ -284,21 +284,21 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "AvatarGroup",
     "from": "@spy4x/preact-ui",
     "line":
-      "Overlapping avatar stack for a handful of members, with a `+N` chip for the rest.",
+      "Overlapping avatar stack for a handful of members, with a +N chip for the rest.",
     "guide": "#/display/avatar-group",
   },
   {
     "name": "Badge",
     "from": "@spy4x/preact-ui",
     "line":
-      "Small status pill: a text label, or element content such as a `StatusMark`, in a `span` — or in an `<a>` when `href` is given, so the whole pill is the link, which hands plain clicks to `navigate` when one is given.",
+      "Small status pill: a text label, or element content such as a StatusMark, in a span — or in an <a> when href is given, so the whole pill is the link, which hands plain clicks to navigate when one is given.",
     "guide": "#/badges/badge",
   },
   {
     "name": "BrandMark",
     "from": "@spy4x/preact-ui",
     "line":
-      "A product's brand mark: a rounded square at `--radius-card`, filled with the brand hue and holding one glyph, followed by the product's name in weight 500 — the construction the design language gives every app's mark (`docs/design-language.md`, \"The brand mark\").",
+      "A product's brand mark: a rounded square at --radius-card, filled with the brand hue and holding one glyph, followed by the product's name in weight 500 — the construction the design language gives every app's mark (docs/design-language.md, \"The brand mark\").",
     "guide": "#/display/brand-mark",
   },
   {
@@ -317,14 +317,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "CardBody",
     "from": "@spy4x/preact-ui",
-    "line": "Card body: the content region of a `Card`.",
+    "line": "Card body: the content region of a Card.",
     "guide": "#/display/card-body",
   },
   {
     "name": "CardFooter",
     "from": "@spy4x/preact-ui",
     "line":
-      "Card footer: a divider-separated action row at the bottom of a `Card`.",
+      "Card footer: a divider-separated action row at the bottom of a Card.",
     "guide": "#/display/card-footer",
   },
   {
@@ -344,14 +344,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Cluster",
     "from": "@spy4x/preact-ui",
     "line":
-      "Children in a row that wraps, a named `gap` apart: a toolbar, a row of buttons, a list of tags.",
+      "Children in a row that wraps, a named gap apart: a toolbar, a row of buttons, a list of tags.",
     "guide": "#/layout/cluster",
   },
   {
     "name": "Coachmark",
     "from": "@spy4x/preact-ui",
     "line":
-      "One hint anchored to one element of the page, shown while the app says `open`.",
+      "One hint anchored to one element of the page, shown while the app says open.",
     "guide": "#/feedback/coachmark",
   },
   {
@@ -365,21 +365,21 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Combobox",
     "from": "@spy4x/preact-ui",
     "line":
-      'Searchable single-select: a text input filtering a `role="listbox"` of options.',
+      'Searchable single-select: a text input filtering a role="listbox" of options.',
     "guide": "#/inputs/combobox",
   },
   {
     "name": "CommandPalette",
     "from": "@spy4x/preact-ui",
     "line":
-      "A search trigger and the dialog it opens: one field and a list of results that the arrow keys move through, as `Combobox` does.",
+      "A search trigger and the dialog it opens: one field and a list of results that the arrow keys move through, as Combobox does.",
     "guide": "#/display/command-palette",
   },
   {
     "name": "ComparisonTable",
     "from": "@spy4x/preact-ui",
     "line":
-      "A comparison of capabilities across products, for a public page: a legend, a real `<table>` and the method and fit that make it trustworthy.",
+      "A comparison of capabilities across products, for a public page: a legend, a real <table> and the method and fit that make it trustworthy.",
     "guide": "#/display/comparison-table",
   },
   {
@@ -414,13 +414,13 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "DataTable",
     "from": "@spy4x/preact-ui",
     "line":
-      "A sortable, optionally paged table: `Table`'s markup, `@spy4x/platform/universal/sort`'s sort rules, one component joining them.",
+      "A sortable, optionally paged table: Table's markup, @spy4x/platform/universal/sort's sort rules, one component joining them.",
     "guide": "#/display/data-table",
   },
   {
     "name": "DateRangePicker",
     "from": "@spy4x/preact-ui",
-    "line": "Preset menu plus a custom from/to panel over `rangeForPreset`.",
+    "line": "Preset menu plus a custom from/to panel over rangeForPreset.",
     "guide": "#/inputs/date-range-picker",
   },
   {
@@ -440,7 +440,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "DropdownItem",
     "from": "@spy4x/preact-ui",
-    "line": "One item of a `Dropdown`'s menu.",
+    "line": "One item of a Dropdown's menu.",
     "guide": "#/inputs/dropdown-item",
   },
   {
@@ -454,7 +454,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "EnhancedForm",
     "from": "@spy4x/preact-ui",
     "line":
-      "A real `<form>` that posts on its own, and gets nicer once JavaScript has run.",
+      "A real <form> that posts on its own, and gets nicer once JavaScript has run.",
     "guide": "#/enhanced-forms/enhanced-form",
   },
   {
@@ -482,28 +482,28 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "FaqList",
     "from": "@spy4x/preact-ui",
     "line":
-      "Questions and answers as native `<details>` disclosures: they open and close with no JavaScript, so the list works on a server-rendered page with scripts off.",
+      "Questions and answers as native <details> disclosures: they open and close with no JavaScript, so the list works on a server-rendered page with scripts off.",
     "guide": "#/display/faq-list",
   },
   {
     "name": "FeatureCard",
     "from": "@spy4x/preact-ui",
     "line":
-      "One feature of a product on its public site: an optional icon, a heading, a line or two of text, an optional link and an optional picture under them, on a library `Card`.",
+      "One feature of a product on its public site: an optional icon, a heading, a line or two of text, an optional link and an optional picture under them, on a library Card.",
     "guide": "#/display/feature-card",
   },
   {
     "name": "Field",
     "from": "@spy4x/preact-ui",
     "line":
-      "Label, control and messages of one field row — the id/`for` wiring every consumer hand-rolls.",
+      "Label, control and messages of one field row — the id/for wiring every consumer hand-rolls.",
     "guide": "#/fields/field",
   },
   {
     "name": "FileInput",
     "from": "@spy4x/preact-ui",
     "line":
-      'File picker built on a real `<input type="file">`, with a drop zone and a keyboard/screen-reader story the input already has for free.',
+      'File picker built on a real <input type="file">, with a drop zone and a keyboard/screen-reader story the input already has for free.',
     "guide": "#/inputs/file-input",
   },
   {
@@ -523,14 +523,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Grid",
     "from": "@spy4x/preact-ui",
     "line":
-      "Equal columns that fill the width: as many as fit at `minColumnWidth`, a named `gap` apart.",
+      "Equal columns that fill the width: as many as fit at minColumnWidth, a named gap apart.",
     "guide": "#/layout/grid",
   },
   {
     "name": "ImageGallery",
     "from": "@spy4x/preact-ui",
     "line":
-      'Thumbnails that open the shared `Lightbox` on the one pressed: a wrapping grid by default, or a sideways-scrolling, snapping row of large images with `layout="strip"`.',
+      'Thumbnails that open the shared Lightbox on the one pressed: a wrapping grid by default, or a sideways-scrolling, snapping row of large images with layout="strip".',
     "guide": "#/display/image-gallery",
   },
   {
@@ -562,14 +562,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Kbd",
     "from": "@spy4x/preact-ui",
     "line":
-      'One key, a combination of keys or a sequence of presses, as the HTML `<kbd>` element: `<Kbd keys="mod+k" />` renders an outer `<kbd>` holding one `<kbd>` per key.',
+      'One key, a combination of keys or a sequence of presses, as the HTML <kbd> element: <Kbd keys="mod+k" /> renders an outer <kbd> holding one <kbd> per key.',
     "guide": "#/display/kbd",
   },
   {
     "name": "LayoutCustomiser",
     "from": "@spy4x/preact-ui",
     "line":
-      "A dialog that reorders and hides the parts of a page: a `SortableList` (drag a handle, or use the keyboard) with a switch per row.",
+      "A dialog that reorders and hides the parts of a page: a SortableList (drag a handle, or use the keyboard) with a switch per row.",
     "guide": "#/display/layout-customiser",
   },
   {
@@ -582,7 +582,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "Link",
     "from": "@spy4x/preact-ui",
-    "line": "A real `<a href>` that hands plain clicks to a `navigate` port.",
+    "line": "A real <a href> that hands plain clicks to a navigate port.",
     "guide": "#/buttons/link",
   },
   {
@@ -607,35 +607,35 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "MoneyDisplay",
     "from": "@spy4x/preact-ui",
     "line":
-      'Renders an amount in `currency`\'s smallest unit as display text, through `Intl.NumberFormat` — `<MoneyDisplay amount={12345} currency="EUR" />` is `€123.45`, `currency="JPY"` is `¥12,345`, `currency="KWD"` is three decimals.',
+      'Renders an amount in currency\'s smallest unit as display text, through Intl.NumberFormat — <MoneyDisplay amount={12345} currency="EUR" /> is €123.45, currency="JPY" is ¥12,345, currency="KWD" is three decimals.',
     "guide": "#/display/money-display",
   },
   {
     "name": "MoneyInput",
     "from": "@spy4x/preact-ui",
     "line":
-      "A text field for an amount in `currency`'s smallest unit: `value`/`onChange` carry the integer, exactly the way `MoneyDisplay` renders it.",
+      "A text field for an amount in currency's smallest unit: value/onChange carry the integer, exactly the way MoneyDisplay renders it.",
     "guide": "#/fields/money-input",
   },
   {
     "name": "MoreMenu",
     "from": "@spy4x/preact-ui",
     "line":
-      "A three-dots button that opens a menu of `DropdownItem`s: the overflow menu of a page header or of one row in a list.",
+      "A three-dots button that opens a menu of DropdownItems: the overflow menu of a page header or of one row in a list.",
     "guide": "#/display/more-menu",
   },
   {
     "name": "Notice",
     "from": "@spy4x/preact-ui",
     "line":
-      'A banner for a page-wide message: a trial that ends soon, a change that was saved, or, with `tone="danger"`, a failure the reader must act on, such as a payment that failed.',
+      'A banner for a page-wide message: a trial that ends soon, a change that was saved, or, with tone="danger", a failure the reader must act on, such as a payment that failed.',
     "guide": "#/feedback/notice",
   },
   {
     "name": "OnDay",
     "from": "@spy4x/preact-ui",
     "line":
-      "A calendar day in the person's format (`FormatContext`), `17 Oct 2026`, in a `<time datetime>` whose hover text is the exact instant.",
+      "A calendar day in the person's format (FormatContext), 17 Oct 2026, in a <time datetime> whose hover text is the exact instant.",
     "guide": "#/display/on-day",
   },
   {
@@ -655,14 +655,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Page",
     "from": "@spy4x/preact-ui",
     "line":
-      "The content column of a page: a readable maximum width, centred, with the page gutter (16 px on a phone, 24 px from `sm`, 32 px from `lg`) and the `xl` gap (32 px) between its sections.",
+      "The content column of a page: a readable maximum width, centred, with the page gutter (16 px on a phone, 24 px from sm, 32 px from lg) and the xl gap (32 px) between its sections.",
     "guide": "#/layout/page",
   },
   {
     "name": "PageAction",
     "from": "@spy4x/preact-ui",
     "line":
-      "A page header's primary action: icon and label from `sm` up, the icon alone on a phone.",
+      "A page header's primary action: icon and label from sm up, the icon alone on a phone.",
     "guide": "#/display/page-action",
   },
   {
@@ -676,13 +676,13 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "PageHero",
     "from": "@spy4x/preact-ui",
     "line":
-      "The top band of an inner page on a public site: an eyebrow, the page's `<h1>`, a lead and its buttons, in the marketing column (`max-w-6xl`) with a hairline under it.",
+      "The top band of an inner page on a public site: an eyebrow, the page's <h1>, a lead and its buttons, in the marketing column (max-w-6xl) with a hairline under it.",
     "guide": "#/billing/page-hero",
   },
   {
     "name": "PageTitle",
     "from": "@spy4x/preact-ui",
-    "line": "Page heading with the library's `pc-h1` typography inlined.",
+    "line": "Page heading with the library's pc-h1 typography inlined.",
     "guide": "#/display/page-title",
   },
   {
@@ -728,7 +728,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "RadioChips",
     "from": "@spy4x/preact-ui",
     "line":
-      "A single choice drawn as `ToggleChips` chips, built on native radios so it works before, or without, any JavaScript.",
+      "A single choice drawn as ToggleChips chips, built on native radios so it works before, or without, any JavaScript.",
     "guide": "#/fields/radio-chips",
   },
   {
@@ -761,14 +761,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "SettingGroup",
     "from": "@spy4x/preact-ui",
     "line":
-      "A named group of settings, such as Account or Security: a small `h2` over its rows, so the page title stays the one large heading on a settings page.",
+      "A named group of settings, such as Account or Security: a small h2 over its rows, so the page title stays the one large heading on a settings page.",
     "guide": "#/display/setting-group",
   },
   {
     "name": "SettingList",
     "from": "@spy4x/preact-ui",
     "line":
-      "A card of `SettingRow`s, one per line, divided by a rule: the shape of a settings page, where each row names a setting, shows its value and offers one action.",
+      "A card of SettingRows, one per line, divided by a rule: the shape of a settings page, where each row names a setting, shows its value and offers one action.",
     "guide": "#/display/setting-list",
   },
   {
@@ -788,7 +788,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "Slider",
     "from": "@spy4x/preact-ui",
-    "line": 'A labelled range slider on the native `<input type="range">`.',
+    "line": 'A labelled range slider on the native <input type="range">.',
     "guide": "#/inputs/slider",
   },
   {
@@ -801,14 +801,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "Stack",
     "from": "@spy4x/preact-ui",
-    "line": "Children in a column, a named `gap` apart.",
+    "line": "Children in a column, a named gap apart.",
     "guide": "#/layout/stack",
   },
   {
     "name": "StatusMark",
     "from": "@spy4x/preact-ui",
     "line":
-      "A shape paired with a word: `Ready`, `In use`, `Beta`, `WIP`, `Paused`, `Archived`, `Known issue`, `Outcome`, `Live`, `Offline`.",
+      "A shape paired with a word: Ready, In use, Beta, WIP, Paused, Archived, Known issue, Outcome, Live, Offline.",
     "guide": "#/badges/status-mark",
   },
   {
@@ -847,14 +847,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "ThemePreview",
     "from": "@spy4x/preact-ui",
     "line":
-      "A frame that shows its children in the library's dark or light palette, switched by a Dark / Light `RadioChips` pair, with no script.",
+      "A frame that shows its children in the library's dark or light palette, switched by a Dark / Light RadioChips pair, with no script.",
     "guide": "#/display/theme-preview",
   },
   {
     "name": "ThemeToggle",
     "from": "@spy4x/preact-ui",
     "line":
-      "One icon button that steps through the theme preference: auto → the opposite of the device → the device's own → auto, in the order `ThemeStore.cycle()` decides.",
+      "One icon button that steps through the theme preference: auto → the opposite of the device → the device's own → auto, in the order ThemeStore.cycle() decides.",
     "guide": "#/buttons/theme-toggle",
   },
   {
@@ -868,14 +868,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Toastr",
     "from": "@spy4x/preact-ui",
     "line":
-      "Stack of transient notifications in a corner of the window — top right unless `corner` says otherwise.",
+      "Stack of transient notifications in a corner of the window — top right unless corner says otherwise.",
     "guide": "#/feedback/toastr",
   },
   {
     "name": "ToggleChips",
     "from": "@spy4x/preact-ui",
     "line":
-      "A group of pressable chips for filtering a list — the clickable counterpart of `Badge`, which only shows text.",
+      "A group of pressable chips for filtering a list — the clickable counterpart of Badge, which only shows text.",
     "guide": "#/fields/toggle-chips",
   },
   {
@@ -901,7 +901,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "Tour",
     "from": "@spy4x/preact-ui",
     "line":
-      "A guided tour: one `Coachmark` for the step at `index`, with the step count, Skip, Back and Next (Done on the last step).",
+      "A guided tour: one Coachmark for the step at index, with the step count, Skip, Back and Next (Done on the last step).",
     "guide": "#/feedback/tour",
   },
   {
@@ -921,14 +921,14 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "When",
     "from": "@spy4x/preact-ui",
     "line":
-      "A moment as its distance from now, `3 days ago`, in a `<time datetime>` whose hover text is the exact instant in the person's format (`FormatContext`).",
+      "A moment as its distance from now, 3 days ago, in a <time datetime> whose hover text is the exact instant in the person's format (FormatContext).",
     "guide": "#/display/when",
   },
   {
     "name": "WidgetCard",
     "from": "@spy4x/preact-ui",
     "line":
-      "One dashboard widget's card: the title (a link when `href` is set), a muted caption, an optional three-dots menu, and a body that shows the widget, a skeleton while it loads, its error with a retry, or one line when it has nothing to show.",
+      "One dashboard widget's card: the title (a link when href is set), a muted caption, an optional three-dots menu, and a body that shows the widget, a skeleton while it loads, its error with a retry, or one line when it has nothing to show.",
     "guide": "#/display/widget-card",
   },
   {
@@ -955,8 +955,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
   {
     "name": "ZoomableImages",
     "from": "@spy4x/preact-ui",
-    "line":
-      "Zoomable images inside a container, opening the shared `Lightbox`.",
+    "line": "Zoomable images inside a container, opening the shared Lightbox.",
     "guide": "#/display/zoomable-images",
   },
   {
@@ -969,7 +968,7 @@ export const PALETTE_COMPONENTS: readonly PaletteComponent[] = [
     "name": "IconGallery",
     "from": "@spy4x/preact-ui-guide",
     "line":
-      "Searchable grid of every icon on one wide guide card, each cell copying `<IconName />` on click.",
+      "Searchable grid of every icon on one wide guide card, each cell copying <IconName /> on click.",
   },
   {
     "name": "UIGuide",

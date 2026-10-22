@@ -4,7 +4,8 @@
  * search on /tools/preact-components runs over (#522): every export of kind
  * `component` in the pinned `@spy4x/preact-*` version's `llms.txt`, icons
  * apart, with the package, the `llms.txt` line and the live guide's card for
- * it when the guide has one.
+ * it when the guide has one. The line's markdown backticks are dropped: a
+ * result row shows plain text, so they would show as written.
  *
  * Run it after bumping the pin in deno.json, then `deno fmt`:
  *   deno run -N=raw.githubusercontent.com -R -W=components/tools/preact-components scripts/palette-index.ts
@@ -50,7 +51,7 @@ const entries = llms.split("\n")
   .map(([name, , from, line]) => ({
     name,
     from,
-    line: line.trim(),
+    line: line.trim().replaceAll("`", ""),
     ...(guide.has(name) ? { guide: guide.get(name) } : {}),
   }))
 if (entries.length === 0) throw new Error(`${url} lists no component`)
@@ -66,7 +67,7 @@ export interface PaletteComponent {
   name: string
   /** The import specifier, \`@spy4x/preact-ui\` and so on. */
   from: string
-  /** The library's one-line summary of it. */
+  /** The library's one-line summary of it, as plain text. */
   line: string
   /** The live guide's card for it, a hash route, when the guide has one. */
   guide?: string
