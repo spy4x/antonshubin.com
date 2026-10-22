@@ -44,6 +44,9 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 
 const clients = projects.freelance
 
+/** Pages whose first screen holds no picture: nothing on them is high priority. */
+const NO_HERO_PICTURE = new Set(["corecircle"])
+
 /** The HTML from the element carrying `marker` to the end of its closing `tag`. */
 function region(html: string, marker: string, tag: string): string {
   const start = html.indexOf(marker)
@@ -366,6 +369,12 @@ siteTest(
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
+      // Corecircle's story replaces the hero picture and its tour sits below
+      // the first screen, so no image there loads with high priority (#562).
+      if (NO_HERO_PICTURE.has(p.slug!)) {
+        assertEquals(count(html, /fetchpriority="high"/), 0, p.slug)
+        continue
+      }
       assertEquals(count(html, /fetchpriority="high"/), 1, p.slug)
       const tag = html.match(/<img\b[^>]*fetchpriority="high"[^>]*>/)![0]
       // The hero is the page's first screenshot: the frame's first one, or
