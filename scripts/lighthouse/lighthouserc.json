@@ -8,7 +8,9 @@
         "http://127.0.0.1:48421/work/smartlite",
         "http://127.0.0.1:48421/tools/mig",
         "http://127.0.0.1:48421/blog",
-        "http://127.0.0.1:48421/blog/zond-sso-probe-bridge"
+        "http://127.0.0.1:48421/blog/zond-sso-probe-bridge",
+        "http://127.0.0.1:48421/blog/opus-5-5-vs-sonnet-5-agent-costs",
+        "http://127.0.0.1:48421/blog/trail-code-claude-code-test"
       ],
       "numberOfRuns": 3,
       "settings": {
