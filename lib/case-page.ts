@@ -2,9 +2,15 @@
 // beyond the raw data: the headline, the `<title>`, the meta description, the
 // top line, the hero picture. Every word comes from `lib/data.ts`; this file
 // only arranges it, so nothing here is new copy.
-import { formatPeriod, type Project, projectScreenshots } from "./data.ts"
+import {
+  formatPeriod,
+  type Project,
+  projects,
+  projectScreenshots,
+} from "./data.ts"
 import { webpForPng } from "./image-path.ts"
 import { FIGURE } from "./llms.ts"
+import { followOnHires } from "./testimonials.ts"
 
 /** The longest `<title>` that still keeps the site name after it. */
 export const TITLE_MAX = 60
@@ -132,7 +138,46 @@ export function heroShot(p: Project): HeroShot | undefined {
   }
 }
 
-/** The 2014–2018 projects show their reviews before "What I built" (#523): dated screens, strong reviews. */
+/**
+ * The pages of the founder who hired Anton twice (#523): Corecircle's story
+ * is its review, and Connectful leads with its reviews.
+ */
+const REVIEW_LED = new Set(["corecircle", "connectful"])
+
+/**
+ * The 2014–2018 projects show their reviews before "What I built" (#523):
+ * dated screens, strong reviews. So do the pages in `REVIEW_LED`.
+ */
 export function reviewsFirst(p: Project): boolean {
-  return (p.period?.from ?? 0) <= 2018
+  return (p.period?.from ?? 0) <= 2018 || REVIEW_LED.has(p.slug ?? "")
+}
+
+/** The other project of a founder who hired Anton twice, and the sentence that says so. */
+export interface SameFounder {
+  other: Project
+  line: string
+}
+
+/**
+ * The follow-on hire `p` belongs to (`followOnHires`), seen from either
+ * side: "Nastassia Ponomarenko first hired me for Connectful, then again for
+ * Corecircle, her next product." Undefined for any other project.
+ */
+export function sameFounder(p: Project): SameFounder | undefined {
+  const hire = followOnHires.find((h) => h.from === p.slug || h.to === p.slug)
+  if (!hire) return undefined
+  const find = (slug: string) => {
+    const found = projects.freelance.find((x) => x.slug === slug)
+    if (!found) throw new Error(`lib/case-page.ts: no client project "${slug}"`)
+    return found
+  }
+  const from = find(hire.from)
+  const to = find(hire.to)
+  const who = from.madeForName ?? `${shortName(from)}'s founder`
+  return {
+    other: p.slug === from.slug ? to : from,
+    line: `${who} first hired me for ${shortName(from)}, then again for ${
+      shortName(to)
+    }, ${hire.possessive} next product.`,
+  }
 }
