@@ -495,7 +495,7 @@ export const projects = {
     {
       title: "Code Review & Architecture Audit",
       slug: "code-review",
-      kind: "developers interviewed and hired after the report",
+      kind: "report and seven Node.js developers interviewed in two weeks",
       heroSize: { width: 1600, height: 1090 },
       catalogSlug: "codebase-health-audit",
       externalURL: "https://spy4x.github.io/pb-code-review",
