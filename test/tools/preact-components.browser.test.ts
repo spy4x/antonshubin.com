@@ -267,7 +267,10 @@ Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, an
       const dialog = page.locator("dialog[open]")
 
       for (const keys of ["Control+k", "/"]) {
-        await page.locator("body").focus()
+        // Off the field: a key typed on the focused trigger opens it too.
+        await page.evaluate(() =>
+          (document.activeElement as HTMLElement)?.blur()
+        )
         await page.keyboard.press(keys)
         await dialog.waitFor({ timeout: WAIT_MS })
         await page.keyboard.press("Escape")
