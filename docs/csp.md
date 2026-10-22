@@ -20,6 +20,12 @@ reads), unit-tested in `lib/csp.test.ts`. `main.ts` only computes the origins
 `UMAMI_PRECONNECT_ORIGIN` (`lib/config.ts` — empty unless Umami is genuinely
 cross-origin) and `SCHEDULE_URL`'s origin, and passes them in.
 
+`frame-src` always allows YouTube: `www.youtube.com` and `youtube.com` for the
+blog posts' embeds, and `www.youtube-nocookie.com` for `/work/foodrazor`'s
+video, whose player (`@spy4x/preact-ui`'s `YouTubeVideo`) the page inserts only
+when the video is pressed. Its poster is a file of this site, so `img-src` needs
+no YouTube origin.
+
 **The nonce pin**: `test/unsubscribe.test.ts` fetches `/`, reads the
 `'nonce-...'` token off the `Content-Security-Policy` header, and asserts it
 equals every rendered `<script nonce="...">`'s value — a plain HTML check, no

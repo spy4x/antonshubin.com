@@ -60,8 +60,10 @@ export function originOf(url: string): string {
  * - `style-src` keeps `'unsafe-inline'` — 14 server-rendered `style="..."`
  *   attributes exist, and a nonce only covers `<style>` elements, not
  *   attributes.
- * - `frame-src` always allows YouTube (blog/project video embeds) and adds
- *   the booking widget's origin only when `SCHEDULE_URL` is set.
+ * - `frame-src` always allows YouTube: `www.youtube.com` and `youtube.com`
+ *   for the blog's embeds, `www.youtube-nocookie.com` for the player a case
+ *   page loads only when its video is pressed (#523). It adds the booking
+ *   widget's origin only when `SCHEDULE_URL` is set.
  * - No `upgrade-insecure-requests`: production HSTS already forces https,
  *   and the directive would break the plain-http rendered-page tests.
  */
@@ -75,6 +77,7 @@ export function buildCsp(options: CspOptions = {}): string {
   const frameSrc = [
     "https://www.youtube.com",
     "https://youtube.com",
+    "https://www.youtube-nocookie.com",
     scheduleOrigin,
   ].filter(Boolean).join(" ")
 
