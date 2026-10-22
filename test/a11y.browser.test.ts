@@ -68,7 +68,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
         waitUntil: "networkidle",
       })
 
-      // The hero shows screenshot 1; the strip starts at 2 (#523).
+      // The counter numbers the strip's own six slides (#562).
       const firstThumb = page.locator(
         'button:has(img[alt="Screenshot 2 of 7"])',
       )
@@ -130,7 +130,7 @@ Deno.test("project gallery lightbox is named, its buttons are named, and focus r
   }
 })
 
-Deno.test("the project gallery counts its screenshots and its named Next and Previous buttons move the strip", async () => {
+Deno.test("the project gallery counts its own slides and its named Next and Previous buttons move the strip", async () => {
   const site = await startSite()
   let browser: Browser | undefined
   try {
@@ -141,7 +141,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
         waitUntil: "networkidle",
       })
       const counter = page.locator("[data-gallery-counter]")
-      assertEquals((await counter.innerText()).trim(), "2 / 7")
+      assertEquals((await counter.innerText()).trim(), "1 / 6")
       const next = page.getByRole("button", { name: "Next screenshot" })
       const prev = page.getByRole("button", { name: "Previous screenshot" })
       await next.waitFor({ state: "visible" })
@@ -150,7 +150,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
       await next.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
-          ?.trim() === "3 / 7"
+          ?.trim() === "2 / 6"
       )
       const scrolled = await page.locator("[data-gallery-strip]").evaluate(
         (el) => el.scrollLeft,
@@ -160,7 +160,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
       await prev.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
-          ?.trim() === "2 / 7"
+          ?.trim() === "1 / 6"
       )
     } finally {
       await page.close()
@@ -219,13 +219,13 @@ Deno.test("a portrait gallery's Next walks to the last screenshot and Previous w
       assert(await prev.isDisabled(), "Previous is enabled at the start")
 
       const forward = await walk(page, next, 6)
-      // The hero shows screenshot 1; the strip starts at 2 (#523).
-      assertEquals(forward[0], "2 / 7")
-      assertEquals(forward[forward.length - 1], "7 / 7", forward.join(", "))
+      // The counter numbers the strip's own six slides (#562).
+      assertEquals(forward[0], "1 / 6")
+      assertEquals(forward[forward.length - 1], "6 / 6", forward.join(", "))
       assert(await next.isDisabled(), "Next is still enabled at the end")
 
       const back = await walk(page, prev, 6)
-      assertEquals(back[back.length - 1], "2 / 7", back.join(", "))
+      assertEquals(back[back.length - 1], "1 / 6", back.join(", "))
       assert(await prev.isDisabled(), "Previous is still enabled at the start")
     } finally {
       await page.close()
