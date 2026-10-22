@@ -108,8 +108,12 @@ Deno.test("with scripts off, the search is disabled and says it needs JavaScript
           .isDisabled(),
         "the search trigger is live with scripts off",
       )
+      const noscript = page.locator("[data-palette-noscript]")
+      assert(await noscript.isVisible(), "the no-script line is hidden")
       assert(
-        await page.locator("[data-palette-noscript]").isVisible(),
+        (await noscript.innerText()).startsWith(
+          "The search needs JavaScript.",
+        ),
         "no line says the search needs JavaScript",
       )
 
