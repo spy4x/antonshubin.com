@@ -1,8 +1,10 @@
 // Browser guards for the site's frame (#293): the skip link shows when it is
 // focused, and the frame (footer, back link, 404, /privacy) has no axe
-// violations and no sideways scroll at 390 and 1440px. Needs a built site and
-// Chromium; see docs/testing.md "Browser-driven tests".
+// violations and no sideways scroll at 390 and 1440px, and no link half under
+// the phone tab bar's top edge is too small a tap target (#531). Needs a built
+// site and Chromium; see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import { AxeBuilder } from "@axe-core/playwright"
 import axeCore from "axe-core"
 import type { Browser, Page } from "playwright"
 import { startSite } from "./harness.ts"
@@ -203,6 +205,83 @@ Deno.test("the back link sits at the same top offset on a tool page as on a case
         }
       } finally {
         await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+// @axe-core/playwright types its page with its own playwright-core, a minor
+// version ahead of the site's; the methods it calls are the same.
+type AxePage = ConstructorParameters<typeof AxeBuilder>[0]["page"]
+
+const PHONES = [{ width: 390, height: 844 }, { width: 412, height: 915 }]
+/** An iPhone's bottom safe-area inset, as test/safe-area.browser.test.ts emulates it. */
+const INSET_BOTTOM = 34
+
+Deno.test("no link half under the phone tab bar's top edge is too small a tap target on first load, at 390 and 412px, with and without a bottom inset", async () => {
+  // Without a calendar: /book then leads with the brief, which puts its email
+  // link at the bar's edge on a 412×915 screen (#531). A link that peeks out
+  // under the bar's foot, past the window's foot, still fails axe's rule with
+  // no inset; that case stays open (#531), so a violation whose link ends past
+  // the window's foot is left out, and every other one fails the test.
+  const site = await startSite({ env: { SCHEDULE_URL: "" } })
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of PHONES) {
+      for (const inset of [0, INSET_BOTTOM]) {
+        // AxeBuilder needs a page from an explicit context, not
+        // browser.newPage()'s implicit one; service workers stay blocked.
+        const context = await browser.newContext({
+          viewport,
+          serviceWorkers: "block",
+        })
+        try {
+          const page = await context.newPage()
+          const cdp = await context.newCDPSession(page)
+          // Experimental CDP method, missing from Playwright's protocol types.
+          await cdp.send(
+            "Emulation.setSafeAreaInsetsOverride" as never,
+            { insets: { bottom: inset } } as never,
+          )
+          for (const path of ["/", "/book", "/tools", "/about"]) {
+            await page.goto(`${site.origin}${path}`, {
+              waitUntil: "networkidle",
+            })
+            const { violations } = await new AxeBuilder({
+              page: page as unknown as AxePage,
+            }).withRules(["target-size"]).analyze()
+            const tooSmall: string[] = []
+            for (const node of violations.flatMap((v) => v.nodes)) {
+              const html = node.html.slice(0, 120)
+              const [selector, ...nested] = node.target
+              // A target inside a frame or a shadow root has no selector in
+              // the top document: report it rather than guess where it ends.
+              if (nested.length > 0 || typeof selector !== "string") {
+                tooSmall.push(`${html} (outside the top document)`)
+                continue
+              }
+              const bottom = await page.evaluate(
+                (s) =>
+                  document.querySelector(s)?.getBoundingClientRect().bottom,
+                selector,
+              )
+              if (bottom === undefined) {
+                tooSmall.push(`${html} (no element for ${selector})`)
+              } else if (bottom <= viewport.height) tooSmall.push(html)
+            }
+            assertEquals(
+              tooSmall,
+              [],
+              `${path} at ${viewport.width}×${viewport.height}, ${inset}px inset`,
+            )
+          }
+        } finally {
+          await context.close()
+        }
       }
     }
   } finally {
