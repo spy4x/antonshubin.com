@@ -4,6 +4,7 @@ import { catalogueSections, demoHref } from "@spy4x/preact-ui-guide"
 import config from "../../../deno.json" with { type: "json" }
 import { PALETTE_COMPONENTS, PALETTE_VERSION } from "./palette-index.ts"
 import {
+  commandWordFirst,
   isForgiving,
   matchReason,
   PALETTE_ALIASES,
@@ -101,4 +102,29 @@ Deno.test("no palette row's line shows a markdown backtick", () => {
   for (const { name, line } of PALETTE_COMPONENTS) {
     assert(!line.includes("`"), `${name}: ${line}`)
   }
+})
+
+Deno.test("typing a theme command's word puts that command first, ahead of a component whose name starts with it, and moves no component", () => {
+  const theme = (to: string) => ({
+    label: `Switch the preview to ${to}`,
+    aliases: ["theme", to.toLowerCase(), "тема"],
+    run: () => {},
+  })
+  for (const to of ["Light", "Dark"]) {
+    // Components first, as the island lists them, then its commands.
+    const options = [...rows, theme(to)]
+    const query = to.toLowerCase()
+    assertEquals(
+      commandWordFirst(matchOptions(options, query), query)[0]?.label,
+      `Switch the preview to ${to}`,
+      query,
+    )
+  }
+  // A component's alias never jumps it ahead: "tab" keeps Table before Tabs.
+  assertEquals(
+    commandWordFirst(matchOptions(rows, "tab"), "tab").slice(0, 2).map((o) =>
+      o.label
+    ),
+    ["Table", "Tabs"],
+  )
 })

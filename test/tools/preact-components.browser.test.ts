@@ -361,7 +361,7 @@ Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, an
   }
 })
 
-Deno.test("from the keyboard, Show a toast shows Toastr with a working Undo and Switch the preview to Light repaints only the frame, with nothing for axe to find open or closed at 390 and 1440px in both themes", async () => {
+Deno.test("from the keyboard, Show a toast shows Toastr with a working Undo and typing light then Enter switches the preview to Light, repainting only the frame, with nothing for axe to find open or closed at 390 and 1440px in both themes", async () => {
   const site = await startSite()
   let browser: Browser | undefined
   try {
@@ -404,7 +404,8 @@ Deno.test("from the keyboard, Show a toast shows Toastr with a working Undo and 
         const before = await previewColours(page)
         await trigger.focus()
         await page.keyboard.press("Control+k")
-        await page.keyboard.type("switch")
+        // "light" also starts Lightbox's name; the command's own word wins.
+        await page.keyboard.type("light")
         await firstResult(page, "Switch the preview to Light")
         await page.keyboard.press("Enter")
         await dialog.waitFor({ state: "detached", timeout: WAIT_MS })
