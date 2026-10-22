@@ -36,14 +36,16 @@ Deno.test("the title keeps the site name only while it fits", () => {
   assertEquals(caseTitle(long), projectHeadline(long))
 })
 
-Deno.test("the meta description leads with the outcome and leaves out a sentence that does not fit, never cutting one", () => {
+Deno.test("the meta description leads with the outcome and leaves out a sentence about screenshots or one that does not fit, never cutting one", () => {
   const p: Project = {
     ...base,
     kind: "app for lamps",
     outcome: "Lit 40 rooms",
     madeForName: "Ann",
     period: { from: 2020 },
-    description: `A lamp app. ${"Long ".repeat(40)}words. Short end.`,
+    description: `A lamp app. The screenshots show it. ${
+      "Long ".repeat(40)
+    }words. Short end.`,
   }
   assertEquals(
     caseDescription(p),
@@ -61,12 +63,11 @@ Deno.test("the meta description says the kind when the first sentence does not f
   assert(caseDescription(p).startsWith(`${"o".repeat(100)}. App for lamps.`))
 })
 
-Deno.test("no client project's meta description is over the limit, cut, or about screenshots", () => {
+Deno.test("no client project's meta description is over the limit or cut", () => {
   for (const p of projects.freelance) {
     const d = caseDescription(p)
     assert(d.length > 40 && d.length <= CASE_DESCRIPTION_MAX, `${p.slug}: ${d}`)
     assert(/[.!?]$/.test(d) && !d.includes("…"), `${p.slug}: ${d}`)
-    assert(!/screenshot/i.test(d), `${p.slug}: ${d}`)
     if (p.outcome) assert(d.startsWith(p.outcome), `${p.slug}: ${d}`)
   }
 })
