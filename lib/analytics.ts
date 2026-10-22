@@ -27,6 +27,7 @@ export const ANALYTICS_EVENTS = [
   "copy",
   "post-read",
   "post-try",
+  "case-try",
   "not-found",
 ] as const
 
@@ -79,8 +80,11 @@ export interface EventProps {
   /**
    * `tool-try`: which of a tool page's own interactions was used.
    * `post-try`: which component of a post was used (its tag name).
+   * `case-try`: which of a case page's interactions was used (`tour`).
    */
   part?: string
+  /** `case-try` only: the step of the interaction that was picked. */
+  step?: string
 }
 
 /** The attributes `eventAttrs()` returns, ready to spread onto an element. */
@@ -228,6 +232,22 @@ export function trackPostTry(item: string, part: string): void {
   if (postTries.has(key)) return
   postTries.add(key)
   track("post-try", { item, part })
+}
+
+/** The `case-try` events this page view has sent, as `item`, `part` and `step`. */
+const caseTries = new Set<string>()
+
+/**
+ * Sends `case-try` (#523) the first time a visitor picks a step of a case
+ * page's interaction in this page view, and nothing for that step after
+ * that: `item` is the project's slug, `part` the interaction, `step` the
+ * step's id.
+ */
+export function trackCaseTry(item: string, part: string, step: string): void {
+  const key = `${item}\n${part}\n${step}`
+  if (caseTries.has(key)) return
+  caseTries.add(key)
+  track("case-try", { item, part, step })
 }
 
 /**
