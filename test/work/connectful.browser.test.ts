@@ -2,7 +2,11 @@
 // client project page (#562). Needs a built site and Chromium; see
 // docs/testing.md "Browser-driven tests".
 import { assertEquals } from "jsr:@std/assert@^1.0.0"
-import { caseLayoutProblems, casePageProblems } from "./browser.ts"
+import {
+  caseLayoutProblems,
+  casePageProblems,
+  fontSwapShifts,
+} from "./browser.ts"
 import { projects } from "../../lib/data.ts"
 
 Deno.test("/work/connectful has no axe violation and no sideways scroll at 390 and 1440px", async () => {
@@ -13,6 +17,16 @@ Deno.test("every client page's top line wraps without a stray dot, its title sta
   assertEquals(
     await caseLayoutProblems(
       projects.freelance.map((p) => `/work/${p.slug}`),
+    ),
+    [],
+  )
+})
+
+Deno.test("no client page's title moves when the web fonts replace the fallback at 390 and 412px", async () => {
+  assertEquals(
+    await fontSwapShifts(
+      projects.freelance.map((p) => `/work/${p.slug}`),
+      [390, 412],
     ),
     [],
   )

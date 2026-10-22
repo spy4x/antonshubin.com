@@ -141,7 +141,10 @@ export function CaseHero(
           /* Every part after the first starts with its "·", and the row sits
             one dot's width left of a box that clips it, so a part that wraps
             to a new line drops its dot: no line starts or ends with one, and
-            no word wraps alone (#562). */
+            no word wraps alone (#562). Below 640px the client and years fill
+            the first line, so the role and status always start the second
+            whatever font is loaded, and the swap from the fallback font moves
+            nothing. */
         }
         <div class="overflow-hidden">
           <p
@@ -149,7 +152,12 @@ export function CaseHero(
             class="-ml-6 flex flex-wrap items-center gap-y-1 text-sm text-graphite"
           >
             {topParts.map((part, i) => (
-              <span key={i} class="flex items-center">
+              <span
+                key={i}
+                class={`flex items-center${
+                  i === 0 ? " basis-full sm:basis-auto" : ""
+                }`}
+              >
                 <span aria-hidden="true" class="w-6 shrink-0 text-center">
                   ·
                 </span>

@@ -144,3 +144,65 @@ export async function caseLayoutProblems(paths: string[]): Promise<string[]> {
   }
   return found
 }
+
+/**
+ * Where the hero's `<h1>` sits on `paths` at each width with the web fonts
+ * and with only the fallback faces (every font file refused), one line per
+ * page whose title moves between the two: the swap would shift the page
+ * (#562's top line wrapped in one font and not the other). Empty when
+ * nothing moves.
+ */
+export async function fontSwapShifts(
+  paths: string[],
+  widths: number[],
+): Promise<string[]> {
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } })
+  let browser: Browser | undefined
+  const found: string[] = []
+  try {
+    browser = await launchChromium()
+    for (const width of widths) {
+      const tops: Record<string, number>[] = []
+      for (const fallback of [false, true]) {
+        const context = await browser.newContext({
+          viewport: { width, height: 900 },
+          serviceWorkers: "block",
+        })
+        try {
+          if (fallback) {
+            await context.route(/\.woff2(\?|$)/, (route) => route.abort())
+          }
+          const page = await context.newPage()
+          const seen: Record<string, number> = {}
+          for (const path of paths) {
+            await page.goto(`${site.origin}${path}`, {
+              waitUntil: "networkidle",
+            })
+            seen[path] = await page.evaluate(async () => {
+              await document.fonts.ready
+              return document.querySelector("h1")!.getBoundingClientRect()
+                .top + scrollY
+            })
+          }
+          tops.push(seen)
+        } finally {
+          await context.close()
+        }
+      }
+      for (const path of paths) {
+        const [web, fallback] = [tops[0][path], tops[1][path]]
+        if (Math.abs(web - fallback) > 1) {
+          found.push(
+            `${path} at ${width}px: the <h1> sits at ${
+              Math.round(fallback)
+            }px in the fallback font, ${Math.round(web)}px in the web font`,
+          )
+        }
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+  return found
+}
