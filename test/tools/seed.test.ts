@@ -114,6 +114,23 @@ seedTest(
 )
 
 seedTest(
+  "the admin panel video's poster is one picture at every size, Seed's Dashboard",
+  (page) => {
+    const video = page.slice(page.indexOf("data-seed-admin-video"))
+    const poster = video.slice(0, video.indexOf("</figure>"))
+    assert(
+      poster.includes("/video/tools/seed/admin-panel-poster-1920.webp"),
+      "the admin panel video does not show Seed's Dashboard poster",
+    )
+    // The 1280w file is Seed's Users still, not a smaller Dashboard.
+    assert(
+      !poster.includes("admin-panel-poster-1280.webp"),
+      "the poster offers the Users still as one of its sizes",
+    )
+  },
+)
+
+seedTest(
   "the Seed page sends no visitor to the admin panel",
   (page) => {
     assert(!page.includes("admin.seedsaas.com"), "a link to the admin panel")
