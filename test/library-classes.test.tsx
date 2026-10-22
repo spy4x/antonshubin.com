@@ -24,6 +24,10 @@ import { CiPill } from "../components/CiPill.tsx"
 import { Nav } from "../components/Nav.tsx"
 import { OrbitSlice } from "../components/tools/preact-components/OrbitSlice.tsx"
 import type { CiSnapshot } from "../lib/github-snapshot.ts"
+import CachedShareSlider from "../islands/CachedShareSlider.tsx"
+import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
+import RunsCalculator from "../islands/RunsCalculator.tsx"
+import { TaskCostChart } from "../components/TaskCostChart.tsx"
 import { startSite } from "./harness.ts"
 
 const STATUSES: StatusMarkStatus[] = [
@@ -200,6 +204,21 @@ function renderedLibraryMarkup(): string {
         options={[{ value: "a", label: "A" }]}
       />,
     ),
+    // The posts' interactive components (#537): Explorable, Slider with and
+    // without marks, stacked and plain Bars with a reference line, DotPlot
+    // with a muted row, a band and a summary.
+    render(<CachedShareSlider post="p" />),
+    render(<FrameworkChecklist post="p" />),
+    render(
+      <RunsCalculator
+        post="p"
+        noise={13}
+        saving={10}
+        experimentTasks={10}
+        marks={[{ value: 10, label: "Ten" }, { value: 32, label: "Claim" }]}
+      />,
+    ),
+    render(<TaskCostChart round="pull" />),
     // The library `Rail` (#433): idle, a page, a section, Book as the page,
     // and a page only the More sheet lists; with Book and with Write, and
     // with the footer slot, which wraps the page and the footer in a column.
@@ -221,7 +240,7 @@ function renderedLibraryMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/(),+=&>*%]/g, (c) => `\\${c}`)
+  return "." + className.replace(/[:.!\[\]\/(),+=&>*%#]/g, (c) => `\\${c}`)
 }
 
 function escapeRegExp(text: string): string {
@@ -361,7 +380,7 @@ Deno.test("a site button carries no library size or fill and the site's radius",
   const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
     .map(([, list]) => list.split(" "))
     .filter((list) => list.includes("transition-colors"))
-  assertEquals(buttons.length, 6, html)
+  assertEquals(buttons.length, 7, html)
   for (const list of buttons) {
     assertEquals(list.filter((c) => forbidden.includes(c)), [], list.join(" "))
     assert(list.includes("rounded-lg!"), list.join(" "))

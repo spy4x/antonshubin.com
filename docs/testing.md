@@ -205,6 +205,13 @@ page. Never retry a test on this error.
   keeps its close button clear of a 47px safe-area inset, closes on a tap beside
   the image and returns focus to the image button. It blocks service workers,
   like every test that opens pages through `newPage()`.
+- `test/post-components.browser.test.ts` (#537): a post's interactive components
+  render disabled with the post's own numbers, then hydrate and follow the
+  keyboard (the runs calculator on the Trail-code post, the cached share slider
+  on the Opus post, the checklist on the cost laboratory post); the first input
+  sends one `post-try` with no entered value; and every component box passes
+  axe-core's WCAG 2 A/AA rules (through `@axe-core/playwright`) with no
+  horizontal scroll at 390 and 1440px.
 - `test/safe-area.browser.test.ts`: at 390px the phone tab bar clears an
   iPhone's home indicator. iOS Safari reports a zero
   `env(safe-area-inset-bottom)` unless `routes/_app.tsx`'s viewport meta tag

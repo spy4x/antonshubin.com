@@ -1,0 +1,239 @@
+{
+  "measured": "2026-10-21/22, Seed, Opus 5.5 implementer at medium, API list prices as reported by claude -p total_cost_usd",
+  "note": "Tasks 311-318 ran in two separate rounds, each with its own run without the map. Tasks 341-239 ran once with three arms in parallel, sharing one run without the map.",
+  "pull": [
+    {
+      "pr": 311,
+      "task": "IPv6 sign-up budget per /48",
+      "without": 0.68,
+      "with": 1.24,
+      "minWithout": 1.1,
+      "minWith": 8.3,
+      "mapCalls": 1,
+      "reviewWithout": "no change",
+      "reviewWith": "pass 2/2",
+      "excluded": "different judgment; the run without the map stopped, thinking a library release was needed"
+    },
+    {
+      "pr": 313,
+      "task": "One day constant",
+      "without": 1.38,
+      "with": 1.36,
+      "minWithout": 10.8,
+      "minWith": 11.0,
+      "mapCalls": 1,
+      "reviewWithout": "pass 2/2",
+      "reviewWith": "pass 2/2"
+    },
+    {
+      "pr": 317,
+      "task": "Connection pooling",
+      "without": 3.90,
+      "with": 3.67,
+      "minWithout": 21.9,
+      "minWith": 17.1,
+      "mapCalls": 3,
+      "reviewWithout": "pass 1/2",
+      "reviewWith": "pass 1/2"
+    },
+    {
+      "pr": 318,
+      "task": "Tests for uncovered behaviour",
+      "without": 3.77,
+      "with": 3.41,
+      "minWithout": 18.7,
+      "minWith": 18.2,
+      "mapCalls": 0,
+      "reviewWithout": "pass 3/4",
+      "reviewWith": "pass 4/4"
+    },
+    {
+      "pr": 341,
+      "task": "Init task and Traefik in dev",
+      "without": 2.33,
+      "with": 2.02,
+      "minWithout": 32.1,
+      "minWith": 21.6,
+      "mapCalls": 1,
+      "reviewWithout": "pass 4/5",
+      "reviewWith": "pass 4/5"
+    },
+    {
+      "pr": 298,
+      "task": "Author line in page hero",
+      "without": 2.29,
+      "with": 2.26,
+      "minWithout": 22.4,
+      "minWith": 26.9,
+      "mapCalls": 0,
+      "reviewWithout": "pass 2/3",
+      "reviewWith": "pass 2/3"
+    },
+    {
+      "pr": 294,
+      "task": "Cache static assets",
+      "without": 1.92,
+      "with": 2.42,
+      "minWithout": 25.4,
+      "minWith": 25.9,
+      "mapCalls": 0,
+      "reviewWithout": "needs-fix 4/4",
+      "reviewWith": "pass 4/4"
+    },
+    {
+      "pr": 296,
+      "task": "One product in structured data",
+      "without": 1.87,
+      "with": 1.53,
+      "minWithout": 17.1,
+      "minWith": 18.7,
+      "mapCalls": 1,
+      "reviewWithout": "pass 4/4",
+      "reviewWith": "pass 4/4"
+    },
+    {
+      "pr": 237,
+      "task": "Clear browser data on sign-out",
+      "without": 2.55,
+      "with": 2.27,
+      "minWithout": 21.0,
+      "minWith": 22.4,
+      "mapCalls": 0,
+      "reviewWithout": "pass 2/2",
+      "reviewWith": "pass 2/2"
+    },
+    {
+      "pr": 239,
+      "task": "Cancel dialog after the grace period",
+      "without": 2.28,
+      "with": 2.48,
+      "minWithout": 23.2,
+      "minWith": 16.9,
+      "mapCalls": 0,
+      "reviewWithout": "pass 6/7",
+      "reviewWith": "pass 6/7"
+    }
+  ],
+  "push": [
+    {
+      "pr": 311,
+      "task": "IPv6 sign-up budget per /48",
+      "without": 1.18,
+      "with": 1.09,
+      "minWithout": 22.1,
+      "minWith": 28.2,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "needs-fix 2/2",
+      "reviewWith": "needs-fix 2/2"
+    },
+    {
+      "pr": 313,
+      "task": "One day constant",
+      "without": 1.22,
+      "with": 1.28,
+      "minWithout": 20.2,
+      "minWith": 19.5,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "pass 2/2",
+      "reviewWith": "needs-fix 1/2"
+    },
+    {
+      "pr": 317,
+      "task": "Connection pooling",
+      "without": 3.63,
+      "with": 2.64,
+      "minWithout": 27.4,
+      "minWith": 33.4,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "pass 1/2",
+      "reviewWith": "pass 1/2"
+    },
+    {
+      "pr": 318,
+      "task": "Tests for uncovered behaviour",
+      "without": 3.42,
+      "with": 3.18,
+      "minWithout": 30.0,
+      "minWith": 26.7,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "pass 4/4",
+      "reviewWith": "pass 3/4"
+    },
+    {
+      "pr": 341,
+      "task": "Init task and Traefik in dev",
+      "without": 2.33,
+      "with": 2.58,
+      "minWithout": 32.1,
+      "minWith": 20.8,
+      "mapCalls": 0,
+      "pushed": 1,
+      "reviewWithout": "pass 4/5",
+      "reviewWith": "pass 4/5"
+    },
+    {
+      "pr": 298,
+      "task": "Author line in page hero",
+      "without": 2.29,
+      "with": 1.70,
+      "minWithout": 22.4,
+      "minWith": 21.8,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "pass 2/3",
+      "reviewWith": "pass 2/3"
+    },
+    {
+      "pr": 294,
+      "task": "Cache static assets",
+      "without": 1.92,
+      "with": 2.04,
+      "minWithout": 25.4,
+      "minWith": 23.1,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "needs-fix 4/4",
+      "reviewWith": "needs-fix 3/4"
+    },
+    {
+      "pr": 296,
+      "task": "One product in structured data",
+      "without": 1.87,
+      "with": 1.78,
+      "minWithout": 17.1,
+      "minWith": 14.9,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "pass 4/4",
+      "reviewWith": "needs-fix 4/4"
+    },
+    {
+      "pr": 237,
+      "task": "Clear browser data on sign-out",
+      "without": 2.55,
+      "with": 2.08,
+      "minWithout": 21.0,
+      "minWith": 15.8,
+      "mapCalls": 0,
+      "pushed": 0,
+      "reviewWithout": "pass 2/2",
+      "reviewWith": "pass 2/2"
+    },
+    {
+      "pr": 239,
+      "task": "Cancel dialog after the grace period",
+      "without": 2.28,
+      "with": 1.93,
+      "minWithout": 23.2,
+      "minWith": 16.9,
+      "mapCalls": 0,
+      "pushed": 1,
+      "reviewWithout": "pass 6/7",
+      "reviewWith": "pass 6/7"
+    }
+  ]
+}
