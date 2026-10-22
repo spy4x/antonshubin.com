@@ -1,8 +1,5 @@
 import { RadioChips } from "@spy4x/preact-ui/radio-chips"
-import {
-  IconCheck,
-  IconExternalLink as ExternalLinkIcon,
-} from "@spy4x/preact-icons"
+import { IconExternalLink as ExternalLinkIcon } from "@spy4x/preact-icons"
 import { NewTabHint } from "./NewTabHint.tsx"
 import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 import {
@@ -13,24 +10,23 @@ import {
   dareTiers,
 } from "../lib/darechat-map.ts"
 
-/** One box: its name, its note, and a check ("In this flow") while a flow that uses it is picked. */
-function Box({ node }: { node: DareNode }) {
+/**
+ * One box: its name, its note, and a check ("In this flow") while a flow
+ * that uses it is picked, styled by `assets/styles.css`. A plain function, not a keyed component: this
+ * markup never hydrates, and Fresh would wrap every keyed component in
+ * comments, which the page's first network round trip has no room for.
+ */
+function box(node: DareNode) {
   return (
     <li
       data-dare-node={node.id}
       data-flows={node.flows.join(" ") || undefined}
-      class={`relative min-w-0 rounded-lg border bg-paper py-2 pl-3 pr-8 ${
-        node.elsewhere ? "border-dashed border-rule-strong" : "border-rule"
-      }`}
+      data-elsewhere={node.elsewhere}
     >
-      <p class="font-semibold text-parchment break-words">{node.label}</p>
-      {node.note && <p class="text-xs text-graphite">{node.note}</p>}
+      <b>{node.label}</b>
+      {node.note && <small>{node.note}</small>}
       {node.flows.length > 0 && (
-        <span
-          data-dare-lit
-          class="absolute right-2 top-2 text-parchment"
-        >
-          <IconCheck class="w-4 h-4" />
+        <span data-dare-lit>
           <span class="sr-only">In this flow</span>
         </span>
       )}
@@ -72,7 +68,6 @@ export function DareChatMap({ item }: { item: string }) {
       <div class="mt-4 grid text-parchment" aria-live="polite">
         {dareFlows.map((f) => (
           <p
-            key={f.id}
             data-dare-sentence={f.id}
             class="col-start-1 row-start-1"
           >
@@ -82,30 +77,14 @@ export function DareChatMap({ item }: { item: string }) {
       </div>
       <ol class="mt-6 grid gap-3">
         {dareTiers.map((tier) => (
-          <li
-            key={tier.id}
-            data-dare-tier={tier.id}
-            class="rounded-xl border border-rule bg-desk p-3 sm:p-5"
-          >
+          <li data-dare-tier={tier.id}>
             <h3 class="text-base sm:text-lg text-parchment">{tier.title}</h3>
             {tier.note && <p class="text-sm text-graphite">{tier.note}</p>}
-            <ul class="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-3">
-              {tier.nodes.map((n) => <Box key={n.id} node={n} />)}
+            <ul>
+              {tier.nodes.map(box)}
             </ul>
             {dareEdges.filter((e) => e.after === tier.id).map((e) => (
-              <p
-                key={e.id}
-                data-dare-edge={e.id}
-                data-flows={e.flow}
-                class="mt-3 flex items-center gap-2 rounded-lg border border-transparent px-3 py-1 text-xs font-semibold text-graphite"
-              >
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 10 10"
-                  class="w-2.5 h-2.5 shrink-0 fill-rule-strong"
-                >
-                  <path d="M0 0h10L5 10z" />
-                </svg>
+              <p data-dare-edge={e.id} data-flows={e.flow}>
                 <span>
                   <span class="text-parchment">{e.from}</span> {e.verb}
                 </span>
