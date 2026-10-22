@@ -2,7 +2,8 @@
 // <h1> at 390 and 1440px with the archive closed and open; Seed's play button
 // on the first screen at both widths; a card's clip and the spotlight's play
 // from the keyboard, loop and send demo-play without fetching any video before
-// the press. Needs a built site and Chromium; see docs/testing.md
+// the press; starting a second clip pauses the first where it was. Needs a
+// built site and Chromium; see docs/testing.md
 // "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser } from "playwright"
@@ -142,6 +143,57 @@ Deno.test("a hub card's clip and the spotlight's play from the keyboard in a loo
           .at(-1),
         ["demo-play", { item: "seed", place: "hero" }],
       )
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("starting a second clip on the hub pauses the first where it was", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    try {
+      await page.goto(`${site.origin}/tools`, { waitUntil: "networkidle" })
+      await page.locator('li[data-tool="mig"] a[aria-label^="Play video"]')
+        .click()
+      const mig = page.locator('li[data-tool="mig"] video')
+      await mig.waitFor({ timeout: WAIT_MS })
+      await page.waitForFunction(
+        () => {
+          const v = document.querySelector<HTMLVideoElement>(
+            'li[data-tool="mig"] video',
+          )
+          return v !== null && !v.paused && v.currentTime > 1
+        },
+        null,
+        { timeout: WAIT_MS },
+      )
+      await page.locator('[data-hub-spotlight] a[aria-label^="Play video"]')
+        .click()
+      await page.waitForFunction(
+        () => {
+          const v = document.querySelector<HTMLVideoElement>(
+            "[data-hub-spotlight] video",
+          )
+          return v !== null && !v.paused && v.currentTime > 0.5
+        },
+        null,
+        { timeout: WAIT_MS },
+      )
+      const first = await mig.evaluate((v) => {
+        const video = v as HTMLVideoElement
+        return { paused: video.paused, at: video.currentTime }
+      })
+      assert(first.paused, "the first clip still plays beside the second")
+      assert(first.at > 1, `the first clip went back to ${first.at}s`)
     } finally {
       await page.close()
     }
