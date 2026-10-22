@@ -30,6 +30,7 @@ import { ROLE } from "../lib/head.ts"
 import { tools } from "../lib/tools.ts"
 import { metaDescription } from "../lib/llms.ts"
 import { workDescription } from "../lib/work.ts"
+import { caseDescription, projectHeadline } from "../lib/case-page.ts"
 import { ABOUT_NAME, aboutDescription } from "../lib/about.ts"
 import { HOW_I_WORK_NAME, howIWorkDescription } from "../lib/how-i-work.ts"
 import {
@@ -257,7 +258,12 @@ async function main() {
       p,
     ): p is typeof p & { slug: string } => Boolean(p.slug))
     for (const project of allProjects) {
-      const html = cardHtml(project.title, oneLine(project.description))
+      // The case page's headline and meta description (#523): the name
+      // and what it is, then the outcome.
+      const html = cardHtml(
+        projectHeadline(project),
+        caseDescription(project),
+      )
       const outUrl = new URL(`projects/${project.slug}.png`, OG_DIR)
       const bytes = await render(browser, html, outUrl)
       console.log(`projects/${project.slug}.png  ${fmtBytes(bytes)}`)
