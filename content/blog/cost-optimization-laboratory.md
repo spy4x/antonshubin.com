@@ -198,6 +198,8 @@ Estimate managed, dedicated, and hybrid designs against the same workload,
 recovery, security, and staffing assumptions. Otherwise the comparison is
 marketing, not architecture.
 
+<FrameworkChecklist />
+
 ## Practical Infrastructure Audit Checklist
 
 Use this before approving a migration or signing a larger platform contract.
