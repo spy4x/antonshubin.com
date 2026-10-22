@@ -131,6 +131,12 @@ export interface CaseFrameProps {
    * projects put the reviews between them) and the video.
    */
   children?: ComponentChildren
+  /**
+   * The page shows the client's reviews itself, in its hero or middle
+   * (Corecircle's story, Connectful's reviews first), so the frame leaves
+   * its own "What {client} said" out.
+   */
+  ownReviews?: boolean
 }
 
 /**
@@ -144,7 +150,7 @@ export interface CaseFrameProps {
  * `routes/work/[slug].tsx` renders it for every other project.
  */
 export function CaseFrame(
-  { project, currentPath, hero, children }: CaseFrameProps,
+  { project, currentPath, hero, children, ownReviews = false }: CaseFrameProps,
 ) {
   setCaseHead(project)
   const slug = project.slug ?? ""
@@ -175,7 +181,7 @@ export function CaseFrame(
         <CaseHero project={project} media={hero} />
         <div data-case-middle class="mt-16 space-y-16">
           {middle}
-          {!inMiddle && reviewsEl}
+          {!inMiddle && !ownReviews && reviewsEl}
           <CaseBuilt project={project} />
           <CaseMore related={relatedProjects(project)} />
         </div>

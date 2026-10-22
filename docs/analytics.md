@@ -372,6 +372,11 @@ interaction sends `case-try`:
   when a step of "The four steps" is picked, by a tab, the arrow keys or the
   lightbox's Previous and Next. The first step, shown when the page opens, sends
   nothing until it is picked again after another.
+- `/work/corecircle`: `case-try` (`item: corecircle`, `part: tour`, `step` one
+  of `corecircle-1` … `corecircle-4`) when a screen of the "Corecircle screens"
+  tour is picked, the same way. Its "See Connectful" link sends `cta`.
+- `/work/connectful` has no interaction of its own; its "See Corecircle" link
+  sends `cta`.
 - `/work/smartlite`: the same for "What an operator sees" (`item: smartlite`,
   `part: tour`, `step` `smartlite-` plus the screen's caption in kebab case:
   `smartlite-dashboard`, `smartlite-alerts`, … `smartlite-lamp-profiles`,
