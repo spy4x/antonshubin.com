@@ -57,7 +57,8 @@ export async function casePageProblems(path: string): Promise<string[]> {
 /**
  * The case frame's layout slips on `paths` (#562), one line each; empty when
  * the pages are sound. At 390 and 1440px a top-line part that wraps to a new
- * line shows no "·" before it, so no line starts or ends with one. At 1440px
+ * line has its "·" outside a box that clips it, so no line starts or ends
+ * with one. At 1440px
  * the title block starts at the top of the hero row, and no strip
  * screenshot is wider or taller than the hero picture (2px for its frame).
  */
@@ -82,6 +83,9 @@ export async function caseLayoutProblems(paths: string[]): Promise<string[]> {
             const out: string[] = []
             const top = document.querySelector("[data-case-top]")!
             const box = top.parentElement!.getBoundingClientRect()
+            const clips = ["hidden", "clip"].includes(
+              getComputedStyle(top.parentElement!).overflowX,
+            )
             let lineTop = -Infinity
             for (const part of Array.from(top.children)) {
               const rect = part.getBoundingClientRect()
@@ -91,6 +95,11 @@ export async function caseLayoutProblems(paths: string[]): Promise<string[]> {
               const shown = dot.right > box.left + 1
               if (newLine && shown) {
                 out.push(`a line starts with "·": ${part.textContent}`)
+              }
+              if (!shown && !clips) {
+                out.push(
+                  `a "·" outside the box is not clipped: ${part.textContent}`,
+                )
               }
               if (!newLine && !shown) {
                 out.push(`a "·" is hidden mid-line: ${part.textContent}`)
