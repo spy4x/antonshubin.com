@@ -15,13 +15,30 @@
  * read through `lib/github-snapshot.ts`, so pages render the same on every
  * request and tests stay deterministic.
  *
- * This module reads no environment variable and imports only `proof.ts` and
- * the committed snapshot (`github-snapshot.ts`, for `toolLicence()`), so tests
- * and scripts can load it without any permission.
+ * This module reads no environment variable and imports only `proof.ts`, the
+ * committed snapshot (`github-snapshot.ts`, for `toolLicence()`) and
+ * `deno.json` (for the library version the site imports), so tests and
+ * scripts can load it without any permission.
  */
+import config from "../deno.json" with { type: "json" }
 import { githubSnapshot } from "./github-snapshot.ts"
 import { proof } from "./proof.ts"
 import type { RegistryPackage } from "./snapshot-fetch.ts"
+
+/**
+ * The exact version `deno.json` pins for `specifier`, so a tool the site
+ * itself imports shows the version it runs and follows every bump.
+ */
+export function importedVersion(
+  specifier: keyof typeof config.imports,
+): string {
+  const spec = config.imports[specifier]
+  const version = spec.match(/@(\d+\.\d+\.\d+)$/)?.[1]
+  if (!version) throw new Error(`deno.json: no exact version in ${spec}`)
+  return version
+}
+
+const PREACT_UI_VERSION = importedVersion("@spy4x/preact-ui")
 
 /**
  * Where a tool stands, shown as a shape plus a word by
@@ -720,10 +737,11 @@ export const tools: Tool[] = [
     registry: {
       name: "JSR",
       url: "https://jsr.io/@spy4x",
-      version: "8.10.0",
+      // The version the site imports, not JSR's latest, so the install line
+      // and the palette demo name the release the page runs and indexes.
+      version: PREACT_UI_VERSION,
       published: true,
-      install: "deno add jsr:@spy4x/preact-ui@8.10.0",
-      latestFrom: { registry: "jsr", name: "@spy4x/preact-ui" },
+      install: `deno add jsr:@spy4x/preact-ui@${PREACT_UI_VERSION}`,
     },
     licence: "MIT",
     runtime:

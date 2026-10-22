@@ -3,6 +3,7 @@
 // #522: the middle is the library's CommandPalette over the library's own
 // components (islands/PaletteDemo.tsx).
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import config from "../../deno.json" with { type: "json" }
 import { startSite } from "../harness.ts"
 import { assertToolFrame } from "../tool-frame.ts"
 import { pageBody, visibleText } from "../html.ts"
@@ -55,6 +56,18 @@ Deno.test("the preact-components page wears the tool frame with the README's lin
   } finally {
     await site.stop()
   }
+})
+
+Deno.test("every install command on the page names the @spy4x/preact-ui version deno.json pins", async () => {
+  const pin = config.imports["@spy4x/preact-ui"].replace(/^jsr:/, "")
+  const page = await builtPage()
+  const named = [...page.matchAll(/@spy4x\/preact-ui@[\w.-]+/g)].map((m) =>
+    m[0]
+  )
+  // The install line and the palette's "Copy the install command".
+  assert(named.length >= 2, `named ${named.length} times`)
+  for (const spec of named) assertEquals(spec, pin)
+  assert(page.includes(`deno add jsr:${pin}`), "no install command")
 })
 
 Deno.test("the palette section renders the search and its four examples disabled until the island runs, the empty stage and the no-script line", async () => {
