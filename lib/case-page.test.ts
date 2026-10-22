@@ -7,6 +7,7 @@ import {
   heroShot,
   projectHeadline,
   reviewsFirst,
+  sameFounder,
   shortName,
   SITE_SUFFIX,
   TITLE_MAX,
@@ -128,6 +129,26 @@ Deno.test("the hero is the first screenshot as WebP, sized, in a phone frame onl
 Deno.test("only projects from 2018 or before put their reviews first", () => {
   assertEquals(reviewsFirst({ ...base, period: { from: 2018 } }), true)
   assertEquals(reviewsFirst({ ...base, period: { from: 2019 } }), false)
+})
+
+Deno.test("Corecircle and Connectful put their reviews first though they are from after 2018", () => {
+  for (const slug of ["corecircle", "connectful"]) {
+    const p = projects.freelance.find((x) => x.slug === slug)!
+    assertEquals(reviewsFirst(p), true, slug)
+  }
+  assertEquals(reviewsFirst({ ...base, period: { from: 2021 } }), false)
+})
+
+Deno.test("sameFounder links each of the founder's two projects to the other, with one sentence", () => {
+  const find = (slug: string) =>
+    projects.freelance.find((x) => x.slug === slug)!
+  const line =
+    "Nastassia Ponomarenko first hired me for Connectful, then again for Corecircle, her next product."
+  assertEquals(sameFounder(find("corecircle"))?.other.slug, "connectful")
+  assertEquals(sameFounder(find("connectful"))?.other.slug, "corecircle")
+  assertEquals(sameFounder(find("corecircle"))?.line, line)
+  assertEquals(sameFounder(find("connectful"))?.line, line)
+  assertEquals(sameFounder(base), undefined)
 })
 
 Deno.test("the meta description leaves out a kind line that repeats the outcome's figure", () => {
