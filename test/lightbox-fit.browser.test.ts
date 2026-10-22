@@ -12,7 +12,9 @@ const VIEWPORTS = [
   { width: 375, height: 812 },
   { width: 1440, height: 900 },
 ]
-const PROJECTS = ["truth-or-dare", "roley", "smartlite", "corecircle"]
+// Roley and SmartLite show a tour instead of the strip since #523: Connectful
+// is the tall phone capture, Microwork the landscape one.
+const PROJECTS = ["truth-or-dare", "connectful", "microwork", "corecircle"]
 
 interface Rect {
   top: number

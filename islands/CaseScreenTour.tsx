@@ -13,7 +13,7 @@ export interface CaseTourStep extends Omit<ScreenTourStep, "text"> {
  * island only adds the switching.
  */
 export default function CaseScreenTour(
-  { item, steps, frame, label, hero = false }: {
+  { item, steps, frame, label, hero = false, numbered = true }: {
     /** The project's slug, the event's `item`. */
     item: string
     steps: CaseTourStep[]
@@ -22,13 +22,15 @@ export default function CaseScreenTour(
     label: string
     /** The tour is the page's hero: its first screenshot gets `fetchpriority="high"`. */
     hero?: boolean
+    /** Number the tabs: on for a sequence of steps, off for screens grouped by job. */
+    numbered?: boolean
   },
 ) {
   return (
     <ScreenTour
       steps={steps}
       frame={frame}
-      numbered
+      numbered={numbered}
       fetchPriority={hero ? "high" : undefined}
       label={label}
       closeLabel="Close"

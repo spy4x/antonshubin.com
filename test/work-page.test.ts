@@ -354,14 +354,22 @@ siteTest(
 )
 
 siteTest(
-  "only the hero, the first screenshot, loads with high priority, and it is not lazy",
+  "only the hero, the page's first screenshot, loads with high priority, and it is not lazy",
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
       assertEquals(count(html, /fetchpriority="high"/), 1, p.slug)
       const tag = html.match(/<img\b[^>]*fetchpriority="high"[^>]*>/)![0]
+      // The hero is the page's first screenshot: the frame's first one, or
+      // the first step of a page's own tour (Roley's starts at "Scripts").
+      const first = html.match(
+        /<img\b[^>]*src="\/img\/projects\/[^"]+\/(?!logo)[^>]*>/,
+      )![0]
+      assertEquals(tag, first, `${p.slug}: the hero is not the first picture`)
       // Fresh may append a cache key (`?__frsh_c=`) to the path.
-      assert(tag.includes(`src="${heroShot(p)!.src}`), tag)
+      if (p.slug !== "roley") {
+        assert(tag.includes(`src="${heroShot(p)!.src}`), tag)
+      }
       assert(!/loading="lazy"/.test(tag), `${p.slug}: hero is lazy`)
       const images = count(
         html,

@@ -303,7 +303,7 @@ Deno.test("the project gallery's Previous and Next are transparent inside a Rule
       viewport: { width: 390, height: 844 },
     })
     try {
-      await page.goto(`${site.origin}/work/smartlite`, {
+      await page.goto(`${site.origin}/work/microwork`, {
         waitUntil: "networkidle",
       })
       const buttons = page.locator(GALLERY_NAV_BUTTONS)
@@ -367,7 +367,7 @@ Deno.test("the project gallery's counter row is 40px tall with and without Previ
           javaScriptEnabled,
         })
         try {
-          await page.goto(`${site.origin}/work/smartlite`, {
+          await page.goto(`${site.origin}/work/microwork`, {
             waitUntil: "networkidle",
           })
           if (javaScriptEnabled && width === 390) {

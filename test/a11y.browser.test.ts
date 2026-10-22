@@ -137,11 +137,11 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
     browser = await launchChromium()
     const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT })
     try {
-      await page.goto(`${site.origin}/work/smartlite`, {
+      await page.goto(`${site.origin}/work/microwork`, {
         waitUntil: "networkidle",
       })
       const counter = page.locator("[data-gallery-counter]")
-      assertEquals((await counter.innerText()).trim(), "2 / 12")
+      assertEquals((await counter.innerText()).trim(), "2 / 7")
       const next = page.getByRole("button", { name: "Next screenshot" })
       const prev = page.getByRole("button", { name: "Previous screenshot" })
       await next.waitFor({ state: "visible" })
@@ -150,7 +150,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
       await next.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
-          ?.trim() === "3 / 12"
+          ?.trim() === "3 / 7"
       )
       const scrolled = await page.locator("[data-gallery-strip]").evaluate(
         (el) => el.scrollLeft,
@@ -160,7 +160,7 @@ Deno.test("the project gallery counts its screenshots and its named Next and Pre
       await prev.click()
       await page.waitForFunction(() =>
         document.querySelector("[data-gallery-counter]")?.textContent
-          ?.trim() === "2 / 12"
+          ?.trim() === "2 / 7"
       )
     } finally {
       await page.close()
@@ -208,8 +208,9 @@ Deno.test("a portrait gallery's Next walks to the last screenshot and Previous w
     browser = await launchChromium()
     const page: Page = await newPage(browser, { viewport: DESKTOP_VIEWPORT })
     try {
-      // Roley: nine phone screenshots, several in view at once at 1440px.
-      await page.goto(`${site.origin}/work/roley`, {
+      // Calltrack: seven screenshots taller than wide, several in view at once
+      // at 1440px. (Roley's page is a tour since #523.)
+      await page.goto(`${site.origin}/work/calltrack`, {
         waitUntil: "networkidle",
       })
       const next = page.getByRole("button", { name: "Next screenshot" })
@@ -217,14 +218,14 @@ Deno.test("a portrait gallery's Next walks to the last screenshot and Previous w
       await next.waitFor({ state: "visible" })
       assert(await prev.isDisabled(), "Previous is enabled at the start")
 
-      const forward = await walk(page, next, 8)
+      const forward = await walk(page, next, 6)
       // The hero shows screenshot 1; the strip starts at 2 (#523).
-      assertEquals(forward[0], "2 / 9")
-      assertEquals(forward[forward.length - 1], "9 / 9", forward.join(", "))
+      assertEquals(forward[0], "2 / 7")
+      assertEquals(forward[forward.length - 1], "7 / 7", forward.join(", "))
       assert(await next.isDisabled(), "Next is still enabled at the end")
 
-      const back = await walk(page, prev, 8)
-      assertEquals(back[back.length - 1], "2 / 9", back.join(", "))
+      const back = await walk(page, prev, 6)
+      assertEquals(back[back.length - 1], "2 / 7", back.join(", "))
       assert(await prev.isDisabled(), "Previous is still enabled at the start")
     } finally {
       await page.close()
