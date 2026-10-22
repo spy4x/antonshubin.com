@@ -75,7 +75,7 @@ Deno.test("What an operator sees lists all 12 screens, grouped by job, with thei
       "Pole state and sensor readings, live over MQTT.",
       "Motion and ambient-light triggers.",
       "Scheduled automation: by time of day, triggered by a sensor, or by manual override.",
-      "Role-based access (admin, operator, viewer) and TOTP 2FA.",
+      "Role-based access and TOTP 2FA.",
       "Some details are blacked out in these screenshots.",
     ]
   ) {

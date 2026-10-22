@@ -61,7 +61,7 @@ Deno.test("Make a movie in four steps is a numbered phone tour whose lines are i
   const text = visibleText(tour)
   for (
     const line of [
-      "Each script pairs with a physical craft box of scripts, props and costumes.",
+      "Physical craft boxes of scripts, props and costumes pair with the app.",
       "The digital recorder films one scene at a time.",
       "An ffmpeg.wasm video pipeline stitches the clips into a finished movie, with intro and ending credits and 50+ transitions.",
       "The finished movie.",

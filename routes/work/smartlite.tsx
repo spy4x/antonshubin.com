@@ -51,7 +51,7 @@ const TOUR_PICKS: TourPick[] = [
   {
     caption: "Users",
     group: "Admin",
-    text: "Role-based access (admin, operator, viewer) and TOTP 2FA.",
+    text: "Role-based access and TOTP 2FA.",
   },
   { caption: "Regions", group: "Admin" },
   { caption: "Lamp profiles", group: "Admin" },

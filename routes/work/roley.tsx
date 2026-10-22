@@ -20,7 +20,7 @@ const TOUR_PICKS: TourPick[] = [
     caption: "Scripts (mobile)",
     label: "Pick a script",
     text:
-      "Each script pairs with a physical craft box of scripts, props and costumes.",
+      "Physical craft boxes of scripts, props and costumes pair with the app.",
   },
   {
     caption: "Recorder (mobile)",
