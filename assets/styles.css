@@ -80,6 +80,7 @@
   /* The gallery strip and its lightbox: hairline and control borders, and the
      dark scrim over a photo (Ink at an alpha, text on it Parchment). */
   --color-border-subtle: var(--color-rule);
+  --color-border-frame: var(--color-rule);
   --color-border-control: var(--color-rule-strong);
   --color-border-button: var(--color-rule-strong);
   --color-border-strong: var(--color-rule-strong);
@@ -147,7 +148,7 @@ div:has(> [data-gallery-counter]) > button {
 /* @spy4x/preact-ui/window-frame and screen-tour: a case page's hero frame,
    plain or phone, and Sogroya's walkthrough (#523, components/case-frame/,
    islands/CaseScreenTour.tsx). Their `dark:` classes stay out. */
-@source inline("shadow-2xl aspect-[9/19] max-w-xs rounded-[2.5rem] bg-foreground rounded-[2rem] top-2 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:overflow-visible lg:p-0 lg:w-full lg:whitespace-normal border-selected text-selected border-current lg:mx-auto [grid-area:1/1] opacity-100 motion-safe:transition-opacity [@media(scripting:enabled)]:grid motion-safe:transition-[opacity,visibility] [@media(scripting:enabled)]:invisible [@media(scripting:enabled)]:opacity-0 border-button bg-hover hover:bg-track self-start sm:min-h-9");
+@source inline("border-frame shadow-2xl aspect-[9/19] max-w-xs rounded-[2.5rem] bg-foreground rounded-[2rem] top-2 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:overflow-visible lg:p-0 lg:w-full lg:whitespace-normal border-selected text-selected border-current lg:mx-auto [grid-area:1/1] opacity-100 motion-safe:transition-opacity [@media(scripting:enabled)]:grid motion-safe:transition-[opacity,visibility] [@media(scripting:enabled)]:invisible [@media(scripting:enabled)]:opacity-0 border-button bg-hover hover:bg-track self-start sm:min-h-9");
 /* @spy4x/preact-ui/feature-card and card: the tool showcase (#448,
    components/ToolShowcase.tsx). Their `dark:` classes stay out, as the
    button's do. */

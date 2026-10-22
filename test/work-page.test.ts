@@ -371,14 +371,11 @@ siteTest(
         html,
         /<img\b[^>]*src="\/img\/projects\/[^"]+\/(?!logo)[^"]*"[^>]*loading="lazy"/,
       )
-      // This count pins the library's loading, not the site's: the strip sets
-      // no `loading` on its first image unless it is the hero (preact-ui
-      // 10.1.0), so that one loads at the default and competes with the hero.
-      // A library release that lazy-loads it fails this line on purpose.
-      const strip = html.includes("data-gallery-strip") ? 1 : 0
+      // The strip is `lazy` (preact-ui 10.3.0), so no screenshot but the
+      // hero competes for bandwidth.
       assertEquals(
         lazy,
-        images - 1 - strip,
+        images - 1,
         `${p.slug}: not every other screenshot is lazy`,
       )
     }

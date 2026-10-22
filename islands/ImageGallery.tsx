@@ -11,9 +11,9 @@ interface GalleryImageData {
 
 /**
  * A project's screenshots as `@spy4x/preact-ui`'s strip, after the case
- * page's hero (#523), which shows the first screenshot: every image after
- * the strip's first is lazy (the library loads that one at the browser's
- * default), and the counter numbers each slide among all the project's screenshots
+ * page's hero (#523), which shows the first screenshot: every image in the
+ * strip is lazy (`lazy`), so none competes with the hero for bandwidth, and
+ * the counter numbers each slide among all the project's screenshots
  * (`first` is the number of the strip's first one), so it matches the
  * "Screenshot 2 of 12" captions. Every slide shows its caption (the
  * `alt`), a "3 / 12" counter sits under the row with Previous and Next
@@ -33,6 +33,7 @@ export default function ImageGallery(
   return (
     <LibraryGallery
       layout="strip"
+      lazy
       captions
       navigation
       navigationVariant="ghost"
