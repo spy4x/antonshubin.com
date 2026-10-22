@@ -1,0 +1,27 @@
+/*
+ * The palette demo on /tools/preact-components (#522), and nothing else:
+ * islands/PaletteDemo.tsx imports it, so only the page that renders that
+ * island links it and no other page downloads its rules. It holds the
+ * classes of the library components the demo renders that the site
+ * stylesheet does not have; the demo's own files stay in the site
+ * stylesheet's scan. Utilities only: the theme and the preset are
+ * references, and the page already has the site stylesheet's variables.
+ */
+@import "tailwindcss/theme.css" theme(reference);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import "@spy4x/preact-theme/preset.css";
+
+/* @spy4x/preact-ui/command-palette, toastr, copy-button and kbd: the field
+   trigger and its hotkey hint, the dialog (a sheet on a phone), its rows, the
+   success and error toasts with Undo, and the stage's copy button. */
+@source inline("max-sm:min-h-11 pointer-fine:inline-flex min-w-6 shadow-raised top-16 bottom-auto my-0 w-[min(36rem,calc(100vw-2rem))] shadow-2xl backdrop:backdrop-blur-sm max-sm:inset-0 max-sm:m-0 max-sm:h-dvh max-sm:max-h-none max-sm:w-full max-sm:rounded-none max-sm:border-0 max-sm:open:flex max-sm:open:flex-col outline-none placeholder:text-placeholder sm:size-9 max-sm:flex-1 m-2 py-6 max-h-96 max-sm:min-h-0 z-50 [--toastr-gap:1rem] [--toastr-far:1rem] [--toastr-width:auto] [--toastr-max:none] sm:[--toastr-gap:2rem] sm:[--toastr-far:auto] sm:[--toastr-width:100%] sm:[--toastr-max:20rem] md:[--toastr-max:24rem] w-(--toastr-width) max-w-(--toastr-max) top-(--toastr-gap) right-(--toastr-gap) left-(--toastr-far) bottom-(--toastr-gap) max-sm:items-center text-selected line-clamp-1 transition-[translate,opacity] duration-300 motion-safe:starting:translate-x-8 motion-safe:starting:opacity-0 bg-success text-(--color-success-foreground) min-w-11 sm:min-h-9 sm:min-w-9 -my-3 -mr-3 self-start sm:-my-2 sm:-mr-2 focus-visible:outline-current bg-danger-fill text-danger-fill-foreground");
+
+/* Where no ThemePreview frame sets the library's palette, the site answers:
+   the search field's placeholder and the toasts' fills. */
+:root {
+  --color-placeholder: var(--color-graphite);
+  --color-success-fill: var(--color-sage);
+  --color-success-foreground: var(--color-ink);
+  --color-danger-fill: var(--color-brick);
+  --color-danger-fill-foreground: var(--color-ink);
+}

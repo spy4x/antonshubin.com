@@ -276,15 +276,37 @@ None yet.
 
 ### preact-components
 
-- `tool-try` (`item: preact-components`, `part: code`): "Show the code" under
-  the Orbit slice is opened. The attributes sit on the `<summary>`, which is not
-  a link, so the tracker's click handling does not cancel the toggle.
-- `outbound` (`to: live`, `place: body`): "Open the live UI guide" under the
-  slice; (`to: issues`, `place: body`): the #210 link and "open issues" in
-  "Where it stands".
-- The preview's Dark and Light radios send nothing yet: the library's
-  `ThemePreview` takes no attributes for its radios, so the spec's `tool-try`
-  with `part: theme-light` / `theme-dark` waits for that option.
+The palette demo (`islands/PaletteDemo.tsx`, #522) sends its events with
+`track()`, `item: preact-components`:
+
+- `tool-try`, `part: palette:open`: the palette opened (a click, Ctrl K or ⌘K,
+  `/`, or an example), once a page view. The number the demo should move is the
+  share of page views with this event.
+- `tool-try`, `part` `example:typo`, `example:order`, `example:layout` or
+  `example:cyrillic`: an example search under the field was pressed.
+- `tool-try`, `part: pick:forgiving` or `pick:name`: a component was picked;
+  `forgiving` when the search needed a typo, another name, the other keyboard
+  layout, the other alphabet or word order. `pick:forgiving` over all picks says
+  whether the forgiving search is what people try.
+- `tool-try`, `part` `command:theme-light`, `command:theme-dark`,
+  `command:toast` or `command:undo`: a "Try" command ran, or Undo on its toast
+  was pressed.
+- `tool-install-copy`, `part: install` or `import`: the install command or a
+  component's import line was copied.
+- `outbound` (`to: live`, `place: body`): the "Open the live UI guide" command
+  (sent with `track()` before the page leaves).
+
+From attributes, as elsewhere:
+
+- `tool-try` (`part: theme-dark` / `theme-light`): the preview's Dark and Light
+  radios, through `ThemePreview`'s `inputAttributes`. A "Switch the preview"
+  command checks the radio without a click, so it counts once, as its command.
+- `tool-try` (`part: code`): "Show the code" under the demo is opened. The
+  attributes sit on the `<summary>`, which is not a link, so the tracker's click
+  handling does not cancel the toggle.
+- `outbound` (`to: live`, `place: body`): "See it in the live UI guide" on the
+  stage and "Open the live UI guide" under the demo; (`to: issues`,
+  `place: body`): the #210 link and "open issues" in "Where it stands".
 
 ### rostok
 

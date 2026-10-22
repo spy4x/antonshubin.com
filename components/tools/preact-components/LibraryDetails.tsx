@@ -2,7 +2,7 @@ import { Card } from "@spy4x/preact-ui/card"
 import { FACT_LINK } from "../../FactCard.tsx"
 import { eventAttrs } from "../../../lib/analytics.ts"
 import type { ToolPageData } from "../../tool-frame/tool-page.ts"
-import { LIBRARY_PACKAGES } from "./orbit.ts"
+import { LIBRARY_PACKAGES } from "./packages.ts"
 
 const ITEM = "preact-components"
 

@@ -81,6 +81,8 @@ export interface EventProps {
    * `tool-try`: which of a tool page's own interactions was used.
    * `post-try`: which component of a post was used (its tag name).
    * `case-try`: which of a case page's interactions was used (`tour`).
+   * `tool-install-copy`: which line was copied, where a page has more than
+   * one (`install`, `import`).
    */
   part?: string
   /** `case-try` only: the step of the interaction that was picked. */
