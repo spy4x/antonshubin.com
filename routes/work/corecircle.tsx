@@ -60,8 +60,9 @@ function Story({ project, review }: { project: Project; review: Testimonial }) {
  * `/work/corecircle` (#523): the review is the story, so the page opens on
  * it. Then "What I built" with the app's four screens as a tour, and a link
  * to Connectful, the same founder's first product. The screenshots are store
- * graphics that already draw a phone, so the tour uses the plain frame; it is
- * the page's hero image, since the story replaces the hero picture.
+ * graphics that already draw a phone, so the tour uses the plain frame. The
+ * story replaces the hero picture, and the tour sits below the first screen,
+ * so no image on the page loads with high priority (#562).
  */
 export default define.page(function CorecirclePage(ctx) {
   const project = findWorkProject("corecircle")
@@ -96,7 +97,6 @@ export default define.page(function CorecirclePage(ctx) {
             frame="plain"
             label={label}
             numbered={false}
-            hero
           />
         </div>
       </div>

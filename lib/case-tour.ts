@@ -24,9 +24,14 @@ export function tourStepId(slug: string, caption: string): string {
 
 /**
  * The tour's steps, in the order of `picks`. Throws on a caption the project
- * has no screenshot for, so a renamed file fails the build, not the page.
+ * has no screenshot for, so a renamed file fails the build, not the page. In
+ * the `phone` frame a caption drops its " (mobile)" (#562): the frame says it.
  */
-export function tourSteps(project: Project, picks: TourPick[]): CaseTourStep[] {
+export function tourSteps(
+  project: Project,
+  picks: TourPick[],
+  frame: "plain" | "phone" = "plain",
+): CaseTourStep[] {
   const shots = projectScreenshots(project)
   const slug = project.slug ?? ""
   return picks.map((pick) => {
@@ -39,7 +44,9 @@ export function tourSteps(project: Project, picks: TourPick[]): CaseTourStep[] {
       group: pick.group,
       image: {
         src: shot.src,
-        alt: shot.alt,
+        alt: frame === "phone"
+          ? shot.alt.replace(/ \(mobile\)$/, "")
+          : shot.alt,
         width: shot.width ?? 1440,
         height: shot.height ?? 1000,
       },

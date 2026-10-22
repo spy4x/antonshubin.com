@@ -51,9 +51,9 @@ siteTest(
     }
     // The store graphics already draw a phone: no phone frame around them.
     assert(!html.includes("rounded-[2.5rem]"), "a phone frame")
-    const hero = html.match(/<img\b[^>]*fetchpriority="high"[^>]*>/g) ?? []
-    assertEquals(hero.length, 1)
-    assert(hero[0]!.includes('src="/img/projects/corecircle/1.webp'), hero[0])
+    // The tour sits below the first screen at both widths, and the story's
+    // text is the largest paint: no screenshot competes with it (#562).
+    assertEquals(count(html, /fetchpriority="high"/g), 0)
     assert(!html.includes("data-gallery-strip"), "a second gallery")
   },
 )

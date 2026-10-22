@@ -9,7 +9,7 @@ import { ClosingBand, DEFAULT_BAND_PROMISES } from "../ClosingBand.tsx"
 import { MoreWorkCard } from "../MoreWorkCard.tsx"
 import { ProjectFactCard, SimilarWorkLink } from "../ProjectFactCard.tsx"
 import { PullQuote } from "../ProjectReviews.tsx"
-import { shortName } from "../../lib/case-page.ts"
+import { heroShot, shortName, stripTile } from "../../lib/case-page.ts"
 import ImageGallery from "../../islands/ImageGallery.tsx"
 import { WORK_PATH } from "../../lib/work.ts"
 
@@ -27,17 +27,47 @@ function splitParagraphs(text: string): string[] {
 }
 
 /**
+ * From 1024px no slide is wider than the hero and no screenshot taller
+ * (#562), so the strip never outgrows the page's main picture and a tall
+ * phone screen never towers over it. Every slide keeps one width, since the
+ * library steps Previous and Next by the first slide's width; a narrower
+ * picture and its caption sit centred in it. Slides snap to the row's start
+ * from 1024px: several fit in the row, and centring one would make Next
+ * land past the next slide. The sizes come from the section's
+ * `--case-tile-*` variables.
+ */
+const TILE_CLASS = [
+  "lg:items-start",
+  "lg:[&>li]:max-w-(--case-tile-width)",
+  "lg:[&>li]:snap-start",
+  "lg:[&_figure]:items-center",
+  "lg:[&_figcaption]:text-center",
+  "lg:[&_figure>button]:w-fit",
+  "lg:[&_img]:w-auto",
+  "lg:[&_img]:max-w-full",
+  "lg:[&_img]:max-h-(--case-tile-height)",
+].join(" ")
+
+/**
  * The screenshots after the hero's first one, as the strip gallery (every
- * image lazy; the counter numbers them among all the project's screenshots).
- * Nothing for a project with one screenshot or none.
+ * image lazy; the counter numbers the strip's own slides), sized from 1024px
+ * by the hero (`stripTile()`). Nothing for a project with one screenshot or
+ * none.
  */
 export function CaseGallery({ project }: { project: Project }) {
   const rest = projectScreenshots(project).slice(1)
   if (rest.length === 0) return null
+  const tile = stripTile(heroShot(project))
   return (
-    <section aria-labelledby="project-screenshots">
+    <section
+      aria-labelledby="project-screenshots"
+      data-case-strip
+      style={tile
+        ? `--case-tile-width:${tile.width}rem;--case-tile-height:${tile.height}rem`
+        : undefined}
+    >
       <h2 id="project-screenshots" class="sr-only">Screenshots</h2>
-      <ImageGallery images={rest} first={2} />
+      <ImageGallery images={rest} class={tile ? TILE_CLASS : undefined} />
     </section>
   )
 }

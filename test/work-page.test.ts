@@ -11,7 +11,7 @@ import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, mainContent, visibleText } from "./html.ts"
 import { formatPeriod, projects } from "../lib/data.ts"
 import { catalogItems } from "../lib/catalog.ts"
-import { firstSentence } from "../lib/llms.ts"
+import { firstSentence, projectLead } from "../lib/llms.ts"
 import { projectTestimonials } from "../lib/testimonials.ts"
 import {
   CASE_DESCRIPTION_MAX,
@@ -43,6 +43,9 @@ function siteTest(name: string, fn: (site: Site) => Promise<void>) {
 }
 
 const clients = projects.freelance
+
+/** Pages whose first screen holds no picture: nothing on them is high priority. */
+const NO_HERO_PICTURE = new Set(["corecircle"])
 
 /** The HTML from the element carrying `marker` to the end of its closing `tag`. */
 function region(html: string, marker: string, tag: string): string {
@@ -366,6 +369,12 @@ siteTest(
   async (site) => {
     for (const p of clients) {
       const html = await site.html(`/work/${p.slug}`)
+      // Corecircle's story replaces the hero picture and its tour sits below
+      // the first screen, so no image there loads with high priority (#562).
+      if (NO_HERO_PICTURE.has(p.slug!)) {
+        assertEquals(count(html, /fetchpriority="high"/), 0, p.slug)
+        continue
+      }
       assertEquals(count(html, /fetchpriority="high"/), 1, p.slug)
       const tag = html.match(/<img\b[^>]*fetchpriority="high"[^>]*>/)![0]
       // The hero is the page's first screenshot: the frame's first one, or
@@ -513,3 +522,29 @@ siteTest(
     }
   },
 )
+
+Deno.test("no client project's kind line repeats its lead (#562)", () => {
+  const words = (text: string) =>
+    text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean)
+  for (const p of clients) {
+    const lead = new Set(words(projectLead(p)))
+    const kind = words(p.kind!)
+    const shared = kind.filter((w) => lead.has(w))
+    assert(
+      shared.length <= kind.length / 2,
+      `${p.slug}: "${p.kind}" repeats the lead (${shared.join(", ")})`,
+    )
+  }
+})
+
+Deno.test("Microwork's and Sajari's kind lines are not a phrase of What I built either (#562)", () => {
+  for (const slug of ["microwork", "sajari"]) {
+    const p = clients.find((c) => c.slug === slug)!
+    const lead = projectLead(p)
+    const built = p.description.replace(/\s+/g, " ").replace(lead, "")
+    assert(
+      !built.toLowerCase().includes(p.kind!.toLowerCase()),
+      `${slug}: "${p.kind}" is printed again under What I built`,
+    )
+  }
+})

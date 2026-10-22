@@ -3,7 +3,7 @@ import { NotFound } from "../../components/NotFound.tsx"
 import { CaseFrame } from "../../components/case-frame/CaseFrame.tsx"
 import { WhatIBuilt } from "../../components/case-frame/CaseParts.tsx"
 import { findWorkProject } from "../../lib/work.ts"
-import { projectScreenshots } from "../../lib/data.ts"
+import { projectScreenshots, screenshotCaption } from "../../lib/data.ts"
 import {
   FOODRAZOR_POSTER,
   type FoodRazorDevice,
@@ -36,14 +36,22 @@ export default define.page(function FoodRazorPage(ctx) {
   if (!project?.videoURL) return <NotFound pathname={ctx.url.pathname} />
   const shots = projectScreenshots(project)
   const shot = (file: string) => shots.find((s) => s.src.endsWith(`/${file}`))!
+  // The caption numbers the screenshot within this device's tour (#562),
+  // not among all twelve: "Screenshot 2 of 3".
   const tour = (device: FoodRazorDevice) =>
-    stepsOn(device).map((step) => {
-      const s = shot(step.files[device]!)
+    stepsOn(device).map((step, i, steps) => {
+      const file = step.files[device]!
+      const s = shot(file)
       const [width, height] = device === "phone" ? [624, 1250] : [1600, 801]
       return {
         id: `foodrazor-${device}-${step.id}`,
         label: step.label,
-        image: { src: s.src, alt: s.alt, width, height },
+        image: {
+          src: s.src,
+          alt: screenshotCaption(file, i, steps.length),
+          width,
+          height,
+        },
       }
     })
   return (

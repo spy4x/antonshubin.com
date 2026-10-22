@@ -124,12 +124,17 @@ function ClickFlow() {
           >
             {i > 0 && <Arrow />}
             <div class="w-full h-full bg-paper border border-rule rounded-lg p-4">
-              <div class="flex flex-wrap items-baseline gap-x-2">
+              <div class="flex items-baseline gap-x-2">
                 <span aria-hidden="true" class="text-sm text-graphite">
                   {i + 1}
                 </span>
-                <h3 class="text-lg text-parchment">{step.name}</h3>
-                <code class="ml-auto text-xs text-graphite">{step.via}</code>
+                <h3 class="min-w-0 text-lg text-parchment">{step.name}</h3>
+                <code
+                  data-case-flow-via
+                  class="ml-auto shrink-0 text-xs text-graphite"
+                >
+                  {step.via}
+                </code>
               </div>
               <p class="mt-2 text-sm text-graphite leading-relaxed">
                 {step.text}

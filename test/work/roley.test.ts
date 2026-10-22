@@ -72,6 +72,16 @@ Deno.test("Make a movie in four steps is a numbered phone tour whose lines are i
   assert(!html.includes("data-gallery-strip"), "a second gallery")
 })
 
+Deno.test("the phone tour's captions do not say (mobile) inside the phone frame (#562)", async () => {
+  const tour = region(
+    await pageHtml(),
+    `aria-labelledby="case-tour"`,
+    "section",
+  )
+  assert(tour.includes(">Scripts<"), "no Scripts caption")
+  assert(!tour.includes("(mobile)"), "a caption says (mobile)")
+})
+
 Deno.test("the re-imagination disclosure sits right above the screens and is said once", async () => {
   const html = await pageHtml()
   const tour = region(html, `aria-labelledby="case-tour"`, "section")

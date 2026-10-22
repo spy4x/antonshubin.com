@@ -53,3 +53,156 @@ export async function casePageProblems(path: string): Promise<string[]> {
   }
   return found
 }
+
+/**
+ * The case frame's layout slips on `paths` (#562), one line each; empty when
+ * the pages are sound. At 390 and 1440px a top-line part that wraps to a new
+ * line has its "·" outside a box that clips it, so no line starts or ends
+ * with one. At 1440px
+ * the title block starts at the top of the hero row, and no strip
+ * screenshot is wider or taller than the hero picture (2px for its frame).
+ */
+export async function caseLayoutProblems(paths: string[]): Promise<string[]> {
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } })
+  let browser: Browser | undefined
+  const found: string[] = []
+  try {
+    browser = await launchChromium()
+    for (const width of [390, 1440]) {
+      const context = await browser.newContext({
+        viewport: { width, height: 900 },
+        serviceWorkers: "block",
+      })
+      try {
+        const page = await context.newPage()
+        for (const path of paths) {
+          await page.goto(`${site.origin}${path}`, {
+            waitUntil: "networkidle",
+          })
+          const problems = await page.evaluate(async (wide) => {
+            const out: string[] = []
+            const top = document.querySelector("[data-case-top]")!
+            const box = top.parentElement!.getBoundingClientRect()
+            const clips = ["hidden", "clip"].includes(
+              getComputedStyle(top.parentElement!).overflowX,
+            )
+            let lineTop = -Infinity
+            for (const part of Array.from(top.children)) {
+              const rect = part.getBoundingClientRect()
+              const dot = part.firstElementChild!.getBoundingClientRect()
+              const newLine = rect.top > lineTop + 1
+              lineTop = Math.max(lineTop, rect.top)
+              const shown = dot.right > box.left + 1
+              if (newLine && shown) {
+                out.push(`a line starts with "·": ${part.textContent}`)
+              }
+              if (!shown && !clips) {
+                out.push(
+                  `a "·" outside the box is not clipped: ${part.textContent}`,
+                )
+              }
+              if (!newLine && !shown) {
+                out.push(`a "·" is hidden mid-line: ${part.textContent}`)
+              }
+            }
+            if (!wide) return out
+            const block = document.querySelector("[data-case-hero-block]")!
+            const gap = top.getBoundingClientRect().top -
+              block.getBoundingClientRect().top
+            if (gap > 1) out.push(`the top line starts ${gap}px down`)
+            const hero = document.querySelector("img[data-case-hero]")
+            const shots = Array.from(
+              document.querySelectorAll<HTMLImageElement>(
+                "[data-case-strip] li img",
+              ),
+            )
+            if (!hero || shots.length === 0) return out
+            for (const img of shots) img.loading = "eager"
+            await Promise.all(shots.map((img) => img.decode().catch(() => {})))
+            const h = hero.getBoundingClientRect()
+            for (const img of shots) {
+              const r = img.getBoundingClientRect()
+              if (r.width > h.width + 2 || r.height > h.height + 2) {
+                out.push(
+                  `${img.alt} is ${Math.round(r.width)}x${
+                    Math.round(r.height)
+                  }, the hero ${Math.round(h.width)}x${Math.round(h.height)}`,
+                )
+              }
+            }
+            return out
+          }, width >= 1024)
+          for (const p of problems) found.push(`${path} at ${width}px: ${p}`)
+        }
+      } finally {
+        await context.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+  return found
+}
+
+/**
+ * Where the hero's `<h1>` sits on `paths` at each width with the web fonts
+ * and with only the fallback faces (every font file refused), one line per
+ * page whose title moves between the two: the swap would shift the page
+ * (#562's top line wrapped in one font and not the other). Empty when
+ * nothing moves.
+ */
+export async function fontSwapShifts(
+  paths: string[],
+  widths: number[],
+): Promise<string[]> {
+  const site = await startSite({ env: { SCHEDULE_URL: SCHEDULE } })
+  let browser: Browser | undefined
+  const found: string[] = []
+  try {
+    browser = await launchChromium()
+    for (const width of widths) {
+      const tops: Record<string, number>[] = []
+      for (const fallback of [false, true]) {
+        const context = await browser.newContext({
+          viewport: { width, height: 900 },
+          serviceWorkers: "block",
+        })
+        try {
+          if (fallback) {
+            await context.route(/\.woff2(\?|$)/, (route) => route.abort())
+          }
+          const page = await context.newPage()
+          const seen: Record<string, number> = {}
+          for (const path of paths) {
+            await page.goto(`${site.origin}${path}`, {
+              waitUntil: "networkidle",
+            })
+            seen[path] = await page.evaluate(async () => {
+              await document.fonts.ready
+              return document.querySelector("h1")!.getBoundingClientRect()
+                .top + scrollY
+            })
+          }
+          tops.push(seen)
+        } finally {
+          await context.close()
+        }
+      }
+      for (const path of paths) {
+        const [web, fallback] = [tops[0][path], tops[1][path]]
+        if (Math.abs(web - fallback) > 1) {
+          found.push(
+            `${path} at ${width}px: the <h1> sits at ${
+              Math.round(fallback)
+            }px in the fallback font, ${Math.round(web)}px in the web font`,
+          )
+        }
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+  return found
+}

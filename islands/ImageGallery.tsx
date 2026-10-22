@@ -18,18 +18,18 @@ interface GalleryImageData {
  * "Screenshot 2 of 12" captions. Every slide shows its caption (the
  * `alt`), a "3 / 12" counter sits under the row with Previous and Next
  * buttons while it overflows (`ghost`: transparent inside a Rule strong
- * border, like the site's secondary Button), and a click opens the lightbox. This island
+ * border, like the site's secondary Button), and a click opens the lightbox.
+ * `class` goes on the row (the case frame sizes the slides with it). This island
  * only maps the site's data (WebP sources, wording) onto the library's props:
  * function props cannot cross an island boundary, so they are set here.
  */
 export default function ImageGallery(
-  { images, first = 1 }: {
+  { images, class: className }: {
     images: GalleryImageData[]
-    /** The number of the first image among all the project's screenshots. */
-    first?: number
+    /** Extra classes for the strip's row. */
+    class?: string
   },
 ) {
-  const shift = first - 1
   return (
     <LibraryGallery
       layout="strip"
@@ -41,13 +41,13 @@ export default function ImageGallery(
       slideWidth="orientation"
       controls="below"
       lightboxCaption={false}
+      class={className}
       images={images.map((image) => ({
         ...image,
         webpSrc: webpForPng(image.src) ?? undefined,
       }))}
       label={(image) => image.alt}
-      counterLabel={(position, total) =>
-        `${position + shift} / ${total + shift}`}
+      counterLabel={(position, total) => `${position} / ${total}`}
       stripPreviousLabel="Previous screenshot"
       stripNextLabel="Next screenshot"
     />

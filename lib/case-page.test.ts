@@ -10,6 +10,7 @@ import {
   sameFounder,
   shortName,
   SITE_SUFFIX,
+  stripTile,
   TITLE_MAX,
 } from "./case-page.ts"
 import { type Project, projects } from "./data.ts"
@@ -159,4 +160,18 @@ Deno.test("the meta description leaves out a kind line that repeats the outcome'
     description: `${"First ".repeat(30)}sentence.`,
   }
   assertEquals(caseDescription(p), "About 200 lamp poles live.")
+})
+
+Deno.test("a strip slide is as wide and as tall as the hero, narrow for a portrait hero (#562)", () => {
+  const shot = { src: "/a.webp", alt: "A", phone: false }
+  assertEquals(
+    stripTile({ ...shot, width: 1600, height: 1000, portrait: false }),
+    { width: 33, height: 20.55 },
+  )
+  assertEquals(
+    stripTile({ ...shot, width: 1600, height: 2021, portrait: true }),
+    { width: 16, height: 20.05 },
+  )
+  assertEquals(stripTile({ ...shot, portrait: false }), undefined)
+  assertEquals(stripTile(undefined), undefined)
 })

@@ -139,6 +139,38 @@ export function heroShot(p: Project): HeroShot | undefined {
 }
 
 /**
+ * The hero picture's width from 1024px, in rem: the right column of
+ * `CaseHero` (`minmax(0,33rem)`), or `lg:max-w-64` for a portrait shot.
+ */
+export const HERO_WIDTH_REM = { landscape: 33, portrait: 16 } as const
+
+/** A strip slide's largest size from 1024px: the hero picture's. */
+export interface StripTile {
+  /** In rem. */
+  width: number
+  /** In rem. */
+  height: number
+}
+
+/**
+ * The strip's largest slide from 1024px (#562): the hero picture's width
+ * and height, so no slide outgrows it. Undefined when the hero has no known
+ * size, and the strip keeps the library's own widths.
+ */
+export function stripTile(shot: HeroShot | undefined): StripTile | undefined {
+  if (!shot?.width || !shot.height) return undefined
+  const width = shot.portrait
+    ? HERO_WIDTH_REM.portrait
+    : HERO_WIDTH_REM.landscape
+  // The hero's frame takes 1px a side, so its picture is 2px narrower.
+  const inner = width - 0.125
+  return {
+    width,
+    height: Math.round(inner * shot.height / shot.width * 100) / 100,
+  }
+}
+
+/**
  * The pages of the founder who hired Anton twice (#523): Corecircle's story
  * is its review, and Connectful leads with its reviews.
  */

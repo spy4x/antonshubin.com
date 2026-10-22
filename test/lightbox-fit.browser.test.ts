@@ -122,8 +122,8 @@ Deno.test("the lightbox fits every screenshot in the viewport with its controls 
               (n) =>
                 document.querySelector("dialog[open] p")?.textContent
                   ?.startsWith(`${n} /`),
-              // The strip starts at screenshot 2: the hero shows 1 (#523).
-              i + 3,
+              // The counter numbers the strip's own slides (#562).
+              i + 2,
             )
           }
         }
