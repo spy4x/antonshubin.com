@@ -3,7 +3,8 @@ import { fresh } from "@fresh/plugin-vite"
 import tailwindcss from "@tailwindcss/vite"
 import { PRESET_CSS } from "@spy4x/preact-theme"
 
-const STYLESHEET = "/assets/styles.css"
+/** The stylesheets that take the preset: the site's, and the palette demo's (#522). */
+const STYLESHEETS = ["/assets/styles.css", "/assets/palette-demo.css"]
 const PRESET_IMPORT = `@import "@spy4x/preact-theme/preset.css";`
 
 /**
@@ -54,9 +55,11 @@ function preactPreset(): Plugin {
     name: "preact-preset",
     enforce: "pre",
     transform(code, id) {
-      if (!id.split("?")[0].endsWith(STYLESHEET)) return
+      const file = id.split("?")[0]
+      const sheet = STYLESHEETS.find((name) => file.endsWith(name))
+      if (!sheet) return
       if (!code.includes(PRESET_IMPORT)) {
-        throw new Error(`${STYLESHEET} must contain ${PRESET_IMPORT}`)
+        throw new Error(`${sheet} must contain ${PRESET_IMPORT}`)
       }
       return code.replace(
         PRESET_IMPORT,

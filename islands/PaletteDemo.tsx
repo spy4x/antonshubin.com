@@ -1,5 +1,6 @@
 import type { ComponentChildren, ComponentType } from "preact"
 import { useEffect, useRef, useState } from "preact/hooks"
+import "../assets/palette-demo.css"
 import type { PaletteDemoProps } from "../components/tools/preact-components/PaletteDemoLive.tsx"
 
 /**
