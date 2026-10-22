@@ -22,7 +22,7 @@ export default function CaseScreenTour(
     label: string
     /** The tour is the page's hero: its first screenshot gets `fetchpriority="high"`. */
     hero?: boolean
-    /** Number the tabs, for steps a person follows in order; off for screens with no order. */
+    /** Number the tabs: on for a sequence of steps, off for screens grouped by job. */
     numbered?: boolean
   },
 ) {

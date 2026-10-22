@@ -377,6 +377,14 @@ interaction sends `case-try`:
   tour is picked, the same way. Its "See Connectful" link sends `cta`.
 - `/work/connectful` has no interaction of its own; its "See Corecircle" link
   sends `cta`.
+- `/work/smartlite`: the same for "What an operator sees" (`item: smartlite`,
+  `part: tour`, `step` `smartlite-` plus the screen's caption in kebab case:
+  `smartlite-dashboard`, `smartlite-alerts`, … `smartlite-lamp-profiles`,
+  `smartlite-profile`; 12 in all). "How a click reaches a pole" is static and
+  sends nothing.
+- `/work/roley`: the same for "Make a movie in four steps" (`item: roley`,
+  `part: tour`, `step` one of `roley-scripts-mobile`, `roley-recorder-mobile`,
+  `roley-processing-mobile`, `roley-watch-mobile`).
 
 "Funnel: case page → /book → call-booked" (above) reads these pages as one entry
 step.
