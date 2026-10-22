@@ -25,6 +25,19 @@ export function projectHeadline(p: Project): string {
   return p.kind ? `${p.title}: ${p.kind}` : p.title
 }
 
+/** Whether `kind` states a figure ("about 200 lamp poles") that `text` already says. */
+export function kindRepeatsFigure(p: Project, text: string): boolean {
+  return (p.kind?.match(FIGURE) ?? []).some((f) => text.includes(f))
+}
+
+/**
+ * The headline for a line that goes on to say `rest`: the name alone when
+ * the kind would say the same figure twice (the llms files, #523).
+ */
+export function headlineBefore(p: Project, rest: string): string {
+  return kindRepeatsFigure(p, rest) ? p.title : projectHeadline(p)
+}
+
 /** The page's `<title>`: the headline, plus the site name when both fit in `TITLE_MAX`. */
 export function caseTitle(p: Project): string {
   const headline = projectHeadline(p)
@@ -65,9 +78,7 @@ export function caseDescription(p: Project): string {
   const [first, ...rest] = p.description.replace(/\s+/g, " ").trim()
     .split(/(?<=[.!?])\s+/)
     .filter((s) => !/\bscreenshots?\b/i.test(s))
-  const repeats = (p.kind?.match(FIGURE) ?? []).some((f) =>
-    outcome?.includes(f)
-  )
+  const repeats = kindRepeatsFigure(p, outcome ?? "")
   const product = p.kind &&
       `${outcome ?? ""} ${first}`.length > CASE_DESCRIPTION_MAX
     ? (repeats ? undefined : sentence(upperFirst(p.kind)))

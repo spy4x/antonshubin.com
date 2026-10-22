@@ -18,6 +18,7 @@ import {
   caseTitle,
   caseTopLine,
   heroShot,
+  kindRepeatsFigure,
   projectHeadline,
   reviewsFirst,
   upperFirst,
@@ -479,14 +480,18 @@ siteTest(
 )
 
 siteTest(
-  "llms-full.txt names every client project by its headline, the name and its kind line",
+  "llms-full.txt names every client project by its headline, or by its name alone when its line already says the kind's figure",
   async (site) => {
     const text = await site.html("/llms-full.txt")
     for (const p of clients) {
-      assert(
-        text.includes(`**${projectHeadline(p)}** (`),
-        `${p.slug}: no headline`,
+      const line = text.split("\n").find((l) =>
+        l.startsWith("- **") && l.includes(`/work/${p.slug})`)
       )
+      assert(line, `${p.slug}: no line`)
+      const headline = line.includes(`**${projectHeadline(p)}** (`)
+      const nameOnly = line.includes(`**${p.title}** (`) &&
+        kindRepeatsFigure(p, line)
+      assert(headline || nameOnly, `${p.slug}: no headline in ${line}`)
     }
   },
 )

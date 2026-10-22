@@ -615,10 +615,14 @@ siteTest(
 )
 
 siteTest(
-  "the closing band on /work and on a project page shows the refund and first-milestone promises",
+  "the closing band shows the refund and first-milestone promises on /work and the refund alone on a project page without a review",
   async (site) => {
-    const expected = [promise("refund"), promise("first-milestone")]
-    for (const path of ["/work", "/work/smartlite"]) {
+    for (
+      const [path, expected] of [
+        ["/work", [promise("refund"), promise("first-milestone")]],
+        ["/work/smartlite", [promise("refund")]],
+      ] as const
+    ) {
       const html = await site.html(path)
       const start = html.indexOf("<section data-closing-band")
       assert(start > 0, `${path} has no closing band`)
