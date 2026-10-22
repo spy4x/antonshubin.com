@@ -82,3 +82,32 @@ Deno.test("SmartLite's tour moves with the arrow keys, Home and End, and sends c
     await site.stop()
   }
 })
+
+Deno.test("each box of How a click reaches a pole keeps its technology on the heading's line at 1440px (#562)", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    try {
+      await page.goto(`${site.origin}/work/smartlite`)
+      const wrapped = await page.locator("[data-case-flow] li").evaluateAll(
+        (boxes) =>
+          boxes.filter((box) => {
+            const h3 = box.querySelector("h3")!.getBoundingClientRect()
+            const via = box.querySelector("[data-case-flow-via]")!
+              .getBoundingClientRect()
+            return via.top >= h3.top + h3.height / 2
+          }).map((box) => box.querySelector("h3")!.textContent),
+      )
+      assertEquals(wrapped, [])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
