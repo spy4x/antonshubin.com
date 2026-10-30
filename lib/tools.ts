@@ -575,7 +575,7 @@ export const tools: Tool[] = [
     kind: "cli",
     status: "in-use",
     group: "tools",
-    posts: ["rostok-self-hosted-scaffolder"],
+    posts: ["rostok-self-hosted-scaffolder", "self-hosted-ci-with-woodpecker"],
     repo: "spy4x/rostok",
     registry: {
       name: "JSR",
