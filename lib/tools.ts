@@ -857,6 +857,7 @@ export const tools: Tool[] = [
       },
     ],
     ci: { provider: "woodpecker", repoId: 13 },
+    posts: ["ai-coding-agent-setup"],
     useIf: [
       "You want a working example of one rules source driving several AI coding agents.",
       "You want a Linux workstation set up by script.",
