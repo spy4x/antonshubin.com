@@ -66,7 +66,7 @@ metube to its own `/login` counts as up. That is the same `302` I called useless
 above, with one difference: here metube sent it, so metube is running.
 
 This is all a monitor ever sees. The run is from the
-[README](https://github.com/spy4x/zond/blob/7744aaab8e64f31379bda47626aeaeaee911ecd5/README.md#L43-L64),
+[README](https://github.com/spy4x/zond/blob/7744aaab8e64f31379bda47626aeaeaee911ecd5/README.md#L42-L61),
 with one service up and one down:
 
 ```console
@@ -145,8 +145,8 @@ targets:
 4. `timeout` is how long zond waits for that service, in milliseconds. The
    default is 5000.
 
-No file? One environment variable does the same, with the default timeout for
-every service:
+No file? One environment variable does the same, and it wins over a file if both
+are set, with the default timeout for every service:
 `ZOND_TARGETS="metube=http://hl-metube:8081/,ollama=http://hl-ollama:11434/api/tags"`.
 
 Then publish zond through your reverse proxy, outside the SSO, and point Gatus
