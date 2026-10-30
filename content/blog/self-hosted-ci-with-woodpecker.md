@@ -5,7 +5,7 @@ description: "How I run self-hosted CI with Woodpecker: one server and agent in 
 tldr:
   - "A Woodpecker server and agent in Docker Compose run CI for this site and my open-source tools; each repository keeps its pipeline in .woodpecker.yml."
   - "Give each secret to the steps that need it, for the events that need it, and write shell variables as $$NAME, or Woodpecker blanks them before the shell runs."
-  - "A release builds the image with kaniko, no secret and no push; only steps that run no repository code get the registry login: crane, which pushes the image, and the step that updates the Docker Hub page."
+  - "A release builds the image with kaniko, no secret and no push; only steps that run no repository code get the registry login: crane and the step that updates the Docker Hub page."
   - "Open sign-up, a locked SQLite database and 4 GB of logs inside it were the real problems, each fixed in the stack's compose file."
 intro: "My Drone CI post from 2023 still gets read, and it no longer describes what I run. This is the current setup: the Woodpecker server and agent, the pipeline files of my public repositories, how secrets reach a step and how a tag turns into a published image. It is for developers who want CI on their own server and want to see real files, mistakes included."
 coverImage: "/img/blog/self-hosted-ci-with-woodpecker/cover.png"
