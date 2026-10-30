@@ -1,125 +1,226 @@
 ---
-title: "The missing piece in a self-hosted CalDAV stack: a web UI for Tasks.org"
-description: "Tasks.org syncs Android tasks to CalDAV. There is no web UI for that data. I built a web app on top of the CalDAV server you already run. It is now being rewritten."
+title: "Tasks.org in the browser: a self-hosted CalDAV web UI"
+description: "caldav-tasks-web is a self-hosted CalDAV web UI: your task lists in a browser, read from and written to the server your phone already syncs with. Made for Tasks.org on Android."
 tldr:
-  - "Update, 8 October 2026: the app is being rewritten. The current version does not work with Stalwart and can lose data when saving a task. There is no demo."
-  - "Tasks.org syncs Android tasks to CalDAV, but no web client existed for that data, so I built a stateless web app on top of the CalDAV server you already run."
-  - "The CalDAV server stays the only source of truth: the app stores only accounts and encrypted credentials, so switching servers moves no todos."
-  - "You don't need Nextcloud for it: the whole stack runs on one small box next to your CalDAV server."
+  - "Update: rewritten for the rebuilt app. It has no database and no accounts; one install serves one person."
+  - "caldav-tasks-web opens your Tasks.org lists in a browser, straight from the CalDAV server your phone syncs with. No second account, no second copy."
+  - "The server only relays; the browser edits a task's text in place, so fields the phone stored, reminders included, survive an edit."
+  - "Tested against Radicale 3.5.4 in Chromium, and I run it with Stalwart 0.16. It is one Docker container behind your HTTPS reverse proxy."
 publishedAt: "2026-07-22"
-readTime: 9
+updatedAt: "2026-10-30"
+readTime: 7
 topic: "self-hosting"
 relatedTool: "caldav-tasks-web"
+catalogSlug: "cto-advisory-retainer"
 ---
 
-> **Update, 8 October 2026:** The app is being rewritten from scratch, with a
-> new design and the shared CalDAV libraries `@spy4x/caldav` and
-> `@spy4x/time/ical`. The current version does not work with Stalwart, can lose
-> data when you save a task, and has no service worker. There is no public demo.
-> Do not install the current version. This post describes what I set out to
-> build in July 2026, not what the repo does today. Progress is in the
-> [repository](https://github.com/spy4x/caldav-tasks-web).
+> **Update, 30 October 2026:** I rewrote this post for the rebuilt version of
+> caldav-tasks-web. The July post described the first version, which the rewrite
+> replaced; [what changed](#what-changed-since-the-first-version) is below.
 
-Tasks.org syncs Android tasks to CalDAV cleanly. There is no web UI for that
-data. After a year of reaching for my phone to edit a todo at my desk, I built
-one. Here is the gap I noticed in the self-hosted ecosystem, and how I closed it
-without breaking the standards-first contract most of us signed up for.
+![The Today screen of caldav-tasks-web in the dark theme: an Add a task box, two overdue tasks, Fix the gate in Home and Call the plumber in Errands, and four tasks due today with their list names and tags](/img/blog/self-hosted-caldav-web-ui-tasks-org/today.webp "Today, across every list, from a local Radicale with made-up tasks")
 
-## The gap in the stack
+Tasks.org on Android syncs your tasks to a CalDAV server you control. At a desk,
+there is no good way to see them: Tasks.org has no web UI. caldav-tasks-web is
+the self-hosted web UI I built for that gap. It opens the same lists in a
+browser, on the same CalDAV server, and writes your edits back the way Tasks.org
+wrote them.
 
-Tasks.org is the strongest Android task manager and it syncs to CalDAV. The data
-lives on a server you control. The moment you sit at a desk, that data is
-unreachable from a browser — no conformant client exists for the web.
+This post is for people who already run a CalDAV server and use Tasks.org. I'll
+show what the app does, how it keeps the phone's data intact, which servers it
+is known to work with, and how to run it.
 
-The data is fine. The standard is fine. The clients are missing.
+## What changed since the first version
 
-## Why I didn't reach for Nextcloud Tasks
+I first wrote this post in July 2026 about the first version. That version kept
+user accounts and encrypted server passwords in its own SQLite database. It did
+not work with Stalwart, and it could lose data when you saved a task. So I
+rewrote it.
 
-Nextcloud is a whole suite, not a CalDAV server. People who chose Radicale or
-Stalwart on purpose shouldn't need to deploy a Nextcloud instance to edit a todo
-on desktop. The fix had to assume the CalDAV server is the only piece already
-running.
+The rewrite has no database and no accounts. One install is one owner and one
+CalDAV account; a second person runs a second install. It also does what the
+first version did not: completing a repeating task moves it to its next date,
+and edits made offline are queued. Everything below describes the current code,
+at commit
+[`8f13fae`](https://github.com/spy4x/caldav-tasks-web/tree/8f13fae44eb5450ba28c0a40876e6f776770b651).
 
-The goal is a task UI for whichever CalDAV server you already run. I used the
-current version against Radicale. Stalwart does not work with it today.
-Nextcloud and Baikal are untested.
+## What you can do in the browser
 
-## Architecture: CalDAV as the only source of truth
+- See **Today** (overdue and due today), **Upcoming** (the next 14 days), each
+  list, and **Search** over titles, notes and tags across all lists.
+- Add, edit, complete, delete and undo. The quick-add line understands a tag, a
+  time and a priority: `Order compost #garden 5pm !1`.
+- Use subtasks, tags, priority, due and start dates, notes, and manual order by
+  drag or keyboard. Deleting a task deletes its subtasks too, as Tasks.org does.
+- Create, rename, recolour and delete lists while you are online.
+- Get reminder notifications through Web Push, for the reminders Tasks.org
+  stores on a task. They are off until you set them up.
+- Press `?` for the keyboard shortcuts.
 
-VTODO files live on the CalDAV server. The web app is a client. In the current
-version, SQLite in the API container holds user accounts and AES-GCM-encrypted
-server credentials and nothing else. Switch CalDAV servers and no todos move.
+![The Errands list: Water the plants, Plan the garden with its two subtasks Buy seeds and Clear the beds, and Call the plumber, each with a drag handle, in manual order](/img/blog/self-hosted-caldav-web-ui-tasks-org/errands.webp "One list in manual order, with subtasks, as Tasks.org stores them")
 
-That property is the design goal. The current version did not meet it: it does
-not work with Stalwart, and it can lose data when you save a task. The rewrite
-exists to fix that.
+The app stores things the way Tasks.org does: a list is a CalDAV calendar, a tag
+is a `CATEGORIES` value, a subtask points to its parent with `RELATED-TO`,
+manual order is `X-APPLE-SORT-ORDER`, and priority is 1, 5, 9 or 0. Open the
+same list on the phone and it looks the same.
 
-## CQRS in a UI app (the idea, not what runs today)
+## Repeating tasks
 
-The read/write split maps cleanly onto CalDAV's GET versus PROPPATCH/PUT/DELETE.
-Each side tests in isolation; the CalDAV adapter is the only piece that knows
-the protocol. The idea was that Radicale and Stalwart would both speak through
-the same PROPFIND/PROPPATCH/PUT/DELETE interface, so adding a third server is a
-new adapter class, not a chain of `if (serverType === ...)` blocks. The rewrite
-does not use a CQRS layer.
+A task can repeat daily, weekly, monthly or yearly, every N days, weeks, months
+or years, on chosen weekdays, and end never, on a date or after a number of
+times.
 
-The CalDAV XML responses vary more than they should. Radicale uses the default
-namespace and emits lowercase `<d:response>`. Stalwart emits uppercase
-`<D:response>` and `<A:response>` for the caldav namespace. Substring-matching
-"calendar" in the response body matches the user's principal home on top of
-actual calendars. The parsers have to be case-insensitive, prefix-tolerant, and
-filter calendars by `<(prefix:)?calendar/>` inside `<resourcetype>`. Stalwart
-still fails in the current version.
+![The repeat part of the task editor: Repeat set to Weekly, every 1 week, buttons for each weekday, Ends set to Never, and a choice to count the next date from the due date or from the day it is completed](/img/blog/self-hosted-caldav-web-ui-tasks-org/editor.webp "The repeat settings in the task editor")
 
-## Preact Signals instead of hooks
+The editor also asks what the next date counts from: the due date, or the day
+you complete the task. Tasks.org has the same choice, but it keeps it in the
+phone's own database and writes nothing about it into the task. So the web app
+keeps its choice in the task as `X-REPEAT-FROM:COMPLETION`, which Tasks.org does
+not read. Set it in both apps; if they differ, the app you complete the task in
+decides the next date.
 
-VTODO state changes constantly — status, priority, due date, percent complete,
-complete vs active, filters, sort, tag toggles. Signals give surgical UI updates
-without a virtual DOM tree of hooks to debug. A hook-based version of this
-project would have spent most of its life chasing re-render storms.
+A repeat rule the app cannot reproduce is never rewritten. The task shows
+"Complete this one in Tasks.org" instead.
 
-The hooks-vs-signals debate is a real one and the right answer depends on the
-app. For a heavily stateful list of items with frequent mutations and dense
-filtering, signals win on clarity and on raw update count. The codebase is
-roughly half the size it would be in React.
+## How it keeps the phone's data intact
 
-## One small box
+The first version could lose data when you saved a task. Here is how the current
+one avoids it. Tasks.org writes fields the web app doesn't show: its own `X-`
+lines, reminder blocks (`VALARM`), its `PRODID`. An app that turns a task into
+its own model and writes that model back drops all of them.
 
-The current version deploys with `deno task deploy`, which rsyncs the project to
-a Hetzner box behind Traefik and runs `docker compose up -d --build`. It is not
-a single binary. It sits behind the same Traefik as the CalDAV server, and its
-SQLite file can be backed up by the same restic job as the CalDAV data.
+So the browser never rebuilds a task. To change one, it reads the task's text as
+stored, changes only the properties you edited, and writes the whole text back.
+Everything else stays as it was. A browser test against Radicale checks that a
+saved edit keeps a reminder and a property the app doesn't know
+([`e2e/tasks.e2e.ts`](https://github.com/spy4x/caldav-tasks-web/blob/8f13fae44eb5450ba28c0a40876e6f776770b651/e2e/tasks.e2e.ts)).
 
-There is no Kubernetes. There is no service mesh. The whole stack fits on a
-single $20/month box and stays there. A real engineer reading this knows that's
-the right shape for a personal productivity tool.
+The server in between is a relay. It signs you in, passes CalDAV requests on and
+serves the app. It never edits a task and never parses one, except to find due
+reminders when you turn notifications on. Your CalDAV password stays on the
+server; the browser never sees it.
 
-## What it cost and what it doesn't do
+Because the server sends your CalDAV credentials with every request, it refuses
+any address the browser sends that is not a calendar it listed, or a task
+directly inside one. This is the check for "directly inside", from
+[`apps/server/caldav/scope.ts`](https://github.com/spy4x/caldav-tasks-web/blob/8f13fae44eb5450ba28c0a40876e6f776770b651/apps/server/caldav/scope.ts):
 
-What the current version does: lists CalDAV calendars with their colors and
-renders a touch-first task list with filters, tags and due dates, plus a Kanban
-view. Credentials are encrypted with AES-GCM at rest.
+```ts
+export function parentCalendar(objectPath: string): string | null {
+  if (objectPath.endsWith("/")) return null
+  const cut = objectPath.lastIndexOf("/") + 1
+  if (/%(2f|5c)/i.test(objectPath.slice(cut))) return null
+  return objectPath.slice(0, cut)
+}
+```
 
-What it doesn't do: it does not work with Stalwart, it can lose data when you
-save a task, and it has no service worker, so it is a web app you open in a
-browser, not an installable offline app. It has no sync engine (it is a client,
-not a server), no recurring-task editor and no native mobile wrapper.
+1. An address ending in `/` is a collection, not a task, so it has no parent
+   calendar.
+2. The task's own name may not hold an encoded slash or backslash (`%2F`,
+   `%5C`): the CalDAV server might decode it into a separator and reach outside
+   the calendar.
+3. Otherwise the calendar is everything up to the last `/`, and the relay then
+   checks that it is one of the calendars it listed.
 
-I built it for myself. The rewrite is for the same reason.
+When two devices change the same task, nothing is overwritten silently. Every
+write carries the task's version marker (its ETag). If the task changed since
+the browser read it, the app reads the fresh copy and applies your edit to it.
+If you and the other device changed the same field, it asks you instead.
 
-## What would help
+## Offline
 
-Nothing to test yet. The rewrite is not ready, and I will not promise features
-or dates. If you want to follow it, watch the
-[repository](https://github.com/spy4x/caldav-tasks-web).
+The browser keeps a copy of your lists in IndexedDB and shows it first, then
+refreshes. Edits made offline wait in a queue and are sent when the network
+returns. If a queued edit clashes with a change made elsewhere, you choose:
+**Keep mine** writes the fields you changed onto the server's copy, **Use
+theirs** drops your edit. A service worker lets the app open offline and install
+as an app.
 
-## Closing
+## Which CalDAV servers work
 
-Self-hosting is a stance, not a chore. Every SaaS-shaped tool that wants to be
-the source of truth is a small erosion of that stance. The gap in the
-self-hosted CalDAV stack was real, and fixing it didn't need to be
-enterprise-grade — it just needed to honour the contract: the server you trust,
-the format you control, the data you already have.
+Only what the repository shows
+([`docs/compatibility.md`](https://github.com/spy4x/caldav-tasks-web/blob/8f13fae44eb5450ba28c0a40876e6f776770b651/docs/compatibility.md)):
 
-If you want a desktop UI for the same data your Android phone sees, watch the
-repository for the rewrite. I would not install the current version.
+| Server    | Version | Status    |
+| --------- | ------- | --------- |
+| Radicale  | 3.5.4   | Tested    |
+| Stalwart  | 0.16    | In my use |
+| Nextcloud | -       | Untested  |
+| Baikal    | -       | Untested  |
+
+Radicale is tested: the browser tests run against it, locally and in CI.
+Stalwart is the server I run it against myself; no automated test talks to it.
+
+Any other server needs CalDAV calendars that hold tasks (`VTODO`) and accept a
+username and password. If you try one, an issue with the server, its version and
+what happened helps the next person.
+
+On the client side, the tests use task files in Tasks.org's form, but no test
+drives the Android app itself. The browser tests run in Chromium only, so
+Firefox and Safari are untested.
+
+## What it doesn't do
+
+- **Several users.** One install is one owner. It is not a hosted service and
+  has no sign-up.
+- **Move a task to another list.** It refuses that for now.
+- **Every edge case.** An edit can be lost in rare cases: two offline edits made
+  from the same stale copy, or a task deleted on another device while you edit
+  it. That is
+  [issue #119](https://github.com/spy4x/caldav-tasks-web/issues/119).
+
+## How to run it
+
+You need a CalDAV account and a reverse proxy with HTTPS. Sign-in uses a
+`__Host-` cookie, and the service worker and notifications need a secure origin,
+so plain `http://` works only on `localhost`.
+
+First make the hash of the password you will sign in with. This step needs
+[Deno](https://deno.com/) 2 and a clone of the repository, because the image
+does not carry the script:
+
+```bash
+git clone https://github.com/spy4x/caldav-tasks-web && cd caldav-tasks-web
+echo "AUTH_PEPPER=$(openssl rand -base64 32)" > .env
+deno task password:hash     # type your sign-in password; it prints the hash
+```
+
+Then start the container, with the same `AUTH_PEPPER`. Keep single quotes around
+the hash, because it contains `$`:
+
+```bash
+docker run -d --name caldav-tasks-web --restart unless-stopped \
+  -p 127.0.0.1:8080:8080 \
+  -e PUBLIC_URL=https://tasks.example.com \
+  -e CALDAV_URL=https://caldav.example.com \
+  -e CALDAV_USERNAME='<your CalDAV username>' \
+  -e CALDAV_PASSWORD='<your CalDAV password>' \
+  -e OWNER_PASSWORD_HASH='<your password hash>' \
+  -e AUTH_PEPPER='<the AUTH_PEPPER from .env>' \
+  -e SESSION_SECRET='<a random string of 32 or more characters>' \
+  antonshubin/caldav-tasks-web:latest
+```
+
+Both blocks are from the
+[README](https://github.com/spy4x/caldav-tasks-web/blob/8f13fae44eb5450ba28c0a40876e6f776770b651/README.md#run-it).
+For a real install, pin a release tag instead of `latest`; the
+[tool page](/tools/caldav-tasks-web) shows the current one. The port is
+published on `127.0.0.1` only, so put your reverse proxy on the same machine.
+`GET /health` answers `{"status":"ok"}`. Reminders, the proxy setup and backups
+are in
+[`docs/self-hosting.md`](https://github.com/spy4x/caldav-tasks-web/blob/8f13fae44eb5450ba28c0a40876e6f776770b651/docs/self-hosting.md).
+
+## Try it
+
+The [caldav-tasks-web page](/tools/caldav-tasks-web) has a one-minute demo with
+made-up tasks: quick add, a subtask moved by keyboard, a weekly repeat, complete
+and undo. If you also want an AI assistant to read and add tasks on the same
+server, [caldav-mcp](/tools/caldav-mcp) is my MCP server for CalDAV events and
+tasks.
+
+Running this for a team? I set this up for small companies, as part of
+[Ongoing](/catalog/cto-advisory-retainer) work: monitoring, backups and security
+patches after launch.
+
+Which CalDAV server do you run Tasks.org against? If it isn't Radicale or
+Stalwart, try it and tell me in an issue whether it works.
