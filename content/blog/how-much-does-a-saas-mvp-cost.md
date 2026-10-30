@@ -1,13 +1,12 @@
 ---
-title: "How much does it cost to build a SaaS MVP? What my price covers and what it leaves out"
-seoTitle: "SaaS MVP cost: what my price covers"
+title: "How much does a SaaS MVP cost, and what does it cover?"
 description: "What it costs to build a SaaS MVP with me: from $8,000 and from 3 weeks. What that price covers, what it leaves out and why, and how a change in scope is quoted."
 tldr:
   - "A SaaS MVP with me starts from $8,000 and from 3 weeks. You get a quote for your own scope before any work starts."
   - "The price covers sign-in, Stripe payments, an API, an admin panel, deployment on your server, CI/CD and backups."
-  - "Native mobile apps, integrations beyond Stripe, custom design and features after launch are left out of the base price and quoted on their own."
+  - "Integrations beyond Stripe and features after launch are quoted separately. Native mobile apps and custom illustrations are not included."
   - "If the scope changes once we have started, you get a quote for the change before I start on it."
-intro: "Founders ask me what an MVP costs before anything else, and a number alone does not answer it. This post explains what my price for a SaaS MVP covers, what it leaves out and why, what to prepare before the first call, and what happens after launch."
+intro: "A price alone does not tell you what an MVP costs, because two quotes with the same number can cover very different products. This post explains what my price for a SaaS MVP covers, what it leaves out and why, what to prepare before the first call, and what happens after launch."
 coverImage: "/img/blog/how-much-does-a-saas-mvp-cost/cover.png"
 coverAlt: "The top of the Seed sign-in card in the dark theme: the heading Welcome back, the line Sign in with your email or username, and an empty email field."
 publishedAt: "2026-10-30"
@@ -16,15 +15,12 @@ topic: "founders"
 catalogSlug: "zero-to-production-saas-mvp"
 ---
 
-How much does it cost to build a SaaS MVP? With me, it starts from $8,000, and
-the product is live from 3 weeks. Both numbers say "from" on purpose: they
-depend on your scope, and you get a quote for your scope before any work starts.
-
-A number is only half an answer, though. Two quotes with the same price can
-cover very different products. So here I'll go through what my price covers,
-what it leaves out and why, what to prepare before we talk, and what happens
-when the scope changes or the product is live. The offer itself, with the full
-list, is on the [SaaS MVP service page](/catalog/zero-to-production-saas-mvp).
+How much does it cost to build a SaaS MVP? The number is only half an answer:
+two quotes with the same price can cover very different products. So here I'll
+go through what my price covers, what it leaves out and why, what to prepare
+before we talk, and what happens when the scope changes or the product is live.
+The offer itself, with the full list, is on the
+[SaaS MVP service page](/catalog/zero-to-production-saas-mvp).
 
 ## What the price covers
 
@@ -69,8 +65,8 @@ it:
    separately. Each one has its own API, its own limits and its own failure
    modes, so folding them into one price would mean guessing.
 3. **Design and branding beyond the defaults.** UI tokens and components are
-   included, so the product looks clean and consistent. Custom illustrations and
-   a brand identity are not.
+   included, so the product looks clean and consistent. Custom illustrations are
+   not.
 4. **Features added after launch.** They are quoted once we scope them. You
    learn what to build next from real users, and I'd rather price that work when
    we both know what it is.
@@ -91,8 +87,8 @@ choose. What helps is a clear answer to the questions the quote depends on:
    quoted on its own, so list the ones that are a must on day one.
 3. **Does it need to be a phone app?** If yes, say so early: the build is
    web-responsive only.
-4. **How much of it is design?** If you have a brand, bring it. If the product
-   depends on custom illustrations, that is a separate line.
+4. **How much of it is design?** If you have a brand, bring it. Custom
+   illustrations are not included in the build.
 
 Everything will be in your name: code, accounts, servers and keys. So expect the
 Stripe account, the server and the domain to be yours from the start, not
@@ -121,12 +117,9 @@ paid. The full list of what you can hold me to is on [How I work](/how-i-work).
 
 ## What happens when the scope changes
 
-It will change. You see working software every week, with a short written
-update, and seeing it is exactly when you notice what is missing.
-
-The rule is simple: if the scope changes once we have started, you get a quote
-for the change before I start on it. You decide whether it goes in now, waits
-for after launch, or replaces something else in the plan. No surprise costs.
+You see working software every week, with a short written update. If the scope
+changes once we have started, you get a quote for the change before I start on
+it. No surprise costs.
 
 ## What happens after launch
 
