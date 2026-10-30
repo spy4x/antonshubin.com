@@ -153,8 +153,9 @@ draft against the brief before the pull request opens.
 **Archiving a post.** Set `archived: true`. The post moves under Archive on
 `/blog`, leaves "Read next" and the RSS feed, drops to sitemap priority 0.3 and
 opens with "Written in <Month Year>. Kept as written." An optional `archiveNote`
-adds one line on what changed since, in Anton's words. It stays on its URL and
-in search; don't change its `updatedAt` for the note.
+adds one line on what changed since, in Anton's words, and an optional
+`supersededBy` (a current post's slug) links that post after the note. It stays
+on its URL and in search; don't change its `updatedAt` for the note.
 
 ## 2. Ship
 
