@@ -49,6 +49,8 @@ const EXCEPTIONS: Record<string, string> = {
     "loads the same calendar in place on the tool page (#457); without JavaScript it opens /book#book",
   "/blog/mig-tiny-self-hosted-scheduler | Open the booking page":
     "mig's running instance, the post's live link read from lib/tools.ts",
+  "/blog/code-audit-ai-built-app | Open the booking page":
+    "mig's running instance, the post's live link read from lib/tools.ts",
   "/blog/cost-optimization-laboratory | written brief":
     "a post's own prose, in the words the brief's form uses",
   "/blog/mig-tiny-self-hosted-scheduler | /book":
