@@ -178,11 +178,12 @@ distroless image" that "has no shell, no curl"
 The image is Debian, its health check calls `wget`, and nothing starts the app
 with `--healthcheck`. The function never runs. Delete it.
 
-**Comments that tell history.** The source files outside the tests cite issue
-numbers 182 times, and 174 of the 484 lines in `lib/book.ts` are comments. Some
-explain a review round rather than the code ("mig#15 round 2", "mig#19 review
-round 3"). A comment should say what the code does now. The issue history
-already lives on GitHub. Not urgent: trim them when a file is touched anyway.
+**Comments that tell history.** The `.ts` and `.tsx` files outside the tests
+cite mig issues (`mig#N`) 199 times, and 174 of the 484 lines in `lib/book.ts`
+are comments. Some explain a review round rather than the code ("mig#15 round
+2", "mig#19 review round 3"). A comment should say what the code does now. The
+issue history already lives on GitHub. Not urgent: trim them when a file is
+touched anyway.
 
 ### Tests
 
