@@ -30,9 +30,9 @@ quote below is from its public repository at commit
 [`54b014c`](https://github.com/spy4x/caldav-mcp/tree/54b014cd5306aa11824f085a7cd07141d55cb259),
 release 1.6.0.
 
-If you are the developer who will write it, my other post,
-[Building an MCP server in TypeScript without the SDK](/blog/building-mcp-servers-with-deno),
-goes through the code line by line. This one stays at the level of decisions.
+If you are the developer who will write it, my
+[developer post on building MCP servers](/blog/building-mcp-servers-with-deno)
+goes into the code. This one stays at the level of decisions.
 
 ## What is an MCP server, in one picture?
 
@@ -96,11 +96,11 @@ server checks that this thing belongs to the person asking.
 The second rule is that the person running the server decides how much the
 assistant may change. caldav-mcp has one setting for it, `CALDAV_MCP_TOOLS`:
 
-| Setting     | The assistant gets               |
-| ----------- | -------------------------------- |
-| `all`       | Every tool (the default)         |
-| `no-delete` | Every tool but the three deletes |
-| `read-only` | Five tools: list, query, get     |
+| Setting     | The assistant gets           |
+| ----------- | ---------------------------- |
+| `all`       | Every tool (the default)     |
+| `no-delete` | All but the three deletes    |
+| `read-only` | Five tools: list, query, get |
 
 A tool the setting leaves out is never registered. The assistant does not see
 it, and a call to it is answered like a tool that does not exist
@@ -170,7 +170,7 @@ On 9 October 2026 I closed
 same code, ported to my shared library, found five problems. Two of them are
 worth telling here.
 
-**Renaming an event broke it.** When the assistant renamed a weekly meeting
+**Renaming an event broke it.** If the assistant renamed a weekly meeting
 through `update_event`, the meeting stopped repeating and lost its guests and
 its reminder, and its time zone became UTC. The update did not change one field.
 It rebuilt the whole event from five fields and wrote that back. Nothing warned
@@ -205,10 +205,10 @@ Deno.test('the login goes only to the configured origin, never to a URL property
 })
 ```
 
-The test runs real tool calls against an in-memory calendar server that records
-every request, then checks that every single request went to the configured
-server. The rename has its own test
-([L311-L319](https://github.com/spy4x/caldav-mcp/blob/54b014cd5306aa11824f085a7cd07141d55cb259/caldav/query_test.ts#L311-L319)):
+The test runs the same calls the tools make against an in-memory calendar server
+that records every request, then checks that every single request went to the
+configured server. The rename has its own test
+([L311-L318](https://github.com/spy4x/caldav-mcp/blob/54b014cd5306aa11824f085a7cd07141d55cb259/caldav/query_test.ts#L311-L318)):
 after a rename, the only lines of the event that may change are its title, its
 timestamp, its change counter and its last-modified date.
 
