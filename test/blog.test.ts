@@ -147,6 +147,13 @@ siteTest(
             visibleText(note).includes("Kept as written."),
           `${article.slug}'s note: ${visibleText(note)}`,
         )
+        if (article.supersededBy) {
+          assert(
+            note.includes(`href="/blog/${article.supersededBy}"`) &&
+              note.includes("data-superseded-by"),
+            `${article.slug}'s note does not link ${article.supersededBy}`,
+          )
+        }
       } else {
         assertEquals(note, "", `${article.slug} is current but has a note`)
       }

@@ -10,6 +10,7 @@ import {
   relatedService,
   relatedToolLink,
   serviceLabel,
+  supersedingPost,
 } from "./blog.ts"
 import type { BlogArticle } from "./blog-posts.ts"
 import { blogArticles } from "./data.ts"
@@ -117,6 +118,17 @@ Deno.test("an archived post's note names the month and year it was written", () 
     ),
     "Written in February 2023. Kept as written. I now use Woodpecker.",
   )
+})
+
+Deno.test("an archived post links the current post that replaces it, and a typo throws", () => {
+  const current = post("new-post")
+  const old = post("old-post", { archived: true, supersededBy: "new-post" })
+  assertEquals(supersedingPost(old, [current, old]), current)
+  assertEquals(supersedingPost(current, [current, old]), undefined)
+  const typo = post("old-post", { archived: true, supersededBy: "nope" })
+  assertThrows(() => supersedingPost(typo, [current]), Error, '"nope"')
+  const toArchived = post("older", { archived: true, supersededBy: "old-post" })
+  assertThrows(() => supersedingPost(toArchived, [old]), Error, '"old-post"')
 })
 
 Deno.test("a title tag drops the name suffix past 55 characters, or uses seoTitle", () => {

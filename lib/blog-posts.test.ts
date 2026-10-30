@@ -61,6 +61,10 @@ Deno.test("a missing, mistyped or unknown front matter field fails naming the fi
       variant("readTime: 8", 'readTime: 8\narchiveNote: "x"'),
       '"archiveNote" needs "archived: true"',
     ],
+    [
+      variant("readTime: 8", 'readTime: 8\nsupersededBy: "x"'),
+      '"supersededBy" needs "archived: true"',
+    ],
     ["No front matter at all.\n", "no readable front matter"],
   ]
   for (const [raw, message] of cases) {

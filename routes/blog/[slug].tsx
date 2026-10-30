@@ -37,6 +37,7 @@ import {
   relatedToolLink,
   serviceHref,
   serviceLabel,
+  supersedingPost,
   TOC_MIN_MINUTES,
   topic,
 } from "../../lib/blog.ts"
@@ -213,6 +214,7 @@ export default define.page(function BlogPost(ctx) {
 
   const canonical = `${SITE}${postHref(article.slug)}`
   const tool = relatedToolLink(article)
+  const successor = supersedingPost(article)
   const postTopic = topic(article.topic)
   const tocItems = article.readTime >= TOC_MIN_MINUTES
     ? headings.filter((h) => h.depth === 2).map(({ id, text }) => ({
@@ -331,6 +333,19 @@ export default define.page(function BlogPost(ctx) {
                 class="mt-4 margin-note text-graphite border-l-2 border-rule-strong pl-3"
               >
                 {archiveNoteText(article)}
+                {successor && (
+                  <>
+                    {" The current post: "}
+                    <a
+                      href={`/blog/${successor.slug}`}
+                      data-superseded-by
+                      class="text-parchment underline underline-offset-4 hover:text-graphite"
+                    >
+                      {successor.title}
+                    </a>
+                    .
+                  </>
+                )}
               </p>
             )}
             {tool && (
