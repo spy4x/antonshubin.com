@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="440"
+  viewBox="0 0 360 440" role="img"
+  aria-label="Three parts, top to bottom. The AI assistant, such as Claude, Cursor, OpenCode or Open WebUI, picks a tool from what you typed and sends a tool call over stdio or HTTPS, then gets the answer back. caldav-mcp, the MCP server, checks who is asking when it is reached over HTTP, offers 13 tools or fewer, checks every argument and holds the calendar login. It sends CalDAV requests with that login to the CalDAV server and gets its answer back. The CalDAV server stores the events and tasks; in your SaaS, that box is your own API.">
+  <rect width="360" height="440" rx="12" fill="#25211d" />
+  <g font-family="IBM Plex Sans, Arial, Helvetica, sans-serif" font-size="15">
+    <rect x="12" y="12" width="336" height="84" rx="8" fill="#2f2a26"
+      stroke="#857f79" />
+    <text x="28" y="38" fill="#efebe2" font-weight="600">AI assistant</text>
+    <text x="28" y="60"
+      fill="#bcb7af">Claude, Cursor, OpenCode, Open WebUI</text>
+    <text x="28" y="82" fill="#bcb7af">Picks a tool from what you typed</text>
+
+    <path d="M34 110 L40 100 L46 110 Z" fill="#bcb7af" />
+    <line x1="40" y1="104" x2="40" y2="140" stroke="#bcb7af" stroke-width="2" />
+    <path d="M34 134 L40 144 L46 134 Z" fill="#bcb7af" />
+    <text x="56" y="127"
+      fill="#efebe2">Tool call and answer, stdio or HTTPS</text>
+
+    <rect x="12" y="148" width="336" height="128" rx="8" fill="#2f2a26"
+      stroke="#8ec5ec" stroke-width="2" />
+    <text x="28" y="174" fill="#efebe2"
+      font-weight="600">caldav-mcp, the MCP server</text>
+    <text x="28" y="196" fill="#bcb7af">Checks who is asking, over HTTP</text>
+    <text x="28" y="218" fill="#bcb7af">Offers 13 tools, or fewer</text>
+    <text x="28" y="240" fill="#bcb7af">Checks every argument</text>
+    <text x="28" y="262" fill="#bcb7af">Holds the calendar login</text>
+
+    <path d="M34 290 L40 280 L46 290 Z" fill="#bcb7af" />
+    <line x1="40" y1="284" x2="40" y2="320" stroke="#bcb7af" stroke-width="2" />
+    <path d="M34 314 L40 324 L46 314 Z" fill="#bcb7af" />
+    <text x="56" y="307" fill="#efebe2">CalDAV request with the login</text>
+
+    <rect x="12" y="328" width="336" height="100" rx="8" fill="#2f2a26"
+      stroke="#857f79" />
+    <text x="28" y="354" fill="#efebe2" font-weight="600">CalDAV server</text>
+    <text x="28" y="376" fill="#bcb7af">Stores the events and tasks</text>
+    <text x="28" y="404" fill="#efebe2">In your SaaS: your own API</text>
+  </g>
+</svg>
