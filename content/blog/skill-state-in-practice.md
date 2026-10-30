@@ -4,7 +4,7 @@ seoTitle: "SKILL.state in practice: why I stopped after 4 days"
 description: "SKILL.state replaces an AI agent's growing chat history with an explicit execution state. I ran it on real tasks in my Claude Code setup for four days, then stopped. Here is what helped, what got in the way and why the problem went away on its own."
 tldr:
   - "SKILL.state swaps an agent's growing chat history for a state file and a fresh step each time. I ran my own version of it on real tasks and stopped after four days."
-  - "The briefs were clean, but every run needed hand fixes: patches that failed the schema, invented timestamps, and a state folder that broke the linter."
+  - "The briefs were clean, but every run needed hand fixes, such as patches that failed the schema, invented timestamps, and a state folder that broke the linter."
   - "The problem it solves, context that grows until it is compacted, mostly went away when I moved to Opus 5.5: 2 of 48 units of work were compacted."
   - "The part worth keeping, a fresh agent per step with a self-contained brief, I already use without the state file."
 intro: "A friend sent me the SKILL.state paper and later asked how it worked out. This is the answer: what I built from it, the four tasks I ran, and why I stopped. It is for anyone who runs coding agents on long tasks and wonders whether an explicit state file is worth it."
@@ -55,10 +55,10 @@ the idea with a skill:
    conversation.
 
 The plan was a fair comparison. My task flow alternated: one task with the
-skill, the next without. After ten tasks on each side I would compare how often
-the first review passed, how often I had to correct the agent, and the minutes
-per task. The skill would become the default if it was at least as reliable and
-no more than a quarter slower.
+skill, the next without. Once each side had enough tasks, I would compare how
+often the first review passed, how often I had to correct the agent, and the
+minutes per task. The skill would become the default if it was at least as
+reliable and not much slower.
 
 ## What happened
 
@@ -87,8 +87,7 @@ Every run with the skill hit at least two of these, and the lead agent fixed
 them by hand:
 
 - **Patches that failed the schema.** Subagents wrote state updates the CLI
-  rejected. In one task, two of four patches failed or were missing, and the
-  lead wrote them itself.
+  rejected, and the lead had to write some of them itself.
 - **Invented timestamps.** The schema wanted a time on every finding. The
   subagents made them up, hours away from the real time, and the lead replaced
   them.
@@ -101,14 +100,14 @@ handoffs meant more places for an instruction to get lost.
 
 ## Why I stopped
 
-The problem went away on its own. On 25 September, in the middle of the
-experiment, I moved my agents to Opus 5.5
+The problem went away on its own. In the middle of the experiment, I moved my
+agents to Opus 5.5
 ([the numbers behind that switch](/blog/opus-5-5-vs-sonnet-5-agent-costs)).
 After that, the median peak context was 162K tokens, and only 2 of 48 units of
 work were compacted at all. The skill fought a problem I barely had anymore, and
 it added bookkeeping to every task.
 
-The comparison was also too slow to finish. At about one task a day, ten on each
+The comparison was also too slow to finish. At my pace, enough tasks on each
 side would have taken weeks.
 
 > A fix for a problem you no longer have is just overhead.
