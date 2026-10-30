@@ -47,7 +47,7 @@ server over SSH and starts them with Docker Compose.
 - **No agent on the server.** The server needs SSH, rsync and Docker, nothing
   else.
 
-The name is Russian: **росток** means "sprout".
+The name is the Russian word for "sprout".
 
 ## The problem it solves
 
@@ -306,10 +306,8 @@ its secrets.
 With age, the encrypted `.env.age` files sit in the same repo as everything
 else, and the key lives on the machine I deploy from. A fresh clone plus the key
 has every setting a deploy needs. rostok does the encryption inside the CLI, so
-there is no binary to install either.
-
-> If the box dies tonight, the repo and the key should be enough to bring it
-> back.
+there is no binary to install either. If the box dies tonight, the repo and the
+key should be enough to bring it back.
 
 ## Try it
 
