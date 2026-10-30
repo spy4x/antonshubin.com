@@ -4,7 +4,7 @@ seoTitle: "Code formatting and linting in 2026: my setup"
 description: "My formatting and linting setup: deno fmt and deno lint, a CI step that blocks the merge, AI agents held to the same check, and what to pick on Node or Bun."
 tldr:
   - "On Deno, deno fmt and deno lint replace Prettier and ESLint: no packages, a few lines in deno.json."
-  - "deno fmt reads .editorconfig only for indentation and line width; deno.json wins, and quote_type is ignored."
+  - "deno fmt reads .editorconfig for indentation, line width and line endings; deno.json wins, and quote_type is ignored."
   - "The check counts only when CI runs it and a red run blocks the merge, for people and AI agents alike."
   - "On Node or Bun: Biome for one tool that formats and lints, dprint for many languages, or keep a working Prettier setup."
 intro: "In 2022 I wrote about Prettier. My TypeScript projects run on Deno now, and formatting needs no extra package, so here is the setup I use in them today: the config, the CI step that blocks a merge, and the rules that hold my AI agents to the same check."
@@ -104,9 +104,10 @@ in sync with your editor.
 ## Where .editorconfig fits
 
 `.editorconfig` is the file most editors read for indentation and line endings.
-`deno fmt` reads it too, but only to fill gaps: the docs list `indent_style`,
-`indent_size` and `max_line_length`, and the order is CLI flags first, then
-`deno.json`, then `.editorconfig`, then defaults.
+`deno fmt` reads it too, but only to fill gaps: indentation (`indent_style`,
+`indent_size`, `tab_width`), line width (`max_line_length`) and line endings
+(`end_of_line`). The order is CLI flags first, then `deno.json`, then
+`.editorconfig`, then defaults.
 
 I checked it with Deno 2.9.7:
 
@@ -126,8 +127,10 @@ That `quote_type` line isn't made up for the example. This site's own
 says `quote_type = single`, while the code uses double quotes, and
 `deno fmt --check` passes. The formatter never reads that line.
 
-So `.editorconfig` is for what it is good at: files the formatter doesn't touch,
-like shell scripts, and editors that don't run the formatter on save.
+So `.editorconfig` is for what it is good at: editors that don't run the
+formatter on save, and files the formatter doesn't touch, like shell scripts.
+Its indentation and line-ending settings reach `deno fmt` too, unless
+`deno.json` sets them.
 [mig's](https://github.com/spy4x/mig/blob/766fa1d7585cf2845bcbbc6351b7c11e86755158/.editorconfig)
 is a good shape to copy: spaces, two of them, LF line endings, UTF-8, trim
 trailing whitespace except in Markdown. The style rules themselves live in one
