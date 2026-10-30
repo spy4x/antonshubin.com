@@ -201,7 +201,7 @@ For comparison I rebuilt the last Deno version (the
 from its own Dockerfile, which runs the code with `deno run` on the Deno Alpine
 image, and measured it the same way.
 
-|                              | Go, published image | Deno, last version rebuilt |
+| Measure                      | Go, published image | Deno, last version rebuilt |
 | ---------------------------- | ------------------- | -------------------------- |
 | Download                     | 3.7 MB              | about 49 MB                |
 | On disk                      | 10.1 MB             | 117.2 MB                   |
