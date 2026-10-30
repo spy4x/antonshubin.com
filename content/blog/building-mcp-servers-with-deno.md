@@ -217,8 +217,9 @@ stderr through `console.error`, because anything else on stdout would break the
 protocol.
 
 You can try it without a calendar server, because `initialize` and `tools/list`
-never call CalDAV. This is the exact command from the README, piped three
-messages:
+never call CalDAV. This is the command from the repository's clients guide
+(`docs/clients.md`), with the same flags as the README's quick start, piped
+three messages:
 
 ```bash
 printf '%s\n' \
@@ -298,17 +299,18 @@ it in two places.
 
 ### What the process may reach
 
-The README's quick start runs the server with two Deno flags, the command you
-saw above. `--allow-net=cal.example.com` lets it connect to your CalDAV host and
+The README's quick start runs the server with two Deno flags, the flags you saw
+above. `--allow-net=cal.example.com` lets it connect to your CalDAV host and
 nowhere else. `--allow-env=...` lets it read only its own settings. It gets no
 file access and cannot start programs. If a dependency tried to send your
 password somewhere else, the runtime would refuse the connection.
 
 This is not a Deno-only idea. Node has had a permission model since v20
-(`--permission`, experimental until v22.13). On Node 22, `node --help` lists
-flags for the file system, child processes, worker threads, WASI and add-ons,
-but none for the network or environment variables, which are the two this server
-needs to narrow. Check what your version covers before you rely on it.
+(`--experimental-permission`, renamed `--permission` and marked stable in
+v22.13). Node 22 has flags for the file system, child processes, worker threads,
+WASI and add-ons, but none for the network. Node 25 added `--allow-net`, still
+marked as in active development, and no released version has a flag for
+environment variables yet. Check what your version covers before you rely on it.
 
 One honest gap: the repository's own `deno task start` and its Docker build use
 `-A`, all permissions, and `deno compile` bakes the permissions it was given
@@ -377,7 +379,7 @@ date writes nothing. The HTTP tests call the `Request` handler directly to check
 the rate limits, the token rules and the status codes.
 
 At this commit the repository has 153 tests, and `deno task test` passes all of
-them in about four seconds, with no calendar server running.
+them in a few seconds, with no calendar server running.
 
 ## Should you skip the SDK too?
 
