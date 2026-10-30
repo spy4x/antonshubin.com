@@ -72,7 +72,8 @@ The source folder holds four kinds of thing:
    and so on. There are 25 at this commit.
 3. `skills/`, step-by-step instructions an agent loads when a task needs them,
    such as `wave` for running parallel work. There are 8.
-4. `settings/` and `mcp.jsonc`, merged into each harness's own settings files.
+4. `settings/`, merged into each harness's own settings files, and `mcp.jsonc`,
+   merged into Claude Code's and OpenCode's (DSH gets no MCP servers from it).
 
 An agent file is written once, in a neutral format. Its front matter says what
 the agent may use (the reviewer's `tools: [read, search, shell]` leaves out the
@@ -111,8 +112,9 @@ it doesn't. So the rules file has one more rule: whatever a machine can check
 gets a check.
 
 In Claude Code that check is a plugin, the `harness-rules` mod. It sees each
-tool call and each new subagent before it runs, and can refuse it with a reason
-the model reads. Here is the one that judges every new subagent
+shell command, each file write or edit, and each new subagent before it runs,
+and can refuse it with a reason the model reads. Here is the one that judges
+every new subagent
 ([`rules.ts`](https://github.com/spy4x/dotfiles/blob/9921684b5bfcc6e3d1e46bd32f54714ca339b737/ai-harnesses/settings/claude/mods/harness-rules/hooks/rules.ts#L32-L54)):
 
 <!-- deno-fmt-ignore -->
