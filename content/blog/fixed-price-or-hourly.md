@@ -1,12 +1,12 @@
 ---
 title: "Fixed price or hourly: how I decide for your project"
-description: "Fixed price or hourly? I work fixed price when the scope is fixed and hourly when the work is open-ended. When each fits, how a scope change is quoted, and what stays the same."
+description: "I work fixed price when the scope is fixed and hourly when the work is open-ended. When each fits, how a scope change is quoted, and which promises hold either way."
 tldr:
   - "I work fixed price when the scope is fixed, and hourly for staff augmentation, code reviews, or when the work is open-ended."
   - "If the scope changes after we start, you get a quote for the change before I start on it. No surprise costs."
   - "On hourly work I bill only the hours I spend on your project, never the time an AI agent runs on its own."
   - "A build and ongoing work both start with a small first milestone, a five-day refund and full ownership from day one."
-intro: "Fixed price or hourly is one of the first questions when you hire a developer. My answer is one sentence, and this post explains it: how to tell which side your project is on, what happens when the scope changes, and what stays the same whichever way you pay."
+intro: "Fixed price or hourly is one of the first questions when you hire a developer. My answer is one sentence, and this post explains it: how to tell which side your project is on, what happens when the scope changes, and which promises hold whichever way you pay."
 coverImage: "/img/blog/fixed-price-or-hourly/cover.png"
 coverAlt: "The pricing question on my How I work page: \"Do you work fixed price or hourly, and what happens when the scope changes?\" with its answer and a link to how hourly billing works with AI."
 publishedAt: "2026-10-30"
@@ -83,7 +83,7 @@ On a build you see working software every week, with a short written update. So
 you always know where the project stands, instead of finding out at the end what
 the fixed price bought you.
 
-## Why does every engagement start small?
+## Why do a build and ongoing work start small?
 
 A build and ongoing work both start with a small first milestone: one or two
 weeks of work. If either of us wants to stop at the end of it, we stop, and you
@@ -95,19 +95,19 @@ right. That holds whether the rest is a fixed price or hourly.
 
 ## What stays the same either way?
 
-The way you pay changes the invoice, not what you can hold me to:
+Three promises hold whether a build is fixed price or ongoing work is hourly:
 
-1. **A five-day refund.** If in the first five days you feel it is not working,
-   tell me and I refund what you paid. This one covers the strategy session and
-   the audit too.
-2. **A small first milestone**, on a build and on ongoing work, as above.
-3. **Full ownership from day one.** The code, the accounts, the servers and the
-   keys are in your name, on a build and on ongoing work.
-4. **Free bug fixes for 30 days** on a build: bugs in what I delivered are fixed
-   on my time.
+1. **A five-day refund**, on every service, the strategy session and the audit
+   included. If in the first five days you feel it is not working, tell me and I
+   refund what you paid.
+2. **A small first milestone**, on a build and on ongoing work alike, as above.
+3. **Full ownership from day one**, on a build and on ongoing work alike. The
+   code, the accounts, the servers and the keys are in your name.
 
-All five promises, in the order a project meets them, are on
-[How I work](/how-i-work).
+One promise comes with a fixed-price build only: **free bug fixes for 30 days**.
+Bugs in what I delivered are fixed on my time.
+
+The full list of promises is on [How I work](/how-i-work).
 
 ## Not sure which side your project is on?
 
