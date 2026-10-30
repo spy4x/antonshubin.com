@@ -133,7 +133,7 @@ siteTest(
 )
 
 siteTest(
-  "archived posts carry a dated note and never show up under Read next",
+  "archived posts carry a dated note, link their successor and never show up under Read next",
   async (site) => {
     const archivedHrefs = archived.map((a) => `href="/blog/${a.slug}"`)
     for (const article of blogArticles) {
