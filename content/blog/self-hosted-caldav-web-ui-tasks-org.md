@@ -39,8 +39,9 @@ rewrote it.
 
 The rewrite has no database and no accounts. One install is one owner and one
 CalDAV account; a second person runs a second install. It also does what the
-first version did not: repeating tasks and offline edits. Everything below
-describes the current code, at commit
+first version did not: completing a repeating task moves it to its next date,
+and edits made offline are queued. Everything below describes the current code,
+at commit
 [`8f13fae`](https://github.com/spy4x/caldav-tasks-web/tree/8f13fae44eb5450ba28c0a40876e6f776770b651).
 
 ## What you can do in the browser
@@ -65,8 +66,9 @@ same list on the phone and it looks the same.
 
 ## Repeating tasks
 
-A task can repeat daily, weekly, monthly or yearly, every N days or weeks, on
-chosen weekdays, and end never, on a date or after a number of times.
+A task can repeat daily, weekly, monthly or yearly, every N days, weeks, months
+or years, on chosen weekdays, and end never, on a date or after a number of
+times.
 
 ![The repeat part of the task editor: Repeat set to Weekly, every 1 week, buttons for each weekday, Ends set to Never, and a choice to count the next date from the due date or from the day it is completed](/img/blog/self-hosted-caldav-web-ui-tasks-org/editor.webp "The repeat settings in the task editor")
 
