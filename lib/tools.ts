@@ -346,7 +346,7 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
-    posts: ["mig-tiny-self-hosted-scheduler"],
+    posts: ["mig-tiny-self-hosted-scheduler", "code-audit-ai-built-app"],
     deployable: true,
     appCategory: "BusinessApplication",
     // "Use it if" and "Skip it if" are the README's own lines (#457).
