@@ -7,7 +7,7 @@ tldr:
   - "It never checks a service itself. When Gatus has no answer, the card says unknown, never green."
   - "Homepage, Homarr and Dashy do far more, but none puts the Gatus status on each card: Homepage and Homarr show totals in a widget, Dashy runs its own checks."
   - "It is one Go binary in an 11 MB image. The server renders the whole page; the only script is the search box."
-intro: "I keep one page with every service I self-host, and I want that page to tell me the truth about what is up. This post is for people who already run Gatus: what oko does, what it leaves out on purpose, and how to run it."
+intro: "I keep one page with every service I self-host, and it should tell the truth about what is up. This post is for people who already run Gatus: what oko does, what it leaves out on purpose, and how to run it."
 coverImage: "/img/blog/oko-homelab-dashboard/cover.png"
 coverAlt: "The top of the oko demo dashboard: a search box with the hint to press slash to focus, the Home section at 5/5 healthy, and cards for Audiobooks, Git service and Photo library with their uptime."
 publishedAt: "2026-10-30"
@@ -31,8 +31,8 @@ for my own servers and run it at
 [dash.antonshubin.com](https://dash.antonshubin.com/).
 
 This post is for you if you already run Gatus, or plan to. If you don't, oko
-shows your services as links with no status, and one of the dashboards below
-will suit you better.
+shows your services as links with no status pill, and one of the dashboards
+below will suit you better.
 
 ## What the popular dashboards do
 
@@ -50,8 +50,7 @@ Each does far more than oko.
 - **[Homarr](https://github.com/homarr-labs/homarr/tree/v2.9.1)** (v2.9.1) is
   set up in the browser, with a drag-and-drop grid and "no YAML involved", as
   its README says. It has users, permissions and sign-in through OIDC or LDAP,
-  and keeps everything in a database: SQLite by default, MySQL or PostgreSQL if
-  you prefer. Its
+  and keeps everything in a database: SQLite by default, or PostgreSQL. Its
   [Gatus integration](https://github.com/homarr-labs/homarr/blob/v2.9.1/packages/integrations/src/stats/providers/gatus.ts)
   feeds a Stats widget with four numbers: up, down, unknown and total.
 - **[Dashy](https://github.com/Lissy93/dashy/tree/4.9.0)** (4.9.0) reads one
@@ -71,8 +70,8 @@ oko fills.
 - **Every service on one page,** grouped by server, in the order you wrote them.
   Press `/` to search by name, product or description, and `Esc` to clear.
 - **Status from Gatus, per card.** A red border means Gatus says the service is
-  down. The pill in the corner is its 30-day uptime. Each server's heading
-  counts what is healthy, down or unknown.
+  down. The pill in the corner is its 30-day uptime. Each server's heading shows
+  how many services are healthy out of the total, and how many are unknown.
 - **Unknown stays unknown.** When Gatus gives no answer for a service, the card
   gets a dashed "unknown" marker. It is not counted as healthy and not drawn as
   down.
@@ -106,7 +105,7 @@ rearrange in the browser, Homepage, Homarr or Dashy are the better choice.
 oko does not need the Gatus API to return any special format. For each service,
 it fetches the two badge SVGs Gatus already serves, in parallel: the health
 badge and the 30-day uptime badge. Then it reads the text inside them, from
-[`internal/gatus/client.go`](https://github.com/spy4x/oko/blob/d93c6b329fcd47d4a9bef91533fdbe0c52f45cf1/internal/gatus/client.go#L82-L92):
+[`internal/gatus/client.go`](https://github.com/spy4x/oko/blob/d93c6b329fcd47d4a9bef91533fdbe0c52f45cf1/internal/gatus/client.go#L82-L91):
 
 ```go
 var (
@@ -135,7 +134,7 @@ the URL to skip the cache once.
 
 Every page view is one Go handler: read the catalog, get the statuses from the
 cache, fill one `html/template`, send the HTML. From
-[`internal/render/handler.go`](https://github.com/spy4x/oko/blob/d93c6b329fcd47d4a9bef91533fdbe0c52f45cf1/internal/render/handler.go#L100-L128):
+[`internal/render/handler.go`](https://github.com/spy4x/oko/blob/d93c6b329fcd47d4a9bef91533fdbe0c52f45cf1/internal/render/handler.go#L100-L129):
 
 ```go
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
@@ -179,8 +178,8 @@ What this gives you:
    Gatus does not need to be reachable from the device you open the dashboard
    on.
 3. **A failed Gatus fetch still renders the page.** The handler logs a warning
-   and draws every card as unknown, so you can still find and open your
-   services.
+   and draws every card linked to Gatus as unknown, so you can still find and
+   open your services.
 4. **Almost no JavaScript.** The page ships one inline script: the search filter
    and its `/` and `Esc` keys. No client framework and no build step.
 
