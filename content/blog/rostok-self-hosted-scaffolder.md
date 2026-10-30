@@ -1,11 +1,11 @@
 ---
 title: "rostok: scaffold a self-hosted homelab from a curated service catalog"
 seoTitle: "rostok: scaffold a self-hosted homelab"
-description: "rostok is a CLI that turns an empty folder into a Git repo for your servers: a catalog of 50 Docker Compose stacks, encrypted secrets and a deploy over SSH."
+description: "rostok is a CLI that turns an empty folder into a Git repo for your servers: a catalog of 50 stacks, encrypted secrets and a deploy over SSH."
 tldr:
   - "rostok is a CLI: run it in an empty folder, answer a few questions, pick services from its catalog, and you get a Git repo with one folder per server."
-  - "Every .env value is encrypted on its own into .env.age, so the repo is safe to push; the key stays on your machine."
-  - "rostok deploy copies a server's files over SSH and starts them with Docker Compose. The server needs only SSH and Docker."
+  - "Once you generate a key, every .env value is encrypted on its own into .env.age, so the repo is safe to push; the key stays on your machine."
+  - "rostok deploy copies a server's files over SSH and starts them with Docker Compose. The server needs only SSH, rsync and Docker."
   - "Install with deno install -g -A -n rostok jsr:@rostok/cli. Release 1.21.0 ships 50 stacks."
 intro: "rostok grew out of the repo that runs my own servers, and I still deploy with it. This post walks through it from an empty folder to a service live on HTTPS, with the real commands and their output, for anyone who runs Docker on one to a few machines."
 coverImage: "/img/blog/rostok-self-hosted-scaffolder/cover.png"
@@ -18,7 +18,7 @@ relatedTool: "rostok"
 catalogSlug: "strategy-call"
 ---
 
-![rostok's wizard in a terminal: server 'home' created at /home/jane/homelab/servers/home, then the stack picker with omni-tools and traefik ticked among open-webui, pangolin, piped, playwright, searxng, stalwart, syncthing and traggo](/img/blog/rostok-self-hosted-scaffolder/wizard-pick-stacks.webp "Picking services from the catalog in the wizard")
+![The left part of rostok's stack picker in a terminal: omni-tools and traefik ticked, open-webui, pangolin, piped, playwright, searxng, stalwart, syncthing and traggo not, each with the start of its description](/img/blog/rostok-self-hosted-scaffolder/wizard-pick-stacks.webp "Picking services from the catalog in the wizard")
 
 Every homelab I stood up started the same way: a folder, a README, and a pile of
 `compose.yml` files copied from the last one. The secrets lived somewhere else,
@@ -44,7 +44,8 @@ server over SSH and starts them with Docker Compose.
 - **Secrets you can commit.** Every value is encrypted on its own into
   `.env.age` with [age](https://age-encryption.org), inside the CLI, with no
   extra binary to install.
-- **No agent on the server.** The server needs SSH and Docker, nothing else.
+- **No agent on the server.** The server needs SSH, rsync and Docker, nothing
+  else.
 
 The name is Russian: **росток** means "sprout".
 
@@ -67,9 +68,8 @@ down as files.
 
 The [demo video on the tool page](/tools/rostok) shows the whole run, recorded
 on a throwaway cloud server that the recipe rents and deletes. Here are the same
-steps with the commands I ran while writing this post. I stopped before the
-deploy, because I don't run tests against a real server from my laptop; the
-deploy pictures below come from that recording.
+steps with the commands I ran while writing this post. The deploy pictures below
+come from that recording.
 
 ### 1. Install
 
@@ -128,7 +128,7 @@ DNS records:
 rostok v1.21.0 — wizard complete.
 ```
 
-Three things happen here that I used to do by hand:
+The wizard does three things here:
 
 1. The wizard tries to read the server's Docker group and user ids over SSH, so
    the containers get the right permissions. With no server to ask, it says so
@@ -210,12 +210,13 @@ Let's Encrypt:
 
 ## What a stack looks like
 
-The CLI is a thin shell around the catalog. Each stack is a folder with an
-ordinary `compose.yml`, a `README.md`, an optional `backup.ts`, and a `+meta.ts`
-that declares its settings. Here is OmniTools' whole
+The CLI is a thin shell around the catalog. Almost every stack is a folder with
+an ordinary `compose.yml`, a `README.md`, an optional `backup.ts`, and a
+`+meta.ts` that declares its settings. Here is OmniTools' whole
 [`stacks/omni-tools/+meta.ts`](https://github.com/spy4x/rostok/blob/a8331657422316333c430ac115c7f1e167a31b04/stacks/omni-tools/%2Bmeta.ts)
 at release 1.21.0:
 
+<!-- deno-fmt-ignore -->
 ```ts
 // Stack metadata for `omni-tools`.
 //
@@ -226,8 +227,7 @@ import type { StackMeta } from "@rostok/cli"
 
 export default {
   name: "omni-tools",
-  description:
-    "Everyday online tools that run in your browser (iib0011/omni-tools)",
+  description: "Everyday online tools that run in your browser (iib0011/omni-tools)",
   category: "tools",
   requires: ["traefik"],
   variables: [
@@ -277,11 +277,8 @@ Woodpecker CI.
 
 rostok is not a side demo. Its README says it plainly: the repository's stacks
 and deploy code run my machines. I deploy four servers in different regions with
-it, each with a different set of services. My
-[how I run production](/infrastructure) page describes my four machines: a cloud
-server in Germany for the public services, a home lab in Singapore, a mini PC
-that travels with me, and a Raspberry Pi in another country that keeps the
-offsite backups.
+it, each with a different set of services. How the rest of my production fits
+together is on [how I run production](/infrastructure).
 
 Several stacks in the catalog are tools I wrote:
 
