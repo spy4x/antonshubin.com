@@ -5,7 +5,7 @@ description: "How I run self-hosted CI with Woodpecker: one server and agent in 
 tldr:
   - "A Woodpecker server and agent in Docker Compose run CI for this site and my open-source tools; each repository keeps its pipeline in .woodpecker.yml."
   - "Give each secret to the steps that need it, for the events that need it, and write shell variables as $$NAME, or Woodpecker blanks them before the shell runs."
-  - "A release builds the image with kaniko, no secret and no push; a separate crane step that runs no repository code is the only one with the registry login."
+  - "A release builds the image with kaniko, no secret and no push; only steps that run no repository code get the registry login: crane, which pushes the image, and the step that updates the Docker Hub page."
   - "Open sign-up, a locked SQLite database and 4 GB of logs inside it were the real problems, each fixed in the stack's compose file."
 intro: "My Drone CI post from 2023 still gets read, and it no longer describes what I run. This is the current setup: the Woodpecker server and agent, the pipeline files of my public repositories, how secrets reach a step and how a tag turns into a published image. It is for developers who want CI on their own server and want to see real files, mistakes included."
 coverImage: "/img/blog/self-hosted-ci-with-woodpecker/cover.png"
@@ -159,9 +159,10 @@ repository's own task (`deno task check`, `go test`) instead of repeating its
 commands, so CI cannot drift from what runs locally. mig learned that the hard
 way: its first pipeline
 [never passed from a clean checkout](https://github.com/spy4x/mig/pull/16),
-because it skipped `deno install`, and its Alpine image could not load a native
-Tailwind binding. It now uses the Debian Deno image, the same one its Dockerfile
-builds with.
+because it skipped `deno install` and its Alpine image failed
+`deno fmt --check`. A newer Alpine image could not load Tailwind's native
+binding, so the pipeline moved to the Debian Deno image, the same one its
+Dockerfile builds with.
 
 ## Browser tests: install Chromium in the step
 
@@ -328,7 +329,9 @@ push:
 ```
 
 1. crane only copies images to a registry. It runs no code from the repository,
-   so this is the one step that gets the Docker Hub login.
+   so it can hold the Docker Hub login. The one other step with that login,
+   `dockerhub-overview`, only sends `docs/dockerhub.md` to Docker Hub as the
+   image's description.
 2. The image is pinned by digest, so a moved tag on Docker Hub cannot change
    what runs next to the login.
 3. The image name and tags come from Woodpecker's variables, not from the
@@ -346,9 +349,8 @@ not at the next release.
 
 zond and oko use the same pattern for GitHub's registry, pushing `:X.Y.Z`,
 `:X.Y` and `:latest` for each release. rostok publishes to JSR instead: its
-publish step
-[retries a stalled upload](https://github.com/spy4x/rostok/pull/484) three
-times, ten minutes each, because uploads to JSR stalled.
+publish step [tries a stalled upload](https://github.com/spy4x/rostok/pull/484)
+up to three times, ten minutes each, because uploads to JSR stalled.
 
 ## Status badges
 
@@ -360,8 +362,8 @@ line:
 ```
 
 The number is the repository's id in Woodpecker, the one in its URL. The badge
-shows the last pipeline on the default branch, and the link opens the public
-list from the screenshot at the top. On this site, the
+shows the last push pipeline on the default branch, and the link opens the
+public list from the screenshot at the top. On this site, the
 [tool pages](/tools/rostok) show each tool's CI status, read from a snapshot of
 the same public API.
 
