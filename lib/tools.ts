@@ -485,6 +485,7 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
+    posts: ["oko-homelab-dashboard"],
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
