@@ -533,7 +533,7 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
-    posts: ["building-mcp-servers-with-deno"],
+    posts: ["building-mcp-servers-with-deno", "mcp-server-for-your-saas"],
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
