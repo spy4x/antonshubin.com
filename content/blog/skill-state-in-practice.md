@@ -83,8 +83,8 @@ a fresh implementer picked them up from the state alone.
 
 ### What got in the way
 
-Every run with the skill hit at least two of these, and the lead agent fixed
-them by hand:
+Every run with the skill hit several of these, and the lead agent fixed them by
+hand:
 
 - **Patches that failed the schema.** Subagents wrote state updates the CLI
   rejected, and the lead had to write some of them itself.
