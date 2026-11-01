@@ -156,11 +156,11 @@ when:
 - switching cost is low and the managed option buys meaningful focus;
 - the expected saving disappears after engineering and operations time.
 
-![The Anakin and Padme meme. Anakin: "We self-host it now". Padme, smiling: "You tested the restore, right?" Anakin stares back silently. Padme, no longer smiling: "Right?"](/img/blog/cost-optimization-laboratory/anakin-restore.webp "The silence is the answer.")
-
 Founders should also resist the opposite mistake: buying a managed component for
 every technical concern before the product has demonstrated the need. Each
 component adds cost, permissions, failure modes, and vendor-specific knowledge.
+
+![The Anakin and Padme meme. Anakin: "We self-host it now". Padme, smiling: "You tested the restore, right?" Anakin stares back silently. Padme, no longer smiling: "Right?"](/img/blog/cost-optimization-laboratory/anakin-restore.webp "The silence is the answer.")
 
 ## A Founder-Friendly Decision Framework
 
