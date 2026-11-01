@@ -24,6 +24,8 @@ function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
     readTime: 5,
     publishedAt: "2026-01-01",
     topic: "self-hosting",
+    coverImage: `/img/blog/${slug}/cover.png`,
+    coverAlt: "A cover",
     ...extra,
   }
 }
