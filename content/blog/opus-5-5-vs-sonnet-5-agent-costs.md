@@ -30,8 +30,10 @@ lanes that touch different files. Each lane gets an **implementer** agent that
 writes the code in its own git worktree and opens a PR. A separate **reviewer**
 agent then checks every PR: it runs the tests, breaks the code on purpose to see
 whether a test goes red, and checks the PR description's claims. Nothing merges
-until a reviewer passes it. A failed review ("needs-fix") goes back to the
-implementer for another round.
+until a reviewer passes it, and the reviewers are hard to impress. A failed
+review ("needs-fix") goes back to the implementer for another round.
+
+![The Gru's Plan meme: Gru presents four boards, "Write the code", "Open a PR", "Reviewer breaks it on purpose", and stares in dismay at the fourth, "Needs fix"](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/gru-review.webp "The plan works every time. Until the fourth board.")
 
 Between September 20 and 25 that produced 203 implementer PRs and 411 reviewer
 agents across four models. I pay a flat subscription, so the dollars below are
@@ -52,7 +54,7 @@ The last column is the one that matters, and the next section shows why.
 An agent doesn't pay for its work once. Every step is a new API call that sends
 the whole conversation again: the brief, every file it read, every test log.
 Most of that comes from the prompt cache, so each call is cheap, but an agent
-makes hundreds of them.
+makes hundreds of them. Cheap times hundreds is not cheap.
 
 In one six-hour window on September 24, my agents used about $593 at list
 prices. **68% of that was cached reads**, 22% cache writes and 10% output.
@@ -64,6 +66,8 @@ thing.
 
 So the price per token matters less than you'd think. What matters is how many
 steps an agent takes and how much it carries through each one.
+
+![The Toy Story meme: Buzz Lightyear points into the distance for Woody, captioned "Cached reads, cached reads everywhere"](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/cached-reads-everywhere.webp "68% of the bill, re-reading the same conversation.")
 
 Cached reads cost the same $0.20 per million tokens on Opus 5.5 and Sonnet 5.
 Only input, output and cache writes cost twice as much on Opus. For my Sonnet
@@ -153,9 +157,12 @@ past lanes cover several levels:
 | Opus 5.5    | medium | $0.39                      | 9 of 16             |
 
 Sonnet at high effort cost 35–51% more per line than at medium, with no clear
-gain in review results. Opus 5.5 did its auth and crypto work at medium. This is
-observational (repositories ran at different efforts), so it's a signal, not
-proof. It was enough to stop me guessing effort up front.
+gain in review results. It thought harder; the reviewers didn't notice. Opus 5.5
+did its auth and crypto work at medium. This is observational (repositories ran
+at different efforts), so it's a signal, not proof. It was enough to stop me
+guessing effort up front.
+
+![The Futurama Fry meme: Fry squints suspiciously, captioned "Not sure if thinking harder, or just billing harder"](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/fry-effort.webp "More effort, more dollars, same review results.")
 
 ## Reviewers: Opus 5.5 against Fable 5.1
 
@@ -168,11 +175,14 @@ Fable wasn't stricter either. On Sonnet-written code in the same days, it
 blocked 17 of 19 first submissions, and Opus 5.5 blocked 74 of 92. That is no
 real difference.
 
+![The They're the Same Picture meme: two pictures labelled "Opus 5.5 review" and "Fable 5.1 review" under the line "Corporate needs you to find the differences between this picture and this picture", and Pam answering "They're the same picture"](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/same-picture.webp "Same work, same strictness. Different invoice.")
+
 On the four PRs that both reviewed at the same time, **each caught security bugs
 the other missed**. One was a delete path that followed symbolic links: Fable
 caught it, and the Opus review running in parallel did not. So neither reviewer
 is complete on its own. Instead of paying 2.7 times more for a second opinion, I
-added that class of bug to the reviewer's checklist.
+added that class of bug to the reviewer's checklist. A checklist costs nothing
+per token.
 
 ## What I changed
 
@@ -190,6 +200,8 @@ added that class of bug to the reviewer's checklist.
 - **Proof for every test.** Each test a PR adds or changes needs a line in the
   PR body naming the code change that turns it red. A PR without those lines
   goes back before any reviewer spends a token on it.
+
+![The Waiting Skeleton meme: a skeleton sitting on a bench in the grass, captioned "The reviewer's 5-minute cache, waiting for the re-review"](/img/blog/opus-5-5-vs-sonnet-5-agent-costs/cache-skeleton.webp "Re-reviews arrive after the default cache has expired.")
 
 ### Update, 30 September 2026: Sonnet 5.5 changes the answer
 
@@ -209,12 +221,12 @@ still hold for it; the list above is my setup as of 26 September.
 
 ## What this doesn't prove
 
-It isn't a controlled experiment. I chose which tasks went to Opus, the sample
-is small (19 Opus 5.5 PRs), and list prices are a stand-in for subscription
-usage. I started a fair split, with every other lane on Opus 5.5 regardless of
-the task, and stopped it early: the like-for-like comparison and the token
-counts pointed the same way. Opus 5.5 was cheaper, probably around half, and at
-worst no more expensive.
+It isn't a controlled experiment; it's my agents on my work, measured by me. I
+chose which tasks went to Opus, the sample is small (19 Opus 5.5 PRs), and list
+prices are a stand-in for subscription usage. I started a fair split, with every
+other lane on Opus 5.5 regardless of the task, and stopped it early: the
+like-for-like comparison and the token counts pointed the same way. Opus 5.5 was
+cheaper, probably around half, and at worst no more expensive.
 
 One gap favours Opus in these numbers. In at least 3 of the 8 Opus PRs that
 failed their first review, the lead agent made the fix itself, so that fix's

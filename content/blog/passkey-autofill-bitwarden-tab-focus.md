@@ -42,7 +42,10 @@ could even do that.
 
 The next day I was browsing Google Maps in Brave, and the Seed tab jumped to the
 front. Twice in ten minutes. Then I put on a YouTube video, and it kept
-happening, about every five minutes. Now I believed him.
+happening, about every five minutes. Now I believed him. Nothing confirms a bug
+report like the bug interrupting your own YouTube video.
+
+![The Woman Yelling at a Cat meme: a woman points and yells "Forced focus is too much", and a white cat at a dinner table answers "I'm just a sign-in page"](/img/blog/passkey-autofill-bitwarden-tab-focus/yelling-cat.webp "Innocent until proven guilty")
 
 ## Can a web page switch your tab by itself?
 
@@ -56,6 +59,8 @@ bundle, the service worker and the web app manifest. None of them called
 click. So the agent's first answer was "not our code". That was true of focus
 calls, and it was not the whole answer.
 
+![The Anakin and Padme meme: Anakin says "The bundle never calls focus()", Padme smiles "So it's not our code, right?", Anakin stays silent, and Padme asks again, less sure: "Right?"](/img/blog/passkey-autofill-bitwarden-tab-focus/anakin-focus.webp "True, and not the whole answer")
+
 ## Was it the "New version available" banner?
 
 Since my friend saw the "New version available" banner, the banner was the first
@@ -64,7 +69,9 @@ announced. Maybe the browser or the desktop raised the tab on that announcement?
 
 I ran the test: a blank tab, the same live region, the same text after 15
 seconds, while I sat on another tab. Nothing moved. And when it happened to me
-again there was no new version at all. Wrong guess.
+again there was no new version at all. Wrong guess. Sorry, banner.
+
+![The Left Exit 12 Off Ramp meme: a car labelled "My first guess" swerves off the highway towards the exit labelled "The banner", away from the straight road labelled "The timer"](/img/blog/passkey-autofill-bitwarden-tab-focus/left-exit-banner.webp "The scenic route to the bug")
 
 > Every five minutes, with no new version, is not an event. It's a timer.
 
@@ -85,7 +92,7 @@ carries a challenge from the server, and the challenge expires after five
 minutes. So every four and a half minutes the page cancelled the waiting request
 and started a new one with a fresh challenge.
 
-And my friend's tab? Its address was `/sign-in`.
+And my friend's tab? Its address was `/sign-in`. Of course it was.
 
 ## Who actually switched the tab?
 
@@ -114,6 +121,8 @@ Bitwarden didn't run in the test profile: it only steps in with a signed-in
 vault, and I wasn't going to sign a test script into mine. So this step is read
 from Bitwarden's code, not reproduced. The code reads plainly, and it matches
 the timing.
+
+![The Spider-Man pointing meme: two Spider-Men point at each other; one says "Seed: I only restarted a request", the other "Bitwarden: I only switched to the tab"](/img/blog/passkey-autofill-bitwarden-tab-focus/spiderman-blame.webp "Each one innocent, together guilty")
 
 ## How do you stop passkey autofill stealing focus?
 
@@ -146,6 +155,8 @@ focus. The fix is in
 [Seed's pull request #610](https://github.com/spy4x/seed/pull/610).
 
 ## What to take from it
+
+![The Disaster Girl meme: a house burns behind a smiling girl; the fire is captioned "My tab jumping to the front" and the girl "A timer in a background tab"](/img/blog/passkey-autofill-bitwarden-tab-focus/disaster-girl-timer.webp "It was the timer all along")
 
 1. **A timer in a background tab is not invisible.** Anything you start, cancel
    or restart there can reach extensions you never heard of. If it doesn't need

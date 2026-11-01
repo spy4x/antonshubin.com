@@ -31,13 +31,16 @@ explicit state file is worth it, it's for you.
 is a runtime design for long agent tasks. Most agents keep everything in one
 growing chat: every observation, action and piece of reasoning is appended to
 the history. Over a long task that gets slow, and old, wrong details "poison"
-later steps.
+later steps. Think of a colleague who still quotes the requirement you dropped
+three meetings ago.
 
 SKILL.state replaces that history with an explicit, mutable execution state. At
 each step the model gets only three things: the skill it follows, the current
 state, and the latest observation. Its reasoning is thrown away once it has
 produced a valid state update. The paper reports better accuracy with much lower
 token use.
+
+![The Distracted Boyfriend meme: the boyfriend, labelled "Me", turns to stare at a woman labelled "A paper promising an explicit state" while his girlfriend, labelled "My growing chat history", glares at him](/img/blog/skill-state-in-practice/distracted.webp "Late September, me and my agents' context window")
 
 ## How I tried it
 
@@ -55,11 +58,13 @@ the idea with a skill:
    whole brief was the skill, the current state and the latest observation. No
    conversation.
 
-The plan was a fair comparison. My task flow alternated: one task with the
-skill, the next without. Once each side had enough tasks, I would compare how
-often the first review passed, how often I had to correct the agent, and the
-minutes per task. The skill would become the default if it was at least as
-reliable and not much slower.
+![The Roll Safe meme, a man tapping his temple: "Can't build every prompt myself", "Approximate it with a skill"](/img/blog/skill-state-in-practice/approximate.webp "Can't change the runtime? Change the skill")
+
+The plan was a fair comparison. Very scientific, at least on paper. My task flow
+alternated: one task with the skill, the next without. Once each side had enough
+tasks, I would compare how often the first review passed, how often I had to
+correct the agent, and the minutes per task. The skill would become the default
+if it was at least as reliable and not much slower.
 
 ## What happened
 
@@ -95,9 +100,12 @@ hand:
 - **A state folder that broke the checks.** `deno fmt` and `deno lint` scanned
   the state folder, so it had to be moved out of the way before every check.
 
+![The bike fall meme: a cyclist labelled "Schema-checked patches" rides along, then jams a stick into his own front wheel, "Subagents' patches fail it", then lies on the ground, "Lead fixes them by hand"](/img/blog/skill-state-in-practice/bike.webp "The schema worked. That was the problem")
+
 In one task a subagent also ignored an instruction not to push, and the lead had
-to rewrite a public commit message. That one isn't the skill's fault, but more
-handoffs meant more places for an instruction to get lost.
+to rewrite a public commit message. Nothing builds character like editing your
+own history in public. That one isn't the skill's fault, but more handoffs meant
+more places for an instruction to get lost.
 
 ## Why I stopped
 
@@ -106,7 +114,10 @@ agents to Opus 5.5
 ([the numbers behind that switch](/blog/opus-5-5-vs-sonnet-5-agent-costs)).
 After that, the median peak context was 162K tokens, and only 2 of 48 units of
 work were compacted at all. The skill fought a problem I barely had anymore, and
-it added bookkeeping to every task.
+it added bookkeeping to every task. The best kind of fix: the one you never had
+to finish.
+
+![The Drake meme: Drake turns away from "A state file, a CLI and a schema for every task" and points happily at "Opus 5.5: 2 of 48 units compacted"](/img/blog/skill-state-in-practice/drake.webp "The new model ate my problem")
 
 The comparison was also too slow to finish. At my pace, enough tasks on each
 side would have taken weeks.
@@ -117,9 +128,13 @@ side would have taken weeks.
 
 The best part of the idea didn't need the state file: a fresh agent for each
 step, with a brief that holds everything it needs. That's already how my agents
-work. A lead splits the work into lanes, each implementer starts clean with its
-own brief, and a separate reviewer checks every diff. Later I removed the skill
-from my setup.
+work.
+
+![The Scooby-Doo unmasking meme: Fred grabs the hood of a ghost labelled "SKILL.state", and under the mask is a man labelled "A fresh agent per step with a good brief"](/img/blog/skill-state-in-practice/unmask.webp "It was the brief all along")
+
+A lead splits the work into lanes, each implementer starts clean with its own
+brief, and a separate reviewer checks every diff. Later I removed the skill from
+my setup.
 
 My test was not the paper's setup. I approximated the idea inside a tool that
 keeps the whole conversation, on a model with plenty of room. With a smaller

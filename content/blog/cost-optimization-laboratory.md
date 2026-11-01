@@ -65,7 +65,9 @@ It is often a good fit when:
 
 The tradeoff is ownership. A lower infrastructure invoice is not a saving if a
 founder becomes the unpaid system administrator or if recovery depends on one
-person remembering undocumented commands.
+person remembering undocumented commands. Cheap hosting, paid for in sleep.
+
+![The Two Buttons meme. A hand hovers over two red buttons labelled "Managed cloud" and "Dedicated", and a sweating man below is labelled "Founder"](/img/blog/cost-optimization-laboratory/two-buttons-model.webp "Plot twist: you can press both. Read on.")
 
 ### Hybrid
 
@@ -111,7 +113,8 @@ budget.
 ## Calculate Total Cost of Ownership, Not Hosting Price
 
 Founders often compare a managed service invoice with the price of a dedicated
-machine. That comparison excludes most of the decision.
+machine. That comparison excludes most of the decision. It's like comparing cars
+by the price of the key.
 
 Use this model instead:
 
@@ -130,6 +133,8 @@ Review each part:
 5. **Migration cost:** Data export, architecture changes, retraining, and
    cutover risk.
 
+![The Scooby-Doo unmasking meme. Fred pulls the hood off a captured villain labelled "A cheap server", and the face underneath is "+ engineering time, operations, failure risk and migration cost"](/img/blog/cost-optimization-laboratory/scooby-tco.webp "And it would have stayed cheap, if it weren't for those meddling costs.")
+
 Managed cloud may win after all five are counted. Dedicated infrastructure may
 win for a stable product with capable ownership. Hybrid may isolate the risks
 worth paying a provider to carry while keeping predictable workloads simple.
@@ -140,7 +145,8 @@ this business the required reliability and control at the lowest total cost?”
 ## What Not to Self-Host
 
 Do not self-host a component merely because open-source software exists for it.
-Avoid taking ownership when:
+Installing it is the easy part; owning it is the job. Avoid taking ownership
+when:
 
 - failure creates a legal, safety, or existential business risk;
 - the team has no named operator and no incident-response capacity;
@@ -149,6 +155,8 @@ Avoid taking ownership when:
 - the workload requires global elasticity the team cannot reproduce;
 - switching cost is low and the managed option buys meaningful focus;
 - the expected saving disappears after engineering and operations time.
+
+![The Anakin and Padme meme. Anakin: "We self-host it now". Padme, smiling: "You tested the restore, right?" Anakin stares back silently. Padme, no longer smiling: "Right?"](/img/blog/cost-optimization-laboratory/anakin-restore.webp "The silence is the answer.")
 
 Founders should also resist the opposite mistake: buying a managed component for
 every technical concern before the product has demonstrated the need. Each
@@ -176,6 +184,8 @@ platform.
 A backup is not a recovery plan. Ownership, order, credentials, dependencies,
 and verification all matter.
 
+![The This Is Fine meme: a dog sits in a burning room with a cup of coffee. First panel: "Recovery never tested". Second panel, the dog smiling: "We have backups"](/img/blog/cost-optimization-laboratory/this-is-fine-backup.webp "A backup nobody has restored is a hope, not a plan.")
+
 ### 3. Assess the operating team
 
 - Who receives an alert?
@@ -184,6 +194,7 @@ and verification all matter.
 - Can another person operate the system from written documentation?
 
 Architecture must fit the team that exists, not a future team on a hiring plan.
+Imaginary engineers don't answer alerts.
 
 ### 4. Identify compliance and security boundaries
 
@@ -244,8 +255,9 @@ Use this before approving a migration or signing a larger platform contract.
 
 ## Choose Architecture From Evidence
 
-There is no prestigious infrastructure option. There is only an option that fits
-the product and one that consumes runway without improving the business.
+There is no prestigious infrastructure option. Nobody hands out medals for
+architecture diagrams. There is only an option that fits the product and one
+that consumes runway without improving the business.
 
 My role as tech lead is to connect those technical tradeoffs to product risk,
 team capacity, and budget—then define a delivery plan the founder can understand

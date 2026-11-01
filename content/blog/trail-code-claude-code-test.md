@@ -39,7 +39,10 @@ Trail-code (formerly graft) has two parts:
 
 I tested only the map. My agents work under written rules, and a decision only
 lands in those rules after I approve it. Notes that agents write into the repo
-on their own don't fit that.
+on their own don't fit that. My agents are clever, but they don't get to write
+the house rules.
+
+![The Drake meme: Drake turns away from "Agents write their own notes into my repo" and points happily at "A decision lands in my rules after I approve it"](/img/blog/trail-code-claude-code-test/drake-notes.webp "My repo, my rules")
 
 ## How I tested it
 
@@ -62,9 +65,11 @@ differ. So I replayed work that was already done:
 4. A reviewer checked every result **blind**, on a clean copy under a random
    letter, with the merged PR as a reference answer.
 5. Afterwards I scanned every tool call to check that no agent peeked at the
-   real repo or the real PR.
+   real repo or the real PR. Trust, but grep.
 
 Trail-code gives an agent the map in two ways, so I tested both.
+
+![The Gru's plan meme: Gru presents a board that reads "Replay 10 merged PRs", then "Clone at the commit before", then "Review every result blind", and stares in disbelief at the last board: "The agents grep anyway"](/img/blog/trail-code-claude-code-test/gru-replay.webp "A flawless plan, until the agents got a say")
 
 ## Round 1: the map as tools ("pull")
 
@@ -76,6 +81,10 @@ Over 10 tasks the agents made **7 map calls**. Everything else was `grep` and
 `sed` through Bash, exactly as without the map. On the 9 comparable tasks, the
 runs with the map cost 3.9% less in total, and the per-task change swung from
 18% cheaper to 26% dearer.
+
+Seven calls. Not seven per task. Seven, in total.
+
+![The Distracted Boyfriend meme: a man labelled "My agents" turns to look at a woman in red labelled "Grep and sed", while his partner, labelled "The code map", stares at him in disbelief](/img/blog/trail-code-claude-code-test/distracted-grep.webp "Old habits, new map")
 
 <TaskCostChart round="pull" />
 
@@ -109,7 +118,10 @@ sign-up rate limit?" worked. "Which file defines JOB_AGGREGATE_ID?" returned
 nothing.
 
 The prompt matching is built for a short chat message. My agents get issue-sized
-briefs, so push mode mostly pushed nothing.
+briefs, so push mode mostly pushed nothing. The hook was waiting for a chat
+message and got a whole issue instead.
+
+![The "Is this a pigeon?" meme: a man labelled "Trail's prompt hook" points at a butterfly labelled "An issue-sized brief" and asks "Is this a short chat message?"](/img/blog/trail-code-claude-code-test/pigeon-brief.webp "No strong match for this prompt")
 
 <TaskCostChart round="push" />
 
@@ -131,6 +143,8 @@ saving has to beat.
 
 > If two identical runs differ by 10%, a tool that saves 10% looks exactly like
 > no tool at all.
+
+![The "They're the same picture" meme from The Office: Pam is asked to find the differences between a card reading "A 10% saving" and a card reading "Run-to-run noise", and says "They're the same picture."](/img/blog/trail-code-claude-code-test/same-picture.webp "Corporate wants a saving. The noise says no.")
 
 That's the main thing I took away. Before you believe a saving, from a vendor or
 from your own test, measure the noise. At 13% noise, 10 tasks can only show a
@@ -161,11 +175,14 @@ If you use Cursor on a large repo you don't know, with short questions, your
 result may well be different. That's the point: the only benchmark that answers
 your question is your work.
 
+![The Change My Mind meme: a man sits at a table with a sign that reads "Your work is the only benchmark. Change my mind."](/img/blog/trail-code-claude-code-test/change-my-mind.webp "Your repo, your benchmark")
+
 ## What it cost
 
 Everything together, 34 implementer runs and 33 blind reviews: about $101 at API
 list prices. That's cheap compared with a month of a tool that adds hooks to
-every session and does nothing for it.
+every session and does nothing for it. Well, almost nothing: it does hand every
+session 3 KB of instructions to use `trail`.
 
 ## Try this on the next tool
 
