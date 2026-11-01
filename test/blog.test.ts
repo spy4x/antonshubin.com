@@ -567,7 +567,7 @@ function unbusted(html: string): string {
 }
 
 siteTest(
-  "every /blog row, archive included, shows its cover lazily as decoration",
+  "every /blog row, archive included, carries its cover, lazy and decorative, and no second link",
   async (site) => {
     const html = await site.html("/blog")
     const rows = html.split("data-post-row").slice(1)
