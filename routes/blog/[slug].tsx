@@ -226,7 +226,7 @@ export default define.page(function BlogPost(ctx) {
   // Each file's real width: a "1000w" on a narrower file made a dense phone
   // draw it at a fraction of the column. A picture 480px wide or less has no
   // smaller copy worth offering (blog-cover.sh only shrinks).
-  const { width: coverWidth } = article.coverSize
+  const { width: coverWidth, height: coverHeight } = article.coverSize
   const wholeSrcset = coverWidth > 480
     ? `${cover.wholeSmall} 480w, ${cover.whole} ${coverWidth}w`
     : `${cover.whole} ${coverWidth}w`
@@ -404,6 +404,12 @@ export default define.page(function BlogPost(ctx) {
               class="post-image"
               data-lightbox
               aria-label={`View larger image: ${article.coverAlt}`}
+              // The column's width, or less where the 28rem height cap would
+              // bind; the image's ratio then gives its height before it loads.
+              style={{
+                width:
+                  `min(100%, calc(28rem * ${coverWidth} / ${coverHeight}))`,
+              }}
             >
               <img
                 src={cover.whole}
@@ -415,7 +421,8 @@ export default define.page(function BlogPost(ctx) {
                 loading="eager"
                 fetchpriority="high"
                 decoding="async"
-                class="block w-auto h-auto max-w-full max-h-[28rem] rounded-lg border border-rule bg-paper"
+                style={{ aspectRatio: `${coverWidth} / ${coverHeight}` }}
+                class="block w-full h-auto rounded-lg border border-rule bg-paper"
               />
             </button>
           </figure>

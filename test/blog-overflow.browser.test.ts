@@ -182,11 +182,30 @@ Deno.test("a post's cover fills the phone's column and opens whole in the lightb
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 3,
     })
+    // Hold the picture back: its box must already have its final size, or
+    // the article jumps down when it arrives.
+    let release = () => {}
+    const held = new Promise<void>((r) => release = r)
+    await page.route(/\/cover-full[^/]*\.webp/, async (route) => {
+      await held
+      await route.continue()
+    })
     // A 580x282 meme: at 390px its width, not the 28rem cap, limits it.
     await page.goto(`${site.origin}/blog/zond-sso-probe-bridge`, {
-      waitUntil: "networkidle",
+      waitUntil: "domcontentloaded",
     })
     const trigger = page.locator("[data-post-cover] [data-lightbox]")
+    const before = await trigger.locator("img").boundingBox()
+    release()
+    await page.waitForLoadState("networkidle")
+    await trigger.locator("img").evaluate((img: HTMLImageElement) =>
+      img.decode()
+    )
+    const after = await trigger.locator("img").boundingBox()
+    assert(
+      before && after && Math.abs(before.height - after.height) < 1,
+      `the cover's box was ${before?.height}px tall before it loaded, ${after?.height}px after`,
+    )
     const [cover, column] = await Promise.all([
       trigger.locator("img").boundingBox(),
       page.locator("[data-post-cover]").boundingBox(),

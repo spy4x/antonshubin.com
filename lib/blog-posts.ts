@@ -96,7 +96,8 @@ export interface BlogArticle {
   coverAlt: string
   /**
    * The size of `cover-full.webp`, written as `"552x414"` in the front matter
-   * (`scripts/blog-cover.sh` prints it), so the post page reserves its space.
+   * (`scripts/blog-cover.sh` prints it): the post page sizes the cover from it,
+   * so its box has its final size before the file loads.
    */
   coverSize: { width: number; height: number }
 }
