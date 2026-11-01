@@ -85,7 +85,7 @@ COMMENT ON COLUMN group_members.role IS '1=viewer, 2=editor, 3=admin, 4=owner';
 ```
 
 A later migration makes the database refuse a second owner, so ownership moves
-only by a transfer:
+only by a transfer. The database says no, so a code review doesn't have to:
 
 ```sql
 -- From libs/server/db/migrations/2026_10_13_0002_group_single_owner.sql
@@ -96,6 +96,8 @@ Groups arrived after the first users, so a separate migration gave every
 existing user a personal group. It skips anyone who already has one, so running
 it twice changes nothing. A group can be renamed, deleted and, for 30 days,
 restored, and a person always keeps at least one.
+
+![The "Change my mind" meme: a man at a table with a sign that reads "A personal space is just a group. Change my mind"](/img/blog/seed-saas-starter/change-my-mind.webp "One kind of group, four roles, zero special cases")
 
 ## CQRS without a framework: commands and queries as plain functions
 
@@ -122,6 +124,8 @@ export function createGroupCreateHandler(
 The handler gets a repository, not a database. In the API it is the Postgres
 repository from `libs/server`. In the handler's tests it is an in-memory fake,
 so those tests need no database.
+
+![The Woman Yelling at a Cat meme: the woman shouts "Where is your controller class? Your decorator?" and the cat at the dinner table answers "I'm a plain function"](/img/blog/seed-saas-starter/plain-function.webp "Arguments in, result out. That's the whole ceremony")
 
 The HTTP route is a thin adapter: it checks that the request comes from the
 app's own origin, parses the body, builds the command and writes the response.
@@ -181,7 +185,8 @@ upgrade.
 
 A template is a starting point. You clone it, change the parts that are wrong
 for your product, and commit those changes to your own repository. There is no
-upstream to keep in sync with. The parts that really are reusable live in the
+upstream to keep in sync with, and no merge conflicts with someone else's
+roadmap. The parts that really are reusable live in the
 [`@spy4x/*` packages on JSR](/blog/preact-component-library-without-shadcn),
 which you upgrade like any other dependency.
 
@@ -189,6 +194,8 @@ The trade-off is real: every project starts as a copy, not an `npm update`. For
 solo founders and small teams, that is the right trade-off. A large organisation
 with many teams on one platform is better served by a framework with a strict
 upgrade policy.
+
+![The Two Buttons meme: a hand hovers between a red button labelled "A framework" and one labelled "A template", and below a sweating man is labelled "Me choosing a SaaS starter"](/img/blog/seed-saas-starter/two-buttons.webp "Pick your pain: upgrades or copies")
 
 ## Why Seed v1 failed
 
@@ -230,8 +237,11 @@ The clocks were most of what a paying user would see: Stripe subscriptions,
 groups and shared access, realtime updates, file upload, a PWA that works
 offline, and user management in the admin panel.
 
-The database had three tables: `User`, `UserDevice` and `Notification`. When I
-retired it, 60 issues were still open, 27 of them features.
+The database had three tables: `User`, `UserDevice` and `Notification`. Three. I
+counted twice. When I retired it, 60 issues were still open, 27 of them
+features.
+
+![The Sad Pablo Escobar meme in three panels: "Seed v1: 33 ticks, 33 clocks" over Pablo sitting alone on a swing, then "Waiting for Stripe" and "Waiting for groups" as he waits at a table and by an empty pool](/img/blog/seed-saas-starter/pablo.webp "The clocks never turned into ticks")
 
 ### Over-engineering, in numbers
 
@@ -239,7 +249,10 @@ The real reason v1 failed was over-engineering. I built the foundation for a
 much bigger product than the one I had: 31 Nx projects and over 100 npm packages
 for an app with three tables. Of its 134 commits, 52 went to setup: lint and
 format rules, CI, dependency updates, renames and Docker. Groups, the decision
-the rest of the data hangs on, were still an open issue when I stopped.
+the rest of the data hangs on, were still an open issue when I stopped. Past me
+built a cathedral for a garden shed.
+
+![The Expanding Brain meme, each brain glowing brighter than the last: "An app with three tables", "31 Nx projects", "Over 100 npm packages", "Groups: still an open issue"](/img/blog/seed-saas-starter/expanding-brain.webp "Peak architecture, zero groups")
 
 The cloud setup is the same story. In November 2022 I opened an issue called
 "Vendor unlocking". It lists the parts that could run only on Google's cloud and

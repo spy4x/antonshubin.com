@@ -24,7 +24,8 @@ months before, it merged 295.
 
 That's about 19 times as many per day. It's also the kind of number that gets a
 post laughed off Hacker News, because it hides almost everything that matters.
-So this post gives you the number, and then takes it apart.
+So this post gives you the number, and then takes it apart. Gently, and with
+more numbers.
 
 **What is it about?** Real counts from my own GitHub account, two periods, and
 the other things that changed at the same time, named. **Who is it for?**
@@ -89,7 +90,9 @@ This change isn't in any chart.
 
 With M3, I reviewed every pull request myself before it merged, because I
 couldn't trust it. That made me the bottleneck: agents can open pull requests
-much faster than one person can read them.
+much faster than one person can read them. A one-person traffic jam.
+
+![The Waiting Skeleton meme: a skeleton on a park bench. Top: "Agents waiting for me". Bottom: "To review their pull requests"](/img/blog/claude-code-vs-minimax-m3-30-days/skeleton-review.webp "Reviewing every pull request myself, as seen from the agents' side.")
 
 With Claude Code and the rules in my
 [dotfiles repository](https://github.com/spy4x/dotfiles), about 99% of what the
@@ -143,6 +146,8 @@ quiet week in the middle. Ask me again in three months.
 lock files and generated data: three data imports into one of my private
 repositories added up to about 98,000 lines on their own.
 
+![The Futurama Fry squinting meme. Top: "Not sure if 1.24 million lines of work". Bottom: "Or just lock files"](/img/blog/claude-code-vs-minimax-m3-30-days/fry-lines.webp "The squint every line count deserves.")
+
 What I checked instead is whether pull requests just got smaller, which would
 inflate the count for free. They didn't: the median went from 266 changed lines
 to 228. The slicing got a bit finer, not ten times finer.
@@ -179,6 +184,8 @@ That's 228 tags, 227 of them versions, against 3 tags in the three months
 before. A release tag is a version someone else can install, which makes it a
 better count of shipped work than pull requests.
 
+![The Drake meme. Drake turns away from "Counting merged pull requests" and smiles at "Counting versions someone can install"](/img/blog/claude-code-vs-minimax-m3-30-days/drake-tags.webp "Same month, better scoreboard.")
+
 ## What it cost
 
 Subscription money only:
@@ -191,7 +198,7 @@ Subscription money only:
 
 The pricier plan came out at about a fifth of the cost per merged pull request.
 That doesn't count the $20 ChatGPT experiment or the occasional DeepSeek API
-calls, or my own time, which is the expensive part.
+calls, or my own time, which is the expensive part. I may be biased on that one.
 
 Cost per pull request only means something if the pull requests are good. My
 quality guard is the reviewer agent's first-pass rate, and in
@@ -199,13 +206,17 @@ quality guard is the reviewer agent's first-pass rate, and in
 how much it varies by model: a cheaper implementer that fails its first review
 more often gives part of the saving back in fix rounds.
 
+![The Change My Mind meme: a man at a table with a "Change my mind" sign. Top: "The pricier plan was cheaper per pull request"](/img/blog/claude-code-vs-minimax-m3-30-days/change-my-mind-cost.webp "Per pull request, the pricier plan wins.")
+
 ## Did M3 get worse over time?
 
 It felt that way to me. When I started, M3 felt overpowered. Then MiniMax ran
 into a backlash from users over a pricing change, and a week or two after that I
 started to feel that M3 got dumber. It made mistakes more often, I had to hold
 its hand a lot, and I had to review every pull request because I couldn't trust
-it.
+it. Less pair programming, more babysitting.
+
+![The Hide the Pain Harold meme: an older man smiling stiffly over a laptop and a mug. Top: "Me, holding M3's hand". Bottom: "On every pull request"](/img/blog/claude-code-vs-minimax-m3-30-days/harold-m3.webp "Smiling through it, one review at a time.")
 
 My guess is that they found another way to make it cheaper to run, for example a
 more heavily quantized model. That's only a guess: I have no proof, and I know

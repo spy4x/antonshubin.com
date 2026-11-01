@@ -47,9 +47,13 @@ it fits in.
 
 The visitor lands on your URL, picks a slot, fills in their email and name. Mig
 emails both of them a confirmation with an ICS attachment. Both get a
-cancellable link signed with HMAC-SHA-256 of a random token. That's it.
+cancellable link signed with HMAC-SHA-256 of a random token. That's it. That's
+the whole product.
 
-Configuration is env vars. No admin UI to maintain.
+Configuration is env vars. No admin UI to maintain, and no admin UI to forget
+the password of.
+
+![The Roll Safe meme: a man tapping his temple, captioned "Can't break the admin UI if there is no admin UI"](/img/blog/mig-tiny-self-hosted-scheduler/no-admin-ui.webp "Configuration is env vars. Nothing to log in to, nothing to break.")
 
 ```bash
 docker run -d --name mig \
@@ -84,21 +88,23 @@ This is the design constraint that keeps mig lightweight:
   Calendar / iCal / Outlook all understand ICS.
 - **No payments.** If you need to charge for a meeting, use Stripe Checkout
   _before_ the mig link.
-- **No round-robin.** One owner. One URL.
+- **No round-robin.** One owner. One URL. One me.
 - **No database.** Bookings live in `data/bookings.json` with atomic write (temp
   file + rename). Mutex-serialised in-memory.
 - **No team admin UI.** Configuration is env vars. Rotate `SMTP_PASS` by
   restarting the container.
 
+![The UNO Draw 25 meme: a card that says "Run a database to send an email, or draw 25", and the player labelled "mig" holding a huge fan of cards](/img/blog/mig-tiny-self-hosted-scheduler/draw-25.webp "mig would rather draw 25.")
+
 If any of these constraints are wrong for your use case, you need a different
-tool. Use cal.com.
+tool. Use cal.com. No hard feelings.
 
 ## Cancellable links without state
 
 The interesting design decision was cancellable links. Most schedulers store a
-cancellation token in the database and look it up on cancel. Mig has no
-database. So the cancellation link is _self-contained_: it contains a SHA-256
-HMAC of a random token, signed with `CANCEL_SECRET`.
+cancellation token in the database and look it up on cancel. Mig has no database
+(you may have noticed a theme). So the cancellation link is _self-contained_: it
+contains a SHA-256 HMAC of a random token, signed with `CANCEL_SECRET`.
 
 ```ts
 // Sign: embed token + signature in the URL
@@ -113,13 +119,16 @@ if (!timingSafeEqual(sig, hmac(CANCEL_SECRET, token))) return 403
 Stateless. The link itself is the record. Rotate `CANCEL_SECRET` once a year to
 invalidate all old links.
 
+![The Always Has Been meme: one astronaut looking at the Earth asks "Wait, the link is the record?" and the astronaut behind him, holding a gun, answers "Always has been"](/img/blog/mig-tiny-self-hosted-scheduler/always-has-been.webp "No table to look the token up in. The link carries it.")
+
 ## Timezone handling without a library
 
-Mig's TZ handling is the part I am most pleased with. The owner sets `HOST_TZ`.
-The visitor's browser sends `Intl.DateTimeFormat().resolvedOptions().timeZone`
-in the request body. The confirmation email renders the time in _both_ timezones
-— host and visitor — because the worst outcome for a scheduling tool is showing
-the wrong time.
+Mig's TZ handling is the part I am most pleased with. Yes, I am proud of time
+zones. Developers are strange people. The owner sets `HOST_TZ`. The visitor's
+browser sends `Intl.DateTimeFormat().resolvedOptions().timeZone` in the request
+body. The confirmation email renders the time in _both_ timezones — host and
+visitor — because the worst outcome for a scheduling tool is showing the wrong
+time.
 
 ```
 When: Tuesday, 9 September 2026
@@ -129,6 +138,8 @@ When: Tuesday, 9 September 2026
 
 No date library, no Luxon, no moment. `Intl.DateTimeFormat` does the heavy
 lifting and ships with the runtime.
+
+![The Buff Doge versus Cheems meme: a muscular Doge labelled "Intl.DateTimeFormat, ships with the runtime" next to a small crying Cheems labelled "A date library, one more dependency"](/img/blog/mig-tiny-self-hosted-scheduler/intl-doge.webp "The runtime already knows what time it is. In both time zones.")
 
 ## Try it
 

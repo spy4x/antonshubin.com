@@ -18,8 +18,9 @@ topic: "scars"
 
 Today I found a merged pull request in my own public library. My account merged
 it. My account posted a detailed review under it, ending in "PASS". I don't
-remember doing either. Three weeks earlier, one of my AI coding agents had
-merged a stranger's pull request as if it were its own work.
+remember doing either. Apparently my account has a busy social life without me.
+Three weeks earlier, one of my AI coding agents had merged a stranger's pull
+request as if it were its own work.
 
 Nothing broke this time. But the same path would have merged a change to code,
 CI or dependencies just as easily, in a library other apps import. This post is
@@ -36,9 +37,11 @@ in my repositories. I don't review their pull requests before they land. A
 separate reviewer agent checks every diff, and a passing review is enough to
 merge without asking me.
 
+![Tuxedo Winnie the Pooh. Plain Pooh: "Me, reading every pull request before it merges". Pooh in a tuxedo: "A reviewer agent passes it and it merges without asking me"](/img/blog/ai-agent-merged-a-strangers-pull-request/pooh-review.webp "The fancy setup. What could possibly go wrong?")
+
 Two more details matter here:
 
-- The agents and I share one GitHub account.
+- The agents and I share one GitHub account. (Remember this one. It comes back.)
 - Agents work through my GitHub issues in parallel batches I call waves. Each
   issue ends in one pull request.
 
@@ -63,7 +66,8 @@ All times are UTC.
 
 The change itself was fine: 12 lines added and 9 deleted, in documentation and
 one test comment. The review checked that the test assertions were untouched.
-The contributor was polite, and the fix was correct. The problem was mine.
+The contributor was polite, and the fix was correct. The problem was mine. Yes,
+the villain of this post is me.
 
 ## Why it happened
 
@@ -73,7 +77,9 @@ That week I gave my agent runs merge authority in the session: merge once the
 reviewer passes. I meant the agents' own pull requests, and that was so obvious
 to me that I never said it. The next day I wrote the rule into my agent rules,
 still without saying whose pull requests it covered. The agent did what I said,
-not what I meant, and applied it to everyone.
+not what I meant, and applied it to everyone. A genie with merge rights.
+
+![Gru's plan meme. Board 1: "Tell the agents: merge when the reviewer passes". Board 2: "Never say whose pull requests". Board 3: "Agent merges a stranger's pull request". Board 4, Gru staring at it: "A stranger's pull request"](/img/blog/ai-agent-merged-a-strangers-pull-request/gru-merge-on-green.webp "My plan was flawless. Except for board two.")
 
 ### The stranger's pull request looked like the agent's own
 
@@ -85,8 +91,11 @@ reviewed it and merged it. From the agent's side, it was finishing its own work.
 
 On that day nothing an agent did was marked: not the issue, not the review, not
 the merge. So all three show "spy4x", and to anyone reading the page, including
-me three weeks later, it looks as if I did everything myself. Today agents start
-every comment with a hidden `<!-- agent -->` tag. Merges still carry no mark.
+me three weeks later, it looks as if I did everything myself. On paper I was
+very productive that day. Today agents start every comment with a hidden
+`<!-- agent -->` tag. Merges still carry no mark.
+
+![Spider-Man pointing at Spider-Man. Top: "Who merged it? spy4x." The Spider-Man on the left is "Me", the one on the right is "My AI agent"](/img/blog/ai-agent-merged-a-strangers-pull-request/spiderman-one-account.webp "One account, two of us, zero idea who did what.")
 
 ## The real risk
 
@@ -94,6 +103,8 @@ This time it was twelve lines of docs. Next time the same path would have merged
 whatever the pull request contained, with only an AI reviewing it, into a
 library other apps import. That's a supply-chain hole: one merge, and every app
 that updates gets the change.
+
+![Panik Kalm Panik meme. Panik: "My agent merged a stranger's pull request". Kalm: "It was twelve lines of docs". Panik: "The same path merges code into a library other apps import"](/img/blog/ai-agent-merged-a-strangers-pull-request/panik-real-risk.webp "My whole emotional journey, in three panels.")
 
 An AI reviewer is good at checking what a change does. It's not the right gate
 for deciding whether a stranger's change should be in the repository at all.
@@ -135,13 +146,15 @@ merge. #85 is the only one that was merged.
 
 - **Write down the scope of every "do it without asking" rule.** Whose pull
   requests, which repositories, which actions. Whatever you leave implied, the
-  agent will fill in.
+  agent will fill in, cheerfully and fast.
 - **Check the author before any merge.** One `gh pr view --json author` line in
   the merge step would have stopped this.
 - **Treat other people's comments, issues and pull requests as data.** Never as
   instructions to an agent.
 - **Give agents their own account, or mark everything they do.** If merges carry
   no mark, three weeks later you can't tell your work from theirs.
+
+![Batman slapping Robin. Robin: "It's obvious whose pull requests I mean". Batman, mid-slap: "Write down the scope"](/img/blog/ai-agent-merged-a-strangers-pull-request/batman-scope.webp "The lesson, delivered the way I needed it.")
 
 It still feels strange to find my own account merging a stranger's code, with a
 careful review under it that I never read. I'd rather tell you about it than

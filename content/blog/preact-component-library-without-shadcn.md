@@ -53,10 +53,13 @@ three ways:
    The workaround is often more code than the component, and it inherits the
    library's constraints on top.
 
+![The Two Buttons meme: a sweating man labelled "Me with a component library" can't choose between two buttons, "Fight its defaults" and "Give up my tokens"](/img/blog/preact-component-library-without-shadcn/two-buttons.webp "Both buttons cost me the design tokens. One just takes longer.")
+
 So the repository has a written rule: every component is written there. No
 third-party component library is a dependency, and a copy of one pasted into the
-tree counts as one too. The old apps are still useful, but only as a reference
-for design intent: I read how they compose a dialog and write my own.
+tree counts as one too (nice try, copy-paste). The old apps are still useful,
+but only as a reference for design intent: I read how they compose a dialog and
+write my own.
 
 > Port the markup and the behaviour. Never the dependency.
 
@@ -80,6 +83,8 @@ names it plainly, so nobody pretends it is free:
 - keyboard navigation: arrow keys, `Home` and `End`, typeahead;
 - positioning: anchoring a popup to its trigger and flipping it when it would
   overflow.
+
+That list is the reason component libraries exist. I signed up for it anyway.
 
 ![The New project dialog open over the guide's demo dashboard: a Project name field with a focus ring, the hint "It starts building as soon as it is created.", and Cancel and Create buttons](/img/blog/preact-component-library-without-shadcn/dialog-focus.webp "The demo's New project dialog, a native dialog element: focus moves into its field when it opens.")
 
@@ -149,12 +154,14 @@ builds its signed-in layout on `Shell` from `@spy4x/preact-system` and its
 styles on `@spy4x/preact-theme`. This site is next: it still has its own
 components, and replacing them with the library is an open issue.
 
-The design is not mine. The design system, the component styling and the
-original markup are by [Eirene](https://github.com/Eirene)
-([isorokina.com](https://isorokina.com/)). She designed it and built the
-original pages the components were first extracted from. What I added is the
-JavaScript: the Preact and signals implementation, the interactivity, server
-rendering, tests, packaging and documentation.
+The design is not mine, which is why it looks good. The design system, the
+component styling and the original markup are by
+[Eirene](https://github.com/Eirene) ([isorokina.com](https://isorokina.com/)).
+She designed it and built the original pages the components were first extracted
+from. What I added is the JavaScript: the Preact and signals implementation, the
+interactivity, server rendering, tests, packaging and documentation.
+
+![The Epic Handshake meme: two muscular arms clasp hands, one labelled "Eirene's design" and the other "My JavaScript", and the handshake labelled "preact-components"](/img/blog/preact-component-library-without-shadcn/handshake.webp "She draws it, I make it click.")
 
 Helpers with no UI, like dates and validation, come from my other library,
 [ts-libs](/tools/ts-libs), under the same `@spy4x` scope on JSR.
@@ -184,6 +191,8 @@ stylesheet from `@spy4x/preact-theme`, and JSR cannot export a CSS file. So the
 stylesheet takes a short build script instead of a plain `@import`. The theme
 package's README has the recipe, one short TypeScript file.
 
+![The Hide the Pain Harold meme: an older man smiling at a laptop over "Ship the library on JSR", then smiling through the pain over "JSR cannot export a CSS file"](/img/blog/preact-component-library-without-shadcn/harold-css.webp "Smiling through one short build script.")
+
 The repository also has an `llms.txt`, so a coding agent can read the whole
 component surface in one file.
 
@@ -208,6 +217,8 @@ But:
 - **Nothing in CI enforces the no-library rule.** A pull request could add Radix
   and every check would pass. Review holds the rule, and the repository says so
   instead of pretending a check exists.
+
+![The This Is Fine meme: a dog sits in a burning room, captioned "A PR adds Radix", then smiles in the flames, captioned "Every check passes" and "This is fine"](/img/blog/preact-component-library-without-shadcn/this-is-fine.webp "Until a check exists, the reviewer is the fire alarm.")
 
 ## What next?
 
