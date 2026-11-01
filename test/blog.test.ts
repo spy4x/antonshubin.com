@@ -638,7 +638,11 @@ siteTest(
         `${article.slug}: the cover must sit between the header and the TL;DR`,
       )
       assert(
-        unbusted(cover).includes(`srcset="${wholeSmall} 480w, ${whole} 1000w"`),
+        unbusted(cover).includes(
+          article.coverSize.width > 480
+            ? `srcset="${wholeSmall} 480w, ${whole} ${article.coverSize.width}w"`
+            : `srcset="${whole} ${article.coverSize.width}w"`,
+        ),
         `${article.slug}: webp`,
       )
       const figure = html.slice(html.lastIndexOf("<figure", at), at)

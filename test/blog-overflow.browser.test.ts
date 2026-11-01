@@ -176,11 +176,14 @@ Deno.test("a post's cover fills the phone's column and opens whole in the lightb
   let browser: Browser | undefined
   try {
     browser = await launchChromium()
+    // A phone at 3x: a srcset that called a 580px file "1000w" drew this
+    // cover 228px wide in a 358px column.
     const page = await newPage(browser, {
       viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 3,
     })
-    // A 1000x667 meme: at 390px its width, not the 28rem cap, limits it.
-    await page.goto(`${site.origin}/blog/claude-code-vs-minimax-m3-30-days`, {
+    // A 580x282 meme: at 390px its width, not the 28rem cap, limits it.
+    await page.goto(`${site.origin}/blog/zond-sso-probe-bridge`, {
       waitUntil: "networkidle",
     })
     const trigger = page.locator("[data-post-cover] [data-lightbox]")

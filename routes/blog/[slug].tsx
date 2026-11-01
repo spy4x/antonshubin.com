@@ -223,6 +223,13 @@ export default define.page(function BlogPost(ctx) {
     : []
   const hasToc = tocItems.length > 0
   const cover = coverWebp(article.coverImage)
+  // Each file's real width: a "1000w" on a narrower file made a dense phone
+  // draw it at a fraction of the column. A picture 480px wide or less has no
+  // smaller copy worth offering (blog-cover.sh only shrinks).
+  const { width: coverWidth } = article.coverSize
+  const wholeSrcset = coverWidth > 480
+    ? `${cover.wholeSmall} 480w, ${cover.whole} ${coverWidth}w`
+    : `${cover.whole} ${coverWidth}w`
 
   head.value = {
     ...head.value,
@@ -400,7 +407,7 @@ export default define.page(function BlogPost(ctx) {
             >
               <img
                 src={cover.whole}
-                srcset={`${cover.wholeSmall} 480w, ${cover.whole} 1000w`}
+                srcset={wholeSrcset}
                 sizes="(min-width: 768px) 720px, 100vw"
                 alt={article.coverAlt}
                 width={article.coverSize.width}
