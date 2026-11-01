@@ -206,7 +206,7 @@ quality guard is the reviewer agent's first-pass rate, and in
 how much it varies by model: a cheaper implementer that fails its first review
 more often gives part of the saving back in fix rounds.
 
-![The Change My Mind meme: a man at a table with a "Change my mind" sign. Top: "The pricier plan was cheaper per pull request"](/img/blog/claude-code-vs-minimax-m3-30-days/change-my-mind-cost.webp "Subscription money only. Please don't count my hours.")
+![The Change My Mind meme: a man at a table with a "Change my mind" sign. Top: "The pricier plan was cheaper per pull request"](/img/blog/claude-code-vs-minimax-m3-30-days/change-my-mind-cost.webp "Per pull request, the pricier plan wins.")
 
 ## Did M3 get worse over time?
 
