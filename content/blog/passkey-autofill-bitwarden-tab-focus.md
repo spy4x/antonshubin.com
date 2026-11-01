@@ -9,7 +9,7 @@ tldr:
   - "My first guess, the \"new version\" banner, was wrong. The timer was the clue."
 intro: "A friend told me my app's tab kept jumping to the front by itself, and a few days later it did it to me in the middle of a YouTube video. This post is the hunt, from the wrong first guess to the timer in my own sign-in page, and the two lines in Bitwarden's code it kept triggering. It is for anyone who ships passkey sign-in, or who ever wondered whether a web page can switch your tab."
 coverImage: "/img/blog/passkey-autofill-bitwarden-tab-focus/cover.png"
-coverAlt: "The sign-in page of the Seed demo: the Seed logo, a note that the demo resets every night, and a Welcome back form with email and password fields."
+coverAlt: "The top of the Seed demo's sign-in page: the Seed logo, a note that the demo resets every night, and a Welcome back card with the start of its email or username field."
 publishedAt: "2026-11-01"
 readTime: 6
 topic: "scars"
@@ -39,8 +39,8 @@ it switched to itself, showing the "New version available" banner. "Forced focus
 is too much," he wrote. I agreed it would be too much, but I wasn't sure a page
 could even do that.
 
-A few days later I was browsing Google Maps in Brave, and the Seed tab jumped to
-the front. Twice in ten minutes. Then I put on a YouTube video, and it kept
+The next day I was browsing Google Maps in Brave, and the Seed tab jumped to the
+front. Twice in ten minutes. Then I put on a YouTube video, and it kept
 happening, about every five minutes. Now I believed him.
 
 ## Can a web page switch your tab by itself?
@@ -93,10 +93,11 @@ profile with a probe page that cancels and restarts a conditional passkey
 request every 8 seconds, while another tab is active. The probe tab stayed in
 the background. So neither Brave nor the request itself does it.
 
-The difference was my real profile, and in it, the Bitwarden extension.
-Bitwarden handles passkeys on every page in place of the browser. Here are the
-two lines from its background script (version 2026.10.0, de-minified a little).
-They run in a `finally` after every passkey request it handles:
+The difference was my real profile, and in it, the Bitwarden extension. With its
+passkey setting on, which is the default, Bitwarden handles passkeys on web
+pages in place of the browser. Here are the two calls its background script
+(version 2026.10.0) makes, with its helpers inlined. They run in a `finally`
+after every passkey request it handles:
 
 ```js
 chrome.tabs.update(tabId, { active: true, highlighted: true })
@@ -105,8 +106,8 @@ chrome.windows.update(windowId, { focused: true })
 
 "Every request" includes one the page cancels. So every 4.5 minutes Seed
 cancelled its waiting request, Bitwarden finished handling it, switched to the
-tab and focused the window. If Brave was behind another app, the whole window
-came up.
+tab and focused the window. If Brave sits behind another app, the whole window
+can come up.
 
 Bitwarden didn't run in the test profile: it only steps in with a signed-in
 vault, and I wasn't going to sign a test script into mine. So this step is read
