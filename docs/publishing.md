@@ -156,7 +156,14 @@ draft against the brief before the pull request opens.
    printed size, and `coverAlt` to one sentence naming the meme and quoting its
    captions. `lib/blog-posts.ts` fails on a missing cover, alt text, size or
    WebP sibling, a path outside `/img/` or a non-PNG, and
-   `lib/blog-posts.test.ts` on a cover that is not 1000×420.
+   `lib/blog-posts.test.ts` on a cover that is not 1000×420. The body gets the
+   same kind of picture, about one per `##` section (Anton, 1 November 2026:
+   posts should be fun, with memes "into articles, bodies themselves"):
+   `scripts/blog-meme.sh <slug> <name> <image> "x y w h
+   CAPTION"...` writes
+   `static/img/blog/<slug>/<name>.webp`, and the post links it as
+   `![alt](/img/blog/<slug>/<name>.webp "caption")`. The alt says what the
+   picture shows and quotes its captions; the captions follow the cover's rule.
 8. Check the "AI crawler optimization (SEO)" table in
    [seo-ai-crawlers.md](seo-ai-crawlers.md). The sitemap, the RSS feed and both
    llms files read `blogArticles`, so they update themselves; the doc rows may
