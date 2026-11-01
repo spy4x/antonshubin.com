@@ -22,8 +22,10 @@ export function PostCover(
     <picture class={extra}>
       <source
         type="image/webp"
-        srcset={hero ? `${full} 1000w` : `${small} 480w, ${full} 1000w`}
-        sizes={hero ? undefined : "(min-width: 640px) 224px, 100vw"}
+        srcset={`${small} 480w, ${full} 1000w`}
+        sizes={hero
+          ? "(min-width: 768px) 720px, 100vw"
+          : "(min-width: 640px) 224px, 100vw"}
       />
       <img
         src={src}

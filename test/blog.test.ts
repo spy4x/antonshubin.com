@@ -618,8 +618,9 @@ siteTest(
         `${article.slug}: the cover must sit between the header and the TL;DR`,
       )
       const webp = article.coverImage.replace(/\.png$/, ".webp")
+      const small = article.coverImage.replace(/\.png$/, "-480.webp")
       assert(
-        unbusted(html).includes(`srcset="${webp} 1000w"`),
+        unbusted(html).includes(`srcset="${small} 480w, ${webp} 1000w"`),
         `${article.slug}: webp`,
       )
     }
