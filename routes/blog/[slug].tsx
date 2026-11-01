@@ -18,6 +18,7 @@ import { NewsletterAsk } from "../../components/NewsletterBlock.tsx"
 import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
 import { SEOHead } from "../../components/SEOHead.tsx"
 import { Breadcrumb } from "../../components/Breadcrumb.tsx"
+import { PostCover } from "../../components/PostCover.tsx"
 import { ClosingBand } from "../../components/ClosingBand.tsx"
 import { SCHEDULE_URL } from "../../lib/config.ts"
 import { EMAIL_ADDRESS, emailContact } from "../../lib/profiles.ts"
@@ -384,6 +385,11 @@ export default define.page(function BlogPost(ctx) {
               </p>
             )}
           </header>
+
+          {/* The cover (#594): the page's one eager, high-priority image. */}
+          <figure class="mt-6">
+            <PostCover src={article.coverImage} alt={article.coverAlt} hero />
+          </figure>
 
           {hasToc && (
             <details data-toc class="post-toc-details mt-6">
