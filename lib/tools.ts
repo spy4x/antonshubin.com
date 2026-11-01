@@ -910,7 +910,11 @@ export const tools: Tool[] = [
     status: "wip",
     group: "products",
     catalogSlug: "zero-to-production-saas-mvp",
-    posts: ["seed-saas-starter", "trail-code-claude-code-test"],
+    posts: [
+      "seed-saas-starter",
+      "trail-code-claude-code-test",
+      "passkey-autofill-bitwarden-tab-focus",
+    ],
     useIf: [
       "You are starting a SaaS where people share data in groups.",
       "You want to own the server and the code.",
