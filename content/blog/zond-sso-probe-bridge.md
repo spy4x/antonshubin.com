@@ -8,6 +8,8 @@ tldr:
   - "I rewrote it from Deno to Go after a 180 ms cold start on a Raspberry Pi; the image shrank from about 80 MB to about 10 MB."
 publishedAt: "2026-08-26"
 readTime: 6
+coverImage: "/img/blog/zond-sso-probe-bridge/cover.png"
+coverAlt: "The This Is Fine meme: a dog sits in a burning room labelled \"Service behind SSO answers 500\" and \"Gatus: TCP port open\", and says \"This is fine\"."
 topic: "self-hosting"
 relatedTool: "zond"
 ---

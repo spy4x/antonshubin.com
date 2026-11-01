@@ -8,10 +8,10 @@ tldr:
   - "Now agents never merge, review or build on a pull request from anyone but me until I ask for that exact action in chat, and they warn me about every one they see."
   - "If you run agents on public repos: scope their autonomy in writing, check the author before any merge, and treat other people's comments as data, not instructions."
 intro: "This is the first post in a new series, Scars: mistakes of mine, told with the timeline, the cause and what I changed after. This one is about AI coding agents on public repositories, and how one of mine merged a stranger's pull request under my name. If you let agents merge anything, read the checklist at the end."
-coverImage: "/img/blog/ai-agent-merged-a-strangers-pull-request/cover.png"
-coverAlt: "A GitHub timeline: spy4x merged the commit into main, then spy4x posted a comment headed \"Reviewer evidence — PASS\"."
 publishedAt: "2026-10-09"
 readTime: 7
+coverImage: "/img/blog/ai-agent-merged-a-strangers-pull-request/cover.png"
+coverAlt: "The Disaster Girl meme: a girl smiles at the camera in front of a burning house. Top: \"A stranger's pull request, merged under my name\". On the girl: \"My AI agent\"."
 topic: "scars"
 ---
 

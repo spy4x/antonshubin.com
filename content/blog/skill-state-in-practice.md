@@ -8,10 +8,10 @@ tldr:
   - "The problem it solves, context that grows until it is compacted, mostly went away when I moved to Opus 5.5: 2 of 48 units of work were compacted."
   - "The part worth keeping, a fresh agent per step with a self-contained brief, I already use without the state file."
 intro: "A friend sent me the SKILL.state paper and later asked how it worked out. This is the answer: what I built from it, the four tasks I ran, and why I stopped. It is for anyone who runs coding agents on long tasks and wonders whether an explicit state file is worth it."
-coverImage: "/img/blog/skill-state-in-practice/cover.png"
-coverAlt: "The arXiv page of the paper \"SKILL.state: Scalable Long-Horizon Agent Skills\" with its title, authors and abstract."
 publishedAt: "2026-10-30"
 readTime: 5
+coverImage: "/img/blog/skill-state-in-practice/cover.png"
+coverAlt: "The Anakin and Padmé meme: \"I'll run SKILL.state on real tasks.\" \"And it'll fix my agents' context, right?\" \"Four days of hand fixes.\" \"Right?\""
 topic: "scars"
 ---
 
