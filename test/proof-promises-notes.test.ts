@@ -286,13 +286,10 @@ Deno.test("no page or llms file shows the private earnings figure or the old ema
     for (const path of [...paths, "/llms.txt", "/llms-full.txt"]) {
       const body = await site.html(path)
       assert(!body.includes("$395K"), `${path} contains $395K`)
-      // The mig post's HOST_EMAIL is sample config, not a contact address.
-      if (path !== "/blog/mig-tiny-self-hosted-scheduler") {
-        assert(
-          !body.includes("anton@antonshubin.com"),
-          `${path} contains anton@antonshubin.com`,
-        )
-      }
+      assert(
+        !body.includes("anton@antonshubin.com"),
+        `${path} contains anton@antonshubin.com`,
+      )
     }
   } finally {
     await site.stop()
