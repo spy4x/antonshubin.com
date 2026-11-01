@@ -567,12 +567,13 @@ function unbusted(html: string): string {
 }
 
 siteTest(
-  "every /blog row, archive included, carries its cover, lazy and decorative, and no second link",
+  "every /blog row, archive included, carries its decorative cover, lazy except the first, and no second link",
   async (site) => {
     const html = await site.html("/blog")
     const rows = html.split("data-post-row").slice(1)
       .map((row) => row.slice(0, row.indexOf("</li>")))
     assertEquals(rows.length, blogArticles.length, "one row per post")
+    const first = rows[0]
     for (const article of blogArticles) {
       const row = rows.find((r) => r.includes(`href="/blog/${article.slug}"`))
       assert(row, `${article.slug} has no row`)
@@ -581,7 +582,11 @@ siteTest(
       assertEquals(attr(imgs[0], "src"), article.coverImage, article.slug)
       assertEquals(attr(imgs[0], "alt"), "", article.slug)
       assertEquals(attr(imgs[0], "aria-hidden"), "true", article.slug)
-      assertEquals(attr(imgs[0], "loading"), "lazy", article.slug)
+      assertEquals(
+        attr(imgs[0], "loading"),
+        row === first ? "eager" : "lazy",
+        article.slug,
+      )
       const small = article.coverImage.replace(/\.png$/, "-480.webp")
       assert(
         unbusted(row).includes(`srcset="${small} 480w`),
@@ -594,8 +599,16 @@ siteTest(
       )
     }
     const main = html.slice(html.indexOf("<main"))
-    assertEquals(count(main, /fetchpriority=/g), 0, "/blog asks for priority")
-    assertEquals(count(main, /loading="eager"/g), 0, "/blog has eager images")
+    assertEquals(
+      count(main, /fetchpriority="high"/g),
+      1,
+      "/blog priority images",
+    )
+    assertEquals(count(main, /loading="eager"/g), 1, "/blog eager images")
+    assert(
+      first.includes('fetchpriority="high"'),
+      "the first row's cover leads",
+    )
   },
 )
 

@@ -40,7 +40,9 @@ export const handler = define.handlers({
  * Below 640px the cover sits on top; from 640px it is a 224px column on the
  * right, after the text in the DOM.
  */
-function PostRow({ article }: { article: BlogArticle }) {
+function PostRow(
+  { article, first = false }: { article: BlogArticle; first?: boolean },
+) {
   return (
     <li
       data-post-row
@@ -66,6 +68,7 @@ function PostRow({ article }: { article: BlogArticle }) {
       <PostCover
         src={article.coverImage}
         alt=""
+        eager={first}
         class="block order-first mb-3 sm:order-last sm:mb-0 sm:w-56 sm:shrink-0"
       />
     </li>
@@ -153,7 +156,7 @@ export default define.page(function Blog(ctx) {
           </ul>
         </nav>
 
-        {topicSections.map(({ topic, posts }) => (
+        {topicSections.map(({ topic, posts }, i) => (
           <section
             key={topic.id}
             data-topic={topic.id}
@@ -164,7 +167,9 @@ export default define.page(function Blog(ctx) {
               {topic.title}
             </h2>
             <ul class="mt-2 border-t border-rule">
-              {posts.map((a) => <PostRow key={a.slug} article={a} />)}
+              {posts.map((a, j) => (
+                <PostRow key={a.slug} article={a} first={i === 0 && j === 0} />
+              ))}
             </ul>
           </section>
         ))}
