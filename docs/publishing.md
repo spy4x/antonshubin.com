@@ -90,18 +90,17 @@ draft against the brief before the pull request opens.
    ---
    ```
 
-   A post with `publishedAt` on or after 2026-10-02 (`LETTER_FIELDS_FROM`) needs
-   `intro`, `coverImage` and `coverAlt`: the build fails naming the one missing.
-   An older post falls back to its `description`, its OG preview PNG and its
-   title, so none is edited just to keep building. A missing, mistyped or
-   unknown field fails the tests, naming the file. An Upwork figure in a title
-   or description is written `{proof:jobs}` (the career count
-   `{proof:projects}`), never the number itself. Link the post's tool with
-   `relatedTool` and the service it sells with `catalogSlug` (#191's writing
-   standard): the post shows the tool's page, demo and repository under the
-   byline, and the service as a text link in the author box. A post with a
-   `catalogSlug` shows a price, so `test/structure.test.ts` adds it to
-   `PRICE_PAGES` on its own.
+   Every post needs `coverImage` and `coverAlt` (step 7), and a post with
+   `publishedAt` on or after 2026-10-02 (`LETTER_FIELDS_FROM`) needs `intro`:
+   the build fails naming the one missing. An older post's intro falls back to
+   its `description`. A missing, mistyped or unknown field fails the tests,
+   naming the file. An Upwork figure in a title or description is written
+   `{proof:jobs}` (the career count `{proof:projects}`), never the number
+   itself. Link the post's tool with `relatedTool` and the service it sells with
+   `catalogSlug` (#191's writing standard): the post shows the tool's page, demo
+   and repository under the byline, and the service as a text link in the author
+   box. A post with a `catalogSlug` shows a price, so `test/structure.test.ts`
+   adds it to `PRICE_PAGES` on its own.
 3. **Every post opens with a TL;DR** (Anton, 30 September 2026): the `tldr`
    list, rendered as a "TL;DR" heading and a list above the body, and listed
    under the post in `llms-full.txt`. Write it last, from the finished draft, as
@@ -138,13 +137,20 @@ draft against the brief before the pull request opens.
    and sits next to the text that talks about it. Real screenshots only,
    captured at 2x with the repo's Chromium (`test/browser.ts`'s
    `launchChromium()`), never a mockup.
-7. **A cover**, used by the Dev.to article and the newsletter mail. Set
-   `coverImage` to a site path of a 1000×420 PNG under
-   `static/img/blog/<slug>/`, cropped from the hero screenshot with no text
-   added; `publish:blog` sends it as the article's `main_image`.
-   `lib/blog-posts.ts` fails on a path outside `/img/`, a non-PNG or a missing
-   file, and `lib/blog-posts.test.ts` on a cover that is not 1000×420. It is
-   required for a new post; an older post's mail uses its OG preview PNG.
+7. **A cover: a meme or an AI picture, never a plain screenshot or text card**
+   (Anton, 1 November 2026: covers "make each blog post feel individual and
+   live"). `/blog` shows it beside the post, the post page under its header, and
+   `publish:blog` sends it to Dev.to as `main_image` and in the newsletter mail.
+   Pick a well-known meme template whose joke is the post's point, or generate a
+   picture when an image model is at hand, and caption it only with what the
+   post itself says (AGENTS.md "Content rule": no new number or claim).
+   `scripts/blog-cover.sh <slug> <image> "x y w h CAPTION"...` draws the
+   captions and writes `cover.png` (1000×420), `cover.webp` and `cover-480.webp`
+   into `static/img/blog/<slug>/`; open the PNG and check every caption fits
+   before committing. Set `coverImage` to the PNG's site path and `coverAlt` to
+   one sentence naming the meme and quoting its captions. `lib/blog-posts.ts`
+   fails on a missing cover, alt text or WebP sibling, a path outside `/img/` or
+   a non-PNG, and `lib/blog-posts.test.ts` on a cover that is not 1000×420.
 8. Check the "AI crawler optimization (SEO)" table in
    [seo-ai-crawlers.md](seo-ai-crawlers.md). The sitemap, the RSS feed and both
    llms files read `blogArticles`, so they update themselves; the doc rows may
