@@ -8,10 +8,10 @@ tldr:
   - "Per hour of work the gain was 3 times, and pull requests got slightly smaller, not bigger. Volume is not value: 227 released versions are the better number."
   - "The plan costs four times as much, yet the subscription cost per merged pull request fell to about a fifth."
 intro: "For three months my coding agents ran on MiniMax M3, then I moved to Claude Code. This post counts what changed on my GitHub account, and is honest about how much of it the model did and how much came from changing how I work. It's for developers choosing an AI coding setup, and for anyone who wants to measure theirs."
-coverImage: "/img/blog/claude-code-vs-minimax-m3-30-days/cover.png"
-coverAlt: "My GitHub contribution graph from April to October: pale squares through the summer, then much brighter ones from late September."
 publishedAt: "2026-10-20"
 readTime: 9
+coverImage: "/img/blog/claude-code-vs-minimax-m3-30-days/cover.png"
+coverAlt: "The Distracted Boyfriend meme: \"Me\" turns to look at \"Claude Code\" while \"MiniMax M3\" stares at him in disbelief."
 topic: "ai-mcp"
 ---
 

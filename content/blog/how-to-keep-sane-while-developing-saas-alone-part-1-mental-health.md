@@ -8,6 +8,8 @@ tldr:
   - "Challenge your self-doubt, and write a growth plan: target market, marketing, sales and scaling."
 publishedAt: "2022-12-15"
 readTime: 7
+coverImage: "/img/blog/how-to-keep-sane-while-developing-saas-alone-part-1-mental-health/cover.png"
+coverAlt: "A meme: \"Always start your day with a positive attitude!\" Me: a woman in an old painting lies in bed, shouting \"Fuuuuuuuuuuck\"."
 topic: "founders"
 archived: true
 archiveNote: "Part 2 was never written."

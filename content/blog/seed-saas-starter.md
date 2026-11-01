@@ -7,11 +7,11 @@ tldr:
   - "My first Seed (2019–2022) failed because I over-engineered it: 52 of its 134 commits went to setup, and groups, billing and offline never shipped."
   - "It is a template, not a framework: you clone it and change it. The reusable parts ship as @spy4x packages on JSR."
 intro: "Seed is the groundwork a SaaS needs before its first real feature, done once and kept in one repository. This post walks through how it is built: groups as tenancy, commands and queries as plain functions, an outbox and an app that works offline."
-coverImage: "/img/blog/seed-saas-starter/cover.png"
-coverAlt: "The notes screen of the Seed live demo in the dark theme: a narrow icon rail on the left, the Notes title with a New note button, tag filters and the first notes of the list."
 publishedAt: "2026-08-26"
 updatedAt: "2026-10-18"
 readTime: 9
+coverImage: "/img/blog/seed-saas-starter/cover.png"
+coverAlt: "The Gru's Plan meme: \"Build a SaaS starter\", \"Set it all up first\", then \"52 of 134 commits go to setup\" twice, the second time with Gru staring at the board."
 topic: "scars"
 relatedTool: "seed"
 catalogSlug: "zero-to-production-saas-mvp"

@@ -542,3 +542,100 @@ siteTest(
     }
   },
 )
+
+/** Every `<img>` tag in `html`. */
+function imgTags(html: string): string[] {
+  return [...html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0])
+}
+
+/**
+ * An attribute's decoded value in one tag, without Fresh's `?__frsh_c=`
+ * cache-busting query; "" for a bare attribute (Preact prints `alt=""` as
+ * `alt`); undefined without it.
+ */
+function attr(tag: string, name: string): string | undefined {
+  const value = tag.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1]
+  if (value === undefined) {
+    return new RegExp(`\\s${name}(?=[\\s/>])`).test(tag) ? "" : undefined
+  }
+  return visibleText(value.replace(/\?__frsh_c=[^\s"]*/g, ""))
+}
+
+/** `html` without Fresh's `?__frsh_c=` cache-busting queries. */
+function unbusted(html: string): string {
+  return html.replace(/\?__frsh_c=[^\s"]*/g, "")
+}
+
+siteTest(
+  "every /blog row, archive included, carries its decorative cover, lazy except the first, and no second link",
+  async (site) => {
+    const html = await site.html("/blog")
+    const rows = html.split("data-post-row").slice(1)
+      .map((row) => row.slice(0, row.indexOf("</li>")))
+    assertEquals(rows.length, blogArticles.length, "one row per post")
+    const first = rows[0]
+    for (const article of blogArticles) {
+      const row = rows.find((r) => r.includes(`href="/blog/${article.slug}"`))
+      assert(row, `${article.slug} has no row`)
+      const imgs = imgTags(row)
+      assertEquals(imgs.length, 1, `${article.slug}: one cover per row`)
+      assertEquals(attr(imgs[0], "src"), article.coverImage, article.slug)
+      assertEquals(attr(imgs[0], "alt"), "", article.slug)
+      assertEquals(attr(imgs[0], "aria-hidden"), "true", article.slug)
+      assertEquals(
+        attr(imgs[0], "loading"),
+        row === first ? "eager" : "lazy",
+        article.slug,
+      )
+      const small = article.coverImage.replace(/\.png$/, "-480.webp")
+      assert(
+        unbusted(row).includes(`srcset="${small} 480w`),
+        `${article.slug}: no 480px WebP in the row's srcset`,
+      )
+      assertEquals(
+        count(row, /<a\b/g),
+        1,
+        `${article.slug}: the cover must not be a second link`,
+      )
+    }
+    const main = html.slice(html.indexOf("<main"))
+    assertEquals(
+      count(main, /fetchpriority="high"/g),
+      1,
+      "/blog priority images",
+    )
+    assertEquals(count(main, /loading="eager"/g), 1, "/blog eager images")
+    assert(
+      first.includes('fetchpriority="high"'),
+      "the first row's cover leads",
+    )
+  },
+)
+
+siteTest(
+  "each post's one eager, high-priority image is its cover, under the header, with its alt",
+  async (site) => {
+    for (const article of blogArticles) {
+      const html = await site.html(`/blog/${article.slug}`)
+      const priority = imgTags(html).filter((t) => t.includes("fetchpriority"))
+      assertEquals(priority.length, 1, `${article.slug}: priority images`)
+      const [cover] = priority
+      assertEquals(attr(cover, "fetchpriority"), "high", article.slug)
+      assertEquals(attr(cover, "src"), article.coverImage, article.slug)
+      assertEquals(attr(cover, "alt"), article.coverAlt, article.slug)
+      assertEquals(count(html, /loading="eager"/g), 1, `${article.slug} eager`)
+      const at = html.indexOf(cover)
+      assert(
+        html.indexOf("</header>", html.indexOf("<h1")) < at &&
+          at < html.indexOf("data-tldr"),
+        `${article.slug}: the cover must sit between the header and the TL;DR`,
+      )
+      const webp = article.coverImage.replace(/\.png$/, ".webp")
+      const small = article.coverImage.replace(/\.png$/, "-480.webp")
+      assert(
+        unbusted(html).includes(`srcset="${small} 480w, ${webp} 1000w"`),
+        `${article.slug}: webp`,
+      )
+    }
+  },
+)

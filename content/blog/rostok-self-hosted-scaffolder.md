@@ -8,6 +8,8 @@ tldr:
   - "For a solo homelab, age encryption is enough; Vault or Doppler is overkill when the risk is losing the box."
 publishedAt: "2026-08-26"
 readTime: 8
+coverImage: "/img/blog/rostok-self-hosted-scaffolder/cover.png"
+coverAlt: "The One Does Not Simply meme: \"One does not simply hand-write every compose file of a homelab\"."
 topic: "self-hosting"
 relatedTool: "rostok"
 ---

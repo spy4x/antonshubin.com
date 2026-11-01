@@ -24,6 +24,8 @@ const ARTICLE: BlogArticle = {
   readTime: 3,
   publishedAt: "2026-09-26",
   topic: "ai-mcp",
+  coverImage: "/img/blog/a-test-post/cover.png",
+  coverAlt: "A cover",
 }
 
 const POST: Post = {
@@ -159,7 +161,7 @@ Deno.test("one default run publishes the post on Dev.to and sends the newsletter
     body:
       "What the post is about\n\n**TL;DR**\n\n- One point.\n- Another point.\n\nBody text.",
     campaign: "a-campaign",
-    coverImage: undefined,
+    coverImage: "/img/blog/a-test-post/cover.png",
   }])
 })
 
@@ -278,7 +280,7 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
   assertStringIncludes(html, ">Anton Shubin<")
   assertStringIncludes(
     html,
-    'src="https://antonshubin.com/img/og/blog/a-test-post.png" alt="A dashboard"',
+    'src="https://antonshubin.com/img/blog/a-test-post/cover.png" alt="A dashboard"',
   )
   assertStringIncludes(html, "Why I wrote &lt;this&gt;.")
   assertStringIncludes(html, ">In short<")
@@ -357,11 +359,11 @@ Deno.test("the Dev.to article body starts with the intro, then the TL;DR, then t
 Deno.test("the Dev.to article gets the post's coverImage", async () => {
   const post: Post = {
     ...POST,
-    article: { ...ARTICLE, coverImage: "/img/blog/a-test-post/cover.png" },
+    article: { ...ARTICLE, coverImage: "/img/blog/another-post/cover.png" },
   }
   const r = fakes({ readPost: () => Promise.resolve(post) })
   await publishBlog(DEFAULT_RUN, r.deps)
-  assertEquals(r.devTo[0].coverImage, "/img/blog/a-test-post/cover.png")
+  assertEquals(r.devTo[0].coverImage, "/img/blog/another-post/cover.png")
 })
 
 Deno.test("every link the newsletter makes into the site is the email channel's tagged url", async () => {

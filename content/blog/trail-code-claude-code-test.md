@@ -8,10 +8,10 @@ tldr:
   - "The same task's cost moved by about 13% from run to run. At that noise, 10 tasks can't prove a saving smaller than about 13%."
   - "Test a tool on your own work: replay merged PRs from the commit before, with and without it, review blind, and measure the noise first."
 intro: "Trail-code promises cheaper, faster coding agents by giving them a map of your code. I replayed 10 merged PRs with and without it, in both of its modes, and reviewed every result blind. This post is what I found and how I tested it, so you can run the same test on the next tool that makes this promise."
-coverImage: "/img/blog/trail-code-claude-code-test/cover.png"
-coverAlt: "The per-task cost chart of round 2: 10.5% cheaper in total, inside the −13% to +13% noise, with the first tasks as dots over the shaded noise band."
 publishedAt: "2026-10-22"
 readTime: 8
+coverImage: "/img/blog/trail-code-claude-code-test/cover.png"
+coverAlt: "The Futurama Fry meme: Fry squints: \"Not sure if 10.5% cheaper, or just noise\"."
 topic: "ai-mcp"
 relatedTool: "seed"
 ---

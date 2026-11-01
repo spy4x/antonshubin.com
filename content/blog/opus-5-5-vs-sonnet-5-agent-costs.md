@@ -9,6 +9,8 @@ tldr:
 publishedAt: "2026-09-26"
 updatedAt: "2026-09-30"
 readTime: 8
+coverImage: "/img/blog/opus-5-5-vs-sonnet-5-agent-costs/cover.png"
+coverAlt: "The Drake meme: Drake turns away from \"Pick the model that is cheaper per token\" and approves \"Pick the model that is cheaper per merged line\"."
 topic: "ai-mcp"
 ---
 

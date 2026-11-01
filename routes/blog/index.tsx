@@ -5,6 +5,7 @@ import { SEOHead } from "../../components/SEOHead.tsx"
 import { Breadcrumb } from "../../components/Breadcrumb.tsx"
 import { Layout } from "../../components/Layout.tsx"
 import { NewsletterBlock } from "../../components/NewsletterBlock.tsx"
+import { PostCover } from "../../components/PostCover.tsx"
 import { type BlogArticle, blogArticles } from "../../lib/data.ts"
 import {
   archivedPosts,
@@ -33,25 +34,43 @@ export const handler = define.handlers({
   },
 })
 
-/** One post as a text row (#274, UX 6 and 7): date first, the title is the link. */
-function PostRow({ article }: { article: BlogArticle }) {
+/**
+ * One post as a row (#274, UX 6 and 7; cover #594): date first, the title is
+ * the link and stretches over the row, so the cover is not a second Tab stop.
+ * Below 640px the cover sits on top; from 640px it is a 224px column on the
+ * right, after the text in the DOM.
+ */
+function PostRow(
+  { article, first = false }: { article: BlogArticle; first?: boolean },
+) {
   return (
-    <li class="relative py-5 border-b border-rule">
-      <p class="text-sm text-graphite">
-        <time datetime={article.publishedAt}>
-          {postDate(article.publishedAt)}
-        </time>{" "}
-        · {article.readTime} min read
-      </p>
-      <h3 class="mt-1 text-xl text-parchment">
-        <a
-          href={postHref(article.slug)}
-          class="post-row-link hover:underline underline-offset-4"
-        >
-          {article.title}
-        </a>
-      </h3>
-      <p class="mt-1 text-graphite line-clamp-2">{article.description}</p>
+    <li
+      data-post-row
+      class="relative py-5 border-b border-rule flex flex-col sm:flex-row sm:items-start sm:gap-6"
+    >
+      <div class="min-w-0 flex-1">
+        <p class="text-sm text-graphite">
+          <time datetime={article.publishedAt}>
+            {postDate(article.publishedAt)}
+          </time>{" "}
+          · {article.readTime} min read
+        </p>
+        <h3 class="mt-1 text-xl text-parchment">
+          <a
+            href={postHref(article.slug)}
+            class="post-row-link hover:underline underline-offset-4"
+          >
+            {article.title}
+          </a>
+        </h3>
+        <p class="mt-1 text-graphite line-clamp-2">{article.description}</p>
+      </div>
+      <PostCover
+        src={article.coverImage}
+        alt=""
+        eager={first}
+        class="block order-first mb-3 sm:order-last sm:mb-0 sm:w-56 sm:shrink-0"
+      />
     </li>
   )
 }
@@ -137,7 +156,7 @@ export default define.page(function Blog(ctx) {
           </ul>
         </nav>
 
-        {topicSections.map(({ topic, posts }) => (
+        {topicSections.map(({ topic, posts }, i) => (
           <section
             key={topic.id}
             data-topic={topic.id}
@@ -148,7 +167,9 @@ export default define.page(function Blog(ctx) {
               {topic.title}
             </h2>
             <ul class="mt-2 border-t border-rule">
-              {posts.map((a) => <PostRow key={a.slug} article={a} />)}
+              {posts.map((a, j) => (
+                <PostRow key={a.slug} article={a} first={i === 0 && j === 0} />
+              ))}
             </ul>
           </section>
         ))}

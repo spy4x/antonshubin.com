@@ -8,12 +8,12 @@ tldr:
   - "It is beta: no screen reader has been run against it, only Deno is tested, and it is Preact and Tailwind only. Try any component in the live guide first."
 publishedAt: "2026-09-30"
 readTime: 8
+coverImage: "/img/blog/preact-component-library-without-shadcn/cover.png"
+coverAlt: "The Woman Yelling at a Cat meme: \"Shadcn, Radix, MUI: use ours!\" yells the woman; the unimpressed cat at the table is \"Me, owning ten packages\"."
 topic: "founders"
 relatedTool: "preact-components"
 catalogSlug: "zero-to-production-saas-mvp"
 seoTitle: "A Preact component library without shadcn or Radix"
-coverImage: "/img/blog/preact-component-library-without-shadcn/cover.png"
-coverAlt: "The demo dashboard from the live guide, built only from the library: a frame titled Orbit, four KPI tiles, a line chart of builds this week and a sortable table of projects with status badges"
 intro: "Every new app I start needs the same things: a button, a table, a dialog, a form field, a chart, a signed-in layout. I kept rebuilding them, or pulling in a component library and then working around it. This post is for developers who build with Preact and Tailwind and wonder whether owning the UI layer is worth it."
 ---
 

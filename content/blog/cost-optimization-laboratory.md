@@ -9,6 +9,8 @@ tldr:
 publishedAt: "2026-06-15"
 updatedAt: "2026-08-20"
 readTime: 9
+coverImage: "/img/blog/cost-optimization-laboratory/cover.png"
+coverAlt: "The \"Is this a pigeon?\" meme: a \"Founder\" points at a butterfly labelled \"The hosting invoice\" and asks \"Is this the total cost?\""
 topic: "founders"
 catalogSlug: "strategy-call"
 ---

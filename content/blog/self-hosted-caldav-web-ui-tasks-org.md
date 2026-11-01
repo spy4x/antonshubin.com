@@ -8,6 +8,8 @@ tldr:
   - "You don't need Nextcloud for it: the whole stack runs on one small box next to your CalDAV server."
 publishedAt: "2026-07-22"
 readTime: 9
+coverImage: "/img/blog/self-hosted-caldav-web-ui-tasks-org/cover.png"
+coverAlt: "The Hide the Pain Harold meme: Harold smiles at \"Tasks on my phone: synced to CalDAV\", then forces the same smile at \"Tasks on my laptop: no web UI\"."
 topic: "self-hosting"
 relatedTool: "caldav-tasks-web"
 ---

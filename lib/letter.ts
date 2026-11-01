@@ -28,12 +28,7 @@ import {
   UNSUBSCRIBE_PLACEHOLDER,
 } from "@spy4x/email/letter"
 import { channelUrl } from "@/scripts/utm.ts"
-import {
-  type BlogArticle,
-  postCover,
-  postCoverAlt,
-  postIntro,
-} from "./blog-posts.ts"
+import { type BlogArticle, postIntro } from "./blog-posts.ts"
 import { ROLE } from "./head.ts"
 import { BOOK_LABEL } from "./nav.ts"
 
@@ -177,8 +172,8 @@ export function postLetter(
     preheader: article.tldr[0],
     blocks: [
       linkedImage({
-        src: `${baseUrl}${postCover(article)}`,
-        alt: postCoverAlt(article),
+        src: `${baseUrl}${article.coverImage}`,
+        alt: article.coverAlt,
         href: url,
       }),
       paragraph(postIntro(article)),
