@@ -567,7 +567,7 @@ function unbusted(html: string): string {
 }
 
 siteTest(
-  "every /blog row, archive included, shows its cover lazily with an empty alt",
+  "every /blog row, archive included, shows its cover lazily as decoration",
   async (site) => {
     const html = await site.html("/blog")
     const rows = html.split("data-post-row").slice(1)
@@ -580,6 +580,7 @@ siteTest(
       assertEquals(imgs.length, 1, `${article.slug}: one cover per row`)
       assertEquals(attr(imgs[0], "src"), article.coverImage, article.slug)
       assertEquals(attr(imgs[0], "alt"), "", article.slug)
+      assertEquals(attr(imgs[0], "aria-hidden"), "true", article.slug)
       assertEquals(attr(imgs[0], "loading"), "lazy", article.slug)
       const small = article.coverImage.replace(/\.png$/, "-480.webp")
       assert(

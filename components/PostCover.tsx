@@ -2,8 +2,9 @@ import { coverWebp } from "../lib/blog-posts.ts"
 
 /**
  * A post's cover (#594): the two WebP copies for browsers, the PNG as the
- * fallback, in a 1000×420 frame. `/blog` rows show it lazily with an empty
- * alt (the title link names the row); the post page shows it as its one
+ * fallback, in a 1000×420 frame. `/blog` rows show it lazily as decoration
+ * (empty alt, hidden from screen readers: the title link names the row); the
+ * post page shows it as its one
  * eager, high-priority image with the post's `coverAlt`.
  */
 export function PostCover(
@@ -27,6 +28,7 @@ export function PostCover(
       <img
         src={src}
         alt={alt}
+        aria-hidden={alt === "" ? "true" : undefined}
         width="1000"
         height="420"
         loading={hero ? "eager" : "lazy"}
