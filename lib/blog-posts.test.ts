@@ -22,6 +22,7 @@ readTime: 8
 topic: "ai-mcp"
 coverImage: "/img/blog/ship-it-today/cover.png"
 coverAlt: "A cover."
+coverSize: "500x375"
 ---
 
 Body.
@@ -44,6 +45,7 @@ Deno.test("a post's front matter becomes its metadata", () => {
     topic: "ai-mcp",
     coverImage: "/img/blog/ship-it-today/cover.png",
     coverAlt: "A cover.",
+    coverSize: { width: 500, height: 375 },
   })
 })
 
@@ -56,6 +58,10 @@ Deno.test("a missing, mistyped or unknown front matter field fails naming the fi
       "YYYY-MM-DD",
     ],
     [variant("readTime: 8", 'readTime: "8"'), "whole number"],
+    [variant('coverSize: "500x375"\n', ""), '"coverSize" is missing'],
+    [variant('"500x375"', '"500"'), '"coverSize" must be'],
+    [variant('"500x375"', '"0x375"'), '"coverSize" must be'],
+    [variant('"500x375"', '"500 x 375"'), '"coverSize" must be'],
     [
       variant("readTime: 8", "readTime: 8\nupdatedat: 2026-09-27"),
       'unknown front matter field "updatedat"',
@@ -128,11 +134,20 @@ function coverDir(covers: Record<string, string[]>): string {
   return dir
 }
 
+/** Every file a post's cover needs, as `scripts/blog-cover.sh` writes them. */
+const ALL_COVER_FILES = [
+  "cover.png",
+  "cover.webp",
+  "cover-480.webp",
+  "cover-full.webp",
+  "cover-full-480.webp",
+]
+
 const WITH_COVER = (path: string) =>
   VALID.replace("/img/blog/ship-it-today/cover.png", path)
 
-Deno.test("a cover PNG under static/img with both WebP copies beside it is kept", () => {
-  const dir = coverDir({ ok: ["cover.png", "cover.webp", "cover-480.webp"] })
+Deno.test("a cover PNG under static/img with its four WebP copies beside it is kept", () => {
+  const dir = coverDir({ ok: ALL_COVER_FILES })
   try {
     const post = parseBlogArticle(
       "a-post",
@@ -143,6 +158,8 @@ Deno.test("a cover PNG under static/img with both WebP copies beside it is kept"
     assertEquals(coverWebp(post.coverImage), {
       full: "/img/blog/ok/cover.webp",
       small: "/img/blog/ok/cover-480.webp",
+      whole: "/img/blog/ok/cover-full.webp",
+      wholeSmall: "/img/blog/ok/cover-full-480.webp",
     })
   } finally {
     Deno.removeSync(dir, { recursive: true })
@@ -151,9 +168,13 @@ Deno.test("a cover PNG under static/img with both WebP copies beside it is kept"
 
 Deno.test("a missing cover or alt, a cover outside static/img, of another type, or without its WebP copies fails naming the file", () => {
   const dir = coverDir({
-    ok: ["cover.png", "cover.webp", "cover-480.webp"],
-    "no-webp": ["cover.png", "cover-480.webp"],
-    "no-small": ["cover.png", "cover.webp"],
+    ok: ALL_COVER_FILES,
+    "no-webp": ALL_COVER_FILES.filter((f) => f !== "cover.webp"),
+    "no-small": ALL_COVER_FILES.filter((f) => f !== "cover-480.webp"),
+    "no-whole": ALL_COVER_FILES.filter((f) => f !== "cover-full.webp"),
+    "no-whole-small": ALL_COVER_FILES.filter(
+      (f) => f !== "cover-full-480.webp",
+    ),
   })
   Deno.writeFileSync(`${dir}/secret.png`, new Uint8Array([1]))
   try {
@@ -172,6 +193,14 @@ Deno.test("a missing cover or alt, a cover outside static/img, of another type, 
       [
         WITH_COVER("/img/blog/no-small/cover.png"),
         "/img/blog/no-small/cover-480.webp is not a file under",
+      ],
+      [
+        WITH_COVER("/img/blog/no-whole/cover.png"),
+        "/img/blog/no-whole/cover-full.webp is not a file under",
+      ],
+      [
+        WITH_COVER("/img/blog/no-whole-small/cover.png"),
+        "/img/blog/no-whole-small/cover-full-480.webp is not a file under",
       ],
       [
         variant('coverImage: "/img/blog/ship-it-today/cover.png"\n', ""),

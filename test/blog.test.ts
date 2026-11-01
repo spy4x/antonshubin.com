@@ -6,6 +6,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, visibleText } from "./html.ts"
 import { blogArticles } from "../lib/data.ts"
+import { coverWebp } from "../lib/blog-posts.ts"
 import { NEWSLETTER_HREF, TOC_MIN_MINUTES } from "../lib/blog.ts"
 import { BOOK_LABEL } from "../lib/nav.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
@@ -613,16 +614,22 @@ siteTest(
 )
 
 siteTest(
-  "each post's one eager, high-priority image is its cover, under the header, with its alt",
+  "each post's one eager, high-priority image is its whole cover, under the header, with its alt and size, opening in the lightbox",
   async (site) => {
     for (const article of blogArticles) {
       const html = await site.html(`/blog/${article.slug}`)
       const priority = imgTags(html).filter((t) => t.includes("fetchpriority"))
       assertEquals(priority.length, 1, `${article.slug}: priority images`)
       const [cover] = priority
+      const { whole, wholeSmall } = coverWebp(article.coverImage)
       assertEquals(attr(cover, "fetchpriority"), "high", article.slug)
-      assertEquals(attr(cover, "src"), article.coverImage, article.slug)
+      assertEquals(unbusted(attr(cover, "src") ?? ""), whole, article.slug)
       assertEquals(attr(cover, "alt"), article.coverAlt, article.slug)
+      assertEquals(
+        [attr(cover, "width"), attr(cover, "height")],
+        [`${article.coverSize.width}`, `${article.coverSize.height}`],
+        `${article.slug}: size`,
+      )
       assertEquals(count(html, /loading="eager"/g), 1, `${article.slug} eager`)
       const at = html.indexOf(cover)
       assert(
@@ -630,11 +637,14 @@ siteTest(
           at < html.indexOf("data-tldr"),
         `${article.slug}: the cover must sit between the header and the TL;DR`,
       )
-      const webp = article.coverImage.replace(/\.png$/, ".webp")
-      const small = article.coverImage.replace(/\.png$/, "-480.webp")
       assert(
-        unbusted(html).includes(`srcset="${small} 480w, ${webp} 1000w"`),
+        unbusted(cover).includes(`srcset="${wholeSmall} 480w, ${whole} 1000w"`),
         `${article.slug}: webp`,
+      )
+      const figure = html.slice(html.lastIndexOf("<figure", at), at)
+      assert(
+        figure.includes("data-post-cover") && figure.includes("data-lightbox"),
+        `${article.slug}: the cover must be a lightbox button`,
       )
     }
   },

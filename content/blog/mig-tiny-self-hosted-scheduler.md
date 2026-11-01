@@ -10,6 +10,7 @@ publishedAt: "2026-08-26"
 readTime: 7
 coverImage: "/img/blog/mig-tiny-self-hosted-scheduler/cover.png"
 coverAlt: "The Change My Mind meme: a man at a table with a sign that says \"A booking page for one person needs no database. Change my mind\"."
+coverSize: "482x361"
 topic: "self-hosting"
 relatedTool: "mig"
 ---

@@ -235,7 +235,7 @@ export function chaptersDraft(ctx: VideoKitContext): string {
  * The companion post's first draft. Its front matter has every field
  * `lib/blog-posts.ts` requires of a `content/blog/*.md` file; `tldr`,
  * `publishedAt`, `readTime`, `topic`, `coverImage` (until the cover files
- * exist) and `coverAlt` are placeholders that fail that parser, naming the
+ * exist), `coverAlt` and `coverSize` are placeholders that fail that parser, naming the
  * file, until the author fills them in.
  */
 export function blogDraft(ctx: VideoKitContext): string {
@@ -248,6 +248,7 @@ readTime: 0
 topic: "founders | ai-mcp | self-hosting | scars"
 coverImage: "/img/blog/${ctx.slug}/cover.png"
 coverAlt: ""
+coverSize: "WIDTHxHEIGHT"
 ---
 
 ${ctx.summary}

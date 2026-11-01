@@ -9,6 +9,7 @@ publishedAt: "2023-02-12"
 readTime: 5
 coverImage: "/img/blog/setting-up-your-own-ci-cd-server-with-drone-ci/cover.png"
 coverAlt: "An illustration of robot arms hovering over a glowing platform with a green check mark."
+coverSize: "1000x930"
 topic: "self-hosting"
 archived: true
 archiveNote: "I now run Woodpecker CI, a community fork of Drone; my Infrastructure page shows it."

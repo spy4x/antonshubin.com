@@ -564,6 +564,7 @@ const OPENING_ARTICLE: BlogArticle = {
   topic: "founders",
   coverImage: "/img/blog/a-post/cover.png",
   coverAlt: "A cover",
+  coverSize: { width: 1000, height: 420 },
 }
 
 Deno.test("the Dev.to opening is the intro, then the TL;DR lines and, for a post without a project, nothing else", () => {

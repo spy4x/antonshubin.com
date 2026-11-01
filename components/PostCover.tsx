@@ -4,17 +4,15 @@ import { coverWebp } from "../lib/blog-posts.ts"
  * A post's cover (#594): the two WebP copies for browsers, the PNG as the
  * fallback, in a 1000×420 frame. `/blog` rows show it lazily as decoration
  * (empty alt, hidden from screen readers: the title link names the row),
- * except the first row's, which is the phone's LCP image; the post page shows
- * it as its one eager, high-priority image with the post's `coverAlt`.
+ * except the first row's, which is the phone's LCP image. The post page shows
+ * the `cover-full` copies instead (`routes/blog/[slug].tsx`).
  */
 export function PostCover(
-  { src, alt, hero = false, eager = hero, class: extra }: {
+  { src, alt, eager = false, class: extra }: {
     /** The post's `coverImage`, the 1000×420 PNG. */
     src: string
     alt: string
-    /** True on the post page, where the cover is the LCP image. */
-    hero?: boolean
-    /** Load now, at high priority: the hero, and the first /blog row. */
+    /** Load now, at high priority: the first /blog row. */
     eager?: boolean
     class?: string
   },
@@ -25,9 +23,7 @@ export function PostCover(
       <source
         type="image/webp"
         srcset={`${small} 480w, ${full} 1000w`}
-        sizes={hero
-          ? "(min-width: 768px) 720px, 100vw"
-          : "(min-width: 640px) 224px, 100vw"}
+        sizes="(min-width: 640px) 224px, 100vw"
       />
       <img
         src={src}

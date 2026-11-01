@@ -78,8 +78,9 @@ export interface BlogArticle {
   /**
    * The cover, a site path to a 1000×420 PNG under `static/img/`: a meme or
    * picture that sets the post's mood, not a cropped screenshot. Required.
-   * `/blog` shows it on the post's row and the post page under its header,
-   * both through the two WebP copies beside it ({@linkcode coverWebp});
+   * `/blog` shows it on the post's row through the two WebP copies beside it,
+   * and the post page shows the picture alone at its own shape, through the
+   * two `cover-full` copies ({@linkcode coverWebp}, {@linkcode coverSize});
    * `scripts/devto.ts` sends the PNG as the Dev.to `main_image` and the
    * newsletter mail shows it.
    */
@@ -93,6 +94,11 @@ export interface BlogArticle {
   intro?: string
   /** The cover's alt text, read on the post page. Required. */
   coverAlt: string
+  /**
+   * The size of `cover-full.webp`, written as `"552x414"` in the front matter
+   * (`scripts/blog-cover.sh` prints it), so the post page reserves its space.
+   */
+  coverSize: { width: number; height: number }
 }
 
 /**
@@ -108,12 +114,23 @@ export function postIntro(article: BlogArticle): string {
 }
 
 /**
- * The two WebP copies of a cover PNG, which sit beside it: `full` is
- * 1000×420 and `small` 480×202, for a `<picture>`'s `srcset`.
+ * The WebP copies of a cover PNG, which sit beside it: `full` is 1000×420 and
+ * `small` 480×202, the banner for `/blog`; `whole` (at most 1000px on a side)
+ * and `wholeSmall` (480px wide) are the picture alone, for the post page.
  */
-export function coverWebp(coverImage: string): { full: string; small: string } {
+export function coverWebp(coverImage: string): {
+  full: string
+  small: string
+  whole: string
+  wholeSmall: string
+} {
   const base = coverImage.replace(/\.png$/, "")
-  return { full: `${base}.webp`, small: `${base}-480.webp` }
+  return {
+    full: `${base}.webp`,
+    small: `${base}-480.webp`,
+    whole: `${base}-full.webp`,
+    wholeSmall: `${base}-full-480.webp`,
+  }
 }
 
 const TOPIC_IDS = new Set<string>(topics.map((t) => t.id))
@@ -123,6 +140,8 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
  * and `scripts/strip-metadata.ts` cleans).
  */
 const COVER_PATH = /^\/img\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.png$/
+/** `coverSize`: width x height in pixels, as `scripts/blog-cover.sh` prints. */
+const COVER_SIZE = /^([1-9]\d{1,3})x([1-9]\d{1,3})$/
 /** How many lines a TL;DR may have (Anton, 30 September 2026). */
 export const TLDR_MIN_LINES = 2
 export const TLDR_MAX_LINES = 4
@@ -145,6 +164,7 @@ const KNOWN_KEYS = new Set([
   "coverImage",
   "intro",
   "coverAlt",
+  "coverSize",
   // The post's UTM campaign, read by scripts/utm.ts (docs/utm.md).
   "utmCampaign",
 ])
@@ -265,6 +285,11 @@ export function parseBlogArticle(
     }
   }
   const coverAlt = text("coverAlt", true)!
+  const size = COVER_SIZE.exec(text("coverSize", true)!)
+  if (!size) {
+    throw new Error(`${where}: "coverSize" must be "<width>x<height>"`)
+  }
+  const coverSize = { width: Number(size[1]), height: Number(size[2]) }
 
   const publishedAt = date("publishedAt", true)!
   const intro = text("intro", false)
@@ -284,6 +309,7 @@ export function parseBlogArticle(
     topic: topicId as TopicId,
     coverImage,
     coverAlt,
+    coverSize,
   }
   const optional = {
     seoTitle: text("seoTitle", false),

@@ -12,6 +12,7 @@ publishedAt: "2026-10-20"
 readTime: 9
 coverImage: "/img/blog/claude-code-vs-minimax-m3-30-days/cover.png"
 coverAlt: "The Distracted Boyfriend meme: \"Me\" turns to look at \"Claude Code\" while \"MiniMax M3\" stares at him in disbelief."
+coverSize: "1000x667"
 topic: "ai-mcp"
 ---
 

@@ -11,6 +11,7 @@ updatedAt: "2026-08-20"
 readTime: 9
 coverImage: "/img/blog/cost-optimization-laboratory/cover.png"
 coverAlt: "The \"Is this a pigeon?\" meme: a \"Founder\" points at a butterfly labelled \"The hosting invoice\" and asks \"Is this the total cost?\""
+coverSize: "1000x898"
 topic: "founders"
 catalogSlug: "strategy-call"
 ---

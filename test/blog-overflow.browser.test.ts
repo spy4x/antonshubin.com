@@ -170,3 +170,36 @@ Deno.test("the post lightbox closes on a tap beside the image, clear of the notc
     await site.stop()
   }
 })
+
+Deno.test("a post's cover fills the phone's column and opens whole in the lightbox", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    // A 1000x667 meme: at 390px its width, not the 28rem cap, limits it.
+    await page.goto(`${site.origin}/blog/claude-code-vs-minimax-m3-30-days`, {
+      waitUntil: "networkidle",
+    })
+    const trigger = page.locator("[data-post-cover] [data-lightbox]")
+    const [cover, column] = await Promise.all([
+      trigger.locator("img").boundingBox(),
+      page.locator("[data-post-cover]").boundingBox(),
+    ])
+    assert(cover && column, "the cover has no box")
+    assert(
+      cover.width >= column.width - 1,
+      `the cover is ${cover.width}px wide in a ${column.width}px column`,
+    )
+    await trigger.click()
+    const dialog = page.getByRole("dialog")
+    await dialog.waitFor({ state: "visible" })
+    const src = await dialog.locator("img").getAttribute("src")
+    assert(src?.includes("/cover-full.webp"), `the lightbox shows ${src}`)
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

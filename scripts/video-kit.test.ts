@@ -304,6 +304,7 @@ Deno.test("the blog draft carries every required front matter field, as placehol
     )
     .replace("/img/blog/some-post/", "/img/blog/ship-it-today/")
     .replace('coverAlt: ""', 'coverAlt: "A cover."')
+    .replace('coverSize: "WIDTHxHEIGHT"', 'coverSize: "960x678"')
   const post = parseBlogArticle("some-post", filled)
   assertEquals(
     [post.publishedAt, post.readTime, post.topic],

@@ -10,6 +10,7 @@ publishedAt: "2026-08-26"
 readTime: 8
 coverImage: "/img/blog/rostok-self-hosted-scaffolder/cover.png"
 coverAlt: "The One Does Not Simply meme: \"One does not simply hand-write every compose file of a homelab\"."
+coverSize: "568x335"
 topic: "self-hosting"
 relatedTool: "rostok"
 ---

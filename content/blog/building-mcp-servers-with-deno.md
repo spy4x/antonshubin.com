@@ -10,6 +10,7 @@ publishedAt: "2026-06-23"
 readTime: 15
 coverImage: "/img/blog/building-mcp-servers-with-deno/cover.png"
 coverAlt: "The Left Exit 12 meme: a car swerves off the highway. The straight sign says \"npm install and node_modules\", the exit says \"deno compile: one binary\", and the car is \"My MCP servers\"."
+coverSize: "804x767"
 topic: "ai-mcp"
 relatedTool: "caldav-mcp"
 catalogSlug: "zero-to-production-saas-mvp"

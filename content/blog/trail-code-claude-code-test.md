@@ -12,6 +12,7 @@ publishedAt: "2026-10-22"
 readTime: 8
 coverImage: "/img/blog/trail-code-claude-code-test/cover.png"
 coverAlt: "The Futurama Fry meme: Fry squints: \"Not sure if 10.5% cheaper, or just noise\"."
+coverSize: "552x414"
 topic: "ai-mcp"
 relatedTool: "seed"
 ---

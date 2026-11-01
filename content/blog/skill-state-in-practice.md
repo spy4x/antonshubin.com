@@ -12,6 +12,7 @@ publishedAt: "2026-10-30"
 readTime: 5
 coverImage: "/img/blog/skill-state-in-practice/cover.png"
 coverAlt: "The Anakin and Padmé meme: \"I'll run SKILL.state on real tasks.\" \"And it'll fix my agents' context, right?\" \"Four days of hand fixes.\" \"Right?\""
+coverSize: "768x768"
 topic: "scars"
 ---
 

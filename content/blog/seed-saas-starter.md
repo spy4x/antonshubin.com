@@ -12,6 +12,7 @@ updatedAt: "2026-10-18"
 readTime: 9
 coverImage: "/img/blog/seed-saas-starter/cover.png"
 coverAlt: "The Gru's Plan meme: \"Build a SaaS starter\", \"Set it all up first\", then \"52 of 134 commits go to setup\" twice, the second time with Gru staring at the board."
+coverSize: "700x449"
 topic: "scars"
 relatedTool: "seed"
 catalogSlug: "zero-to-production-saas-mvp"

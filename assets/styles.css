@@ -799,7 +799,8 @@ kbd {
   margin: 2em 0;
 }
 
-.blog-content .post-image {
+.blog-content .post-image,
+[data-post-cover] .post-image {
   display: block;
   margin-inline: auto;
   max-width: 100%;
@@ -807,7 +808,8 @@ kbd {
   cursor: zoom-in;
 }
 
-.blog-content .post-image:focus-visible {
+.blog-content .post-image:focus-visible,
+[data-post-cover] .post-image:focus-visible {
   outline: 2px solid var(--color-parchment);
   outline-offset: 3px;
 }

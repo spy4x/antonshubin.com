@@ -123,6 +123,7 @@ Deno.test("a post's letter is 600px wide with the cover first, then the intro, t
     intro: "Why I wrote it.",
     coverImage: "/img/blog/a-post/cover.png",
     coverAlt: "A cover",
+    coverSize: { width: 1000, height: 420 },
     tldr: ["First.", "Second."],
     readTime: 5,
     publishedAt: "2026-10-02",

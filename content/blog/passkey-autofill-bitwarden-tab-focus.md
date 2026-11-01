@@ -10,6 +10,7 @@ tldr:
 intro: "A friend told me my app's tab kept jumping to the front by itself, and a few days later it did it to me in the middle of a YouTube video. This post is the hunt, from the wrong first guess to the timer in my own sign-in page, and the two lines in Bitwarden's code it kept triggering. It is for anyone who ships passkey sign-in, or who ever wondered whether a web page can switch your tab."
 coverImage: "/img/blog/passkey-autofill-bitwarden-tab-focus/cover.png"
 coverAlt: "The Scooby-Doo unmasking meme: Fred holds a captured ghost captioned \"The ghost that keeps switching my tab\", then pulls off the sheet to reveal a scowling man captioned \"My own passkey renewal timer\"."
+coverSize: "720x960"
 publishedAt: "2026-11-01"
 readTime: 6
 topic: "scars"
