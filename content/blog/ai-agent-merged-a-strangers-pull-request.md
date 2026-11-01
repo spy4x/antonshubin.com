@@ -12,6 +12,7 @@ publishedAt: "2026-10-09"
 readTime: 7
 coverImage: "/img/blog/ai-agent-merged-a-strangers-pull-request/cover.png"
 coverAlt: "The Disaster Girl meme: a girl smiles at the camera in front of a burning house. Top: \"A stranger's pull request, merged under my name\". On the girl: \"My AI agent\"."
+coverSize: "500x375"
 topic: "scars"
 ---
 

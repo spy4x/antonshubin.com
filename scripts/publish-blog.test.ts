@@ -26,6 +26,7 @@ const ARTICLE: BlogArticle = {
   topic: "ai-mcp",
   coverImage: "/img/blog/a-test-post/cover.png",
   coverAlt: "A cover",
+  coverSize: { width: 1000, height: 420 },
 }
 
 const POST: Post = {
@@ -273,6 +274,7 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
     ...ARTICLE,
     intro: "Why I wrote <this>.",
     coverAlt: "A dashboard",
+    coverSize: { width: 1000, height: 420 },
     tldr: ["Use <b> & more.", "Second."],
   })
   const { html } = mail

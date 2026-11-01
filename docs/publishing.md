@@ -78,6 +78,7 @@ draft against the brief before the pull request opens.
    intro: "Two or three sentences in Anton's voice: why this post exists and who it is for."
    coverImage: "/img/blog/<slug>/cover.png" # 1000x420 PNG, see step 7
    coverAlt: "What the cover shows, for someone who cannot see it."
+   coverSize: "720x960" # the whole picture's size, printed by blog-cover.sh
    publishedAt: "2026-09-26"
    updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
@@ -139,18 +140,23 @@ draft against the brief before the pull request opens.
    `launchChromium()`), never a mockup.
 7. **A cover: a meme or an AI picture, never a plain screenshot or text card**
    (Anton, 1 November 2026: covers "make each blog post feel individual and
-   live"). `/blog` shows it beside the post, the post page under its header, and
-   `publish:blog` sends it to Dev.to as `main_image` and in the newsletter mail.
-   Pick a well-known meme template whose joke is the post's point, or generate a
-   picture when an image model is at hand, and caption it only with what the
-   post itself says (AGENTS.md "Content rule": no new number or claim).
+   live"). `/blog` shows the 1000×420 banner beside the post, the post page
+   shows the whole picture at its own shape under its header (opening in the
+   lightbox on a tap), and `publish:blog` sends it to Dev.to as `main_image` and
+   in the newsletter mail. Pick a well-known meme template whose joke is the
+   post's point, or generate a picture when an image model is at hand, and
+   caption it only with what the post itself says (AGENTS.md "Content rule": no
+   new number or claim).
    `scripts/blog-cover.sh <slug> <image> "x y w h CAPTION"...` draws the
    captions and writes `cover.png` (1000×420), `cover.webp` and `cover-480.webp`
-   into `static/img/blog/<slug>/`; open the PNG and check every caption fits
-   before committing. Set `coverImage` to the PNG's site path and `coverAlt` to
-   one sentence naming the meme and quoting its captions. `lib/blog-posts.ts`
-   fails on a missing cover, alt text or WebP sibling, a path outside `/img/` or
-   a non-PNG, and `lib/blog-posts.test.ts` on a cover that is not 1000×420.
+   for the banner, plus `cover-full.webp` and `cover-full-480.webp` (the whole
+   picture, at most 1000px a side) into `static/img/blog/<slug>/`, and prints
+   the `coverSize` line; open both and check every caption fits before
+   committing. Set `coverImage` to the PNG's site path, `coverSize` to the
+   printed size, and `coverAlt` to one sentence naming the meme and quoting its
+   captions. `lib/blog-posts.ts` fails on a missing cover, alt text, size or
+   WebP sibling, a path outside `/img/` or a non-PNG, and
+   `lib/blog-posts.test.ts` on a cover that is not 1000×420.
 8. Check the "AI crawler optimization (SEO)" table in
    [seo-ai-crawlers.md](seo-ai-crawlers.md). The sitemap, the RSS feed and both
    llms files read `blogArticles`, so they update themselves; the doc rows may

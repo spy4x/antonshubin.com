@@ -2,8 +2,10 @@
 # Makes a blog post's cover (docs/publishing.md step 7): a meme template with
 # captions, or any picture, centred on a 1000x420 canvas over a blurred copy of
 # itself. Writes cover.png (Dev.to, newsletter), cover.webp and cover-480.webp
-# (the site) into static/img/blog/<slug>/. Needs ImageMagick 7 and the Noto
-# Sans Condensed Black font.
+# (the /blog list), and the picture alone at its own shape as cover-full.webp
+# and cover-full-480.webp (the post page), into static/img/blog/<slug>/, then
+# prints the post's coverSize line. Needs ImageMagick 7 and the Noto Sans
+# Condensed Black font.
 #
 #   scripts/blog-cover.sh <slug> <image> ["x y w h CAPTION [dark]"]...
 #
@@ -54,4 +56,9 @@ magick \( "$work/meme.png" -resize 1000x420^ -gravity center -extent 1000x420 \
   -composite -strip "$dir/cover.png"
 magick "$dir/cover.png" -quality 80 -strip "$dir/cover.webp"
 magick "$dir/cover.png" -resize 480x -quality 80 -strip "$dir/cover-480.webp"
-echo "$dir/cover.png, cover.webp, cover-480.webp"
+magick "$work/meme.png" -resize "1000x1000>" -quality 80 -strip \
+  "$dir/cover-full.webp"
+magick "$dir/cover-full.webp" -resize "480x>" -quality 80 -strip \
+  "$dir/cover-full-480.webp"
+echo "$dir: cover.png, cover.webp, cover-480.webp, cover-full.webp, cover-full-480.webp"
+magick identify -format 'coverSize: "%wx%h"\n' "$dir/cover-full.webp"

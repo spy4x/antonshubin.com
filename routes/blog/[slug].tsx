@@ -11,6 +11,7 @@ import {
   renderBlogPost,
 } from "../../lib/markdown.ts"
 import { PostBody } from "../../components/PostBody.tsx"
+import { coverWebp } from "../../lib/blog-posts.ts"
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx"
 import PostToc from "../../islands/PostToc.tsx"
 import PostRead from "../../islands/PostRead.tsx"
@@ -18,7 +19,6 @@ import { NewsletterAsk } from "../../components/NewsletterBlock.tsx"
 import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
 import { SEOHead } from "../../components/SEOHead.tsx"
 import { Breadcrumb } from "../../components/Breadcrumb.tsx"
-import { PostCover } from "../../components/PostCover.tsx"
 import { ClosingBand } from "../../components/ClosingBand.tsx"
 import { SCHEDULE_URL } from "../../lib/config.ts"
 import { EMAIL_ADDRESS, emailContact } from "../../lib/profiles.ts"
@@ -222,6 +222,14 @@ export default define.page(function BlogPost(ctx) {
     }))
     : []
   const hasToc = tocItems.length > 0
+  const cover = coverWebp(article.coverImage)
+  // Each file's real width: a "1000w" on a narrower file made a dense phone
+  // draw it at a fraction of the column. A picture 480px wide or less has no
+  // smaller copy worth offering (blog-cover.sh only shrinks).
+  const { width: coverWidth, height: coverHeight } = article.coverSize
+  const wholeSrcset = coverWidth > 480
+    ? `${cover.wholeSmall} 480w, ${cover.whole} ${coverWidth}w`
+    : `${cover.whole} ${coverWidth}w`
 
   head.value = {
     ...head.value,
@@ -386,9 +394,37 @@ export default define.page(function BlogPost(ctx) {
             )}
           </header>
 
-          {/* The cover (#594): the page's one eager, high-priority image. */}
-          <figure class="mt-6">
-            <PostCover src={article.coverImage} alt={article.coverAlt} hero />
+          {
+            /* The cover (#594): the page's one eager, high-priority image, the
+              picture alone at its own shape, opening in the lightbox. */
+          }
+          <figure data-post-cover class="mt-6">
+            <button
+              type="button"
+              class="post-image"
+              data-lightbox
+              aria-label={`View larger image: ${article.coverAlt}`}
+              // The column's width, or less where the 28rem height cap would
+              // bind; the image's ratio then gives its height before it loads.
+              style={{
+                width:
+                  `min(100%, calc(28rem * ${coverWidth} / ${coverHeight}))`,
+              }}
+            >
+              <img
+                src={cover.whole}
+                srcset={wholeSrcset}
+                sizes="(min-width: 768px) 720px, 100vw"
+                alt={article.coverAlt}
+                width={article.coverSize.width}
+                height={article.coverSize.height}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                style={{ aspectRatio: `${coverWidth} / ${coverHeight}` }}
+                class="block w-full h-auto rounded-lg border border-rule bg-paper"
+              />
+            </button>
           </figure>
 
           {hasToc && (

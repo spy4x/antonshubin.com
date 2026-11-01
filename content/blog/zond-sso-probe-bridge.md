@@ -10,6 +10,7 @@ publishedAt: "2026-08-26"
 readTime: 6
 coverImage: "/img/blog/zond-sso-probe-bridge/cover.png"
 coverAlt: "The This Is Fine meme: a dog sits in a burning room labelled \"Service behind SSO answers 500\" and \"Gatus: TCP port open\", and says \"This is fine\"."
+coverSize: "580x282"
 topic: "self-hosting"
 relatedTool: "zond"
 ---

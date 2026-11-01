@@ -26,6 +26,7 @@ function post(slug: string, extra: Partial<BlogArticle> = {}): BlogArticle {
     topic: "self-hosting",
     coverImage: `/img/blog/${slug}/cover.png`,
     coverAlt: "A cover",
+    coverSize: { width: 1000, height: 420 },
     ...extra,
   }
 }
