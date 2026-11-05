@@ -14,11 +14,13 @@
 import type { ComponentType } from "preact"
 import { type Type, type } from "arktype"
 import CachedShareSlider from "../islands/CachedShareSlider.tsx"
+import DenoTiesChecklist from "../islands/DenoTiesChecklist.tsx"
 import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
 import RunsCalculator from "../islands/RunsCalculator.tsx"
 import { TaskCostChart } from "../components/TaskCostChart.tsx"
 import { cachedShareMarkdown, runsMarkdown } from "./post-math.ts"
 import { checklistMarkdown } from "./framework-checklist.ts"
+import { denoTiesMarkdown } from "./deno-ties.ts"
 import { taskCostMarkdown } from "./task-cost.ts"
 
 /** What the post page passes to every component besides its own props. */
@@ -70,6 +72,12 @@ export const POST_COMPONENTS: PostComponentRegistry = {
     component: CachedShareSlider,
     anchor: "per-call-price",
     toMarkdown: () => cachedShareMarkdown(),
+  }),
+  DenoTiesChecklist: postComponent({
+    props: noProps,
+    component: DenoTiesChecklist,
+    anchor: "deno-ties",
+    toMarkdown: () => denoTiesMarkdown(),
   }),
   FrameworkChecklist: postComponent({
     props: noProps,

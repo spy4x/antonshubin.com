@@ -28,6 +28,7 @@ type AxePage = ConstructorParameters<typeof AxeBuilder>[0]["page"]
 const TRAIL = "trail-code-claude-code-test"
 const OPUS = "opus-5-5-vs-sonnet-5-agent-costs"
 const LAB = "cost-optimization-laboratory"
+const DENO = "migrate-from-deno-to-node-and-bun"
 
 /** Loads a post and waits until the figure with `id` has hydrated. */
 async function openPost(page: Page, origin: string, slug: string, id: string) {
@@ -158,6 +159,61 @@ Deno.test("the cached-share slider and the framework checklist react to the keyb
   }
 })
 
+Deno.test("the Deno ties checklist starts with Seed's ticks and follows the keyboard", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${DENO}`)
+    assertStringIncludes(
+      html,
+      "You ticked 11 of 14. Seed had 11 of those, and here is what replaced each one.",
+    )
+    assert(
+      /id="deno-ties-figure"[^>]*data-live="false"/.test(html),
+      "the checklist is live before any script ran",
+    )
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, DENO, "deno-ties-figure")
+      const result = page.locator("#deno-ties-figure [data-result]")
+      const kv = page.getByRole("checkbox", { name: "Deno KV" })
+      await kv.focus()
+      await page.keyboard.press("Space")
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "You ticked 12 of 14. Seed had 11 of those",
+      )
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Never used: the data lives in Postgres and Valkey.",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertEquals(await kv.isChecked(), false)
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Nothing ticked: your project has none of these ties.",
+      )
+      await page.getByRole("button", { name: "Show Seed's ticks" }).click()
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "You ticked 11 of 14.",
+      )
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: DENO, part: "DenoTiesChecklist" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("every component box has no axe violation at 390 and 1440px", async () => {
   const site = await startSite()
   let browser: Browser | undefined
@@ -178,6 +234,7 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
             [TRAIL, "how-many-tasks-figure"],
             [OPUS, "per-call-price-figure"],
             [LAB, "decision-framework-figure"],
+            [DENO, "deno-ties-figure"],
           ]
         ) {
           await openPost(page, site.origin, slug, id)

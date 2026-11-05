@@ -8,7 +8,7 @@ tldr:
   - "It is a template, not a framework: you clone it and change it. The reusable parts ship as @spy4x packages on JSR."
 intro: "Seed is the groundwork a SaaS needs before its first real feature, done once and kept in one repository. This post walks through how it is built: groups as tenancy, commands and queries as plain functions, an outbox and an app that works offline."
 publishedAt: "2026-08-26"
-updatedAt: "2026-10-18"
+updatedAt: "2026-11-05"
 readTime: 9
 coverImage: "/img/blog/seed-saas-starter/cover.png"
 coverAlt: "The Gru's Plan meme: \"Build a SaaS starter\", \"Set it all up first\", then \"52 of 134 commits go to setup\" twice, the second time with Gru staring at the board."
@@ -42,7 +42,7 @@ seed/
 │   ├── api/               # Hono API: REST and WebSocket over one CQRS bus
 │   ├── spa/               # Preact + Vite web app, works offline
 │   ├── admin/             # the operator area, on a host of its own
-│   ├── mpa/               # the public website, server-rendered with Fresh
+│   ├── mpa/               # the public website, server-rendered with Preact
 │   └── worker/            # background jobs, drains the outbox
 ├── libs/
 │   ├── domain/            # your product's rules: commands, queries, events
@@ -269,7 +269,7 @@ Same idea, different rules:
 
 | Area    | v1 (2019–2022)                                     | Seed today                                             |
 | ------- | -------------------------------------------------- | ------------------------------------------------------ |
-| Stack   | Nx, Angular, NestJS, Prisma; over 100 npm packages | Deno 2, Hono, Preact and Fresh, on web standards       |
+| Stack   | Nx, Angular, NestJS, Prisma; over 100 npm packages | Hono and Preact on web standards; Deno, Node or Bun    |
 | Hosting | Firebase and Google Cloud only                     | Docker Compose on any Linux host you control           |
 | Groups  | An open issue                                      | One at sign-up; roles, invitations, ownership transfer |
 | Billing | Stripe subscriptions planned, never built          | Billing per member                                     |
@@ -277,10 +277,11 @@ Same idea, different rules:
 | Admin   | User management planned, never built               | An admin app on its own host                           |
 
 - **No cloud lock-in.** The servers use Fetch `Request` and `Response`, Web
-  Crypto and a plain WebSocket. Traefik, Postgres, Valkey and the monitoring run
-  in the same Compose setup. Sign-in, sessions and the authenticator-app second
-  factor are my own code, in Seed and the `@spy4x` packages, not a hosted
-  service.
+  Crypto and a plain WebSocket, so they run on Deno, Node and Bun:
+  [how I moved Seed off Deno](/blog/migrate-from-deno-to-node-and-bun). Traefik,
+  Postgres, Valkey and the monitoring run in the same Compose setup. Sign-in,
+  sessions and the authenticator-app second factor are my own code, in Seed and
+  the `@spy4x` packages, not a hosted service.
 - **Product features first.** Everything in the right-hand column works today,
   along with live updates, the public website and the outbox worker.
 - **Reusable parts leave the template.** Validation, time, networking and the UI
