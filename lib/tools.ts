@@ -912,6 +912,7 @@ export const tools: Tool[] = [
     catalogSlug: "zero-to-production-saas-mvp",
     posts: [
       "seed-saas-starter",
+      "migrate-from-deno-to-node-and-bun",
       "trail-code-claude-code-test",
       "passkey-autofill-bitwarden-tab-focus",
     ],
