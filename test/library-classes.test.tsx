@@ -514,7 +514,7 @@ Deno.test("a site button carries no library size or fill and the site's radius",
   const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
     .map(([, list]) => list.split(" "))
     .filter((list) => list.includes("transition-colors"))
-  assertEquals(buttons.length, 7, html)
+  assertEquals(buttons.length, 8, html)
   for (const list of buttons) {
     assertEquals(list.filter((c) => forbidden.includes(c)), [], list.join(" "))
     assert(list.includes("rounded-lg!"), list.join(" "))
