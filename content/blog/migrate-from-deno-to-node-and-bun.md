@@ -1,7 +1,7 @@
 ---
 title: "Deno's development is ending, so I moved my SaaS starter to Node and Bun"
 seoTitle: "Migrate from Deno to Node and Bun: what was really hard"
-description: "To migrate from Deno to Node and Bun, the Deno.* calls are the easy part. What was hard in my SaaS starter, how I replaced Fresh, and what CI missed."
+description: "To migrate from Deno to Node and Bun, the runtime calls are the easy part. What was hard in my SaaS starter, how I replaced Fresh, and what CI missed."
 tldr:
   - "The `Deno.*` calls were not the hard part. Serving files, Deno types in public signatures and Fresh's internals were."
   - "I replaced Fresh by copying its API: 419 of 423 responses came out identical, and every page shipped less JavaScript."
