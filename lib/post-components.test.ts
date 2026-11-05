@@ -197,6 +197,7 @@ Deno.test("toDevToMarkdown swaps each tag for its fallback and a link to its anc
 const POSTS_WITH_COMPONENTS: Record<string, string[]> = {
   "opus-5-5-vs-sonnet-5-agent-costs": ["CachedShareSlider"],
   "cost-optimization-laboratory": ["FrameworkChecklist"],
+  "hire-developer-take-over-ai-built-app": ["ProposalChecklist"],
   "trail-code-claude-code-test": [
     "TaskCostChart",
     "TaskCostChart",
@@ -241,6 +242,10 @@ Deno.test("the Dev.to body of each post with components has its fallback and a T
     "cost-optimization-laboratory": [
       "as a checklist you can tick",
       "#decision-framework>",
+    ],
+    "hire-developer-take-over-ai-built-app": [
+      "as a checklist you can tick for a proposal you received",
+      "#proposal-checklist>",
     ],
     "trail-code-claude-code-test": [
       "| Cache static assets | $1.92 | $2.42 | +26% | 0 |",
