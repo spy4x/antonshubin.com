@@ -1,7 +1,7 @@
 ---
-title: "The runtime under my SaaS starter is ending. Here's how I moved off it"
-seoTitle: "Migrate from Deno to Node and Bun: a real codebase"
-description: "How I migrated my SaaS starter from Deno to Node and Bun: what was really tied to Deno, how Fresh was replaced, and the speed regression CI missed."
+title: "Deno's development is ending, so I moved my SaaS starter to Node and Bun"
+seoTitle: "Migrate from Deno to Node and Bun: what was really hard"
+description: "To migrate from Deno to Node and Bun, the Deno.* calls are the easy part. What was hard in my SaaS starter, how I replaced Fresh, and what CI missed."
 tldr:
   - "The `Deno.*` calls were not the hard part. Serving files, Deno types in public signatures and Fresh's internals were."
   - "I replaced Fresh by copying its API: 419 of 423 responses came out identical, and every page shipped less JavaScript."
@@ -25,9 +25,10 @@ that for [Seed](/blog/seed-saas-starter), the SaaS starter every new project of
 mine starts from. The pull requests that finished it merged on 4 November 2026.
 
 This post is for a developer or a tech lead with a Deno codebase who read the
-news and now has to decide: stay, fork or move. It shows what was really tied to
-Deno in a tested codebase, what replaced each piece, and the mistake I shipped
-on the way.
+news and now has to decide: stay, fork or move. Short version of the worry "my
+code is full of `Deno.*`": those calls were the easy part. It shows what was
+really tied to Deno in a tested codebase, what replaced each piece, and the
+mistake I shipped on the way.
 
 ## What happened to Deno?
 
@@ -144,17 +145,17 @@ I didn't rewrite the routes. I wrote a small layer that copies Fresh 2's API:
 with Vite and runs on web standards. It is
 [`@spy4x/preact-server`](https://github.com/spy4x/preact-components/pull/1187),
 1,459 lines of source and 919 lines of tests, part of my open-source component
-library. Because the API matched, Seed's 29 route files barely changed. Seed's
-side of the switch, [spy4x/seed#815](https://github.com/spy4x/seed/pull/815),
-touched 128 files and deleted more than it added: +562, −908.
+library. Because the API matched, Seed's route files barely changed. Seed's side
+of the switch, [spy4x/seed#815](https://github.com/spy4x/seed/pull/815), touched
+128 files and deleted more than it added: +562, −908.
 
 ### Did anything change for the visitor?
 
-To find out, I requested every route on both builds and compared the answers.
-419 of 423 responses were identical. Two of the four differences were one
-video's modification time and ETag. The other two were the malformed path
-`/%E0%A4%A`: Fresh answered with a bare 500, the new layer answers with the
-site's 404 page.
+To find out, I requested every route on both builds and compared the answers
+([spy4x/seed#623](https://github.com/spy4x/seed/issues/623)). 419 of 423
+responses were identical. Two of the four differences were one video's
+modification time and ETag. The other two were the malformed path `/%E0%A4%A`:
+Fresh answered with a bare 500, the new layer answers with the site's 404 page.
 
 The pages also got lighter. Gzipped JavaScript per page, Lighthouse mobile, 22
 pages, median of 3 runs:
@@ -178,7 +179,9 @@ Two things got better:
   still runs on Fresh, and its CSP code reads Fresh's private nonce. That is
   exactly the kind of internal I don't want to depend on.
 - **Safer redirects.** `ctx.redirect()` keeps `/\host` and `/<tab>/host` on the
-  site. Fresh lets both through to another host.
+  site
+  ([the test](https://github.com/spy4x/preact-components/blob/6d5082cfa45b5ce19fbb3e6f351b8c2874e475de/server/app.test.tsx#L130-L137)).
+  Fresh lets both through to another host.
 
 And four things Fresh has that the layer doesn't: `csrf()` middleware (a
 same-origin check from my shared library does the job), `_404` and `_500`
@@ -236,8 +239,10 @@ added the Node and Bun start files, their Docker images and a CI smoke test that
 builds the site and runs it on all three runtimes. 27 files, +768, −212.
 
 Two surprises came with it. Adding `"type": "module"` to the root `package.json`
-broke Playwright under Deno. And in CI, the new smoke test and the browser tests
-raced each other on `vapid.json` and the build folders.
+broke Playwright under Deno. The fix was to leave the field out: that file only
+hands `npm run` and `bun run` over to `deno task`. And in CI, the new smoke test
+and the browser tests raced each other on `vapid.json` and the build folders.
+The fix: the smoke test now runs in its own copy of the checkout.
 
 ![The Domino Effect meme: a man tips the smallest domino, labelled "\"type\": \"module\"", towards the biggest one, labelled "Playwright under Deno"](/img/blog/migrate-from-deno-to-node-and-bun/domino.webp "One line of JSON, one red pipeline")
 
@@ -259,8 +264,9 @@ out. Now a coordinator continues a stopped session's work itself.
 
 ![The Monkey Puppet meme: the puppet glances sideways, then looks away. Caption: "My coordinator after forwarding a half-done session's report"](/img/blog/migrate-from-deno-to-node-and-bun/monkey.webp "Very helpful. Thank you for the report.")
 
-An agent also drafted this post from those pull requests and measurements; every
-number above links back to one of them.
+An agent also drafted this post. Every number in it comes from a merged pull
+request or from the measurements in
+[spy4x/seed#623](https://github.com/spy4x/seed/issues/623).
 
 ## How tied to Deno is your project?
 
@@ -278,7 +284,7 @@ Seed's; the last three Seed never had:
 | `Deno.connect`, such as a Redis client                     | Nothing: the client already ran over a `connectTcp` adapter, `Deno.connect` on Deno and `node:net` on Node and Bun.                                             |
 | Fresh                                                      | `@spy4x/preact-server`, a new layer that copies Fresh 2's API.                                                                                                  |
 | `jsr:` imports                                             | `deno bundle` builds them into the server file, so Node and Bun never see a `jsr:` import.                                                                      |
-| `Deno.Command`                                             | Nothing: only the screenshot, video and changelog scripts use it, and they stay on Deno.                                                                        |
+| `Deno.Command`                                             | Nothing: only the dev, deploy and media scripts use it, and they stay on Deno.                                                                                  |
 | `deno test`, `deno fmt`, `deno lint`                       | Nothing: the toolchain stays Deno. `npm run` and `bun run` call the same `deno task`s.                                                                          |
 | Deno KV                                                    | Never used: the data lives in Postgres and Valkey.                                                                                                              |
 | Deno Deploy                                                | Never used: Seed runs in Docker Compose on any Linux host.                                                                                                      |
@@ -309,8 +315,9 @@ make the switch cheap, then decide when you have to:
 
 If your product runs on Deno and you'd like a calm plan instead of a panicked
 rewrite, that is what my
-[code and security audit](/catalog/codebase-health-audit) is for. I go through
-your codebase, list every tie to Deno ranked by risk, and tell you what to move
+[code and security audit](/catalog/codebase-health-audit) is for: three days,
+from $1,500. It covers architecture, security and performance, and for a Deno
+codebase that includes every tie to Deno, ranked by risk, with what to move
 first and what to leave alone.
 
 And if you've already started your own move, tell me what bit you. I'd like to

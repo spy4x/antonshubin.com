@@ -75,10 +75,9 @@ export default function DenoTiesChecklist({ post }: { post: string }) {
         </fieldset>
         <div
           class="flex flex-col gap-3 border-t border-rule pt-5 text-sm text-parchment"
-          aria-live="polite"
           data-result
         >
-          <p class="font-semibold">{result.summary}</p>
+          <p class="font-semibold" aria-live="polite">{result.summary}</p>
           {result.rows.length > 0 && (
             <dl class="flex flex-col gap-3">
               {result.rows.map((t) => (

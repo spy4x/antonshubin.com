@@ -85,7 +85,7 @@ export const DENO_TIES: readonly DenoTie[] = [
     "command",
     true,
     "`Deno.Command`",
-    "Nothing: only the screenshot, video and changelog scripts use it, and they stay on Deno.",
+    "Nothing: only the dev, deploy and media scripts use it, and they stay on Deno.",
   ),
   tie(
     "toolchain",
