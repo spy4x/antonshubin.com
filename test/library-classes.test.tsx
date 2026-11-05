@@ -32,6 +32,7 @@ import { findTool } from "../lib/tools.ts"
 import type { CiSnapshot } from "../lib/github-snapshot.ts"
 import CachedShareSlider from "../islands/CachedShareSlider.tsx"
 import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
+import ProposalChecklist from "../islands/ProposalChecklist.tsx"
 import RunsCalculator from "../islands/RunsCalculator.tsx"
 import { TaskCostChart } from "../components/TaskCostChart.tsx"
 import { startSite } from "./harness.ts"
@@ -240,6 +241,7 @@ function renderedLibraryMarkup(): string {
     // with a muted row, a band and a summary.
     render(<CachedShareSlider post="p" />),
     render(<FrameworkChecklist post="p" />),
+    render(<ProposalChecklist post="p" />),
     render(
       <RunsCalculator
         post="p"

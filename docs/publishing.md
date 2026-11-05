@@ -316,13 +316,14 @@ needs no JavaScript), then add an entry to `POST_COMPONENTS` in
   the anchor.
 
 Registered today: `CachedShareSlider` (the Opus 5.5 post), `FrameworkChecklist`
-(the cost laboratory post), `RunsCalculator` and `TaskCostChart` (the Trail-code
-post). Each sits in the library's `Explorable` frame. `TaskCostChart` is a
-server component with no island; it reads the post's dated data file,
-`content/blog/data/<slug>.json`, through `lib/task-cost.ts`, which also writes
-its summary sentence and its Dev.to table, so no number in the chart is typed by
-hand. The arithmetic of the other three lives in `lib/post-math.ts` and
-`lib/framework-checklist.ts`, next to their fallbacks.
+(the cost laboratory post), `ProposalChecklist` (the AI-built app takeover
+post), `RunsCalculator` and `TaskCostChart` (the Trail-code post). Each sits in
+the library's `Explorable` frame. `TaskCostChart` is a server component with no
+island; it reads the post's dated data file, `content/blog/data/<slug>.json`,
+through `lib/task-cost.ts`, which also writes its summary sentence and its
+Dev.to table, so no number in the chart is typed by hand. The arithmetic of the
+other four lives in `lib/post-math.ts`, `lib/framework-checklist.ts` and
+`lib/proposal-checklist.ts`, next to their fallbacks.
 
 On the reader's first input the component calls
 `trackPostTry(post, "<TagName>")` from `lib/analytics.ts`, which sends one
