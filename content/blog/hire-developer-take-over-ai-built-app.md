@@ -64,7 +64,7 @@ written by AI too, which is a little funny for a job about cleaning up after AI.
 
 Here is what should make you close a proposal before the second paragraph:
 
-- **A template placeholder is still in it.** A `[hours per week]` or a
+- **A template placeholder is still in it.** A `[client name]` or a
   `[your project]` that nobody filled in. If they didn't read their own message,
   they won't read your code.
 - **Your name is wrong, or someone else signed it.** It was pasted from the last
@@ -82,12 +82,12 @@ Here is what should make you close a proposal before the second paragraph:
 - **The rate is far below a senior rate.** A senior job at a junior price means
   the person is not senior, or will not stay. You pay the difference later, in
   rework.
-- **It offers free work or a discount.** "I'll fix the first bug for free", or
-  "below my usual rate". It reads as need, not confidence. And free work comes
-  without a contract, so nothing says the code is yours.
-- **An agency writes as one person.** "I" in the first paragraph, "our lead
-  developer" in the third. Agencies are fine. Hiding who will do the work is
-  not, so ask who writes the code and talk to that person.
+- **It offers free work or a discount.** "I'll fix the first bug for free", or a
+  special price just for you. It reads as need, not confidence. And free work
+  comes without a contract, so nothing says the code is yours.
+- **An agency writes as one person.** "I" in the first paragraph, "our team" in
+  the third. Agencies are fine. Hiding who will do the work is not, so ask who
+  writes the code and talk to that person.
 - **A video link is the whole reply.** A short video about your project can be
   great. A video instead of a written answer means you can't skim it, compare it
   or forward it to a technical friend.
@@ -169,9 +169,10 @@ A small paid audit is different:
 
 It costs a little, and it is the cheapest way to find out what you are actually
 buying. Yes, this is the part where I mention that I sell one: my
-[code and security audit](/catalog/codebase-health-audit) is a fixed price, a
-written report and a call to walk you through it. If you hire someone else, ask
-them for the same shape of first step.
+[code and security audit](/catalog/codebase-health-audit) has a fixed price,
+quoted before any work starts, and gives you a written report and a call to walk
+you through it. If you hire someone else, ask them for the same shape of first
+step.
 
 ![A drawing of a fortune teller gazing into a crystal ball labelled "Free call", while a developer next to her reads actual code with a flashlight. Caption: "One of them has seen your code."](/img/blog/hire-developer-take-over-ai-built-app/free-call.webp "Predictions are free for a reason")
 
