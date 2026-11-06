@@ -37,8 +37,8 @@ AI-built apps tend to break in the same few places:
 
 - **Database access rules.** On Supabase these are Row Level Security policies.
   A table with only a read policy looks fine in a demo. Then updates and deletes
-  quietly change zero rows, and inserts fail with an error the generated code
-  often never checks. The user sees "Saved!", and nothing was saved.
+  can quietly change zero rows, and inserts fail with an error the generated
+  code often never checks. The user sees "Saved!", and nothing was saved.
 - **Secret keys in the browser.** A key meant for the server ends up in the code
   every visitor downloads.
 - **Payments the browser decides.** The page marks an order as paid, instead of
