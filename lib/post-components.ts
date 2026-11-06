@@ -16,10 +16,12 @@ import { type Type, type } from "arktype"
 import CachedShareSlider from "../islands/CachedShareSlider.tsx"
 import DenoTiesChecklist from "../islands/DenoTiesChecklist.tsx"
 import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
+import ProposalChecklist from "../islands/ProposalChecklist.tsx"
 import RunsCalculator from "../islands/RunsCalculator.tsx"
 import { TaskCostChart } from "../components/TaskCostChart.tsx"
 import { cachedShareMarkdown, runsMarkdown } from "./post-math.ts"
 import { checklistMarkdown } from "./framework-checklist.ts"
+import { proposalChecklistMarkdown } from "./proposal-checklist.ts"
 import { denoTiesMarkdown } from "./deno-ties.ts"
 import { taskCostMarkdown } from "./task-cost.ts"
 
@@ -84,6 +86,12 @@ export const POST_COMPONENTS: PostComponentRegistry = {
     component: FrameworkChecklist,
     anchor: "decision-framework",
     toMarkdown: () => checklistMarkdown(),
+  }),
+  ProposalChecklist: postComponent({
+    props: noProps,
+    component: ProposalChecklist,
+    anchor: "proposal-checklist",
+    toMarkdown: () => proposalChecklistMarkdown(),
   }),
   RunsCalculator: postComponent({
     props: type({

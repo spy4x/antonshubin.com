@@ -29,6 +29,7 @@ const TRAIL = "trail-code-claude-code-test"
 const OPUS = "opus-5-5-vs-sonnet-5-agent-costs"
 const LAB = "cost-optimization-laboratory"
 const DENO = "migrate-from-deno-to-node-and-bun"
+const HIRE = "hire-developer-take-over-ai-built-app"
 
 /** Loads a post and waits until the figure with `id` has hydrated. */
 async function openPost(page: Page, origin: string, slug: string, id: string) {
@@ -159,6 +160,76 @@ Deno.test("the cached-share slider and the framework checklist react to the keyb
   }
 })
 
+Deno.test("the proposal checklist scores ticks from the keyboard and sends no ticked value", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${HIRE}`)
+    assert(
+      /id="proposal-checklist-figure"[^>]*data-live="false"/.test(html),
+      "the checklist is live before any script ran",
+    )
+    assertStringIncludes(
+      html,
+      "Tick what you see in the proposal you received.",
+    )
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, HIRE, "proposal-checklist-figure")
+      const verdict = page.locator("#proposal-checklist-figure [data-verdict]")
+      const result = page.locator("#proposal-checklist-figure [data-result]")
+      const tick = async (name: string) => {
+        await page.getByRole("checkbox", { name }).focus()
+        await page.keyboard.press("Space")
+      }
+      await tick("A live app on your stack")
+      assertEquals(
+        await verdict.textContent(),
+        "No red flags, but little proof yet: ask the three questions below.",
+      )
+      await tick("One specific insight from real work")
+      await tick("A dated, priced first step")
+      assertEquals(
+        await verdict.textContent(),
+        "No red flags and three or more green ones: offer this candidate a paid first step.",
+      )
+      await tick("The diagnosis fits any app")
+      assertEquals(
+        await verdict.textContent(),
+        "One red flag: ask about it before you pay for anything.",
+      )
+      await tick("A video link is the whole reply")
+      assertEquals(
+        await verdict.textContent(),
+        "Two or more red flags: pass, however good the price looks.",
+      )
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Red flags: 2 of 9. Green flags: 3 of 5.",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertEquals(
+        await verdict.textContent(),
+        "Tick what you see in the proposal you received.",
+      )
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: HIRE, part: "ProposalChecklist" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("the Deno ties checklist starts with Seed's ticks and follows the keyboard", async () => {
   const site = await startSite()
   let browser: Browser | undefined
@@ -235,6 +306,7 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
             [OPUS, "per-call-price-figure"],
             [LAB, "decision-framework-figure"],
             [DENO, "deno-ties-figure"],
+            [HIRE, "proposal-checklist-figure"],
           ]
         ) {
           await openPost(page, site.origin, slug, id)

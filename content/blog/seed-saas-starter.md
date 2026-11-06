@@ -301,7 +301,9 @@ products can use it too.
 
 If you are a founder and would rather have me build your MVP on Seed, that is my
 [SaaS MVP offer](/catalog/zero-to-production-saas-mvp): from $8,000 and from
-three weeks, with a quote for your scope before any work starts.
+three weeks, with a quote for your scope before any work starts. If you already
+built yours with an AI tool, here is
+[how to hire a developer to take it over](/blog/hire-developer-take-over-ai-built-app).
 
 If you clone it, tell me what you build, or
 [open an issue](https://github.com/spy4x/seed/issues) for what is missing.
