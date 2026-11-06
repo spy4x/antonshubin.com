@@ -67,6 +67,8 @@ export interface BlogArticle {
   archived?: boolean
   /** What changed since, added after the archive note's date line. */
   archiveNote?: string
+  /** The slug of the current post that replaces this archived one, linked from its note. */
+  supersededBy?: string
   /**
    * The tool the post is about, a slug in `lib/tools.ts`.
    * `lib/blog.ts`'s `relatedToolLink()` throws on a typo.
@@ -159,6 +161,7 @@ const KNOWN_KEYS = new Set([
   "topic",
   "archived",
   "archiveNote",
+  "supersededBy",
   "relatedTool",
   "catalogSlug",
   "youtubeVideoId",
@@ -250,6 +253,10 @@ export function parseBlogArticle(
   if (archiveNote && !archived) {
     throw new Error(`${where}: "archiveNote" needs "archived: true"`)
   }
+  const supersededBy = text("supersededBy", false)
+  if (supersededBy && !archived) {
+    throw new Error(`${where}: "supersededBy" needs "archived: true"`)
+  }
 
   const tldr = attrs.tldr
   if (tldr === undefined) throw new Error(`${where}: "tldr" is missing`)
@@ -316,6 +323,7 @@ export function parseBlogArticle(
     seoTitle: text("seoTitle", false),
     updatedAt: date("updatedAt", false),
     archiveNote,
+    supersededBy,
     relatedTool: text("relatedTool", false),
     catalogSlug: text("catalogSlug", false),
     youtubeVideoId: text("youtubeVideoId", false),

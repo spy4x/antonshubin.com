@@ -110,6 +110,26 @@ export function archiveNoteText(article: BlogArticle): string {
 }
 
 /**
+ * The current post an archived one points to (`supersededBy`), or undefined.
+ * Throws, naming the post, when the slug is not a post or is archived itself,
+ * so a typo fails the test run instead of shipping a broken link.
+ */
+export function supersedingPost(
+  article: BlogArticle,
+  list: readonly BlogArticle[] = blogArticles,
+): BlogArticle | undefined {
+  const slug = article.supersededBy
+  if (!slug) return undefined
+  const found = list.find((a) => a.slug === slug)
+  if (!found || found.archived) {
+    throw new Error(
+      `content/blog/${article.slug}.md: supersededBy "${slug}" is not a current post`,
+    )
+  }
+  return found
+}
+
+/**
  * The post's `<title>`: `seoTitle` when set; otherwise the title, with
  * " — Anton Shubin" only when the whole fits in 55 characters, the length a
  * search result shows (SEO 9).

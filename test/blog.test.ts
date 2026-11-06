@@ -134,7 +134,7 @@ siteTest(
 )
 
 siteTest(
-  "archived posts carry a dated note and never show up under Read next",
+  "archived posts carry a dated note, link their successor and never show up under Read next",
   async (site) => {
     const archivedHrefs = archived.map((a) => `href="/blog/${a.slug}"`)
     for (const article of blogArticles) {
@@ -148,6 +148,13 @@ siteTest(
             visibleText(note).includes("Kept as written."),
           `${article.slug}'s note: ${visibleText(note)}`,
         )
+        if (article.supersededBy) {
+          assert(
+            note.includes(`href="/blog/${article.supersededBy}"`) &&
+              note.includes("data-superseded-by"),
+            `${article.slug}'s note does not link ${article.supersededBy}`,
+          )
+        }
       } else {
         assertEquals(note, "", `${article.slug} is current but has a note`)
       }
