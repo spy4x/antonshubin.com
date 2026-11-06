@@ -10,8 +10,8 @@ intro: "If you built your MVP with Lovable, Bolt, Cursor or Claude, you probably
 publishedAt: "2026-11-05"
 readTime: 9
 coverImage: "/img/blog/hire-developer-take-over-ai-built-app/cover.png"
-coverAlt: "A drawing: a cheerful robot hands a shocked developer a cardboard box labelled \"My app\" with tangled wires spilling out of it. Caption: \"It works. Mostly. Your turn.\""
-coverSize: "1000x600"
+coverAlt: "The Distracted Boyfriend meme: a man labelled \"You\" turns to stare at a woman labelled \"Someone who promises to rewrite it\", while his girlfriend, labelled \"Someone who reads the code you have\", looks at him in disbelief."
+coverSize: "1000x667"
 topic: "founders"
 catalogSlug: "codebase-health-audit"
 ---
@@ -51,7 +51,7 @@ what works, which is most of it. A developer whose first idea is "let's rewrite
 it from scratch" is offering to throw away the one thing you have that already
 works, and to bill you for the privilege.
 
-![A drawing of a developer cheerfully pushing a screen labelled "Works" into a bin labelled "Rewrite", while the founder watches in horror. Caption: "First, let's delete the part that works."](/img/blog/hire-developer-take-over-ai-built-app/rewrite.webp "Rewrite is a plan, not an insight")
+![The Roll Safe meme: a man taps his temple with a knowing smile. Captions: "Can't have bugs in your app" and "If I rewrite your app"](/img/blog/hire-developer-take-over-ai-built-app/rewrite.webp "Rewrite is a plan, not an insight")
 
 If you are still deciding whether you need a person at all, I wrote about
 [when an AI subscription is enough](/why-not-just-ai) and when it isn't.
@@ -92,7 +92,7 @@ Here is what should make you close a proposal before the second paragraph:
   great. A video instead of a written answer means you can't skim it, compare it
   or forward it to a technical friend.
 
-![A drawing of a proposal on a screen that starts "Dear CLIENT NAME", the name still in square brackets under a magnifying glass. Caption: "Tailored specially for you."](/img/blog/hire-developer-take-over-ai-built-app/placeholder.webp "Bespoke, hand-crafted, copy-pasted")
+![The Is This a Pigeon meme: a man points at a butterfly labelled "Dear", then an unfilled client-name placeholder, and asks, "Is this a proposal written for me?"](/img/blog/hire-developer-take-over-ai-built-app/placeholder.webp "Bespoke, hand-crafted, copy-pasted")
 
 ## What do green flags look like?
 
@@ -174,7 +174,7 @@ quoted before any work starts, and gives you a written report and a call to walk
 you through it. If you hire someone else, ask them for the same shape of first
 step.
 
-![A drawing of a fortune teller gazing into a crystal ball labelled "Free call", while a developer next to her reads actual code with a flashlight. Caption: "One of them has seen your code."](/img/blog/hire-developer-take-over-ai-built-app/free-call.webp "Predictions are free for a reason")
+![The Drake meme in two panels. Drake turns away from "A free call where they guess" and points approvingly at "A paid audit where they read your code"](/img/blog/hire-developer-take-over-ai-built-app/free-call.webp "Predictions are free for a reason")
 
 ## How do you run the first week safely?
 
@@ -200,7 +200,7 @@ holds the keys.
 6. **Change the keys when someone leaves.** Any secret key the developer saw
    gets replaced. It's not distrust; it's how you close the door.
 
-![A drawing of a founder holding a big ring of keys labelled "Repo", "Database", "Stripe" and "Domain", handing a developer a single small key labelled "Read-only". Caption: "Start here."](/img/blog/hire-developer-take-over-ai-built-app/keys.webp "Trust is earned one key at a time")
+![The Change My Mind meme: a man sits at a table with a sign that reads "Give a new developer read-only access first. Change my mind"](/img/blog/hire-developer-take-over-ai-built-app/keys.webp "Trust is earned one key at a time")
 
 Got a proposal in your inbox right now? Run it through the
 [checklist above](#proposal-checklist) and ask the three questions. And if you'd
