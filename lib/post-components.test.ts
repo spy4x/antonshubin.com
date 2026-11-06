@@ -198,6 +198,7 @@ const POSTS_WITH_COMPONENTS: Record<string, string[]> = {
   "opus-5-5-vs-sonnet-5-agent-costs": ["CachedShareSlider"],
   "cost-optimization-laboratory": ["FrameworkChecklist"],
   "hire-developer-take-over-ai-built-app": ["ProposalChecklist"],
+  "migrate-from-deno-to-node-and-bun": ["DenoTiesChecklist"],
   "trail-code-claude-code-test": [
     "TaskCostChart",
     "TaskCostChart",
@@ -246,6 +247,10 @@ Deno.test("the Dev.to body of each post with components has its fallback and a T
     "hire-developer-take-over-ai-built-app": [
       "as a checklist you can tick for a proposal you received",
       "#proposal-checklist>",
+    ],
+    "migrate-from-deno-to-node-and-bun": [
+      "works as a checklist you can tick for your own project",
+      "#deno-ties>",
     ],
     "trail-code-claude-code-test": [
       "| Cache static assets | $1.92 | $2.42 | +26% | 0 |",
