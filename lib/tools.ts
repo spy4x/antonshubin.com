@@ -857,6 +857,7 @@ export const tools: Tool[] = [
       },
     ],
     ci: { provider: "woodpecker", repoId: 13 },
+    posts: ["deno-fmt-lint-ci-and-ai-agents"],
     useIf: [
       "You want a working example of one rules source driving several AI coding agents.",
       "You want a Linux workstation set up by script.",
