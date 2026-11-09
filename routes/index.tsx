@@ -6,7 +6,6 @@ import { Layout } from "../components/Layout.tsx"
 import { SCHEDULE_URL, UPWORK_URL } from "../lib/config.ts"
 import { formatPeriod, highlightProjects } from "../lib/data.ts"
 import { catalogItems, priceLabel } from "../lib/catalog.ts"
-import { proof } from "../lib/proof.ts"
 import { promise } from "../lib/promises.ts"
 import { ClosingBand } from "../components/ClosingBand.tsx"
 import { PromiseTimeline } from "../components/PromiseTimeline.tsx"
@@ -16,20 +15,34 @@ import {
   testimonialProject,
   visibleTestimonials,
 } from "../lib/testimonials.ts"
-import { head, ROLE } from "../lib/head.ts"
-import { HOME_LEAD, homeDescription } from "../lib/home.ts"
+import { head } from "../lib/head.ts"
+import {
+  HOME_AI_ANSWER,
+  HOME_AI_LINK_LABEL,
+  HOME_CAPACITY,
+  HOME_H1_CLAIM,
+  HOME_H1_NAME,
+  HOME_LEAD,
+  HOME_TEAM_LINE,
+  HOME_TEAM_LINK_LABEL,
+  HOME_VIDEO_CAPTION,
+  HOME_VIDEO_ID,
+  HOME_VIDEO_LABEL,
+  HOME_VIDEO_LENGTH,
+  homeDescription,
+  homeProofLine,
+} from "../lib/home.ts"
 import { PRICING_RULE } from "../lib/how-i-work.ts"
-import { tools } from "../lib/tools.ts"
 import { clientProject } from "../lib/llms.ts"
 import { WithNote } from "../components/WithNote.tsx"
 import LeadForm from "../islands/LeadForm.tsx"
+import HomeVideo from "../islands/HomeVideo.tsx"
 import { BookCallLink } from "../components/BookCallLink.tsx"
 import Button from "../components/Button.tsx"
 import { NewTabHint } from "../components/NewTabHint.tsx"
 import { TestimonialCard } from "../components/TestimonialCard.tsx"
-import { ToolCard } from "../components/ToolCard.tsx"
 import { CardPicture } from "../components/CardPicture.tsx"
-import { Fact, FACT_LINK, FactCard } from "../components/FactCard.tsx"
+import { FACT_LINK } from "../components/FactCard.tsx"
 import {
   IconArrowRight as ArrowRightIcon,
   IconCalendar as CalendarIcon,
@@ -38,7 +51,6 @@ import { eventAttrs } from "../lib/analytics.ts"
 import {
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
-  WHY_NOT_JUST_AI_PROMPT,
 } from "../lib/why-not-just-ai.ts"
 
 /** The section link style: Parchment, underlined, the underline brightens on hover. */
@@ -46,14 +58,6 @@ const LINK = FACT_LINK
 
 /** The arrow after a section link or a "more" link. */
 const ARROW = <ArrowRightIcon class="inline w-3.5 h-3.5 ml-1" />
-
-/** The four Upwork figures of the fact card, in reading order. */
-const figures = [
-  { value: proof("jobs"), label: "jobs on Upwork" },
-  { value: proof("job-success"), label: "Job Success" },
-  { value: proof("earned"), label: "earned on Upwork" },
-  { value: proof("hours"), label: "hours on Upwork" },
-]
 
 /**
  * The three promises named under the actions (#269, psychologist 4): the
@@ -76,17 +80,6 @@ const alsoWork = [
   { slug: "truth-or-dare", label: "DareChat" },
 ].map((a) => ({ ...a, project: clientProject(a.slug) }))
 
-/** The tool cards: at most this many, so a growing registry never crowds the page. */
-const TOOLS_SHOWN = 3
-const shownTools = tools.filter((t) => t.status !== "archived").slice(
-  0,
-  TOOLS_SHOWN,
-)
-
-/** A 1x1 transparent GIF: the portrait's `<img>` fallback, so a phone requests nothing. */
-const BLANK_PIXEL =
-  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-
 /** A section's one "All …" link: where it goes, its words and its event. */
 interface SectionLink {
   href: string
@@ -103,13 +96,11 @@ interface SectionLink {
  * the source, so the Tab order follows the phone's reading order.
  */
 function HomeSection(
-  { id, heading, link, children, after }: {
+  { id, heading, link, children }: {
     id: string
     heading: string
     link?: SectionLink
     children: ComponentChildren
-    /** A line after the section link: the tools section's writing line. */
-    after?: ComponentChildren
   },
 ) {
   return (
@@ -139,20 +130,17 @@ function HomeSection(
           </a>
         </p>
       )}
-      {after && <div class="lg:col-span-2">{after}</div>}
     </section>
   )
 }
 
 /**
- * The home page (#269, #187, #529). Proof before price, the ask after both:
- * the hero (the two-line heading, a one-sentence lead, Book and the brief,
- * the three promises, the Upwork line) beside the "At a glance" card, then
- * client work, client reviews, how a project runs, services and prices, the
- * tools and one writing line, and the closing band with the brief form.
- * Book appears twice: in the hero and in the band. At 390px the card has no
- * portrait (the phone header already shows the photo) and follows the
- * actions; from 1024px it is as tall as the hero's text column.
+ * The home page (#269, #529, #615). Judgement first, proof before price, the
+ * ask after both: the hero (the two-line heading, a one-sentence lead, Book
+ * and the brief, the video, the proof and capacity lines, the three promises,
+ * the Upwork line), then client reviews, "Why not just use AI?", client work,
+ * how a project runs, services and prices, and the closing band with the
+ * brief form. Book appears twice: in the hero and in the band.
  */
 export default define.page(function Home(ctx) {
   head.value = { ...head.value, description: homeDescription() }
@@ -161,18 +149,28 @@ export default define.page(function Home(ctx) {
     <Layout currentPath={ctx.url.pathname}>
       <SEOHead />
       <div class="max-w-6xl mx-auto">
-        {/* 1. Hero: heading, lead, actions, promises; the card beside it */}
+        {
+          /* 1. Hero: heading, lead, actions, the video, then the proof lines.
+          DOM order is visual order: from 1024px the video takes the right
+          column over both rows, at 390px it is a row after the actions. */
+        }
         <section
           data-home-section="hero"
-          class="mb-16 lg:mb-24 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_26rem]"
+          class="mb-16 lg:mb-24 grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:grid-rows-[auto_1fr]"
         >
-          <div class="flex flex-col lg:justify-center lg:py-6">
+          <div class="flex flex-col">
             <h1 class="text-parchment text-balance">
-              <span class="block text-base sm:text-lg text-graphite mb-2">
-                Anton Shubin
+              <span
+                data-home-h1-name
+                class="block text-base sm:text-lg text-graphite mb-2"
+              >
+                {HOME_H1_NAME}
               </span>
-              <span class="block text-3xl sm:text-4xl lg:text-5xl leading-tight">
-                {ROLE}
+              <span
+                data-home-h1-claim
+                class="block text-4xl lg:text-5xl leading-tight"
+              >
+                {HOME_H1_CLAIM}
               </span>
             </h1>
             <p
@@ -201,7 +199,25 @@ export default define.page(function Home(ctx) {
                 {BRIEF_LABEL}
               </Button>
             </div>
-            <p data-home-promises class="mt-6 text-sm text-graphite">
+          </div>
+
+          <div class="lg:col-start-2 lg:row-start-1 lg:row-span-2">
+            <HomeVideo
+              videoId={HOME_VIDEO_ID}
+              label={HOME_VIDEO_LABEL}
+              caption={HOME_VIDEO_CAPTION}
+              length={HOME_VIDEO_LENGTH}
+            />
+          </div>
+
+          <div data-home-proof class="space-y-2 text-sm text-graphite">
+            <WithNote id="upwork-profile" class="note-stack">
+              <p data-home-proof-line class="text-parchment">
+                {homeProofLine()}
+              </p>
+            </WithNote>
+            <p data-home-capacity>{HOME_CAPACITY}</p>
+            <p data-home-promises>
               {heroPromises.join(" · ")}.{" "}
               <a
                 href="/how-i-work"
@@ -212,7 +228,7 @@ export default define.page(function Home(ctx) {
                 {ARROW}
               </a>
             </p>
-            <p class="mt-2 text-sm text-graphite">
+            <p>
               Found me on Upwork?{" "}
               <a
                 href={UPWORK_URL}
@@ -227,84 +243,70 @@ export default define.page(function Home(ctx) {
               </a>
             </p>
           </div>
-
-          {
-            /* "At a glance": no portrait below 1024px, so a phone requests
-              no image here. From 1024px the portrait is the page's one eager,
-              high-priority image (LCP); its `<img>` holds a blank pixel until
-              the `<source>` matches. */
-          }
-          <FactCard label="At a glance" data-home-facts>
-            <div class="flex h-full flex-col">
-              <div data-hero-media class="hidden lg:block mb-5">
-                <picture>
-                  <source
-                    media="(min-width: 1024px)"
-                    srcset="/img/photo-mobile.webp 640w, /img/photo-big.webp 1200w"
-                    sizes="(min-width: 1280px) 376px, 312px"
-                    type="image/webp"
-                  />
-                  <img
-                    class="w-full h-auto aspect-[4/3] object-cover object-[50%_30%] rounded-lg"
-                    src={BLANK_PIXEL}
-                    alt="Anton Shubin"
-                    width="640"
-                    height="480"
-                    fetchpriority="high"
-                    loading="eager"
-                    decoding="async"
-                  />
-                </picture>
-              </div>
-              <p class="mb-4 text-xs font-semibold uppercase tracking-wide text-graphite">
-                At a glance
-              </p>
-              <WithNote id="upwork-profile" class="note-stack">
-                <dl data-proof-figures class="grid grid-cols-2 gap-4">
-                  {figures.map((f) => (
-                    <div key={f.label} class="flex flex-col-reverse">
-                      <dt class="text-xs text-graphite">{f.label}</dt>
-                      <dd class="price text-2xl font-semibold text-parchment">
-                        {f.value}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </WithNote>
-              <dl class="mt-5 space-y-3 border-t border-rule pt-4 text-sm">
-                <Fact term="Upwork">
-                  <a
-                    href={UPWORK_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    {...eventAttrs("outbound", { to: "upwork", place: "card" })}
-                    class={LINK}
-                  >
-                    {proof("expert-vetted")} · {proof("top-percent")}
-                    <NewTabHint />
-                  </a>
-                </Fact>
-                <Fact term="Team">
-                  Solo, or with senior developers from my own pool: full-stack,
-                  DevOps and architecture
-                </Fact>
-              </dl>
-              <p class="mt-5 text-sm lg:mt-auto lg:pt-5">
-                <a
-                  href="/about"
-                  data-home-about
-                  {...eventAttrs("cta", { place: "card", target: "/about" })}
-                  class={LINK}
-                >
-                  More about me
-                  {ARROW}
-                </a>
-              </p>
-            </div>
-          </FactCard>
         </section>
 
-        {/* 2. Client work: picture cards, the outcome first, then who it was for */}
+        {
+          /* 2. Client reviews: three excerpts from three clients, picked in
+          lib/testimonials.ts's homeTestimonialIds (#231), each naming and
+          linking its project. Renders only entries cleared for publishing (a
+          source link and Anton's permission; see #186). */
+        }
+        {visible.length > 0 && (
+          <HomeSection
+            id="testimonials"
+            heading="Client reviews"
+            link={{
+              href: UPWORK_URL,
+              label: "All reviews on Upwork",
+              external: true,
+              event: eventAttrs("outbound", { to: "upwork" }),
+            }}
+          >
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {visible.map((t) => (
+                <TestimonialCard
+                  key={t.id}
+                  t={t}
+                  project={testimonialProject(t)}
+                />
+              ))}
+            </div>
+          </HomeSection>
+        )}
+
+        {
+          /* 3. Why not just use AI?: the short answer, the full one on
+          /why-not-just-ai, then the team set-up line. */
+        }
+        <HomeSection
+          id="why-ai"
+          heading={WHY_NOT_JUST_AI_LINK_LABEL}
+          link={{
+            href: WHY_NOT_JUST_AI_PATH,
+            label: HOME_AI_LINK_LABEL,
+            event: eventAttrs("cta", {
+              place: "body",
+              target: WHY_NOT_JUST_AI_PATH,
+            }),
+          }}
+        >
+          <div class="max-w-3xl space-y-4 text-graphite leading-relaxed">
+            <p data-home-ai>{HOME_AI_ANSWER}</p>
+            <p data-home-team>
+              {HOME_TEAM_LINE}{" "}
+              <a
+                href="#audit-form"
+                {...eventAttrs("brief", { place: "body" })}
+                class={LINK}
+              >
+                {HOME_TEAM_LINK_LABEL}
+                {ARROW}
+              </a>
+            </p>
+          </div>
+        </HomeSection>
+
+        {/* 4. Client work: picture cards, the outcome first, then who it was for */}
         <HomeSection
           id="work"
           heading="Client work"
@@ -368,36 +370,7 @@ export default define.page(function Home(ctx) {
           </p>
         </HomeSection>
 
-        {
-          /* 3. Client reviews: three excerpts from three clients, picked in
-          lib/testimonials.ts's homeTestimonialIds (#231), each naming and
-          linking its project. Renders only entries cleared for publishing (a
-          source link and Anton's permission; see #186). */
-        }
-        {visible.length > 0 && (
-          <HomeSection
-            id="testimonials"
-            heading="Client reviews"
-            link={{
-              href: UPWORK_URL,
-              label: "All reviews on Upwork",
-              external: true,
-              event: eventAttrs("outbound", { to: "upwork" }),
-            }}
-          >
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {visible.map((t) => (
-                <TestimonialCard
-                  key={t.id}
-                  t={t}
-                  project={testimonialProject(t)}
-                />
-              ))}
-            </div>
-          </HomeSection>
-        )}
-
-        {/* 4. How a project runs: the five promises, in the order a project meets them */}
+        {/* 5. How a project runs: the five promises, in the order a project meets them */}
         <HomeSection
           id="how-it-works"
           heading="How a project runs"
@@ -410,7 +383,7 @@ export default define.page(function Home(ctx) {
           <PromiseTimeline variant="compact" headingLevel={3} />
         </HomeSection>
 
-        {/* 5. Services and prices: after the proof and the promises */}
+        {/* 6. Services and prices: after the proof and the promises */}
         <HomeSection
           id="services"
           heading="Services and prices"
@@ -460,61 +433,6 @@ export default define.page(function Home(ctx) {
             A price that says "from" gets a quote for your scope before any work
             starts.
           </p>
-          <p class="mt-2 text-sm text-graphite" data-why-not-just-ai-link>
-            {WHY_NOT_JUST_AI_PROMPT}{" "}
-            <a
-              href={WHY_NOT_JUST_AI_PATH}
-              {...eventAttrs("cta", {
-                place: "body",
-                target: WHY_NOT_JUST_AI_PATH,
-              })}
-              class={LINK}
-            >
-              {WHY_NOT_JUST_AI_LINK_LABEL}
-            </a>
-          </p>
-        </HomeSection>
-
-        {/* 6. Tools: the open-source tools Anton builds and runs himself, then one writing line */}
-        <HomeSection
-          id="tools"
-          heading="Tools I build and run myself"
-          link={{
-            href: "/tools",
-            label: "All tools",
-            event: eventAttrs("cta", { place: "body", target: "/tools" }),
-          }}
-          after={
-            <p
-              data-home-writing
-              class="border-t border-rule pt-6 text-sm text-graphite"
-            >
-              Writing:{" "}
-              <a
-                href="/saas-architecture-guide"
-                {...eventAttrs("cta", {
-                  place: "body",
-                  target: "/saas-architecture-guide",
-                })}
-                class={LINK}
-              >
-                SaaS Architecture Guide
-              </a>
-              {" · "}
-              <a
-                href="/blog"
-                {...eventAttrs("cta", { place: "body", target: "/blog" })}
-                class={LINK}
-              >
-                All writing
-                {ARROW}
-              </a>
-            </p>
-          }
-        >
-          <ul class="grid gap-4 md:grid-cols-3">
-            {shownTools.map((t) => <ToolCard key={t.slug} tool={t} />)}
-          </ul>
         </HomeSection>
 
         {/* 7. Closing band: the brief form sits in its `children` slot */}
