@@ -30,7 +30,7 @@ export const WHY_NOT_JUST_AI_H1 = "Why hire me instead of an AI subscription?"
 
 /** The answer in one paragraph: the line answer engines quote. */
 export const WHY_NOT_JUST_AI_LEAD =
-  "An AI subscription writes code. I decide what to build and what to leave out, set the rules the AI works to, run it in production and answer for the result. I use the same AI tools every day, so you get their speed too."
+  "An AI subscription writes code. I take the whole software side off your plate: I decide what to build and what to leave out, set the rules the AI works to, hire and lead the team when you need one, run it in production and answer for the result."
 
 /**
  * The sentence and link label other pages use to point here (the home page,

@@ -15,6 +15,8 @@ import {
 import {
   HOME_AI_ANSWER,
   HOME_CAPACITY,
+  HOME_H1_CLAIM,
+  HOME_H1_NAME,
   HOME_LEAD,
   HOME_VIDEO_ID,
   HOME_VIDEO_LABEL,
@@ -312,7 +314,7 @@ Deno.test(
 )
 
 siteTest(
-  "the home lead is one sentence that the page, the Person JSON-LD and llms.txt share",
+  "the home lead is the text that the page, the Person JSON-LD and llms.txt share",
   async (site) => {
     const html = await site.html("/")
     const lead = html.match(/<p[^>]*data-home-lead[^>]*>([\s\S]*?)<\/p>/)
@@ -987,10 +989,7 @@ siteTest(
     const h1 = visibleText(
       html.slice(html.indexOf("<h1"), html.indexOf("</h1>")),
     )
-    assertEquals(
-      h1,
-      "Anton Shubin, senior full-stack engineer and tech lead I tell founders what not to build, then build the rest.",
-    )
+    assertEquals(h1, `${HOME_H1_NAME} ${HOME_H1_CLAIM}`)
     const section = (id: string) => {
       const start = html.indexOf(`data-home-section="${id}"`)
       assert(start > 0, `no ${id} section`)

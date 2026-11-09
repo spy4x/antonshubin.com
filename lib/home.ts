@@ -6,22 +6,26 @@
  */
 
 import { proof } from "./proof.ts"
+import { promise } from "./promises.ts"
+
+/** The ownership promise's title, lower-cased to sit mid-sentence. */
+const OWNERSHIP = promise("ownership").title.replace(/^Y/, "y")
 
 /** The H1's small line: who is talking. */
 export const HOME_H1_NAME =
   "Anton Shubin, senior full-stack engineer and tech lead"
 
-/** The H1's large line: the judgement Anton sells (#615). */
-export const HOME_H1_CLAIM =
-  "I tell founders what not to build, then build the rest."
+/** The H1's large line: what Anton takes on for a founder (#615). */
+export const HOME_H1_CLAIM = "I take the whole software side off your plate."
 
 /**
- * The home page's lead, in one sentence (#529, #615): the page, the meta
- * description, the Person JSON-LD, the sitemap comment and both llms files
- * read it, so search and AI assistants quote what a visitor reads.
+ * The home page's lead (#529, #615): the page, the Person JSON-LD, the
+ * sitemap comment and both llms files read it, so search and AI assistants
+ * quote what a visitor reads. Every claim in it comes from a review in
+ * `lib/testimonials.ts`.
  */
 export const HOME_LEAD =
-  "I cut your plan to what proves the idea, then build it with AI agents working to my rules, and you own the code, the servers and the keys from day one."
+  `Your technical partner from idea to revenue. I plan it with you, build it, run it, and hire and lead the team when you need one. You get honest advice, your money is spent like it's mine, and ${OWNERSHIP}.`
 
 /** The lead with who says it, for the places that introduce Anton first. */
 export const HOME_INTRO =
@@ -56,20 +60,25 @@ export const HOME_VIDEO_LENGTH = "1 min · YouTube"
 /** The longest meta description search engines show without cutting it. */
 export const META_DESCRIPTION_MAX = 160
 
+/** The meta description when the lead is too long for one (#615). */
+export const HOME_SHORT_DESCRIPTION =
+  `Anton Shubin, your technical partner. I take the whole software side off your plate, from idea to revenue, and ${OWNERSHIP}.`
+
 /**
- * The home page's meta description: for a name search the buyer already
- * knows who Anton is (the `<title>` names the role), so it is the lead alone.
- * The lead of #615 leaves no room within `META_DESCRIPTION_MAX` for the old
- * Upwork and Book tail. Deliberately not `lib/head.ts`'s `SITE_DESCRIPTION`,
- * which describes the site on every page.
+ * The home page's meta description: the lead when it fits within
+ * `META_DESCRIPTION_MAX`, else `HOME_SHORT_DESCRIPTION`, so a search result
+ * never cuts it. Deliberately not `lib/head.ts`'s `SITE_DESCRIPTION`, which
+ * describes the site on every page.
  */
 export function homeDescription(): string {
-  return HOME_LEAD
+  return HOME_LEAD.length <= META_DESCRIPTION_MAX
+    ? HOME_LEAD
+    : HOME_SHORT_DESCRIPTION
 }
 
 /** The short answer of the home page's "Why not just use AI?" section (#615). */
 export const HOME_AI_ANSWER =
-  "An AI subscription writes the code you ask for. It won't tell you what to leave out, and it won't answer for the result. I do both. AI agents write most of my code, to my rules, style guides and standards. I oversee the work, and every week I review the code and the agents' sessions for anything slow or wasteful."
+  "AI writes code. It doesn't own your product. It won't hire and lead your team, choose the cheapest way to run it, tell you when an idea won't pay off, or answer for the result. I do all of that, and AI agents write most of my code, to my rules and standards, with a weekly review of the code and the agents' work."
 
 /** The section's link to the full comparison on /why-not-just-ai. */
 export const HOME_AI_LINK_LABEL =

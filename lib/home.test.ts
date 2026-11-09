@@ -1,5 +1,10 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
-import { HOME_LEAD, homeDescription, META_DESCRIPTION_MAX } from "./home.ts"
+import {
+  HOME_LEAD,
+  HOME_SHORT_DESCRIPTION,
+  homeDescription,
+  META_DESCRIPTION_MAX,
+} from "./home.ts"
 
 Deno.test("the home meta description fits a search result", () => {
   const text = homeDescription()
@@ -9,6 +14,11 @@ Deno.test("the home meta description fits a search result", () => {
   )
 })
 
-Deno.test("the home meta description is the lead a visitor reads", () => {
-  assertEquals(homeDescription(), HOME_LEAD)
+Deno.test("the home meta description is the lead when it fits, else the short description", () => {
+  assertEquals(
+    homeDescription(),
+    HOME_LEAD.length <= META_DESCRIPTION_MAX
+      ? HOME_LEAD
+      : HOME_SHORT_DESCRIPTION,
+  )
 })

@@ -168,14 +168,14 @@ export default define.page(function Home(ctx) {
               </span>
               <span
                 data-home-h1-claim
-                class="block text-4xl lg:text-5xl leading-tight"
+                class="block text-[2.5rem] lg:text-5xl leading-tight"
               >
                 {HOME_H1_CLAIM}
               </span>
             </h1>
             <p
               data-home-lead
-              class="mt-5 max-w-[36rem] text-lg text-graphite leading-relaxed text-pretty"
+              class="mt-5 max-w-[36rem] text-base lg:text-lg text-graphite leading-relaxed text-pretty"
             >
               {HOME_LEAD}
             </p>
