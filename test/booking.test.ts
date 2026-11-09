@@ -14,7 +14,7 @@ import { catalogItem, INTRO_CALL } from "../lib/catalog.ts"
 import { TIMEZONE_LABEL } from "../lib/config.ts"
 import { ROLE } from "../lib/head.ts"
 import { promise } from "../lib/promises.ts"
-import { testimonial } from "../lib/testimonials.ts"
+import { contactTestimonialId, testimonial } from "../lib/testimonials.ts"
 import { INITIAL_EMBED_HEIGHT_PX } from "../islands/MeetEmbed.tsx"
 import { BOOK_LABEL } from "../lib/nav.ts"
 
@@ -208,8 +208,8 @@ Deno.test("the booking page says what follows the call, quotes one client and of
       )
     }
     assert(
-      text.includes(testimonial("roley-2").excerpt),
-      "/book: the roley-2 quote is missing",
+      text.includes(testimonial(contactTestimonialId).excerpt),
+      `/book: the ${contactTestimonialId} quote is missing`,
     )
     assert(text.includes("Prefer writing?"))
     // Under "Prefer writing?" the form's own heading is hidden, so the phrase

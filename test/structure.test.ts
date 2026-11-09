@@ -12,7 +12,17 @@ import {
   railColumn,
   visibleText,
 } from "./html.ts"
-import { HOME_LEAD } from "../lib/home.ts"
+import {
+  HOME_AI_ANSWER,
+  HOME_CAPACITY,
+  HOME_H1_CLAIM,
+  HOME_H1_NAME,
+  HOME_LEAD,
+  HOME_VIDEO_ID,
+  HOME_VIDEO_LABEL,
+  HOME_VIDEO_LENGTH,
+  homeProofLine,
+} from "../lib/home.ts"
 import { BRIEF_LABEL } from "../lib/nav.ts"
 import {
   catalogItems,
@@ -27,6 +37,7 @@ import { visibleTestimonials } from "../lib/testimonials.ts"
 import { MAX_FAQS } from "../lib/faqs.ts"
 import { promises } from "../lib/promises.ts"
 import { redirectTable, redirectTarget } from "../lib/redirects.ts"
+import { WHY_NOT_JUST_AI_PATH } from "../lib/why-not-just-ai.ts"
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -238,7 +249,7 @@ siteTest(
 // to a URL — issue #156 replaced the previous behaviour of rendering it
 // anyway with an empty `href`.
 Deno.test(
-  "the home page puts proof before price in seven sections, with one primary call to action",
+  "the home page puts reviews under the hero, the AI answer next and price last, in seven sections, with one primary call to action",
   async () => {
     const previous = Deno.env.get("SCHEDULE_URL")
     Deno.env.set("SCHEDULE_URL", "https://meet.example.com")
@@ -246,8 +257,9 @@ Deno.test(
     try {
       const html = await site.html("/")
       const main = mainContent(html)
-      // Proof before price, the ask after both (#529); "testimonials"
-      // shows only while a review is cleared for the site.
+      // Reviews under the hero, then the AI answer, proof before price and
+      // the ask after both (#529, #615); "testimonials" shows only while a
+      // review is cleared for the site. The tools section left home in #615.
       assertEquals(
         [...main.matchAll(/<section[^>]*data-home-section="([^"]*)"/g)].map((
           m,
@@ -255,14 +267,14 @@ Deno.test(
         visibleTestimonials().length > 0
           ? [
             "hero",
-            "work",
             "testimonials",
+            "why-ai",
+            "work",
             "how-it-works",
             "services",
-            "tools",
             "cta",
           ]
-          : ["hero", "work", "how-it-works", "services", "tools", "cta"],
+          : ["hero", "why-ai", "work", "how-it-works", "services", "cta"],
       )
       assert(
         count(main, /<section[\s>]/g) <= 7,
@@ -302,7 +314,7 @@ Deno.test(
 )
 
 siteTest(
-  "the home lead is one sentence that the page, the Person JSON-LD and llms.txt share",
+  "the home lead is the text that the page, the Person JSON-LD and llms.txt share",
   async (site) => {
     const html = await site.html("/")
     const lead = html.match(/<p[^>]*data-home-lead[^>]*>([\s\S]*?)<\/p>/)
@@ -314,6 +326,40 @@ siteTest(
         | undefined
     assert(person?.description.includes(HOME_LEAD), person?.description)
     assert((await site.html("/llms.txt")).includes(HOME_LEAD), "llms.txt")
+  },
+)
+
+siteTest(
+  "the home hero shows the Upwork proof line and the two-client limit instead of a fact card",
+  async (site) => {
+    const html = await site.html("/")
+    const start = html.indexOf('data-home-section="hero"')
+    const hero = html.slice(start, html.indexOf("</section>", start))
+    const text = visibleText(hero)
+    assert(text.includes(homeProofLine()), text)
+    assert(text.includes(HOME_CAPACITY), text)
+    assert(!text.includes("At a glance"), "the fact card is back")
+  },
+)
+
+siteTest(
+  "the home AI section links the full comparison and never says Anton checks every change himself",
+  async (site) => {
+    const html = await site.html("/")
+    const start = html.indexOf('data-home-section="why-ai"')
+    assert(start > 0, "no why-ai section")
+    const section = html.slice(start, html.indexOf("</section>", start))
+    assert(
+      section.includes(`href="${WHY_NOT_JUST_AI_PATH}"`),
+      "no comparison link",
+    )
+    assert(section.includes('href="#audit-form"'), "no team set-up link")
+    const text = visibleText(mainContent(html))
+    assert(text.includes(HOME_AI_ANSWER), "the short answer is missing")
+    assert(
+      !/\bI (read|test|review|check)\b[^.]*every change/i.test(text),
+      "the home page says Anton checks every change himself",
+    )
   },
 )
 
@@ -936,14 +982,14 @@ siteTest(
 )
 
 siteTest(
-  "the home page has one H1 that holds the name, and all four catalog prices in the services section, not the hero",
+  "the home page has one H1 that holds the name, the role and the claim, and all four catalog prices in the services section, not the hero",
   async (site) => {
     const html = await site.html("/")
     assertEquals(count(html, /<h1[\s>]/g), 1)
     const h1 = visibleText(
       html.slice(html.indexOf("<h1"), html.indexOf("</h1>")),
     )
-    assert(h1.includes("Anton Shubin") && h1.includes("Tech Lead"), h1)
+    assertEquals(h1, `${HOME_H1_NAME} ${HOME_H1_CLAIM}`)
     const section = (id: string) => {
       const start = html.indexOf(`data-home-section="${id}"`)
       assert(start > 0, `no ${id} section`)
@@ -994,25 +1040,40 @@ siteTest(
 )
 
 siteTest(
-  "the home page portrait is the one eager image and its <img> holds no photo URL",
+  "the home video poster is the one eager image, its <img> holds no poster URL, and no request goes to YouTube before a press",
   async (site) => {
     const html = await site.html("/")
-    const media = html.slice(html.indexOf("data-hero-media"))
-    const img = media.match(/<img[^>]*>/)![0]
-    assert(img.includes('fetchpriority="high"'), img)
+    const start = html.indexOf("data-home-video")
+    assert(start > 0, "no video in the hero")
+    const video = html.slice(start, html.indexOf("Watch on YouTube", start))
+    const eager = video.match(/<img[^>]*fetchpriority="high"[^>]*>/)?.[0]
+    assert(eager, "the poster is not the high-priority image")
     assert(
-      !/photo-(big|mobile)/.test(img),
-      `a phone would fetch the photo: ${img}`,
+      !/video-poster/.test(eager),
+      `a phone would fetch the large poster: ${eager}`,
     )
-    assert(/<source[^>]*min-width: 1024px/.test(media), "no 1024px source")
-    // The photo is 2:3 cut to 4:3: the /about crop keeps the face and
-    // shoulders, a top crop cuts them off.
     assert(
-      img.includes("object-[50%_30%]"),
-      `portrait crop differs from /about: ${img}`,
+      /<source[^>]*min-width: 1024px[^>]*video-poster/.test(video),
+      "no 1024px poster source",
     )
-    const main = mainContent(html)
-    assertEquals(count(main, /fetchpriority="high"/g), 1)
+    assert(
+      /<img[^>]*video-poster[^>]*loading="lazy"/.test(video),
+      "the phone thumbnail is not lazy",
+    )
+    assert(
+      video.includes(`href="https://www.youtube.com/shorts/${HOME_VIDEO_ID}"`),
+      "the facade does not link the short on YouTube",
+    )
+    assert(
+      video.includes(`aria-label="${HOME_VIDEO_LABEL}. ${HOME_VIDEO_LENGTH}"`),
+      "the play link has no name",
+    )
+    assert(!/<iframe/.test(video), "the player renders before a press")
+    assert(
+      !/photo-(big|mobile)/.test(mainContent(html)),
+      "the portrait is back",
+    )
+    assertEquals(count(mainContent(html), /fetchpriority="high"/g), 1)
   },
 )
 

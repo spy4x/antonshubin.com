@@ -351,26 +351,39 @@ pointing at its page's `#project` node, with no review markup.
 
 ### Home page and shared pieces
 
-`routes/index.tsx` (#269, redesigned in #529) puts proof before price and the
-ask after both. The hero holds a two-line `<h1>` (name small, `ROLE` large), the
-one-sentence lead (`lib/home.ts`'s `HOME_LEAD`, which the meta description, the
-Person JSON-LD, the sitemap comment and both llms files read too), Book and
-"Send a written brief", the three promises with "How these work" and the Upwork
-line, beside the "At a glance" `FactCard` (portrait, the Upwork figures,
-Expert-Vetted, Team, About), as tall as the text column from 1024px and after
-the actions at 390px. Then Client work (three picture cards through
-`components/CardPicture.tsx`, shared with `/work`), Client reviews, "How a
-project runs", Services and prices (four cards, `PRICING_RULE`), the tools
-(three `ToolCard`s and one writing line) and the closing band with the brief
-form. Every section under the hero is `HomeSection`: the H2 left and its one
-"All …" link on the same baseline on the right from 1024px, under the content at
-390px. Book appears twice, in the hero and in the band. The portrait renders
-only from 1024px: its `<img>` holds a blank pixel until a `min-width: 1024px`
-`<source>` matches, so a phone requests no portrait, and it is the page's one
-eager, `fetchpriority="high"` image. Reuse these rather than making a copy:
+`routes/index.tsx` (#269, redesigned in #529, reframed in #615) sells Anton as
+the technical partner who takes the whole software side off a founder's plate
+(every claim backed by a review), puts proof before price and the ask after all
+of it. The hero holds a two-line `<h1>` (`lib/home.ts`'s `HOME_H1_NAME` small,
+`HOME_H1_CLAIM` large), the lead (`HOME_LEAD`, which the Person JSON-LD, the
+sitemap comment and both llms files read too; the meta description is the lead
+when it fits 160 characters, else `HOME_SHORT_DESCRIPTION`), Book and "Send a
+written brief", the video, then the proof line (`homeProofLine()`, with the
+`upwork-profile` note), the capacity line (`HOME_CAPACITY`), the three promises
+with "How these work" and the Upwork line. The video is `islands/HomeVideo.tsx`,
+a click-to-load facade for `HOME_VIDEO_ID` (a placeholder short until #619;
+`HOME_VIDEO_LABEL` and `HOME_VIDEO_CAPTION` change with it): a link to the short
+on youtube.com, upgraded after hydration to a `youtube-nocookie.com` player with
+focus moved into it and the `video` event, and "Watch on YouTube" always under
+it. From 1024px it takes the right column over both hero rows, 9:16 and 300px
+wide, and its poster (`static/img/home/video-poster.webp`) is the page's one
+eager, `fetchpriority="high"` image, held as a blank pixel until a
+`min-width: 1024px` `<source>` matches; at 390px it is a row after the actions
+with a lazy 96px thumbnail, so the H1 stays the first screen's largest paint.
+DOM order is visual order. No portrait on home (it stays on `/about`), no
+`VideoObject` until the real video exists. Then Client reviews
+(`homeTestimonialIds`), "Why not just use AI?" (the short answer, the link to
+`/why-not-just-ai` and the team set-up line to the brief; no FAQ markup), Client
+work (three picture cards through `components/CardPicture.tsx`, shared with
+`/work`), "How a project runs", Services and prices (four cards, `PRICING_RULE`)
+and the closing band with the brief form. The tools are not on home; the rail
+links them. Every section under the hero is `HomeSection`: the H2 left and its
+one link on the same baseline on the right from 1024px, under the content at
+390px. Book appears twice, in the hero and in the band. Reuse these rather than
+making a copy:
 
 - `components/FactCard.tsx`: the fact card's box plus `Fact` rows, used by the
-  project page's card and the home card.
+  project page's card and the price and answer cards.
 - `components/PromiseTimeline.tsx`: the five promises as a timeline (`variant`
   `compact` or `full`, `headingLevel` 2 or 3), no icons, no accent.
 - `components/ClosingBand.tsx`: the band that ends a page (its `children` slot
@@ -382,17 +395,17 @@ eager, `fetchpriority="high"` image. Reuse these rather than making a copy:
 Shubin" and a lead line, then the portrait (the page's one eager,
 `fetchpriority="high"` image, cropped to 4:3) and a sticky `FactCard` with Book
 in the right column, first at 390px. The main column holds the career in four
-dated steps, two client reviews (`gopingu-1`, `connectful-2`, quoted nowhere
-else), what Anton runs himself, one paragraph about life outside work, and how
-to pay; `ClosingBand` ends the page. Book appears in the card and the band only.
-The story, the page name and the meta description live in `lib/about.ts`, which
-`/llms-full.txt` and `deno task og` read too; the city is `lib/config.ts`'s
-`LOCATION`. The story leaves out the 2022 post's income figures, the loan, the
-80/20 split and the "leave freelance" goal, and `lib/about.test.ts` fails if one
-comes back. `/about` carries the site's only `ProfilePage` JSON-LD
-(`components/SEOHead.tsx`); `/` carries a `WebPage` about the Person instead.
-`test/about.test.ts` checks the built page and that no other sitemap page has a
-`ProfilePage`. It is linked from the phone More sheet, the home fact card and a
+dated steps, two client reviews (`corecircle-1`, `foodrazor-2`, quoted nowhere
+else but their own project pages), what Anton runs himself, one paragraph about
+life outside work, and how to pay; `ClosingBand` ends the page. Book appears in
+the card and the band only. The story, the page name and the meta description
+live in `lib/about.ts`, which `/llms-full.txt` and `deno task og` read too; the
+city is `lib/config.ts`'s `LOCATION`. The story leaves out the 2022 post's
+income figures, the loan, the 80/20 split and the "leave freelance" goal, and
+`lib/about.test.ts` fails if one comes back. `/about` carries the site's only
+`ProfilePage` JSON-LD (`components/SEOHead.tsx`); `/` carries a `WebPage` about
+the Person instead. `test/about.test.ts` checks the built page and that no other
+sitemap page has a `ProfilePage`. It is linked from the phone More sheet and a
 top line on the 2022 post.
 
 ### Infrastructure page
@@ -514,7 +527,7 @@ offers the new-tab link and `#brief`. "Open the calendar in a new tab"
 (`NEW_TAB_LABEL`) is the one wording for the scheduler's own page. A `FactCard`
 side panel (portrait, `ROLE`, `TIMEZONE_LABEL`, email, Telegram, Upwork, the
 invoicing line) sits beside the calendar from 1024px and after it at 390px; then
-"After the call" (through `promise()`), the `roley-2` quote and the brief
+"After the call" (through `promise()`), the `connectful-2` quote and the brief
 (`#brief`). The brief's `LeadForm` gets `calendarAbove="#book"`, so its success
 panel points up instead of rendering a second calendar; on `/` the success panel
 mounts its calendar only after a submit, so a home view never loads the
@@ -575,10 +588,14 @@ posts, "Already built it with AI?", three projects with `StatusMark`, five
 questions (also the `FAQPage`; hourly billing while the agents work is #516) and
 `ClosingBand` with the ownership and bug-fix promises, since the last answer
 already gives the refund and the first milestone. `lib/why-not-just-ai.ts` holds
-the wording; promises come through `promise()`. The footer's Site group alone
-lists it (`lib/nav.ts`'s `WHY_NOT_JUST_AI`), not the rail or the More sheet. In
-the page body, `WHY_NOT_JUST_AI_PROMPT` and `WHY_NOT_JUST_AI_LINK_LABEL` link it
-from the home page (under the prices), `/catalog` (under the services),
+the wording; promises come through `promise()`. The comparison table says
+"Checked on" `COMPARISON_CHECKED_ON`; bump it when a row changes. No sentence on
+the site says Anton reviews every change himself: a reviewer agent does, and he
+reviews the code and the agents' sessions weekly (`WEEKLY_AUDIT`). The footer's
+Site group alone lists it (`lib/nav.ts`'s `WHY_NOT_JUST_AI`), not the rail or
+the More sheet. The home page's "Why not just use AI?" section links it with
+`HOME_AI_LINK_LABEL`. In the page body, `WHY_NOT_JUST_AI_PROMPT` and
+`WHY_NOT_JUST_AI_LINK_LABEL` link it from `/catalog` (under the services),
 `/how-i-work`'s AI paragraph and the service pages in `WHY_NOT_JUST_AI_SERVICES`
 (the MVP and Ongoing pages, under "Who this is for"). The /how-i-work pricing
 answer links straight to the hourly question (`#faq-hourly-while-ai-works`, "How

@@ -39,6 +39,8 @@ const EXCEPTIONS: Record<string, string> = {
     "the form's submit button sends the brief, it does not open it",
   "/ | Send my brief":
     "the form's submit button sends the brief, it does not open it",
+  "/ | Ask about a team set-up":
+    "the team set-up line's own ask (#615): a brief about a different offer than the call",
   "/pay | From outside US? Contact me":
     "a payment question, not a booking; it links the page that lists email and Telegram",
   "/tools | Open the booking page":
