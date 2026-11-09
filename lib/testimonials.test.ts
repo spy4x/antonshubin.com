@@ -119,8 +119,8 @@ Deno.test("every real testimonial links its source and is cleared for the site",
   assertEquals(visibleTestimonials(testimonials), testimonials)
 })
 
-Deno.test("the home page shows Roley, Corecircle and FoodRazor, one review each", () => {
-  assertEquals(homeTestimonialIds, ["roley-1", "corecircle-1", "foodrazor-2"])
+Deno.test("the home page shows Roley, Connectful and Gopingu, one review each", () => {
+  assertEquals(homeTestimonialIds, ["roley-2", "connectful-2", "gopingu-1"])
   const slugs = homeTestimonialIds.map((id) => testimonial(id).projectSlug)
   assertEquals(
     new Set(slugs).size,
@@ -141,6 +141,13 @@ Deno.test("the About page quotes no review the home page or /book already shows"
     assert(!homeTestimonialIds.includes(id), `${id} is on the home page too`)
     assert(id !== contactTestimonialId, `${id} is on /book too`)
   }
+})
+
+Deno.test("/book quotes no review the home page already shows", () => {
+  assert(
+    !homeTestimonialIds.includes(contactTestimonialId),
+    `${contactTestimonialId} is on the home page too`,
+  )
 })
 
 Deno.test("microwork's four reviews come back first contract first", () => {
