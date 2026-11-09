@@ -146,7 +146,7 @@ for (
       await recordUmami(page)
       // The test runs offline: every YouTube request is counted and refused.
       const youtube: string[] = []
-      await page.route(/youtube/, (route) => {
+      await page.route(/youtube|ytimg/, (route) => {
         youtube.push(route.request().url())
         return route.abort()
       })
