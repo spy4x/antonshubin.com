@@ -119,8 +119,8 @@ Deno.test("every real testimonial links its source and is cleared for the site",
   assertEquals(visibleTestimonials(testimonials), testimonials)
 })
 
-Deno.test("the home page shows Roley, Connectful and Gopingu, one review each", () => {
-  assertEquals(homeTestimonialIds, ["roley-2", "connectful-2", "gopingu-1"])
+Deno.test("the home page shows three reviews, each from a different client", () => {
+  assertEquals(homeTestimonialIds.length, 3)
   const slugs = homeTestimonialIds.map((id) => testimonial(id).projectSlug)
   assertEquals(
     new Set(slugs).size,

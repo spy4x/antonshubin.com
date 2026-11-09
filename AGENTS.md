@@ -351,11 +351,13 @@ pointing at its page's `#project` node, with no review markup.
 
 ### Home page and shared pieces
 
-`routes/index.tsx` (#269, redesigned in #529, reframed in #615) sells judgement
-first, puts proof before price and the ask after all of it. The hero holds a
-two-line `<h1>` (`lib/home.ts`'s `HOME_H1_NAME` small, `HOME_H1_CLAIM` large),
-the one-sentence lead (`HOME_LEAD`, which the meta description, the Person
-JSON-LD, the sitemap comment and both llms files read too), Book and "Send a
+`routes/index.tsx` (#269, redesigned in #529, reframed in #615) sells Anton as
+the technical partner who takes the whole software side off a founder's plate
+(every claim backed by a review), puts proof before price and the ask after all
+of it. The hero holds a two-line `<h1>` (`lib/home.ts`'s `HOME_H1_NAME` small,
+`HOME_H1_CLAIM` large), the lead (`HOME_LEAD`, which the Person JSON-LD, the
+sitemap comment and both llms files read too; the meta description is the lead
+when it fits 160 characters, else `HOME_SHORT_DESCRIPTION`), Book and "Send a
 written brief", the video, then the proof line (`homeProofLine()`, with the
 `upwork-profile` note), the capacity line (`HOME_CAPACITY`), the three promises
 with "How these work" and the Upwork line. The video is `islands/HomeVideo.tsx`,
@@ -525,7 +527,7 @@ offers the new-tab link and `#brief`. "Open the calendar in a new tab"
 (`NEW_TAB_LABEL`) is the one wording for the scheduler's own page. A `FactCard`
 side panel (portrait, `ROLE`, `TIMEZONE_LABEL`, email, Telegram, Upwork, the
 invoicing line) sits beside the calendar from 1024px and after it at 390px; then
-"After the call" (through `promise()`), the `roley-1` quote and the brief
+"After the call" (through `promise()`), the `connectful-2` quote and the brief
 (`#brief`). The brief's `LeadForm` gets `calendarAbove="#book"`, so its success
 panel points up instead of rendering a second calendar; on `/` the success panel
 mounts its calendar only after a submit, so a home view never loads the
