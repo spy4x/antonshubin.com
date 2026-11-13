@@ -6,7 +6,7 @@ tldr:
   - "AI made typing code cheap. Deciding what to build, checking the code and running it in production cost about what they did."
   - "Sign-in, payments, admin and deploy take two to four weeks from scratch. A SaaS starter cuts that to a day or two."
   - "Budget for running costs too: a server, payment fees, email, and someone fixing things after launch."
-intro: "Every founder asks me this, and most cost articles answer it with \"$10k to $250k, it depends\", which helps nobody. So here is the breakdown I actually use, with a calculator you can try on your own idea, and the costs nobody mentions until the first invoice from Stripe."
+intro: "It is the first question most founders ask, and most cost articles answer it with \"$10k to $250k, it depends\", which helps nobody. So here is the breakdown I actually use, with a calculator you can try on your own idea, and the costs nobody mentions until the first invoice from Stripe."
 coverImage: "/img/blog/how-much-does-a-saas-mvp-cost/cover.png"
 coverAlt: "Gru's Plan meme. Gru's board says \"Build a simple MVP\", then \"Add teams, AI and a phone app\", then \"Quote: past $60,000\" twice, and the second time he stares at it."
 coverSize: "700x449"
@@ -127,8 +127,7 @@ If your number came out scary, good: you found out here, for free, and not in
 week nine. Go back and untick something. The first version almost always has an
 extra that can wait for real users to ask for it.
 
-For the record, my own prices are on my [services page](/catalog). They follow
-the same arithmetic.
+For the record, my own prices are on my [services page](/catalog).
 
 ## What did AI change in 2027?
 
@@ -162,10 +161,10 @@ it happens a lot.
 There's no single right answer. Here's an honest comparison, with prices checked
 on 13 November 2026.
 
-- **No-code (Bubble):** [$32 to $349 a month][bubble] for web plans billed
-  yearly, plus usage, plus your own time. Best when you want to test demand and
-  you're happy to learn the tool. Watch out: you can't take the code with you if
-  you outgrow it.
+- **No-code (Bubble):** [from about $30 a month][bubble] for a web plan, plus
+  usage, plus your own time. Best when you want to test demand and you're happy
+  to learn the tool. Watch out: you can't take the code with you if you outgrow
+  it.
 - **AI app builder (Lovable):** [about $25 a month][lovable] and your evenings.
   Best for a prototype to show investors or first users. Watch out for the last
   20%: payments, security, data.
@@ -189,10 +188,10 @@ the cheapest for somebody.
 The build is a one-time bill. These come every month:
 
 - **A server.** A small cloud server at Hetzner
-  [starts at €5.49 a month][hetzner]. With a staging copy and backups, my rule
-  of thumb is €20 to €50 for an early product. If someone suggests a setup
-  billed per request with no spending cap, ask what happens when a bot finds
-  your sign-up form.
+  [starts at €5.49 a month][hetzner] before VAT. With a staging copy and
+  backups, my rule of thumb is €20 to €50 for an early product. If someone
+  suggests a setup billed per request with no spending cap, ask what happens
+  when a bot finds your sign-up form.
 - **Payment fees.** Stripe takes [2.9% + 30¢][stripe] per US card payment, plus
   0.7% for subscriptions through Stripe Billing. On a $20 subscription, that's
   about $1 a month per customer. Not a reason to skip payments; a reason to

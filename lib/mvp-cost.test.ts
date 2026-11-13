@@ -1,12 +1,52 @@
 import { assertEquals, assertThrows } from "jsr:@std/assert@^1"
 import {
+  ALWAYS,
+  CORE_SIZES,
   DEFAULT_INPUT,
   estimate,
   estimateLine,
+  EXTRAS,
+  FOUNDATION,
   mvpCostMarkdown,
+  usd,
 } from "./mvp-cost.ts"
 
-Deno.test("the default case matches the numbers the post's prose gives", () => {
+/** The post's text with every run of whitespace made one space. */
+async function postText(): Promise<string> {
+  const md = await Deno.readTextFile(
+    "content/blog/how-much-does-a-saas-mvp-cost.md",
+  )
+  return md.replace(/\s+/g, " ")
+}
+
+Deno.test("the post's tables and worked examples match lib/mvp-cost.ts", async () => {
+  const text = await postText()
+  const has = (part: string) =>
+    assertEquals(text.includes(part), true, `the post lacks "${part}"`)
+  for (const p of FOUNDATION) {
+    has(`| ${p.label} | ${p.days.low}–${p.days.high} days |`)
+  }
+  const low = FOUNDATION.reduce((n, p) => n + p.days.low, 0)
+  const high = FOUNDATION.reduce((n, p) => n + p.days.high, 0)
+  has(`| **${low}–${high} days** |`)
+  for (const e of EXTRAS) has(`| ${e.label} | ${e.days.low}–${e.days.high} |`)
+  for (const c of CORE_SIZES) has(`${c.days.low} to ${c.days.high}`)
+  has(`Add ${ALWAYS.days.low} to ${ALWAYS.days.high} days to every build`)
+  const d = estimate(DEFAULT_INPUT)
+  has(
+    `${d.days.low} to ${d.days.high} working days. That's ${d.weeks.low} to ${d.weeks.high} weeks, or ${
+      usd(d.usd.low)
+    } to ${usd(d.usd.high)} at $${DEFAULT_INPUT.rate} an hour`,
+  )
+  const s = estimate({ ...DEFAULT_INPUT, starter: true })
+  has(
+    `${s.days.low} to ${s.days.high} days: ${s.weeks.low} to ${s.weeks.high} weeks, ${
+      usd(s.usd.low)
+    } to ${usd(s.usd.high)}`,
+  )
+})
+
+Deno.test("the default case gives the calculator's first result", () => {
   const e = estimate(DEFAULT_INPUT)
   assertEquals(e.days, { low: 28, high: 56 })
   assertEquals(estimateLine(e), "6–12 weeks, $16,800–$33,600")

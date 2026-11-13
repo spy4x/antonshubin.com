@@ -54,7 +54,7 @@ export default function MvpCostCalculator({ post }: { post: string }) {
       live={live.value}
       title="Price your own MVP"
       lead="Pick what your first version needs. The ranges are my rules of thumb, not a quote."
-      noScriptNote="Turn on JavaScript to pick parts. The table above has every estimate."
+      noScriptNote="Turn on JavaScript to pick parts. Every range is in the text above."
       caption="One senior developer with AI tools, 8-hour days. Your picks stay in this page."
     >
       <div class="flex flex-col gap-6">
