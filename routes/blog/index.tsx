@@ -54,6 +54,7 @@ function PostRow(
             {postDate(article.publishedAt)}
           </time>{" "}
           · {article.readTime} min read
+          {article.youtubeVideoId && " · Video"}
         </p>
         <h3 class="mt-1 text-xl text-parchment">
           <a

@@ -86,7 +86,7 @@ draft against the brief before the pull request opens.
    relatedTool: "mig" # optional; a lib/tools.ts slug
    catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
    seoTitle: "Short title" # optional; <title> only, for a title over 55 characters
-   youtubeVideoId: "abc123" # optional
+   youtubeVideoId: "abc123" # optional; its /blog row then says "Video"
    utmCampaign: "short-campaign" # optional; defaults to the slug (docs/utm.md)
    ---
    ```
