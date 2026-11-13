@@ -195,7 +195,9 @@ Deno.test("the full llms list carries every post's TL;DR, the short list none", 
 
 Deno.test("a founder post ends with Book and a post of any other topic with the newsletter", () => {
   assertEquals(postAsk(post("x", { topic: "founders" })), "book")
-  for (const topic of ["ai-mcp", "self-hosting", "scars"] as const) {
+  for (
+    const topic of ["developers", "ai-mcp", "self-hosting", "scars"] as const
+  ) {
     assertEquals(postAsk(post("x", { topic })), "newsletter")
   }
 })
