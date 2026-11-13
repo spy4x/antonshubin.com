@@ -25,7 +25,9 @@ small paid audit before you hand over production.
 This post is for a founder who built an MVP with Lovable, Bolt, Cursor or Claude
 and now needs a senior developer to continue. I am one of those developers: I
 take over apps like yours, and I sell the audit this post recommends. I'll say
-where that matters, and every check below works on me too.
+where that matters, and every check below works on me too. If you are still
+pricing the next stage, start with
+[what a SaaS MVP costs in 2027](/blog/how-much-does-a-saas-mvp-cost).
 
 ## What are you really hiring for?
 
