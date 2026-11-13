@@ -112,12 +112,12 @@ self-irony:
 
 ## How a post closes
 
-- A short push to act, not a summary: "Make yourself a 24h hackathon, develop a
-  single-feature MVP, and just" ship it.
-- An invitation: a question to the reader, or a pointer to subscribe for the
-  next part.
-- Skip "In conclusion," and a paragraph that repeats the post; the reader has
-  just read it.
+The rule is the global `blog-post` skill, section 5 "Voice", and what the page
+ends with is in AGENTS.md "Blog posts". Two shapes from Anton's own posts:
+
+- A short push to act on the post's own advice, not a summary: "Make yourself a
+  24h hackathon, develop a single-feature MVP, and just" ship it.
+- A question to the reader, or a pointer to the next part.
 
 ## Phrases to keep out of new drafts
 

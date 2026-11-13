@@ -148,8 +148,8 @@ export default define.page(function Privacy(ctx) {
           </p>
           <p>
             A blog post with an embedded video loads it from YouTube when you
-            scroll to it. A project page loads its video from YouTube only when
-            you press play.
+            scroll to it. The home page and a project page load their video from
+            YouTube only when you press play.
           </p>
         </Section>
 

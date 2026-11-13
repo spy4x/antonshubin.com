@@ -8,6 +8,9 @@ tldr:
   - "Go deep in one niche instead of chasing hype, and don't delay starting your own project."
 publishedAt: "2022-06-07"
 readTime: 15
+coverImage: "/img/blog/from-office-job-to-freelance-to-my-startups/cover.png"
+coverAlt: "A chart of my career from 2011 to 2024 as three coloured waves: office job, then freelance, then my own projects."
+coverSize: "1000x618"
 topic: "founders"
 archived: true
 archiveNote: "Today most of my time goes to client work. The current story is on the About page."

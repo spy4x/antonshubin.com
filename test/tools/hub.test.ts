@@ -26,6 +26,7 @@ const ORDER = [
   "ts-libs",
   "zond",
   "financy",
+  "ringmaster",
   "caldav-tasks-web",
   "air-quality-sensor",
   "toread-today",

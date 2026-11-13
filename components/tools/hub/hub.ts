@@ -42,7 +42,7 @@ export const SECTIONS: HubSection[] = [
     id: "being-built",
     title: "Being built",
     kind: "line",
-    slugs: ["financy", "caldav-tasks-web"],
+    slugs: ["financy", "ringmaster", "caldav-tasks-web"],
   },
 ]
 

@@ -319,6 +319,11 @@ export interface Tool {
   knownIssue?: { text: string; link: ToolLink }
   /** One line under the post's title in "The story behind it". */
   storyLine?: string
+  /**
+   * The slug of the starter this tool is built on (`seed`): the facts card's
+   * "Built on" row links its page.
+   */
+  builtOn?: string
 }
 
 /**
@@ -346,7 +351,7 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
-    posts: ["mig-tiny-self-hosted-scheduler"],
+    posts: ["mig-tiny-self-hosted-scheduler", "code-audit-ai-built-app"],
     deployable: true,
     appCategory: "BusinessApplication",
     // "Use it if" and "Skip it if" are the README's own lines (#457).
@@ -485,6 +490,7 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
+    posts: ["oko-homelab-dashboard"],
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
@@ -533,7 +539,7 @@ export const tools: Tool[] = [
     kind: "service",
     status: "in-use",
     group: "tools",
-    posts: ["building-mcp-servers-with-deno"],
+    posts: ["building-mcp-servers-with-deno", "mcp-server-for-your-saas"],
     deployable: true,
     appCategory: "DeveloperApplication",
     useIf: [
@@ -857,7 +863,7 @@ export const tools: Tool[] = [
       },
     ],
     ci: { provider: "woodpecker", repoId: 13 },
-    posts: ["ai-coding-agent-setup"],
+    posts: ["ai-coding-agent-setup", "deno-fmt-lint-ci-and-ai-agents"],
     useIf: [
       "You want a working example of one rules source driving several AI coding agents.",
       "You want a Linux workstation set up by script.",
@@ -882,22 +888,162 @@ export const tools: Tool[] = [
   {
     slug: "financy",
     name: "Financy",
-    job: "self-hosted finance tracker for a person or a family",
+    job: "finance tracker for a person or a family, in any mix of currencies",
     summary:
-      "Self-hosted finance tracker for a person or a family — open source, work in progress, not ready for everyday use. Targets multi-currency accounts and group or family collaboration with role-based access; transfers between accounts follow double-entry principles.",
+      "A finance tracker for a person or a family, in any mix of currencies: every transaction keeps its original amount next to the converted one. Being rebuilt on Seed, the SaaS starter, and not ready for use yet. AGPL-3.0, to run on your own server; a paid cloud comes later.",
     kind: "app",
     status: "wip",
     group: "products",
     catalogSlug: "zero-to-production-saas-mvp",
-    deployable: true,
-    appCategory: "FinanceApplication",
-    dontUseIf: [
-      "You need something ready for everyday use: it is a work in progress.",
-    ],
     repo: "spy4x/financy",
     programmingLanguage: "TypeScript",
-    standing: "Being revived — work in progress, not ready for everyday use.",
     ci: { provider: "woodpecker", repoId: 1 },
+    builtOn: "seed",
+    headline: "Every currency, one total, for the whole household.",
+    lede:
+      "Financy is an open-source finance tracker for a person or a family, in any mix of currencies, being rebuilt in public on Seed. It is not ready to use yet; financy.dev shows what works today.",
+    pageTitle: "Financy: a finance tracker built on Seed",
+    live: { label: "Follow it on financy.dev", href: "https://financy.dev" },
+    hero: {
+      src: "/img/tools/financy/financy-dev.webp",
+      srcset:
+        "/img/tools/financy/financy-dev-640.webp 640w, /img/tools/financy/financy-dev.webp 1280w",
+      alt:
+        "The financy.dev home page in the dark theme: the line Financy is a free, open-source (AGPL-3.0) finance tracker for a person or a family, in any mix of currencies, Get notified and Follow the build on GitHub buttons, and a card Where the rebuild stands with what works today and what is being built now.",
+      width: 1280,
+      height: 800,
+    },
+    features: [
+      {
+        title: "Every currency, one total",
+        text:
+          "Accounts in any currency. Every transaction will keep its original amount next to the converted one, so a later exchange rate never rewrites your history.",
+      },
+      {
+        title: "Made for households",
+        text:
+          "Share a budget with your partner or family, each with their own role, and see every change live.",
+      },
+      {
+        title: "Yours to host, or ours",
+        text:
+          "Free and open source to run on your own server with Docker Compose, with a paid cloud later for people who would rather not.",
+      },
+    ],
+    fits: [
+      {
+        text:
+          "Rebuilt on Seed, the SaaS starter, so it has sign-in with two-factor authentication, households with roles, live updates, an app that works offline and an admin panel from day one.",
+        href: "/tools/seed",
+        planned: false,
+      },
+    ],
+    works: [
+      "Accounts in any currency",
+      "Categories with one level of subcategories",
+      "A monthly limit for each category",
+      "Sign-in with email, passkeys and two-factor authentication",
+      "Shared households: invite people and give each a role, from viewer to owner",
+      "Live updates on every device, and an app that opens offline",
+      "Export a household to a file, and import it again",
+      "The app and its website in nine languages",
+      "Running on your own server with Docker Compose",
+    ],
+    notYet: [
+      "Income and expenses, with the original amount kept (being built now)",
+      "Transfers between accounts, across currencies (being built now)",
+      "This month's money at a glance (being built now)",
+      "Bank statement import, later",
+      "The paid cloud, later: the same code, run for you",
+    ],
+    useIf: [
+      "You keep money in more than one currency and want one total.",
+      "You share a budget with a partner or family and want each person to have their own role.",
+    ],
+    dontUseIf: [
+      "You need something to use today: Financy is not ready yet.",
+      "You want it connected to your bank: Financy has no bank connection.",
+    ],
+  },
+  {
+    slug: "ringmaster",
+    name: "Ringmaster",
+    job: "runs Claude Code agents on GitHub issues",
+    summary:
+      "Runs Claude Code agents on GitHub issues unattended and shows what they did and what they cost. Each run takes one issue, a reviewer agent checks every change before it merges, and a daily budget caps the spend. Being rebuilt on Seed, the SaaS starter; it takes no new users and its source is not public yet.",
+    kind: "app",
+    status: "wip",
+    group: "products",
+    runtime: "My own machine, on my own Claude Code subscription",
+    builtOn: "seed",
+    usedFor: "Runs the agent work on my own projects.",
+    headline:
+      "AI agents on real GitHub issues, with a reviewer and a daily budget.",
+    lede:
+      "Ringmaster runs Claude Code agents on GitHub issues unattended: a reviewer agent checks every change before it merges, and a daily budget caps the spend. It is being rebuilt on Seed, the SaaS starter, and takes no new users yet.",
+    pageTitle: "Ringmaster: unattended Claude Code agents",
+    clip: {
+      title:
+        "Ringmaster's panel: today's budget, the last runs, and one run followed live",
+      caption:
+        "32\u00a0s, with captions and music: today's budget and how many issues merged per $100, the last 20 lead runs with status and cost, one project's runs and spend, a finished run's report and its pull request, then a running lead followed live with no reload. The figures are sample data.",
+      poster: {
+        src: "/video/tools/ringmaster/poster.webp",
+        srcset:
+          "/video/tools/ringmaster/poster-640.webp 640w, /video/tools/ringmaster/poster.webp 1280w",
+        alt:
+          "Ringmaster's panel in the dark theme, on sample data: the Today's budget card, four key-figure cards such as issues merged per $100, and the Lead runs table with each run's status and cost.",
+        width: 1280,
+        height: 800,
+      },
+      video: { duration: "PT32S", uploadDate: "2026-11-13" },
+    },
+    features: [
+      {
+        title: "One issue per run",
+        text:
+          "Each headless Claude Code run takes one GitHub issue, picked from the projects registered on the dashboard, within each project's agent limit.",
+      },
+      {
+        title: "A reviewer before every merge",
+        text: "A separate reviewer agent checks every change before it merges.",
+      },
+      {
+        title: "A daily budget",
+        text:
+          "A daily budget caps the spend, and the panel shows what each run did and what it cost.",
+      },
+    ],
+    fits: [
+      {
+        text:
+          "Being rebuilt on Seed, the SaaS starter; the current version keeps running until the handover.",
+        href: "/tools/seed",
+        planned: true,
+      },
+    ],
+    works: [
+      "One GitHub issue per run, as a headless Claude Code run",
+      "A reviewer agent before every merge",
+      "A daily budget that caps the spend",
+      "The next issues picked from the projects registered on the dashboard",
+      "Every Claude Code transcript kept in the run database",
+      "A daily retro and digest",
+      "The new panel on Seed: today's budget, the last 20 runs, spend per project, and a run's page that follows a running agent live",
+    ],
+    notYet: [
+      "Sign-ups: only I sign in",
+      "Its source, which will open under AGPL-3.0, free to run on your own server",
+      "A hosted cloud, after that",
+    ],
+    useIf: [
+      "Your team works from GitHub issues and wants AI agents to take some of them, with a reviewer and a daily budget.",
+      "You want me to set up the same workflow on your repositories, with your rules and your budget.",
+    ],
+    dontUseIf: [
+      "You want to install it yourself today: it takes no new users and its source is not public yet.",
+      "Your team's work is not tracked in GitHub issues: each run starts from one.",
+    ],
   },
   {
     slug: "seed",
@@ -911,7 +1057,12 @@ export const tools: Tool[] = [
     status: "wip",
     group: "products",
     catalogSlug: "zero-to-production-saas-mvp",
-    posts: ["seed-saas-starter", "trail-code-claude-code-test"],
+    posts: [
+      "seed-saas-starter",
+      "migrate-from-deno-to-node-and-bun",
+      "trail-code-claude-code-test",
+      "passkey-autofill-bitwarden-tab-focus",
+    ],
     useIf: [
       "You are starting a SaaS where people share data in groups.",
       "You want to own the server and the code.",

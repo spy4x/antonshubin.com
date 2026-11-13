@@ -7,6 +7,9 @@ tldr:
   - "The more detail you give it, the better its feedback; it helped me avoid unnecessary complexity at the MVP stage."
 publishedAt: "2023-04-18"
 readTime: 5
+coverImage: "/img/blog/how-chatgpt-can-help-you-design-system-architecture/cover.png"
+coverAlt: "A drawing of a robot standing at a whiteboard of connected boxes, with thought bubbles full of more diagrams above its head."
+coverSize: "1000x1000"
 topic: "ai-mcp"
 youtubeVideoId: "Ri3TLTKvSYQ"
 ---

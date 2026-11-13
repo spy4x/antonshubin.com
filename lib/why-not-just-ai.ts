@@ -30,7 +30,7 @@ export const WHY_NOT_JUST_AI_H1 = "Why hire me instead of an AI subscription?"
 
 /** The answer in one paragraph: the line answer engines quote. */
 export const WHY_NOT_JUST_AI_LEAD =
-  "An AI subscription writes code. I decide what to build, make sure every change is reviewed, run it in production and answer for the result. I use the same AI tools every day, so you get their speed too."
+  "An AI subscription writes code. I take the whole software side off your plate: I decide what to build and what to leave out, set the rules the AI works to, hire and lead the team when you need one, run it in production and answer for the result."
 
 /**
  * The sentence and link label other pages use to point here (the home page,
@@ -64,7 +64,7 @@ export const ENOUGH_INTRO = "Often it is, and then you don't need me yet."
 export const ENOUGH_CASES: string[] = [
   "You want a clickable prototype to show a few potential customers.",
   "It is a landing page, an internal tool or a script that nobody's money or data depends on.",
-  "You are an engineer with the time to review every change yourself.",
+  "You are an engineer with the time to set the rules and check the agents' work yourself.",
   "You are still finding out whether anyone wants the product.",
 ]
 export const ENOUGH_CLOSING =
@@ -80,7 +80,7 @@ export const COMPARISON_PRODUCTS = [
  * When the table was last checked against how I work: the spec's date, as a
  * UTC midnight that the page formats in UTC, so no server time zone moves it.
  */
-export const COMPARISON_CHECKED_ON = new Date(Date.UTC(2026, 9, 20))
+export const COMPARISON_CHECKED_ON = new Date(Date.UTC(2026, 10, 9))
 /** The zone the table's checked date is formatted in. */
 export const COMPARISON_TIME_ZONE = "UTC"
 export const COMPARISON_METHOD =
@@ -106,10 +106,9 @@ export function comparisonRows(): ComparisonLine[] {
       note: "It builds what you ask for.",
     },
     {
-      capability: "Reviews every change before you see it",
+      capability: "Works to written rules and standards, reviewed every week",
       values: ["yes", "partial"],
-      note:
-        "Neither AI reviewer caught every security bug on its own in my test.",
+      note: "A subscription follows only the rules you write for it.",
     },
     {
       capability:
@@ -132,21 +131,29 @@ export const BILL_ME_HEADING = "Will you just run Claude and bill me for it?"
 /** The first paragraph of the answer, with ownership spliced from its promise. */
 export function billMeAnswer(): string {
   const ownership = decapitalize(promise("ownership").desc).replace(/\.$/, "")
-  return `Partly, yes. AI agents type much of my code, and I say so openly. You pay for the result, not for my typing: on a fixed scope the price is fixed, and ${ownership} from day one.`
+  return `Partly, yes. AI agents type most of my code, and I say so openly. You pay for the result, not for my typing: on a fixed scope the price is fixed, and ${ownership} from day one.`
 }
 
-/** The weekly audit: Anton's own check, now that a reviewer agent checks every change (#489). */
+/**
+ * The weekly review: Anton's own check of the code and the agents' sessions
+ * (#615). A reviewer agent checks every change (#489); Anton does not.
+ */
 export const WEEKLY_AUDIT =
-  "Every week I audit the work myself, to make sure the project is on the right track and the quality is still high."
+  "Every week I review the code and the agents' sessions: what slowed them down, what it cost and where money was wasted. Then I fix the causes, such as slow test runs or tests that fail at random."
+
+/** Anton's own tool that keeps the agents on task (#615). */
+export const RINGMASTER_LINE =
+  "My own tool, Ringmaster, keeps the agents on task and their cost under control."
 
 /** How a change gets made, in order; the last step is the weekly promise. */
 export function processSteps(): string[] {
   return [
     "A written spec before any code.",
-    "AI agents write the change.",
+    "AI agents write the change, to my rules, style guides and standards.",
     "A separate reviewer agent checks it; sign-in, payments and secrets get a security review.",
     "Nothing reaches you until it passes that review.",
     WEEKLY_AUDIT,
+    RINGMASTER_LINE,
     firstSentence(promise("weekly-software").desc),
   ]
 }
