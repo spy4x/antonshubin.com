@@ -7,7 +7,7 @@ import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, visibleText } from "./html.ts"
 import { blogArticles } from "../lib/data.ts"
 import { coverWebp } from "../lib/blog-posts.ts"
-import { NEWSLETTER_HREF, TOC_MIN_MINUTES } from "../lib/blog.ts"
+import { NEWSLETTER_HEADING, TOC_MIN_MINUTES } from "../lib/blog.ts"
 import { BOOK_LABEL } from "../lib/nav.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
 import { findTool } from "../lib/tools.ts"
@@ -184,18 +184,17 @@ function buttons(html: string): string[] {
     .filter((tag) => tag.startsWith("<button") || tag.includes("rounded-lg!"))
 }
 
+/** Everything a reader meets after a post's article: the band, "Read next" and the side column. */
+function afterArticle(html: string): string {
+  return html.slice(html.indexOf("data-closing-band"), html.indexOf("<footer"))
+}
+
 siteTest(
-  "after the article a post has exactly one button, Book on a founder post and Subscribe on any other, with the other ask as a plain link",
+  "after the article every post has exactly one button, the newsletter form's, under the author",
   async (site) => {
-    const asks = { book: 0, newsletter: 0 }
     for (const article of blogArticles) {
       const html = await site.html(`/blog/${article.slug}`)
-      // Everything a reader meets after the article: the band, "Read next"
-      // and the side column.
-      const after = html.slice(
-        html.indexOf("data-closing-band"),
-        html.indexOf("<footer"),
-      )
+      const after = afterArticle(html)
       const box = section(html, "data-closing-band")
       assert(box, `${article.slug} has no closing band`)
       const author = block(box, "data-author-box", "div")
@@ -204,42 +203,18 @@ siteTest(
         `${article.slug}: the band's children slot holds no author`,
       )
       assert(visibleText(box).includes("I build greenfield SaaS"), box)
+      assert(visibleText(box).includes(NEWSLETTER_HEADING), box)
       const found = buttons(after)
       assertEquals(found.length, 1, `${article.slug}: ${found.join("\n")}`)
+      assert(found[0].includes('type="submit"'), found[0])
+      assert(
+        block(box, "data-newsletter-ask", "form").includes(found[0]),
+        `${article.slug}: the button is not the newsletter form's`,
+      )
       assert(
         box.indexOf("data-author-box") < box.indexOf(found[0]),
         `${article.slug}: the author must come before the ask`,
       )
-      const bookLinks = [...after.matchAll(/<a\b[^>]*href="\/book"[^>]*>/g)]
-      assertEquals(bookLinks.length, 1, `${article.slug}: Book links`)
-      if (article.topic === "founders") {
-        asks.book++
-        assert(found[0].includes("data-primary-book"), found[0])
-        assertEquals(count(after, /<form\b/), 0, article.slug)
-        assert(
-          box.includes(`href="${NEWSLETTER_HREF}"`),
-          `${article.slug} has no plain link to the newsletter`,
-        )
-      } else {
-        asks.newsletter++
-        assert(found[0].includes('type="submit"'), found[0])
-        assert(
-          block(box, "data-newsletter-ask", "form").includes(found[0]),
-          `${article.slug}: the button is not the newsletter form's`,
-        )
-        assertEquals(count(after, /data-primary-book/), 0, article.slug)
-        assert(
-          box.includes(`>${BOOK_LABEL}</a>`),
-          `${article.slug}: Book is not a plain link`,
-        )
-      }
-      if (article.catalogSlug) {
-        assert(
-          box.includes(`href="/catalog/${article.catalogSlug}"`),
-          `${article.slug} does not link its service`,
-        )
-        assert(visibleText(box).includes("The same work for you:"), box)
-      }
       // One set of links after the post, not five (Mkt 1, 8, 9).
       assert(
         !html.includes("data-post-nav"),
@@ -250,8 +225,27 @@ siteTest(
         `${article.slug} keeps Share`,
       )
     }
-    assert(asks.book > 0, "no founder post to check")
-    assert(asks.newsletter > 0, "no developer post to check")
+  },
+)
+
+siteTest(
+  "no post page ends in a sales pitch: no Book, no sales heading and no service link after the article, founder posts included",
+  async (site) => {
+    let founders = 0
+    for (const article of blogArticles) {
+      if (article.topic === "founders") founders++
+      const after = afterArticle(await site.html(`/blog/${article.slug}`))
+      assertEquals(count(after, /data-primary-book/), 0, article.slug)
+      assertEquals(count(after, /href="\/book[#"?]/), 0, article.slug)
+      assertEquals(count(after, /href="\/catalog/), 0, article.slug)
+      assertEquals(
+        count(after, /Need this for your product\?/),
+        0,
+        article.slug,
+      )
+      assertEquals(visibleText(after).includes(BOOK_LABEL), false, article.slug)
+    }
+    assert(founders > 0, "no founder post to check")
   },
 )
 
@@ -269,10 +263,7 @@ siteTest(
       )
       const text = visibleText(line)
       assert(text.includes(`Reply by email: ${EMAIL_ADDRESS}`), text)
-      const ask = Math.max(
-        box.indexOf("data-primary-book"),
-        box.indexOf("<form"),
-      )
+      const ask = box.indexOf("<form")
       assert(
         ask > 0 && ask < box.indexOf("data-reply-line"),
         `${article.slug}: the reply line is not under the ask`,
@@ -280,24 +271,6 @@ siteTest(
     }
   },
 )
-
-Deno.test("without a booking URL a founder post's one button is the newsletter form and nothing offers Book", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: "" } })
-  try {
-    const founder = blogArticles.find((a) => a.topic === "founders")!
-    const html = await site.html(`/blog/${founder.slug}`)
-    const after = html.slice(
-      html.indexOf("data-closing-band"),
-      html.indexOf("<footer"),
-    )
-    const found = buttons(after)
-    assertEquals(found.length, 1, found.join("\n"))
-    assert(found[0].includes('type="submit"'), found[0])
-    assertEquals(count(after, /href="\/book"/), 0)
-  } finally {
-    await site.stop()
-  }
-})
 
 siteTest(
   "every post in the sitemap opens with its TL;DR heading and list before any other heading",

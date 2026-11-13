@@ -27,10 +27,10 @@ Anton's goals, not whether it is interesting.
   links: to a related post, a project, a tool or the catalog.
 - **Marketer.** Who exactly is the reader: a founder or CTO who might hire
   Anton, a developer who might use one of his tools, or both? What should that
-  reader do after the last paragraph: book a call, open the catalog, star or try
-  a tool, subscribe? Name the one next step and end the post with it. Name the
-  channels that fit this reader, which decides which channel texts in step 4 are
-  worth writing.
+  reader do after reading: open the catalog, star or try a tool, subscribe? How
+  the post may point there is in AGENTS.md "Blog posts". Name the channels that
+  fit this reader, which decides which channel texts in step 4 are worth
+  writing.
 - **Psychologist.** What makes this reader start, keep reading and trust the
   author? Open with the reader's problem or a concrete result, not with
   background, then say what the post is and who it is for, as
@@ -99,9 +99,9 @@ draft against the brief before the pull request opens.
    `{proof:jobs}` (the career count `{proof:projects}`), never the number
    itself. Link the post's tool with `relatedTool` and the service it sells with
    `catalogSlug` (#191's writing standard): the post shows the tool's page, demo
-   and repository under the byline, and the service as a text link in the author
-   box. A post with a `catalogSlug` shows a price, so `test/structure.test.ts`
-   adds it to `PRICE_PAGES` on its own.
+   and repository under the byline. `catalogSlug` is checked against
+   `lib/catalog.ts` but no longer drawn on the page: a post never ends on a
+   service (AGENTS.md "Blog posts").
 3. **Every post opens with a TL;DR** (Anton, 30 September 2026): the `tldr`
    list, rendered as a "TL;DR" heading and a list above the body, and listed
    under the post in `llms-full.txt`. Write it last, from the finished draft, as
@@ -241,10 +241,10 @@ links can be printed again any time with `deno task links`.
 
 The newsletter is a letter from Anton (#364): his portrait and name, then the
 post's cover linked to the post, the `intro`, "In short" with the TL;DR, one
-button ("Read the article · N min") and a P.S. with the booking link. The
-subject is the post's title alone; the hidden preview line is the first TL;DR
-line. Every link into the site is the `email` channel's tagged URL, and every
-mail carries the subscriber's own one-click `List-Unsubscribe`.
+button ("Read the article · N min") and the reply line, with no P.S. (AGENTS.md
+"Blog posts"). The subject is the post's title alone; the hidden preview line is
+the first TL;DR line. Every link into the site is the `email` channel's tagged
+URL, and every mail carries the subscriber's own one-click `List-Unsubscribe`.
 
 `publish:blog <slug>` sends it. To look at it or test it first, before the
 deploy or without sending to the list:
@@ -362,7 +362,7 @@ it is for, written by the agent last, from the finished post; it opens the
 newsletter and the Dev.to article and can open a LinkedIn post) and `coverAlt`,
 and the build fails without any of the three; older posts fall back to their
 `description`, their OG preview PNG and their title. The newsletter is that
-letter with the cover, the intro, "In short", one button and the P.S.; its
+letter with the cover, the intro, "In short", one button and the reply line; its
 subject is the post's title alone. `publish:blog <slug> --preview <file>` writes
 its HTML and text locally and `--test-newsletter` sends one copy to
 `CONTACT_EMAIL` with no log. Three hard rules:

@@ -1,8 +1,9 @@
 /**
  * The one layout of every mail a subscriber gets (#364): the newsletter, the
  * confirmation and the welcome. It reads as a letter from Anton: his portrait
- * and name, the content, a P.S. with the booking link, a line inviting a
- * reply and a small grey footer. The owner notice and the lead mail stay
+ * and name, the content, a line inviting a reply and a small grey footer.
+ * Only the welcome adds a P.S. with the booking link: a post's letter never
+ * ends in a sales pitch (AGENTS.md "Blog posts"). The owner notice and the lead mail stay
  * plain text and do not use it.
  *
  * The shell, the block helpers and the per-recipient unsubscribe link are
@@ -69,9 +70,10 @@ export interface LetterInput {
   /** The hidden preview line the inbox shows next to the subject. */
   preheader?: string
   blocks: readonly LetterBlock[]
-  /** Show the P.S. with the booking link; the confirmation mail has none. */
-  ps?: boolean
-  /** The question or sentence before the booking link in the P.S. */
+  /**
+   * The sentence before the booking link in a P.S. Omitted, the mail has no
+   * P.S.: only the welcome has one.
+   */
   psLead?: string
   /** Why the reader gets this mail, one sentence. */
   reason: string
@@ -106,17 +108,16 @@ function portraitHeader(baseUrl: string): LetterBlock {
 
 /** Wraps `blocks` in the letter layout and returns both parts. */
 export function renderLetter(input: LetterInput): Letter {
-  const { baseUrl, campaign } = input
+  const { baseUrl, campaign, psLead } = input
   const bookUrl = emailLink(baseUrl, "/book", campaign)
-  const psLead = input.psLead ?? "Building a product?"
   const replyLine = "Reply to this email: it comes straight to me."
 
-  const ps: LetterBlock = {
+  const ps: LetterBlock[] = psLead === undefined ? [] : [{
     html: `<p style="margin:16px 0 0">P.S. ${escapeHtml(psLead)} <a href="${
       escapeHtml(bookUrl)
     }" style="color:${LINK}">${escapeHtml(BOOK_LABEL)}</a>.</p>`,
     text: `P.S. ${psLead} ${BOOK_LABEL}: ${bookUrl}`,
-  }
+  }]
   const reply: LetterBlock = {
     html: `<p style="margin:16px 0 0">${escapeHtml(replyLine)}</p>`,
     text: replyLine,
@@ -125,7 +126,7 @@ export function renderLetter(input: LetterInput): Letter {
   return renderShell({
     header: portraitHeader(baseUrl),
     blocks: input.blocks,
-    afterword: input.ps === false ? [reply] : [ps, reply],
+    afterword: [...ps, reply],
     footer: {
       reason: input.reason,
       ...(input.unsubscribeLink === undefined

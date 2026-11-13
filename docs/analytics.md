@@ -58,6 +58,12 @@ after 2026-10-21 is the change, not lost interest; on the home page compare
 `hero` plus `band`, and `brief-sent` plus `call-booked`, over four weeks before
 and after.
 
+Since 2026-11-13 a blog post sends no `book` and no `cta` with `place: end`: its
+end holds only the author, the newsletter form and the reply line (AGENTS.md
+"Blog posts"). `place: end` stays for the hackathon pages and the SaaS
+architecture guide, so a drop in `end` clicks after that date is the change, and
+a post's own effect shows in `newsletter-signup` and `post-read`.
+
 The old event names (`nav-book`, `form-submit-audit`, `meet-embed-frame-load`
 and about 90 others) stopped on 2026-09-30. The weekly report says so until
 2026-10-14 instead of comparing across the rename.

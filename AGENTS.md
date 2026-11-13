@@ -691,6 +691,15 @@ compare a branch against `origin/main`: clone or `git worktree add` a copy of
 `main`, build it, then `deno task lcp --ab <main copy> <this worktree> --n 15`,
 adding `--path <page>` for a page other than `/`.
 
+## Blog posts
+
+How a post's text ends is the global `blog-post` skill, section 5 "Voice". On
+this site, a post page ends with the author (photo, name, `ROLE`,
+`AUTHOR_LINE`), the newsletter ask and the reply-by-email line, never Book or a
+priced service link (Anton, 13 November 2026: the reader should finish the post
+having enjoyed it, not find it was an ad). The newsletter mail of a post has no
+booking P.S. `test/blog.test.ts` checks every post page.
+
 ## Content rule
 
 No client name, number, prize, testimonial or guarantee goes on the site unless

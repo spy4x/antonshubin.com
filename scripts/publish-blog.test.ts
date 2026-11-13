@@ -269,7 +269,7 @@ async function announcementFor(article: BlogArticle) {
   return parsePostAnnouncement(r.remote[0].stdin)
 }
 
-Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the TL;DR escaped, one button, P.S., unsubscribe", async () => {
+Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the TL;DR escaped, one button, the reply line, unsubscribe, and no booking P.S.", async () => {
   const mail = await announcementFor({
     ...ARTICLE,
     intro: "Why I wrote <this>.",
@@ -290,8 +290,8 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
   assertStringIncludes(html, "Use &lt;b&gt; &amp; more.")
   assertEquals(html.includes("<b>"), false)
   assertStringIncludes(html, "Read the article · 3 min")
-  assertStringIncludes(html, "P.S.")
-  assertStringIncludes(html, "Book a free 30-minute call")
+  assertEquals(html.includes("P.S."), false)
+  assertEquals(html.includes("Book a free 30-minute call"), false)
   assertStringIncludes(html, "{{unsubscribe-link}}")
   assertEquals(html.split("Read the article").length - 1, 1)
   const order = [
@@ -300,7 +300,7 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
     "Why I wrote",
     "In short",
     "Read the article",
-    "P.S.",
+    "Reply to this email",
   ]
     .map((needle) => html.indexOf(needle))
   assertEquals(order, [...order].sort((x, y) => x - y))
@@ -372,7 +372,7 @@ Deno.test("every link the newsletter makes into the site is the email channel's 
   const { html, text } = await announcementFor(ARTICLE)
   const hrefs = [...html.matchAll(/href="(https:\/\/antonshubin\.com[^"]*)"/g)]
     .map((m) => m[1].replaceAll("&amp;", "&"))
-  assertEquals(hrefs.length >= 4, true, hrefs.join("\n"))
+  assertEquals(hrefs.length >= 3, true, hrefs.join("\n"))
   for (const href of hrefs) {
     assertStringIncludes(
       href,
@@ -386,8 +386,9 @@ Deno.test("every link the newsletter makes into the site is the email channel's 
     true,
   )
   assertEquals(
-    hrefs.some((h) => h.startsWith("https://antonshubin.com/book?")),
-    true,
+    hrefs.some((h) => h.startsWith("https://antonshubin.com/book")),
+    false,
+    "the newsletter links the booking page",
   )
   for (const m of text.matchAll(/https:\/\/antonshubin\.com\S*/g)) {
     assertStringIncludes(m[0], "utm_source=email")
