@@ -215,13 +215,6 @@ const PRICE_PAGES: Record<string, string[]> = {
       .map((p) => [`/work/${p.slug}`, []]),
   ),
   "/saas-architecture-guide": [],
-  // A post with a catalogSlug names its service's price in the author box
-  // and the side card (#274). None of their texts states another amount.
-  ...Object.fromEntries(
-    blogArticles
-      .filter((a) => a.catalogSlug)
-      .map((a) => [`/blog/${a.slug}`, []]),
-  ),
 }
 
 siteTest(

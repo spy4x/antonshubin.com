@@ -316,12 +316,12 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
         await assertNoContrastViolations(page, site.origin, path)
       }
 
-      // Every page in the loop above except /pay carries a booking button
-      // (the home CTA, the blog post footer: both go to /book since #387;
-      // the booking page's own new-tab link goes to the scheduler). Without
-      // this, a server that never received the placeholder would pass the
-      // loop above vacuously.
-      for (const path of ["/", "/book", "/blog/ship-it-today"]) {
+      // The home page and /book carry a booking link (the home CTA goes to
+      // /book since #387; the booking page's own new-tab link goes to the
+      // scheduler). A post no longer ends with Book (AGENTS.md "Blog
+      // posts"). Without this, a server that never received the placeholder
+      // would pass the loop above vacuously.
+      for (const path of ["/", "/book"]) {
         await page.goto(`${site.origin}${path}`, { waitUntil: "networkidle" })
         const selector = path === "/book"
           ? `a[href="${PLACEHOLDER_SCHEDULE_URL}"]`
@@ -334,10 +334,11 @@ Deno.test("no WCAG AA colour-contrast violations across nine representative page
       }
 
       // components/Breadcrumb.tsx's "/" separator: aria-hidden, so axe never
-      // judges it (see the file header) — checked manually instead. Still on
-      // the last page from the loop above (/blog/building-mcp-servers-with-deno,
-      // whose breadcrumb is Home > Blog > post title — any page in the loop
-      // with more than one crumb would do).
+      // judges it (see the file header) — checked manually instead, on a
+      // post (any page with more than one crumb would do).
+      await page.goto(`${site.origin}/blog/ship-it-today`, {
+        waitUntil: "networkidle",
+      })
       const breadcrumbSepRatio = await getContrastRatio(
         page,
         'nav[aria-label="Breadcrumb"] span[aria-hidden="true"]',
