@@ -85,13 +85,16 @@ the summary's first sentences, and which "What it is" never repeats; at most one
 secondary button for `live` with "View on GitHub", the hero media and an
 optional line under the actions), the page's middle, `ToolDetails` ("Where it
 stands" from `works`/`notYet`, plus the optional `knownIssue`, or the page's
-`beside`, the sticky "Tool facts" card `ToolFacts`, "Use it if", "Skip it if"
-and "The story behind it"), `ToolBand` ("Two ways to use it": the install or
+`beside`, the sticky "Tool facts" card `ToolFacts` (with a "Built on" row
+linking the starter's page when the entry sets `builtOn`), "Use it if", "Skip it
+if" and "The story behind it"), `ToolBand` ("Two ways to use it": the install or
 quick-start command and "View on GitHub" beside the catalog price and the page
 body's only Book) and `ToolMore` (three tools: the tool's entry in `MORE_TOOLS`
 in `components/tool-frame/ToolMore.tsx`, hand-picked by what a visitor of that
-tool wants next, unless the page passes its own `more`). Props `hero`, `beside`
-and `band` change only what those parts document. `knownIssue`
+tool wants next, unless the page passes its own `more`). A custom page that
+keeps the default middle renders `DefaultMiddle`
+(`components/tool-frame/DefaultMiddle.tsx`) as its children. Props `hero`,
+`beside` and `band` change only what those parts document. `knownIssue`
 (`{ text, link }`) is one line under "Works today": the library's `known-issue`
 `StatusMark`, a sentence built only from the facts of the open issue it links
 to, and that link, which sends `outbound` with `to: issues` and `place: body`.

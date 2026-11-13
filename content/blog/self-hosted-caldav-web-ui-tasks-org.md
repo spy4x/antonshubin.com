@@ -8,6 +8,9 @@ tldr:
   - "You don't need Nextcloud for it: the whole stack runs on one small box next to your CalDAV server."
 publishedAt: "2026-07-22"
 readTime: 9
+coverImage: "/img/blog/self-hosted-caldav-web-ui-tasks-org/cover.png"
+coverAlt: "The Hide the Pain Harold meme: Harold smiles at \"Tasks on my phone: synced to CalDAV\", then forces the same smile at \"Tasks on my laptop: no web UI\"."
+coverSize: "480x601"
 topic: "self-hosting"
 relatedTool: "caldav-tasks-web"
 ---
@@ -31,14 +34,20 @@ Tasks.org is the strongest Android task manager and it syncs to CalDAV. The data
 lives on a server you control. The moment you sit at a desk, that data is
 unreachable from a browser — no conformant client exists for the web.
 
-The data is fine. The standard is fine. The clients are missing.
+The data is fine. The standard is fine. The clients are missing. A fridge full
+of food, and not a single fork.
+
+![The "Is this a pigeon?" meme: a man labelled "Me at my desk" points at a butterfly labelled "My phone" and asks "Is this a web UI for my tasks?"](/img/blog/self-hosted-caldav-web-ui-tasks-org/pigeon.webp "A year of desk work, one phone in hand")
 
 ## Why I didn't reach for Nextcloud Tasks
 
-Nextcloud is a whole suite, not a CalDAV server. People who chose Radicale or
+Nextcloud is a whole suite, not a CalDAV server. Deploying it to edit a todo is
+like buying a bus to get to the corner shop. People who chose Radicale or
 Stalwart on purpose shouldn't need to deploy a Nextcloud instance to edit a todo
 on desktop. The fix had to assume the CalDAV server is the only piece already
 running.
+
+![The Left Exit 12 meme: the road sign points straight on to "Nextcloud for one todo" and right to "The CalDAV server I already run", and a car labelled "Me" swerves hard onto the exit](/img/blog/self-hosted-caldav-web-ui-tasks-org/exit.webp "Taking the exit to the server I already have")
 
 The goal is a task UI for whichever CalDAV server you already run. I used the
 current version against Radicale. Stalwart does not work with it today.
@@ -52,7 +61,8 @@ server credentials and nothing else. Switch CalDAV servers and no todos move.
 
 That property is the design goal. The current version did not meet it: it does
 not work with Stalwart, and it can lose data when you save a task. The rewrite
-exists to fix that.
+exists to fix that. The design goal and the current version are not on speaking
+terms yet.
 
 ## CQRS in a UI app (the idea, not what runs today)
 
@@ -63,13 +73,16 @@ the same PROPFIND/PROPPATCH/PUT/DELETE interface, so adding a third server is a
 new adapter class, not a chain of `if (serverType === ...)` blocks. The rewrite
 does not use a CQRS layer.
 
-The CalDAV XML responses vary more than they should. Radicale uses the default
-namespace and emits lowercase `<d:response>`. Stalwart emits uppercase
-`<D:response>` and `<A:response>` for the caldav namespace. Substring-matching
-"calendar" in the response body matches the user's principal home on top of
-actual calendars. The parsers have to be case-insensitive, prefix-tolerant, and
-filter calendars by `<(prefix:)?calendar/>` inside `<resourcetype>`. Stalwart
-still fails in the current version.
+The CalDAV XML responses vary more than they should. Standards are great: every
+server has its own. Radicale uses the default namespace and emits lowercase
+`<d:response>`. Stalwart emits uppercase `<D:response>` and `<A:response>` for
+the caldav namespace. Substring-matching "calendar" in the response body matches
+the user's principal home on top of actual calendars. The parsers have to be
+case-insensitive, prefix-tolerant, and filter calendars by
+`<(prefix:)?calendar/>` inside `<resourcetype>`. Stalwart still fails in the
+current version.
+
+![The Mocking SpongeBob meme: "Radicale: `<d:response>`" at the top, and SpongeBob mocking it at the bottom with "Stalwart: `<D:response>` and `<A:response>`"](/img/blog/self-hosted-caldav-web-ui-tasks-org/mocking.webp "Same standard, different capital letters")
 
 ## Preact Signals instead of hooks
 
@@ -77,6 +90,8 @@ VTODO state changes constantly — status, priority, due date, percent complete,
 complete vs active, filters, sort, tag toggles. Signals give surgical UI updates
 without a virtual DOM tree of hooks to debug. A hook-based version of this
 project would have spent most of its life chasing re-render storms.
+
+![The Batman slapping Robin meme: Robin says "Hooks for a list that changes constantly" and Batman slaps him, saying "Signals. No re-render storms."](/img/blog/self-hosted-caldav-web-ui-tasks-org/batman.webp "For this app, at least. Please don't email me about hooks")
 
 The hooks-vs-signals debate is a real one and the right answer depends on the
 app. For a heavily stateful list of items with frequent mutations and dense
@@ -90,9 +105,12 @@ a Hetzner box behind Traefik and runs `docker compose up -d --build`. It is not
 a single binary. It sits behind the same Traefik as the CalDAV server, and its
 SQLite file can be backed up by the same restic job as the CalDAV data.
 
-There is no Kubernetes. There is no service mesh. The whole stack fits on a
-single $20/month box and stays there. A real engineer reading this knows that's
-the right shape for a personal productivity tool.
+There is no Kubernetes. There is no service mesh. My todo list does not need to
+auto-scale. The whole stack fits on a single $20/month box and stays there. A
+real engineer reading this knows that's the right shape for a personal
+productivity tool.
+
+![The "One does not simply" meme with Boromir: "One does not simply need Kubernetes for a personal todo tool"](/img/blog/self-hosted-caldav-web-ui-tasks-org/kubernetes.webp "One box, one Traefik, one restic job")
 
 ## What it cost and what it doesn't do
 
@@ -104,6 +122,8 @@ What it doesn't do: it does not work with Stalwart, it can lose data when you
 save a task, and it has no service worker, so it is a web app you open in a
 browser, not an installable offline app. It has no sync engine (it is a client,
 not a server), no recurring-task editor and no native mobile wrapper.
+
+![The Futurama Fry "Not sure if" meme: "Not sure if installable offline app", "Or just a web app in a browser tab"](/img/blog/self-hosted-caldav-web-ui-tasks-org/fry.webp "Spoiler: a browser tab")
 
 I built it for myself. The rewrite is for the same reason.
 

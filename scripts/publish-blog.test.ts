@@ -24,6 +24,9 @@ const ARTICLE: BlogArticle = {
   readTime: 3,
   publishedAt: "2026-09-26",
   topic: "ai-mcp",
+  coverImage: "/img/blog/a-test-post/cover.png",
+  coverAlt: "A cover",
+  coverSize: { width: 1000, height: 420 },
 }
 
 const POST: Post = {
@@ -159,7 +162,7 @@ Deno.test("one default run publishes the post on Dev.to and sends the newsletter
     body:
       "What the post is about\n\n**TL;DR**\n\n- One point.\n- Another point.\n\nBody text.",
     campaign: "a-campaign",
-    coverImage: undefined,
+    coverImage: "/img/blog/a-test-post/cover.png",
   }])
 })
 
@@ -266,11 +269,12 @@ async function announcementFor(article: BlogArticle) {
   return parsePostAnnouncement(r.remote[0].stdin)
 }
 
-Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the TL;DR escaped, one button, P.S., unsubscribe", async () => {
+Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the TL;DR escaped, one button, the reply line, unsubscribe, and no booking P.S.", async () => {
   const mail = await announcementFor({
     ...ARTICLE,
     intro: "Why I wrote <this>.",
     coverAlt: "A dashboard",
+    coverSize: { width: 1000, height: 420 },
     tldr: ["Use <b> & more.", "Second."],
   })
   const { html } = mail
@@ -278,7 +282,7 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
   assertStringIncludes(html, ">Anton Shubin<")
   assertStringIncludes(
     html,
-    'src="https://antonshubin.com/img/og/blog/a-test-post.png" alt="A dashboard"',
+    'src="https://antonshubin.com/img/blog/a-test-post/cover.png" alt="A dashboard"',
   )
   assertStringIncludes(html, "Why I wrote &lt;this&gt;.")
   assertStringIncludes(html, ">In short<")
@@ -286,8 +290,8 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
   assertStringIncludes(html, "Use &lt;b&gt; &amp; more.")
   assertEquals(html.includes("<b>"), false)
   assertStringIncludes(html, "Read the article · 3 min")
-  assertStringIncludes(html, "P.S.")
-  assertStringIncludes(html, "Book a free 30-minute call")
+  assertEquals(html.includes("P.S."), false)
+  assertEquals(html.includes("Book a free 30-minute call"), false)
   assertStringIncludes(html, "{{unsubscribe-link}}")
   assertEquals(html.split("Read the article").length - 1, 1)
   const order = [
@@ -296,7 +300,7 @@ Deno.test("the newsletter is a letter: portrait, cover, intro, In short with the
     "Why I wrote",
     "In short",
     "Read the article",
-    "P.S.",
+    "Reply to this email",
   ]
     .map((needle) => html.indexOf(needle))
   assertEquals(order, [...order].sort((x, y) => x - y))
@@ -357,18 +361,18 @@ Deno.test("the Dev.to article body starts with the intro, then the TL;DR, then t
 Deno.test("the Dev.to article gets the post's coverImage", async () => {
   const post: Post = {
     ...POST,
-    article: { ...ARTICLE, coverImage: "/img/blog/a-test-post/cover.png" },
+    article: { ...ARTICLE, coverImage: "/img/blog/another-post/cover.png" },
   }
   const r = fakes({ readPost: () => Promise.resolve(post) })
   await publishBlog(DEFAULT_RUN, r.deps)
-  assertEquals(r.devTo[0].coverImage, "/img/blog/a-test-post/cover.png")
+  assertEquals(r.devTo[0].coverImage, "/img/blog/another-post/cover.png")
 })
 
 Deno.test("every link the newsletter makes into the site is the email channel's tagged url", async () => {
   const { html, text } = await announcementFor(ARTICLE)
   const hrefs = [...html.matchAll(/href="(https:\/\/antonshubin\.com[^"]*)"/g)]
     .map((m) => m[1].replaceAll("&amp;", "&"))
-  assertEquals(hrefs.length >= 4, true, hrefs.join("\n"))
+  assertEquals(hrefs.length >= 3, true, hrefs.join("\n"))
   for (const href of hrefs) {
     assertStringIncludes(
       href,
@@ -382,8 +386,9 @@ Deno.test("every link the newsletter makes into the site is the email channel's 
     true,
   )
   assertEquals(
-    hrefs.some((h) => h.startsWith("https://antonshubin.com/book?")),
-    true,
+    hrefs.some((h) => h.startsWith("https://antonshubin.com/book")),
+    false,
+    "the newsletter links the booking page",
   )
   for (const m of text.matchAll(/https:\/\/antonshubin\.com\S*/g)) {
     assertStringIncludes(m[0], "utm_source=email")

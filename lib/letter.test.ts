@@ -45,8 +45,8 @@ Deno.test("the letter opens with the portrait, Anton's name and the role, and cl
   assertStringIncludes(text, "Unsubscribe: https://example.com/u?t=1")
 })
 
-Deno.test("the P.S. links the booking page with its one wording, as the email channel's tagged link, and the confirmation turns it off", () => {
-  const withPs = render()
+Deno.test("a P.S. links the booking page with its one wording, as the email channel's tagged link, and a letter without a lead has none", () => {
+  const withPs = render({ psLead: "Building a product?" })
   const book =
     `${BASE}/book?utm_source=email&utm_medium=email&utm_campaign=a-campaign`
   assertStringIncludes(withPs.html, `href="${book.replaceAll("&", "&amp;")}"`)
@@ -55,12 +55,9 @@ Deno.test("the P.S. links the booking page with its one wording, as the email ch
     withPs.text,
     `P.S. Building a product? ${BOOK_LABEL}: ${book}`,
   )
-  assertStringIncludes(
-    withPs.html,
-    "P.S. Building a product? <a ",
-  )
+  assertStringIncludes(withPs.html, "P.S. Building a product? <a ")
   assertStringIncludes(withPs.html, `${BOOK_LABEL}</a>.</p>`)
-  const without = render({ ps: false })
+  const without = render()
   assertEquals(without.html.includes("P.S."), false)
   assertEquals(without.text.includes("P.S."), false)
 })
@@ -123,6 +120,7 @@ Deno.test("a post's letter is 600px wide with the cover first, then the intro, t
     intro: "Why I wrote it.",
     coverImage: "/img/blog/a-post/cover.png",
     coverAlt: "A cover",
+    coverSize: { width: 1000, height: 420 },
     tldr: ["First.", "Second."],
     readTime: 5,
     publishedAt: "2026-10-02",
@@ -137,6 +135,27 @@ Deno.test("a post's letter is 600px wide with the cover first, then the intro, t
   assertEquals(letter.html.includes("Search snippet"), false)
   assertEquals(letter.html.split("Read the article · 5 min").length - 1, 1)
   assertStringIncludes(letter.html, "#f97316")
+})
+
+Deno.test("a post's letter never ends in a sales pitch: no P.S. and no link to the booking page", () => {
+  const letter = postLetter({
+    slug: "a-post",
+    title: "A post",
+    description: "Search snippet",
+    coverImage: "/img/blog/a-post/cover.png",
+    coverAlt: "A cover",
+    coverSize: { width: 1000, height: 420 },
+    tldr: ["First."],
+    readTime: 5,
+    publishedAt: "2026-10-02",
+    topic: "founders",
+  }, { baseUrl: BASE, campaign: "a-post" })
+  for (const part of [letter.html, letter.text]) {
+    assertEquals(part.includes("P.S."), false, part)
+    assertEquals(part.includes(`${BASE}/book`), false, part)
+    assertEquals(part.includes(BOOK_LABEL), false, part)
+  }
+  assertStringIncludes(letter.text, "Reply to this email")
 })
 
 Deno.test("the plain-text footer is separated by dash, dash, space, and a P.S. lead can be changed", () => {

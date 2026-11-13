@@ -8,11 +8,12 @@ tldr:
   - "rostok deploy copies a server's files over SSH and starts them with Docker Compose. The server needs only SSH, rsync and Docker."
   - "Install with deno install -g -A -n rostok jsr:@rostok/cli. Release 1.21.0 ships 50 stacks."
 intro: "rostok grew out of the repo that runs my own servers, and I still deploy with it. This post walks through it from an empty folder to a service live on HTTPS, with the real commands and their output, for anyone who runs Docker on one to a few machines."
-coverImage: "/img/blog/rostok-self-hosted-scaffolder/cover.png"
-coverAlt: "rostok's stack picker in a terminal: omni-tools and traefik ticked, open-webui, pangolin, piped, playwright, searxng, stalwart, syncthing and traggo not."
 publishedAt: "2026-08-26"
 updatedAt: "2026-10-30"
 readTime: 7
+coverImage: "/img/blog/rostok-self-hosted-scaffolder/cover.png"
+coverAlt: "The One Does Not Simply meme: \"One does not simply hand-write every compose file of a homelab\"."
+coverSize: "568x335"
 topic: "self-hosting"
 relatedTool: "rostok"
 catalogSlug: "strategy-call"
@@ -63,6 +64,8 @@ Running a service yourself is rarely the hard part. The plumbing around it is:
 Every self-hosted setup answers these questions somehow, but the answers stay
 local decisions that never become a pattern you can reuse. rostok writes them
 down as files.
+
+![The Is This a Pigeon meme: a man labelled "Me" points at a butterfly labelled "secrets-not-committed.txt" and asks "Is this secret management?"](/img/blog/rostok-self-hosted-scaffolder/pigeon.webp "Spoiler: it was not.")
 
 ## From zero to a running service
 
@@ -268,10 +271,14 @@ export default {
 4. `satisfies StackMeta` lets the type checker catch a mistyped field in a
    stack.
 
+![The Batman Slapping Robin meme: Robin starts "I'll just type the config by hand" and Batman slaps him, saying "The meta validates it"](/img/blog/rostok-self-hosted-scaffolder/batman-meta.webp "Typed by hand, typo by hand.")
+
 Adding a service to the catalog is one pull request with such a folder.
 `rostok stack list` shows what is there today; release 1.21.0 lists 50 stacks in
 15 groups, from Traefik and Authelia to Immich, Vaultwarden, Gitea and
 Woodpecker CI.
+
+![The Trade Offer meme: a man in a suit offers a trade, "I receive: one PR with +meta.ts", "You receive: a new stack for everyone"](/img/blog/rostok-self-hosted-scaffolder/trade-offer.webp "Adding a stack is one PR.")
 
 ## What runs on my own servers
 
@@ -308,6 +315,8 @@ else, and the key lives on the machine I deploy from. A fresh clone plus the key
 has every setting a deploy needs. rostok does the encryption inside the CLI, so
 there is no binary to install either. If the box dies tonight, the repo and the
 key should be enough to bring it back.
+
+![The Left Exit 12 Off Ramp meme: a car labelled "Me, a solo homelabber" swerves off the highway past the straight-on lane "Vault, Doppler" onto the exit "age"](/img/blog/rostok-self-hosted-scaffolder/exit-age.webp "One binary beats one more service to babysit.")
 
 ## Try it
 

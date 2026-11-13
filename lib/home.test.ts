@@ -1,7 +1,10 @@
-import { assert } from "jsr:@std/assert@^1.0.0"
-import { INTRO_CALL } from "./catalog.ts"
-import { homeDescription, META_DESCRIPTION_MAX } from "./home.ts"
-import { proof } from "./proof.ts"
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
+import {
+  HOME_LEAD,
+  HOME_SHORT_DESCRIPTION,
+  homeDescription,
+  META_DESCRIPTION_MAX,
+} from "./home.ts"
 
 Deno.test("the home meta description fits a search result", () => {
   const text = homeDescription()
@@ -11,8 +14,11 @@ Deno.test("the home meta description fits a search result", () => {
   )
 })
 
-Deno.test("the home meta description carries the Upwork status and the first step from the data files", () => {
-  const text = homeDescription()
-  assert(text.includes(proof("expert-vetted")), text)
-  assert(text.includes(INTRO_CALL), text)
+Deno.test("the home meta description is the lead when it fits, else the short description", () => {
+  assertEquals(
+    homeDescription(),
+    HOME_LEAD.length <= META_DESCRIPTION_MAX
+      ? HOME_LEAD
+      : HOME_SHORT_DESCRIPTION,
+  )
 })

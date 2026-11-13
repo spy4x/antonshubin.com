@@ -85,7 +85,6 @@ function confirmationMessage(
         "The link works for three days. If it was not you, ignore this mail and nothing happens.",
       ),
     ],
-    ps: false,
     reason: "You get this once, because this address was entered on the site",
   })
   return {
