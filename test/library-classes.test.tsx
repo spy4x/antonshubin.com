@@ -32,6 +32,7 @@ import { findTool } from "../lib/tools.ts"
 import type { CiSnapshot } from "../lib/github-snapshot.ts"
 import CachedShareSlider from "../islands/CachedShareSlider.tsx"
 import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
+import ProposalChecklist from "../islands/ProposalChecklist.tsx"
 import RunsCalculator from "../islands/RunsCalculator.tsx"
 import { TaskCostChart } from "../components/TaskCostChart.tsx"
 import { startSite } from "./harness.ts"
@@ -240,6 +241,7 @@ function renderedLibraryMarkup(): string {
     // with a muted row, a band and a summary.
     render(<CachedShareSlider post="p" />),
     render(<FrameworkChecklist post="p" />),
+    render(<ProposalChecklist post="p" />),
     render(
       <RunsCalculator
         post="p"
@@ -512,7 +514,7 @@ Deno.test("a site button carries no library size or fill and the site's radius",
   const buttons = [...html.matchAll(/<(?:a|button)\b[^>]*class="([^"]*)"/g)]
     .map(([, list]) => list.split(" "))
     .filter((list) => list.includes("transition-colors"))
-  assertEquals(buttons.length, 7, html)
+  assertEquals(buttons.length, 8, html)
   for (const list of buttons) {
     assertEquals(list.filter((c) => forbidden.includes(c)), [], list.join(" "))
     assert(list.includes("rounded-lg!"), list.join(" "))

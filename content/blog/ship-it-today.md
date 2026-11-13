@@ -7,6 +7,9 @@ tldr:
   - "Don't wait for perfect: publish something today and improve it every day."
 publishedAt: "2022-04-27"
 readTime: 5
+coverImage: "/img/blog/ship-it-today/cover.png"
+coverAlt: "A drawing of a cartoon dog in a burning wooden boat named S.S. Shipit."
+coverSize: "960x678"
 topic: "founders"
 archived: true
 archiveNote: "I still ship this way: the tools on my Tools page each went out small and early."

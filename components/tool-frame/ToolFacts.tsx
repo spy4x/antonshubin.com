@@ -3,14 +3,14 @@ import { CiPill } from "../CiPill.tsx"
 import { Fact, FACT_LINK, FactCard } from "../FactCard.tsx"
 import { eventAttrs } from "../../lib/analytics.ts"
 import { MIN_STARS_SHOWN } from "../../lib/github-snapshot.ts"
-import { ciUrl, toolLicence } from "../../lib/tools.ts"
+import { ciUrl, tool as toolBySlug, toolLicence } from "../../lib/tools.ts"
 import { checkedLabel } from "../../lib/tools-live.ts"
 import type { ToolPageData } from "./tool-page.ts"
 
 /**
- * The tool frame's facts card (#454, part 5): Status, Version, Licence, Runs
- * on, Website, Live, Code and CI, in that order, each row only when it has a
- * value. Its footer holds one link, "View on GitHub". Every link sends
+ * The tool frame's facts card (#454, part 5): Status, Built on, Version,
+ * Licence, Runs on, Website, Live, Code and CI, in that order, each row only
+ * when it has a value. Its footer holds one link, "View on GitHub". Every link sends
  * `outbound` with `place: card`.
  */
 export function ToolFacts({ data }: { data: ToolPageData }) {
@@ -25,6 +25,14 @@ export function ToolFacts({ data }: { data: ToolPageData }) {
         <Fact term="Status">
           <StatusMark status={tool.status} />
         </Fact>
+        {tool.builtOn && (
+          <Fact term="Built on">
+            <a href={`/tools/${tool.builtOn}`} class={FACT_LINK}>
+              {toolBySlug(tool.builtOn).name}
+            </a>
+            {`, the ${toolBySlug(tool.builtOn).job}`}
+          </Fact>
+        )}
         {tool.registry && (
           <Fact term="Version">
             <span data-version>

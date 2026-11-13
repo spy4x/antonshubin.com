@@ -37,6 +37,10 @@ export const GOOD_FIT: string[] = [
   "Full-stack, DevOps and architecture from one person.",
 ]
 
+/** How many clients Anton takes at once (#615): the "Good fit" part's last line. */
+export const CAPACITY_LINE =
+  "I work with at most two clients at a time, so each one gets my full attention. One client at 20 to 40 hours a week suits me best."
+
 /** What I don't do yet: the "Not a fit yet" list. */
 export const NOT_A_FIT: string[] = [
   "Mobile apps. I don't build them yet, and I'm looking at Capacitor.",

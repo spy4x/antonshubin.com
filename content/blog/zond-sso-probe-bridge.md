@@ -11,6 +11,9 @@ intro: "If your self-hosted services sit behind Authelia or Authentik, your moni
 publishedAt: "2026-08-26"
 updatedAt: "2026-10-30"
 readTime: 7
+coverImage: "/img/blog/zond-sso-probe-bridge/cover.png"
+coverAlt: "The This Is Fine meme: a dog sits in a burning room labelled \"Service behind SSO answers 500\" and \"Gatus: TCP port open\", and says \"This is fine\"."
+coverSize: "580x282"
 topic: "self-hosting"
 relatedTool: "zond"
 catalogSlug: "cto-advisory-retainer"
@@ -39,6 +42,8 @@ That leaves two bad options:
 A TCP check from inside the network is not the answer either.
 `tcp://hl-metube:8081` tells you a port is open. A service can listen on its
 port and still answer `500` to every request.
+
+![The Batman slapping Robin meme: Robin says "The port is open, so it's up", and Batman slaps him mid-sentence, saying "It returns 500 on every request"](/img/blog/zond-sso-probe-bridge/batman-tcp.webp "An open port is not a healthy service")
 
 ## What zond does
 
@@ -160,6 +165,8 @@ at it:
     - "[STATUS] == 200"
 ```
 
+![The Tuxedo Winnie the Pooh meme: plain Pooh looks unimpressed next to "Accepting 302 as healthy", and Pooh in a tuxedo looks pleased next to "Asking zond: 200 or 503"](/img/blog/zond-sso-probe-bridge/pooh-probe.webp "Health checks, but make them fancy")
+
 ## Why zond has no login
 
 A login on zond would bring back the exact problem it solves: a credential for
@@ -175,6 +182,8 @@ own config
 ([`internal/server/server.go`](https://github.com/spy4x/zond/blob/7744aaab8e64f31379bda47626aeaeaee911ecd5/internal/server/server.go#L69)),
 answers `404` for a name it doesn't know, and only ever sends a GET to the URLs
 you wrote down.
+
+![The Roll Safe meme: a man taps his temple, captioned "Can't steal a session if there is no session"](/img/blog/zond-sso-probe-bridge/roll-safe-auth.webp "The most secure session is no session")
 
 ## Where it runs
 
