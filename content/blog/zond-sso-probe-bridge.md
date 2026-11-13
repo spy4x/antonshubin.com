@@ -8,6 +8,9 @@ tldr:
   - "I rewrote it from Deno to Go after a 180 ms cold start on a Raspberry Pi; the image shrank from about 80 MB to about 10 MB."
 publishedAt: "2026-08-26"
 readTime: 6
+coverImage: "/img/blog/zond-sso-probe-bridge/cover.png"
+coverAlt: "The This Is Fine meme: a dog sits in a burning room labelled \"Service behind SSO answers 500\" and \"Gatus: TCP port open\", and says \"This is fine\"."
+coverSize: "580x282"
 topic: "self-hosting"
 relatedTool: "zond"
 ---
@@ -31,7 +34,10 @@ It feeds the Gatus checks behind my status page;
 The first instinct is to use a TCP check in Gatus: `tcp://hl-metube:8081`. That
 tells you a port is open. It does not tell you the HTTP layer is healthy. A
 service can listen on its port and still return 500 on every request — and a TCP
-check will report it as up.
+check will report it as up. Green dashboard, broken service: the dog from the
+cover would feel right at home.
+
+![The Batman slapping Robin meme: Robin says "The port is open, so it's up", and Batman slaps him mid-sentence, saying "It returns 500 on every request"](/img/blog/zond-sso-probe-bridge/batman-tcp.webp "An open port is not a healthy service")
 
 You need a real HTTP probe. The problem is that the service you want to probe is
 behind SSO, and your monitoring tool does not have credentials.
@@ -70,8 +76,11 @@ One line in Gatus:
     - "[STATUS] == 200"
 ```
 
-That is the whole setup. Zond returns only `ok\n` or `unreachable\n`. No data
-leaks. No session to steal. No action to perform on the URL.
+That is the whole setup. Yes, really. Zond returns only `ok\n` or
+`unreachable\n`. No data leaks. No session to steal. No action to perform on the
+URL.
+
+![The Tuxedo Winnie the Pooh meme: plain Pooh looks unimpressed next to "Accepting 302 as healthy", and Pooh in a tuxedo looks pleased next to "Asking zond: 200 or 503"](/img/blog/zond-sso-probe-bridge/pooh-probe.webp "Health checks, but make them fancy")
 
 ## What I learned rewriting it from Deno to Go
 
@@ -87,13 +96,16 @@ The Go rewrite:
 - stdlib HTTP server with one external dep (`go.yaml.in/yaml/v3`)
 - Single static binary, no runtime to install
 
+![The Buff Doge vs Cheems meme: a muscular doge labelled "Go: ~10 MB distroless image" stands next to a small, crying Cheems labelled "Deno: ~80 MB and a 180 ms cold start"](/img/blog/zond-sso-probe-bridge/doge-go.webp "Same probe, fewer megabytes")
+
 The rewrite took two evenings. The Deno version had grown some habits I had to
 break: dynamic `Deno.serve`, structured logging, async-ergonomic fan-out. The Go
 version has none of that and is easier to reason about.
 
 I am increasingly convinced that monitoring endpoints belong in Go. The perf
 ceiling is irrelevant — the predictability matters. Zond will boot in 8 ms on
-the same Raspberry Pi in five years. The Deno binary might not.
+the same Raspberry Pi in five years. The Deno binary might not. Sorry, Deno:
+it's not you, it's my friend's Raspberry Pi.
 
 ## Why no authentication
 
@@ -102,10 +114,12 @@ action. Adding auth would reintroduce the exact problem Zond solves: now you
 have to manage credentials for a monitoring endpoint, and you have an attack
 surface that did not exist before.
 
+![The Roll Safe meme: a man taps his temple, captioned "Can't steal a session if there is no session"](/img/blog/zond-sso-probe-bridge/roll-safe-auth.webp "The most secure session is no session")
+
 If you really need to hide the existence of an internal service, proxy Zond
 behind your SSO — but the endpoint itself is safe to expose. The worst case is
 an attacker learns "metube is up" or "metube is down", which is exactly what
-your uptime page already says.
+your uptime page already says. Not exactly a heist.
 
 ## Try it
 

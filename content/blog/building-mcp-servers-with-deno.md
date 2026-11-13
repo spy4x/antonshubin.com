@@ -9,6 +9,9 @@ tldr:
 publishedAt: "2026-06-23"
 updatedAt: "2026-10-30"
 readTime: 10
+coverImage: "/img/blog/building-mcp-servers-with-deno/cover.png"
+coverAlt: "The Left Exit 12 meme: a car swerves off the highway. The straight sign says \"npm install and node_modules\", the exit says \"deno compile: one binary\", and the car is \"My MCP servers\"."
+coverSize: "804x767"
 topic: "ai-mcp"
 relatedTool: "caldav-mcp"
 catalogSlug: "zero-to-production-saas-mvp"
@@ -215,6 +218,8 @@ This is the one place where the runtime shows: `Deno.stdin` and `Deno.stdout`.
 Everything else is `TextDecoder`, `Uint8Array` and strings. The logger writes to
 stderr through `console.error`, because anything else on stdout would break the
 protocol.
+
+![The Surprised Pikachu meme. "Logs with console.log", "The MCP protocol uses stdout", "The client crashes", and Pikachu looks shocked](/img/blog/building-mcp-servers-with-deno/pikachu-stdout.webp "Who could have seen this coming.")
 
 You can try it without a calendar server, because `initialize` and `tools/list`
 never call CalDAV. This is the command from the repository's clients guide

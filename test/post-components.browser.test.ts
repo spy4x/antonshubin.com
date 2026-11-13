@@ -28,6 +28,9 @@ type AxePage = ConstructorParameters<typeof AxeBuilder>[0]["page"]
 const TRAIL = "trail-code-claude-code-test"
 const OPUS = "opus-5-5-vs-sonnet-5-agent-costs"
 const LAB = "cost-optimization-laboratory"
+const DENO = "migrate-from-deno-to-node-and-bun"
+const HIRE = "hire-developer-take-over-ai-built-app"
+const MVP = "how-much-does-a-saas-mvp-cost"
 
 /** Loads a post and waits until the figure with `id` has hydrated. */
 async function openPost(page: Page, origin: string, slug: string, id: string) {
@@ -158,6 +161,185 @@ Deno.test("the cached-share slider and the framework checklist react to the keyb
   }
 })
 
+Deno.test("the proposal checklist scores ticks from the keyboard and sends no ticked value", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${HIRE}`)
+    assert(
+      /id="proposal-checklist-figure"[^>]*data-live="false"/.test(html),
+      "the checklist is live before any script ran",
+    )
+    assertStringIncludes(
+      html,
+      "Tick what you see in the proposal you received.",
+    )
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, HIRE, "proposal-checklist-figure")
+      const verdict = page.locator("#proposal-checklist-figure [data-verdict]")
+      const result = page.locator("#proposal-checklist-figure [data-result]")
+      const tick = async (name: string) => {
+        await page.getByRole("checkbox", { name }).focus()
+        await page.keyboard.press("Space")
+      }
+      await tick("A live app on your stack")
+      assertEquals(
+        await verdict.textContent(),
+        "No red flags, but little proof yet: ask the three questions below.",
+      )
+      await tick("One specific insight from real work")
+      await tick("A dated, priced first step")
+      assertEquals(
+        await verdict.textContent(),
+        "No red flags and three or more green ones: offer this candidate a paid first step.",
+      )
+      await tick("The diagnosis fits any app")
+      assertEquals(
+        await verdict.textContent(),
+        "One red flag: ask about it before you pay for anything.",
+      )
+      await tick("A video link is the whole reply")
+      assertEquals(
+        await verdict.textContent(),
+        "Two or more red flags: pass, however good the price looks.",
+      )
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Red flags: 2 of 9. Green flags: 3 of 5.",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertEquals(
+        await verdict.textContent(),
+        "Tick what you see in the proposal you received.",
+      )
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: HIRE, part: "ProposalChecklist" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("the Deno ties checklist starts with Seed's ticks and follows the keyboard", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${DENO}`)
+    assertStringIncludes(
+      html,
+      "You ticked 11 of 14. Seed had 11 of those, and here is what replaced each one.",
+    )
+    assert(
+      /id="deno-ties-figure"[^>]*data-live="false"/.test(html),
+      "the checklist is live before any script ran",
+    )
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, DENO, "deno-ties-figure")
+      const result = page.locator("#deno-ties-figure [data-result]")
+      const kv = page.getByRole("checkbox", { name: "Deno KV" })
+      await kv.focus()
+      await page.keyboard.press("Space")
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "You ticked 12 of 14. Seed had 11 of those",
+      )
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Never used: the data lives in Postgres and Valkey.",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertEquals(await kv.isChecked(), false)
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Nothing ticked: your project has none of these ties.",
+      )
+      await page.getByRole("button", { name: "Show Seed's ticks" }).click()
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "You ticked 11 of 14.",
+      )
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: DENO, part: "DenoTiesChecklist" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("the MVP cost calculator follows the keyboard and sends no pick", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${MVP}`)
+    assert(
+      /id="mvp-cost-figure"[^>]*data-live="false"/.test(html),
+      "the calculator is live before any script ran",
+    )
+    assertStringIncludes(html, "6–12 weeks, $16,800–$33,600")
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, MVP, "mvp-cost-figure")
+      const estimate = page.locator("#mvp-cost-figure [data-estimate]")
+      const result = page.locator("#mvp-cost-figure [data-result]")
+      const pick = async (role: "radio" | "checkbox", name: string) => {
+        await page.getByRole(role, { name, exact: true }).focus()
+        await page.keyboard.press("Space")
+      }
+      await pick("radio", "From a SaaS starter")
+      assertEquals(await estimate.textContent(), "4–8 weeks, $10,800–$22,200")
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "18–37 working days. The starter saved 10–19 of them.",
+      )
+      await pick("checkbox", "Phone apps for iOS and Android")
+      await pick("radio", "$150/h")
+      assertEquals(
+        await estimate.textContent(),
+        "6–12 weeks, $33,600–$68,400",
+      )
+      await pick("checkbox", "Teams and roles")
+      assertEquals(
+        await estimate.textContent(),
+        "5–11 weeks, $30,000–$61,200",
+      )
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: MVP, part: "MvpCostCalculator" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("every component box has no axe violation at 390 and 1440px", async () => {
   const site = await startSite()
   let browser: Browser | undefined
@@ -178,6 +360,9 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
             [TRAIL, "how-many-tasks-figure"],
             [OPUS, "per-call-price-figure"],
             [LAB, "decision-framework-figure"],
+            [DENO, "deno-ties-figure"],
+            [HIRE, "proposal-checklist-figure"],
+            [MVP, "mvp-cost-figure"],
           ]
         ) {
           await openPost(page, site.origin, slug, id)

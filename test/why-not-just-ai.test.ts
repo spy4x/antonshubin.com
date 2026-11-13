@@ -11,6 +11,7 @@ import {
   comparisonRows,
   HOURLY_AI_BILLING,
   processSteps,
+  RINGMASTER_LINE,
   WEEKLY_AUDIT,
   WHY_NOT_JUST_AI_H1,
   WHY_NOT_JUST_AI_LEAD,
@@ -268,13 +269,17 @@ siteTest(
         `${name} says Anton reviews every change himself`,
       )
     }
-    // The audit is a step of the process, before the weekly software.
+    // The audit and Ringmaster are steps of the process, before the weekly
+    // software.
     const steps = processSteps()
     const weekly = steps.indexOf(
       steps.find((s) => promise("weekly-software").desc.startsWith(s))!,
     )
-    assert(weekly > 0, "no weekly software step")
-    assertEquals(steps.indexOf(WEEKLY_AUDIT), weekly - 1)
+    assert(weekly > 1, "no weekly software step")
+    assertEquals(steps.slice(weekly - 2, weekly), [
+      WEEKLY_AUDIT,
+      RINGMASTER_LINE,
+    ])
   },
 )
 
@@ -314,7 +319,7 @@ siteTest(
 
 for (const tz of ["Pacific/Honolulu", "Asia/Tokyo"]) {
   Deno.test(
-    `why-not-just-ai shows the table's checked date as October 20, 2026 on a server in ${tz}`,
+    `why-not-just-ai shows the table's checked date as November 9, 2026 on a server in ${tz}`,
     async () => {
       const site = await startSite({ env: { TZ: tz } })
       try {
@@ -322,8 +327,8 @@ for (const tz of ["Pacific/Honolulu", "Asia/Tokyo"]) {
           slice(await site.html(PAGE), "<table", "</figure>"),
         )
         assert(
-          table.includes("Checked on October 20, 2026."),
-          `no checked date of October 20, 2026 in: ${table}`,
+          table.includes("Checked on November 9, 2026."),
+          `no checked date of November 9, 2026 in: ${table}`,
         )
       } finally {
         await site.stop()

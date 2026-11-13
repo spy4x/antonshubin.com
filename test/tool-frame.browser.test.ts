@@ -207,3 +207,41 @@ Deno.test("a focused screenshot, dark or white, draws a Parchment and Ink ring i
     await site.stop()
   }
 })
+
+Deno.test("the sticky facts card never covers the fit lists and the story while scrolling", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    try {
+      await page.goto(`${site.origin}/tools/seed`, {
+        waitUntil: "networkidle",
+      })
+      const fit = page.locator("[data-tool-fit-row]")
+      const card = page.locator("[data-fact-card]")
+      for (const block of ["start", "center", "end"] as const) {
+        await fit.evaluate(
+          (el, block) => el.scrollIntoView({ block }),
+          block,
+        )
+        const c = await card.boundingBox()
+        const f = await fit.boundingBox()
+        assert(c && f, "the card or the fit row is missing")
+        assert(
+          c.y + c.height <= f.y,
+          `the card ends at ${
+            c.y + c.height
+          }px, below the fit row's top at ${f.y}px (scrolled to ${block})`,
+        )
+      }
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

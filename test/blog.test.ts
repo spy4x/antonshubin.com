@@ -6,7 +6,8 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
 import { count, jsonLd, visibleText } from "./html.ts"
 import { blogArticles } from "../lib/data.ts"
-import { NEWSLETTER_HREF, TOC_MIN_MINUTES } from "../lib/blog.ts"
+import { coverWebp } from "../lib/blog-posts.ts"
+import { NEWSLETTER_HEADING, TOC_MIN_MINUTES } from "../lib/blog.ts"
 import { BOOK_LABEL } from "../lib/nav.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
 import { findTool } from "../lib/tools.ts"
@@ -183,18 +184,17 @@ function buttons(html: string): string[] {
     .filter((tag) => tag.startsWith("<button") || tag.includes("rounded-lg!"))
 }
 
+/** Everything a reader meets after a post's article: the band, "Read next" and the side column. */
+function afterArticle(html: string): string {
+  return html.slice(html.indexOf("data-closing-band"), html.indexOf("<footer"))
+}
+
 siteTest(
-  "after the article a post has exactly one button, Book on a founder post and Subscribe on any other, with the other ask as a plain link",
+  "after the article every post has exactly one button, the newsletter form's, under the author",
   async (site) => {
-    const asks = { book: 0, newsletter: 0 }
     for (const article of blogArticles) {
       const html = await site.html(`/blog/${article.slug}`)
-      // Everything a reader meets after the article: the band, "Read next"
-      // and the side column.
-      const after = html.slice(
-        html.indexOf("data-closing-band"),
-        html.indexOf("<footer"),
-      )
+      const after = afterArticle(html)
       const box = section(html, "data-closing-band")
       assert(box, `${article.slug} has no closing band`)
       const author = block(box, "data-author-box", "div")
@@ -203,42 +203,18 @@ siteTest(
         `${article.slug}: the band's children slot holds no author`,
       )
       assert(visibleText(box).includes("I build greenfield SaaS"), box)
+      assert(visibleText(box).includes(NEWSLETTER_HEADING), box)
       const found = buttons(after)
       assertEquals(found.length, 1, `${article.slug}: ${found.join("\n")}`)
+      assert(found[0].includes('type="submit"'), found[0])
+      assert(
+        block(box, "data-newsletter-ask", "form").includes(found[0]),
+        `${article.slug}: the button is not the newsletter form's`,
+      )
       assert(
         box.indexOf("data-author-box") < box.indexOf(found[0]),
         `${article.slug}: the author must come before the ask`,
       )
-      const bookLinks = [...after.matchAll(/<a\b[^>]*href="\/book"[^>]*>/g)]
-      assertEquals(bookLinks.length, 1, `${article.slug}: Book links`)
-      if (article.topic === "founders") {
-        asks.book++
-        assert(found[0].includes("data-primary-book"), found[0])
-        assertEquals(count(after, /<form\b/), 0, article.slug)
-        assert(
-          box.includes(`href="${NEWSLETTER_HREF}"`),
-          `${article.slug} has no plain link to the newsletter`,
-        )
-      } else {
-        asks.newsletter++
-        assert(found[0].includes('type="submit"'), found[0])
-        assert(
-          block(box, "data-newsletter-ask", "form").includes(found[0]),
-          `${article.slug}: the button is not the newsletter form's`,
-        )
-        assertEquals(count(after, /data-primary-book/), 0, article.slug)
-        assert(
-          box.includes(`>${BOOK_LABEL}</a>`),
-          `${article.slug}: Book is not a plain link`,
-        )
-      }
-      if (article.catalogSlug) {
-        assert(
-          box.includes(`href="/catalog/${article.catalogSlug}"`),
-          `${article.slug} does not link its service`,
-        )
-        assert(visibleText(box).includes("The same work for you:"), box)
-      }
       // One set of links after the post, not five (Mkt 1, 8, 9).
       assert(
         !html.includes("data-post-nav"),
@@ -249,8 +225,27 @@ siteTest(
         `${article.slug} keeps Share`,
       )
     }
-    assert(asks.book > 0, "no founder post to check")
-    assert(asks.newsletter > 0, "no developer post to check")
+  },
+)
+
+siteTest(
+  "no post page ends in a sales pitch: no Book, no sales heading and no service link after the article, founder posts included",
+  async (site) => {
+    let founders = 0
+    for (const article of blogArticles) {
+      if (article.topic === "founders") founders++
+      const after = afterArticle(await site.html(`/blog/${article.slug}`))
+      assertEquals(count(after, /data-primary-book/), 0, article.slug)
+      assertEquals(count(after, /href="\/book[#"?]/), 0, article.slug)
+      assertEquals(count(after, /href="\/catalog/), 0, article.slug)
+      assertEquals(
+        count(after, /Need this for your product\?/),
+        0,
+        article.slug,
+      )
+      assertEquals(visibleText(after).includes(BOOK_LABEL), false, article.slug)
+    }
+    assert(founders > 0, "no founder post to check")
   },
 )
 
@@ -268,10 +263,7 @@ siteTest(
       )
       const text = visibleText(line)
       assert(text.includes(`Reply by email: ${EMAIL_ADDRESS}`), text)
-      const ask = Math.max(
-        box.indexOf("data-primary-book"),
-        box.indexOf("<form"),
-      )
+      const ask = box.indexOf("<form")
       assert(
         ask > 0 && ask < box.indexOf("data-reply-line"),
         `${article.slug}: the reply line is not under the ask`,
@@ -279,24 +271,6 @@ siteTest(
     }
   },
 )
-
-Deno.test("without a booking URL a founder post's one button is the newsletter form and nothing offers Book", async () => {
-  const site = await startSite({ env: { SCHEDULE_URL: "" } })
-  try {
-    const founder = blogArticles.find((a) => a.topic === "founders")!
-    const html = await site.html(`/blog/${founder.slug}`)
-    const after = html.slice(
-      html.indexOf("data-closing-band"),
-      html.indexOf("<footer"),
-    )
-    const found = buttons(after)
-    assertEquals(found.length, 1, found.join("\n"))
-    assert(found[0].includes('type="submit"'), found[0])
-    assertEquals(count(after, /href="\/book"/), 0)
-  } finally {
-    await site.stop()
-  }
-})
 
 siteTest(
   "every post in the sitemap opens with its TL;DR heading and list before any other heading",
@@ -540,5 +514,139 @@ siteTest(
         article.slug,
       )
     }
+  },
+)
+
+/** Every `<img>` tag in `html`. */
+function imgTags(html: string): string[] {
+  return [...html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0])
+}
+
+/**
+ * An attribute's decoded value in one tag, without Fresh's `?__frsh_c=`
+ * cache-busting query; "" for a bare attribute (Preact prints `alt=""` as
+ * `alt`); undefined without it.
+ */
+function attr(tag: string, name: string): string | undefined {
+  const value = tag.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1]
+  if (value === undefined) {
+    return new RegExp(`\\s${name}(?=[\\s/>])`).test(tag) ? "" : undefined
+  }
+  return visibleText(value.replace(/\?__frsh_c=[^\s"]*/g, ""))
+}
+
+/** `html` without Fresh's `?__frsh_c=` cache-busting queries. */
+function unbusted(html: string): string {
+  return html.replace(/\?__frsh_c=[^\s"]*/g, "")
+}
+
+siteTest(
+  "every /blog row, archive included, carries its decorative cover, lazy except the first, and no second link",
+  async (site) => {
+    const html = await site.html("/blog")
+    const rows = html.split("data-post-row").slice(1)
+      .map((row) => row.slice(0, row.indexOf("</li>")))
+    assertEquals(rows.length, blogArticles.length, "one row per post")
+    const first = rows[0]
+    for (const article of blogArticles) {
+      const row = rows.find((r) => r.includes(`href="/blog/${article.slug}"`))
+      assert(row, `${article.slug} has no row`)
+      const imgs = imgTags(row)
+      assertEquals(imgs.length, 1, `${article.slug}: one cover per row`)
+      assertEquals(attr(imgs[0], "src"), article.coverImage, article.slug)
+      assertEquals(attr(imgs[0], "alt"), "", article.slug)
+      assertEquals(attr(imgs[0], "aria-hidden"), "true", article.slug)
+      assertEquals(
+        attr(imgs[0], "loading"),
+        row === first ? "eager" : "lazy",
+        article.slug,
+      )
+      const small = article.coverImage.replace(/\.png$/, "-480.webp")
+      assert(
+        unbusted(row).includes(`srcset="${small} 480w`),
+        `${article.slug}: no 480px WebP in the row's srcset`,
+      )
+      assertEquals(
+        count(row, /<a\b/g),
+        1,
+        `${article.slug}: the cover must not be a second link`,
+      )
+    }
+    const main = html.slice(html.indexOf("<main"))
+    assertEquals(
+      count(main, /fetchpriority="high"/g),
+      1,
+      "/blog priority images",
+    )
+    assertEquals(count(main, /loading="eager"/g), 1, "/blog eager images")
+    assert(
+      first.includes('fetchpriority="high"'),
+      "the first row's cover leads",
+    )
+  },
+)
+
+siteTest(
+  "each post's one eager, high-priority image is its whole cover, under the header, with its alt and size, opening in the lightbox",
+  async (site) => {
+    for (const article of blogArticles) {
+      const html = await site.html(`/blog/${article.slug}`)
+      const priority = imgTags(html).filter((t) => t.includes("fetchpriority"))
+      assertEquals(priority.length, 1, `${article.slug}: priority images`)
+      const [cover] = priority
+      const { whole, wholeSmall } = coverWebp(article.coverImage)
+      assertEquals(attr(cover, "fetchpriority"), "high", article.slug)
+      assertEquals(unbusted(attr(cover, "src") ?? ""), whole, article.slug)
+      assertEquals(attr(cover, "alt"), article.coverAlt, article.slug)
+      assertEquals(
+        [attr(cover, "width"), attr(cover, "height")],
+        [`${article.coverSize.width}`, `${article.coverSize.height}`],
+        `${article.slug}: size`,
+      )
+      assertEquals(count(html, /loading="eager"/g), 1, `${article.slug} eager`)
+      const at = html.indexOf(cover)
+      assert(
+        html.indexOf("</header>", html.indexOf("<h1")) < at &&
+          at < html.indexOf("data-tldr"),
+        `${article.slug}: the cover must sit between the header and the TL;DR`,
+      )
+      assert(
+        unbusted(cover).includes(
+          article.coverSize.width > 480
+            ? `srcset="${wholeSmall} 480w, ${whole} ${article.coverSize.width}w"`
+            : `srcset="${whole} ${article.coverSize.width}w"`,
+        ),
+        `${article.slug}: webp`,
+      )
+      const figure = html.slice(html.lastIndexOf("<figure", at), at)
+      assert(
+        figure.includes("data-post-cover") && figure.includes("data-lightbox"),
+        `${article.slug}: the cover must be a lightbox button`,
+      )
+    }
+  },
+)
+
+siteTest(
+  "a /blog row says Video in its meta line only when its post has a video",
+  async (site) => {
+    const html = await site.html("/blog")
+    const rows = html.split("data-post-row").slice(1)
+      .map((row) => row.slice(0, row.indexOf("</li>")))
+    let videos = 0
+    for (const article of blogArticles) {
+      const row = rows.find((r) => r.includes(`href="/blog/${article.slug}"`))
+      assert(row, `${article.slug} has no row`)
+      const meta = visibleText(block(row, "<p", "p"))
+      assert(meta.includes("min read"), `${article.slug}: no meta line`)
+      if (article.youtubeVideoId) videos++
+      assertEquals(
+        meta.includes("Video"),
+        Boolean(article.youtubeVideoId),
+        `${article.slug}: meta line "${meta}"`,
+      )
+    }
+    assert(videos > 0, "no post has a video to check")
+    assert(videos < blogArticles.length, "no post without a video to check")
   },
 )

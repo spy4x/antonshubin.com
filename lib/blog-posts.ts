@@ -19,9 +19,15 @@ import { proof } from "./proof.ts"
 /**
  * The topics, in the order `/blog` lists them: the three #191 decided, plus
  * Scars (Anton, 9 October 2026), posts about a mistake of mine and what I
- * changed after it.
+ * changed after it, plus For developers (Anton, 13 November 2026), so a
+ * post written for developers ends with the newsletter, not Book.
  */
-export type TopicId = "founders" | "ai-mcp" | "self-hosting" | "scars"
+export type TopicId =
+  | "founders"
+  | "developers"
+  | "ai-mcp"
+  | "self-hosting"
+  | "scars"
 
 export interface Topic {
   id: TopicId
@@ -30,6 +36,7 @@ export interface Topic {
 
 export const topics: Topic[] = [
   { id: "founders", title: "For founders" },
+  { id: "developers", title: "For developers" },
   { id: "ai-mcp", title: "AI and MCP" },
   { id: "self-hosting", title: "Self-hosting" },
   { id: "scars", title: "Scars" },
@@ -76,13 +83,15 @@ export interface BlogArticle {
   catalogSlug?: string
   youtubeVideoId?: string
   /**
-   * The cover, a site path to a 1000×420 PNG under `static/img/`, cut from a
-   * real screenshot in the post. The page itself never shows it;
-   * `scripts/devto.ts` sends it as the Dev.to `main_image` and the newsletter
-   * mail shows it. Required for a post published on or after
-   * {@linkcode LETTER_FIELDS_FROM}; see {@linkcode postCover}.
+   * The cover, a site path to a 1000×420 PNG under `static/img/`: a meme or
+   * picture that sets the post's mood, not a cropped screenshot. Required.
+   * `/blog` shows it on the post's row through the two WebP copies beside it,
+   * and the post page shows the picture alone at its own shape, through the
+   * two `cover-full` copies ({@linkcode coverWebp}, {@linkcode coverSize});
+   * `scripts/devto.ts` sends the PNG as the Dev.to `main_image` and the
+   * newsletter mail shows it.
    */
-  coverImage?: string
+  coverImage: string
   /**
    * Two or three sentences in Anton's voice on why the post exists and who it
    * is for (docs/publishing.md). It opens the newsletter mail and the Dev.to
@@ -90,15 +99,20 @@ export interface BlogArticle {
    * {@linkcode LETTER_FIELDS_FROM}; see {@linkcode postIntro}.
    */
   intro?: string
-  /** The cover's alt text. Required from {@linkcode LETTER_FIELDS_FROM}. */
-  coverAlt?: string
+  /** The cover's alt text, read on the post page. Required. */
+  coverAlt: string
+  /**
+   * The size of `cover-full.webp`, written as `"552x414"` in the front matter
+   * (`scripts/blog-cover.sh` prints it): the post page sizes the cover from it,
+   * so its box has its final size before the file loads.
+   */
+  coverSize: { width: number; height: number }
 }
 
 /**
- * The day #364 merged. A post published on or after it must carry `intro`,
- * `coverImage` and `coverAlt` or the build fails; an older post falls back
- * (`postIntro()`, `postCover()`, `postCoverAlt()`), so no old post is edited
- * just to keep building.
+ * The day #364 merged. A post published on or after it must carry `intro` or
+ * the build fails; an older post falls back to its description
+ * (`postIntro()`), so no old post is edited just to keep building.
  */
 export const LETTER_FIELDS_FROM = "2026-10-02"
 
@@ -107,14 +121,24 @@ export function postIntro(article: BlogArticle): string {
   return article.intro ?? article.description
 }
 
-/** The post's cover: its `coverImage`, else its OG preview PNG (1200×630). */
-export function postCover(article: BlogArticle): string {
-  return article.coverImage ?? `/img/og/blog/${article.slug}.png`
-}
-
-/** The cover's alt text: its `coverAlt`, else the post's title. */
-export function postCoverAlt(article: BlogArticle): string {
-  return article.coverAlt ?? article.title
+/**
+ * The WebP copies of a cover PNG, which sit beside it: `full` is 1000×420 and
+ * `small` 480×202, the banner for `/blog`; `whole` (at most 1000px on a side)
+ * and `wholeSmall` (480px wide) are the picture alone, for the post page.
+ */
+export function coverWebp(coverImage: string): {
+  full: string
+  small: string
+  whole: string
+  wholeSmall: string
+} {
+  const base = coverImage.replace(/\.png$/, "")
+  return {
+    full: `${base}.webp`,
+    small: `${base}-480.webp`,
+    whole: `${base}-full.webp`,
+    wholeSmall: `${base}-full-480.webp`,
+  }
 }
 
 const TOPIC_IDS = new Set<string>(topics.map((t) => t.id))
@@ -124,6 +148,8 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
  * and `scripts/strip-metadata.ts` cleans).
  */
 const COVER_PATH = /^\/img\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.png$/
+/** `coverSize`: width x height in pixels, as `scripts/blog-cover.sh` prints. */
+const COVER_SIZE = /^([1-9]\d{1,3})x([1-9]\d{1,3})$/
 /** How many lines a TL;DR may have (Anton, 30 September 2026). */
 export const TLDR_MIN_LINES = 2
 export const TLDR_MAX_LINES = 4
@@ -146,6 +172,7 @@ const KNOWN_KEYS = new Set([
   "coverImage",
   "intro",
   "coverAlt",
+  "coverSize",
   // The post's UTM campaign, read by scripts/utm.ts (docs/utm.md).
   "utmCampaign",
 ])
@@ -252,33 +279,32 @@ export function parseBlogArticle(
     }
   }
 
-  const coverImage = text("coverImage", false)
-  if (coverImage !== undefined) {
-    if (!COVER_PATH.test(coverImage)) {
+  const coverImage = text("coverImage", true)!
+  if (!COVER_PATH.test(coverImage)) {
+    throw new Error(
+      `${where}: "coverImage" must be a /img/... path to a .png file`,
+    )
+  }
+  for (const path of [coverImage, ...Object.values(coverWebp(coverImage))]) {
+    if (!isFile(`${staticDir}${path}`)) {
       throw new Error(
-        `${where}: "coverImage" must be a /img/... path to a .png file`,
-      )
-    }
-    if (!isFile(`${staticDir}${coverImage}`)) {
-      throw new Error(
-        `${where}: "coverImage" ${coverImage} is not a file under ${staticDir}/`,
+        `${where}: cover ${path} is not a file under ${staticDir}/`,
       )
     }
   }
+  const coverAlt = text("coverAlt", true)!
+  const size = COVER_SIZE.exec(text("coverSize", true)!)
+  if (!size) {
+    throw new Error(`${where}: "coverSize" must be "<width>x<height>"`)
+  }
+  const coverSize = { width: Number(size[1]), height: Number(size[2]) }
 
   const publishedAt = date("publishedAt", true)!
   const intro = text("intro", false)
-  const coverAlt = text("coverAlt", false)
-  if (publishedAt >= LETTER_FIELDS_FROM) {
-    for (
-      const [key, value] of Object.entries({ intro, coverImage, coverAlt })
-    ) {
-      if (value === undefined) {
-        throw new Error(
-          `${where}: "${key}" is missing; a post published on or after ${LETTER_FIELDS_FROM} needs it`,
-        )
-      }
-    }
+  if (publishedAt >= LETTER_FIELDS_FROM && intro === undefined) {
+    throw new Error(
+      `${where}: "intro" is missing; a post published on or after ${LETTER_FIELDS_FROM} needs it`,
+    )
   }
 
   const article: BlogArticle = {
@@ -289,6 +315,9 @@ export function parseBlogArticle(
     readTime,
     publishedAt,
     topic: topicId as TopicId,
+    coverImage,
+    coverAlt,
+    coverSize,
   }
   const optional = {
     seoTitle: text("seoTitle", false),
@@ -297,9 +326,7 @@ export function parseBlogArticle(
     relatedTool: text("relatedTool", false),
     catalogSlug: text("catalogSlug", false),
     youtubeVideoId: text("youtubeVideoId", false),
-    coverImage,
     intro: intro === undefined ? undefined : fillProof(intro),
-    coverAlt,
   }
   for (const [key, value] of Object.entries(optional)) {
     if (value !== undefined) {

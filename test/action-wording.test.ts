@@ -39,6 +39,8 @@ const EXCEPTIONS: Record<string, string> = {
     "the form's submit button sends the brief, it does not open it",
   "/ | Send my brief":
     "the form's submit button sends the brief, it does not open it",
+  "/ | Ask about a team set-up":
+    "the team set-up line's own ask (#615): a brief about a different offer than the call",
   "/pay | From outside US? Contact me":
     "a payment question, not a booking; it links the page that lists email and Telegram",
   "/tools | Open the booking page":
@@ -48,6 +50,8 @@ const EXCEPTIONS: Record<string, string> = {
   "/tools/mig | Load my calendar here":
     "loads the same calendar in place on the tool page (#457); without JavaScript it opens /book#book",
   "/blog/mig-tiny-self-hosted-scheduler | Open the booking page":
+    "mig's running instance, the post's live link read from lib/tools.ts",
+  "/blog/code-audit-ai-built-app | Open the booking page":
     "mig's running instance, the post's live link read from lib/tools.ts",
   "/blog/cost-optimization-laboratory | written brief":
     "a post's own prose, in the words the brief's form uses",
