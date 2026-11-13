@@ -64,7 +64,7 @@ export default function MvpCostCalculator({ post }: { post: string }) {
         >
           <div class="flex flex-col gap-5">
             <fieldset class="m-0 min-w-0 border-0 p-0">
-              <legend class={LEGEND}>The thing people pay for</legend>
+              <legend class={LEGEND}>Your core feature</legend>
               {CORE_SIZES.map((c) => (
                 <label key={c.id} class={LABEL}>
                   <input
@@ -83,7 +83,9 @@ export default function MvpCostCalculator({ post }: { post: string }) {
               ))}
             </fieldset>
             <fieldset class="m-0 min-w-0 border-0 p-0">
-              <legend class={LEGEND}>Sign-in, payments, admin, deploy</legend>
+              <legend class={LEGEND}>
+                Sign-in, payments, admin and deploy
+              </legend>
               {[
                 { on: false, label: "Built from scratch" },
                 { on: true, label: "From a SaaS starter" },

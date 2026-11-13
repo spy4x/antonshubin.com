@@ -162,16 +162,27 @@ it happens a lot.
 There's no single right answer. Here's an honest comparison, with prices checked
 on 13 November 2026.
 
-| Way                      | What you pay                                                                                           | Best when                                                  | Watch out for                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| No-code (Bubble)         | [$32 to $349 a month][bubble] for web plans billed yearly, plus usage, plus your own time              | You want to test demand and you're happy to learn the tool | You can't take the code with you if you outgrow it                            |
-| AI app builder (Lovable) | [About $25 a month][lovable] and your evenings                                                         | A prototype to show investors or first users               | The last 20%: payments, security, data                                        |
-| Freelancer               | Their rate × days. The calculator above uses $35, $75 and $150 an hour                                 | A clear scope and one person you trust                     | One person is one point of failure. Check who owns the code                   |
-| Agency                   | Most on Clutch [charge $24 to $49 an hour][clutch]; onshore agencies charge a lot more                 | A big scope, design and a project manager included         | You pay for the project manager too, and you may never meet the developer     |
-| Hire an employee         | A US software developer's median pay was [$135,980 a year][bls] in May 2025, before taxes and benefits | You're past the MVP and building for years                 | Hiring takes months, and one person rarely covers design, backend and servers |
+- **No-code (Bubble):** [$32 to $349 a month][bubble] for web plans billed
+  yearly, plus usage, plus your own time. Best when you want to test demand and
+  you're happy to learn the tool. Watch out: you can't take the code with you if
+  you outgrow it.
+- **AI app builder (Lovable):** [about $25 a month][lovable] and your evenings.
+  Best for a prototype to show investors or first users. Watch out for the last
+  20%: payments, security, data.
+- **Freelancer:** their rate × days; the calculator above uses $35, $75 and $150
+  an hour. Best with a clear scope and one person you trust. Watch out: one
+  person is one point of failure, so check who owns the code.
+- **Agency:** most on Clutch [charge $24 to $49 an hour][clutch]; onshore
+  agencies charge a lot more. Best for a big scope with design and a project
+  manager included. Watch out: you pay for the project manager too, and you may
+  never meet the developer.
+- **Hire an employee:** a US software developer's median pay was
+  [$135,980 a year][bls] in May 2025, before taxes and benefits. Best when
+  you're past the MVP and building for years. Watch out: hiring takes months,
+  and one person rarely covers design, backend and servers.
 
-Note what's missing from that table: "the cheapest option". Every row is the
-cheapest one for somebody.
+Note what's missing from that list: "the cheapest option". Every one of them is
+the cheapest for somebody.
 
 ## What does it cost to run after launch?
 
