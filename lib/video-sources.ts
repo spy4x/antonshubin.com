@@ -46,6 +46,12 @@ export const VIDEO_SOURCES: readonly VideoSource[] = [
   demo("ts-libs", "d58a2176f21c78a366aa13dfd837aefe5405362b"),
   demo("dotfiles", "435f9df29e506a555cd3c48e178fa460aac20376"),
   demo("seed", "3a14e887ed99f2a269a5b9554d884fa537a16278"),
+  // A private repository: pull it with GITHUB_TOKEN set (scripts/pull-videos.ts).
+  demo(
+    "ringmaster",
+    "d024b9244965ab0b28b71c5e92706cd5fc830120",
+    "ringmaster-next",
+  ),
   {
     slug: "seed",
     repo: "seed",
