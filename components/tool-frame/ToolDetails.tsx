@@ -159,29 +159,39 @@ export function ToolDetails(
   const left = beside === undefined ? <ToolStanding data={data} /> : beside
   const hasLeft = left !== null && left !== false &&
     (beside !== undefined || Boolean(data.tool.works?.length))
-  return (
+  const card = (
     <div
-      data-tool-details
-      class="mt-16 grid gap-x-10 gap-y-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
+      data-fact-card
+      class="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-8"
     >
-      {hasLeft && (
+      <ToolFacts data={data} />
+    </div>
+  )
+  const fit = (
+    <div
+      data-tool-fit-row
+      class={hasLeft
+        ? "min-w-0 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+        : "min-w-0 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-start-1 lg:row-start-1"}
+    >
+      <ToolFit data={data} />
+      <ToolStory data={data} />
+    </div>
+  )
+  const row =
+    "grid gap-x-10 gap-y-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
+  // The sticky card stays inside its own grid: in a grid that also holds the
+  // fit row, it would slide down over "The story" while scrolling.
+  if (!hasLeft) {
+    return <div data-tool-details class={`mt-16 ${row}`}>{card}{fit}</div>
+  }
+  return (
+    <div data-tool-details class="mt-16 grid gap-y-12">
+      <div class={row}>
         <div class="min-w-0 lg:col-start-1 lg:row-start-1">{left}</div>
-      )}
-      <div
-        data-fact-card
-        class="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-8"
-      >
-        <ToolFacts data={data} />
+        {card}
       </div>
-      <div
-        data-tool-fit-row
-        class={hasLeft
-          ? "min-w-0 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-3"
-          : "min-w-0 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-start-1 lg:row-start-1"}
-      >
-        <ToolFit data={data} />
-        <ToolStory data={data} />
-      </div>
+      {fit}
     </div>
   )
 }
