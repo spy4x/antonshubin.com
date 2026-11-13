@@ -192,6 +192,7 @@ export const AUTHOR_LINE =
  */
 export const NEWSLETTER_TOPICS = [
   "decisions for founders",
+  "developer craft",
   "AI and MCP",
   "self-hosting",
   "my own mistakes",

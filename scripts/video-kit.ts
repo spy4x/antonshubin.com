@@ -245,7 +245,7 @@ description: ${JSON.stringify(ctx.summary)}
 tldr: []
 publishedAt: "YYYY-MM-DD"
 readTime: 0
-topic: "founders | ai-mcp | self-hosting | scars"
+topic: "founders | developers | ai-mcp | self-hosting | scars"
 coverImage: "/img/blog/${ctx.slug}/cover.png"
 coverAlt: ""
 coverSize: "WIDTHxHEIGHT"

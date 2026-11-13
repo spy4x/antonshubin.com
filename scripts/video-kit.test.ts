@@ -299,7 +299,7 @@ Deno.test("the blog draft carries every required front matter field, as placehol
     .replace("readTime: 0", "readTime: 4")
     .replace("tldr: []", 'tldr: ["One point.", "Another point."]')
     .replace(
-      `topic: "founders | ai-mcp | self-hosting | scars"`,
+      `topic: "founders | developers | ai-mcp | self-hosting | scars"`,
       `topic: "founders"`,
     )
     .replace("/img/blog/some-post/", "/img/blog/ship-it-today/")

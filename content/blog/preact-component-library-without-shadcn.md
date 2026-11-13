@@ -11,7 +11,7 @@ readTime: 8
 coverImage: "/img/blog/preact-component-library-without-shadcn/cover.png"
 coverAlt: "The Woman Yelling at a Cat meme: \"Shadcn, Radix, MUI: use ours!\" yells the woman; the unimpressed cat at the table is \"Me, owning ten packages\"."
 coverSize: "680x438"
-topic: "founders"
+topic: "developers"
 relatedTool: "preact-components"
 catalogSlug: "zero-to-production-saas-mvp"
 seoTitle: "A Preact component library without shadcn or Radix"

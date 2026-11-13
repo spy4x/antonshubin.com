@@ -19,9 +19,15 @@ import { proof } from "./proof.ts"
 /**
  * The topics, in the order `/blog` lists them: the three #191 decided, plus
  * Scars (Anton, 9 October 2026), posts about a mistake of mine and what I
- * changed after it.
+ * changed after it, plus For developers (Anton, 13 November 2026), so a
+ * post written for developers ends with the newsletter, not Book.
  */
-export type TopicId = "founders" | "ai-mcp" | "self-hosting" | "scars"
+export type TopicId =
+  | "founders"
+  | "developers"
+  | "ai-mcp"
+  | "self-hosting"
+  | "scars"
 
 export interface Topic {
   id: TopicId
@@ -30,6 +36,7 @@ export interface Topic {
 
 export const topics: Topic[] = [
   { id: "founders", title: "For founders" },
+  { id: "developers", title: "For developers" },
   { id: "ai-mcp", title: "AI and MCP" },
   { id: "self-hosting", title: "Self-hosting" },
   { id: "scars", title: "Scars" },

@@ -82,7 +82,7 @@ draft against the brief before the pull request opens.
    publishedAt: "2026-09-26"
    updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
-   topic: "ai-mcp" # founders, ai-mcp, self-hosting or scars
+   topic: "ai-mcp" # founders, developers, ai-mcp, self-hosting or scars
    relatedTool: "mig" # optional; a lib/tools.ts slug
    catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
    seoTitle: "Short title" # optional; <title> only, for a title over 55 characters
@@ -317,14 +317,15 @@ needs no JavaScript), then add an entry to `POST_COMPONENTS` in
 
 Registered today: `CachedShareSlider` (the Opus 5.5 post), `FrameworkChecklist`
 (the cost laboratory post), `DenoTiesChecklist` (the post on moving off Deno),
-`ProposalChecklist` (the AI-built app takeover post), `RunsCalculator` and
-`TaskCostChart` (the Trail-code post). Each sits in the library's `Explorable`
-frame. `TaskCostChart` is a server component with no island; it reads the post's
-dated data file, `content/blog/data/<slug>.json`, through `lib/task-cost.ts`,
-which also writes its summary sentence and its Dev.to table, so no number in the
-chart is typed by hand. The arithmetic of the other five lives in
-`lib/post-math.ts`, `lib/framework-checklist.ts`, `lib/deno-ties.ts` and
-`lib/proposal-checklist.ts`, next to their fallbacks.
+`ProposalChecklist` (the AI-built app takeover post), `MvpCostCalculator` (the
+SaaS MVP cost post), `RunsCalculator` and `TaskCostChart` (the Trail-code post).
+Each sits in the library's `Explorable` frame. `TaskCostChart` is a server
+component with no island; it reads the post's dated data file,
+`content/blog/data/<slug>.json`, through `lib/task-cost.ts`, which also writes
+its summary sentence and its Dev.to table, so no number in the chart is typed by
+hand. The arithmetic of the other six lives in `lib/post-math.ts`,
+`lib/framework-checklist.ts`, `lib/deno-ties.ts`, `lib/proposal-checklist.ts`
+and `lib/mvp-cost.ts`, next to their fallbacks.
 
 On the reader's first input the component calls
 `trackPostTry(post, "<TagName>")` from `lib/analytics.ts`, which sends one

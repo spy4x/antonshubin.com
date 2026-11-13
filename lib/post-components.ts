@@ -16,6 +16,8 @@ import { type Type, type } from "arktype"
 import CachedShareSlider from "../islands/CachedShareSlider.tsx"
 import DenoTiesChecklist from "../islands/DenoTiesChecklist.tsx"
 import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
+import MvpCostCalculator from "../islands/MvpCostCalculator.tsx"
+import { mvpCostMarkdown } from "./mvp-cost.ts"
 import ProposalChecklist from "../islands/ProposalChecklist.tsx"
 import RunsCalculator from "../islands/RunsCalculator.tsx"
 import { TaskCostChart } from "../components/TaskCostChart.tsx"
@@ -86,6 +88,12 @@ export const POST_COMPONENTS: PostComponentRegistry = {
     component: FrameworkChecklist,
     anchor: "decision-framework",
     toMarkdown: () => checklistMarkdown(),
+  }),
+  MvpCostCalculator: postComponent({
+    props: noProps,
+    component: MvpCostCalculator,
+    anchor: "mvp-cost",
+    toMarkdown: () => mvpCostMarkdown(),
   }),
   ProposalChecklist: postComponent({
     props: noProps,

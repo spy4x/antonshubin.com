@@ -10,7 +10,7 @@ readTime: 7
 coverImage: "/img/blog/the-importance-of-code-formatting-with-prettier/cover.png"
 coverAlt: "A tweet: \"Use whatever brace style you prefer. But not this. Don't do this. Seek help instead of this.\" above Java code with every brace and semicolon pushed to the right edge."
 coverSize: "1000x958"
-topic: "founders"
+topic: "developers"
 archived: true
 archiveNote: "In my Deno projects deno fmt does this job now, with no config."
 youtubeVideoId: "uaqFYlfOZeE"

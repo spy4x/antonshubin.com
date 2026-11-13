@@ -30,6 +30,7 @@ const OPUS = "opus-5-5-vs-sonnet-5-agent-costs"
 const LAB = "cost-optimization-laboratory"
 const DENO = "migrate-from-deno-to-node-and-bun"
 const HIRE = "hire-developer-take-over-ai-built-app"
+const MVP = "how-much-does-a-saas-mvp-cost"
 
 /** Loads a post and waits until the figure with `id` has hydrated. */
 async function openPost(page: Page, origin: string, slug: string, id: string) {
@@ -285,6 +286,60 @@ Deno.test("the Deno ties checklist starts with Seed's ticks and follows the keyb
   }
 })
 
+Deno.test("the MVP cost calculator follows the keyboard and sends no pick", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${MVP}`)
+    assert(
+      /id="mvp-cost-figure"[^>]*data-live="false"/.test(html),
+      "the calculator is live before any script ran",
+    )
+    assertStringIncludes(html, "6–12 weeks, $16,800–$33,600")
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, MVP, "mvp-cost-figure")
+      const estimate = page.locator("#mvp-cost-figure [data-estimate]")
+      const result = page.locator("#mvp-cost-figure [data-result]")
+      const pick = async (role: "radio" | "checkbox", name: string) => {
+        await page.getByRole(role, { name, exact: true }).focus()
+        await page.keyboard.press("Space")
+      }
+      await pick("radio", "From a SaaS starter")
+      assertEquals(await estimate.textContent(), "4–8 weeks, $10,800–$22,200")
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "18–37 working days. The starter saved 10–19 of them.",
+      )
+      await pick("checkbox", "Phone apps for iOS and Android")
+      await pick("radio", "$150/h")
+      assertEquals(
+        await estimate.textContent(),
+        "6–12 weeks, $33,600–$68,400",
+      )
+      await pick("checkbox", "Teams and roles")
+      assertEquals(
+        await estimate.textContent(),
+        "5–11 weeks, $30,000–$61,200",
+      )
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: MVP, part: "MvpCostCalculator" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("every component box has no axe violation at 390 and 1440px", async () => {
   const site = await startSite()
   let browser: Browser | undefined
@@ -307,6 +362,7 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
             [LAB, "decision-framework-figure"],
             [DENO, "deno-ties-figure"],
             [HIRE, "proposal-checklist-figure"],
+            [MVP, "mvp-cost-figure"],
           ]
         ) {
           await openPost(page, site.origin, slug, id)
