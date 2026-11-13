@@ -4,9 +4,9 @@ import { ShowcaseFeatures } from "../ToolShowcase.tsx"
 import { heroStill, summaryAfterLede, type ToolPageData } from "./tool-page.ts"
 
 /**
- * The default middle (frame part 4): the entry's "What you get" cards, credit, live proof, summary, packages, the
- * screenshots the hero does not already show, its links to other repos and
- * where it stands. Each block renders only when the entry has data for it.
+ * The default middle (frame part 4): the entry's "What you get" cards,
+ * credit, live proof, summary, packages, the screenshots the hero does not
+ * already show, its links to other repos and where it stands. Each block renders only when the entry has data for it.
  */
 export function DefaultMiddle({ data }: { data: ToolPageData }) {
   const { tool } = data

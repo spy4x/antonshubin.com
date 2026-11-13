@@ -9,8 +9,8 @@ import type { ToolPageData } from "./tool-page.ts"
 
 /**
  * The tool frame's facts card (#454, part 5): Status, Built on, Version,
- * Licence, Runs on, Website, Live, Code and CI, in that order, each row only when it has a
- * value. Its footer holds one link, "View on GitHub". Every link sends
+ * Licence, Runs on, Website, Live, Code and CI, in that order, each row only
+ * when it has a value. Its footer holds one link, "View on GitHub". Every link sends
  * `outbound` with `place: card`.
  */
 export function ToolFacts({ data }: { data: ToolPageData }) {
