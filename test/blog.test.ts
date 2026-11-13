@@ -653,3 +653,27 @@ siteTest(
     }
   },
 )
+
+siteTest(
+  "a /blog row says Video in its meta line only when its post has a video",
+  async (site) => {
+    const html = await site.html("/blog")
+    const rows = html.split("data-post-row").slice(1)
+      .map((row) => row.slice(0, row.indexOf("</li>")))
+    let videos = 0
+    for (const article of blogArticles) {
+      const row = rows.find((r) => r.includes(`href="/blog/${article.slug}"`))
+      assert(row, `${article.slug} has no row`)
+      const meta = visibleText(block(row, "<p", "p"))
+      assert(meta.includes("min read"), `${article.slug}: no meta line`)
+      if (article.youtubeVideoId) videos++
+      assertEquals(
+        meta.includes("Video"),
+        Boolean(article.youtubeVideoId),
+        `${article.slug}: meta line "${meta}"`,
+      )
+    }
+    assert(videos > 0, "no post has a video to check")
+    assert(videos < blogArticles.length, "no post without a video to check")
+  },
+)
