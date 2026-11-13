@@ -104,7 +104,7 @@ Deno.test("a project page's outcome note fits beside its claim with no horizonta
   }
 })
 
-Deno.test("the home page's Upwork note stays under its figures in the fact card, with no horizontal scroll", async () => {
+Deno.test("the home page's Upwork note stays under its proof line, with no horizontal scroll", async () => {
   const site = await startSite()
   let browser: Browser | undefined
   try {
@@ -127,11 +127,11 @@ Deno.test("the home page's Upwork note stays under its figures in the fact card,
               clientWidth: document.documentElement.clientWidth,
             }
           },
-          [`${wrap} > dl`, `${wrap} .note-aside`],
+          [`${wrap} > [data-home-proof-line]`, `${wrap} .note-aside`],
         )
         assert(
           boxes.note.top >= boxes.claim.bottom,
-          `at ${width}px the note (top ${boxes.note.top}) is not below the figures (bottom ${boxes.claim.bottom})`,
+          `at ${width}px the note (top ${boxes.note.top}) is not below the proof line (bottom ${boxes.claim.bottom})`,
         )
         assert(
           boxes.scrollWidth <= boxes.clientWidth,

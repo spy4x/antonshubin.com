@@ -8,13 +8,17 @@ tldr:
   - "For a solo homelab, age encryption is enough; Vault or Doppler is overkill when the risk is losing the box."
 publishedAt: "2026-08-26"
 readTime: 8
+coverImage: "/img/blog/rostok-self-hosted-scaffolder/cover.png"
+coverAlt: "The One Does Not Simply meme: \"One does not simply hand-write every compose file of a homelab\"."
+coverSize: "568x335"
 topic: "self-hosting"
 relatedTool: "rostok"
 ---
 
 Every homelab I have ever stood up started the same way: a folder, a README, a
 bunch of `compose.yml` files I copy-pasted from my last homelab, and a
-`secrets-not-committed.txt` file that immediately drifts from reality.
+`secrets-not-committed.txt` file that immediately drifts from reality. Every.
+Single. Time.
 
 `rostok` is the CLI I built to stop doing that. One wizard, a few prompts, and
 you go from a fresh folder to a deployable infrastructure-as-code repo for your
@@ -30,7 +34,7 @@ Self-hosting is not the hard part. The hard part is the _plumbing around it_:
 
 - Which services fit together, and which ones duplicate functionality
 - Where secrets live — encrypted at rest, decryptable on deploy, never pasted
-  into a Slack DM
+  into a Slack DM (we've all been tempted)
 - The deploy story — same `docker compose up -d` works on a fresh box, on a
   reinstall, and after a migration
 - Recoverability — if the box dies tonight, can you rebuild from the repo alone?
@@ -38,6 +42,8 @@ Self-hosting is not the hard part. The hard part is the _plumbing around it_:
 Every self-hosted stack has these questions. Most answers are local decisions
 ("I keep secrets in a Vaultwarden note") and never migrate to a reusable
 pattern. `rostok` is my attempt to make the answers reusable.
+
+![The Is This a Pigeon meme: a man labelled "Me" points at a butterfly labelled "secrets-not-committed.txt" and asks "Is this secret management?"](/img/blog/rostok-self-hosted-scaffolder/pigeon.webp "Spoiler: it was not.")
 
 ## What the wizard actually does
 
@@ -62,7 +68,7 @@ Welcome to rostok (росток) — scaffold your homelab
     ...
 ```
 
-At the end the wizard writes:
+At the end the wizard writes (no wand required):
 
 ```
 .
@@ -82,11 +88,14 @@ Every `.env` mutation runs the age64 encryptor. The catalog ships with
 `+meta.ts` per stack declaring its variables, defaults, and validation, so the
 wizard cannot accidentally write invalid config.
 
+![The Batman Slapping Robin meme: Robin starts "I'll just type the config by hand" and Batman slaps him, saying "The meta validates it"](/img/blog/rostok-self-hosted-scaffolder/batman-meta.webp "Typed by hand, typo by hand.")
+
 ## The catalog is the product
 
-The CLI is a thin shell around the catalog. `stacks/<name>/+meta.ts` is a typed
-schema that drives both the wizard prompts and the deploy-time substitution into
-`compose.yml`. Adding a new stack is a single PR:
+The CLI is a thin shell around the catalog: the CLI is the waiter, the catalog
+is the kitchen. `stacks/<name>/+meta.ts` is a typed schema that drives both the
+wizard prompts and the deploy-time substitution into `compose.yml`. Adding a new
+stack is a single PR:
 
 ```
 stacks/gatus/
@@ -101,6 +110,8 @@ I currently run 30+ stacks through this catalog on my own homelab (see
 breakdown). Each one is a PR-shaped contribution — easy to vendor, easy to fork,
 easy to retire.
 
+![The Trade Offer meme: a man in a suit offers a trade, "I receive: one PR with +meta.ts", "You receive: a new stack for everyone"](/img/blog/rostok-self-hosted-scaffolder/trade-offer.webp "Adding a stack is one PR.")
+
 ## What I learned shipping it
 
 Three things that surprised me:
@@ -112,11 +123,13 @@ rebuild". `age` is one binary, the `.env.age` files are commit-safe, and the
 decryption happens at deploy time with a key that lives on the deployer's
 machine. No service to keep alive.
 
+![The Left Exit 12 Off Ramp meme: a car labelled "Me, a solo homelabber" swerves off the highway past the straight-on lane "Vault, Doppler" onto the exit "age"](/img/blog/rostok-self-hosted-scaffolder/exit-age.webp "One binary beats one more service to babysit.")
+
 **2. The catalog wants to be committed, not vendored.** I started with "vendor
 the catalog as a git submodule". That made adding a stack a multi-repo PR.
-Folding the catalog into the CLI itself means adding `stacks/<name>/+meta.ts` is
-a one-PR contribution that anyone with `rostok` installed gets next time they
-update.
+Submodules: great until you use them. Folding the catalog into the CLI itself
+means adding `stacks/<name>/+meta.ts` is a one-PR contribution that anyone with
+`rostok` installed gets next time they update.
 
 **3. The wizard is doing less work than I thought.** Most of the time, the
 wizard is reading the meta and writing into the right file. The hard part is the

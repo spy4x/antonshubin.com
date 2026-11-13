@@ -22,6 +22,7 @@ export const ANALYTICS_EVENTS = [
   "cta",
   "tool-install-copy",
   "demo-play",
+  "video",
   "zoom",
   "tool-try",
   "copy",

@@ -9,6 +9,9 @@ tldr:
 publishedAt: "2026-07-22"
 updatedAt: "2026-10-30"
 readTime: 7
+coverImage: "/img/blog/self-hosted-caldav-web-ui-tasks-org/cover.png"
+coverAlt: "The Hide the Pain Harold meme: Harold smiles at \"Tasks on my phone: synced to CalDAV\", then forces the same smile at \"Tasks on my laptop: no web UI\"."
+coverSize: "480x601"
 topic: "self-hosting"
 relatedTool: "caldav-tasks-web"
 catalogSlug: "cto-advisory-retainer"
@@ -29,6 +32,8 @@ wrote them.
 This post is for people who already run a CalDAV server and use Tasks.org. I'll
 show what the app does, how it keeps the phone's data intact, which servers it
 is known to work with, and how to run it.
+
+![The "Is this a pigeon?" meme: a man labelled "Me at my desk" points at a butterfly labelled "My phone" and asks "Is this a web UI for my tasks?"](/img/blog/self-hosted-caldav-web-ui-tasks-org/pigeon.webp "A year of desk work, one phone in hand")
 
 ## What changed since the first version
 

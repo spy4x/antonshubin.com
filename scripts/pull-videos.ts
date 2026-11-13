@@ -7,6 +7,10 @@
  * Idempotent: a file whose bytes already match is left alone, and a changed
  * one is written to a temporary name and renamed, so an interrupted run never
  * leaves half a video. Any answer other than 200 stops the run with the URL.
+ * A clip from a private repository (Ringmaster's) needs `GITHUB_TOKEN`, sent
+ * only to raw.githubusercontent.com:
+ *
+ *   GITHUB_TOKEN=$(gh auth token) deno task pull:videos
  */
 import {
   rawUrl,
@@ -68,7 +72,13 @@ export async function pullVideos(
 
 if (import.meta.main) {
   const root = new URL("../static/video/tools", import.meta.url).pathname
-  for (const { path, status } of await pullVideos(VIDEO_SOURCES, root)) {
+  const token = Deno.env.get("GITHUB_TOKEN")
+  const fetchFile: typeof fetch = token
+    ? (url) => fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    : fetch
+  for (
+    const { path, status } of await pullVideos(VIDEO_SOURCES, root, fetchFile)
+  ) {
     console.log(`${status.padEnd(9)} ${path.slice(root.length + 1)}`)
   }
 }
