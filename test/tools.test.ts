@@ -24,6 +24,12 @@ function hasCustomPage(slug: string): boolean {
   }
 }
 
+/** Whether a tool's page renders the default middle: no route of its own, or one that renders `DefaultMiddle`. */
+function hasDefaultMiddle(slug: string): boolean {
+  return !hasCustomPage(slug) ||
+    Deno.readTextFileSync(`routes/tools/${slug}.tsx`).includes("<DefaultMiddle")
+}
+
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
   Deno.test(name, async () => {
@@ -214,7 +220,7 @@ siteTest(
   "each tool with posts links them, and each of those posts links its tool page back",
   async (site) => {
     const withPosts = tools.filter((t) => t.posts?.length)
-    assertEquals(withPosts.length, 7)
+    assertEquals(withPosts.length, 8)
     for (const t of withPosts) {
       const page = await site.html(`/tools/${t.slug}`)
       for (const slug of t.posts!) {
@@ -266,7 +272,8 @@ siteTest(
         text.includes(t.catalogSlug ? "See the MVP offer" : "Services"),
         `${t.slug}: offer link`,
       )
-      if (!t.catalogSlug) {
+      // A page's own `buildLine` is checked by that page's test.
+      if (!t.catalogSlug && t.slug !== "ringmaster") {
         assert(
           text.includes(
             "Need something like this for your team? That's my day job.",
@@ -336,7 +343,7 @@ siteTest(
         .map((m) => visibleText(m[1]).split(" ")[0])
       assertEquals(
         labels,
-        hasCustomPage(t.slug)
+        !hasDefaultMiddle(t.slug)
           ? []
           : (t.fits ?? []).map((f) => (f.planned ? "Planned" : "Today")),
         t.slug,
@@ -688,7 +695,7 @@ siteTest(
       for (const w of t.works ?? []) {
         assert(visibleText(`<x ${works}`).includes(w), `${t.slug}: ${w}`)
       }
-      if (t.works?.length) {
+      if (t.works?.length && t.repo) {
         const notYet = page.slice(page.indexOf("data-not-yet"))
         assert(
           notYet.includes(`href="https://github.com/${t.repo}/issues"`),

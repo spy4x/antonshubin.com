@@ -41,6 +41,7 @@ with every event, so no event has a `page` property.
 | `cta`                                | an internal call-to-action link (work card, service card, tool card, How I work, FAQ …)                       | `place`, `target` (the link's path)                                                                                                                                                                                                                    |
 | `tool-install-copy`                  | an install command, or a tool page's quick-start command, is copied                                           | `item`                                                                                                                                                                                                                                                 |
 | `demo-play`                          | a tool page's demo clip is played (`DemoVideo`'s play link pressed)                                           | `item` (tool slug), `place` (`hero`, `body`, or `card` on the `/tools` hub)                                                                                                                                                                            |
+| `video`                              | the home hero's video is played (`islands/HomeVideo.tsx`'s play link pressed), once per view                  | `place` (`hero`)                                                                                                                                                                                                                                       |
 | `zoom`                               | a screenshot on a tool page opens in the lightbox                                                             | `item` (tool slug)                                                                                                                                                                                                                                     |
 | `tool-try`                           | a tool page's own interaction is used                                                                         | `item` (tool slug), `part` (which interaction; each page lists its values under "Tool pages" below)                                                                                                                                                    |
 | `copy`                               | a `/pay` copy button                                                                                          | `field`                                                                                                                                                                                                                                                |
@@ -56,6 +57,12 @@ scheduler). Before #529 it was the rail's orange Book, so a drop in `nav` clicks
 after 2026-10-21 is the change, not lost interest; on the home page compare
 `hero` plus `band`, and `brief-sent` plus `call-booked`, over four weeks before
 and after.
+
+Since 2026-11-13 a blog post sends no `book` and no `cta` with `place: end`: its
+end holds only the author, the newsletter form and the reply line (AGENTS.md
+"Blog posts"). `place: end` stays for the hackathon pages and the SaaS
+architecture guide, so a drop in `end` clicks after that date is the change, and
+a post's own effect shows in `newsletter-signup` and `post-read`.
 
 The old event names (`nav-book`, `form-submit-audit`, `meet-embed-frame-load`
 and about 90 others) stopped on 2026-09-30. The weekly report says so until
@@ -187,13 +194,13 @@ his visits stay out of the numbers, and any visitor can do the same.
 This file holds the event names and properties and the saved reports
 `deno task umami-reports` keeps.
 
-`demo-play` and `zoom` are sent with `track()` from islands
-(`islands/ToolHeroClip.tsx`, `islands/ToolZoom.tsx`), never as
-`data-umami-event` attributes on the clip's play link: Umami's tracker answers a
-click on a tracked `<a href>` by cancelling it and then opening the href, which
-for the play link is the video file. A `tool-try` on a `<label>`, `<summary>` or
-`<button>` may use `eventAttrs()`; on a link that must not navigate, use
-`track()`.
+`demo-play`, `video` and `zoom` are sent with `track()` from islands
+(`islands/ToolHeroClip.tsx`, `islands/HomeVideo.tsx`, `islands/ToolZoom.tsx`),
+never as `data-umami-event` attributes on the clip's play link: Umami's tracker
+answers a click on a tracked `<a href>` by cancelling it and then opening the
+href, which for the play link is the video file. A `tool-try` on a `<label>`,
+`<summary>` or `<button>` may use `eventAttrs()`; on a link that must not
+navigate, use `track()`.
 
 ## Tool pages
 

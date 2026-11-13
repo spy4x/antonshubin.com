@@ -8,11 +8,12 @@ tldr:
   - "Every time is shown on two clocks: the visitor sees their own zone, and my emails show my time with the visitor's beside it."
   - "A booking is saved before any email goes out, so two people racing for one slot never both get a confirmation."
 intro: "I wanted a \"book a call with me\" link on my own site without a Calendly subscription or a database to run, so I built mig. This post shows what it does, what it leaves out on purpose, and the few design choices that make a small scheduler safe to put in front of strangers. It is for developers and founders who want a booking page they own."
-coverImage: "/img/blog/mig-tiny-self-hosted-scheduler/cover.png"
-coverAlt: "mig's time picker in the dark theme for Tuesday, 3 November 2026, with times in New York, UTC-5: an Evening group of slots from 18:00 to 23:30, each marked Mon 2 Nov."
 publishedAt: "2026-08-26"
 updatedAt: "2026-10-30"
 readTime: 8
+coverImage: "/img/blog/mig-tiny-self-hosted-scheduler/cover.png"
+coverAlt: "The Change My Mind meme: a man at a table with a sign that says \"A booking page for one person needs no database. Change my mind\"."
+coverSize: "482x361"
 topic: "self-hosting"
 relatedTool: "mig"
 ---
@@ -46,6 +47,8 @@ database. Bookings live in one JSON file that mig writes through a temp file and
 a rename, so a crash leaves either the old file or the new one, never half of
 it.
 
+![The Roll Safe meme: a man tapping his temple, captioned "Can't break the admin UI if there is no admin UI"](/img/blog/mig-tiny-self-hosted-scheduler/no-admin-ui.webp "Configuration is env vars. Nothing to log in to, nothing to break.")
+
 ## What a booking looks like
 
 A visitor picks a day, then a time, then types a name and an email. Notes are
@@ -71,6 +74,8 @@ pushes for new bookings, cancellations and failures are optional too.
   `WEEKLY_AVAILABILITY` and `BLOCKED_DATES` say.
 - **Scale.** It is one process with one file. Thousands of bookings a day is not
   its job.
+
+![The UNO Draw 25 meme: a card that says "Run a database to send an email, or draw 25", and the player labelled "mig" holding a huge fan of cards](/img/blog/mig-tiny-self-hosted-scheduler/draw-25.webp "mig would rather draw 25.")
 
 If one of these is a deal breaker, use Cal.com. mig's README says the same.
 
@@ -124,6 +129,8 @@ export function formatOwnerClock(
 
 There is no date library in mig itself. The zone math is `Intl.DateTimeFormat`
 under the hood, through the `@spy4x/time` package I share between my projects.
+
+![The Buff Doge versus Cheems meme: a muscular Doge labelled "Intl.DateTimeFormat, ships with the runtime" next to a small crying Cheems labelled "A date library, one more dependency"](/img/blog/mig-tiny-self-hosted-scheduler/intl-doge.webp "The runtime already knows what time it is. In both time zones.")
 
 ## Save first, then send
 

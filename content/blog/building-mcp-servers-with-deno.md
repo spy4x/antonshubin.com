@@ -8,6 +8,9 @@ tldr:
   - "Ship the minimum first, then add stderr logging, error boundaries, timeouts and a health check as production shows you what you need."
 publishedAt: "2026-06-23"
 readTime: 15
+coverImage: "/img/blog/building-mcp-servers-with-deno/cover.png"
+coverAlt: "The Left Exit 12 meme: a car swerves off the highway. The straight sign says \"npm install and node_modules\", the exit says \"deno compile: one binary\", and the car is \"My MCP servers\"."
+coverSize: "804x767"
 topic: "ai-mcp"
 relatedTool: "caldav-mcp"
 catalogSlug: "zero-to-production-saas-mvp"
@@ -28,8 +31,8 @@ I write MCP servers in Deno, not Node, for six concrete reasons:
 
 1. **Zero npm install.** MCP servers are small, single-purpose tools. The
    dependency tree of a typical Node MCP is 200MB+ of `node_modules` for what
-   should be a small program. Deno imports URLs directly — the entire server is
-   a single binary you can `deno compile`.
+   should be a small program. Somewhere, a hard drive sighs. Deno imports URLs
+   directly — the entire server is a single binary you can `deno compile`.
 2. **Built-in TypeScript.** No `tsconfig.json`, no `ts-node`, no `tsup`. Deno
    runs `.ts` files natively. Tooling stays out of the way.
 3. **Permission flags.** MCP servers run unattended in production. Deno's
@@ -43,6 +46,8 @@ I write MCP servers in Deno, not Node, for six concrete reasons:
 6. **Single binary deploy.** `deno compile --output mcp-server main.ts` produces
    a self-contained Linux binary. No runtime to install on the server, no
    node_modules to copy, no `package.json` to maintain.
+
+![The Woman Yelling at a Cat meme. The woman: "You need tsconfig, ts-node and tsup!" The cat at the dinner table: "I run .ts files natively"](/img/blog/building-mcp-servers-with-deno/cat-typescript.webp "Deno, unbothered, eating its salad.")
 
 ## The shape of an MCP server
 
@@ -61,7 +66,8 @@ mcp-server/
 
 The split is intentional. Tools are self-contained — each file exports a single
 async function. Adding a tool is "write one file, register one line". Removing a
-tool is the inverse. There is no central god-object.
+tool is the inverse. There is no central god-object. Gods are hard to test
+anyway.
 
 ## The transport: HTTP, not stdio
 
@@ -80,7 +86,10 @@ I default to **Streamable HTTP** for every server I write. Reasons:
 - **Bearer token auth is trivial.** Add a middleware. Stdio auth is
   process-environment-only and a footgun.
 
-The cost is small: ~50 lines of HTTP transport code. Worth it.
+The cost is small: ~50 lines of HTTP transport code. Worth it. Fifty lines once,
+or an `mcpo` container forever.
+
+![The Always Has Been meme. One astronaut looks at the Earth: "Wait, all four of my MCP servers needed HTTP?" The astronaut behind him: "Always has been"](/img/blog/building-mcp-servers-with-deno/always-http.webp "Spoiler from the end of this post.")
 
 ## A working example: list_calendars
 
@@ -128,6 +137,8 @@ Standard CalDAV PROPFIND. Three things to note:
    they come from env vars and live only in process memory.
 3. **Errors are structured.** `throw new Error` with the URL and status. The MCP
    layer catches and surfaces them as JSON-RPC error responses.
+
+![The Buff Doge vs Cheems meme. Buff Doge: "Direct fetch: 30 lines". Small crying Cheems: "An npm library: 200 lines and its own XML parser"](/img/blog/building-mcp-servers-with-deno/doge-fetch.webp "Fewer lines, more muscle.")
 
 ### The tool wrapper
 
@@ -238,7 +249,7 @@ headers.
 
 The "hello world" version is 80 lines. The production version stays a small
 program overall, but grows noticeably because of the boring work that makes it
-survive a real environment.
+survive a real environment. Boring is the point: boring survives.
 
 ### 1. Structured logging
 
@@ -262,6 +273,8 @@ export function log(
 Use `console.error` for logs, never `console.log`. The MCP protocol uses stdout.
 A log line on stdout is a malformed JSON-RPC frame and the client crashes.
 
+![The Surprised Pikachu meme. "Logs with console.log", "The MCP protocol uses stdout", "The client crashes", and Pikachu looks shocked](/img/blog/building-mcp-servers-with-deno/pikachu-stdout.webp "Who could have seen this coming.")
+
 ### 2. Per-tool error boundaries
 
 ```typescript
@@ -284,8 +297,8 @@ The AI gets a structured error message. The user sees a clear "tool failed:
 ### 3. Rate limiting and timeouts
 
 Every upstream call needs a timeout. CalDAV servers hang, IMAP servers hang,
-SMTP servers hang. Default is 30 seconds; tighter for read-only tools (5s),
-looser for sends (60s).
+SMTP servers hang. Everything hangs, eventually. Default is 30 seconds; tighter
+for read-only tools (5s), looser for sends (60s).
 
 ```typescript
 async function withTimeout<T>(
@@ -331,13 +344,16 @@ That is the whole deploy story. One binary, three env vars, no `package.json`,
 no `node_modules`, no `Dockerfile` required (though I ship a Dockerfile for the
 homelab — ~10 lines, multi-stage).
 
+![The Success Kid meme, a toddler clenching a fist on the beach. Top: "Deployed an MCP server". Bottom: "One binary, three env vars, no node_modules"](/img/blog/building-mcp-servers-with-deno/success-deploy.webp "The whole deploy story fits in a meme.")
+
 ## What I learned shipping four of these
 
 I now have four MCP servers running in production (caldav-mcp, immich-mcp,
 email-mcp, google-maps-mcp). The lessons that surprised me:
 
 1. **Streamable HTTP wins for everything.** I started with stdio "for
-   simplicity." Every single one had to be HTTP anyway. Just start there.
+   simplicity." Every single one had to be HTTP anyway. Just start there, and
+   skip my four detours.
 2. **Per-tool context beats globals.** The first version of caldav-mcp read env
    vars inside each tool. Adding tests meant refactoring every tool. The
    ctx-object pattern fixed it once.
@@ -351,6 +367,8 @@ email-mcp, google-maps-mcp). The lessons that surprised me:
    from scratch is a mistake. Write the minimum, deploy it, then add the boring
    work (logging, timeouts, error handling) as the production traffic shows you
    what you need.
+
+![The Expanding Brain meme. Small brain: "Write the production version from scratch". Glowing brain: "Ship the minimum in 80 lines". Brighter brain: "Deploy it". Cosmic brain: "Let production traffic show you what to harden"](/img/blog/building-mcp-servers-with-deno/brain-ship.webp "Enlightenment, in four steps.")
 
 If you are building an MCP server, start with the
 [MCP TypeScript SDK docs](https://modelcontextprotocol.io/) and the

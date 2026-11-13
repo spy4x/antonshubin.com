@@ -1,4 +1,3 @@
-import { BOOK_HREF, BOOK_LABEL } from "../../lib/nav.ts"
 import { page } from "fresh"
 import { define } from "../../lib/utils.ts"
 import { Layout } from "../../components/Layout.tsx"
@@ -11,6 +10,7 @@ import {
   renderBlogPost,
 } from "../../lib/markdown.ts"
 import { PostBody } from "../../components/PostBody.tsx"
+import { coverWebp } from "../../lib/blog-posts.ts"
 import BlogImageEnhancer from "../../islands/BlogImageEnhancer.tsx"
 import PostToc from "../../islands/PostToc.tsx"
 import PostRead from "../../islands/PostRead.tsx"
@@ -19,7 +19,6 @@ import { getBreadcrumb, head, ROLE } from "../../lib/head.ts"
 import { SEOHead } from "../../components/SEOHead.tsx"
 import { Breadcrumb } from "../../components/Breadcrumb.tsx"
 import { ClosingBand } from "../../components/ClosingBand.tsx"
-import { SCHEDULE_URL } from "../../lib/config.ts"
 import { EMAIL_ADDRESS, emailContact } from "../../lib/profiles.ts"
 import { toJsonLd } from "../../lib/json-ld.ts"
 import {
@@ -27,16 +26,11 @@ import {
   AUTHOR_LINE,
   blogNode,
   NEWSLETTER_HEADING,
-  NEWSLETTER_HREF,
-  postAsk,
   postDate,
   postHref,
   postTitleTag,
   readNext,
-  relatedService,
   relatedToolLink,
-  serviceHref,
-  serviceLabel,
   TOC_MIN_MINUTES,
   topic,
 } from "../../lib/blog.ts"
@@ -107,78 +101,28 @@ const QUIET_LINK =
 
 /**
  * The author box at the end of every post (#191, #274, #390), built on the
- * shared closing band (#270): the band's heading, who wrote the post and the
- * #249 positioning line, then exactly one button, chosen by `postAsk()`:
- * Book on a "For founders" post, the newsletter form on every other. The
- * other ask and the post's service follow as plain text links, then one line
- * that invites a reply by email. Without a booking URL there is no Book, so
- * the newsletter is the ask on every post.
+ * shared closing band (#270): who wrote the post and the #249 positioning
+ * line, the newsletter form, then one line that invites a reply by email.
+ * A post never ends in a sales pitch (AGENTS.md "Blog posts"): no Book, no
+ * priced service link.
  */
 function AuthorBox({ article }: { article: BlogArticle }) {
-  const ask = SCHEDULE_URL ? postAsk(article) : "newsletter"
-  const service = relatedService(article)
   return (
     <ClosingBand
-      heading={ask === "book"
-        ? "Need this for your product?"
-        : NEWSLETTER_HEADING}
+      heading={NEWSLETTER_HEADING}
       promiseIds={[]}
-      book={ask === "book"}
-      bookItem={article.slug}
+      book={false}
       after={
-        <>
-          <p
-            data-quiet-links
-            class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm empty:hidden"
+        <p data-reply-line class="mt-4 text-sm text-graphite">
+          Questions, or a different result? Reply by email:{" "}
+          <a
+            href={emailContact.href}
+            {...eventAttrs("outbound", { to: "email", item: article.slug })}
+            class={QUIET_LINK}
           >
-            {service && (
-              <a
-                href={serviceHref(service)}
-                {...eventAttrs("cta", {
-                  place: "end",
-                  target: serviceHref(service),
-                })}
-                class={`price ${QUIET_LINK}`}
-              >
-                {serviceLabel(service)}
-              </a>
-            )}
-            {ask === "book"
-              ? (
-                <a
-                  href={NEWSLETTER_HREF}
-                  // Fresh marks every link under /blog as the current section.
-                  aria-current="false"
-                  {...eventAttrs("cta", {
-                    place: "end",
-                    target: NEWSLETTER_HREF,
-                  })}
-                  class={QUIET_LINK}
-                >
-                  {NEWSLETTER_HEADING}
-                </a>
-              )
-              : SCHEDULE_URL && (
-                <a
-                  href={BOOK_HREF}
-                  {...eventAttrs("book", { place: "end", item: article.slug })}
-                  class={QUIET_LINK}
-                >
-                  {BOOK_LABEL}
-                </a>
-              )}
-          </p>
-          <p data-reply-line class="mt-4 text-sm text-graphite">
-            Questions, or a different result? Reply by email:{" "}
-            <a
-              href={emailContact.href}
-              {...eventAttrs("outbound", { to: "email", item: article.slug })}
-              class={QUIET_LINK}
-            >
-              {EMAIL_ADDRESS}
-            </a>. It comes straight to me.
-          </p>
-        </>
+            {EMAIL_ADDRESS}
+          </a>. It comes straight to me.
+        </p>
       }
     >
       <div data-author-box class="mb-6">
@@ -199,7 +143,7 @@ function AuthorBox({ article }: { article: BlogArticle }) {
         </div>
         <p class="mt-4 text-graphite">{AUTHOR_LINE}</p>
       </div>
-      {ask === "newsletter" && <NewsletterAsk />}
+      <NewsletterAsk />
     </ClosingBand>
   )
 }
@@ -221,6 +165,14 @@ export default define.page(function BlogPost(ctx) {
     }))
     : []
   const hasToc = tocItems.length > 0
+  const cover = coverWebp(article.coverImage)
+  // Each file's real width: a "1000w" on a narrower file made a dense phone
+  // draw it at a fraction of the column. A picture 480px wide or less has no
+  // smaller copy worth offering (blog-cover.sh only shrinks).
+  const { width: coverWidth, height: coverHeight } = article.coverSize
+  const wholeSrcset = coverWidth > 480
+    ? `${cover.wholeSmall} 480w, ${cover.whole} ${coverWidth}w`
+    : `${cover.whole} ${coverWidth}w`
 
   head.value = {
     ...head.value,
@@ -384,6 +336,39 @@ export default define.page(function BlogPost(ctx) {
               </p>
             )}
           </header>
+
+          {
+            /* The cover (#594): the page's one eager, high-priority image, the
+              picture alone at its own shape, opening in the lightbox. */
+          }
+          <figure data-post-cover class="mt-6">
+            <button
+              type="button"
+              class="post-image"
+              data-lightbox
+              aria-label={`View larger image: ${article.coverAlt}`}
+              // The column's width, or less where the 28rem height cap would
+              // bind; the image's ratio then gives its height before it loads.
+              style={{
+                width:
+                  `min(100%, calc(28rem * ${coverWidth} / ${coverHeight}))`,
+              }}
+            >
+              <img
+                src={cover.whole}
+                srcset={wholeSrcset}
+                sizes="(min-width: 768px) 720px, 100vw"
+                alt={article.coverAlt}
+                width={article.coverSize.width}
+                height={article.coverSize.height}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                style={{ aspectRatio: `${coverWidth} / ${coverHeight}` }}
+                class="block w-full h-auto rounded-lg border border-rule bg-paper"
+              />
+            </button>
+          </figure>
 
           {hasToc && (
             <details data-toc class="post-toc-details mt-6">

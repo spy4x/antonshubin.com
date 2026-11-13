@@ -7,7 +7,10 @@ tldr:
   - "My own .prettierrc is at the end, with every option explained."
 publishedAt: "2022-12-21"
 readTime: 7
-topic: "founders"
+coverImage: "/img/blog/the-importance-of-code-formatting-with-prettier/cover.png"
+coverAlt: "A tweet: \"Use whatever brace style you prefer. But not this. Don't do this. Seek help instead of this.\" above Java code with every brace and semicolon pushed to the right edge."
+coverSize: "1000x958"
+topic: "developers"
 archived: true
 archiveNote: "In my Deno projects deno fmt does this job now, with no config."
 youtubeVideoId: "uaqFYlfOZeE"

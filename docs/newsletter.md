@@ -78,8 +78,9 @@ passes, and so does the site's own form on Safari before 16.4, which sends
 Layout and sender (#364): the confirmation mail, the welcome mail and every
 newsletter use one letter layout (`lib/letter.ts`, built on
 `@spy4x/email/letter`): Anton's portrait and name, the content, a P.S. with the
-booking link (not in the confirmation), a "reply to this email" line and a small
-footer. Each has an HTML and a plain-text part. The sender is
+booking link (in the welcome only: a newsletter never ends in a sales pitch,
+AGENTS.md "Blog posts"), a "reply to this email" line and a small footer. Each
+has an HTML and a plain-text part. The sender is
 `Anton Shubin <hi@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox that
 reaches Anton, so none of these mails sets `Reply-To`; the lead mail still does
 (the visitor's address). The welcome mail and every newsletter carry
@@ -282,10 +283,10 @@ pass a fake transport from `test/fake-mail.ts`, so no test opens a connection.
 
 The subscriber mails are one letter (#364): `lib/letter.ts` renders the
 confirmation, the welcome and every newsletter in one layout (Anton's portrait
-and name, the content, a P.S. with the booking link, a reply line, a small
-footer), built on `@spy4x/email/letter`'s `renderLetter` (#405), as HTML plus a
-plain-text part, with every value escaped and every link into the site the
-`email` channel's tagged URL (`scripts/utm.ts`). They are sent as
+and name, the content, the welcome's P.S. with the booking link, a reply line, a
+small footer), built on `@spy4x/email/letter`'s `renderLetter` (#405), as HTML
+plus a plain-text part, with every value escaped and every link into the site
+the `email` channel's tagged URL (`scripts/utm.ts`). They are sent as
 `Anton Shubin <hi@antonshubin.com>` (the `SMTP_FROM` env value), a mailbox that
 reaches Anton, so they set no `Reply-To`; the welcome and every newsletter carry
 the subscriber's own one-click `List-Unsubscribe` (`listUnsubscribe` on

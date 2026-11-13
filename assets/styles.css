@@ -406,6 +406,20 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 40rem;
 }
+/* A skipped section's placeholder must not be shorter than the section on a
+   phone: its links keep their real offsets, so they would sit on top of the
+   next section's links, and Lighthouse's touch-target audit fails (#615). The
+   client work cards, the reviews and the timeline stack at 390px (about 82rem,
+   48rem and 46rem). */
+@media (max-width: 1023px) {
+  [data-home-section][data-home-section="work"] {
+    contain-intrinsic-size: auto 84rem;
+  }
+  [data-home-section][data-home-section="testimonials"],
+  [data-home-section][data-home-section="how-it-works"] {
+    contain-intrinsic-size: auto 50rem;
+  }
+}
 [data-home-section]:not([data-home-section="hero"], [data-home-section="cta"]) {
   margin-inline: -0.5rem;
   padding-inline: 0.5rem;
@@ -799,7 +813,8 @@ kbd {
   margin: 2em 0;
 }
 
-.blog-content .post-image {
+.blog-content .post-image,
+[data-post-cover] .post-image {
   display: block;
   margin-inline: auto;
   max-width: 100%;
@@ -807,7 +822,8 @@ kbd {
   cursor: zoom-in;
 }
 
-.blog-content .post-image:focus-visible {
+.blog-content .post-image:focus-visible,
+[data-post-cover] .post-image:focus-visible {
   outline: 2px solid var(--color-parchment);
   outline-offset: 3px;
 }
