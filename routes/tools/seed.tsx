@@ -20,7 +20,7 @@ export default define.page(async function SeedPage(ctx) {
       data={data}
       currentPath={ctx.url.pathname}
       hero={{ children: <SeedStart tool={tool} /> }}
-      more={["preact-components", "ts-libs", "mig"]}
+      more={["ringmaster", "financy", "preact-components"]}
     >
       <SeedRunning />
       <ShowcaseFeatures
