@@ -10,6 +10,7 @@ tldr:
 intro: "My Drone CI post from 2023 still gets read, and it no longer describes what I run. This is the current setup: the Woodpecker server and agent, the pipeline files of my public repositories, how secrets reach a step and how a tag turns into a published image. It is for developers who want CI on their own server and want to see real files, mistakes included."
 coverImage: "/img/blog/self-hosted-ci-with-woodpecker/cover.png"
 coverAlt: "The Woodpecker pipeline list of the public mig repository in the dark theme: a green pipeline success badge and three passed pipelines, a v2.2.0 tag, a push to main and a pull request."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 10
 topic: "self-hosting"
