@@ -67,9 +67,9 @@ security, and cost control — not cheap-hosting ideology or a hobbyist identity
 ### 3. `/llms-full.txt` (routes/llms-full.txt.ts)
 
 - Extended version with ALL pages, ALL catalog items (with prices), ALL blog
-  posts, grouped under the three Writing topics with each post's tool link, and
-  the Archive last (#274); `lib/blog.ts`'s `llmsBlogSections()` builds the list
-  for both llms files
+  posts, grouped under the Writing topics with each post's tool link, and the
+  Archive last (#274); `lib/blog.ts`'s `llmsBlogSections()` builds the list for
+  both llms files
 - Each catalog item line names the kinds of work sold under it with their
   `#fragment` (`alsoCovers` ids, #271) and the promises its page shows
   (`catalogPromises()`)
@@ -228,9 +228,10 @@ Five entities in a `@graph` array (six on `/about`):
 - `BlogPosting.image` is an `ImageObject` of the post's 1200×630 PNG from
   `deno task og`, never an SVG cover; `articleSection` is the post's topic;
   `dateModified` is `updatedAt`, which the byline also shows as "Updated"
-- `/blog`'s title names the three subject topics (Scars, the fourth, is not in
-  it); a post's `<title>` is its `seoTitle`, or its title with " — Anton Shubin"
-  only when that fits in 55 characters (`postTitleTag()` in `lib/blog.ts`)
+- `/blog`'s title names three subject topics (For developers and Scars are not
+  in it); a post's `<title>` is its `seoTitle`, or its title with " — Anton
+  Shubin" only when that fits in 55 characters (`postTitleTag()` in
+  `lib/blog.ts`)
 - Every `h2` and `h3` in a post has a stable id from its text, so a section can
   be linked; posts of 8 minutes or more list their `h2`s under "Contents"
 - Every post opens with a "TL;DR" `h2` (id `tldr`) and its front matter's `tldr`

@@ -70,6 +70,7 @@ export function applicationJsonLd(tool: Tool, url: string) {
  * A `VideoObject` for the hero clip, only once its files exist (`video` is
  * set) and only with real values: the committed `duration` and
  * `uploadDate`, the poster as `thumbnailUrl` and the MP4 as `contentUrl`.
+ * `about` points at the `#tool` node, which exists only for public code.
  */
 export function videoJsonLd(tool: Tool, url: string) {
   const clip = tool.clip
@@ -85,7 +86,7 @@ export function videoJsonLd(tool: Tool, url: string) {
     "contentUrl": `${SITE}${mp4.src}`,
     "uploadDate": clip.video.uploadDate,
     "duration": clip.video.duration,
-    "about": { "@id": `${url}#tool` },
+    ...(tool.repo ? { "about": { "@id": `${url}#tool` } } : {}),
   }
 }
 

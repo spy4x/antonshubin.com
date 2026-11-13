@@ -7,7 +7,8 @@ import { copyToClipboard } from "@spy4x/platform/browser/clipboard"
  * The post body's two interactive parts, wired to markup `lib/markdown.ts`
  * renders on the server (#274):
  *
- * - Each post image is already a `<button data-lightbox>` in the HTML, so a
+ * - Each post image, and the cover (`[data-post-cover]`), is already a
+ *   `<button data-lightbox>` in the HTML, so a
  *   keyboard reaches it without JS; this opens it in a full-screen
  *   `<dialog>` (UX 8). The close button clears the notch and home bar
  *   (`env(safe-area-inset-*)`, the site sets `viewport-fit=cover`), and a
@@ -27,7 +28,7 @@ export default function BlogImageEnhancer() {
   useEffect(() => {
     // A post with a component has one `.blog-content` box per chunk (#537).
     document.querySelectorAll<HTMLButtonElement>(
-      ".blog-content [data-lightbox]",
+      ".blog-content [data-lightbox], [data-post-cover] [data-lightbox]",
     )
       .forEach((button) => {
         button.addEventListener("click", () => {

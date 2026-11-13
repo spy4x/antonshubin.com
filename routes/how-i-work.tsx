@@ -28,6 +28,7 @@ import {
 } from "../lib/catalog.ts"
 import { faqs } from "../lib/faqs.ts"
 import {
+  CAPACITY_LINE,
   GOOD_FIT,
   HOW_I_WORK_NAME,
   HOW_I_WORK_SUBTITLE,
@@ -38,6 +39,7 @@ import {
 } from "../lib/how-i-work.ts"
 import { proof } from "../lib/proof.ts"
 import {
+  RINGMASTER_LINE,
   WEEKLY_AUDIT,
   WHY_NOT_JUST_AI_LINK_LABEL,
   WHY_NOT_JUST_AI_PATH,
@@ -190,8 +192,9 @@ export default define.page(function HowIWork() {
                   </ul>
                 </div>
               </div>
+              <p data-capacity class="mt-6 text-graphite">{CAPACITY_LINE}</p>
               <WithNote id="upwork-profile" class="note-stack">
-                <p data-proof-line class="mt-6 text-parchment">
+                <p data-proof-line class="mt-4 text-parchment">
                   {repeatClientsLine()} {proof("job-success")}{" "}
                   Job Success on Upwork.
                 </p>
@@ -212,14 +215,19 @@ export default define.page(function HowIWork() {
               <h2 id="hiw-ai" class="h2 mb-4">How I use AI</h2>
               <div class="max-w-2xl space-y-4 text-graphite leading-relaxed">
                 <p>
-                  I use AI coding agents every day, and I say so up front. The
-                  agents write much of the code. I decide what gets built and
-                  how it fits together, and every change starts as a written
-                  spec from me.
+                  I use AI coding agents every day, and I say so up front. They
+                  write most of the code, working to my rules, style guides and
+                  standards. I decide what gets built and how it fits together,
+                  and every change starts with a written spec.
                 </p>
                 <p>
                   A separate reviewer agent checks every change, security
-                  included, before it reaches you. {WEEKLY_AUDIT}
+                  included, before it reaches you. {WEEKLY_AUDIT}{" "}
+                  {RINGMASTER_LINE}
+                </p>
+                <p data-ai-contract>
+                  AI tools process your code. If your contract or NDA rules that
+                  out, tell me and we agree how to work.
                 </p>
                 <p>
                   The rules the agents work to are public, in{" "}

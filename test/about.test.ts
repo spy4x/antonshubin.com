@@ -153,7 +153,7 @@ Deno.test("/about shows Book in its card and its closing band only", async () =>
 })
 
 siteTest(
-  "/about is linked from both llms files, the home proof line and the 2022 post",
+  "/about is linked from both llms files and the 2022 post",
   async (site) => {
     for (const path of ["/llms.txt", "/llms-full.txt"]) {
       assert(
@@ -161,11 +161,6 @@ siteTest(
         `${path} does not link /about`,
       )
     }
-    const home = await site.html("/")
-    assert(
-      /<a\b[^>]*href="\/about"[^>]*data-home-about/.test(home),
-      "the home page does not link /about",
-    )
     const post = await site.html(
       "/blog/from-office-job-to-freelance-to-my-startups",
     )

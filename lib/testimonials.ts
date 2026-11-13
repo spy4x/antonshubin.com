@@ -227,25 +227,27 @@ export const testimonials: Testimonial[] = [
 
 /**
  * The three excerpts on the home page, in order: three different clients
- * (#269), so the page never shows one client's praise twice.
+ * (#269), so the page never shows one client's praise twice, chosen to show
+ * the partner role in its full range (#615): a partner a founder can trust,
+ * a team hired and money looked after, order brought to a broken project.
  */
 export const homeTestimonialIds: string[] = [
   "roley-1",
-  "corecircle-1",
-  "foodrazor-2",
+  "gopingu-1",
+  "microwork-2",
 ]
 
 /**
- * The two reviews on `/about` (#294): how Anton treats people and money
- * (psychologist 2), from clients the home page and `/book` don't quote.
+ * The two reviews on `/about` (#294, #615): from clients the home page and
+ * `/book` don't quote.
  */
-export const aboutTestimonialIds: string[] = ["gopingu-1", "connectful-2"]
+export const aboutTestimonialIds: string[] = ["corecircle-1", "foodrazor-2"]
 
 /**
- * The client sentence beside the calendar on `/book` (#272, Psych 5):
- * not one the home page shows.
+ * The client sentence beside the calendar on `/book` (#272, #615): not one
+ * the home page shows.
  */
-export const contactTestimonialId = "roley-2"
+export const contactTestimonialId = "connectful-2"
 
 /** Looks a testimonial up by id and throws on a typo. */
 export function testimonial(id: string): Testimonial {

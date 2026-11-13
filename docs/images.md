@@ -59,13 +59,15 @@ own repository, under `media/demo/` beside the recipe that remakes it (#521).
 `deno task pull:videos` copies `demo.webm` (VP9, offered first), `demo.mp4`
 (H.264), `poster.webp`, `poster-640.webp` and `captions.vtt` from
 raw.githubusercontent.com at that commit into `static/video/tools/<slug>/`,
-rewriting only the files that changed. A clip is never recorded or edited here:
-change it in its repository, then move the pin and run the task. Seed's admin
-panel video (`admin-panel.*`, shown in "See it running") comes from spy4x/seed's
-`apps/mpa/` through the same task. A clip is 20 to 40 seconds, has burned-in
-captions and its own quiet music, shows staged demo data only, and each file is
-at most 2.5 MB. Nothing downloads before the visitor presses play (`DemoVideo`),
-so the budget protects only the person who pressed. Its `lib/tools.ts` entry
+rewriting only the files that changed. A private repository (Ringmaster's
+spy4x/ringmaster-next) needs a token, sent only to raw.githubusercontent.com:
+`GITHUB_TOKEN=$(gh auth token) deno task pull:videos`. A clip is never recorded
+or edited here: change it in its repository, then move the pin and run the task.
+Seed's admin panel video (`admin-panel.*`, shown in "See it running") comes from
+spy4x/seed's `apps/mpa/` through the same task. A clip's length, captions, music
+and file size follow the global `demo-video` skill, and it shows staged demo
+data only. Nothing downloads before the visitor presses play (`DemoVideo`), so
+the size budget protects only the person who pressed. Its `lib/tools.ts` entry
 names it in `clip` (title, caption, poster); set `clip.video` (`duration` as ISO
 8601, `uploadDate` the commit day) only once both files are committed, which
 also adds the `VideoObject` JSON-LD. `test/tool-frame.test.ts` fails when an

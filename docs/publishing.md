@@ -27,10 +27,10 @@ Anton's goals, not whether it is interesting.
   links: to a related post, a project, a tool or the catalog.
 - **Marketer.** Who exactly is the reader: a founder or CTO who might hire
   Anton, a developer who might use one of his tools, or both? What should that
-  reader do after the last paragraph: book a call, open the catalog, star or try
-  a tool, subscribe? Name the one next step and end the post with it. Name the
-  channels that fit this reader, which decides which channel texts in step 4 are
-  worth writing.
+  reader do after reading: open the catalog, star or try a tool, subscribe? How
+  the post may point there is in AGENTS.md "Blog posts". Name the channels that
+  fit this reader, which decides which channel texts in step 4 are worth
+  writing.
 - **Psychologist.** What makes this reader start, keep reading and trust the
   author? Open with the reader's problem or a concrete result, not with
   background, then say what the post is and who it is for, as
@@ -78,30 +78,30 @@ draft against the brief before the pull request opens.
    intro: "Two or three sentences in Anton's voice: why this post exists and who it is for."
    coverImage: "/img/blog/<slug>/cover.png" # 1000x420 PNG, see step 7
    coverAlt: "What the cover shows, for someone who cannot see it."
+   coverSize: "720x960" # the whole picture's size, printed by blog-cover.sh
    publishedAt: "2026-09-26"
    updatedAt: "2026-10-02" # optional; only for a significant edit
    readTime: 8
-   topic: "ai-mcp" # founders, ai-mcp, self-hosting or scars
+   topic: "ai-mcp" # founders, developers, ai-mcp, self-hosting or scars
    relatedTool: "mig" # optional; a lib/tools.ts slug
    catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
    seoTitle: "Short title" # optional; <title> only, for a title over 55 characters
-   youtubeVideoId: "abc123" # optional
+   youtubeVideoId: "abc123" # optional; its /blog row then says "Video"
    utmCampaign: "short-campaign" # optional; defaults to the slug (docs/utm.md)
    ---
    ```
 
-   A post with `publishedAt` on or after 2026-10-02 (`LETTER_FIELDS_FROM`) needs
-   `intro`, `coverImage` and `coverAlt`: the build fails naming the one missing.
-   An older post falls back to its `description`, its OG preview PNG and its
-   title, so none is edited just to keep building. A missing, mistyped or
-   unknown field fails the tests, naming the file. An Upwork figure in a title
-   or description is written `{proof:jobs}` (the career count
-   `{proof:projects}`), never the number itself. Link the post's tool with
-   `relatedTool` and the service it sells with `catalogSlug` (#191's writing
-   standard): the post shows the tool's page, demo and repository under the
-   byline, and the service as a text link in the author box. A post with a
-   `catalogSlug` shows a price, so `test/structure.test.ts` adds it to
-   `PRICE_PAGES` on its own.
+   Every post needs `coverImage` and `coverAlt` (step 7), and a post with
+   `publishedAt` on or after 2026-10-02 (`LETTER_FIELDS_FROM`) needs `intro`:
+   the build fails naming the one missing. An older post's intro falls back to
+   its `description`. A missing, mistyped or unknown field fails the tests,
+   naming the file. An Upwork figure in a title or description is written
+   `{proof:jobs}` (the career count `{proof:projects}`), never the number
+   itself. Link the post's tool with `relatedTool` and the service it sells with
+   `catalogSlug` (#191's writing standard): the post shows the tool's page, demo
+   and repository under the byline. `catalogSlug` is checked against
+   `lib/catalog.ts` but no longer drawn on the page: a post never ends on a
+   service (AGENTS.md "Blog posts").
 3. **Every post opens with a TL;DR** (Anton, 30 September 2026): the `tldr`
    list, rendered as a "TL;DR" heading and a list above the body, and listed
    under the post in `llms-full.txt`. Write it last, from the finished draft, as
@@ -138,13 +138,32 @@ draft against the brief before the pull request opens.
    and sits next to the text that talks about it. Real screenshots only,
    captured at 2x with the repo's Chromium (`test/browser.ts`'s
    `launchChromium()`), never a mockup.
-7. **A cover**, used by the Dev.to article and the newsletter mail. Set
-   `coverImage` to a site path of a 1000×420 PNG under
-   `static/img/blog/<slug>/`, cropped from the hero screenshot with no text
-   added; `publish:blog` sends it as the article's `main_image`.
-   `lib/blog-posts.ts` fails on a path outside `/img/`, a non-PNG or a missing
-   file, and `lib/blog-posts.test.ts` on a cover that is not 1000×420. It is
-   required for a new post; an older post's mail uses its OG preview PNG.
+7. **A cover: a meme or an AI picture, never a plain screenshot or text card**
+   (Anton, 1 November 2026: covers "make each blog post feel individual and
+   live"). `/blog` shows the 1000×420 banner beside the post, the post page
+   shows the whole picture at its own shape under its header (opening in the
+   lightbox on a tap), and `publish:blog` sends it to Dev.to as `main_image` and
+   in the newsletter mail. Pick a well-known meme template whose joke is the
+   post's point, or generate a picture when an image model is at hand, and
+   caption it only with what the post itself says (AGENTS.md "Content rule": no
+   new number or claim).
+   `scripts/blog-cover.sh <slug> <image> "x y w h CAPTION"...` draws the
+   captions and writes `cover.png` (1000×420), `cover.webp` and `cover-480.webp`
+   for the banner, plus `cover-full.webp` and `cover-full-480.webp` (the whole
+   picture, at most 1000px a side) into `static/img/blog/<slug>/`, and prints
+   the `coverSize` line; open both and check every caption fits before
+   committing. Set `coverImage` to the PNG's site path, `coverSize` to the
+   printed size, and `coverAlt` to one sentence naming the meme and quoting its
+   captions. `lib/blog-posts.ts` fails on a missing cover, alt text, size or
+   WebP sibling, a path outside `/img/` or a non-PNG, and
+   `lib/blog-posts.test.ts` on a cover that is not 1000×420. The body gets the
+   same kind of picture, about one per `##` section (Anton, 1 November 2026:
+   posts should be fun, with memes "into articles, bodies themselves"):
+   `scripts/blog-meme.sh <slug> <name> <image> "x y w h
+   CAPTION"...` writes
+   `static/img/blog/<slug>/<name>.webp`, and the post links it as
+   `![alt](/img/blog/<slug>/<name>.webp "caption")`. The alt says what the
+   picture shows and quotes its captions; the captions follow the cover's rule.
 8. Check the "AI crawler optimization (SEO)" table in
    [seo-ai-crawlers.md](seo-ai-crawlers.md). The sitemap, the RSS feed and both
    llms files read `blogArticles`, so they update themselves; the doc rows may
@@ -223,10 +242,10 @@ links can be printed again any time with `deno task links`.
 
 The newsletter is a letter from Anton (#364): his portrait and name, then the
 post's cover linked to the post, the `intro`, "In short" with the TL;DR, one
-button ("Read the article · N min") and a P.S. with the booking link. The
-subject is the post's title alone; the hidden preview line is the first TL;DR
-line. Every link into the site is the `email` channel's tagged URL, and every
-mail carries the subscriber's own one-click `List-Unsubscribe`.
+button ("Read the article · N min") and the reply line, with no P.S. (AGENTS.md
+"Blog posts"). The subject is the post's title alone; the hidden preview line is
+the first TL;DR line. Every link into the site is the `email` channel's tagged
+URL, and every mail carries the subscriber's own one-click `List-Unsubscribe`.
 
 `publish:blog <slug>` sends it. To look at it or test it first, before the
 deploy or without sending to the list:
@@ -298,13 +317,16 @@ needs no JavaScript), then add an entry to `POST_COMPONENTS` in
   the anchor.
 
 Registered today: `CachedShareSlider` (the Opus 5.5 post), `FrameworkChecklist`
-(the cost laboratory post), `RunsCalculator` and `TaskCostChart` (the Trail-code
-post). Each sits in the library's `Explorable` frame. `TaskCostChart` is a
-server component with no island; it reads the post's dated data file,
+(the cost laboratory post), `DenoTiesChecklist` (the post on moving off Deno),
+`ProposalChecklist` (the AI-built app takeover post), `MvpCostCalculator` (the
+SaaS MVP cost post), `RunsCalculator` and `TaskCostChart` (the Trail-code post).
+Each sits in the library's `Explorable` frame. `TaskCostChart` is a server
+component with no island; it reads the post's dated data file,
 `content/blog/data/<slug>.json`, through `lib/task-cost.ts`, which also writes
 its summary sentence and its Dev.to table, so no number in the chart is typed by
-hand. The arithmetic of the other three lives in `lib/post-math.ts` and
-`lib/framework-checklist.ts`, next to their fallbacks.
+hand. The arithmetic of the other six lives in `lib/post-math.ts`,
+`lib/framework-checklist.ts`, `lib/deno-ties.ts`, `lib/proposal-checklist.ts`
+and `lib/mvp-cost.ts`, next to their fallbacks.
 
 On the reader's first input the component calls
 `trackPostTry(post, "<TagName>")` from `lib/analytics.ts`, which sends one
@@ -341,7 +363,7 @@ it is for, written by the agent last, from the finished post; it opens the
 newsletter and the Dev.to article and can open a LinkedIn post) and `coverAlt`,
 and the build fails without any of the three; older posts fall back to their
 `description`, their OG preview PNG and their title. The newsletter is that
-letter with the cover, the intro, "In short", one button and the P.S.; its
+letter with the cover, the intro, "In short", one button and the reply line; its
 subject is the post's title alone. `publish:blog <slug> --preview <file>` writes
 its HTML and text locally and `--test-newsletter` sends one copy to
 `CONTACT_EMAIL` with no log. Three hard rules:

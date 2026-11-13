@@ -7,12 +7,7 @@
 import { dayLabel, monthLabel } from "@spy4x/time/locale"
 import { blogArticles } from "./data.ts"
 import { type BlogArticle, byNewest, topic, topics } from "./blog-posts.ts"
-import {
-  type CatalogItem,
-  catalogItem,
-  catalogPath,
-  priceLabel,
-} from "./catalog.ts"
+import { type CatalogItem, catalogItem } from "./catalog.ts"
 import { findTool, repoUrl, type ToolLink as LiveLink } from "./tools.ts"
 
 export { topic, topics }
@@ -63,22 +58,9 @@ export function relatedToolLink(article: BlogArticle): ToolLink | undefined {
   }
 }
 
-/** The catalog item a post links to, or undefined; throws on a typo. */
+/** The catalog item a post's `catalogSlug` names, or undefined; throws on a typo. */
 export function relatedService(article: BlogArticle): CatalogItem | undefined {
   return article.catalogSlug ? catalogItem(article.catalogSlug) : undefined
-}
-
-/** The service link's text: "The same work for you: Strategy session, $150". */
-export function serviceLabel(item: CatalogItem): string {
-  const price = priceLabel(item)
-  return `The same work for you: ${item.shortTitle}, ${
-    price.charAt(0).toLowerCase() + price.slice(1)
-  }`
-}
-
-/** The service link's path. */
-export function serviceHref(item: CatalogItem): string {
-  return catalogPath(item.slug)
 }
 
 /**
@@ -230,6 +212,7 @@ export const AUTHOR_LINE =
  */
 export const NEWSLETTER_TOPICS = [
   "decisions for founders",
+  "developer craft",
   "AI and MCP",
   "self-hosting",
   "my own mistakes",
@@ -255,22 +238,8 @@ export const WELCOME_LINE =
     listed(NEWSLETTER_TOPICS, "or")
   }: ${NEWSLETTER_CADENCE}.`
 
-/** The heading of the newsletter ask, and the words of a text link to it. */
+/** The heading of the newsletter ask that ends every post. */
 export const NEWSLETTER_HEADING = "Get the next post by email"
-
-/** Where a text link to the newsletter ask goes: the sign-up box on `/blog`. */
-export const NEWSLETTER_HREF = "/blog#newsletter-heading"
-
-/** The one ask a post ends with (#390). */
-export type PostAsk = "book" | "newsletter"
-
-/**
- * Which ask ends a post (#390): Book on a "For founders" post; the
- * newsletter on every other topic, whose readers are mostly developers.
- */
-export function postAsk(article: BlogArticle): PostAsk {
-  return article.topic === "founders" ? "book" : "newsletter"
-}
 
 /**
  * The `Blog` JSON-LD node's identity: the `/blog` page describes it in full and
