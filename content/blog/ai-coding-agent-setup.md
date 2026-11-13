@@ -10,6 +10,7 @@ tldr:
 intro: "I run several AI coding agents at once, and I don't review their pull requests before they land. This post shows the setup that makes that safe enough: where the rules live, how parallel tasks stay apart, and what the reviewer agent checks. It's for founders who want to know how I work, and for developers who run agents themselves."
 coverImage: "/img/blog/ai-coding-agent-setup/cover.png"
 coverAlt: "A terminal split in three columns: the same reviewer agent rendered as Claude Code's reviewer.md, OpenCode's reviewer.md and DSH's agent.cordis.yml."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 9
 topic: "ai-mcp"
