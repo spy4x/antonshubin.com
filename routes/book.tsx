@@ -84,7 +84,7 @@ export default define.page(function Book(ctx) {
       <Breadcrumb
         items={getBreadcrumb(head.value.canonical, head.value.pageName!)}
       />
-      <div class="max-w-6xl mx-auto grid gap-x-10 gap-y-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
+      <div class="max-w-6xl mx-auto grid gap-x-10 gap-y-10 lg:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)] lg:items-start">
         {/* 1. Heading and the first action: the calendar, or the brief */}
         <div class="lg:col-start-1 lg:row-start-1 min-w-0">
           <h1 class="text-3xl sm:text-4xl text-parchment text-balance">
@@ -189,7 +189,7 @@ export default define.page(function Book(ctx) {
                 <a
                   href={emailContact.href}
                   {...eventAttrs("outbound", { to: "email" })}
-                  class={`${FACT_LINK} break-all`}
+                  class={`${FACT_LINK} whitespace-nowrap`}
                 >
                   {EMAIL_ADDRESS}
                 </a>
