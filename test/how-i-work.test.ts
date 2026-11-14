@@ -176,7 +176,11 @@ siteTest(
   async (site) => {
     const html = await site.html("/how-i-work")
     const ai = slice(html, '<section aria-labelledby="hiw-ai"', "</section>")
-    assert(ai.includes('href="https://github.com/spy4x/dotfiles"'), "dotfiles")
+    // The rules link is internal now: a `cta`, never an `outbound`.
+    const rules = ai.match(/<a href="\/tools\/dotfiles"[^>]*>/)?.[0]
+    assert(rules, "dotfiles")
+    assert(rules.includes('data-umami-event="cta"'), rules)
+    assert(rules.includes('data-umami-event-target="/tools/dotfiles"'), rules)
     assert(ai.includes('href="/infrastructure"'), "infrastructure")
     assert(ai.includes('href="#faq-ai-and-your-code"'), "AI-provider answer")
     assert(ai.includes("data-why-not-just-ai-link"), "why-not-just-ai link")

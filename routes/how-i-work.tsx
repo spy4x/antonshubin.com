@@ -49,9 +49,6 @@ import { repeatClientsLine } from "../lib/testimonials.ts"
 import { toJsonLd } from "../lib/json-ld.ts"
 import { eventAttrs, linkEvent } from "../lib/analytics.ts"
 
-/** The public repository the agents' rules live in ("How I use AI"). */
-const DOTFILES_URL = "https://github.com/spy4x/dotfiles"
-
 /** The two promises that lead to a catalog item (Mkt 3): the first milestone and the bug fixes. */
 const promiseLinks: Record<string, PromiseLink> = {
   "first-milestone": {
@@ -232,13 +229,14 @@ export default define.page(function HowIWork() {
                 <p>
                   The rules the agents work to are public, in{" "}
                   <a
-                    href={DOTFILES_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    {...linkEvent(DOTFILES_URL)}
+                    href="/tools/dotfiles"
+                    {...eventAttrs("cta", {
+                      place: "body",
+                      target: "/tools/dotfiles",
+                    })}
                     class={FACT_LINK}
                   >
-                    spy4x/dotfiles
+                    my dotfiles
                   </a>
                   . However the code was written, I answer for the result.
                 </p>
