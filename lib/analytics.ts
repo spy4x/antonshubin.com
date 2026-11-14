@@ -37,17 +37,16 @@ export type AnalyticsEvent = typeof ANALYTICS_EVENTS[number]
 
 /**
  * Where on the page a link sits: the nav, the first screen (`hero`), a fact
- * or price card (`card`), the closing band (`band`), a post's side column
- * (`side`), the end of a post (`end`), a line at the top of the main column
- * (`top`), the booking calendar's box and its new-tab link (`calendar`), or
- * anywhere else in the page's own text (`body`).
+ * or price card (`card`), the closing band (`band`), the end of a post
+ * (`end`), a line at the top of the main column (`top`), the booking
+ * calendar's box and its new-tab link (`calendar`), or anywhere else in the
+ * page's own text (`body`).
  */
 export const PLACES = [
   "nav",
   "hero",
   "card",
   "band",
-  "side",
   "end",
   "top",
   "calendar",
