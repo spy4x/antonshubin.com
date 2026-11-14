@@ -9,6 +9,7 @@ tldr:
 intro: "Fixed price or hourly is one of the first questions when you hire a developer. My answer is one sentence, and this post explains it: how to tell which side your project is on, what happens when the scope changes, and which promises hold whichever way you pay."
 coverImage: "/img/blog/fixed-price-or-hourly/cover.png"
 coverAlt: "The pricing question on my How I work page: \"Do you work fixed price or hourly, and what happens when the scope changes?\" with its answer and a link to how hourly billing works with AI."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 5
 topic: "founders"
