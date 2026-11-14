@@ -16,6 +16,7 @@ import {
   WAIT_MS,
 } from "./browser.ts"
 import { toolPageProblems } from "./tool-frame.ts"
+import { tools } from "../lib/tools.ts"
 
 Deno.test("the shared tool page check finds no axe violation, sideways scroll or extra h1 on a page without and with hero media", async () => {
   const site = await startSite({
@@ -248,7 +249,7 @@ Deno.test("the sticky facts card never covers the fit lists and the story while 
 
 // #452: one placement for every copy button: inside the bordered box that
 // holds the code it copies, as on Seed's quick start, never above the box.
-Deno.test("every boxed block of copyable code on a tool page holds its own copy button inside the box", async () => {
+Deno.test("every boxed block of copyable code on the hub and every tool page holds its own copy button inside the box", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
   })
@@ -259,10 +260,8 @@ Deno.test("every boxed block of copyable code on a tool page holds its own copy 
     try {
       const problems: string[] = []
       let boxes = 0
-      for (
-        const slug of ["mig", "oko", "zond", "seed", "ts-libs", "caldav-mcp"]
-      ) {
-        await page.goto(`${site.origin}/tools/${slug}`, {
+      for (const path of ["/tools", ...tools.map((t) => `/tools/${t.slug}`)]) {
+        await page.goto(`${site.origin}${path}`, {
           waitUntil: "networkidle",
         })
         const found = await page.evaluate(() => {
@@ -284,7 +283,7 @@ Deno.test("every boxed block of copyable code on a tool page holds its own copy 
         })
         for (const f of found.filter((f) => f.boxed)) {
           boxes++
-          if (!f.holds) problems.push(`/tools/${slug}: #${f.id}`)
+          if (!f.holds) problems.push(`${path}: #${f.id}`)
         }
       }
       assert(boxes >= 15, `only ${boxes} boxed code blocks found`)
