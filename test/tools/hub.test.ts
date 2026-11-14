@@ -7,6 +7,7 @@ import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "../harness.ts"
 import { count, jsonLd, pageBody, visibleText } from "../html.ts"
 import { clipSources, toolRows, tools } from "../../lib/tools.ts"
+import { toolSummary } from "../../lib/llms.ts"
 import { heroStill } from "../../components/tool-frame/tool-page.ts"
 import { SECTIONS } from "../../components/tools/hub/hub.ts"
 import { smallestFile } from "../../components/tools/hub/HubParts.tsx"
@@ -37,10 +38,19 @@ const STATUS_WORDS = {
   "in-use": "In use",
   ready: "Ready",
   beta: "Beta",
-  wip: "WIP",
+  wip: "In progress",
   paused: "Paused",
   archived: "Archived",
 } as const
+
+Deno.test("each tool's llms line says the status word the hub shows", () => {
+  for (const t of tools) {
+    assert(
+      toolSummary(t).includes(`Status: ${STATUS_WORDS[t.status]}.`),
+      `${t.slug}: ${toolSummary(t)}`,
+    )
+  }
+})
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {

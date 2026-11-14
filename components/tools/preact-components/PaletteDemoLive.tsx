@@ -26,10 +26,16 @@ import {
 
 const ITEM = "preact-components"
 
-/** A row of the palette: a component to put on the stage, or a command to run. */
+/**
+ * A row of the palette: a component to put on the stage, or a command to run.
+ * A command's action is `act`, run by `pick`, not the library's `run`: the
+ * palette pins a `run` row whose word starts the query above every other row
+ * as "Best match", so "toastr" would run "Show a toast" instead of picking
+ * Toastr. `commandWordFirst` keeps the site's own order instead.
+ */
 interface Row extends CommandPaletteOption {
   component?: PaletteComponent
-  run?: () => void
+  act?: () => void
 }
 
 /** What the stage shows: the picked component and why the search found it. */
@@ -206,7 +212,7 @@ export function PaletteDemoLive(
       detail: "Repaints this frame with the library's other palette",
       hint: "theme",
       aliases: ["theme", other, "тема"],
-      run: () => setTheme(other),
+      act: () => setTheme(other),
     },
     {
       id: "command:toast",
@@ -215,7 +221,7 @@ export function PaletteDemoLive(
       detail: "The library's Toastr, with an Undo button",
       hint: "Toastr",
       aliases: ["toastr", "notification"],
-      run: () => {
+      act: () => {
         track("tool-try", { item: ITEM, part: "command:toast" })
         toasts.success({
           title: "",
@@ -240,7 +246,7 @@ export function PaletteDemoLive(
       detail: install,
       hint: "copy",
       aliases: ["install", "copy"],
-      run: () => void copyPort("install")(install),
+      act: () => void copyPort("install")(install),
     },
     {
       id: "command:guide",
@@ -249,7 +255,7 @@ export function PaletteDemoLive(
       detail: "Every component, running, with its code",
       hint: "link",
       aliases: ["guide", "docs"],
-      run: () => {
+      act: () => {
         track("outbound", { to: "live", item: ITEM, place: "body" })
         location.assign(guideHref)
       },
@@ -257,7 +263,7 @@ export function PaletteDemoLive(
   ]
 
   const pick = (row: Row) => {
-    if (row.run) return row.run()
+    if (row.act) return row.act()
     const component = row.component!
     const query = lastQuery.current
     const kind = matchOption(query, {
