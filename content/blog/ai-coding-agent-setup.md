@@ -279,7 +279,7 @@ fix. A pull request gets at most three failed reviews. After the third, the lead
 finishes a fix of about ten lines itself, or leaves the pull request open with a
 note on what's left.
 
-## Every rule has a scar
+## The scars behind my rules
 
 All of this still breaks, and the public record shows how. Many of my rules
 exist because something went wrong first, and for a while each of those carried
@@ -315,8 +315,8 @@ and 73 GB of RAM. Now
 so a runaway stops at the cap instead of at my memory.
 
 **An agent logged my desktop out.** It read the parent-PID column of a process
-listing as a target and killed the systemd user manager. Everything went with
-it. Now, before `pkill` or `killall`, an agent
+listing as a target and killed the systemd user manager, which logged me out of
+the desktop. Now, before `pkill` or `killall`, an agent
 [runs `pgrep -a` with the same pattern and reads every match](https://github.com/spy4x/dotfiles/blob/5b4ede99ae750ed42cac3b69dad5c2c58dd86832/ai-harnesses/AGENTS.md#L581-L584).
 
 **A reviewer cleaned up two other reviewers.** The harness offers one temporary
