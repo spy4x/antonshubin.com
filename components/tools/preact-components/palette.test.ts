@@ -108,7 +108,7 @@ Deno.test("typing a theme command's word puts that command first, ahead of a com
   const theme = (to: string) => ({
     label: `Switch the preview to ${to}`,
     aliases: ["theme", to.toLowerCase(), "тема"],
-    run: () => {},
+    act: () => {},
   })
   for (const to of ["Light", "Dark"]) {
     // Components first, as the island lists them, then its commands.
@@ -124,7 +124,7 @@ Deno.test("typing a theme command's word puts that command first, ahead of a com
   const toast = {
     label: "Show a toast",
     aliases: ["toastr", "notification"],
-    run: () => {},
+    act: () => {},
   }
   assertEquals(
     commandWordFirst(matchOptions([...rows, toast], "toastr"), "toastr")[0]

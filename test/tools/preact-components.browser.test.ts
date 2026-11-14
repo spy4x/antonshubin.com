@@ -250,11 +250,15 @@ async function liveTrigger(page: Page) {
   return trigger
 }
 
-/** Waits for the open palette to list `label` first. */
+/**
+ * Waits for the open palette's first row, as listed on screen, to be named
+ * exactly `label`. The name, not the row's text: "Show a toast" shows the
+ * hint "Toastr" too.
+ */
 async function firstResult(page: Page, label: string) {
-  await page.locator("dialog[open] [role=option]").first().filter({
-    hasText: label,
-  }).waitFor({ timeout: WAIT_MS })
+  await page.locator("dialog[open] [role=option]").first()
+    .and(page.getByRole("option", { name: label, exact: true }))
+    .waitFor({ timeout: WAIT_MS })
 }
 
 Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, and each example puts its component on the stage with why it matched", async () => {
@@ -483,6 +487,36 @@ Deno.test("a denied clipboard says so in a toast and selects the import line for
         await page.evaluate(() => getSelection()?.toString()),
         `import { Toastr } from "@spy4x/preact-ui"`,
       )
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("the open palette lists a component named as typed above a command that has the word, and a command's own word above a component that only starts with it", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    try {
+      await page.goto(`${site.origin}${PATH}`, { waitUntil: "networkidle" })
+      await (await liveTrigger(page)).focus()
+      const cases = [
+        ["toastr", "Toastr"],
+        ["toast", "Toastr"],
+        ["light", "Switch the preview to Light"],
+      ]
+      for (const [query, first] of cases) {
+        if (query !== cases[0][0]) await page.keyboard.press("ControlOrMeta+a")
+        await page.keyboard.type(query)
+        await firstResult(page, first)
+      }
     } finally {
       await page.close()
     }

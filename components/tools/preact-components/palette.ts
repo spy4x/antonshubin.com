@@ -84,15 +84,16 @@ export const PALETTE_LABELS = {
  * moved up, ahead of everything but a name typed in full: "light" runs
  * "Switch the preview to Light" instead of picking Lightbox, whose name only
  * starts with it, while "toastr" still picks Toastr over "Show a toast". The
- * library's matcher ranks a name's prefix above an exact alias.
+ * library's matcher ranks a name's prefix above an exact alias. A command is a
+ * row with `act`.
  */
 export function commandWordFirst<
-  T extends { label: string; aliases?: readonly string[]; run?: () => void },
+  T extends { label: string; aliases?: readonly string[]; act?: () => void },
 >(ranked: readonly T[], query: string): T[] {
   const word = query.trim().toLowerCase()
   const named = (row: T) => row.label.toLowerCase() === word
   const command = (row: T) =>
-    !named(row) && row.run !== undefined &&
+    !named(row) && row.act !== undefined &&
     (row.aliases ?? []).includes(word)
   return [
     ...ranked.filter(named),
