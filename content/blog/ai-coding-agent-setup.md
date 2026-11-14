@@ -6,13 +6,14 @@ tldr:
   - "My agents' rules, skills and agents live once, in the public spy4x/dotfiles repo. One command renders them into Claude Code, OpenCode and DSH."
   - "Every task runs in its own git worktree, and parallel tasks never touch the same files, so agents can't overwrite each other's work."
   - "A separate reviewer agent checks every change. It breaks the code on purpose, and a test that stays green on broken code counts for nothing."
-  - "It still breaks: an agent once merged a stranger's pull request, because my rule never said whose pull requests it covered."
+  - "Many of my rules began as incidents: an agent merged a stranger's pull request, and a fake rsync in a test ate 73 GB of RAM in minutes."
 intro: "I run several AI coding agents at once, and I don't review their pull requests before they land. This post shows the setup that makes that safe enough: where the rules live, how parallel tasks stay apart, and what the reviewer agent checks. It's for founders who want to know how I work, and for developers who run agents themselves."
 coverImage: "/img/blog/ai-coding-agent-setup/cover.png"
 coverAlt: "A terminal split in three columns: the same reviewer agent rendered as Claude Code's reviewer.md, OpenCode's reviewer.md and DSH's agent.cordis.yml."
 coverSize: "1000x420"
 publishedAt: "2026-10-30"
-readTime: 9
+updatedAt: "2026-11-14"
+readTime: 10
 topic: "ai-mcp"
 relatedTool: "dotfiles"
 ---
@@ -278,9 +279,13 @@ fix. A pull request gets at most three failed reviews. After the third, the lead
 finishes a fix of about ten lines itself, or leaves the pull request open with a
 note on what's left.
 
-## What goes wrong
+## Every rule has a scar
 
-All of this still breaks, and the public record shows how.
+All of this still breaks, and the public record shows how. Many of my rules
+exist because something went wrong first, and for a while each of those carried
+its story in brackets: "(once: …)". The stories now live outside the rules file,
+because of that size budget, so the links below point at a commit that still had
+them.
 
 **An agent merged a stranger's pull request.** My rule said "merge when the
 reviewer passes" and never said whose pull requests it meant. An agent applied
@@ -293,6 +298,42 @@ The rules now have an
 nothing from another account is merged, reviewed or built on until I ask for
 that exact action in chat. The lesson I took: whatever a rule leaves implied, an
 agent fills in.
+
+**32 busy-loops ran for 11.5 hours.** When a shell gets killed, the jobs it
+started with `&` keep running: `systemd --user` adopts them, and the cleanup on
+the command's last line never runs. Once, that left 32 busy-loops spinning for
+11.5 hours. A bare `&` looks so innocent. So now
+[nothing is left running](https://github.com/spy4x/dotfiles/blob/5b4ede99ae750ed42cac3b69dad5c2c58dd86832/ai-harnesses/AGENTS.md#L493-L500):
+an agent works in the foreground first, then through the harness's own
+background runner, and never with a bare `&`.
+
+**A fake `rsync` ate 73 GB of RAM.** A test put a fake `rsync` on the `PATH` to
+stand in for the real one. The fake then called `rsync` itself, found itself
+instead of the real one, and did it again. In minutes that was 4,900 processes
+and 73 GB of RAM. Now
+[anything that spawns processes runs under a cap](https://github.com/spy4x/dotfiles/blob/5b4ede99ae750ed42cac3b69dad5c2c58dd86832/ai-harnesses/AGENTS.md#L536-L542),
+so a runaway stops at the cap instead of at my memory.
+
+**An agent logged my desktop out.** It read the parent-PID column of a process
+listing as a target and killed the systemd user manager. Everything went with
+it. Now, before `pkill` or `killall`, an agent
+[runs `pgrep -a` with the same pattern and reads every match](https://github.com/spy4x/dotfiles/blob/5b4ede99ae750ed42cac3b69dad5c2c58dd86832/ai-harnesses/AGENTS.md#L581-L584).
+
+**A reviewer cleaned up two other reviewers.** The harness offers one temporary
+folder and calls it session-specific, but the lead and every subagent it starts
+share it. One reviewer's cleanup wiped two other reviewers' worktrees. Very
+tidy. Now each agent makes its own folder inside, and
+[nobody deletes or empties the shared one](https://github.com/spy4x/dotfiles/blob/5b4ede99ae750ed42cac3b69dad5c2c58dd86832/ai-harnesses/AGENTS.md#L529-L534).
+
+**An agent waited seven hours on a run that had long finished.** Patient, I'll
+give it that. Now
+[every wait has a deadline](https://github.com/spy4x/dotfiles/blob/5b4ede99ae750ed42cac3b69dad5c2c58dd86832/ai-harnesses/AGENTS.md#L552-L556):
+a background command runs inside a `timeout` sized to the job, with some slack.
+
+None of these rules came from a whiteboard. Each one costs a few lines of that
+budget, and each one is still cheaper than the second time.
+
+### What still goes wrong
 
 **Most pull requests fail their first review.** In the cost post's data, most
 pull requests from every model failed their first review on ordinary code.
