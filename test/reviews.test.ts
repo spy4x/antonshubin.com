@@ -1,7 +1,7 @@
 // #231: every client project page shows its period and its clients' full
-// reviews with a link to the Upwork profile, and the home page shows three
-// review excerpts that each name and link their project and period. Checked
-// on the built pages, since the wiring lives in the route files.
+// reviews with a link to its Upwork portfolio item, and the home page shows
+// three review excerpts that each name and link their project and period.
+// Checked on the built pages, since the wiring lives in the route files.
 import { assert } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
 import { visibleText } from "./html.ts"
@@ -9,10 +9,10 @@ import { formatPeriod, projects } from "../lib/data.ts"
 import {
   homeTestimonialIds,
   projectTestimonials,
+  reviewHref,
   testimonial,
   testimonialProject,
 } from "../lib/testimonials.ts"
-import { UPWORK_URL } from "../lib/config.ts"
 
 /** Registers a test that gets a running copy of the built site and always stops it. */
 function siteTest(name: string, fn: (site: Site) => Promise<void>) {
@@ -47,8 +47,8 @@ siteTest(
         `/work/${project.slug} has reviews but no review section`,
       )
       assert(
-        html.includes(`href="${UPWORK_URL}"`),
-        `/work/${project.slug} does not link the Upwork profile`,
+        html.includes(`href="${reviewHref(project.slug!)}"`),
+        `/work/${project.slug} does not link its Upwork review`,
       )
       const start = html.indexOf("data-project-reviews")
       const section = html.slice(start, html.indexOf("</section>", start))
