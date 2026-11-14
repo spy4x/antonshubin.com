@@ -228,6 +228,9 @@ page. Never retry a test on this error.
   card's one link is stretched over it with `after:absolute after:inset-0`, as
   on the highlight cards), and a link inside a catalog card keeps its own
   target.
+- `test/book-contact.browser.test.ts` (#445): from 320 to 1440px, the `/book`
+  contact card keeps the email address on one line inside its column, with no
+  sideways scroll.
 - `test/analytics.browser.test.ts` (#318): `post-read` counts once, only when
   the end of a post has been on screen and 15 s have passed (Playwright's fake
   clock), and the not-found page counts `not-found`. It, `lead-form` (brief
