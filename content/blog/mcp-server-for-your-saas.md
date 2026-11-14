@@ -9,6 +9,7 @@ tldr:
 intro: "When a customer asks whether their AI assistant can use your product, someone has to answer. This post is for that founder: what an MCP server exposes, how it stays safe, what went wrong in mine and what it takes to run, with caldav-mcp as the worked example."
 coverImage: "/img/blog/mcp-server-for-your-saas/cover.png"
 coverAlt: "A chat app named Assistant, connected to caldav-mcp with 13 tools, answering the question \"What's on my list for today?\" with two tool calls: query_events found 1 event and query_todos found 4 tasks, 1 overdue."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 9
 topic: "ai-mcp"
