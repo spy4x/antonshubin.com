@@ -125,7 +125,9 @@ page. Never retry a test on this error.
   it also checks the project gallery's "n / N" counter and its named
   Previous/Next buttons, and runs every axe-core WCAG 2 A/AA rule plus a
   horizontal-scroll check on six sample project pages, and on `/tools` and every
-  tool page, at 390 and 1440px.
+  tool page, at 390 and 1440px. At 390px those tool pages also get axe's
+  `target-size` rule (#452), walked half a screen at a time with the sticky tab
+  bar hidden, and every visible copy button must be at least 44px tall.
 - `test/contrast.browser.test.ts` (#160): axe-core's `color-contrast` rule
   (version pinned exactly in `deno.json`, like `playwright`) against six
   representative pages, served with a placeholder `SCHEDULE_URL` because the
