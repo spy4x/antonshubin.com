@@ -37,7 +37,7 @@ const STATUS_WORDS = {
   "in-use": "In use",
   ready: "Ready",
   beta: "Beta",
-  wip: "WIP",
+  wip: "In progress",
   paused: "Paused",
   archived: "Archived",
 } as const

@@ -306,7 +306,7 @@ Deno.test("Ctrl K and / open the palette, Escape closes it back on the field, an
           "Toastr",
           "Matched “ещфые” through the wrong keyboard layout.",
         ],
-        ["cyrillic", "Toastr", "Matched “тост” through Cyrillic and a typo."],
+        ["cyrillic", "Toastr", "Matched “тостр” through Cyrillic and a typo."],
       ]
       for (const [part, name, reason] of examples) {
         await page.locator(`[data-palette-example=${part}]`).focus()

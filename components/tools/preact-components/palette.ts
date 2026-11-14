@@ -8,7 +8,7 @@ import { matchOption } from "@spy4x/preact-ui/command-palette"
 
 /**
  * Other names the search finds a component by: search vocabulary only, never
- * shown and never a claim. Toastr has no Cyrillic "тост" here, so that
+ * shown and never a claim. Toastr has no Cyrillic "тостр" here, so that
  * example shows the transliteration, not an alias.
  */
 export const PALETTE_ALIASES: Readonly<Record<string, readonly string[]>> = {
@@ -68,7 +68,7 @@ export const PALETTE_EXAMPLES: readonly PaletteExample[] = [
   { query: "combobx", caption: "a typo", part: "typo" },
   { query: "picker date", caption: "any order", part: "order" },
   { query: "ещфые", caption: "wrong layout", part: "layout" },
-  { query: "тост", caption: "Cyrillic", part: "cyrillic" },
+  { query: "тостр", caption: "Cyrillic", part: "cyrillic" },
 ]
 
 /** The palette's own words on this page; `{n}` is the component count. */
@@ -130,7 +130,7 @@ export function matchReason(query: string, name: string): string {
     const alias = aliases.find((a) => matchOption(query, { label: a }))
     reasons.push(alias ? `another name, “${alias}”` : "another name")
   } else {
-    // The matcher names one kind, its last step: "тост" is read as "tost"
+    // The matcher names one kind, its last step: "тостр" is read as "tostr"
     // and then a typo is fixed, so a Cyrillic query for a Latin name says
     // both.
     if (kind !== "layout" && CYRILLIC.test(typed) && !CYRILLIC.test(name)) {

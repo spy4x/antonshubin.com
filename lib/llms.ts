@@ -101,7 +101,7 @@ const STATUS_WORDS: Record<Tool["status"], string> = {
   "in-use": "In use",
   ready: "Ready",
   beta: "Beta",
-  wip: "WIP",
+  wip: "In progress",
   paused: "Paused",
   archived: "Archived",
 }

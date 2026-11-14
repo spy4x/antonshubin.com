@@ -29,7 +29,7 @@ Deno.test("each example search finds its component first and the stage says why"
       "Toastr",
       "Matched “ещфые” through the wrong keyboard layout.",
     ],
-    "тост": ["Toastr", "Matched “тост” through Cyrillic and a typo."],
+    "тостр": ["Toastr", "Matched “тостр” through Cyrillic and a typo."],
   }
   assertEquals(
     PALETTE_EXAMPLES.map((e) => e.query).sort(),
