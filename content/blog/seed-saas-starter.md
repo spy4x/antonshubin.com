@@ -177,6 +177,10 @@ The offline layer lives in one folder, `apps/spa/src/offline/`. A product that
 does not want it deletes that folder and follows a short list of edits in
 `docs/offline.md`, and keeps an online web app that still gets live updates.
 
+Because the app makes every new id itself, a tag created on that plane already
+has its own page. Why that page is the same screen for adding and editing is in
+[One editor per entity](/blog/one-editor-per-entity).
+
 ## SaaS boilerplate or framework: why Seed is a template
 
 A framework is a dependency. When your product needs something the framework did
