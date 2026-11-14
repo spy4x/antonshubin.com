@@ -1062,6 +1062,7 @@ export const tools: Tool[] = [
       "migrate-from-deno-to-node-and-bun",
       "trail-code-claude-code-test",
       "passkey-autofill-bitwarden-tab-focus",
+      "one-editor-per-entity",
     ],
     useIf: [
       "You are starting a SaaS where people share data in groups.",
