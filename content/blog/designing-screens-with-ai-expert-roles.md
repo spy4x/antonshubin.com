@@ -60,7 +60,7 @@ repository. Here is each one in a sentence or two:
   Joins only for pages a visitor uses to decide: public pages, pricing, sign-up.
   It sat out this redesign, which was all signed-in screens.
 - **[Design reviewer](https://github.com/spy4x/dotfiles/blob/9959ed264b4c514688fef8d96fc8b93ea0baeee4/ai-harnesses/agents/design-reviewer.md).**
-  Comes after the build. Its file opens with "You did not design or build this
+  Comes after the build. Its file tells it, "You did not design or build this
   screen." It opens every changed screen with Playwright at 390 and 1440 px in
   every theme, runs axe-core, walks it with the keyboard only, and tries the
   main task as a first-time user.
@@ -155,9 +155,9 @@ the admin screens and found failures that were already
 heading levels that skip on the Billing page, and on the System page a `<dl>`
 holding `<p>` children and two scrolling tables that the keyboard can't reach.
 
-Those admin screens were built before the design gate existed, so I asked for an
-audit of all of them. The reviewer checked every admin screen at 390 and 1440
-px, light and dark, and
+Those admin screens were built before the design gate existed, so I had already
+asked for an audit of all of them. The reviewer checked every admin screen at
+390 and 1440 px, light and dark, and
 [listed what blocked](https://github.com/spy4x/template/issues/464#issuecomment-6229933108):
 
 - Tab panels showed no focus ring, and focus was lost after a token was revoked.
@@ -165,7 +165,7 @@ px, light and dark, and
   button and the event.
 - At 1440 px, addresses in the audit log broke mid-word.
 - There was a card inside a card and dashed empty boxes.
-- "The block dialog does not name the person."
+- The block dialog did not name the person.
 
 ![The Batman slapping Robin meme: Robin says "Block this person?" and Batman slaps him, answering "Which person?"](/img/blog/designing-screens-with-ai-expert-roles/which-person.webp "The design reviewer, reading a confirmation dialog.")
 
@@ -193,10 +193,9 @@ the cut is written down instead of silently lost.
 **"Create" against "Add".** The writer's rule was one term per concept, and its
 table said "Create" replaces "Add". In notes, though, only the editor's button
 ended up saying "Create note"; the toast, the shortcut and the audit log still
-said "Add note". Two weeks later,
-[seed#586](https://github.com/spy4x/seed/pull/586) fixed the mismatch and
-settled on "Add note" for notes. A test now pins it. Today the group editor says
-"Create group" and the note editor says
+used "add". Two weeks later, [seed#586](https://github.com/spy4x/seed/pull/586)
+fixed the mismatch and settled on "Add note" for notes. A test now pins it.
+Today the group editor says "Create group" and the note editor says
 ["Add note"](https://github.com/spy4x/seed/blob/68545f6921c1265b5251a1361d22c24c678e2869/i18n/app/en.ts#L1024),
 which is consistent per thing, if not across the app.
 
