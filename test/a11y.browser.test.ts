@@ -485,11 +485,28 @@ Deno.test("the tools hub and every tool page have no horizontal scroll and no ax
           )
           assertEquals(await axeViolations(page), [], where)
           if (viewport === MOBILE_VIEWPORT) {
+            // axe's WCAG 2.2 tap-target rule (24px, or enough space around), which the
+            // WCAG 2 A/AA run above leaves out (#452). Run at the top of the page, so the
+            // sticky tab bar covers nothing the rule would then call too small.
+            const tooSmall = await page.evaluate(async () => {
+              // deno-lint-ignore no-explicit-any
+              const axe = (globalThis as any).axe
+              const results = await axe.run(document, {
+                runOnly: ["target-size"],
+              })
+              return results.violations.flatMap((
+                v: { nodes: { html: string }[] },
+              ) => v.nodes.map((n) => n.html.slice(0, 160)))
+            }) as string[]
+            assertEquals(tooSmall, [], `${where}: target-size`)
             // The house bar for a phone tap target is 44px (`min-h-11`), stricter than axe's 24px:
-            // the quick start's and install line's copy buttons are a developer's main action on the page.
+            // every copy button on a tool page is a developer's main action there.
             const copyHeights = await page.$$eval(
-              `button[aria-label="Copy the install command"]`,
-              (els) => els.map((el) => el.getBoundingClientRect().height),
+              `button[data-umami-event="tool-install-copy"]`,
+              (els) =>
+                els.filter((el) => el.checkVisibility()).map((el) =>
+                  el.getBoundingClientRect().height
+                ),
             )
             if (path === "/tools/seed") {
               assert(
