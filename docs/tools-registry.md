@@ -119,25 +119,38 @@ accent in the page body.
 
 Wording the frame keeps: "Skip it if", never "Don't use it if"; "View on GitHub"
 and "open issues" are the only names of links to the tool's repository; Seed is
-a "SaaS starter"; every copy button's tooltip is "Copy the install command".
-`test/tool-frame.ts` holds the shared checks a custom page's test calls:
-`assertToolFrame()` on the built HTML, `toolPageProblems()` in a browser (axe,
-no sideways scroll, one `<h1>` at 390 and 1440px). `test/tool-frame.test.ts`
-runs the first over every tool page; `test/a11y.browser.test.ts` runs axe over
-every tool page.
+a "SaaS starter". Every copy button is named by what it copies, so a screen
+reader tells them apart: "Copy the install command for <tool or package>"
+(`COPY_INSTALL_TITLE` in `components/InstallLine.tsx` plus the name), "Copy the
+quick-start command", or the file or block (`Copy compose.yml`, "Copy the embed
+code"); two buttons share a name only when they copy the same text. It sits
+inside the bordered box with its code, beside it or in the box's header row,
+never above the box. After a copy it reads "Copied" in Parchment; a failure
+reads "Copy failed" in Brick. `test/tools.test.ts` pins the names on each custom
+page and `test/tool-frame.browser.test.ts` the placement. `test/tool-frame.ts`
+holds the shared checks a custom page's test calls: `assertToolFrame()` on the
+built HTML, `toolPageProblems()` in a browser (axe, no sideways scroll, one
+`<h1>` at 390 and 1440px). `test/tool-frame.test.ts` runs the first over every
+tool page; `test/a11y.browser.test.ts` runs axe over every tool page.
 
 "What you get" (`features`, drawn by `components/ToolShowcase.tsx`) is one
 library `FeatureCard` per entry in a six-column grid: `size` makes a card a
 third (default), a half or two thirds wide, so pair cards to fill each row;
 cards in a row stretch to one height with the `shot` at the bottom, and
 `phoneShot` replaces it under 640px where the full crop would be too small to
-read. Crop shots to render near their natural size. A clip's files follow
-docs/images.md "Videos", and a page's own events go in its subsection of
-docs/analytics.md "Tool pages". Every claim in these fields comes from the
-project's own README or docs, and "Where it stands" only from its status
-section. Screenshots live in `static/img/tools/<slug>/` (see
-[images.md](images.md)). A starter's catalog item (`kind: "starter"`) says
-"Built on" and links the starter's page.
+read. Crop shots to render near their natural size. `DefaultMiddle` reads, in
+page order and each only when set: `features`; `credit` (its `text` and
+`links`); "What it is", only without `features`, from the `summary` sentences
+the lede has not used and from `packages`; "Live proof" from `proofLinks`, the
+links that prove `usedFor`; the `screenshots` the hero does not already show;
+the links to other repos in `fits`; and "Where it stands" from `standing`, shown
+there only when `usedFor` is also set (without `usedFor`, `toolLede()` falls
+back to `standing` and the lede says it). A clip's files follow docs/images.md
+"Videos", and a page's own events go in its subsection of docs/analytics.md
+"Tool pages". Every claim in these fields comes from the project's own README or
+docs, and "Where it stands" only from its status section. Screenshots live in
+`static/img/tools/<slug>/` (see [images.md](images.md)). A starter's catalog
+item (`kind: "starter"`) says "Built on" and links the starter's page.
 
 **The hub (#456).** `/tools` (`routes/tools/index.tsx`) is arranged by hand, not
 in registry order: `components/tools/hub/hub.ts` names the spotlight (the tool

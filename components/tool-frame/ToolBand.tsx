@@ -10,9 +10,6 @@ import { BOOK_LABEL } from "../../lib/nav.ts"
 import { type Tool, toolLicence } from "../../lib/tools.ts"
 import type { ToolPageData } from "./tool-page.ts"
 
-/** The tooltip of every install and quick-start copy button on a tool page. */
-export const COPY_INSTALL_TITLE = "Copy the install command"
-
 /**
  * A tool's quick-start command with its copy button (`tool-install-copy`).
  * The command wraps only between arguments, never inside one. `id` must be
@@ -41,7 +38,7 @@ export function QuickStart({ tool, id }: { tool: Tool; id: string }) {
         <CopyButton
           elementId={id}
           label="Copy"
-          title={COPY_INSTALL_TITLE}
+          title="Copy the quick-start command"
           analytics={eventAttrs("tool-install-copy", { item: tool.slug })}
         />
       </div>

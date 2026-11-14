@@ -334,8 +334,9 @@ admin panel video beside them sends `demo-play` with `place: body` (visitors get
 no admin sign-in, so there is no admin link). The "try it" link under a "What
 you get" card sends `demo-app` with `place: card`. The hero's website line sends
 `website` and "The full quick start" sends `github`, both with `place: hero`.
-The copy button of "The next commands" sends `tool-install-copy`. `book` and
-`cta` to the MVP offer with `item: seed` are the number the page should move.
+Both copy buttons of "The next commands" (the set-up commands and the start
+command) send `tool-install-copy`. `book` and `cta` to the MVP offer with
+`item: seed` are the number the page should move.
 
 ### ts-libs
 

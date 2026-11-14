@@ -3,6 +3,7 @@ import { Card } from "@spy4x/preact-ui/card"
 import { IconChevronDown } from "@spy4x/preact-icons"
 import CopyButton from "../../../islands/CopyButton.tsx"
 import { FACT_LINK } from "../../FactCard.tsx"
+import { COPY_INSTALL_TITLE } from "../../InstallLine.tsx"
 import { eventAttrs } from "../../../lib/analytics.ts"
 import {
   TS_LIBS_QUICK_START,
@@ -30,15 +31,13 @@ export function WithCode({ text }: { text: string }) {
  * A block of code that scrolls sideways inside itself instead of wrapping,
  * focusable so the keyboard can scroll it too.
  */
-function CodeBlock(
-  { id, code, label }: { id?: string; code: string; label: string },
-) {
+function CodeBlock({ code, label }: { code: string; label: string }) {
   return (
     <pre
       tabIndex={0}
       aria-label={label}
       class="overflow-x-auto rounded-lg border border-rule bg-paper p-4 text-sm leading-relaxed text-parchment"
-    ><code id={id}>{code}</code></pre>
+    ><code>{code}</code></pre>
   )
 }
 
@@ -52,19 +51,25 @@ export function RunExample({ id, repo }: { id: string; repo: string }) {
     // Its own width never stretches a grid column: the band's columns have
     // no min-w-0, and the commands' long lines would widen the page.
     <div data-run-example class="contain-inline-size">
-      <div class="flex items-center justify-between gap-3">
-        <p id={`${id}-label`} class="text-sm text-graphite">
-          Run the example
-        </p>
+      <p id={`${id}-label`} class="text-sm text-graphite">
+        Run the example
+      </p>
+      <div
+        role="group"
+        aria-labelledby={`${id}-label`}
+        class="mt-2 flex items-start gap-3 rounded-lg border border-rule bg-paper py-2.5 pl-3 pr-3"
+      >
+        <pre
+          tabIndex={0}
+          aria-label="Commands"
+          class="min-w-0 flex-1 overflow-x-auto py-1.5 text-sm leading-relaxed text-parchment"
+        ><code id={id}>{TS_LIBS_QUICK_START}</code></pre>
         <CopyButton
           elementId={id}
           label="Copy"
           title="Copy the commands"
           analytics={eventAttrs("tool-install-copy", { item: SLUG })}
         />
-      </div>
-      <div class="mt-2" role="group" aria-labelledby={`${id}-label`}>
-        <CodeBlock id={id} code={TS_LIBS_QUICK_START} label="Commands" />
       </div>
       <p class="mt-2 text-sm text-graphite">
         main.ts is the example at the top of the{" "}
@@ -125,7 +130,7 @@ function PackageItem({ pkg, open }: { pkg: TsLibsPackage; open: boolean }) {
           <CopyButton
             elementId={installId}
             label="Copy"
-            title="Copy the install command"
+            title={`${COPY_INSTALL_TITLE} for ${full}`}
             analytics={eventAttrs("tool-install-copy", { item: SLUG })}
           />
         </div>

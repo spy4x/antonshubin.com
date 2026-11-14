@@ -72,6 +72,13 @@ export function count(html: string, pattern: RegExp): number {
   return [...html.matchAll(new RegExp(pattern.source, flags))].length
 }
 
+/** The accessible names of a page's copy buttons (`tool-install-copy`), in page order. */
+export function copyButtonNames(html: string): string[] {
+  return [
+    ...html.matchAll(/<button[^>]*data-umami-event="tool-install-copy"[^>]*>/g),
+  ].map((m) => m[0].match(/aria-label="([^"]*)"/)?.[1] ?? "")
+}
+
 /** Slices `html` from the first `start` marker to the first `end` after it, or "" with no start. */
 function between(html: string, start: string, end: string): string {
   const from = html.indexOf(start)

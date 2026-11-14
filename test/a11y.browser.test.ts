@@ -485,11 +485,43 @@ Deno.test("the tools hub and every tool page have no horizontal scroll and no ax
           )
           assertEquals(await axeViolations(page), [], where)
           if (viewport === MOBILE_VIEWPORT) {
+            // axe's WCAG 2.2 tap-target rule (24px, or enough space around), which the
+            // WCAG 2 A/AA run above leaves out (#452). axe checks only what is on
+            // screen, so the page is walked half a screen at a time. The sticky tab bar
+            // is hidden meanwhile: a target passing under it is not too small, and
+            // test/safe-area.browser.test.ts checks the bar's own targets.
+            const tooSmall = await page.evaluate(async () => {
+              // deno-lint-ignore no-explicit-any
+              const axe = (globalThis as any).axe
+              const bar = document.querySelector<HTMLElement>(
+                '[data-e2e="rail-shell-tabbar"]',
+              )
+              if (!bar) return ["no tab bar to hide"]
+              bar.style.visibility = "hidden"
+              const found = new Set<string>()
+              const end = document.documentElement.scrollHeight
+              for (let y = 0; y < end; y += innerHeight / 2) {
+                scrollTo(0, y)
+                const results = await axe.run(document, {
+                  runOnly: ["target-size"],
+                })
+                for (const v of results.violations) {
+                  for (const n of v.nodes) found.add(n.html.slice(0, 160))
+                }
+              }
+              bar.style.visibility = ""
+              scrollTo(0, 0)
+              return [...found]
+            }) as string[]
+            assertEquals(tooSmall, [], `${where}: target-size`)
             // The house bar for a phone tap target is 44px (`min-h-11`), stricter than axe's 24px:
-            // the quick start's and install line's copy buttons are a developer's main action on the page.
+            // every copy button on a tool page is a developer's main action there.
             const copyHeights = await page.$$eval(
-              `button[aria-label="Copy the install command"]`,
-              (els) => els.map((el) => el.getBoundingClientRect().height),
+              `button[data-umami-event="tool-install-copy"]`,
+              (els) =>
+                els.filter((el) => el.checkVisibility()).map((el) =>
+                  el.getBoundingClientRect().height
+                ),
             )
             if (path === "/tools/seed") {
               assert(

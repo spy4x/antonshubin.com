@@ -56,11 +56,50 @@ const copied = (page: Page) =>
     (globalThis as unknown as { __copied: string[] }).__copied
   )
 
-Deno.test("the /pay copy button says Copied! after the clipboard takes the address", async () => {
+/** The computed colour of a token class, resolved live so a token edit can't desync a check. */
+const tokenColor = (page: Page, cls: string) =>
+  page.evaluate((c) => {
+    const span = document.createElement("span")
+    span.className = c
+    document.body.append(span)
+    const color = getComputedStyle(span).color
+    span.remove()
+    return color
+  }, cls)
+
+/**
+ * Whether a button reading `text` settles on `color`. Polled, because the
+ * button's colour transition takes a moment to settle.
+ */
+const settlesOn = (page: Page, text: string, color: string) =>
+  page.waitForFunction(
+    ([t, c]) =>
+      [...document.querySelectorAll("button")].some((b) =>
+        b.textContent?.trim() === t && getComputedStyle(b).color === c
+      ),
+    [text, color],
+    { timeout: WAIT_MS },
+  ).then(() => true, () => false)
+
+Deno.test("the /pay copy button reads its label in Graphite, then Copied in Parchment after the clipboard takes the address", async () => {
   await withPage("async-ok", "/pay", async (page) => {
     const button = page.getByRole("button", { name: "Copy EVM address" })
+    assert(
+      await settlesOn(
+        page,
+        "Copy EVM address",
+        await tokenColor(page, "text-graphite"),
+      ),
+      "the idle button is not in Graphite",
+    )
     await button.click()
-    await page.getByText("Copied!").first().waitFor({ timeout: WAIT_MS })
+    await page.getByText("Copied", { exact: true }).first().waitFor({
+      timeout: WAIT_MS,
+    })
+    assert(
+      await settlesOn(page, "Copied", await tokenColor(page, "text-parchment")),
+      "Copied is not in Parchment",
+    )
     const [text] = await copied(page)
     assert(/^0x[0-9a-fA-F]{40}$/.test(text), `copied ${text}`)
   })
@@ -69,41 +108,31 @@ Deno.test("the /pay copy button says Copied! after the clipboard takes the addre
 Deno.test("the /pay copy button still copies through the textarea fallback when the clipboard API rejects", async () => {
   await withPage("legacy-ok", "/pay", async (page) => {
     await page.getByRole("button", { name: "Copy EVM address" }).click()
-    await page.getByText("Copied!").first().waitFor({ timeout: WAIT_MS })
+    await page.getByText("Copied", { exact: true }).first().waitFor({
+      timeout: WAIT_MS,
+    })
     assertEquals((await copied(page)).length, 1)
   })
 })
 
-Deno.test("the /pay copy button says Copy failed, not Copied!, when nothing could be copied", async () => {
+Deno.test("the /pay copy button says Copy failed in Brick, not Copied, when nothing could be copied", async () => {
   await withPage("fails", "/pay", async (page) => {
     await page.getByRole("button", { name: "Copy EVM address" }).click()
     const failed = page.getByRole("button", { name: "Copy failed" })
     await failed.waitFor({ timeout: WAIT_MS })
-    assertEquals(await page.getByText("Copied!").count(), 0)
-    // The failure reads in the error colour, resolved live so a token edit can't desync the check.
-    // Polled, because the button's colour transition takes a moment to settle.
-    const probe = await page.evaluate(() => {
-      const span = document.createElement("span")
-      span.className = "text-brick"
-      document.body.append(span)
-      const color = getComputedStyle(span).color
-      span.remove()
-      return color
-    })
-    const settled = await page.waitForFunction(
-      (brick) =>
-        [...document.querySelectorAll("button")].some((b) =>
-          b.textContent?.trim() === "Copy failed" &&
-          getComputedStyle(b).color === brick
-        ),
-      probe,
-      { timeout: WAIT_MS },
-    ).then(() => true, () => false)
-    assert(settled, "Copy failed is not in the error colour")
+    assertEquals(await page.getByText("Copied", { exact: true }).count(), 0)
+    assert(
+      await settlesOn(
+        page,
+        "Copy failed",
+        await tokenColor(page, "text-brick"),
+      ),
+      "Copy failed is not in the error colour",
+    )
   })
 })
 
-Deno.test("a post's code Copy button reads Copied! on success and Copy failed when nothing could be copied", async () => {
+Deno.test("a post's code Copy button reads Copied on success and Copy failed when nothing could be copied", async () => {
   const slug = "building-mcp-servers-with-deno"
   assert(blogArticles.some((a) => a.slug === slug), "sample post is gone")
   await withPage("async-ok", `/blog/${slug}`, async (page) => {
@@ -111,7 +140,7 @@ Deno.test("a post's code Copy button reads Copied! on success and Copy failed wh
     await button.waitFor({ state: "visible" })
     await button.click()
     await page.waitForFunction(() =>
-      document.querySelector("[data-copy-code]")?.textContent === "Copied!"
+      document.querySelector("[data-copy-code]")?.textContent === "Copied"
     )
   })
   await withPage("fails", `/blog/${slug}`, async (page) => {
@@ -124,7 +153,7 @@ Deno.test("a post's code Copy button reads Copied! on success and Copy failed wh
   })
 })
 
-Deno.test("a post's code Copy button reads Copied! when the clipboard API rejects and the textarea fallback works", async () => {
+Deno.test("a post's code Copy button reads Copied when the clipboard API rejects and the textarea fallback works", async () => {
   await withPage(
     "legacy-ok",
     "/blog/building-mcp-servers-with-deno",
@@ -133,7 +162,7 @@ Deno.test("a post's code Copy button reads Copied! when the clipboard API reject
       await button.waitFor({ state: "visible" })
       await button.click()
       await page.waitForFunction(() =>
-        document.querySelector("[data-copy-code]")?.textContent === "Copied!"
+        document.querySelector("[data-copy-code]")?.textContent === "Copied"
       )
       assertEquals((await copied(page)).length, 1)
     },

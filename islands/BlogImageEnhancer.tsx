@@ -49,7 +49,7 @@ export default function BlogImageEnhancer() {
           const code = button.closest(".code-block")?.querySelector("pre")
           const text = code?.textContent ?? ""
           const copied = await copyToClipboard(text.replace(/\n$/, ""))
-          button.textContent = copied ? "Copied!" : "Copy failed"
+          button.textContent = copied ? "Copied" : "Copy failed"
           setTimeout(() => {
             button.textContent = "Copy"
           }, 3000)

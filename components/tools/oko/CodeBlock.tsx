@@ -1,18 +1,17 @@
 import type { ComponentChildren } from "preact"
 import CopyButton from "../../../islands/CopyButton.tsx"
 import { eventAttrs } from "../../../lib/analytics.ts"
-import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx"
 
 /**
  * A file of oko's quick start or config, with its name and a Copy button
- * (`tool-install-copy`). `id` must be unique on the page: the button copies
+ * (`tool-install-copy`) named after the file. `id` must be unique on the page: the button copies
  * the text of the element with that id. `aside` sits beside the code, outside
  * what is copied (the field markers of "From config to card").
  */
 export function CodeBlock(
   { id, file, code, aside, children }: {
     id: string
-    /** The file name in the block's header. */
+    /** The file name in the block's header; the Copy button is "Copy <file>". */
     file: string
     /** The text, copied as is; ignored when `children` draws it line by line. */
     code?: string
@@ -33,7 +32,7 @@ export function CodeBlock(
         <CopyButton
           elementId={id}
           label="Copy"
-          title={COPY_INSTALL_TITLE}
+          title={`Copy ${file}`}
           analytics={eventAttrs("tool-install-copy", { item: "oko" })}
         />
       </div>

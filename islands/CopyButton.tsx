@@ -42,10 +42,13 @@ export default function CopyButton(
     }, 10000)
   }
 
-  // One colour class at a time: a failure reads in Brick (error), everything else in Sage.
+  // One colour class at a time: a failure reads in Brick (error); idle and
+  // copied stay neutral, since Sage is a status colour and Accent is for Book.
   const colorClass = failed.value
     ? "text-brick hover:text-brick"
-    : "text-sage hover:text-sage"
+    : copied.value
+    ? "text-parchment hover:text-parchment"
+    : "text-graphite hover:text-parchment"
   const baseClass =
     `inline-flex items-center min-h-11 sm:min-h-6 gap-1 text-xs ${colorClass} transition-colors`
 
@@ -62,7 +65,7 @@ export default function CopyButton(
       {copied.value
         ? (
           <>
-            <CheckIcon class="w-3.5 h-3.5" /> Copied!
+            <CheckIcon class="w-3.5 h-3.5" /> Copied
           </>
         )
         : failed.value
