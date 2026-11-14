@@ -279,6 +279,10 @@ fix. A pull request gets at most three failed reviews. After the third, the lead
 finishes a fix of about ten lines itself, or leaves the pull request open with a
 note on what's left.
 
+A change to what a person sees gets a second gate, a design reviewer, and a
+design phase with its own AI roles before any code:
+[what each of those roles caught on a real redesign](/blog/designing-screens-with-ai-expert-roles).
+
 ## The scars behind my rules
 
 All of this still breaks, and the public record shows how. Many of my rules
