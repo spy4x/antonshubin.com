@@ -1,15 +1,15 @@
 ---
 title: "One editor per entity: why Add and Edit share one screen"
-description: "Why New and Edit should open the same form, at /groups/new and /groups/:id: one set of fields and checks, a real address, and creates that work offline."
+description: "Why New and Edit should open the same form, at /groups/new and /groups/:id: one set of fields and checks, a real address, and ids that let creates work offline."
 tldr:
   - "In my apps, Add and Edit are one screen: New group opens the group's editor at /groups/new, and an existing group opens the same component at /groups/:id."
   - "One component means one set of fields, one check and one place for the loading, error and offline states, so create and edit cannot drift apart."
   - "A real address beats ?new: you can link to it and reload it, and after a create the address is replaced, so Back does not reopen an empty form."
   - "Ids made on the device let Seed create tags and notes offline and send them later with the same id. Groups still need a connection."
-intro: "Seed's New group button used to open a dialog with one field, while editing a group showed four. This post is for developers and product people who keep building a create form and an edit form for the same thing, and wonder whether they should."
+intro: "Seed's New group button used to open a dialog with one field, while editing a group showed four: description, colour and emoji besides the name. This post is for developers and product people who keep building a create form and an edit form for the same thing, and wonder whether they should."
 coverImage: "/img/blog/one-editor-per-entity/cover.png"
 coverAlt: "The They're The Same Picture meme from The Office: Pam is asked to find the differences between two papers labelled \"New group\" and \"Edit group\", and answers \"They're the same picture.\""
-coverSize: "894x1000"
+coverSize: "720x805"
 publishedAt: "2026-11-14"
 readTime: 8
 topic: "developers"
@@ -18,7 +18,7 @@ catalogSlug: "zero-to-production-saas-mvp"
 seoTitle: "Why Add and Edit should be one screen"
 ---
 
-![Seed's group editor twice, side by side. On the left, create mode at /groups/new: the title New group, the name Book club, a description, a books emoji, the teal colour, and Cancel and Create group buttons. On the right, the same form in edit mode for Book club, with the tabs General, Members, Billing and Activity, a changed description, and Discard and Save group buttons](/img/blog/one-editor-per-entity/new-and-edit.webp "One component at /groups/new and at /groups/:id, in Seed's public demo.")
+![Seed's group editor twice, side by side. On the left, create mode at /groups/new: the title New group, the name Book club, a description, a books emoji, the teal colour, and Cancel and Create group buttons. On the right, the same form in edit mode for Book club, with the tabs General, Members, Billing and Activity, a changed description, and Discard and Save group buttons](/img/blog/one-editor-per-entity/new-and-edit.webp "One component at /groups/new and at /groups/:id, in Seed's public demo, whose build predates the time zone field.")
 
 In my apps, Add and Edit are one screen. "New group" opens the group's editor at
 `/groups/new` in create mode, and an existing group opens the same editor at
@@ -94,8 +94,8 @@ picks the mode
 Both branches draw one `GroupEditorScreen`. Create mode passes `creating`; edit
 mode passes the saved group. What that buys:
 
-1. **One set of fields.** Name, description, emoji and colour in both modes. A
-   create sends all four in one request.
+1. **One set of fields.** Name, description, emoji, colour and, since November,
+   the group's time zone, in both modes. A create sends them all in one request.
 2. **One check.** `checkGroupDraft` checks the draft with the server's own
    parsers, so a typo is caught before the round trip, and both `create()` and
    `save()` call it
