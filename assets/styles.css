@@ -517,8 +517,8 @@ kbd {
 /*
  * Writing (#274). One open reading column of about 68 characters on Ink
  * (UX 1): 18px body text on phones, 19px from 1024px. From 1280px a long
- * post gets a sticky side column with its contents and the author card
- * (UX 3, Mkt 4); `.post-layout--aside` is set only when the post has one.
+ * post gets a sticky side column with its "On this page" contents (UX 3);
+ * `.post-layout--aside` is set only when the post has one.
  */
 .post-layout {
   margin-inline: auto;
