@@ -2,7 +2,8 @@
 /**
  * Writes `components/tools/preact-components/palette-index.ts`, the list the
  * search on /tools/preact-components runs over (#522): every export of kind
- * `component` in the pinned `@spy4x/preact-*` version's `llms.txt`, icons
+ * `component` in the pinned `@spy4x/preact-*` version's `llms.txt` from a
+ * package this site imports (so the test can import each name), icons
  * apart, with the package, the `llms.txt` line and the live guide's card for
  * it when the guide has one. The line's markdown backticks are dropped: a
  * result row shows plain text, so they would show as written.
@@ -46,7 +47,7 @@ const entries = llms.split("\n")
   .map((line) => line.split("\t"))
   .filter(([, kind, from]) =>
     kind === "component" && from?.startsWith("@spy4x/preact-") &&
-    from !== "@spy4x/preact-icons"
+    from !== "@spy4x/preact-icons" && from in config.imports
   )
   .map(([name, , from, line]) => ({
     name,
