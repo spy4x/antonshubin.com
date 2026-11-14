@@ -10,6 +10,7 @@ tldr:
 intro: "In 2022 I wrote about Prettier. My TypeScript projects run on Deno now, and formatting needs no extra package, so here is the setup I use in them today: the config, the CI step that blocks a merge, and the rules that hold my AI agents to the same check."
 coverImage: "/img/blog/deno-fmt-lint-ci-and-ai-agents/cover.png"
 coverAlt: "Step logs of a Woodpecker CI run: deno fmt --check printed Checked 128 files, deno lint printed Checked 52 files, and deno task test follows."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 8
 topic: "ai-mcp"

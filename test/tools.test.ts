@@ -220,7 +220,7 @@ siteTest(
   "each tool with posts links them, and each of those posts links its tool page back",
   async (site) => {
     const withPosts = tools.filter((t) => t.posts?.length)
-    assertEquals(withPosts.length, 8)
+    assertEquals(withPosts.length, 9)
     for (const t of withPosts) {
       const page = await site.html(`/tools/${t.slug}`)
       for (const slug of t.posts!) {
