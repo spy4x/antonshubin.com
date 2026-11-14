@@ -27,13 +27,15 @@ export const notes: Note[] = [
   },
   {
     id: "foodrazor-acquired",
-    text: "Acquired by OrderEZ, reported by e27 in February 2023.",
+    text:
+      "Acquired by OrderEZ, reported by e27 in February 2023. The 10 countries and hundreds of restaurants come from the client's internal project data.",
     href:
       "https://e27.co/fb-ops-management-platform-orderez-acquires-foodrazor-20230216/",
   },
   {
     id: "corecircle-users",
-    text: "The founder said 200K users in her June 2022 interview.",
+    text:
+      "The founder said 200K users in her June 2022 interview. The 2024 acquisition comes from the client's internal project data.",
     href:
       "https://foundersfeature.substack.com/p/founders-feature-054-corecircle",
   },

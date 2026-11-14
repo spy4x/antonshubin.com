@@ -223,7 +223,7 @@ export const projects = {
       catalogSlug: "cto-advisory-retainer",
       externalURL: "https://foodrazor.com",
       description:
-        "Digitize paper invoices, automating orders to suppliers, and tracking price fluctuations.",
+        "FoodRazor lets restaurants digitize paper invoices, automating orders to suppliers and tracking price fluctuations. I joined a team that had no developers and hired them from my own pool of senior developers. The client, Michael Distel, and I became close friends.",
       role: "Tech Lead",
       tags: [
         "Angular",
@@ -280,7 +280,7 @@ export const projects = {
       screenshotURLs: ["1.webp", "2.webp", "3.webp", "4.webp"],
       screenshotSize: { width: 460, height: 996 },
       description:
-        "Fitness-focused social network with exercise tracking features and ML for recommendation system.",
+        "Corecircle is a fitness-focused social network with exercise tracking and ML for recommendations. Nastassia Ponomarenko hired me after we worked together on Connectful. I joined a team of mobile developers and built the website, the backend, the architecture and the DevOps. The mobile apps used my real-time and REST APIs.",
       externalURL: "https://corecircle.com",
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
@@ -428,7 +428,7 @@ export const projects = {
       externalURL: "https://microwork.io",
       externalURLDead: true,
       description:
-        "Human text classification service freelance platform. Earn money by classifying things.",
+        "Microwork was a human text classification platform. Freelancers used it to earn money by classifying things. It was early senior-level work for me: in a team with other developers, I led the frontend, built it in AngularJS and built part of the backend.",
       role: "Team lead & tech lead (full-stack)",
       tags: ["AngularJS", "Node.js", "Express.js", "MongoDB", "AWS EC2"],
       logoImageURL: "/img/projects/microwork/logo.svg",

@@ -7,12 +7,15 @@ import {
   projectTestimonials,
   repeatClients,
   repeatClientsLine,
+  reviewHref,
   type Testimonial,
   testimonial,
   testimonialProject,
   testimonials,
+  UPWORK_PORTFOLIO,
   visibleTestimonials,
 } from "./testimonials.ts"
+import { UPWORK_URL } from "./config.ts"
 
 const base: Omit<Testimonial, "sourceHref" | "permission"> = {
   id: "example-1",
@@ -117,6 +120,16 @@ Deno.test("every review is rated 5.0, as Anton confirmed for all his reviews sin
 
 Deno.test("every real testimonial links its source and is cleared for the site", () => {
   assertEquals(visibleTestimonials(testimonials), testimonials)
+})
+
+Deno.test("a project with no Upwork portfolio item links its review to the profile", () => {
+  assert(!("no-portfolio" in UPWORK_PORTFOLIO))
+  assertEquals(reviewHref("no-portfolio"), UPWORK_URL)
+})
+
+Deno.test("a project with an Upwork portfolio item links its review there", () => {
+  assertEquals(reviewHref("roley"), UPWORK_PORTFOLIO.roley)
+  assert(UPWORK_PORTFOLIO.roley !== UPWORK_URL)
 })
 
 Deno.test("the home page shows three reviews, each from a different client", () => {
