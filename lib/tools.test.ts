@@ -83,7 +83,7 @@ Deno.test("every own project is a tool or a row, each in a known group", () => {
   ])
 })
 
-Deno.test("every status is written down: in use, ready, beta, WIP, paused or archived, as Anton classified them", () => {
+Deno.test("every status is written down: in use, ready, beta, in progress, paused or archived, as Anton classified them", () => {
   const status = Object.fromEntries(
     [...tools, ...toolRows].map((t) => [t.slug, t.status]),
   )

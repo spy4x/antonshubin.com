@@ -318,7 +318,7 @@ function renderedPaletteMarkup(): string {
 
 /** A class name as Tailwind writes it in a selector: `hover:x` → `hover\:x`. */
 function selectorFor(className: string): string {
-  return "." + className.replace(/[:.!\[\]\/(),+=&>*%@#]/g, (c) => `\\${c}`)
+  return "." + className.replace(/[:.!\[\]\/(),+=&<>*%@#]/g, (c) => `\\${c}`)
 }
 
 function escapeRegExp(text: string): string {
@@ -376,12 +376,18 @@ function paletteOnly(): Set<string> {
   )
 }
 
+/** A class as written in the source: the HTML escapes `&` (the rail's
+ * `[:root:has(&)]` variants), `>` (the comparison table's `[&_tbody>tr...]`
+ * variant) and `<` (the slider's typed `attr(data-fill_type(<number>))`). */
+function unescapeClass(c: string): string {
+  return c.replaceAll("&amp;", "&").replaceAll("&gt;", ">")
+    .replaceAll("&lt;", "<")
+}
+
 function classesIn(html: string): Set<string> {
   return new Set(
     [...html.matchAll(/class="([^"]*)"/g)].flatMap(([, list]) =>
-      list.split(/\s+/).map((c) =>
-        c.replaceAll("&amp;", "&").replaceAll("&gt;", ">")
-      )
+      list.split(/\s+/).map(unescapeClass)
     ),
   )
 }
@@ -399,10 +405,8 @@ function renderedClasses(): { light: Set<string>; dark: Set<string> } {
       .matchAll(/class="([^"]*)"/g)
   ) {
     for (const raw of list.split(/\s+/)) {
-      // The HTML escapes `&` (the rail's `[:root:has(&)]` variants) and `>`
-      // (the comparison table's `[&_tbody>tr...]` variant), and a
-      // named group (`group/rail`) only marks an element, with no rule.
-      const c = raw.replaceAll("&amp;", "&").replaceAll("&gt;", ">")
+      // A named group (`group/rail`) only marks an element, with no rule.
+      const c = unescapeClass(raw)
       if (!c || /^group(\/|$)/.test(c)) continue
       ;(c.startsWith("dark:") ? dark : light).add(c)
     }
