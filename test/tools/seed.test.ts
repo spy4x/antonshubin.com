@@ -6,7 +6,10 @@ import { type Site, startSite } from "../harness.ts"
 import { count, pageBody, visibleText } from "../html.ts"
 import { assertToolFrame } from "../tool-frame.ts"
 import { tool } from "../../lib/tools.ts"
-import { NEXT_COMMANDS } from "../../components/tools/seed/SeedStart.tsx"
+import {
+  DEV_COMMANDS,
+  SETUP_COMMANDS,
+} from "../../components/tools/seed/SeedStart.tsx"
 import {
   ADMIN_VIDEO,
   DEMO_APP,
@@ -173,7 +176,7 @@ seedTest(
 )
 
 seedTest(
-  "the next commands sit in a closed disclosure with one copy button and the README's commands in order",
+  "the next commands sit in a closed disclosure, split after init into two blocks with a copy button each, the README's commands in order",
   (page) => {
     const at = page.indexOf("data-seed-next")
     assert(at !== -1, "no next-commands disclosure")
@@ -183,13 +186,26 @@ seedTest(
     )
     assert(!/<details[^>]*\sopen/.test(details), "open by default")
     assert(visibleText(details).startsWith("The next commands"), "summary")
-    const code = details.match(/<code id="seed-next-commands">([^<]*)<\/code>/)
-      ?.[1]
-    assertEquals(code, NEXT_COMMANDS.join("\n"))
+    const blocks = [...details.matchAll(/<code id="([^"]+)">([^<]*)<\/code>/g)]
+      .map((m) => [m[1], m[2]])
+    assertEquals(blocks, [
+      ["seed-setup-commands", SETUP_COMMANDS.join("\n")],
+      ["seed-dev-command", DEV_COMMANDS.join("\n")],
+    ])
+    // init asks for the project name, so a pasted dev behind it would answer it.
+    assertEquals(SETUP_COMMANDS.at(-1), "deno task init")
+    assertEquals(DEV_COMMANDS, ["deno task dev"])
     assertEquals(
       count(details, /data-umami-event="tool-install-copy"/g),
-      1,
+      2,
       "copy buttons",
+    )
+    const text = visibleText(details)
+    assert(
+      text.indexOf("asks for the project name") <
+          text.indexOf("deno task dev") &&
+        text.indexOf("deno task dev") < text.indexOf("http://app.localhost"),
+      `the lines between the blocks are out of order: ${text}`,
     )
     assert(
       details.includes('href="https://github.com/spy4x/seed#quick-start"'),
