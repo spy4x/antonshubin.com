@@ -10,6 +10,7 @@ tldr:
 intro: "I keep one page with every service I self-host, and it should tell the truth about what is up. This post is for people who already run Gatus: what oko does, what it leaves out on purpose, and how to run it."
 coverImage: "/img/blog/oko-homelab-dashboard/cover.png"
 coverAlt: "The top of the oko demo dashboard: a search box with the hint to press slash to focus, the Home section at 5/5 healthy, and cards for Audiobooks, Git service and Photo library with their uptime."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 7
 topic: "self-hosting"
