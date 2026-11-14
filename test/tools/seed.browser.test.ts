@@ -33,15 +33,15 @@ Deno.test("the Seed page has no axe violation, sideways scroll or extra h1, with
         if (overflow > 0) {
           problems.push(`${at}: scrolls sideways by ${overflow}px`)
         }
-        // The commands wrap rather than scroll inside their box.
-        const inner = await page.locator("#seed-next-commands").evaluate(
-          (el) => {
+        // The commands wrap rather than scroll inside their boxes.
+        for (const id of ["seed-setup-commands", "seed-dev-command"]) {
+          const inner = await page.locator(`#${id}`).evaluate((el) => {
             const pre = el.parentElement!
             return pre.scrollWidth - pre.clientWidth
-          },
-        )
-        if (inner > 0) {
-          problems.push(`${at}: the commands scroll by ${inner}px`)
+          })
+          if (inner > 0) {
+            problems.push(`${at}: #${id} scrolls by ${inner}px`)
+          }
         }
         for (const v of await axeViolations(page)) problems.push(`${at}: ${v}`)
       }
