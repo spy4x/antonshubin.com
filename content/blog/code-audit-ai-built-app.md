@@ -10,6 +10,7 @@ tldr:
 intro: "If you built your app with Lovable, Cursor or Claude Code, you may wonder what a code audit would actually look at. Instead of describing it, I ran my checklist on one of my own open-source repositories and wrote down what it found, line by line."
 coverImage: "/img/blog/code-audit-ai-built-app/cover.png"
 coverAlt: "The mutate function of mig's bookings store on GitHub, in the dark theme, with the comment that says it hands the caller a clone."
+coverSize: "1000x420"
 publishedAt: "2026-10-30"
 readTime: 9
 topic: "founders"
