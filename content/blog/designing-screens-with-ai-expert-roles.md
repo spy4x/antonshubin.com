@@ -17,7 +17,7 @@ topic: "ai-mcp"
 relatedTool: "dotfiles"
 ---
 
-![Seed's New group page in the dark theme: a back arrow and the title "New group", then Name with "Design crew" typed in, Description marked Optional with "0 of 500 characters", Emoji, a row of colour swatches, and the buttons Cancel and Create group](/img/blog/designing-screens-with-ai-expert-roles/new-group.webp "Seed's New group page, from the public demo. Four roles argued about this screen before any code.")
+![Seed's New group page in the dark theme: a back arrow and the title "New group", then Name with "Design crew" typed in, Description marked Optional with "0 of 500 characters", Emoji, a row of colour swatches, and the buttons Cancel and Create group](/img/blog/designing-screens-with-ai-expert-roles/new-group.webp "Seed's New group page, from the public demo. Four roles advised on this screen before any code.")
 
 I don't ask one AI model to "design a nice screen". When I design UI with AI
 agents, four of them, each with a different job description, read the same brief
@@ -36,9 +36,9 @@ look like a default template.
 
 ## What does each role do?
 
-Each role is a short Markdown file in my public
+Each role is a Markdown file in my public
 [dotfiles](https://github.com/spy4x/dotfiles/tree/9959ed264b4c514688fef8d96fc8b93ea0baeee4/ai-harnesses/agents)
-repository. The files are short, so here is each one in a sentence or two:
+repository. Here is each one in a sentence or two:
 
 - **[Product designer](https://github.com/spy4x/dotfiles/blob/9959ed264b4c514688fef8d96fc8b93ea0baeee4/ai-harnesses/agents/product-designer.md).**
   The job of the screen, hierarchy, layout "mobile first at 390 px, then 1440
@@ -116,18 +116,12 @@ was promoted as if notes were the only thing in a group. The psychologist asked
 that the whole row be the link, with "Current" written as text. That's how the
 list in the [demo](https://app.seedsaas.com) looks today:
 
-![Seed's Groups page in the dark theme: a New group button and four rows, Book
-club (Viewer, 8 members), Marketing (Editor, 9 members), Product team with the
-word "Current" next to its name (Owner, 14 members) and Personal (Owner, only
-you), each with a
-chevron](/img/blog/designing-screens-with-ai-expert-roles/groups-list.webp "The
-Groups list in the demo: \"Current\ "is a word, not an icon you have to
-decode.")
+![Seed's Groups page in the dark theme: a New group button and four rows, Book club (Viewer, 8 members), Marketing (Editor, 9 members), Product team with the word "Current" next to its name (Owner, 14 members) and Personal (Owner, only you), each with a chevron](/img/blog/designing-screens-with-ai-expert-roles/groups-list.webp "The Groups list in the demo. The current group says so in a word, not an icon.")
 
 Its second catch was quieter. Opening a group's editor must never change your
-current group: you came to look, not to move. The product lead said the same
-thing, and the lead added one exception: creating a group does switch to it,
-"since the person made it to use it".
+current group. The product lead said the same thing, and the lead added one
+exception: creating a group does switch to it, "since the person made it to use
+it".
 
 ![The Epic Handshake meme: two arms labelled "Psychologist" and "Product lead" clasp hands over the caption "Opening an editor never switches the group"](/img/blog/designing-screens-with-ai-expert-roles/handshake.webp "When two roles say the same thing, the lead stops arguing.")
 
@@ -182,13 +176,13 @@ library first, so they ship to every app that uses it, not only this one.
 
 ## What did not work?
 
-Some recommendations were wrong, and one fix didn't hold.
+Some recommendations didn't survive the merge, and one fix didn't hold.
 
 **The designer's 280 characters.** Its wireframe gave a group description 280
 characters. The API already allowed 500, so the merge dropped it: "Dropped: the
 API allows 500 today". You can see "0 of 500 characters" in the first
-screenshot. The roles read a brief and screenshots, not the code, so they guess
-at limits the code already sets.
+screenshot. The roles work from the brief and the screenshots, so a limit the
+brief doesn't state is a guess.
 
 **More than the job needed.** The designer also wanted to move the group picker
 into the shared library ("Dropped for now: only this template needs it today")
@@ -200,7 +194,7 @@ the cut is written down instead of silently lost.
 table said "Create" replaces "Add". In notes, though, only the editor's button
 ended up saying "Create note"; the toast, the shortcut and the audit log still
 said "Add note". Two weeks later,
-[seed#586](https://github.com/spy4x/seed/pull/586) found the mismatch and
+[seed#586](https://github.com/spy4x/seed/pull/586) fixed the mismatch and
 settled on "Add note" for notes. A test now pins it. Today the group editor says
 "Create group" and the note editor says
 ["Add note"](https://github.com/spy4x/seed/blob/68545f6921c1265b5251a1361d22c24c678e2869/i18n/app/en.ts#L1024),
@@ -218,10 +212,10 @@ came from me.
 
 ![The Always Has Been meme: one astronaut looks at the Earth and asks "Wait, the big changes came from the human?", and a second astronaut behind him answers "Always has been"](/img/blog/designing-screens-with-ai-expert-roles/always-has-been.webp "The roles polish the idea. Someone still has to have it.")
 
-They also miss what isn't in front of them. They don't see the code, so they
-guess at limits. A wording rule isn't a check, so "Create" and "Add" drifted
-apart without anything turning red. And the design reviewer only judges the
-screens in the diff, which is why the old admin screens needed their own audit.
+They also miss what isn't in front of them. A limit the brief leaves out, they
+guess. A wording rule isn't a check, so "Create" and "Add" drifted apart without
+anything turning red. And the design reviewer only judges the screens in the
+diff, which is why the old admin screens needed their own audit.
 
 Where AI did the work: every role, the merged spec, the build and both reviews
 in this post were AI agents. I wrote the rules they follow and the request that
