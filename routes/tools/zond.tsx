@@ -1,7 +1,6 @@
 import { define } from "../../lib/utils.ts"
 import { eventAttrs } from "../../lib/analytics.ts"
 import { NotFound } from "../../components/NotFound.tsx"
-import { COPY_INSTALL_TITLE } from "../../components/tool-frame/ToolBand.tsx"
 import { ToolFrame } from "../../components/tool-frame/ToolFrame.tsx"
 import { loadToolPage } from "../../components/tool-frame/tool-page.ts"
 import { AskZond } from "../../components/tools/zond/AskZond.tsx"
@@ -72,9 +71,11 @@ function ProblemPicture() {
 
 /** One copyable block: the text in a box that scrolls sideways on its own, and its copy button. */
 function CodeBlock(
-  { id, label, text, wrap, class: className }: {
+  { id, label, title, text, wrap, class: className }: {
     id: string
     label: string
+    /** The copy button's tooltip and accessible name: what it copies. */
+    title: string
     text: string
     /** Wraps a one-line command instead of scrolling it. */
     wrap?: boolean
@@ -92,7 +93,7 @@ function CodeBlock(
         <CopyButton
           elementId={id}
           label="Copy"
-          title={COPY_INSTALL_TITLE}
+          title={title}
           analytics={eventAttrs("tool-install-copy", { item: "zond" })}
         />
       </div>
@@ -128,12 +129,19 @@ function QuickStartBlocks() {
         <CodeBlock
           id="zond-compose"
           label="compose.yml"
+          title="Copy compose.yml"
           text={BLOCKS.compose}
         />
-        <CodeBlock id="zond-config" label="zond.yml" text={BLOCKS.config} />
+        <CodeBlock
+          id="zond-config"
+          label="zond.yml"
+          title="Copy zond.yml"
+          text={BLOCKS.config}
+        />
         <CodeBlock
           id="zond-command"
           label="Start it and ask it"
+          title="Copy the start command"
           text={BLOCKS.command}
           wrap
           class="lg:col-span-2"
@@ -147,7 +155,12 @@ function QuickStartBlocks() {
             point your monitor at it.
           </p>
         </div>
-        <CodeBlock id="zond-gatus" label="Gatus" text={BLOCKS.gatus} />
+        <CodeBlock
+          id="zond-gatus"
+          label="Gatus"
+          title="Copy the Gatus endpoint"
+          text={BLOCKS.gatus}
+        />
       </div>
     </section>
   )

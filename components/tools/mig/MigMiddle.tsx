@@ -2,7 +2,6 @@ import type { ComponentChildren } from "preact"
 import { FeatureCard } from "@spy4x/preact-ui/feature-card"
 import { FACT_LINK } from "../../FactCard.tsx"
 import { NewTabHint } from "../../NewTabHint.tsx"
-import { COPY_INSTALL_TITLE } from "../../tool-frame/ToolBand.tsx"
 import CopyButton from "../../../islands/CopyButton.tsx"
 import MigTryCalendar from "../../../islands/MigTryCalendar.tsx"
 import { embedUrl, NEW_TAB_LABEL } from "../../../lib/meet-embed.ts"
@@ -32,8 +31,9 @@ export const EMBED_SNIPPET =
 
 /**
  * A block of code that scrolls sideways inside its own box, with a copy
- * button (`tool-install-copy`) above it. `id` must be unique on the page:
- * the button copies the block's text through it.
+ * button (`tool-install-copy`) beside it in the box, as on every tool page.
+ * `id` must be unique on the page: the button copies the block's text
+ * through it.
  */
 function CodeBox(
   { id, label, name, title, code }: {
@@ -48,28 +48,30 @@ function CodeBox(
 ) {
   return (
     <div data-code-box class="min-w-0">
-      <div class="flex items-center justify-between gap-3">
-        {label
-          ? <p id={`${id}-label`} class="text-sm text-graphite">{label}</p>
-          : <span />}
+      {label && <p id={`${id}-label`} class="text-sm text-graphite">{label}</p>}
+      <div
+        class={`${
+          label ? "mt-2 " : ""
+        }flex items-start gap-3 rounded-lg border border-rule bg-paper py-2.5 pl-3 pr-3`}
+      >
+        {
+          /* Focusable and named, so a keyboard can scroll a long line into view. */
+        }
+        <div
+          role="region"
+          aria-labelledby={label ? `${id}-label` : undefined}
+          aria-label={label ? undefined : name}
+          tabIndex={0}
+          class="min-w-0 flex-1 overflow-x-auto"
+        >
+          <pre class="py-1.5 text-sm leading-relaxed text-parchment"><code id={id}>{code}</code></pre>
+        </div>
         <CopyButton
           elementId={id}
           label="Copy"
           title={title}
           analytics={eventAttrs("tool-install-copy", { item: "mig" })}
         />
-      </div>
-      {
-        /* Focusable and named, so a keyboard can scroll a long line into view. */
-      }
-      <div
-        role="region"
-        aria-labelledby={label ? `${id}-label` : undefined}
-        aria-label={label ? undefined : name}
-        tabIndex={0}
-        class="mt-2 overflow-x-auto rounded-lg border border-rule bg-paper"
-      >
-        <pre class="p-4 text-sm leading-relaxed text-parchment"><code id={id}>{code}</code></pre>
       </div>
     </div>
   )
@@ -82,7 +84,7 @@ export function ComposeQuickStart({ version }: { version: string }) {
       id="mig-compose"
       label="Run it with Docker Compose"
       name="compose.yml"
-      title={COPY_INSTALL_TITLE}
+      title="Copy compose.yml"
       code={composeFile(version)}
     />
   )

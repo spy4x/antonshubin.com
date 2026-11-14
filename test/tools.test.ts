@@ -5,8 +5,15 @@
 // registry. Asserts structure and short phrases, never prose.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
-import { count, jsonLd, pageBody, visibleText } from "./html.ts"
+import {
+  copyButtonNames,
+  count,
+  jsonLd,
+  pageBody,
+  visibleText,
+} from "./html.ts"
 import { ciUrl, tool, toolLicence, tools } from "../lib/tools.ts"
+import { tsLibsPackages } from "../lib/ts-libs.ts"
 import { ciReading, repoSnapshot } from "../lib/github-snapshot.ts"
 import { summaryAfterLede } from "../components/tool-frame/tool-page.ts"
 
@@ -809,6 +816,64 @@ siteTest(
         ),
       ].map(([, h]) => visibleText(h))
       assert(headings.includes("Skip it if"), `${t.slug}: no "Skip it if"`)
+    }
+  },
+)
+
+// #452: a screen reader tells copy buttons apart by name only, so each says
+// what it copies. Two buttons share a name only when they copy the same text
+// (a quick start shown under the hero and again in the band).
+const COPY_NAMES: Record<string, string[]> = {
+  "caldav-mcp": ["Copy claude_desktop_config.json"],
+  mig: [
+    "Copy compose.yml",
+    "Copy the embed code",
+    "Copy the install command for mig",
+  ],
+  oko: [
+    "Copy config.json (one service)",
+    "Copy compose.yml",
+    "Copy oko/config.json",
+  ],
+  seed: [
+    "Copy the quick-start command",
+    "Copy the set-up commands",
+    "Copy the start command",
+    "Copy the quick-start command",
+  ],
+  "ts-libs": [
+    "Copy the commands",
+    ...tsLibsPackages.map((p) =>
+      `Copy the install command for @spy4x/${p.name}`
+    ),
+    "Copy the commands",
+  ],
+  zond: [
+    "Copy compose.yml",
+    "Copy zond.yml",
+    "Copy the start command",
+    "Copy the Gatus endpoint",
+  ],
+}
+
+siteTest(
+  "each copy button on a tool page is named by what it copies",
+  async (site) => {
+    for (const [slug, names] of Object.entries(COPY_NAMES)) {
+      const page = pageBody(await site.html(`/tools/${slug}`))
+      assertEquals(copyButtonNames(page), names, slug)
+    }
+  },
+)
+
+siteTest(
+  "the hub names each install line's copy button after its tool",
+  async (site) => {
+    const names = copyButtonNames(pageBody(await site.html("/tools")))
+    assert(names.length > 1, `${names.length} copy buttons on the hub`)
+    assertEquals(new Set(names).size, names.length, names.join("\n"))
+    for (const name of names) {
+      assert(name.startsWith("Copy the install command for "), name)
     }
   },
 )

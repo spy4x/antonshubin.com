@@ -3,6 +3,12 @@ import type { Tool } from "../lib/tools.ts"
 import { eventAttrs } from "../lib/analytics.ts"
 
 /**
+ * The start of every install command's copy-button name; each button adds
+ * what it installs, so a page with several names each apart.
+ */
+export const COPY_INSTALL_TITLE = "Copy the install command"
+
+/**
  * A tool's one install command, pinned to a version, with the registry named
  * (#189). While `registry.published` is false the command is shown marked
  * "Not yet available" and gets no copy button, so nobody copies a command
@@ -29,7 +35,7 @@ export function InstallLine(
           <CopyButton
             elementId={id}
             label="Copy"
-            title="Copy the install command"
+            title={`${COPY_INSTALL_TITLE} for ${tool.name}`}
             analytics={eventAttrs("tool-install-copy", { item: tool.slug })}
           />
         )}

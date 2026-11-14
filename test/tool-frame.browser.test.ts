@@ -245,3 +245,55 @@ Deno.test("the sticky facts card never covers the fit lists and the story while 
     await site.stop()
   }
 })
+
+// #452: one placement for every copy button: inside the bordered box that
+// holds the code it copies, as on Seed's quick start, never above the box.
+Deno.test("every boxed block of copyable code on a tool page holds its own copy button inside the box", async () => {
+  const site = await startSite({
+    env: { SCHEDULE_URL: "https://meet.example.com/book" },
+  })
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser)
+    try {
+      const problems: string[] = []
+      let boxes = 0
+      for (
+        const slug of ["mig", "oko", "zond", "seed", "ts-libs", "caldav-mcp"]
+      ) {
+        await page.goto(`${site.origin}/tools/${slug}`, {
+          waitUntil: "networkidle",
+        })
+        const found = await page.evaluate(() => {
+          for (const d of document.querySelectorAll("details")) d.open = true
+          const bordered = (el: Element) =>
+            parseFloat(getComputedStyle(el).borderTopWidth) > 0
+          return [...document.querySelectorAll("main code[id]")].map((code) => {
+            let box: Element | null = code
+            while (box && !bordered(box)) box = box.parentElement
+            if (!box) return { id: code.id, boxed: false, holds: false }
+            return {
+              id: code.id,
+              boxed: true,
+              holds: !!box.querySelector(
+                'button[data-umami-event="tool-install-copy"]',
+              ),
+            }
+          })
+        })
+        for (const f of found.filter((f) => f.boxed)) {
+          boxes++
+          if (!f.holds) problems.push(`/tools/${slug}: #${f.id}`)
+        }
+      }
+      assert(boxes >= 15, `only ${boxes} boxed code blocks found`)
+      assertEquals(problems, [], "copy buttons outside their code box")
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
