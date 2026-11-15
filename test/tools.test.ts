@@ -311,6 +311,23 @@ siteTest(
 )
 
 siteTest(
+  "every More tools card's job line is a sentence starting with a capital",
+  async (site) => {
+    for (const t of tools) {
+      const html = await site.html(`/tools/${t.slug}`)
+      const page = pageBody(html)
+      const more = page.slice(page.indexOf("data-tool-more"))
+      const jobs = [...more.matchAll(/<p data-tool-job[^>]*>([\s\S]*?)<\/p>/g)]
+        .map((m) => visibleText(m[1]))
+      assertEquals(jobs.length, 3, `${t.slug}: job lines`)
+      for (const job of jobs) {
+        assert(/^\p{Lu}.*\.$/u.test(job), `${t.slug}: "${job}"`)
+      }
+    }
+  },
+)
+
+siteTest(
   "the hub and the tool pages are cached for an hour",
   async (site) => {
     for (const path of ["/tools", "/tools/mig"]) {
