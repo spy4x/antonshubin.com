@@ -11,6 +11,18 @@ The script reads the local commit hash and passes it to the remote build as
 the deploy reads it back (see "Cloudflare purge"). Nothing is written back to a
 tracked file, so `git status` is clean before and after a deploy.
 
+The Dockerfile also runs the build with `DENO_DEPLOYMENT_ID=$BUILD_ID`. Fresh
+versions assets with a build id in two places: the server HTML
+(`?__frsh_c=<id>`) and the client bundle, which rewrites `src` and `srcset` on
+hydration. It reads the id from that variable or from git, else picks a random
+one for each side; the image has no `.git`, so without the variable the two
+differ and every hydrated image downloads twice (#593).
+
+After the purge, the deploy reads `https://<domain>/tools` (with its own query
+string) and its `/assets/client-entry-*.js`, and fails unless every `__frsh_c`
+and the script both carry `BUILD_ID` (`scripts/build-id-check.ts`). Unlike the
+purge, this step fails closed: an unreachable page fails the deploy too.
+
 Decrypt env before deploy if needed (it writes `.env.prod` and `.env.deploy`):
 
 ```bash
