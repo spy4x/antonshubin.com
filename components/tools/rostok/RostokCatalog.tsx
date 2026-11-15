@@ -8,6 +8,19 @@ import { findTool } from "../../../lib/tools.ts"
 const CHIP =
   "rounded border border-rule bg-ink px-1.5 py-0.5 text-xs text-parchment break-all"
 
+/**
+ * The hidden separator between a category's label and its count, so a screen
+ * reader says "Monitoring, 7 stacks". A constant, because `deno fmt` drops the
+ * trailing space of a literal and Fresh's JSX precompile drops a trailing
+ * `&nbsp;`.
+ */
+const HIDDEN_COMMA = ", "
+
+/** "stack" or "stacks", for a count of `n`. */
+function stackWord(n: number) {
+  return n === 1 ? "stack" : "stacks"
+}
+
 /** A list of variable keys as code chips, or "none". */
 function Keys({ keys }: { keys: string[] }) {
   if (keys.length === 0) return <span class="text-graphite">none</span>
@@ -83,7 +96,7 @@ function Stack({ stack }: { stack: RostokStack }) {
               {...linkEvent(`/tools/${own.slug}`, { place: "body" })}
               class={FACT_LINK}
             >
-              This tool's page
+              This tool's page<span class="sr-only">{` (${own.name})`}</span>
             </a>
           </p>
         )}
@@ -121,7 +134,11 @@ export function RostokCatalog() {
                   class="flex min-h-11 items-center gap-2 rounded-lg border border-rule px-3 text-sm text-parchment hover:bg-lamp lg:min-h-9 lg:justify-between lg:border-transparent"
                 >
                   {g.label}
+                  <span class="sr-only">{HIDDEN_COMMA}</span>
                   <span class="text-graphite">{g.stacks.length}</span>
+                  <span class="sr-only">
+                    {` ${stackWord(g.stacks.length)}`}
+                  </span>
                 </a>
               </li>
             ))}
@@ -138,8 +155,9 @@ export function RostokCatalog() {
                 class="flex scroll-mt-8 items-baseline gap-3 text-xl text-parchment"
               >
                 {g.label}
+                <span class="sr-only">{HIDDEN_COMMA}</span>
                 <span class="font-sans text-sm font-normal text-graphite">
-                  {g.stacks.length} {g.stacks.length === 1 ? "stack" : "stacks"}
+                  {g.stacks.length} {stackWord(g.stacks.length)}
                 </span>
               </h3>
               <ul class="mt-4 grid items-start gap-3 sm:grid-cols-2">
