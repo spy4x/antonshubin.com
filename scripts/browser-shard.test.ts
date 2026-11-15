@@ -6,19 +6,36 @@ import {
   shards,
 } from "./browser-shard.ts"
 
-Deno.test("the three CI shards run every browser test file exactly once", async () => {
+/** The `<index>/<count>` of every browser shard step in .woodpecker.yml. */
+async function ciShards(): Promise<{ index: number; count: number }[]> {
+  const yml = await Deno.readTextFile(
+    new URL("../.woodpecker.yml", import.meta.url),
+  )
+  return [...yml.matchAll(/browser-shard\.ts (\d+\/\d+)/g)].map((m) =>
+    parseShard(m[1])
+  )
+}
+
+Deno.test("the CI shard steps run every browser test file exactly once", async () => {
   const files = await browserTestFiles()
   assert(files.length >= 37, `found only ${files.length} browser test files`)
-  const assigned = shards(files, 3).flat()
+  const steps = await ciShards()
+  const count = steps[0]?.count
+  assert(count > 1, "no browser-shard step in .woodpecker.yml")
+  assertEquals(
+    steps.map((s) => `${s.index}/${s.count}`).toSorted(),
+    Array.from({ length: count }, (_, i) => `${i + 1}/${count}`),
+  )
+  const split = shards(files, count)
+  const assigned = steps.flatMap((s) => split[s.index - 1])
   assertEquals(assigned.toSorted(), files)
-  assertEquals(new Set(assigned).size, files.length)
 })
 
 Deno.test("no CI shard carries more than half the browser test seconds", async () => {
   const files = await browserTestFiles()
   const cost = (f: string) => SECONDS[f] ?? 7
   const total = files.reduce((s, f) => s + cost(f), 0)
-  for (const shard of shards(files, 3)) {
+  for (const shard of shards(files, (await ciShards())[0].count)) {
     assert(shard.reduce((s, f) => s + cost(f), 0) <= total / 2)
   }
 })

@@ -13,8 +13,8 @@ There is no deploy step in CI — deploying stays a manual, post-merge action (s
   to every later step, so nothing after it installs or builds again.
 - `unit` (same image): fmt, lint, type check and `deno task test:unit`, minus
   `scripts/video-cut.test.ts`.
-- `browser-1` to `browser-3` (`mcr.microsoft.com/playwright:v1.63.0-noble`):
-  `scripts/browser-shard.ts` splits every `test/**/*.browser.test.ts` into three
+- `browser-1` to `browser-4` (`mcr.microsoft.com/playwright:v1.63.0-noble`):
+  `scripts/browser-shard.ts` splits every `test/**/*.browser.test.ts` into four
   shards of about equal CI time, by the seconds in its `SECONDS` table, and
   `scripts/browser-shard.test.ts` fails unless the shards cover every file
   exactly once. The image holds the Chromium build that Playwright version
@@ -22,9 +22,10 @@ There is no deploy step in CI — deploying stays a manual, post-merge action (s
   tag must match `deno.json`'s `"playwright"` pin exactly.
 - `video-cut` (`jrottenberg/ffmpeg:7.1-ubuntu2404`): the one test that needs
   ffmpeg, ffprobe, libass and a font.
-- `lighthouse-1` and `lighthouse-2` (the Playwright image): the Lighthouse
-  budget on the shared build, half the pages each (`LIGHTHOUSE_SHARD` in
-  `scripts/lighthouse/run.sh`). They install nginx, the one package the pipeline
+- `lighthouse-1` to `lighthouse-3` (the Playwright image): the Lighthouse budget
+  on the shared build, a third of the pages each (`LIGHTHOUSE_SHARD` in
+  `scripts/lighthouse/run.sh`), after the browser shards, since a busy CPU
+  lowers the performance score. They install nginx, the one package the pipeline
   installs.
 
 When a browser test gets much slower or faster, update its line in

@@ -36,7 +36,7 @@ steps:
     when:
       event: [push, pull_request]
 
-  # The browser-driven tests (every test/**/*.browser.test.ts) in three shards
+  # The browser-driven tests (every test/**/*.browser.test.ts) in four shards
   # balanced by their CI times (scripts/browser-shard.ts). The Playwright image
   # matches deno.json's "playwright" import (1.63.0): it holds the Chromium
   # build that version launches, its libraries and fonts, so no step downloads
@@ -45,7 +45,7 @@ steps:
     image: &playwright mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
-      - deno run -A scripts/browser-shard.ts 1/3
+      - deno run -A scripts/browser-shard.ts 1/4
     depends_on: [build]
     when:
       event: [push, pull_request]
@@ -54,7 +54,7 @@ steps:
     image: *playwright
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
-      - deno run -A scripts/browser-shard.ts 2/3
+      - deno run -A scripts/browser-shard.ts 2/4
     depends_on: [build]
     when:
       event: [push, pull_request]
@@ -63,7 +63,16 @@ steps:
     image: *playwright
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
-      - deno run -A scripts/browser-shard.ts 3/3
+      - deno run -A scripts/browser-shard.ts 3/4
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  browser-4:
+    image: *playwright
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - deno run -A scripts/browser-shard.ts 4/4
     depends_on: [build]
     when:
       event: [push, pull_request]
@@ -87,29 +96,43 @@ steps:
   # SEO. scripts/lighthouse/run.sh serves the build step's _fresh/ behind nginx
   # with gzip, as Cloudflare serves it. The Playwright image: Lighthouse CI
   # starts Lighthouse with `node`, and the image has Node, Chromium and its
-  # libraries. It has no nginx, the one package this pipeline installs. Two
-  # shards, each half the pages (LIGHTHOUSE_SHARD in run.sh).
+  # libraries. It has no nginx, the one package this pipeline installs. Three
+  # shards, a third of the pages each (LIGHTHOUSE_SHARD in run.sh). They start
+  # after the browser shards: a busy CPU lowers the performance score, and a
+  # page near the 95 line failed while the browser shards ran beside it.
   lighthouse-1:
     image: *playwright
     environment:
-      LIGHTHOUSE_SHARD: 1/2
+      LIGHTHOUSE_SHARD: 1/3
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
       - deno task lighthouse
-    depends_on: [build]
+    depends_on: [browser-1, browser-2, browser-3, browser-4]
     when:
       event: [push, pull_request]
 
   lighthouse-2:
     image: *playwright
     environment:
-      LIGHTHOUSE_SHARD: 2/2
+      LIGHTHOUSE_SHARD: 2/3
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
       - deno task lighthouse
-    depends_on: [build]
+    depends_on: [browser-1, browser-2, browser-3, browser-4]
+    when:
+      event: [push, pull_request]
+
+  lighthouse-3:
+    image: *playwright
+    environment:
+      LIGHTHOUSE_SHARD: 3/3
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
+      - deno task lighthouse
+    depends_on: [browser-1, browser-2, browser-3, browser-4]
     when:
       event: [push, pull_request]
 

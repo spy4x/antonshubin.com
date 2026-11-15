@@ -7,7 +7,7 @@
  *
  * The test files are every `*.browser.test.ts` under `test/`: the name is the
  * one list, so a new browser test joins a shard without being listed here.
- * CI runs `1/3`, `2/3` and `3/3` as three parallel steps (.woodpecker.yml);
+ * CI runs `1/4` to `4/4` as four parallel steps (.woodpecker.yml);
  * the task runs `1/1`, every file in one process. A shard with no files fails
  * instead of running `deno test` without arguments, which would run the whole
  * unit suite.
