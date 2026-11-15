@@ -1,6 +1,7 @@
 import type { Tool } from "../lib/tools.ts"
 import { StatusMark } from "@spy4x/preact-ui/status-mark"
 import { eventAttrs } from "../lib/analytics.ts"
+import { upperFirst } from "../lib/case-page.ts"
 
 const linkClass =
   "text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment"
@@ -44,7 +45,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
           {tool.name}
         </a>
       </h3>
-      <p class="mt-1 text-graphite">{tool.job}.</p>
+      <p data-tool-job class="mt-1 text-graphite">{upperFirst(tool.job)}.</p>
       <Credit tool={tool} />
       <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-graphite">
         <StatusMark status={tool.status} />
