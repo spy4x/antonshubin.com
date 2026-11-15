@@ -87,9 +87,24 @@ steps:
   # SEO. scripts/lighthouse/run.sh serves the build step's _fresh/ behind nginx
   # with gzip, as Cloudflare serves it. The Playwright image: Lighthouse CI
   # starts Lighthouse with `node`, and the image has Node, Chromium and its
-  # libraries. It has no nginx, the one package this pipeline installs.
-  lighthouse:
+  # libraries. It has no nginx, the one package this pipeline installs. Two
+  # shards, each half the pages (LIGHTHOUSE_SHARD in run.sh).
+  lighthouse-1:
     image: *playwright
+    environment:
+      LIGHTHOUSE_SHARD: 1/2
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
+      - deno task lighthouse
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  lighthouse-2:
+    image: *playwright
+    environment:
+      LIGHTHOUSE_SHARD: 2/2
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
