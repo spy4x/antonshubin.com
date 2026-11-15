@@ -10,7 +10,7 @@ intro: "Seed's New group button used to open a dialog with one field, while edit
 coverImage: "/img/blog/one-editor-per-entity/cover.png"
 coverAlt: "The They're The Same Picture meme from The Office: Pam is asked to find the differences between two papers labelled \"New group\" and \"Edit group\", and answers \"They're the same picture.\""
 coverSize: "720x805"
-publishedAt: "2026-11-14"
+publishedAt: "2026-11-15"
 readTime: 8
 topic: "developers"
 relatedTool: "seed"
@@ -166,9 +166,10 @@ What happened there:
 3. When the network came back, the queue sent `tag.create` with the same id
    ([`new-ids.test.ts`](https://github.com/spy4x/seed/blob/51aeafe4ed92d2479a4296dfcae91bf7501623a9/apps/spa/src/offline/new-ids.test.ts#L157-L175)
    checks exactly this).
-4. If the queue sends a create again because an answer got lost, the server
-   refuses a second create with an id it already holds ("Tag id is already in
-   use"), so a retry cannot make a copy.
+4. If the queue sends a create again because an answer got lost, the server sees
+   that the id already holds this tag and answers with it, so a retry cannot
+   make a copy. Only a different tag under the same id is refused ("Tag id is
+   already in use").
 
 One editor helps here too: the group editor's offline notice is written once,
 with one sentence for creating and one for saving, and both modes show it.
