@@ -1,12 +1,12 @@
 ---
 title: "Do you need a developer if AI can build your app?"
-description: "Often you don't, yet. When AI alone is enough, what changes once users, payments or personal data arrive, a one-hour self-check and a quiz."
+description: "Do you need a developer if AI built your app? Often not yet. When AI alone is enough, what changes with users, payments or personal data, and a quiz."
 tldr:
   - "If nobody's money, data or work depends on your app yet, you don't need a developer. Keep building with AI and find out whether anyone wants it."
   - "Real users, payments and personal data change the answer: the risks are bugs that break other features, cloud bills and data any user can read."
   - "Do the one-hour self-check first: a second test user, billing caps, a restored backup, every account in your name, no secret keys in the page."
   - "When people depend on the app and the code shows warning signs, get someone on it regularly. Until then, a one-off review is enough."
-intro: "I sell developer time, and this post tells you when you don't need to buy any. Founders ask me whether their AI-built app needs a developer, and the honest answer is often \"not yet\". This is the long answer, for anyone who has built something with Lovable, Bolt, Claude Code or Codex, with a quiz at the end that tells you where you stand."
+intro: "I sell developer time, and this post tells you when you don't need to buy any. Whether an AI-built app needs a developer is a fair question, and the honest answer is often \"not yet\". This is the long answer, for anyone who has built something with Lovable, Bolt, Claude Code or Codex, with a quiz at the end that tells you where you stand."
 coverImage: "/img/blog/do-you-need-a-developer-ai-app/cover.png"
 coverAlt: "The Two Buttons meme: a sweating man labelled \"Founder with a working demo\" can't choose between two red buttons, \"Keep prompting\" and \"Hire a developer\"."
 coverSize: "1000x378"
