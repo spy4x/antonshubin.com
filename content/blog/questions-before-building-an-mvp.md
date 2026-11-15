@@ -20,8 +20,8 @@ Before you build an MVP, answer seven questions: who pays and for what, what one
 job version one must do, whether you can test it without building anything, what
 breaks if a feature is left out, what you can buy instead of build, what you
 can't afford to lose, and how you'll know it worked. The answers usually make
-the feature list much shorter before anyone writes a line of code, and that cut
-is the cheapest money you'll ever save.
+the feature list much shorter before anyone writes a line of code, and each cut
+is money saved before it was ever spent.
 
 I'm a developer, so every feature you cut is work I don't get paid for. I ask
 anyway, because a smaller first version that ships beats a big one that's still
