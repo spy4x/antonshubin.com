@@ -213,7 +213,9 @@ Most MVP budgets don't blow up because someone lied. They blow up because the
 scope grew one "small thing" at a time. A few habits stop that:
 
 1. **Write the cut list first.** Next to the feature list, write what's not in
-   version one. It's the most useful page in the whole project.
+   version one. It's the most useful page in the whole project, and
+   [the questions I ask before building an MVP](/blog/questions-before-building-an-mvp)
+   help you fill it.
 2. **Pay for a small first milestone.** One or two weeks of work you keep either
    way. You learn how this person works before you bet the whole budget.
 3. **See working software every week.** Not a status report. Something you can
