@@ -341,6 +341,14 @@ for (
       await page.locator("[data-home-video] iframe").waitFor({
         timeout: WAIT_MS,
       })
+      // The scroll runs in an effect after the next frame, not with the iframe.
+      await page.waitForFunction(
+        () =>
+          (globalThis as unknown as { __scrolls: unknown[] }).__scrolls.length >
+            0,
+        null,
+        { timeout: WAIT_MS },
+      )
       assertEquals(
         await page.evaluate(() =>
           (globalThis as unknown as { __scrolls: unknown[] }).__scrolls
