@@ -71,13 +71,13 @@ Deno.test("one stake and no warning sign means a one-off review", () => {
 })
 
 Deno.test("a stake with exactly one warning sign is still a one-off review", () => {
-  const r = quizResult(yesTo("payments", "months"))
+  const r = quizResult(yesTo("payments", "hidden-breakage"))
   assertEquals([r.stakes, r.warnings], [1, 1])
   assertEquals(r.verdict, VERDICTS.review)
 })
 
 Deno.test("a stake with two warning signs means someone ongoing", () => {
-  const r = quizResult(yesTo("real-users", "months", "regressions"))
+  const r = quizResult(yesTo("real-users", "hidden-breakage", "regressions"))
   assertEquals([r.stakes, r.warnings], [1, 2])
   assertEquals(r.verdict, VERDICTS.ongoing)
 })
@@ -91,12 +91,12 @@ Deno.test("all yes means someone ongoing", () => {
 Deno.test("a partly answered quiz counts unanswered questions as no", () => {
   const one = quizResult({ payments: "yes" })
   assertEquals([one.answered, one.verdict], [1, VERDICTS.review])
-  const no = quizResult({ months: "no" })
+  const no = quizResult({ "hidden-breakage": "no" })
   assertEquals([no.answered, no.verdict], [1, VERDICTS.enough])
   const two = quizResult({
     downtime: "yes",
     bill: "yes",
-    "shared-edits": "yes",
+    "lost-edits": "yes",
   })
   assertEquals([two.answered, two.verdict], [3, VERDICTS.ongoing])
 })

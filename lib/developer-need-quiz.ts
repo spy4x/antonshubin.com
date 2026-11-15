@@ -46,9 +46,10 @@ export const QUESTIONS: readonly QuizQuestion[] = [
     label: "Would someone lose money or a day of work if it went down?",
   },
   {
-    id: "months",
+    id: "hidden-breakage",
     group: "warning",
-    label: "Have you kept changing it with AI for two months or more?",
+    label:
+      "Has a change made with AI broken something you only found out about later?",
   },
   {
     id: "regressions",
@@ -56,9 +57,9 @@ export const QUESTIONS: readonly QuizQuestion[] = [
     label: "Has fixing one thing broken another, more than once?",
   },
   {
-    id: "shared-edits",
+    id: "lost-edits",
     group: "warning",
-    label: "Do several people edit the same data at the same time?",
+    label: "Have two people's edits ever overwritten each other?",
   },
   {
     id: "bill",
@@ -89,13 +90,13 @@ export const VERDICTS: Readonly<Record<Verdict["id"], Verdict>> = {
     id: "review",
     title: "Get a one-off review",
     text:
-      "Real people depend on the app, but the code isn't showing the warning signs yet. Do the self-check above, then have an experienced developer read the code once.",
+      "Do the self-check above. If anything fails, or you can't tell, have someone experienced read the code once: a technical friend or a paid reviewer.",
   },
   ongoing: {
     id: "ongoing",
     title: "You need someone on it ongoing",
     text:
-      "People depend on the app and the code already shows the warning signs. Every new prompt adds to the problem, so someone with judgement should read the changes regularly.",
+      "People depend on the app and the code already shows the warning signs. Each change now carries more risk than it looks, so someone with judgement should read the changes regularly.",
   },
 }
 

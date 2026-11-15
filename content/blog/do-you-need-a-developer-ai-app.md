@@ -1,11 +1,11 @@
 ---
 title: "Do you need a developer if AI can build your app?"
-description: "Do you need a developer if AI built your app? Often not yet. When AI alone is enough, what changes with users, payments or personal data, and a quiz."
+description: "Often not yet: AI alone is enough for a prototype. What changes with real users, payments or personal data, a one-hour self-check, and a quiz."
 tldr:
   - "If nobody's money, data or work depends on your app yet, you don't need a developer. Keep building with AI and find out whether anyone wants it."
   - "Real users, payments and personal data change the answer: the risks are bugs that break other features, cloud bills and data any user can read."
   - "Do the one-hour self-check first: a second test user, billing caps, a restored backup, every account in your name, no secret keys in the page."
-  - "When people depend on the app and the code shows warning signs, get someone on it regularly. Until then, a one-off review is enough."
+  - "When people depend on it but the code shows no warning signs, the self-check and maybe a one-off review are enough. When it shows warning signs too, get someone on it regularly."
 intro: "I sell developer time, and this post tells you when you don't need to buy any. Whether an AI-built app needs a developer is a fair question, and the honest answer is often \"not yet\". This is the long answer, for anyone who has built something with Lovable, Bolt, Claude Code or Codex, with a quiz at the end that tells you where you stand."
 coverImage: "/img/blog/do-you-need-a-developer-ai-app/cover.png"
 coverAlt: "The Two Buttons meme: a sweating man labelled \"Founder with a working demo\" can't choose between two red buttons, \"Keep prompting\" and \"Hire a developer\"."
@@ -15,21 +15,24 @@ readTime: 11
 topic: "founders"
 ---
 
-Do you need a developer if AI can build your app? Often, not yet. If you are
-testing an idea, showing a prototype or running something nobody's money or data
-depends on, AI tools alone are enough. You need a developer once real users,
-payments or personal data arrive, or once months of prompting start breaking
-more than they fix. Even then, a one-off review often covers it.
+You don't need a developer if AI can build your app and nobody's money, data or
+work depends on it yet. If you are testing an idea, showing a prototype or
+running an internal tool only you use, AI tools alone are enough. Once real
+users, payments or personal data arrive, have the risky parts checked by someone
+experienced. Often a one-off review covers it, and an hour of self-checks comes
+first.
 
-I'm a developer who sells development, so take this with that in mind. But I
-also build with AI agents every day, and I vibe-coded enough to know where it
-goes wrong. This post is for a founder who has built something with Lovable,
+One thing I'd tell you not to buy: a rewrite of your prototype before anyone
+uses it. I build with AI agents every day, and I vibe-coded enough to know where
+it goes wrong. This post is for a founder who has built something with Lovable,
 Bolt, Claude Code or Codex, or is about to. It ends with a short quiz that tells
 you which of three answers fits your app.
 
-## When is AI alone enough?
+## When can AI build your app without a developer?
 
-More often than developers like to admit. AI is enough on its own when:
+AI can build and run your app on its own when nobody's money, data or work
+depends on it yet. That is more often than developers like to admit. For
+example, when:
 
 - **You are building a clickable prototype** to show investors or a few
   potential customers. Nobody logs in for real, so nothing real can leak.
@@ -69,9 +72,9 @@ step 1, or taking payments on step 3 while still treating the app like a demo.
 
 ## What happens to a vibe-coded app after a couple of months?
 
-This part is from my own experience. I vibe-coded too, without reading and
-controlling the code, and this is what happened, usually after a couple of
-months:
+After a couple of months of prompting without reading the code, a vibe-coded app
+usually turns into spaghetti: bugs pile up, the design drifts and the bills
+grow. I vibe-coded too, and this is what happened:
 
 > Without reading the code, it becomes spaghetti. Nobody defined high coding
 > standards at the start, nobody chose the infrastructure and nobody designed
@@ -122,15 +125,15 @@ Two people edit the same record and the last save silently wipes out the other
 person's change. Or a setting kept in one shared place leaks from one user's
 screen onto another's. With one user, you'd never see either.
 
-### Security holes the AI tools leave in
+### Is an AI-built app secure?
 
-The classic one: the database rules are off, so any signed-in user, or anyone at
-all, can read every other user's rows. This happened at scale. In 2025, a
-security researcher reported that Lovable projects with a database, created on
-or before 15 April 2025, could have row-level security policies so weak that
-[anyone could read or write their tables][cve] (CVE-2025-48757). Lovable
-disputes the report, saying each customer is responsible for protecting their
-own app's data, and has since added
+Often not by default: the classic hole is database rules that let any signed-in
+user, or anyone at all, read every other user's rows. This happened at scale. In
+2025, a security researcher reported that Lovable projects with a database,
+created on or before 15 April 2025, could have row-level security policies so
+weak that [anyone could read or write their tables][cve] (CVE-2025-48757).
+Lovable disputes the report, saying each customer is responsible for protecting
+their own app's data, and has since added
 [a security scan before publishing][lovable-scan] that checks for missing or
 overly broad rules. A scan helps; it doesn't know which data in your app is
 private. The other classic is a secret API key shipped to the browser, where
@@ -138,9 +141,10 @@ anyone can copy it and run up your bill.
 
 ![The This Is Fine meme: a dog in a hat sits at a table with a cup of coffee while the room burns around him. Captions: "Month three of vibe coding" and "This is fine"](/img/blog/do-you-need-a-developer-ai-app/fine.webp "It's fine until the second user signs up")
 
-The lesson in one line: a senior developer with AI beats an inexperienced person
-with AI, because the AI multiplies the judgement it is given. It doesn't bring
-its own.
+A senior developer with AI gets more out of it than someone new to code with AI,
+because AI multiplies the judgement it is given and doesn't bring its own. The
+judgement it needs most from you: who may see which data, and what a change
+might break.
 
 ## What can you check yourself in an hour, without code?
 
@@ -198,7 +202,7 @@ All four can build a working app. They differ in how much of the result you see,
 and in what they leave to you. Prices from each vendor's own page, checked on 15
 November 2026, monthly billing.
 
-| Tool        | What it is                                                 | Right pick when                                                    | What it leaves to you                                                       | Paid plans from                                                        |
+| Tool        | What it is                                                 | Right pick when                                                    | What it leaves to you                                                       | Paid plans from (checked 15 Nov 2026)                                  |
 | ----------- | ---------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | Lovable     | An app builder you talk to in the browser                  | You can't code and want a working web app to show people           | Who can see which data, and what an edit breaks elsewhere                   | [$25 a month][lovable] for 100 credits; a free plan with daily credits |
 | Bolt        | An app builder you talk to in the browser                  | The same; try both on your idea and keep the one you like          | The same                                                                    | [$25 a month][bolt]; a free plan with 1M tokens a month                |
@@ -211,7 +215,7 @@ Claude Code or Codex give you much more control, and they are what I use myself.
 None of them decides who may see which data in your app. That decision is still
 yours.
 
-## When is a developer worth the money?
+## Vibe coding or hiring a developer: when is it worth the money?
 
 When the cost of a mistake is bigger than the cost of a developer. In practice,
 these are the signals:
@@ -226,15 +230,11 @@ Notice that "the code is messy" isn't on the list. Messy code that nobody
 depends on is a prototype doing its job.
 
 A developer worth paying doesn't throw away what you built. They read it, keep
-what works and make the risky parts safe. I let AI agents write most of my own
-code, with a reviewer agent checking every change; I wrote up
-[what that costs in practice][agents]. If you're comparing AI with a developer
-as a purchase, I've put the numbers side by side on [why not just use AI][wna].
-And if you already know you need someone,
+what works and make the risky parts safe. If you're comparing AI with a
+developer as a purchase, I've put the numbers side by side on
+[why not just use AI][wna]. If you already know you need someone,
 [here's how to hire a developer to take over an AI-built app][takeover] without
 getting burned.
-
-![The Buff Doge vs Cheems meme: a muscular dog labelled "Senior developer + AI" stands next to a small, sad dog labelled "Inexperienced person + AI"](/img/blog/do-you-need-a-developer-ai-app/doge.webp "AI multiplies the judgement it is given")
 
 ## Do you need a developer yet?
 
@@ -249,9 +249,9 @@ The quiz below asks eight yes-or-no questions from this post, in two groups.
 
 **What the code shows:**
 
-- Have you kept changing it with AI for two months or more?
+- Has a change made with AI broken something you only found out about later?
 - Has fixing one thing broken another, more than once?
-- Do several people edit the same data at the same time?
+- Have two people's edits ever overwritten each other?
 - Has the bill for hosting or the database grown faster than your users?
 
 It gives one of three answers:
@@ -260,13 +260,13 @@ It gives one of three answers:
   money, data or work depends on the app yet, so keep building and find out
   whether people want it. Messy code is fine in a prototype.
 - **Get a one-off review**, when at least one answer in the first group is yes
-  and at most one in the second. Real people depend on the app, but the code
-  isn't showing the warning signs yet. Do the self-check above, then have an
-  experienced developer read the code once.
+  and at most one in the second. Do the self-check above. If anything fails, or
+  you can't tell, have someone experienced read the code once: a technical
+  friend or a paid reviewer.
 - **You need someone on it ongoing**, when at least one answer in the first
   group is yes and two or more in the second. People depend on the app and the
-  code already shows the warning signs. Every new prompt adds to the problem, so
-  someone with judgement should read the changes regularly.
+  code already shows the warning signs. Each change now carries more risk than
+  it looks, so someone with judgement should read the changes regularly.
 
 Questions you leave unanswered count as no. Your answers stay in this page.
 
@@ -280,6 +280,5 @@ Questions you leave unanswered count as no. Your answers stay in this page.
 [bolt]: https://bolt.new/pricing
 [claude]: https://claude.com/pricing
 [codex]: https://learn.chatgpt.com/docs/pricing
-[agents]: /blog/opus-5-5-vs-sonnet-5-agent-costs
 [wna]: /why-not-just-ai
 [takeover]: /blog/hire-developer-take-over-ai-built-app

@@ -268,7 +268,7 @@ Deno.test("the developer quiz answers from the keyboard, gives each verdict and 
         "Answer a question to see where you stand.",
       )
       await pick(
-        "Have you kept changing it with AI for two months or more?",
+        "Has a change made with AI broken something you only found out about later?",
         "No",
       )
       assertEquals(await title.textContent(), "AI is enough for now")
@@ -277,7 +277,7 @@ Deno.test("the developer quiz answers from the keyboard, gives each verdict and 
       await pick("Has fixing one thing broken another, more than once?", "Yes")
       assertEquals(await title.textContent(), "Get a one-off review")
       await pick(
-        "Have you kept changing it with AI for two months or more?",
+        "Has a change made with AI broken something you only found out about later?",
         "Yes",
       )
       assertEquals(await title.textContent(), "You need someone on it ongoing")
