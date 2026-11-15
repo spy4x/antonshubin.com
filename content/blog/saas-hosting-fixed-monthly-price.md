@@ -1,6 +1,6 @@
 ---
 title: "Hosting a small SaaS for a fixed monthly price"
-description: "Host a SaaS for a fixed monthly price and no bot can run up your bill. When usage billing is safe, why an alert is not a cap, and what a server costs you."
+description: "Host a SaaS for a fixed monthly price and no bot can send you a five-figure bill. When usage billing is safe, why an alert is not a cap, and what a server costs you."
 tldr:
   - "A server with a fixed monthly price can't send a five-figure surprise: a bot or a bug can slow it down, but the worst extra on the bill is a small traffic charge."
   - "Billing per request is fine with a cap that stops the spending. A budget alert that emails you is not a cap."
