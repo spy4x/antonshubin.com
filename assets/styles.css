@@ -428,6 +428,8 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 2rem;
+  /* A one-letter label ("X") is 9px wide; 24px is the smallest tap target. */
+  min-width: 1.5rem;
   color: var(--color-parchment);
   text-underline-offset: 4px;
 }
