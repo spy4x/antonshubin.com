@@ -138,10 +138,11 @@ from completing. `recipients` holds one keyed hash per subscriber the mail
 server accepted (the package's `sentMark`: HMAC-SHA256 under
 `UNSUBSCRIBE_SECRET` of the slug and the lowercased address), never an address.
 The entry is written before the first mail. Each hash is appended to
-`newsletter-log.json.journal` right after that mail is accepted, and the next
-run's start or this run's finish merges the journal into `newsletter-log.json`
-(through a temp file and a rename, as `subscribers.json` is written) and removes
-it. The whole send holds the lock `newsletter-log.json.lock`: a second run that
+`newsletter-log.json.journal` right after that mail is accepted. A run's finish,
+or the start of a send for a new post, merges the journal into
+`newsletter-log.json` (through a temp file and a rename, as `subscribers.json`
+is written) and removes it; until then every read of the log counts the journal
+too. The whole send holds the lock `newsletter-log.json.lock`: a second run that
 starts while one is going is refused ("another send is in progress") and mails
 nobody. The OS frees the lock when a process dies, so a crashed run leaves
 nothing to clean up. `completedAt` is set by a run that finished with no
