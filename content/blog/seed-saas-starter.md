@@ -18,6 +18,10 @@ relatedTool: "seed"
 catalogSlug: "zero-to-production-saas-mvp"
 ---
 
+Not a developer? Read
+[the founder version](/blog/saas-boilerplate-for-your-mvp): what Seed does for
+your MVP, in plain words.
+
 ![The notes screen of the Seed live demo in the dark theme: a narrow icon rail on the left, the Notes title for the Acme Studio group with a New note button, five tag filters, and six notes with their tags, such as a Q4 roadmap and a checkout bug](/img/blog/seed-saas-starter/notes-dark.webp "What you start with: the notes feature in the live demo")
 
 Over the last decade I shipped about 80 production projects on Upwork and a
@@ -293,17 +297,11 @@ them apps. The difference is what the parts are for: none of them waits for a
 feature planned for later. And the biggest optional part, the offline layer,
 comes out with the steps described above.
 
-## Try it, or have me build on it
+## Try it, then tell me what is missing
 
-If you are a developer, open the [live demo](https://app.seedsaas.com), then
-clone [spy4x/seed](https://github.com/spy4x/seed). It is MIT-licensed, so closed
+Open the [live demo](https://app.seedsaas.com), then clone
+[spy4x/seed](https://github.com/spy4x/seed). It is MIT-licensed, so closed
 products can use it too.
-
-If you are a founder and would rather have me build your MVP on Seed, that is my
-[SaaS MVP offer](/catalog/zero-to-production-saas-mvp): from $8,000 and from
-three weeks, with a quote for your scope before any work starts. If you already
-built yours with an AI tool, here is
-[how to hire a developer to take it over](/blog/hire-developer-take-over-ai-built-app).
 
 If you clone it, tell me what you build, or
 [open an issue](https://github.com/spy4x/seed/issues) for what is missing.

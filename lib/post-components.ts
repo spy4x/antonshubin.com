@@ -28,6 +28,8 @@ import { checklistMarkdown } from "./framework-checklist.ts"
 import { proposalChecklistMarkdown } from "./proposal-checklist.ts"
 import { denoTiesMarkdown } from "./deno-ties.ts"
 import { taskCostMarkdown } from "./task-cost.ts"
+import SaasPlumbingChecklist from "../islands/SaasPlumbingChecklist.tsx"
+import { plumbingChecklistMarkdown } from "./saas-plumbing.ts"
 
 /** What the post page passes to every component besides its own props. */
 export interface PostComponentContext {
@@ -126,6 +128,12 @@ export const POST_COMPONENTS: PostComponentRegistry = {
     component: TaskCostChart,
     anchor: (p) => `cost-${p.round}`,
     toMarkdown: (p) => taskCostMarkdown(p.round),
+  }),
+  SaasPlumbingChecklist: postComponent({
+    props: noProps,
+    component: SaasPlumbingChecklist,
+    anchor: "plumbing-checklist",
+    toMarkdown: () => plumbingChecklistMarkdown(),
   }),
 }
 
