@@ -207,8 +207,10 @@ navigate, use `track()`.
 Every tool page sends the frame's events (#454): `demo-play`, `zoom`, `outbound`
 (`place` `hero`, `card`, `band` or `body`), `tool-install-copy`, `book`
 (`place: band`, `item`) and `cta` (the offer or "Services", More tools, the
-post). A page's own events go in its subsection below; each lane edits only its
-own.
+post). The facts card sends `outbound` (`place: card`) for links to other sites
+and `book` (`place: card`, `item`) for an on-site Live link, mig's "Open the
+booking page" to `/book`. A page's own events go in its subsection below; each
+lane edits only its own.
 
 ### The hub (`/tools`)
 
