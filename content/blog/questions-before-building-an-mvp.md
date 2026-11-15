@@ -1,5 +1,6 @@
 ---
 title: "Before you build an MVP: the questions I ask first"
+seoTitle: "Questions to ask before building an MVP, and what to cut"
 description: "Seven questions to ask before building an MVP: who pays, the one job, what to cut from version one, what to buy instead, and what never gets cut."
 tldr:
   - "Before any quote, I ask who pays and for what, and what one job version one must do. Everything else goes on a cut list."
@@ -18,20 +19,24 @@ catalogSlug: "strategy-call"
 
 Before you build an MVP, answer seven questions: who pays and for what, what one
 job version one must do, whether you can test it without building anything, what
-breaks if a feature is left out, what you can buy instead of build, what you
-can't afford to lose, and how you'll know it worked. The answers usually make
-the feature list much shorter before anyone writes a line of code, and each cut
-is money saved before it was ever spent.
+breaks if a feature is left out, what you can buy instead of build, what never
+gets cut, and how you'll know it worked. The answers usually make the feature
+list much shorter before anyone writes a line of code, and each cut is money
+saved before it was ever spent.
 
 I'm a developer, so every feature you cut is work I don't get paid for. I ask
 anyway, because a smaller first version that ships beats a big one that's still
-"almost done" when the money runs out. This post is for a founder with an idea,
-a budget and a feature list, about to hire someone or start building with AI.
+"almost done" when the money runs out. Yes, if it works you might hire me for
+version two. If the test says nobody wants it, you keep the money, and that's
+the outcome I'd want if it were my budget. This post is for a founder with an
+idea, a budget and a feature list, about to hire someone or start building with
+AI.
 
 ## Why start with questions instead of a quote?
 
-Because a feature list is a guess about what customers want, and a quote for a
-guess is a very precise price for something that might be wrong.
+Start with questions because a feature list is a guess about what customers
+want, and a quote for a guess is a very precise price for something that might
+be wrong.
 
 A common case: a founder sends twenty features, including teams, an admin
 dashboard, an AI assistant and "a mobile app, later, but let's plan for it now".
@@ -56,9 +61,10 @@ help that customer do that paid action is a candidate for the cut list.
 
 ## 2. What is the one job version one must do?
 
-The one thing a customer would be annoyed to lose. Describe it as steps a user
-takes, not as a vision: "a member opens the link, picks a class, gets a
-confirmation email". Three steps. That's the core feature.
+An MVP should have one core feature: the job a customer pays for, described as
+the few steps a user takes, plus what that job needs to work, such as signing
+in. Describe it as steps, not as a vision: "a member opens the link, picks a
+class, gets a confirmation email". Three steps. That's the core feature.
 
 Everything else is supporting cast. Some of it is needed on day one, like
 signing in. Most of it is not, like a dashboard of charts nobody asked for yet.
@@ -87,20 +93,21 @@ come to the build with real customers telling you what matters.
 
 ## 4. What breaks if we leave this out?
 
-This is the question I ask about every feature on the list. If the honest answer
-is "nothing, for the first customers", it goes on the cut list. Not deleted:
-written down, with the reason, so it can come back the day a customer asks for
-it.
+Cut every feature whose absence breaks nothing for your first customers. I ask
+this about every feature on the list, and if the honest answer is "nothing, for
+the first customers", it goes on the cut list. Not deleted: written down, with
+the reason, so it can come back the day a customer asks for it.
 
 The usual cut list for a first version, and why:
 
 - **Teams and roles.** Your first customers can start with one account per
   company, or you can set up their accounts by hand. Roles are worth building
   when a customer asks who can see what.
-- **An admin panel.** For the first customers, you can fix a record by hand in
-  the database tool your host gives you. It's ugly, and nobody but you sees it.
-- **Phone apps.** A web app that works well on a phone reaches the same people.
-  In my rules of thumb, apps for iOS and Android alone add
+- **An admin panel.** For the first customers, you or your developer can fix a
+  record by hand in a few minutes. It's ugly, and nobody but you sees it.
+- **Phone apps.** A web app that works well on a phone reaches most of the same
+  people, without waiting on app-store review. In my rules of thumb, apps for
+  iOS and Android alone add
   [10 to 20 working days](/blog/how-much-does-a-saas-mvp-cost) to an MVP.
 - **Several languages.** Launch in the language of your first customers. Adding
   a second later is a known job; designing for five on day one is a guess.
@@ -141,7 +148,7 @@ that's what my [strategy session](/catalog/strategy-call) is for: an hour on
 your project, with notes afterwards. You can also do it alone with this page,
 which is cheaper.
 
-## 6. What would you be embarrassed to lose?
+## 6. What never gets cut from an MVP?
 
 Cutting scope is not the same as cutting corners. A smaller app still has to be
 a safe one, and this is the list I don't cut, however small the budget:
@@ -187,5 +194,4 @@ And a "no" for now is not a "no" forever. The cut list is a list of things
 you'll be glad to build once a customer asks for them, which is the best
 specification you'll ever get.
 
-> The best feature in your version one is the one you add in version two,
-> because a customer asked for it twice.
+> The best feature in version two is the one a customer asked for twice.

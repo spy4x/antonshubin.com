@@ -182,6 +182,9 @@ did it without a developer.
 Hiring isn't the first step. These are cheaper, and each removes a whole class
 of problems:
 
+- **Shorten the list before you pay for it.**
+  [The questions I ask before building an MVP](/blog/questions-before-building-an-mvp)
+  usually move teams, admin panels and phone apps to version two.
 - **Use managed sign-in and payments instead of hand-made ones.** A sign-in
   service and a hosted payment page such as [Stripe Checkout][stripe-checkout]
   take card details and passwords out of your app entirely. The fewer secrets
