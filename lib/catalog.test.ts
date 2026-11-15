@@ -6,7 +6,7 @@ import {
   catalogOffers,
   catalogPromises,
   catalogRedirects,
-  freeCallPaidSessionLine,
+  paidSessionLine,
   priceLabel,
   priceRows,
   QUOTE_NOTE,
@@ -104,12 +104,11 @@ Deno.test("each item goes by one name: its short title is in its H1 and its page
   }
 })
 
-Deno.test("the llms line says the intro call is free and the strategy session is paid, at its price", () => {
-  const line = freeCallPaidSessionLine()
+Deno.test("the llms line says the strategy session is paid, at its price", () => {
+  const line = paidSessionLine()
   const session = catalogItems.find((i) => i.slug === "strategy-call")!
-  assert(line.startsWith("The 30-minute intro call is free. "), line)
   assert(
-    line.includes(`The strategy session is paid (${priceLabel(session)}): `),
+    line.startsWith(`The strategy session is paid (${priceLabel(session)}): `),
     line,
   )
 })
@@ -210,5 +209,14 @@ Deno.test("no 'Projects this fits' line is written in the first person", () => {
         `${item.slug}: "${example}"`,
       )
     }
+  }
+})
+
+Deno.test("no item but the strategy session calls its call a strategy call", () => {
+  for (const item of catalogItems) {
+    if (item.slug === "strategy-call") continue
+    const text = [item.desc, item.outcome, ...item.cardPoints, ...item.includes]
+      .join(" ")
+    assert(!/strategy call/i.test(text), `${item.slug}: ${text}`)
   }
 })
