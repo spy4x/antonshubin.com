@@ -193,9 +193,5 @@ session 3 KB of instructions to use `trail`.
 5. Run the baseline twice, so you know your noise before you read any saving,
    and check with the calculator above whether your task count can show it.
 
-Deciding whether an AI tool is worth it for your team? In a
-[60-minute strategy session](/catalog/strategy-call) we can plan this test for
-your own agents and repo.
-
 Which tool should I put through this next? Reply to the newsletter or write to
 me. And if you want the next test in your inbox, subscribe below.

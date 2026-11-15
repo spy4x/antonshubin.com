@@ -207,9 +207,4 @@ holds the keys.
 ![The Change My Mind meme: a man sits at a table with a sign that reads "Give a new developer read-only access first. Change my mind"](/img/blog/hire-developer-take-over-ai-built-app/keys.webp "Trust is earned one key at a time")
 
 Got a proposal in your inbox right now? Run it through the
-[checklist above](#proposal-checklist) and ask the three questions. And if you'd
-like me to be one of the candidates, my
-[code and security audit](/catalog/codebase-health-audit) is the first step I'd
-offer you: a written report of what is solid, what is risky and what to fix
-first, before anyone touches production. If you'd rather talk it through first,
-book a [one-hour strategy session](/catalog/strategy-call).
+[checklist above](#proposal-checklist) and ask the three questions.

@@ -256,6 +256,36 @@ siteTest(
   },
 )
 
+/** The post's own body: from its first `.blog-content` box to the closing band. */
+function articleBody(html: string): string {
+  const start = html.indexOf('class="blog-content')
+  const end = html.indexOf("data-closing-band")
+  return start === -1 || end < start ? "" : html.slice(start, end)
+}
+
+siteTest(
+  "no post's own last two paragraphs link to a priced page (/catalog or /book)",
+  async (site) => {
+    const pitches: string[] = []
+    for (const article of blogArticles) {
+      const body = articleBody(await site.html(`/blog/${article.slug}`))
+      assert(body, `${article.slug}: no article body found`)
+      const paragraphs = [...body.matchAll(/<p\b[^>]*>[\s\S]*?<\/p>/g)]
+        .map((m) => m[0])
+      assert(
+        paragraphs.length >= 2,
+        `${article.slug}: ${paragraphs.length} paragraphs, expected two or more`,
+      )
+      for (const p of paragraphs.slice(-2)) {
+        if (/href="\/(?:catalog|book)[/?#"]/.test(p)) {
+          pitches.push(`${article.slug}: ${visibleText(p)}`)
+        }
+      }
+    }
+    assertEquals(pitches, [])
+  },
+)
+
 siteTest(
   "every post invites a reply by email under its ask, at the site's contact address",
   async (site) => {

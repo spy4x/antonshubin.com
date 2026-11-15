@@ -313,12 +313,5 @@ make the switch cheap, then decide when you have to:
 5. **Measure your heaviest page.** The one with the most islands, not the one
    that's easiest to measure.
 
-If your product runs on Deno and you'd like a calm plan instead of a panicked
-rewrite, that is what my
-[code and security audit](/catalog/codebase-health-audit) is for: three days,
-from $1,500. It covers architecture, security and performance, and for a Deno
-codebase that includes every tie to Deno, ranked by risk, with what to move
-first and what to leave alone.
-
 And if you've already started your own move, tell me what bit you. I'd like to
 know if it was the `Deno.*` calls or, like me, everything around them.
