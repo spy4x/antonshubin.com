@@ -109,15 +109,3 @@ One promise comes with a fixed-price build only: **free bug fixes for 30 days**.
 Bugs in what I delivered are fixed on my time.
 
 The full list of promises is on [How I work](/how-i-work).
-
-## Not sure which side your project is on?
-
-That is normal when the idea is still forming. You can
-[send a written brief](/book#brief): a paragraph about your idea or problem, and
-I write back with 3 concrete architectural improvements. No cost, no pitch. If
-you want a full hour on it, the paid [strategy session](/catalog/strategy-call)
-gives you honest technical feedback and a plan you can act on, with or without
-me.
-
-Or [book a free 30-minute call](/book), tell me what you are building, and we
-work out which one fits.

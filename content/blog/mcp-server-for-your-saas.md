@@ -259,10 +259,6 @@ answered before anyone writes code:
    same proxy.
 
 If you want to see it working first, try [caldav-mcp](/tools/caldav-mcp) with
-your own assistant: it is free and open source. If you want one built for your
-product, an MCP server for your own API, CRM or database is part of my
-[Build service](/catalog/zero-to-production-saas-mvp#mcp-servers), shipped as a
-self-hosted Docker image you own, with a quote for your scope before any work
-starts.
+your own assistant: it is free and open source.
 
 What would your customers ask their assistant to do in your product first?

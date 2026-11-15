@@ -287,7 +287,3 @@ If you run Gatus, give oko ten minutes: write three services into `config.json`,
 start it, and see whether the page tells you the truth. If something is missing
 or wrong, [open an issue](https://github.com/spy4x/oko/issues), or tell me on
 the [oko page](/tools/oko).
-
-And if it's your product's production you want watched like this, that is part
-of what I do on [ongoing work](/catalog/cto-advisory-retainer): monitoring,
-backups and security patches after launch.

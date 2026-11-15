@@ -329,8 +329,3 @@ rostok
 The code, the catalog and every command are in
 [spy4x/rostok](https://github.com/spy4x/rostok), MIT-licensed. If a service you
 run is missing, a pull request with its `stacks/<name>/` folder is welcome.
-
-If you run a small company and want to replace some of your SaaS bills with
-services on your own servers, start with a
-[strategy session](/catalog/strategy-call): one hour on what to move, what to
-keep, and what it costs to run.
