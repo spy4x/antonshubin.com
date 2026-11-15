@@ -40,11 +40,6 @@ export const notes: Note[] = [
       "https://foundersfeature.substack.com/p/founders-feature-054-corecircle",
   },
   {
-    id: "sogroya-live",
-    text: "Live when I last checked.",
-    checkedOn: "2026-09-25",
-  },
-  {
     id: "infra-live-checked",
     text:
       "All three answered when I checked. The CI link opens a public repository's pipelines, because the root asks for a GitHub sign-in.",

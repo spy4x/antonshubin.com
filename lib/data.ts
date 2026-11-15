@@ -344,7 +344,8 @@ export const projects = {
       logoImageURL: "/img/projects/sogroya/logo.svg",
       logoPlate: true,
       externalURL: "https://sogroyadosereminder.com",
-      externalURLNote: "sogroya-live",
+      // The host's TLS certificate expired on 2026-10-07 (checked 2026-11-15, #625).
+      externalURLDead: true,
       description:
         "A four-step multilingual web app for setting once-weekly Sogroya medication reminders on mobile and desktop calendars. I built the SvelteKit + TypeScript SPA, five-language flow (English, French, German, Portuguese, and Japanese), privacy consent, dose/day/time selection, and in-browser ICS generation. Static deployment kept the experience fast, backend-free, and easy to distribute globally.",
       role: "Full-stack",
