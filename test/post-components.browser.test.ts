@@ -31,6 +31,7 @@ const LAB = "cost-optimization-laboratory"
 const DENO = "migrate-from-deno-to-node-and-bun"
 const HIRE = "hire-developer-take-over-ai-built-app"
 const MVP = "how-much-does-a-saas-mvp-cost"
+const NEED = "do-you-need-a-developer-ai-app"
 
 /** Loads a post and waits until the figure with `id` has hydrated. */
 async function openPost(page: Page, origin: string, slug: string, id: string) {
@@ -231,6 +232,82 @@ Deno.test("the proposal checklist scores ticks from the keyboard and sends no ti
   }
 })
 
+Deno.test("the developer quiz answers from the keyboard, gives each verdict and keeps every answer in the page", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${NEED}`)
+    assert(
+      /id="developer-need-quiz-figure"[^>]*data-live="false"/.test(html),
+      "the quiz is live before any script ran",
+    )
+    assertStringIncludes(html, "Answer a question to see where you stand.")
+    assertStringIncludes(html, "Does it take payments?")
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, NEED, "developer-need-quiz-figure")
+      const figure = page.locator("#developer-need-quiz-figure")
+      const title = figure.locator("[data-verdict-title]")
+      /** Focuses the question's Yes radio, then Space picks it or the arrow moves to No. */
+      const pick = async (question: string, answer: "Yes" | "No") => {
+        const group = page.getByRole("group", { name: question })
+        await group.getByRole("radio", { name: "Yes" }).focus()
+        if (answer === "Yes") await page.keyboard.press("Space")
+        else await page.keyboard.press("ArrowDown")
+        assert(
+          await group.getByRole("radio", { name: answer }).isChecked(),
+          `${question} is not ${answer}`,
+        )
+      }
+      assertEquals(
+        await title.textContent(),
+        "Answer a question to see where you stand.",
+      )
+      await pick(
+        "Has a change made with AI broken something you only found out about later?",
+        "No",
+      )
+      assertEquals(await title.textContent(), "AI is enough for now")
+      await pick("Does it take payments?", "Yes")
+      assertEquals(await title.textContent(), "Get a one-off review")
+      await pick("Has fixing one thing broken another, more than once?", "Yes")
+      assertEquals(await title.textContent(), "Get a one-off review")
+      await pick(
+        "Has a change made with AI broken something you only found out about later?",
+        "Yes",
+      )
+      assertEquals(await title.textContent(), "You need someone on it ongoing")
+      assertStringIncludes(
+        (await figure.locator("[data-result]").textContent()) ?? "",
+        "Answered 3 of 8.",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertEquals(
+        await title.textContent(),
+        "Answer a question to see where you stand.",
+      )
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(
+        await page.evaluate(() => [localStorage.length, sessionStorage.length]),
+        [0, 0],
+      )
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: NEED, part: "DeveloperNeedQuiz" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("the Deno ties checklist starts with Seed's ticks and follows the keyboard", async () => {
   const site = await startSite()
   let browser: Browser | undefined
@@ -363,6 +440,7 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
             [DENO, "deno-ties-figure"],
             [HIRE, "proposal-checklist-figure"],
             [MVP, "mvp-cost-figure"],
+            [NEED, "developer-need-quiz-figure"],
           ]
         ) {
           await openPost(page, site.origin, slug, id)

@@ -318,6 +318,7 @@ needs no JavaScript), then add an entry to `POST_COMPONENTS` in
 
 Registered today: `CachedShareSlider` (the Opus 5.5 post), `FrameworkChecklist`
 (the cost laboratory post), `DenoTiesChecklist` (the post on moving off Deno),
+`DeveloperNeedQuiz` (the post on whether you need a developer),
 `ProposalChecklist` (the AI-built app takeover post), `MvpCostCalculator` (the
 SaaS MVP cost post), `RunsCalculator` and `TaskCostChart` (the Trail-code post)
 and `SaasPlumbingChecklist` (the Seed post for founders). Each sits in the
@@ -325,9 +326,9 @@ library's `Explorable` frame. `TaskCostChart` is a server component with no
 island; it reads the post's dated data file, `content/blog/data/<slug>.json`,
 through `lib/task-cost.ts`, which also writes its summary sentence and its
 Dev.to table, so no number in the chart is typed by hand. The arithmetic of the
-other seven lives in `lib/post-math.ts`, `lib/framework-checklist.ts`,
-`lib/deno-ties.ts`, `lib/proposal-checklist.ts`, `lib/mvp-cost.ts` and
-`lib/saas-plumbing.ts`, next to their fallbacks.
+other eight lives in `lib/post-math.ts`, `lib/framework-checklist.ts`,
+`lib/deno-ties.ts`, `lib/proposal-checklist.ts`, `lib/developer-need-quiz.ts`,
+`lib/mvp-cost.ts` and `lib/saas-plumbing.ts`, next to their fallbacks.
 
 On the reader's first input the component calls
 `trackPostTry(post, "<TagName>")` from `lib/analytics.ts`, which sends one

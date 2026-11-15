@@ -15,6 +15,8 @@ import type { ComponentType } from "preact"
 import { type Type, type } from "arktype"
 import CachedShareSlider from "../islands/CachedShareSlider.tsx"
 import DenoTiesChecklist from "../islands/DenoTiesChecklist.tsx"
+import DeveloperNeedQuiz from "../islands/DeveloperNeedQuiz.tsx"
+import { developerNeedQuizMarkdown } from "./developer-need-quiz.ts"
 import FrameworkChecklist from "../islands/FrameworkChecklist.tsx"
 import MvpCostCalculator from "../islands/MvpCostCalculator.tsx"
 import { mvpCostMarkdown } from "./mvp-cost.ts"
@@ -84,6 +86,12 @@ export const POST_COMPONENTS: PostComponentRegistry = {
     component: DenoTiesChecklist,
     anchor: "deno-ties",
     toMarkdown: () => denoTiesMarkdown(),
+  }),
+  DeveloperNeedQuiz: postComponent({
+    props: noProps,
+    component: DeveloperNeedQuiz,
+    anchor: "developer-need-quiz",
+    toMarkdown: () => developerNeedQuizMarkdown(),
   }),
   FrameworkChecklist: postComponent({
     props: noProps,
