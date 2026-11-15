@@ -2,9 +2,9 @@
 title: "Hosting a small SaaS for a fixed monthly price"
 description: "Host a SaaS for a fixed monthly price and no bot can run up your bill. When usage billing is safe, why an alert is not a cap, and what a server costs you."
 tldr:
-  - "A server with a fixed monthly price can't send a surprise bill: a bot or a bug can slow it down, but not add a zero to the invoice."
+  - "A server with a fixed monthly price can't send a five-figure surprise: a bot or a bug can slow it down, but the worst extra on the bill is a small traffic charge."
   - "Billing per request is fine with a cap that stops the spending. A budget alert that emails you is not a cap."
-  - "Hetzner cloud servers start at €5.49 a month, and the bill never goes past the monthly price."
+  - "Hetzner cloud servers start at €5.49 a month; the server's price is capped, and traffic past the included 20 TB costs €1 per TB."
   - "The real cost of a fixed price is looking after the server: updates, backups with a restore you've tried, monitoring."
 intro: "Right after \"what will it cost to build?\", founders ask me whether the hosting bill will bite. This post answers that: why I run my own products on servers with a fixed monthly price, when paying per request is safe, and what the fixed price quietly costs you instead."
 coverImage: "/img/blog/saas-hosting-fixed-monthly-price/cover.png"
@@ -18,12 +18,12 @@ catalogSlug: "cto-advisory-retainer"
 
 Will your hosting bill surprise you? Not if you host your SaaS for a fixed
 monthly price. You rent a server at a set price, and a bot, a scraper or a bug
-in your code can slow it down, but it can't add a zero to the invoice. For most
-early products, one server like that, such as a Hetzner cloud server from
-[€5.49 a month][hetzner-cloud], is cheaper and calmer than hosting billed per
-request. Paying per request is fine too, but only with a cap that really stops
-the spending. The catch with a fixed price is that someone has to look after the
-server, and that's the part to budget for.
+in your code can slow it down, but it can't turn the invoice into a five-figure
+one. For most early products, one server like that, such as a Hetzner cloud
+server from [€5.49 a month][hetzner-cloud], is cheaper and calmer than hosting
+billed per request. Paying per request is fine too, but only with a cap that
+really stops the spending. The catch with a fixed price is that someone has to
+look after the server, and that's the part to budget for.
 
 I run my own products this way, and this post is for a founder about to launch
 who has heard "serverless scales to zero" and "serverless bills to infinity" in
@@ -50,7 +50,7 @@ no ceiling unless you set one. Two public stories show how that ends:
   empty, private Amazon S3 bucket received nearly 100 million write requests in
   a day: an open-source tool's default settings used the same bucket name. AWS
   billed the rejected requests too, over $1,300 for that day. AWS has since
-  stopped charging for unauthorized requests like those ([The Register][s3]).
+  stopped charging for requests it rejects like those ([The Register][s3]).
 
 In both stories, things changed only after the story went public and loud. "Go
 viral on Hacker News with your invoice" is not a billing plan.
@@ -70,8 +70,9 @@ Here are the public prices of Hetzner, the provider I use myself, on 16 November
 
 Two lines on those pages matter more than the prices. For cloud servers: "Your
 server's bill will never exceed its monthly price cap." Cloud servers in the EU
-include at least 20 TB of traffic a month. For dedicated servers: "Traffic usage
-is unlimited and free of charge."
+include at least 20 TB of traffic a month, and each extra TB costs €1, so even a
+bad attack adds tens or hundreds of euros, not thousands. For dedicated servers:
+"Traffic usage is unlimited and free of charge."
 
 In my [MVP cost post](/blog/how-much-does-a-saas-mvp-cost), my rule of thumb for
 an early product, with a staging copy and backups, is €20 to €50 a month. Then
