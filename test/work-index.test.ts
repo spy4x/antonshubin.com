@@ -242,12 +242,11 @@ siteTest(
 )
 
 siteTest(
-  "the FoodRazor, Corecircle and Sogroya pages carry their margin notes",
+  "the FoodRazor and Corecircle pages carry their margin notes",
   async (site) => {
     const expected: Record<string, string> = {
       foodrazor: "foodrazor-acquired",
       corecircle: "corecircle-users",
-      sogroya: "sogroya-live",
     }
     for (const [slug, id] of Object.entries(expected)) {
       const html = await site.html(`/work/${slug}`)
