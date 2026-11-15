@@ -168,7 +168,11 @@ siteTest(
     const takeover = await site.html(
       "/blog/hire-developer-take-over-ai-built-app",
     )
-    assert(pageBody(takeover).includes(link), "the takeover post")
+    // Up to "Read next", which may list the post on its own.
+    assert(
+      slice(takeover, "<article", "Read next").includes(link),
+      "the takeover post's text",
+    )
     assertEquals((await site.get(ENOUGH_POST.href)).status, 200)
   },
 )
