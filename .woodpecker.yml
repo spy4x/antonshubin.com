@@ -96,38 +96,12 @@ steps:
   # SEO. scripts/lighthouse/run.sh serves the build step's _fresh/ behind nginx
   # with gzip, as Cloudflare serves it. The Playwright image: Lighthouse CI
   # starts Lighthouse with `node`, and the image has Node, Chromium and its
-  # libraries. It has no nginx, the one package this pipeline installs. Three
-  # shards, a third of the pages each (LIGHTHOUSE_SHARD in run.sh). They start
-  # after the browser shards: a busy CPU lowers the performance score, and a
-  # page near the 95 line failed while the browser shards ran beside it.
-  lighthouse-1:
+  # libraries. It has no nginx, the one package this pipeline installs. One
+  # step, after the browser shards: a busy CPU lowers the performance score.
+  # Pages near the 95 line failed both beside the browser shards and when three
+  # Lighthouse shards ran side by side (pipelines 1998 and 2004).
+  lighthouse:
     image: *playwright
-    environment:
-      LIGHTHOUSE_SHARD: 1/3
-    commands:
-      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
-      - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
-      - deno task lighthouse
-    depends_on: [browser-1, browser-2, browser-3, browser-4]
-    when:
-      event: [push, pull_request]
-
-  lighthouse-2:
-    image: *playwright
-    environment:
-      LIGHTHOUSE_SHARD: 2/3
-    commands:
-      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
-      - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
-      - deno task lighthouse
-    depends_on: [browser-1, browser-2, browser-3, browser-4]
-    when:
-      event: [push, pull_request]
-
-  lighthouse-3:
-    image: *playwright
-    environment:
-      LIGHTHOUSE_SHARD: 3/3
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx

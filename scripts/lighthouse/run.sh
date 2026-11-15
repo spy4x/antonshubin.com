@@ -7,27 +7,10 @@
 # exists only in production, and its 404 would cost best practices. Reports land in .lighthouseci/.
 # CI runs this script (.woodpecker.yml); run it the same way on a machine, from the repository root.
 # Needs nginx, and a Chromium: `CHROME_PATH`, or the newest one Playwright installed.
-# LIGHTHOUSE_SHARD=<index>/<count> checks only every <count>-th page of lighthouserc.json, from the
-# <index>-th on, so CI can run the shards side by side; unset, every page is checked.
 set -euo pipefail
 
 HERE=scripts/lighthouse
 [ -f _fresh/server.js ] || { echo "no build: run deno task build first"; exit 1; }
-
-URL_ARGS=()
-if [ -n "${LIGHTHOUSE_SHARD:-}" ]; then
-  mapfile -t URL_ARGS < <(deno eval --no-config '
-    const shard = Deno.env.get("LIGHTHOUSE_SHARD") ?? ""
-    const [index, count] = shard.split("/").map(Number)
-    const rc = JSON.parse(Deno.readTextFileSync("scripts/lighthouse/lighthouserc.json"))
-    const urls: string[] = rc.ci.collect.url
-    for (const [k, url] of urls.entries()) {
-      if (index >= 1 && k % count === index - 1) console.log(`--collect.url=${url}`)
-    }')
-  # A bad or empty shard fails here, instead of checking every page or none.
-  [ "${#URL_ARGS[@]}" -gt 0 ] || { echo "LIGHTHOUSE_SHARD=$LIGHTHOUSE_SHARD names no page"; exit 1; }
-  echo "Lighthouse shard $LIGHTHOUSE_SHARD: ${#URL_ARGS[@]} pages"
-fi
 
 if [ -z "${CHROME_PATH:-}" ]; then
   CHROME_PATH=$(find "${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}" \
@@ -76,5 +59,5 @@ wait_for nginx "${PIDS[-1]}" http://127.0.0.1:48421/
 ROOT=$PWD
 (cd "$SCRATCH" && deno run -A --no-config --no-lock --node-modules-dir=auto \
   --minimum-dependency-age=1440 npm:@lhci/cli@0.15.1 autorun \
-  --config="$ROOT/$HERE/lighthouserc.json" "${URL_ARGS[@]}" \
+  --config="$ROOT/$HERE/lighthouserc.json" \
   --upload.outputDir="$ROOT/.lighthouseci/reports")

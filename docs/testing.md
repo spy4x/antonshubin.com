@@ -22,11 +22,10 @@ There is no deploy step in CI — deploying stays a manual, post-merge action (s
   tag must match `deno.json`'s `"playwright"` pin exactly.
 - `video-cut` (`jrottenberg/ffmpeg:7.1-ubuntu2404`): the one test that needs
   ffmpeg, ffprobe, libass and a font.
-- `lighthouse-1` to `lighthouse-3` (the Playwright image): the Lighthouse budget
-  on the shared build, a third of the pages each (`LIGHTHOUSE_SHARD` in
-  `scripts/lighthouse/run.sh`), after the browser shards, since a busy CPU
-  lowers the performance score. They install nginx, the one package the pipeline
-  installs.
+- `lighthouse` (the Playwright image): the Lighthouse budget on the shared
+  build, alone after the browser shards, since a busy CPU lowers the performance
+  score; split into shards side by side, pages fell below 95. It installs nginx,
+  the one package the pipeline installs.
 
 When a browser test gets much slower or faster, update its line in
 `scripts/browser-shard.ts`'s `SECONDS` so the shards stay even.
