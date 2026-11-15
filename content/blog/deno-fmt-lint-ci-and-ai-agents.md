@@ -12,6 +12,7 @@ coverImage: "/img/blog/deno-fmt-lint-ci-and-ai-agents/cover.png"
 coverAlt: "Step logs of a Woodpecker CI run: deno fmt --check printed Checked 128 files, deno lint printed Checked 52 files, and deno task test follows."
 coverSize: "1000x420"
 publishedAt: "2026-10-30"
+updatedAt: "2026-11-15"
 readTime: 8
 topic: "ai-mcp"
 relatedTool: "dotfiles"
@@ -125,8 +126,9 @@ again, and you get two spaces and no semicolon: `deno.json` wins.
 
 That `quote_type` line isn't made up for the example. This site's own
 [`.editorconfig`](https://github.com/spy4x/antonshubin.com/blob/78f79f2d3ebe84d05497b51af9f5e50cb60280e8/.editorconfig)
-says `quote_type = single`, while the code uses double quotes, and
-`deno fmt --check` passes. The formatter never reads that line.
+said `quote_type = single` when I wrote this, while the code used double quotes,
+and `deno fmt --check` passed. The formatter never reads that line. (It says
+`double` now, so it at least doesn't mislead an editor.)
 
 So `.editorconfig` is for what it is good at: editors that don't run the
 formatter on save, and files the formatter doesn't touch, like shell scripts.
@@ -193,14 +195,22 @@ I run several AI coding agents at once. Their rules live in one file in my
 [dotfiles](https://github.com/spy4x/dotfiles), rendered for each harness. Two
 parts of those rules matter here.
 
-First, an agent may not make a check easier to pass. From
+First, an agent may not quietly make a check easier to pass. From
 [`ai-harnesses/AGENTS.md`](https://github.com/spy4x/dotfiles/blob/9921684b5bfcc6e3d1e46bd32f54714ca339b737/ai-harnesses/AGENTS.md#L199-L200):
 
 > Never add, remove, reword or weaken a rule, and never remove or weaken a check
 > (lint or format config, a `check` task, a CI step), unless I asked for that
 > change in chat.
 
-So when a lint rule fails, the fix goes into the code, not into `deno.json`.
+> **Update, 15 November 2026:** the rule has changed since I wrote this. An
+> agent may now add, change or remove a rule or a check itself, but only in its
+> own pull request, through the same reviewer gate, and never in the pull
+> request whose work it unblocks
+> ([the current rule](https://github.com/spy4x/dotfiles/blob/545890e5714d268e0d0fdc5b005e85f801c39f73/ai-harnesses/AGENTS.md#L131-L138)).
+
+So when a lint rule fails, the fix goes into the code, not into `deno.json`,
+unless the rule itself is wrong. Then loosening it is a separate change that a
+reviewer has to pass on its own.
 
 Second, an agent may not merge around the check. A Claude Code hook in the same
 repository reads every shell command an agent runs, before it runs, and refuses

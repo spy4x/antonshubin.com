@@ -87,7 +87,7 @@ optional line under the actions), the page's middle, `ToolDetails` ("Where it
 stands" from `works`/`notYet`, plus the optional `knownIssue`, or the page's
 `beside`, the sticky "Tool facts" card `ToolFacts` (with a "Built on" row
 linking the starter's page when the entry sets `builtOn`), "Use it if", "Skip it
-if" and "The story behind it"), `ToolBand` ("Two ways to use it": the install or
+if" and "Posts about it"), `ToolBand` ("Two ways to use it": the install or
 quick-start command and "View on GitHub" beside the catalog price and the page
 body's only Book) and `ToolMore` (three tools: the tool's entry in `MORE_TOOLS`
 in `components/tool-frame/ToolMore.tsx`, hand-picked by what a visitor of that

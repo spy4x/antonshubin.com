@@ -317,7 +317,7 @@ export interface Tool {
    * with the facts of the open issue it links to.
    */
   knownIssue?: { text: string; link: ToolLink }
-  /** One line under the post's title in "The story behind it". */
+  /** One line under the post's title in "Posts about it". */
   storyLine?: string
   /**
    * The slug of the starter this tool is built on (`seed`): the facts card's
@@ -538,7 +538,7 @@ export const tools: Tool[] = [
     job:
       "MCP server that lets AI assistants read and write CalDAV events and tasks",
     summary:
-      "MCP server that lets AI assistants read and write CalDAV events and tasks — Claude Desktop, OpenCode, Cursor, and Open WebUI all work with it. Built on web standards with zero npm dependencies, and runs as a single Deno binary.",
+      "MCP server that lets AI assistants read and write CalDAV events and tasks — Claude Desktop, OpenCode, Cursor, and Open WebUI all work with it. Built on web standards with no npm install or node_modules, and runs as a single Deno binary.",
     kind: "service",
     status: "in-use",
     group: "tools",
