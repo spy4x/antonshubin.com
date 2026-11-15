@@ -70,34 +70,49 @@ function railLinks(html: string): string[] {
 
 /**
  * Fresh's renderer would mark every link to `/` as the current section
- * (`aria-current="true"`) on every page. The phone header sets the value
- * itself through `navCurrent()`, and the library `Rail` renders "false" on
- * an entry that is not current, which Fresh leaves alone, so the portrait
- * and the More sheet's Home row read "page" on the home page and "false"
- * everywhere else.
+ * (`aria-current="true"`) on every page. The library `Rail` renders "false"
+ * on an entry that is not current, which Fresh leaves alone, so the
+ * portrait and the More sheet's Home row read "page" on the home page and
+ * "false" everywhere else (the portrait reads "true" on About and
+ * Infrastructure, checked in test/nav.test.ts). The phone header's home link
+ * reads a fixed "false" (#561): on a phone the More tab marks the home page.
  */
 siteTest(
-  "the three home links are the current page only on the home page",
+  "the portrait and the sheet's Home are the current page only on home; the header's never",
   async (site) => {
     const homeLinks = (html: string) =>
       [
         ...railTop(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
         ...moreSheet(html).matchAll(/<a\b[^>]*href="\/"[^>]*>/g),
-        ...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g),
       ].map((m) => m[0])
+    const header = (html: string) =>
+      [...html.matchAll(/<a\b[^>]*aria-label="Anton Shubin, home"[^>]*>/g)]
+        .map((m) => m[0])
     const cases = [["/", "page"], ["/blog", "false"], ["/work", "false"]]
     for (const [path, expected] of cases) {
-      const links = homeLinks(await site.html(path))
+      const html = await site.html(path)
+      const links = homeLinks(html)
       assertEquals(
         links.length,
-        3,
-        `${path}: the portrait, the sheet's Home and the phone header`,
+        2,
+        `${path}: the portrait and the sheet's Home`,
       )
-      for (const link of links) {
+      const headerLinks = header(html)
+      assertEquals(
+        headerLinks.length,
+        1,
+        `${path}: the phone header's home link`,
+      )
+      for (
+        const [link, want] of [
+          ...links.map((l) => [l, expected]),
+          ...headerLinks.map((l) => [l, "false"]),
+        ]
+      ) {
         assert(link.includes(`href="/"`), link)
         assert(
-          link.includes(`aria-current="${expected}"`),
-          `${path}: expected aria-current="${expected}" on ${link}`,
+          link.includes(`aria-current="${want}"`),
+          `${path}: expected aria-current="${want}" on ${link}`,
         )
       }
     }
