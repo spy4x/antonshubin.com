@@ -78,14 +78,16 @@ export function projectLead(p: Project): string {
 /**
  * `text` with its whitespace collapsed, cut to at most `max` characters at a
  * word boundary, with "…" marking a cut — for a `<meta name="description">`,
- * which search engines truncate at about 160 characters anyway.
+ * which search results cut at about 155 characters anyway. A cut that lands
+ * at the end of a sentence keeps the sentence's own stop instead of "…".
  */
-export function metaDescription(text: string, max = 160): string {
+export function metaDescription(text: string, max = 155): string {
   const flat = text.replace(/\s+/g, " ").trim()
   if (flat.length <= max) return flat
   const room = flat.slice(0, max - 1)
   const space = room.lastIndexOf(" ")
   const cut = space > 0 ? room.slice(0, space) : room
+  if (/[.!?]$/.test(cut)) return cut
   return `${cut.replace(/[\s,;:—–-]+$/, "")}…`
 }
 

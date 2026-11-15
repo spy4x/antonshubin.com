@@ -1,7 +1,7 @@
 // #636: /tools/ringmaster is a custom page on the shared tool frame with no
 // public repository and no live link. Its hero line says whose machine and
 // subscription it runs on, the facts card says it is built on Seed, the band
-// says when you can run it yourself and links the Ongoing offer, and it sends
+// says when you can run it yourself and links the Fractional CTO offer, and it sends
 // no visitor to GitHub. Needs a built site; see docs/testing.md.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "../harness.ts"
@@ -46,7 +46,7 @@ Deno.test("the Ringmaster page wears the tool frame with its clip, no GitHub lin
   }
 })
 
-Deno.test("the Ringmaster band says it cannot be installed yet and links the Ongoing offer", async () => {
+Deno.test("the Ringmaster band says it cannot be installed yet and links the Fractional CTO offer", async () => {
   const site = await startSite({
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
   })
@@ -63,9 +63,9 @@ Deno.test("the Ringmaster band says it cannot be installed yet and links the Ong
       "build line",
     )
     assert(
-      /href="\/catalog\/cto-advisory-retainer"[^>]*>See the Ongoing offer</
+      /href="\/catalog\/cto-advisory-retainer"[^>]*>See the Fractional CTO offer</
         .test(band),
-      "Ongoing offer link",
+      "Fractional CTO offer link",
     )
   } finally {
     await site.stop()

@@ -357,7 +357,7 @@ siteTest(
 )
 
 siteTest(
-  "the label leads and 'fractional CTO' is only the Ongoing service",
+  "the label leads and 'fractional CTO' is only the Fractional CTO service's name",
   async (site) => {
     const html = await site.html("/")
     const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ""
@@ -370,9 +370,9 @@ siteTest(
     assert(person, "no Person in the JSON-LD")
     assertEquals(person.jobTitle, "Senior Full-Stack Engineer & Tech Lead")
     assert(!/fractional/i.test(person.description), person.description)
-    // The one allowed mention is the Ongoing item's own title, wherever it is linked.
-    const ongoingTitle =
-      catalogItems.find((i) => i.slug === "cto-advisory-retainer")!.title
+    // The one allowed mention is the item's own name (its title or short
+    // title), wherever it is linked.
+    const cto = catalogItems.find((i) => i.slug === "cto-advisory-retainer")!
     for (
       const path of [
         "/",
@@ -383,13 +383,12 @@ siteTest(
         "/infrastructure",
       ]
     ) {
-      const text = visibleText(await site.html(path)).replaceAll(
-        ongoingTitle,
-        "",
-      )
+      const text = visibleText(await site.html(path))
+        .replaceAll(cto.title, "")
+        .replaceAll(cto.shortTitle, "")
       assert(
         !/fractional/i.test(text),
-        `${path} mentions "fractional" outside the Ongoing service`,
+        `${path} mentions "fractional" outside the Fractional CTO service's name`,
       )
     }
   },

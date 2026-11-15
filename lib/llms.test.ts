@@ -93,12 +93,17 @@ Deno.test("a meta description keeps short text whole and collapses whitespace", 
   assertEquals(metaDescription("One\n\ntwo   three."), "One two three.")
 })
 
-Deno.test("a meta description is cut at a word boundary to at most 160 characters", () => {
+Deno.test("a meta description is cut at a word boundary to at most 155 characters", () => {
   const long = `${"word ".repeat(60)}end`
   const cut = metaDescription(long)
-  assert(cut.length <= 160, `${cut.length} characters`)
+  assert(cut.length <= 155, `${cut.length} characters`)
   assert(cut.endsWith("word…"), cut.slice(-12))
   assert(!cut.includes("\n"))
+})
+
+Deno.test("a meta description cut at the end of a sentence keeps its full stop, not an ellipsis", () => {
+  const text = `${"word ".repeat(29)}end. ${"x".repeat(20)}`
+  assertEquals(metaDescription(text), `${"word ".repeat(29)}end.`)
 })
 
 Deno.test("an llms summary drops the product sentence when the outcome repeats its figure", () => {

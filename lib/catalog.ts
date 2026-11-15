@@ -55,7 +55,7 @@ export interface CatalogItem {
   category: string
   /** Short title for cards and lists. */
   shortTitle: string
-  /** One or two prices. Two means the client picks, as with the Ongoing item. */
+  /** One or two prices. Two means the client picks, as with the Fractional CTO item. */
   prices: CatalogPrice[]
   delivery: string
   /** One sentence for the meta description, the llms files and the guide page. */
@@ -149,7 +149,7 @@ export const catalogItems: CatalogItem[] = [
     priceNote: QUOTE_NOTE,
     delivery: "3 days",
     summary:
-      "I check your app's code and security and tell you what to fix first, including apps built with Lovable, Supabase, Cursor or Claude Code.",
+      "I check your app's code and security and say what to fix first, including apps built with Lovable, Supabase, Cursor or Claude Code.",
     desc:
       "I review your existing codebase over three days, apps built with AI tools included. You get a written report covering architecture, security gaps and performance bottlenecks, with a prioritized roadmap of what to fix, and we walk through it together on a call.",
     outcome:
@@ -170,7 +170,7 @@ export const catalogItems: CatalogItem[] = [
     tech: ["Any stack", "Security audit", "Performance profiling"],
     exclusions: [
       "A certificate that the app is secure: the report lists what I found, ranked by risk",
-      "Fixing the issues: that is quoted separately, as a Build or Ongoing job",
+      "Fixing the issues: that is quoted separately, as a SaaS MVP or Fractional CTO job",
     ],
     audience:
       "Founders who built their app with AI tools such as Lovable, Cursor or Claude Code and want it checked before real users, payments or personal data arrive; founders who inherited a messy codebase; and teams planning a major rewrite who want a clear roadmap first.",
@@ -183,12 +183,12 @@ export const catalogItems: CatalogItem[] = [
   {
     icon: "rocket",
     slug: "zero-to-production-saas-mvp",
-    title: "Build: SaaS MVP, From Idea to Production",
+    title: "SaaS MVP, From Idea to Production",
     seoTitle: "Build a SaaS MVP from idea to production",
     category: "Software development",
     next: "cto-advisory-retainer",
     priceNote: QUOTE_NOTE,
-    shortTitle: "Build: MVP",
+    shortTitle: "SaaS MVP",
     prices: [{ usd: 8000, from: true }],
     delivery: "From 3 weeks",
     summary:
@@ -241,7 +241,7 @@ export const catalogItems: CatalogItem[] = [
       "Third-party integrations beyond Stripe (CRM, email tools and so on are quoted separately)",
       "Features added after launch — quoted once we scope them",
       "Design and branding beyond system defaults — UI tokens and components are included, custom illustrations are not",
-      "Ongoing maintenance — that is the Ongoing item in this catalog",
+      "Ongoing maintenance — that is the Fractional CTO item in this catalog",
     ],
     tech: ["Deno", "Preact", "PostgreSQL", "Docker", "Stripe"],
     audience:
@@ -255,11 +255,11 @@ export const catalogItems: CatalogItem[] = [
   {
     icon: "briefcase",
     slug: "cto-advisory-retainer",
-    title: "Ongoing: Fractional CTO, Hourly or on Retainer",
+    title: "Fractional CTO, Hourly or on Retainer",
     seoTitle: "Fractional CTO, hourly or on a monthly retainer",
     category: "Fractional CTO",
     priceNote: "The retainer works out cheaper from about 20 hours a month.",
-    shortTitle: "Ongoing",
+    shortTitle: "Fractional CTO",
     prices: [
       { usd: 150, from: false, period: "hour" },
       { usd: 3000, from: true, period: "month" },
@@ -349,10 +349,11 @@ export function catalogPath(slug: string): string {
 }
 
 /**
- * The `lib/promises.ts` ids a service shows beside its price (#271). Build
- * and Ongoing are the engagements the project pages' closing band already
- * shows the refund and the first milestone for, so those and ownership apply
- * to both, and Build adds the bug-fix window its `includes` already names.
+ * The `lib/promises.ts` ids a service shows beside its price (#271). The
+ * SaaS MVP and Fractional CTO items are the engagements the project pages'
+ * closing band already shows the refund and the first milestone for, so those
+ * and ownership apply to both, and the SaaS MVP adds the bug-fix window its
+ * `includes` already names.
  * The strategy session and the code audit show the refund only (Anton,
  * #301): a one-off job has no milestone, weekly delivery or code to fix.
  */
@@ -455,6 +456,18 @@ export function callVersusSession(): {
       desc: session.summary,
     },
   }
+}
+
+/**
+ * The llms files' line that keeps the free intro call apart from the paid
+ * strategy session (#494), so an answer engine cannot quote a free session.
+ */
+export function freeCallPaidSessionLine(): string {
+  const session = catalogItem("strategy-call")
+  const call = INTRO_CALL.replace(/^free /, "")
+  return `The ${call} is free. The ${session.shortTitle.toLowerCase()} is paid (${
+    priceLabel(session)
+  }): ${session.summary.charAt(0).toLowerCase()}${session.summary.slice(1)}`
 }
 
 /** The written-brief form with this service chosen (`?service=` is read by the booking page, #272). */

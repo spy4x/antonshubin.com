@@ -31,28 +31,31 @@ server on a free port and returns `{ get, html, stop }` — `get` uses
 `jsonLd()` and `count()` for asserting on structure and short phrases, never
 prose — the copy changes often, and a test that pins a paragraph breaks for the
 wrong reason. `test/structure.test.ts` guards site structure (catalog, nav,
-redirects, prices, labels). `test/label-in-name.test.ts` (#236) fails when an
-`aria-label`led button or link's visible text is not part of its name, on every
-sitemap page plus `/pay`, and pins that each `/pay` copy button names its field.
-`test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only accessible
-names, from server-rendered HTML only — it doesn't cover the two lightboxes'
-buttons, which only exist after client JS opens them (see "Browser-driven
-tests"). The library `Rail` sets `aria-current` on its entries from the path
-`components/Nav.tsx` hands it: "page" on the page, "true" on its section, so a
-nested route passes its own path. Contact is the page on `/book` only, also when
-it links `/book#brief`, which is matched by its `contact` key. An entry that is
-not current carries `aria-current="false"`, so Fresh's renderer leaves the
-rail's links to `/` (the portrait and the More sheet's Home row) alone; Fresh
-would otherwise mark every link to `/` as the current section on every page. The
-phone header sets its own value through `lib/nav.ts`'s `navCurrent()`.
-`test/a11y.test.ts` checks all three home links. `test/nav.test.ts` checks
-Contact on every page (the rail's bottom slot, the More sheet and the phone
-header), the tab bar's order, the More sheet's links and the portrait's top
-slot. `test/html.ts` slices the rail's parts (`railColumn`, `railTop`, `tabBar`,
-`moreSheet`) and the page (`pageBody` stops at the footer, `mainContent` at the
-phone dock), because the footer follows `<main>` in the same column and the dock
-follows both. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no
-server needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
+redirects, prices, labels). `test/head-lengths.test.ts` (#494) fails when a
+non-blog sitemap page's `<title>` is over 60 characters before " — Anton Shubin"
+or its meta description over 155. `test/label-in-name.test.ts` (#236) fails when
+an `aria-label`led button or link's visible text is not part of its name, on
+every sitemap page plus `/pay`, and pins that each `/pay` copy button names its
+field. `test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only
+accessible names, from server-rendered HTML only — it doesn't cover the two
+lightboxes' buttons, which only exist after client JS opens them (see
+"Browser-driven tests"). The library `Rail` sets `aria-current` on its entries
+from the path `components/Nav.tsx` hands it: "page" on the page, "true" on its
+section, so a nested route passes its own path. Contact is the page on `/book`
+only, also when it links `/book#brief`, which is matched by its `contact` key.
+An entry that is not current carries `aria-current="false"`, so Fresh's renderer
+leaves the rail's links to `/` (the portrait and the More sheet's Home row)
+alone; Fresh would otherwise mark every link to `/` as the current section on
+every page. The phone header sets its own value through `lib/nav.ts`'s
+`navCurrent()`. `test/a11y.test.ts` checks all three home links.
+`test/nav.test.ts` checks Contact on every page (the rail's bottom slot, the
+More sheet and the phone header), the tab bar's order, the More sheet's links
+and the portrait's top slot. `test/html.ts` slices the rail's parts
+(`railColumn`, `railTop`, `tabBar`, `moreSheet`) and the page (`pageBody` stops
+at the footer, `mainContent` at the phone dock), because the footer follows
+`<main>` in the same column and the dock follows both. `lib/markdown.test.ts`
+(#160) tests `lib/markdown.ts` directly, no server needed.
+`test/bot-filter.test.ts` (#179) boots the site with placeholder
 `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
 preconnect links while browsers do. `routes/_app.tsx` makes that decision at
 render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is

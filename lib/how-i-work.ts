@@ -21,7 +21,7 @@ export const HOW_I_WORK_TITLE =
 
 /** The meta description and the OG image's subtitle: the five promises as phrases. */
 export function howIWorkDescription(): string {
-  return `Five promises you can hold me to: ${
+  return `My five promises: ${
     promises.map((p) => p.phrase).join(", ").replace(/, ([^,]*)$/, ", and $1")
   }.`
 }

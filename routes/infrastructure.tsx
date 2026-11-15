@@ -102,10 +102,10 @@ export default define.page(function Infrastructure() {
   head.value = {
     ...head.value,
     title:
-      "How I run production: Docker Compose, Traefik and self-hosted CI — Anton Shubin",
+      "How I self-host production: Docker Compose, Traefik, CI — Anton Shubin",
     pageName: "Infrastructure",
     description:
-      "How Anton runs his own production: Docker Compose behind Traefik, Authelia sign-in, restic backups, Gatus checks and self-hosted CI, with the live services linked.",
+      "How Anton runs production: Docker Compose behind Traefik, Authelia sign-in, restic backups, Gatus checks and self-hosted CI, with the live services linked.",
     canonical,
     ogType: "article",
     ogImage: `${BASE}/img/og/infrastructure.png`,

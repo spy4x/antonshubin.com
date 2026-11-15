@@ -214,7 +214,7 @@ Five entities in a `@graph` array (six on `/about`):
 - No `Review` or `AggregateRating`, for the same reason as the project pages
 - `<title>` is "Client work and case studies — Anton Shubin"; the meta
   description is `workDescription()`: `ROLE`, the project count, the year span
-  and as many of the first four highlight names as fit in 160 characters
+  and as many of the first four highlight names as fit in 155 characters
 - `test/work-index.test.ts` checks that the `ItemList` URLs equal the page's
   title links in order
 
@@ -320,8 +320,8 @@ Five entities in a `@graph` array (six on `/about`):
   `AggregateRating` or `Article`.
 - Linked from the footer's Site group, the home page under the prices,
   `/catalog` under the services, the "How I use AI" section and the pricing
-  answer on `/how-i-work`, the SaaS MVP and Ongoing service pages and the ends
-  of the two posts on AI agents.
+  answer on `/how-i-work`, the SaaS MVP and Fractional CTO service pages and the
+  ends of the two posts on AI agents.
 
 ### 12. The SaaS MVP page (`/catalog/zero-to-production-saas-mvp`)
 

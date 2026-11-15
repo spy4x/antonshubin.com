@@ -357,7 +357,7 @@ the technical partner who takes the whole software side off a founder's plate
 of it. The hero holds a two-line `<h1>` (`lib/home.ts`'s `HOME_H1_NAME` small,
 `HOME_H1_CLAIM` large), the lead (`HOME_LEAD`, which the Person JSON-LD, the
 sitemap comment and both llms files read too; the meta description is the lead
-when it fits 160 characters, else `HOME_SHORT_DESCRIPTION`), Book and "Send a
+when it fits 155 characters, else `HOME_SHORT_DESCRIPTION`), Book and "Send a
 written brief", the video, then the proof line (`homeProofLine()`, with the
 `upwork-profile` note), the capacity line (`HOME_CAPACITY`), the three promises
 with "How these work" and the Upwork line. The video is `islands/HomeVideo.tsx`,
@@ -439,7 +439,7 @@ the item's `outcome` as the lead, `components/ServicePriceCard.tsx` (built on
 `FactCard`, first at 390px, sticky from 1024px: the price rows from
 `priceRows()`, time, stack, the promises from `catalogPromises()`, Book and
 "Send a written brief"), then the scope (included and not included side by
-side), "How it starts" (`startSteps()`: Build and Strategy only), the
+side), "How it starts" (`startSteps()`: SaaS MVP and Strategy only), the
 `alsoCovers` kinds of work as H3s whose ids are fragment targets, who it is for,
 "Projects this fits", the work sold under it (`projectsForCatalog()` in
 `lib/work.ts`, at most three `MoreWorkCard`s plus one `TestimonialCard`; none
@@ -448,24 +448,24 @@ step" link (`CatalogItem.next`) and the closing band. The index is a 2×2
 comparison from 1024px. Each card shows the audience, the `outcome`, the price,
 its own promise line (the `catalogPromises()` titles, never all five) and the
 item's three plain `cardPoints`, then one details link; `includes` stays on the
-item page (#541). Build and Ongoing, the items with two or more promises, open
-their main column with "What you can count on" (a compact `PromiseTimeline`),
-then "How it starts" and "Why it costs less" where the page has them, then the
-scope with `desc` under its heading; there the card's Promises row is hidden
-below 1024px (`promisesInBody`), so a phone shows the promises once. A retired
-slug answers 301 to the fragment of the section that absorbed it, so
-`alsoCovers` ids and the `how-it-starts` id must not change without editing
-`catalogRedirects`. The two action wordings are `BOOK_LABEL` and `BRIEF_LABEL`
-in `lib/nav.ts` (see "Booking page"); the brief link is `briefPath(slug)`. A
-promise shown for a service is the owner's decision (`catalogPromises()`): the
-strategy session and the audit show the refund only (#301). The paid session is
-booked through the brief, because mig takes no payment: its "How it starts" is
-brief, invoice, call, notes. The SaaS MVP page is the one hire page (#484):
-"SaaS MVP development" above the H1, a quotable lead (price, time, ownership),
-"Why it costs less" and six questions with a `FAQPage` after the next-step link,
-all from `lib/saas-mvp.ts`; `components/Questions.tsx` draws the questions here,
-on How I work and on Why not just AI. `test/services.test.ts` checks the built
-pages.
+item page (#541). SaaS MVP and Fractional CTO, the items with two or more
+promises, open their main column with "What you can count on" (a compact
+`PromiseTimeline`), then "How it starts" and "Why it costs less" where the page
+has them, then the scope with `desc` under its heading; there the card's
+Promises row is hidden below 1024px (`promisesInBody`), so a phone shows the
+promises once. A retired slug answers 301 to the fragment of the section that
+absorbed it, so `alsoCovers` ids and the `how-it-starts` id must not change
+without editing `catalogRedirects`. The two action wordings are `BOOK_LABEL` and
+`BRIEF_LABEL` in `lib/nav.ts` (see "Booking page"); the brief link is
+`briefPath(slug)`. A promise shown for a service is the owner's decision
+(`catalogPromises()`): the strategy session and the audit show the refund only
+(#301). The paid session is booked through the brief, because mig takes no
+payment: its "How it starts" is brief, invoice, call, notes. The SaaS MVP page
+is the one hire page (#484): "SaaS MVP development" above the H1, a quotable
+lead (price, time, ownership), "Why it costs less" and six questions with a
+`FAQPage` after the next-step link, all from `lib/saas-mvp.ts`;
+`components/Questions.tsx` draws the questions here, on How I work and on Why
+not just AI. `test/services.test.ts` checks the built pages.
 
 ### Project page
 
@@ -597,10 +597,10 @@ the More sheet. The home page's "Why not just use AI?" section links it with
 `HOME_AI_LINK_LABEL`. In the page body, `WHY_NOT_JUST_AI_PROMPT` and
 `WHY_NOT_JUST_AI_LINK_LABEL` link it from `/catalog` (under the services),
 `/how-i-work`'s AI paragraph and the service pages in `WHY_NOT_JUST_AI_SERVICES`
-(the MVP and Ongoing pages, under "Who this is for"). The /how-i-work pricing
-answer links straight to the hourly question (`#faq-hourly-while-ai-works`, "How
-hourly billing works with AI"). `test/why-not-just-ai.test.ts` checks the built
-page.
+(the SaaS MVP and Fractional CTO pages, under "Who this is for"). The
+/how-i-work pricing answer links straight to the hourly question
+(`#faq-hourly-while-ai-works`, "How hourly billing works with AI").
+`test/why-not-just-ai.test.ts` checks the built page.
 
 ### Tool pages
 

@@ -6,6 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "./harness.ts"
 import { formatPeriod, highlightSlugs, projects } from "../lib/data.ts"
+import { freeCallPaidSessionLine } from "../lib/catalog.ts"
 import { GOOD_FIT } from "../lib/how-i-work.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
 
@@ -27,6 +28,27 @@ Deno.test("both llms files give the email address from lib/profiles.ts", async (
         text.includes(EMAIL_ADDRESS),
         `${llmsPath} does not give ${EMAIL_ADDRESS}`,
       )
+    }
+  } finally {
+    await site.stop()
+  }
+})
+
+Deno.test("both llms files keep the free intro call apart from the paid strategy session", async () => {
+  const site = await startSite()
+  try {
+    for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
+      const text = await site.html(llmsPath)
+      assert(
+        text.includes(freeCallPaidSessionLine()),
+        `${llmsPath} does not say which call is free`,
+      )
+      // A line that names the session and says "free" must say "paid" too.
+      for (const line of text.split("\n")) {
+        if (!/strategy session|strategy-call/i.test(line)) continue
+        if (!/\bfree\b/i.test(line)) continue
+        assert(/\bpaid\b/.test(line), `${llmsPath}: ${line}`)
+      }
     }
   } finally {
     await site.stop()

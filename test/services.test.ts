@@ -192,7 +192,7 @@ siteTest(
     assertEquals(count(main, /Book a free 30-minute call/g), 1)
     // "Client work" for every service that has a project, none for Strategy.
     assertEquals(count(html, /data-catalog-work/g), 3)
-    // No time claim: the audit's project is from 2017 and Ongoing's from 2018.
+    // No time claim: the audit's project is from 2017 and the Fractional CTO's from 2018.
     assertFalse(
       /recent/i.test(visibleText(html)),
       "/catalog claims recent work",
@@ -214,7 +214,7 @@ siteTest(
     }
     assertEquals(
       title(await site.html("/catalog")),
-      "Services and prices: SaaS builds, code and security audits, fractional CTO — Anton Shubin",
+      "Services and prices: SaaS MVP, code audit, fractional CTO — Anton Shubin",
     )
   },
 )
@@ -295,7 +295,7 @@ siteTest(
 )
 
 siteTest(
-  "How it starts is a list on Build (three steps) and Strategy (four) only",
+  "How it starts is a list on the SaaS MVP (three steps) and Strategy (four) only",
   async (site) => {
     for (const item of catalogItems) {
       const html = await site.html(`/catalog/${item.slug}`)
@@ -573,7 +573,7 @@ siteTest(
 )
 
 siteTest(
-  "Build and Ongoing open with What you can count on, and a phone sees those promises once",
+  "SaaS MVP and Fractional CTO open with What you can count on, and a phone sees those promises once",
   async (site) => {
     for (const item of catalogItems) {
       const html = await site.html(`/catalog/${item.slug}`)
@@ -612,7 +612,7 @@ siteTest(
       assert(row, `${item.slug}: no Promises row`)
       assert(row[1].split(" ").includes("max-lg:hidden"), item.slug)
     }
-    // Build: promises, How it starts, Why it costs less, then the scope.
+    // SaaS MVP: promises, How it starts, Why it costs less, then the scope.
     const build = await site.html(`/catalog/${SAAS_MVP_SLUG}`)
     const order = [
       `id="service-promises"`,

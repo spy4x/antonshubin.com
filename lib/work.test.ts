@@ -52,14 +52,14 @@ Deno.test("yearSpan runs from the first year to the last, or to now while one is
   assertEquals(formatYearSpan(yearSpan([old])), "2014")
 })
 
-Deno.test("the /work description fits 160 characters by naming fewer highlights, never by cutting a word", () => {
+Deno.test("the /work description fits 155 characters by naming fewer highlights, never by cutting a word", () => {
   const work = clientWork()
   const text = workDescription("Role", work)
-  assert(text.length <= 160, `${text.length}`)
-  assert(text.endsWith("what I built, for whom, and what happened."), text)
+  assert(text.length <= 155, `${text.length}`)
+  assert(text.endsWith("what I built and what happened."), text)
   assert(text.includes(work.highlights[0].title), text)
-  const tight = workDescription("Role", work, 110)
-  assert(tight.length <= 110, tight)
+  const tight = workDescription("Role", work, 95)
+  assert(tight.length <= 95, tight)
   assert(tight.includes(`including ${work.highlights[0].title}:`), tight)
 })
 

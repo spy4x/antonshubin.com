@@ -28,7 +28,7 @@ pageTest(
     assertEquals(h1.length, 1)
     assertEquals(
       visibleText(h1[0][1]),
-      "Truth or Dare (DareChat) : Real-time multiplayer game for Russian-speaking audiences",
+      "Truth or Dare (DareChat) : Real-time multiplayer game",
     )
   },
 )

@@ -164,7 +164,7 @@ siteTest(
 )
 
 siteTest(
-  "why-not-just-ai is linked from the footer, the home page, the catalog, How I work, the MVP and Ongoing pages, both AI posts, both llms files and the sitemap",
+  "why-not-just-ai is linked from the footer, the home page, the catalog, How I work, the SaaS MVP and Fractional CTO pages, both AI posts, both llms files and the sitemap",
   async (site) => {
     const link = `href="${PAGE}"`
     const home = await site.html("/")

@@ -164,7 +164,7 @@ export const projects = {
     {
       title: "Truth or Dare (DareChat)",
       slug: "truth-or-dare",
-      kind: "real-time multiplayer game for Russian-speaking audiences",
+      kind: "real-time multiplayer game",
       alternateName: "Truth or Dare",
       heroSize: { width: 1600, height: 2021 },
       cardImage: {
@@ -213,7 +213,7 @@ export const projects = {
     {
       title: "FoodRazor",
       slug: "foodrazor",
-      kind: "paper invoices, orders to suppliers and price tracking",
+      kind: "invoices, orders to suppliers and price tracking",
       heroSize: { width: 1600, height: 801 },
       cardImage: {
         src: "/img/projects/foodrazor/card.webp",
@@ -339,7 +339,7 @@ export const projects = {
     {
       title: "Sogroya Dose Reminder",
       slug: "sogroya",
-      kind: "multilingual web app for weekly medication reminders",
+      kind: "multilingual medication reminders",
       catalogSlug: "zero-to-production-saas-mvp",
       logoImageURL: "/img/projects/sogroya/logo.svg",
       logoPlate: true,
@@ -493,7 +493,7 @@ export const projects = {
       madeForURL: "https://www.linkedin.com/in/hamishogilvy/",
     },
     {
-      title: "Code Review & Architecture Audit",
+      title: "Node.js API Code Review",
       slug: "code-review",
       kind: "callbacks and code style report",
       heroSize: { width: 1600, height: 1090 },

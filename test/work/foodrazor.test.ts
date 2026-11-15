@@ -29,7 +29,7 @@ pageTest(
     assertEquals(h1.length, 1)
     assertEquals(
       visibleText(h1[0][1]),
-      "FoodRazor : Paper invoices, orders to suppliers and price tracking",
+      "FoodRazor : Invoices, orders to suppliers and price tracking",
     )
   },
 )
