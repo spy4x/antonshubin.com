@@ -7,17 +7,17 @@ tldr:
   - "The spec ends with a table: every recommendation, the role that gave it, and whether it was adopted or dropped. That table is where weak ideas get cut."
   - "After the build, a design reviewer opens the screens in a browser at 390 and 1440 px with axe-core and the keyboard. It found a Block dialog that never said who."
   - "The roles still miss things: the big calls in this redesign were mine, and a wording rule drifted until a later fix settled it."
-intro: "People ask how my products end up looking finished when AI agents write most of the code. The answer is a design phase with separate AI roles and a design gate after the build. This post walks through one real redesign of Seed, role by role, with a link to every catch and an honest list of what did not work."
+intro: "AI agents write most of my code. What keeps the screens from looking like a default template is a design phase with separate AI roles and a design gate after the build. This post walks through one real redesign of Seed, role by role, with a link to every catch and an honest list of what did not work."
 coverImage: "/img/blog/designing-screens-with-ai-expert-roles/cover.png"
 coverAlt: "The Drake meme: Drake turns away from \"Ask one AI to make it look good\" and approves \"Four expert roles, one merged spec\"."
 coverSize: "720x720"
-publishedAt: "2026-11-14"
+publishedAt: "2026-11-15"
 readTime: 9
 topic: "ai-mcp"
 relatedTool: "dotfiles"
 ---
 
-![Seed's New group page in the dark theme: a back arrow and the title "New group", then Name with "Design crew" typed in, Description marked Optional with "0 of 500 characters", Emoji, a row of colour swatches, and the buttons Cancel and Create group](/img/blog/designing-screens-with-ai-expert-roles/new-group.webp "Seed's New group page, from the public demo. Four roles advised on this screen before any code.")
+![Seed's New group page in the dark theme: a back arrow and the title "New group", then Name with "Design crew" typed in, Description marked Optional with "0 of 500 characters", Emoji, two rows of colour swatches, and the buttons Cancel and Create group](/img/blog/designing-screens-with-ai-expert-roles/new-group.webp "Seed's New group page, from the public demo. Four roles advised on this screen before any code.")
 
 I don't ask one AI model to "design a nice screen". When I design UI with AI
 agents, four of them, each with a different job description, read the same brief
@@ -96,8 +96,8 @@ instead of a dialog with one Name field. The merged spec is
 [template#453](https://github.com/spy4x/template/issues/453) (Seed lived in the
 `spy4x/template` repository then; it's archived now). It says: "The design phase
 ran the product designer, product lead, UX writer and psychologist." Its
-Evidence section has the table of where each recommendation went. These are my
-favourite rows.
+Evidence section has the table of where each recommendation went. Here are some
+of its rows.
 
 ### Product lead: one request, and limits before the form
 
@@ -112,9 +112,10 @@ button.
 ### Psychologist: the row is the link, and opening is not switching
 
 In the old app, clicking a group in `/groups` opened its notes, and "Open notes"
-was promoted as if notes were the only thing in a group. The psychologist asked
-that the whole row be the link, with "Current" written as text. That's how the
-list in the [demo](https://app.seedsaas.com) looks today:
+was promoted as if notes were the only thing in a group. I asked for the row to
+open the group's editor instead and for "Open notes" to stop being promoted. The
+psychologist added that the whole row be the link, with "Current" written as
+text. That's how the list in the [demo](https://app.seedsaas.com) looks today:
 
 ![Seed's Groups page in the dark theme: a New group button and four rows, Book club (Viewer, 8 members), Marketing (Editor, 9 members), Product team with the word "Current" next to its name (Owner, 14 members) and Personal (Owner, only you), each with a chevron](/img/blog/designing-screens-with-ai-expert-roles/groups-list.webp "The Groups list in the demo. The current group says so in a word, not an icon.")
 
