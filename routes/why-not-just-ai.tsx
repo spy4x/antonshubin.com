@@ -56,6 +56,7 @@ import {
   ENOUGH_CLOSING,
   ENOUGH_HEADING,
   ENOUGH_INTRO,
+  ENOUGH_POST,
   processSteps,
   QUESTIONS_HEADING,
   RULES_LINE_AFTER,
@@ -241,6 +242,17 @@ export default define.page(function WhyNotJustAi() {
                 {ENOUGH_CASES.map((t) => <li key={t}>{t}</li>)}
               </ul>
               <p class="mt-4 max-w-2xl text-parchment">{ENOUGH_CLOSING}</p>
+              <p class="mt-3 max-w-2xl text-graphite" data-enough-post>
+                {ENOUGH_POST.before}
+                <a
+                  href={ENOUGH_POST.href}
+                  {...linkEvent(ENOUGH_POST.href)}
+                  class={FACT_LINK}
+                >
+                  {ENOUGH_POST.label}
+                </a>
+                {ENOUGH_POST.after}
+              </p>
             </section>
 
             <section aria-labelledby="wna-compare" data-compare>

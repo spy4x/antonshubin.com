@@ -69,6 +69,13 @@ export const ENOUGH_CASES: string[] = [
 ]
 export const ENOUGH_CLOSING =
   "Come to me when real users, real money or real data depend on it."
+/** The one link to the post that answers the same question honestly. */
+export const ENOUGH_POST = {
+  href: "/blog/do-you-need-a-developer-ai-app",
+  before: "Not sure which side of that line you are on? ",
+  label: "Take the quiz in the post on whether you need a developer",
+  after: ".",
+}
 
 export const COMPARISON_HEADING = "What I add on top"
 export const COMPARISON_CAPTION = "What you get from each"

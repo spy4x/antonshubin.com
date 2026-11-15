@@ -56,7 +56,9 @@ works, and to bill you for the privilege.
 ![The Roll Safe meme: a man taps his temple with a knowing smile. Captions: "Can't have bugs in your app" and "If I rewrite your app"](/img/blog/hire-developer-take-over-ai-built-app/rewrite.webp "Rewrite is a plan, not an insight")
 
 If you are still deciding whether you need a person at all, I wrote about
-[when an AI subscription is enough](/why-not-just-ai) and when it isn't.
+[when an AI subscription is enough](/why-not-just-ai) and when it isn't, and
+[do you need a developer if AI can build your app?](/blog/do-you-need-a-developer-ai-app)
+ends with a quiz that tells you.
 
 ## What are the red flags in a proposal?
 
