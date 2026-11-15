@@ -181,7 +181,7 @@ flock "$DST/subscribers.json.lock" \
 # From @spy4x/server 1.84.0 the newest recipients sit in the log's journal,
 # newsletter-log.json.journal, until the next rewrite: restore it with the log,
 # unless the host still has one, which is newer than the backup.
-if [ -f "$SRC/newsletter-log.json" ] if [ -f "$SRC/newsletter-log.json" ] && [ ! -f "$DST/newsletter-log.json" ]; thenif [ -f "$SRC/newsletter-log.json" ] && [ ! -f "$DST/newsletter-log.json" ]; then
+if [ -f "$SRC/newsletter-log.json" ] &&
   [ ! -f "$DST/newsletter-log.json" ]; then
   cp "$SRC/newsletter-log.json" "$DST/newsletter-log.json"
   [ -f "$SRC/newsletter-log.json.journal" ] &&
