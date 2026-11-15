@@ -277,3 +277,79 @@ for (const when of ["before", "after"] as const) {
     })
   }
 }
+
+Deno.test("after a tap at 390x844 the whole home video player is on screen, above the tab bar", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL } })
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    await page.route(/youtube|ytimg/, (route) => route.abort())
+    await page.goto(`${site.origin}/`, { waitUntil: "networkidle" })
+    await page.locator("[data-home-video-play]").click({ timeout: WAIT_MS })
+    await page.locator("[data-home-video] iframe").waitFor({ timeout: WAIT_MS })
+    // The scroll is smooth here, so this waits for it to end inside the fold.
+    await page.waitForFunction(
+      () => {
+        const box = document.querySelector("[data-home-video] iframe")!
+          .getBoundingClientRect()
+        const dock = document.querySelector('[data-e2e="rail-shell-dock"]')
+        const fold = Math.min(
+          dock?.getBoundingClientRect().top ?? innerHeight,
+          innerHeight,
+        )
+        return box.top >= 0 && box.bottom <= fold
+      },
+      null,
+      { timeout: WAIT_MS },
+    )
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+for (
+  const [motion, behavior] of [
+    ["reduce", "auto"],
+    ["no-preference", "smooth"],
+  ] as const
+) {
+  Deno.test(`the home video player scrolls into view with behavior "${behavior}" when reduced motion is "${motion}"`, async () => {
+    const site = await startSite({ env: { SCHEDULE_URL } })
+    let browser: Browser | undefined
+    try {
+      browser = await launchChromium()
+      const page = await newPage(browser, {
+        viewport: { width: 390, height: 844 },
+        reducedMotion: motion,
+      })
+      await page.addInitScript(() => {
+        const g = globalThis as unknown as { __scrolls: unknown[] }
+        g.__scrolls = []
+        const original = Element.prototype.scrollIntoView
+        Element.prototype.scrollIntoView = function (options) {
+          g.__scrolls.push(options)
+          return original.call(this, options)
+        }
+      })
+      await page.route(/youtube|ytimg/, (route) => route.abort())
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" })
+      await page.locator("[data-home-video-play]").click({ timeout: WAIT_MS })
+      await page.locator("[data-home-video] iframe").waitFor({
+        timeout: WAIT_MS,
+      })
+      assertEquals(
+        await page.evaluate(() =>
+          (globalThis as unknown as { __scrolls: unknown[] }).__scrolls
+        ),
+        [{ block: "nearest", behavior }],
+      )
+    } finally {
+      await browser?.close()
+      await site.stop()
+    }
+  })
+}

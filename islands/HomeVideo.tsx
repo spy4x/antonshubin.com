@@ -59,8 +59,18 @@ export default function HomeVideo(
   const id = encodeURIComponent(videoId)
   const watchHref = `https://www.youtube.com/shorts/${id}`
 
+  // On a phone the player starts below the fold, so it is scrolled into view;
+  // focus moves into it without a second, instant scroll.
   useEffect(() => {
-    if (playing.value) player.current?.focus()
+    const frame = player.current
+    if (!frame) return
+    frame.focus({ preventScroll: true })
+    frame.scrollIntoView({
+      block: "nearest",
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    })
   }, [playing.value])
 
   const play = (event: MouseEvent) => {
