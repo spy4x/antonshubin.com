@@ -94,9 +94,9 @@ it.
 
 The usual cut list for a first version, and why:
 
-- **Teams and roles.** Your first customers can share one login, or you can set
-  up their accounts by hand. Roles are worth building when a customer asks who
-  can see what.
+- **Teams and roles.** Your first customers can start with one account per
+  company, or you can set up their accounts by hand. Roles are worth building
+  when a customer asks who can see what.
 - **An admin panel.** For the first customers, you can fix a record by hand in
   the database tool your host gives you. It's ugly, and nobody but you sees it.
 - **Phone apps.** A web app that works well on a phone reaches the same people.
@@ -118,7 +118,7 @@ much easier to plan once version one has customers.
 
 ![The Drake meme in two panels. Drake turns away from "An admin panel with charts" and points approvingly at "Fixing a record by hand"](/img/blog/questions-before-building-an-mvp/drake.webp "The admin panel can wait. The customers can't")
 
-## 5. Can something you already pay for do it?
+## 5. Can a service do it instead?
 
 Before building any part, I check whether a service does it already. Sign-in,
 payments, email, file storage and analytics are solved problems, and paying for
@@ -134,7 +134,7 @@ billing, deploys. A SaaS starter, a codebase with that layer already built and
 tested, covers most of it. Ask whoever you hire what they start from. "A blank
 folder" means you're paying to rebuild a password reset.
 
-![The Roll Safe meme: a man in a suit taps his temple with a knowing grin. Captions: "Can't leak card numbers" and "If your app never sees them"](/img/blog/questions-before-building-an-mvp/roll-safe.webp "Security through not having the thing")
+![The Roll Safe meme: a man in a leather jacket taps his temple with a knowing grin. Captions: "Can't leak card numbers" and "If your app never sees them"](/img/blog/questions-before-building-an-mvp/roll-safe.webp "Security through not having the thing")
 
 If you'd like someone to go through these questions with you on your own idea,
 that's what my [strategy session](/catalog/strategy-call) is for: an hour on
