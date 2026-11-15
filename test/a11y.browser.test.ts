@@ -388,6 +388,41 @@ Deno.test("/about has no horizontal scroll and no axe violations at 390 and 1440
 })
 
 /**
+ * axe's target-size rule only sees what is on screen at each scroll step, so
+ * a footer link can slip past it. Measure every footer link directly.
+ */
+Deno.test("every footer link is at least 24px wide and tall", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page: Page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await page.goto(`${site.origin}/`, { waitUntil: "networkidle" })
+      await page.locator("footer.site-footer").scrollIntoViewIfNeeded()
+      const small = await page.locator("footer.site-footer a").evaluateAll(
+        (links) =>
+          links
+            .map((a) => ({
+              text: a.textContent,
+              box: a.getBoundingClientRect(),
+            }))
+            .filter(({ box }) => box.width < 24 || box.height < 24)
+            .map(({ text, box }) => `${text} ${box.width}x${box.height}`),
+      )
+      assertEquals(small, [], `footer links under 24px`)
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+/**
  * The site footer goes in the Rail's `footer` slot, after `<main>`. A
  * `<footer>` inside `<main>` loses its `contentinfo` role, so screen-reader
  * users could no longer jump to it.
