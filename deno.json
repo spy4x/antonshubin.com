@@ -5,7 +5,7 @@
   "tasks": {
     "check": "deno fmt --check . && deno lint . && deno check && deno task test && deno task test:browser",
     "test": "deno task build && deno task test:unit",
-    "test:unit": "deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0,raw.githubusercontent.com --allow-run=deno --ignore='**/*.browser.test.ts'",
+    "test:unit": "deno test --allow-env --allow-read --allow-write --allow-net=127.0.0.1,0.0.0.0,raw.githubusercontent.com --allow-run=deno --ignore='**/*.browser.test.ts',.ci/",
     "test:browser": "deno run -A scripts/browser-shard.ts 1/1",
     "dev": "vite",
     "build": "vite build",
