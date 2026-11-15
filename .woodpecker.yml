@@ -8,7 +8,7 @@ when:
 
 steps:
   check:
-    image: denoland/deno:2.9.0
+    image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
     commands:
       - deno install
       # test/lead-form.browser.test.ts, test/a11y.browser.test.ts,
@@ -62,7 +62,7 @@ steps:
   # this trigger. See docs/weekly-numbers.md for the one-time cron setup and
   # the env vars this step needs.
   weekly-numbers:
-    image: denoland/deno:2.9.0
+    image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
     commands:
       - deno install
       - deno task weekly-numbers
