@@ -398,7 +398,5 @@ work here were not JSON-RPC. They were the error results, the read-only
 allowlist and the HTTP hardening, and you need those with or without an SDK.
 
 If you run a CalDAV server, try [caldav-mcp](/tools/caldav-mcp) with your
-assistant and tell me what breaks. If you need an MCP server that lets an
-assistant work inside your own CRM, database or internal API, that is part of my
-[Build service](/catalog/zero-to-production-saas-mvp#mcp-servers), shipped as a
-self-hosted image you own. What would you connect your assistant to first?
+assistant and tell me what breaks. What would you connect your assistant to
+first?

@@ -227,7 +227,3 @@ through a dialog, and see if it behaves the way you expect. If something is
 missing or broken, open an issue on
 [GitHub](https://github.com/spy4x/preact-components). And if the library looks
 useful, a star helps other Preact developers find it.
-
-Building a product and want its UI layer owned like this, instead of rented from
-a library? That's my day job: see
-[how I build a SaaS MVP](/catalog/zero-to-production-saas-mvp).

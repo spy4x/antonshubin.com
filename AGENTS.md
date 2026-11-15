@@ -139,8 +139,13 @@ unreviewed or unmerged code.
 
 The deploy script passes the local commit hash to the remote build as
 `BUILD_ID`, which `routes/sw.js.ts` prints in the retired worker (below), where
-the deploy reads it back. Nothing is written back to a tracked file, so a deploy
-leaves `git status` clean — see `docs/deploy.md`.
+the deploy reads it back. The Dockerfile also hands it to the build as
+`DENO_DEPLOYMENT_ID`, so Fresh's asset id (`?__frsh_c=`) is the same in the
+server HTML and the client bundle; without it the image, which has no git, gets
+two random ids and hydrated images download twice (#593). The deploy's last step
+checks that on the live `/tools` and fails on a mismatch. Nothing is written
+back to a tracked file, so a deploy leaves `git status` clean — see
+`docs/deploy.md`.
 
 After `docker compose up` the deploy waits for the new build and purges
 Cloudflare: `/sw.js` plus every `static/` file changed since the build that was
