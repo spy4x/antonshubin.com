@@ -160,8 +160,7 @@ export const siteItems: Pick<NavItem, "href" | "label">[] = [
  * on the page itself, `"true"` anywhere under it, `"false"` otherwise. The
  * same matching Fresh's renderer applies on the server, except that `/` is
  * only ever the page itself: Fresh marks every link to `/` as the current
- * section on every page. Used for the phone header's link to `/` in
- * `components/Layout.tsx`.
+ * section on every page. `portraitCurrent()` uses it.
  */
 export function navCurrent(
   currentPath: string,
@@ -175,4 +174,28 @@ export function navCurrent(
   // becomes a section, unlike under Fresh's matching.
   if (current.startsWith(`${target}/`)) return "true"
   return "false"
+}
+
+/** The pages about Anton himself, which the rail's portrait marks as its section (#561). */
+const aboutAntonItems: NavItem[] = [ABOUT, INFRASTRUCTURE]
+
+/**
+ * The `aria-current` of the desktop rail's portrait entry ("Anton", linking
+ * `/`) on `currentPath` (#561): `"page"` on the home page, `"true"` on About
+ * and Infrastructure (or under them), `undefined` elsewhere. About and
+ * Infrastructure are rows of the phone More sheet only, so without this the
+ * desktop column would mark nothing on their pages.
+ */
+export function portraitCurrent(
+  currentPath: string,
+): "page" | "true" | undefined {
+  if (navCurrent(currentPath, HOME.href) === "page") return "page"
+  if (
+    aboutAntonItems.some((item) =>
+      navCurrent(currentPath, item.href) !== "false"
+    )
+  ) {
+    return "true"
+  }
+  return undefined
 }
