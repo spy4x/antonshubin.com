@@ -133,13 +133,16 @@ and is backed up with the list. An entry is
 `{ slug, subject, startedAt, audience, recipients, sent, failed, completedAt? }`.
 `audience` holds the keyed hashes of everyone on the list when the first run
 started, and a resumed run mails only its missing members, so a subscriber who
-joins later never gets an old post, even when one stored row can never be mailed
-and keeps the post from completing. `recipients` holds one keyed hash per
-subscriber the mail server accepted (the package's `sentMark`: HMAC-SHA256 under
+joins later never gets an old post, even when a mail failed and kept the post
+from completing. `recipients` holds one keyed hash per subscriber the mail
+server accepted (the package's `sentMark`: HMAC-SHA256 under
 `UNSUBSCRIBE_SECRET` of the slug and the lowercased address), never an address.
-The entry is written before the first mail and each hash right after that mail
-is accepted, through a temp file and a rename, as `subscribers.json` is written.
-The whole send holds the lock `newsletter-log.json.lock`: a second run that
+The entry is written before the first mail. Each hash is appended to
+`newsletter-log.json.journal` right after that mail is accepted. A run's finish,
+or the start of a send for a new post, merges the journal into
+`newsletter-log.json` (through a temp file and a rename, as `subscribers.json`
+is written) and removes it; until then every read of the log counts the journal
+too. The whole send holds the lock `newsletter-log.json.lock`: a second run that
 starts while one is going is refused ("another send is in progress") and mails
 nobody. The OS frees the lock when a process dies, so a crashed run leaves
 nothing to clean up. `completedAt` is set by a run that finished with no
@@ -151,10 +154,12 @@ sent. To resend a post to everyone on purpose, remove its entry from the file by
 hand. The script also refuses an empty subscriber list (a missing or unreadable
 `subscribers.json`) and a list with a row that has no `key` (see the backfill
 above) before recording anything, and exits non-zero when any mail failed or
-none went out. To read the log:
+none went out. To read the log (after a crash, the journal holds the hashes
+mailed since the run started):
 
 ```bash
 ssh cloudlab 'sudo cat ~/apps/antonshubin.com/data/newsletter-log.json'
+ssh cloudlab 'sudo cat ~/apps/antonshubin.com/data/newsletter-log.json.journal'
 ```
 
 ## Viewing subscribers
@@ -182,10 +187,12 @@ confirmation link are dropped on the next write. Requires `UNSUBSCRIBE_SECRET`
 
 Tokens use the ts-libs signed payload codec (#233). A version 1 link (mailed
 before #405, no key) is checked against every listed address; a version 2 link
-carries the row's `key` and is looked up by it. Both keep working. The older
-bare-signature token is no longer accepted (#237); a link carrying one answers
-"link not recognised". A confirm link minted before #405 is refused as invalid;
-it expired within three days anyway.
+carries the row's `key` and is looked up by it. Both keep working: version 1
+links only because `lib/mailing-list.ts` passes `legacyTokens: true` to
+`createSubscriptionCrypto`, which `@spy4x/server` needs to accept them (#624).
+The older bare-signature token is no longer accepted (#237); a link carrying one
+answers "link not recognised". A confirm link minted before #405 is refused as
+invalid; it expired within three days anyway.
 
 ## Backup
 
@@ -235,9 +242,9 @@ The email field of `/api/subscribe` and `/api/lead` goes through
 most 254 characters, with a local part of at most 64, passes, lowercased, so a
 display name, `<`, `>` or `"` answers 400, and only the bare address is stored
 or mailed. The newsletter send applies the same check to every stored row: a row
-that fails is skipped, counted as failed and logged by row number only.
-`/api/subscribe` answers a known address exactly as a new one, so it cannot test
-who is on the list.
+that fails is skipped, counted as skipped and logged by row number only, so it
+never keeps a post from completing. `/api/subscribe` answers a known address
+exactly as a new one, so it cannot test who is on the list.
 
 Every POST route reads its body through `lib/request-body.ts` (#251), which
 wraps `@spy4x/net/bounded-body` (forms: `@spy4x/server/http/bounded-body`'s
