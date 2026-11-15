@@ -214,7 +214,7 @@ siteTest(
     }
     assertEquals(
       title(await site.html("/catalog")),
-      "Services and prices: SaaS builds, code and security audits, fractional CTO — Anton Shubin",
+      "Services and prices: SaaS MVP, code audit, fractional CTO — Anton Shubin",
     )
   },
 )

@@ -441,6 +441,7 @@ export const tools: Tool[] = [
   {
     slug: "zond",
     name: "Zond",
+    pageTitle: "Zond: health probe bridge for services behind SSO proxies",
     job: "internal health probe bridge for services behind SSO proxies",
     summary:
       "Internal health probe bridge for services behind SSO proxies. Originally Deno+TS, rewritten to Go as a single 10 MB distroless binary. Sits beside the containers on the same Docker network and probes them directly, so Gatus and other monitoring tools that lack SSO support can still check services behind Authelia.",
@@ -483,6 +484,7 @@ export const tools: Tool[] = [
   {
     slug: "oko",
     name: "oko",
+    pageTitle: "oko: self-hosted status dashboard with Gatus uptime",
     job:
       "one page for every self-hosted service, with its status and 30-day uptime from gatus",
     summary:
@@ -532,6 +534,7 @@ export const tools: Tool[] = [
   {
     slug: "caldav-mcp",
     name: "caldav-mcp",
+    pageTitle: "caldav-mcp: MCP server for CalDAV events and tasks",
     job:
       "MCP server that lets AI assistants read and write CalDAV events and tasks",
     summary:
@@ -623,6 +626,7 @@ export const tools: Tool[] = [
   {
     slug: "ts-libs",
     name: "ts-libs",
+    pageTitle: "ts-libs: TypeScript libraries for web-standards back ends",
     job: "tested TypeScript building blocks for web-standards back ends",
     summary:
       "Eleven framework-agnostic packages built on web standards: ES modules, Fetch, Web Crypto and Streams. Sign-in, Postgres access, SMTP, safe outbound requests, time zones and validation, each with a one-line install. Every package is tested on Deno, the runtime I build with.",
@@ -731,6 +735,7 @@ export const tools: Tool[] = [
   {
     slug: "preact-components",
     name: "preact-components",
+    pageTitle: "preact-components: Preact and Tailwind UI components",
     job: "server-rendered Preact and Tailwind components",
     summary:
       "A Preact port of Eirene's design system: components, design tokens, icons, charts and signals helpers in ten packages. Every module is a standard ES module that renders to HTML on the server and hydrates in the browser, with keyboard handling and focus written by hand. The tests and the build run on Deno.",
@@ -875,6 +880,7 @@ export const tools: Tool[] = [
   {
     slug: "air-quality-sensor",
     name: "Air Quality Sensor",
+    pageTitle: "Air Quality Sensor: DIY ESP32 air quality monitor",
     job: "DIY ESP32-based air quality monitoring system",
     summary:
       "DIY ESP32-based air quality monitoring system measuring PM1.0, PM2.5, PM10 particles, CO2, temperature, and humidity. Integrates with Home Assistant for smart home automation and real-time alerts.",
@@ -1289,6 +1295,7 @@ export const tools: Tool[] = [
   {
     slug: "toread-today",
     name: "Toread.Today",
+    pageTitle: "Toread.Today: organise things to read or watch later",
     job: "a cloud tool to organise things to read or watch later",
     summary:
       "A cloud tool to organise things to read/watch later. Priorities, tags, statuses and other fancy stuff. Web, Desktop & Mobile app, Google Chrome extension.",

@@ -141,13 +141,13 @@ export function workScopeLine(role: string, work = clientWork()): string {
 export function workDescription(
   role: string,
   work = clientWork(),
-  max = 160,
+  max = 155,
 ): string {
   const list = clientWorkInOrder(work)
   const scope = `${role}. ${list.length} client projects, ${
     formatYearSpan(yearSpan(list))
   }`
-  const tail = ": what I built, for whom, and what happened."
+  const tail = ": what I built and what happened."
   const names = work.highlights.slice(0, 4).map(projectShortName)
   for (let n = names.length; n > 0; n--) {
     const shown = names.slice(0, n)

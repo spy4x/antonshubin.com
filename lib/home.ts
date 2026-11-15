@@ -58,7 +58,7 @@ export const HOME_VIDEO_CAPTION = "A short from my YouTube channel."
 export const HOME_VIDEO_LENGTH = "1 min · YouTube"
 
 /** The longest meta description search engines show without cutting it. */
-export const META_DESCRIPTION_MAX = 160
+export const META_DESCRIPTION_MAX = 155
 
 /** The meta description when the lead is too long for one (#615). */
 export const HOME_SHORT_DESCRIPTION =

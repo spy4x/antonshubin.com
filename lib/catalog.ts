@@ -149,7 +149,7 @@ export const catalogItems: CatalogItem[] = [
     priceNote: QUOTE_NOTE,
     delivery: "3 days",
     summary:
-      "I check your app's code and security and tell you what to fix first, including apps built with Lovable, Supabase, Cursor or Claude Code.",
+      "I check your app's code and security and say what to fix first, including apps built with Lovable, Supabase, Cursor or Claude Code.",
     desc:
       "I review your existing codebase over three days, apps built with AI tools included. You get a written report covering architecture, security gaps and performance bottlenecks, with a prioritized roadmap of what to fix, and we walk through it together on a call.",
     outcome:

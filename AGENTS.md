@@ -357,7 +357,7 @@ the technical partner who takes the whole software side off a founder's plate
 of it. The hero holds a two-line `<h1>` (`lib/home.ts`'s `HOME_H1_NAME` small,
 `HOME_H1_CLAIM` large), the lead (`HOME_LEAD`, which the Person JSON-LD, the
 sitemap comment and both llms files read too; the meta description is the lead
-when it fits 160 characters, else `HOME_SHORT_DESCRIPTION`), Book and "Send a
+when it fits 155 characters, else `HOME_SHORT_DESCRIPTION`), Book and "Send a
 written brief", the video, then the proof line (`homeProofLine()`, with the
 `upwork-profile` note), the capacity line (`HOME_CAPACITY`), the three promises
 with "How these work" and the Upwork line. The video is `islands/HomeVideo.tsx`,

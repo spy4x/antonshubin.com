@@ -134,7 +134,7 @@ export default define.page(function SaasArchGuide() {
     title: "SaaS Architecture Guide — Anton Shubin",
     pageName: "SaaS Architecture Guide",
     description:
-      `A short reading order from idea to production: architecture decisions, client projects and how they turned out, infrastructure and AI integration, with lessons from ${
+      `A reading order from idea to production: architecture, client projects with their outcomes, infrastructure and AI, with lessons from ${
         proof("projects")
       } projects.`,
     canonical: "https://antonshubin.com/saas-architecture-guide",

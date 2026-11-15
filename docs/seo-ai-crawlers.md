@@ -214,7 +214,7 @@ Five entities in a `@graph` array (six on `/about`):
 - No `Review` or `AggregateRating`, for the same reason as the project pages
 - `<title>` is "Client work and case studies — Anton Shubin"; the meta
   description is `workDescription()`: `ROLE`, the project count, the year span
-  and as many of the first four highlight names as fit in 160 characters
+  and as many of the first four highlight names as fit in 155 characters
 - `test/work-index.test.ts` checks that the `ItemList` URLs equal the page's
   title links in order
 

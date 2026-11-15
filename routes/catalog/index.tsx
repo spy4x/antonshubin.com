@@ -34,7 +34,7 @@ export default define.page(function Catalog() {
   head.value = {
     ...head.value,
     title:
-      "Services and prices: SaaS builds, code and security audits, fractional CTO — Anton Shubin",
+      "Services and prices: SaaS MVP, code audit, fractional CTO — Anton Shubin",
     pageName: "Services",
     description: `Services and prices: ${
       catalogItems.map((i) => `${i.shortTitle} (${priceLabel(i)})`).join(", ")
