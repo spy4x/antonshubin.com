@@ -3,6 +3,7 @@ import {
   navCurrent,
   navItemFor,
   navLabel,
+  portraitCurrent,
   railItems,
   sheetBottomItems,
   sheetTopItems,
@@ -29,6 +30,32 @@ Deno.test("navCurrent never marks home as the section of another page", () => {
 Deno.test("navCurrent does not match a path that only shares a prefix", () => {
   assertEquals(navCurrent("/tools-extra", "/tools"), "false")
   assertEquals(navCurrent("/blog", "/catalog"), "false")
+})
+
+Deno.test("portraitCurrent marks the portrait the page on home", () => {
+  assertEquals(portraitCurrent("/"), "page")
+})
+
+Deno.test("portraitCurrent marks the portrait the section on About and Infrastructure", () => {
+  assertEquals(portraitCurrent("/about"), "true")
+  assertEquals(portraitCurrent("/infrastructure"), "true")
+  assertEquals(portraitCurrent("/about/"), "true")
+  assertEquals(portraitCurrent("/infrastructure/"), "true")
+})
+
+Deno.test("portraitCurrent leaves the portrait unmarked on every other page", () => {
+  for (
+    const path of [
+      "/blog",
+      "/work",
+      "/book",
+      "/how-i-work",
+      "/about-x",
+      "/privacy",
+    ]
+  ) {
+    assertEquals(portraitCurrent(path), undefined, path)
+  }
 })
 
 Deno.test("navLabel gives the nav's own word for a section, not the URL's", () => {

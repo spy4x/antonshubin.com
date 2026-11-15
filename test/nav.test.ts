@@ -12,6 +12,7 @@ import {
   phoneHeader,
   railBottom,
   railColumn,
+  railTop,
   tabBar,
   visibleText,
 } from "./html.ts"
@@ -42,30 +43,33 @@ function navSurfaces(html: string): string {
 /**
  * Checks Contact on every page: once in the rail's bottom zone, once in the
  * More sheet, once in the phone header, nowhere else in the navigation,
- * going to `href` in the same tab, current only on /book.
+ * going to `href` in the same tab. The rail's and the sheet's are current
+ * only on /book; the header's never is (#561): on a phone the More tab is
+ * the page's one mark.
  */
 async function assertContact(site: Site, href: string): Promise<void> {
   for (const path of await allPaths(site)) {
     const html = await site.html(path)
-    const found = [
+    const nav = [
       ...links(railBottom(html), "data-nav-contact"),
       ...links(moreSheet(html), "data-nav-contact"),
-      ...links(phoneHeader(html), "data-header-contact"),
     ]
-    assertEquals(found.length, 3, `${path}: Contact in rail, sheet, header`)
+    const header = links(phoneHeader(html), "data-header-contact")
+    assertEquals(nav.length, 2, `${path}: Contact in rail and sheet`)
+    assertEquals(header.length, 1, `${path}: Contact in the phone header`)
     assertEquals(
       links(railColumn(html) + tabBar(html), "data-nav-contact").length,
       0,
       `${path}: Contact among the destinations or tabs`,
     )
-    for (const link of found) {
+    for (const link of [...nav, ...header]) {
       assert(link.tag.includes(`href="${href}"`), `${path}: ${link.tag}`)
       assert(!link.tag.includes("target="), `${path}: ${link.tag}`)
       assertEquals(link.text, "Contact", `${path}: reads "${link.text}"`)
       assertEquals(
         link.tag.match(/aria-current="([^"]*)"/)?.[1],
-        path === "/book" ? "page" : "false",
-        `${path}: Contact is the current page only on /book: ${link.tag}`,
+        path === "/book" && !header.includes(link) ? "page" : "false",
+        `${path}: Contact is current only in the rail and sheet on /book: ${link.tag}`,
       )
     }
   }
@@ -175,6 +179,74 @@ Deno.test("the rail's portrait is a library entry linking home with no tooltip",
     )
     assertEquals(visibleText(top), "Anton")
     assert(!top.includes("data-rail-tip"), "the portrait draws a tooltip")
+  } finally {
+    await site.stop()
+  }
+})
+
+/**
+ * The navigation entries in `html` that read as current (#561): a link or
+ * button with `aria-current` "page" or "true", or holding the library's
+ * current bar (`data-current-bar`), which marks the More tab, a button with
+ * no `aria-current` of its own. Each entry counts once.
+ */
+function currentEntries(html: string): string[] {
+  return [...html.matchAll(/<(a|button)\b([^>]*)>([\s\S]*?)<\/\1>/g)]
+    .filter((m) =>
+      /aria-current="(page|true)"/.test(m[2]) ||
+      m[3].includes("data-current-bar")
+    )
+    .map((m) => m[0].slice(0, m[0].indexOf(">") + 1))
+}
+
+/** Pages no navigation list includes: neither screen size marks anything on them. */
+const UNLISTED = new Set([
+  "/why-not-just-ai",
+  "/saas-architecture-guide",
+  "/privacy",
+  "/pay",
+])
+
+Deno.test("every page has exactly one current mark on desktop and one on a phone", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL } })
+  try {
+    const paths = await allPaths(site)
+    for (const path of UNLISTED) {
+      assert(paths.includes(path), `${path} is no longer a page`)
+    }
+    for (const path of paths) {
+      const html = await site.html(path)
+      const expected = UNLISTED.has(path) ? 0 : 1
+      const desktop = currentEntries(
+        railTop(html) + railColumn(html) + railBottom(html),
+      )
+      assertEquals(desktop.length, expected, `${path}: desktop ${desktop}`)
+      const phone = currentEntries(tabBar(html) + phoneHeader(html))
+      assertEquals(phone.length, expected, `${path}: phone ${phone}`)
+    }
+  } finally {
+    await site.stop()
+  }
+})
+
+Deno.test("the portrait is the page on home and the section on About and Infrastructure only", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL } })
+  try {
+    const portrait: Record<string, string> = {
+      "/": "page",
+      "/about": "true",
+      "/infrastructure": "true",
+    }
+    for (const path of await allPaths(site)) {
+      const top = railTop(await site.html(path))
+      const tag = top.match(/<a\b[^>]*href="\/"[^>]*>/)?.[0]
+      assert(tag, `${path}: no portrait link`)
+      assertEquals(
+        tag.match(/aria-current="([^"]*)"/)?.[1],
+        portrait[path] ?? "false",
+        `${path}: ${tag}`,
+      )
+    }
   } finally {
     await site.stop()
   }

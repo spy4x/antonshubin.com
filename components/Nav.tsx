@@ -23,6 +23,7 @@ import {
   contactHref,
   type NavIcon,
   type NavItem,
+  portraitCurrent,
   railItems,
   sheetBottomItems,
   sheetTopItems,
@@ -109,10 +110,13 @@ function sheetItem(item: NavItem): RailItem {
  * each icon, and the same current fill as the apps. From 768px: the portrait
  * and "Anton" on top (a `RailEntry` in the `top` slot), linking home, then
  * `lib/nav.ts`'s `railItems` (the only part that scrolls on a short screen),
- * then Contact in the `bottom` slot. Below 768px: a tab bar of Work,
- * Services, Tools, Writing and More, whose sheet holds Home and About, How I
- * work, then Infrastructure and Contact: all but How I work are `sheetOnly`
- * items, so More is marked current on their pages. The site footer goes in
+ * then Contact in the `bottom` slot. The portrait is the current page on
+ * Home and the current section on About and Infrastructure
+ * (`portraitCurrent()`, #561), which the column does not list. Below 768px: a
+ * tab bar of Work, Services, Tools, Writing and More, whose sheet holds Home
+ * and About, How I work, then Infrastructure and Contact: all but How I work
+ * are `sheetOnly` items, so More is the one current mark on their pages (the
+ * phone header marks nothing). The site footer goes in
  * the `footer` slot, after `<main>`. The profiles and feeds are in the footer
  * (#293). No entry is a call to action: Book buttons live in the page body.
  *
@@ -132,7 +136,7 @@ export function Nav({ currentPath, scheduleUrl, children, footer }: NavProps) {
         item={{ key: "portrait", label: "Anton", href: "/", Icon: Portrait }}
         place="rail"
         variant="labels"
-        current={currentPath === "/" ? "page" : undefined}
+        current={portraitCurrent(currentPath)}
       />
     )
   // The column's Contact. The sheet's Contact is a `sheetOnly` item instead,

@@ -206,17 +206,24 @@ bar holds Work, Services, Tools, Writing and More. No navigation entry is a call
 to action or carries the accent (#529): Book buttons live in the page body.
 There is no Links control (#293): More lists pages only (Home, About, How I
 work, Infrastructure, Contact), and the profiles and feeds live in the footer.
-Home, About, Infrastructure and Contact are `sheetOnly` items, so More is marked
-current on their pages. The icons come from `@spy4x/preact-icons`. Keep the
-markup small, because under `scripts/lcp.ts`'s network profile every extra KB on
-every page measurably delays the home page's LCP image. The phone header (photo
-and name on the left, a quiet Contact link on the right) is plain markup in
-`components/Layout.tsx`; the time zone is in the footer. Contact
-(`CONTACT_LABEL`, `contactHref()`) goes to `/book` in the same tab, is current
-only there, and carries `data-nav-contact` (`data-header-contact` in the
-header), never `data-primary-book`; with `SCHEDULE_URL` unset it goes to that
-page's written brief (`/book#brief`). The footer's Contact group links the same
-page. `test/nav.test.ts` checks all three on every page.
+Each page has one "you are here" mark per screen size (#561). On a phone, Home,
+About, Infrastructure and Contact are `sheetOnly` items, so the More tab is
+their page's one mark, and the phone header's links are never current (a fixed
+`aria-current="false"`, so Fresh's renderer does not mark them itself). On
+desktop, the portrait is the current page on Home and the current section
+(`aria-current="true"`) on About and Infrastructure, which the column does not
+list (`portraitCurrent()` in `lib/nav.ts`). The icons come from
+`@spy4x/preact-icons`. Keep the markup small, because under `scripts/lcp.ts`'s
+network profile every extra KB on every page measurably delays the home page's
+LCP image. The phone header (photo and name on the left, a quiet Contact link on
+the right) is plain markup in `components/Layout.tsx`; the time zone is in the
+footer. Contact (`CONTACT_LABEL`, `contactHref()`) goes to `/book` in the same
+tab, is current in the rail and the sheet only there, and carries
+`data-nav-contact` (`data-header-contact` in the header), never
+`data-primary-book`; with `SCHEDULE_URL` unset it goes to that page's written
+brief (`/book#brief`). The footer's Contact group links the same page.
+`test/nav.test.ts` checks all three, and the one mark per screen size, on every
+page.
 
 ## Site frame
 
