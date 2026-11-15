@@ -114,7 +114,7 @@ Deno.test("the caldav-mcp page renders the frame, the 13 tool rows with their No
     // The clip's caption says it has captions and music and is a real exchange.
     assert(
       visibleText(page).includes(
-        "with captions and music · a real exchange with a demo calendar",
+        "with captions and music: a real exchange between an assistant and a demo calendar",
       ),
       "clip caption",
     )

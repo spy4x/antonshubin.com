@@ -282,7 +282,7 @@ async function main() {
       browser,
       cardHtml(
         "Tools I build and run myself",
-        "Open-source tools, each with its status, CI status and install.",
+        "Open-source tools, each with its status and install.",
       ),
       new URL("tools.png", OG_DIR),
     )

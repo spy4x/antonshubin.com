@@ -149,7 +149,7 @@ The guide's overview counts 81 components and 120 icons across them today.
 ## Where it came from
 
 The components were extracted from real products, so I stop rebuilding the same
-pieces for the next one. My [SaaS template](/blog/seed-saas-starter) already
+pieces for the next one. My SaaS starter [Seed](/blog/seed-saas-starter) already
 builds its signed-in layout on `Shell` from `@spy4x/preact-system` and its
 styles on `@spy4x/preact-theme`. This site is next: it still has its own
 components, and replacing them with the library is an open issue.

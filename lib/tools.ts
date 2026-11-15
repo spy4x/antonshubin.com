@@ -347,7 +347,7 @@ export const tools: Tool[] = [
     name: "mig",
     job: "tiny self-hosted meeting scheduler",
     summary:
-      "миг (moment) — tiny self-hosted meeting scheduler, built on web standards. One owner, one URL, one feature: book a time slot. Runs as a single Deno binary, with JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a static meeting link without a Next.js + Postgres deployment.",
+      "миг (moment) — tiny self-hosted meeting scheduler, built on web standards. One owner, one link, no database: book a time slot. Runs as a single Deno binary, with JSON-file storage, SMTP for confirmations with ICS attachment, SHA-256 HMAC for cancellable links, timezone-aware. Built because Calendly alternatives are heavyweight — I needed a booking link without a Calendly subscription or a cal.com stack of Postgres and Redis to run.",
     kind: "service",
     status: "in-use",
     group: "tools",
@@ -440,8 +440,8 @@ export const tools: Tool[] = [
   },
   {
     slug: "zond",
-    name: "Zond",
-    pageTitle: "Zond: health probe bridge for services behind SSO proxies",
+    name: "zond",
+    pageTitle: "zond: health probe bridge for services behind SSO proxies",
     job: "internal health probe bridge for services behind SSO proxies",
     summary:
       "Internal health probe bridge for services behind SSO proxies. Originally Deno+TS, rewritten to Go as a single 10 MB distroless binary. Sits beside the containers on the same Docker network and probes them directly, so Gatus and other monitoring tools that lack SSO support can still check services behind Authelia.",
@@ -518,7 +518,7 @@ export const tools: Tool[] = [
     clip: {
       title: "oko: add a service to config.json, reload, search the dashboard",
       caption:
-        "A demo dashboard of Jane Doe's servers: paste a new service into config.json, reload to see its card with no restart, filter with /, and read the down and unknown cards. 44\u00a0s, with captions and music.",
+        "44\u00a0s, with captions and music: a demo dashboard of Jane Doe's servers, where you paste a new service into config.json, reload to see its card with no restart, filter with /, and read the down and unknown cards.",
       poster: {
         src: "/video/tools/oko/poster.webp",
         srcset:
@@ -562,7 +562,7 @@ export const tools: Tool[] = [
     clip: {
       title: "caldav-mcp: an assistant answers what is on today's task list",
       caption:
-        "51 s · with captions and music · a real exchange with a demo calendar",
+        "51\u00a0s, with captions and music: a real exchange between an assistant and a demo calendar, answering what is on today's task list.",
       poster: {
         src: "/video/tools/caldav-mcp/poster.webp",
         srcset:
@@ -649,7 +649,7 @@ export const tools: Tool[] = [
     },
     licence: "MIT",
     runtime:
-      "Deno on the server; @spy4x/time, @spy4x/validation, @spy4x/platform's browser entry points and @spy4x/realtime's client run in a browser, untested there",
+      "Deno on the server; @spy4x/time, @spy4x/validation and @spy4x/caldav use no Deno.* API, so they also run in a browser, untested there",
     usedFor:
       "Seed, my SaaS starter, imports nine of these packages; mig, my meeting scheduler, and this site import six each.",
     proofLinks: [
@@ -694,7 +694,7 @@ export const tools: Tool[] = [
     clip: {
       title: "ts-libs: time zones, money and form input",
       caption:
-        "Three packages, run for real: one meeting shown in each person's own time zone, money kept in whole cents with each currency's decimals, and what a user typed checked against a schema, with one plain message per field.",
+        "52\u00a0s, with captions and music: three packages run for real, with one meeting shown in each person's own time zone, money kept in whole cents with each currency's decimals, and what a user typed checked against a schema, with one plain message per field.",
       poster: {
         src: "/video/tools/ts-libs/poster.webp",
         alt:
@@ -772,7 +772,7 @@ export const tools: Tool[] = [
     clip: {
       title: "A tour of the preact-components live guide",
       caption:
-        "The live guide: Orbit, a dashboard built only from the library, a filter on its table, light and dark, the accent colour, / to search, arrow keys between tabs, and a component's code to copy.",
+        "1\u00a0min, with captions and music: the live guide, with Orbit, a dashboard built only from the library, a filter on its table, light and dark, the accent colour, / to search, arrow keys between tabs, and a component's code to copy.",
       poster: {
         src: "/video/tools/preact-components/poster.webp",
         srcset:
@@ -836,7 +836,7 @@ export const tools: Tool[] = [
     clip: {
       title: "Keeping three AI harnesses in sync",
       caption:
-        "One folder of rules rendered for Claude Code, OpenCode and DSH: a one-line edit reaches all three, a hand edit to one copy fails the check, and deno task ai puts it back in sync.",
+        "58\u00a0s, with captions and music: one folder of rules rendered for Claude Code, OpenCode and DSH, where a one-line edit reaches all three, a hand edit to one copy fails the check, and deno task ai puts it back in sync.",
       poster: {
         src: "/video/tools/dotfiles/poster.webp",
         srcset:
@@ -849,7 +849,7 @@ export const tools: Tool[] = [
       video: { duration: "PT58S", uploadDate: "2026-10-21" },
     },
     quickStart: {
-      label: "Compare your harnesses with mine (writes nothing)",
+      label: "Compare your harnesses with mine (needs Deno, writes nothing)",
       command:
         "git clone https://github.com/spy4x/dotfiles && cd dotfiles && deno task ai --check",
     },
@@ -1279,7 +1279,7 @@ export const tools: Tool[] = [
       title:
         "caldav-tasks-web: quick add, subtasks, a repeating task, complete and undo",
       caption:
-        "1 min 2 s · with captions and music · demo tasks on a local Radicale",
+        "1\u00a0min 2\u00a0s, with captions and music: demo tasks on a local Radicale, with a quick add, subtasks, a repeating task, and a task completed and undone.",
       poster: {
         src: "/video/tools/caldav-tasks-web/poster.webp",
         srcset:
