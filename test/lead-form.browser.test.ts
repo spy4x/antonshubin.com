@@ -506,6 +506,109 @@ Deno.test("a brief the form refuses counts as invalid and never as sent", async 
   }
 })
 
+const SEND_FAILED =
+  "Your brief didn't send. Try again in a minute, or email me directly."
+
+/**
+ * Opens the home page in a fresh page, answers `/api/lead` with `answer`,
+ * fills the form with `fields`, submits it and returns the error it shows.
+ * The submit is a dispatched `submit` event, which skips the browser's own
+ * `required`/`type="email"` checks, so the form's own `validate()` is what
+ * speaks for an empty or malformed field.
+ */
+async function briefErrorFor(
+  browser: Browser,
+  origin: string,
+  fields: { name: string; email: string; stack: string },
+  answer: (route: Route) => Promise<void> = (route) =>
+    route.fulfill({ status: 200, body: JSON.stringify({ ok: true }) }),
+): Promise<string> {
+  const page = await newPage(browser)
+  try {
+    await page.route("**/api/lead", answer)
+    await page.goto(`${origin}/`, { waitUntil: "networkidle" })
+    await page.fill("#lead-name", fields.name)
+    await page.fill("#lead-email", fields.email)
+    await page.fill("#lead-stack", fields.stack)
+    await page.locator("[data-lead-form] form").evaluate((form) => {
+      form.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      )
+    })
+    const error = page.locator("#lead-form-error")
+    await error.waitFor({ state: "visible" })
+    return await error.innerText()
+  } finally {
+    await page.close()
+  }
+}
+
+Deno.test("the brief form says which field to fix in plain words", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const filled = {
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      stack: "Deno + Fresh",
+    }
+    const cases: [Partial<typeof filled>, string][] = [
+      [{ name: "  " }, "Enter your name"],
+      [{ email: "" }, "Enter your email"],
+      [{ email: "ada@example" }, "Enter an email like name@example.com"],
+      [{ stack: "" }, "Describe your idea or your current app"],
+    ]
+    for (const [change, message] of cases) {
+      const fields = { ...filled, ...change }
+      assertEquals(
+        await briefErrorFor(browser, site.origin, fields),
+        message,
+        JSON.stringify(change),
+      )
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("a brief that fails to send says so and offers email, whatever the server said", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const fields = {
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      stack: "Deno + Fresh",
+    }
+    const answers: [string, (route: Route) => Promise<void>][] = [
+      ["a 500 with an error", (route) =>
+        route.fulfill({
+          status: 500,
+          contentType: "application/json",
+          body: JSON.stringify({ error: "Internal detail" }),
+        })],
+      [
+        "a 400 without an error",
+        (route) => route.fulfill({ status: 400, body: "" }),
+      ],
+      ["a network failure", (route) => route.abort("failed")],
+    ]
+    for (const [label, answer] of answers) {
+      assertEquals(
+        await briefErrorFor(browser, site.origin, fields, answer),
+        SEND_FAILED,
+        label,
+      )
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("a brief posts what a bot typed into the off-screen website field, and an empty one for a person", async () => {
   const site = await startSite()
   let browser: Browser | undefined
