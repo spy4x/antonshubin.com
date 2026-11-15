@@ -247,5 +247,6 @@ Have a service behind your SSO that your monitor can't see? Add zond to its
 Compose file, ask it `/health/<name>`, and see whether you get `ok`.
 
 If you'd rather have someone set up monitoring like this for your product and
-keep an eye on it, that is part of [Ongoing](/catalog/cto-advisory-retainer):
-monitoring, backups and security patches after launch.
+keep an eye on it, that is part of
+[Fractional CTO](/catalog/cto-advisory-retainer): monitoring, backups and
+security patches after launch.

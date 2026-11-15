@@ -21,6 +21,7 @@ import {
   catalogItem,
   catalogItems,
   catalogPromises,
+  freeCallPaidSessionLine,
   INTRO_CALL,
   priceLabel,
 } from "../lib/catalog.ts"
@@ -170,7 +171,7 @@ ${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from ${COMPANY.name}, 
 
 ## Core Expertise
 
-- Senior full-stack engineering and technical leadership for SaaS teams; fractional CTO work is one service, listed under Ongoing
+- Senior full-stack engineering and technical leadership for SaaS teams; fractional CTO work is one service, listed as Fractional CTO
 - SaaS MVP development (zero-to-production)
 - Backend API architecture (Deno/Node.js, Preact/React, PostgreSQL)
 - AI/LLM integration (OpenAI, Claude, DeepSeek, RAG pipelines)
@@ -184,7 +185,7 @@ ${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from ${COMPANY.name}, 
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the brief form for a free written brief: ${BASE_URL}${WRITE_FALLBACK_HREF}
+Start with a ${INTRO_CALL}, or send your idea or current app through the brief form for a free written brief: ${BASE_URL}${WRITE_FALLBACK_HREF}. ${freeCallPaidSessionLine()}
 
 ${
       catalogItems.map((i, n) =>
@@ -283,7 +284,9 @@ Questions a founder or CTO may arrive with:
 Existing pages for each of these queries:
 - An MVP, a backend API, an AI integration or an MCP server: /catalog/${build.slug}
 - A code review: /catalog/${audit.slug}
-- Talking through an idea: /catalog/${strategy.slug}, or the ${INTRO_CALL}
+- Talking through an idea: the paid ${strategy.shortTitle.toLowerCase()} (${
+      priceLabel(strategy)
+    }) at /catalog/${strategy.slug}, or the ${INTRO_CALL}
 - Ongoing technical leadership, a fractional CTO, or post-launch support: /catalog/${ongoing.slug}
 - Production infrastructure guidance: /infrastructure
 - Free written feedback first: ${WRITE_FALLBACK_HREF}

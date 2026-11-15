@@ -7,7 +7,12 @@ import { COMPANY, COMPANY_LINE } from "../lib/company.ts"
 import { ABOUT_PATH } from "../lib/about.ts"
 import { hackathons, highlightSlugs } from "../lib/data.ts"
 import { llmsBlogSections } from "../lib/blog.ts"
-import { catalogItems, INTRO_CALL, priceLabel } from "../lib/catalog.ts"
+import {
+  catalogItems,
+  freeCallPaidSessionLine,
+  INTRO_CALL,
+  priceLabel,
+} from "../lib/catalog.ts"
 import { decapitalize, promises } from "../lib/promises.ts"
 import { proof } from "../lib/proof.ts"
 import { ROLE } from "../lib/head.ts"
@@ -107,7 +112,7 @@ export const handler = define.handlers({
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send a written brief (${BASE_URL}/book#brief): I write back with 3 concrete architectural improvements, free, within one working day.
+Start with a ${INTRO_CALL}, or send a written brief (${BASE_URL}/book#brief): I write back with 3 concrete architectural improvements, free, within one working day. ${freeCallPaidSessionLine()}
 
 ${services}
 

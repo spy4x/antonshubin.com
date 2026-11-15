@@ -14,6 +14,6 @@ same price list is used on Upwork, so a price change is followed by a manual
 edit there; neatsoft.dev shows no prices (neatsoft.dev#5).
 
 The label the site leads with is `ROLE` in `lib/head.ts` ("Senior Full-Stack
-Engineer & Tech Lead"). "Fractional CTO" appears only as the Ongoing catalog
-item. The five promises on `/how-i-work` are the only promises on the site; the
-free written audit carries no deadline.
+Engineer & Tech Lead"). "Fractional CTO" appears only as the name of the
+`cto-advisory-retainer` catalog item. The five promises on `/how-i-work` are the
+only promises on the site; the free written audit carries no deadline.

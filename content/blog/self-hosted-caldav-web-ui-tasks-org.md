@@ -224,8 +224,8 @@ server, [caldav-mcp](/tools/caldav-mcp) is my MCP server for CalDAV events and
 tasks.
 
 Running this for a team? I set this up for small companies, as part of
-[Ongoing](/catalog/cto-advisory-retainer) work: monitoring, backups and security
-patches after launch.
+[Fractional CTO](/catalog/cto-advisory-retainer) work: monitoring, backups and
+security patches after launch.
 
 Which CalDAV server do you run Tasks.org against? If it isn't Radicale or
 Stalwart, try it and tell me in an issue whether it works.

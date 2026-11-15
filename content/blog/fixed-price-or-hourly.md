@@ -59,11 +59,11 @@ Hourly fits work without a fixed edge. My rule names three kinds: staff
 augmentation, where I join your team; code reviews; and work that is open-ended.
 A fixed quote for that would be a guess, and one of us would pay for the guess.
 
-That is the [Ongoing](/catalog/cto-advisory-retainer) service: architecture
-decisions, code review, technical direction for your developers, and looking
-after what is already in production. It has two ways to pay. Pay by the hour
-when the need comes and goes, or take a monthly retainer when it is steady. The
-retainer works out cheaper from about 20 hours a month.
+That is the [Fractional CTO](/catalog/cto-advisory-retainer) service:
+architecture decisions, code review, technical direction for your developers,
+and looking after what is already in production. It has two ways to pay. Pay by
+the hour when the need comes and goes, or take a monthly retainer when it is
+steady. The retainer works out cheaper from about 20 hours a month.
 
 ### Hourly, when AI agents do the typing
 

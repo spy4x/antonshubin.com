@@ -6,6 +6,7 @@ import {
   catalogOffers,
   catalogPromises,
   catalogRedirects,
+  freeCallPaidSessionLine,
   priceLabel,
   priceRows,
   QUOTE_NOTE,
@@ -95,6 +96,24 @@ Deno.test("every item has an SEO title and a service type, and no title repeats"
   assertEquals(new Set(catalogItems.map((i) => i.seoTitle)).size, 4)
 })
 
+Deno.test("each item goes by one name: its short title is in its H1 and its page title", () => {
+  for (const item of catalogItems) {
+    const name = item.shortTitle.toLowerCase()
+    assert(item.title.toLowerCase().includes(name), `${item.slug}: H1`)
+    assert(item.seoTitle.toLowerCase().includes(name), `${item.slug}: title`)
+  }
+})
+
+Deno.test("the llms line says the intro call is free and the strategy session is paid, at its price", () => {
+  const line = freeCallPaidSessionLine()
+  const session = catalogItems.find((i) => i.slug === "strategy-call")!
+  assert(line.startsWith("The 30-minute intro call is free. "), line)
+  assert(
+    line.includes(`The strategy session is paid (${priceLabel(session)}): `),
+    line,
+  )
+})
+
 Deno.test("the one-off items show only the refund, each id one lib/promises.ts knows", () => {
   assertEquals(catalogPromises("strategy-call"), ["refund"])
   assertEquals(catalogPromises("codebase-health-audit"), ["refund"])
@@ -114,7 +133,7 @@ Deno.test("the one-off items show only the refund, each id one lib/promises.ts k
   }
 })
 
-Deno.test("Ongoing is two labelled price rows and the break-even line sits on the last", () => {
+Deno.test("Fractional CTO is two labelled price rows and the break-even line sits on the last", () => {
   const ongoing = catalogItems.find((i) => i.slug === "cto-advisory-retainer")!
   const rows = priceRows(ongoing)
   assertEquals(rows.map((r) => r.label), ["Hourly", "Retainer"])
@@ -127,7 +146,7 @@ Deno.test("Ongoing is two labelled price rows and the break-even line sits on th
   assertEquals(single.map((r) => r.label), ["Price"])
 })
 
-Deno.test("How it starts has steps on Build and Strategy, none elsewhere", () => {
+Deno.test("How it starts has steps on the SaaS MVP and Strategy, none elsewhere", () => {
   assertEquals(startSteps("zero-to-production-saas-mvp")?.length, 3)
   assertEquals(
     startSteps("strategy-call")?.[1].title,

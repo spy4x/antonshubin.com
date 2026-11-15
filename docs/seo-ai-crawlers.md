@@ -320,8 +320,8 @@ Five entities in a `@graph` array (six on `/about`):
   `AggregateRating` or `Article`.
 - Linked from the footer's Site group, the home page under the prices,
   `/catalog` under the services, the "How I use AI" section and the pricing
-  answer on `/how-i-work`, the SaaS MVP and Ongoing service pages and the ends
-  of the two posts on AI agents.
+  answer on `/how-i-work`, the SaaS MVP and Fractional CTO service pages and the
+  ends of the two posts on AI agents.
 
 ### 12. The SaaS MVP page (`/catalog/zero-to-production-saas-mvp`)
 

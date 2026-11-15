@@ -124,7 +124,7 @@ export default define.page(function CatalogDetail(ctx) {
   const versus = callVersusSession()
   const promiseIds = catalogPromises(item.slug)
   const bandPromises = promiseIds.slice(0, 2)
-  // Build and Ongoing carry several promises, so their main column opens with
+  // SaaS MVP and Fractional CTO carry several promises, so their main column opens with
   // them, before any feature (#541); a one-promise page keeps its order.
   const promisesFirst = promiseIds.length >= 2
 

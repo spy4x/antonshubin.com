@@ -34,7 +34,7 @@ export const WHY_NOT_JUST_AI_LEAD =
 
 /**
  * The sentence and link label other pages use to point here (the home page,
- * /catalog, /how-i-work, the MVP and Ongoing pages).
+ * /catalog, /how-i-work, the SaaS MVP and Fractional CTO pages).
  */
 export const WHY_NOT_JUST_AI_PROMPT =
   "Weighing this against an AI subscription?"

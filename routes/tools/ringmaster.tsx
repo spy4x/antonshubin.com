@@ -1,5 +1,5 @@
 import { define } from "../../lib/utils.ts"
-import { catalogPath } from "../../lib/catalog.ts"
+import { catalogItem, catalogPath } from "../../lib/catalog.ts"
 import { eventAttrs } from "../../lib/analytics.ts"
 import { NotFound } from "../../components/NotFound.tsx"
 import { FACT_LINK } from "../../components/FactCard.tsx"
@@ -10,7 +10,7 @@ import { DefaultMiddle } from "../../components/tool-frame/DefaultMiddle.tsx"
 // /tools/ringmaster (#636): the frame with the default middle and the demo
 // clip, but no repository, live link or install line, since its source is not
 // public and it takes no users. The band says when you can run it yourself and
-// sends "Have me build it" to the Ongoing offer.
+// sends "Have me build it" to the Fractional CTO offer.
 
 const OFFER = catalogPath("cto-advisory-retainer")
 
@@ -45,7 +45,7 @@ export default define.page(async function RingmasterPage(ctx) {
             {...eventAttrs("cta", { place: "band", target: OFFER })}
             class={FACT_LINK}
           >
-            See the Ongoing offer
+            See the {catalogItem("cto-advisory-retainer").shortTitle} offer
           </a>
         ),
       }}
