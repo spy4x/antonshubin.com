@@ -9,6 +9,7 @@ import { count, jsonLd, pageBody, visibleText } from "./html.ts"
 import {
   COMPARISON_PRODUCTS,
   comparisonRows,
+  ENOUGH_POST,
   HOURLY_AI_BILLING,
   processSteps,
   RINGMASTER_LINE,
@@ -150,6 +151,29 @@ siteTest(
       about: { "@id": string }
     }
     assertEquals(page?.about["@id"], "https://antonshubin.com/#person")
+  },
+)
+
+siteTest(
+  "why-not-just-ai's subscription section and the takeover post link the post that asks whether you need a developer",
+  async (site) => {
+    const link = `href="${ENOUGH_POST.href}"`
+    const enough = slice(
+      await site.html(PAGE),
+      'aria-labelledby="wna-enough"',
+      "</section>",
+    )
+    assert(enough.includes(link), "the subscription section")
+    assert(visibleText(enough).includes(ENOUGH_POST.label), "the link text")
+    const takeover = await site.html(
+      "/blog/hire-developer-take-over-ai-built-app",
+    )
+    // Up to "Read next", which may list the post on its own.
+    assert(
+      slice(takeover, "<article", "Read next").includes(link),
+      "the takeover post's text",
+    )
+    assertEquals((await site.get(ENOUGH_POST.href)).status, 200)
   },
 )
 
