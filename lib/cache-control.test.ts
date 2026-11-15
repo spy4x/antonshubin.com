@@ -17,7 +17,7 @@ Deno.test("production keeps a route's own no-store, even on a core page", () => 
 Deno.test("production caches core pages and leaves other pages alone", () => {
   assertEquals(
     cacheControlFor({ ...PAGE, pathname: "/how-i-work" }),
-    "public, max-age=259200, stale-while-revalidate=43200",
+    "public, max-age=300, stale-while-revalidate=60",
   )
   assertEquals(cacheControlFor(PAGE), undefined)
 })
@@ -78,11 +78,11 @@ Deno.test("a route's own no-store still wins everywhere else", () => {
 Deno.test("production caches /about as a core page", () => {
   assertEquals(
     cacheControlFor({ ...PAGE, pathname: "/about" }),
-    "public, max-age=259200, stale-while-revalidate=43200",
+    "public, max-age=300, stale-while-revalidate=60",
   )
 })
 
-Deno.test("the tools hub and every tool page are kept for an hour, not three days", () => {
+Deno.test("the tools hub and every tool page are kept for an hour", () => {
   for (const pathname of ["/tools", "/tools/mig", "/tools/ts-libs"]) {
     const value = cacheControlFor({ ...PAGE, pathname })
     assertEquals(
@@ -93,7 +93,7 @@ Deno.test("the tools hub and every tool page are kept for an hour, not three day
   }
   assertEquals(
     cacheControlFor({ ...PAGE, pathname: "/work" }),
-    "public, max-age=259200, stale-while-revalidate=43200",
+    "public, max-age=300, stale-while-revalidate=60",
   )
 })
 
@@ -115,6 +115,16 @@ Deno.test("a tool page's demo clip and poster get the image tier, even over Fres
     assertEquals(
       cacheControlFor({ ...PAGE, pathname, current: "no-store" }),
       "public, max-age=604800, stale-while-revalidate=86400",
+      pathname,
+    )
+  }
+})
+
+Deno.test("/blog and the home page stay in the browser for 5 minutes, so a new post shows (#491)", () => {
+  for (const pathname of ["/blog", "/"]) {
+    assertEquals(
+      cacheControlFor({ ...PAGE, pathname }),
+      "public, max-age=300, stale-while-revalidate=60",
       pathname,
     )
   }

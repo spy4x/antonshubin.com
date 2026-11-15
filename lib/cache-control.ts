@@ -4,7 +4,7 @@
 
 import { pagesFor } from "./pages.ts"
 
-// Core static page routes that change infrequently (cached 3 days at edge):
+// Core page routes (kept 5 minutes in the browser, see cacheControlFor below):
 // `lib/pages.ts`'s list, minus the pages it marks as kept off the edge tier.
 export const CORE_PAGES = new Set(pagesFor("edge").map((p) => p.path))
 
@@ -52,7 +52,7 @@ export function cacheControlFor(
 ): string | undefined {
   // Never cache an error. A 404 for a core page (for example /hackathons
   // while its list is empty) would otherwise stay in browsers and at the edge
-  // for three days after the page comes back.
+  // after the page comes back.
   if (status >= 400) return "no-store"
 
   // Content-hashed assets — cache forever (fingerprint = immutable)
@@ -80,7 +80,7 @@ export function cacheControlFor(
   // caching for HTML too, add a CF Cache Rule:
   //   Field: Hostname = antonshubin.com
   //   Then:  Cache Eligibility → Eligible for cache
-  //   Edge TTL → 3 days
+  //   Edge TTL → no longer than the core tier below (5 minutes)
   // Without that rule, these headers still help the browser cache
   // (the site has no service worker any more, #285).
   // Before adding that rule: pages differ by user agent (routes/_app.tsx
@@ -90,17 +90,19 @@ export function cacheControlFor(
   // that separates bots from browsers.
 
   // The tools hub and every tool page show versions, stars and CI status that
-  // the server refreshes hourly (lib/tools-live.ts), so a three-day edge copy
-  // would hide every refresh: keep them for an hour.
+  // the server refreshes hourly (lib/tools-live.ts): keep them for an hour.
   if (pathname === "/tools" || pathname.startsWith("/tools/")) {
     return "public, max-age=3600, stale-while-revalidate=600"
   }
 
-  // Core static pages — cache 3 days at edge, stale-while-revalidate
-  // for PWA background refreshes. The site content changes every few
-  // days, so 3 days balances freshness with max edge cache HIT rate.
+  // Core pages — 5 minutes in the browser (#491). /blog and the home page list
+  // the newest posts, and a longer copy hid a new post from returning
+  // visitors for days. Cloudflare treats HTML as DYNAMIC (above), so the
+  // browser is the only cache and the server load does not change. The short
+  // stale-while-revalidate keeps a stale list from showing for long: a day
+  // of it would still serve the old /blog on the first visit back.
   if (CORE_PAGES.has(pathname)) {
-    return "public, max-age=259200, stale-while-revalidate=43200"
+    return "public, max-age=300, stale-while-revalidate=60"
   }
 
   return undefined

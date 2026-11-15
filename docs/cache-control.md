@@ -13,7 +13,7 @@ Cache tiers:
 | ----------------- | ------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------- |
 | Immutable         | 1 year (`max-age=31536000`)     | `/assets/*`, `/_fresh/*`                         | Content-hashed files (fingerprint = immutable)                      |
 | Images and static | 7 days + stale-while-revalidate | `/img/*`, `/video/*`, favicons, `/manifest.json` | Photos, illustrations, demo clips, small root files (rarely change) |
-| Core pages        | 3 days + stale-while-revalidate | `CORE_PAGES` set                                 | SSR pages that update every few days                                |
+| Core pages        | 5 minutes + 1 minute stale      | `CORE_PAGES` set                                 | SSR pages; `/` and `/blog` list new posts as soon as they go live   |
 | Tools pages       | 1 hour + stale-while-revalidate | `/tools`, `/tools/*`                             | Versions, stars and CI status the server refreshes hourly           |
 | No cache          | `no-cache, must-revalidate`     | `/sw.js`                                         | Set by `routes/sw.js.ts` (byte-for-byte PWA update detection)       |
 
