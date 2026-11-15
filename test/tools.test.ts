@@ -311,7 +311,7 @@ siteTest(
 )
 
 siteTest(
-  "the hub and the tool pages are cached for an hour, not three days",
+  "the hub and the tool pages are cached for an hour",
   async (site) => {
     for (const path of ["/tools", "/tools/mig"]) {
       const res = await site.get(path)

@@ -1,7 +1,7 @@
 /**
  * The site's core pages (#293, #192): the one list behind two things that
  * used to keep their own copy. `lib/cache-control.ts` builds `CORE_PAGES`
- * (the three-day edge cache) from it and `routes/sitemap.xml.ts` builds its
+ * (the core-page cache tier) from it and `routes/sitemap.xml.ts` builds its
  * static entries from it. A page added here is in both.
  *
  * Dynamic pages (`/blog/<slug>`, `/work/<slug>`, ...) are not listed: their
