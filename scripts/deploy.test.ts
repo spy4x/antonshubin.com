@@ -69,6 +69,42 @@ Deno.test("the Cloudflare token file is never committed or uploaded", () => {
   )
 })
 
+// Fresh needs one build id for the server HTML and the client bundle, or every
+// hydrated image downloads twice (#593). The image has no git, so the id must
+// reach the build step through DENO_DEPLOYMENT_ID.
+Deno.test("the Dockerfile declares BUILD_ID before the build that reads it", () => {
+  const dockerfile = lines("Dockerfile")
+  const arg = dockerfile.findIndex((line) => line.startsWith("ARG BUILD_ID"))
+  const build = dockerfile.findIndex((line) =>
+    line.startsWith("RUN") && line.includes("deno task build")
+  )
+  assert(build >= 0, "the Dockerfile no longer runs deno task build")
+  assert(arg >= 0 && arg < build, "ARG BUILD_ID must come before the build")
+})
+
+Deno.test("the Dockerfile build sets DENO_DEPLOYMENT_ID from BUILD_ID", () => {
+  const build = lines("Dockerfile").find((line) =>
+    line.startsWith("RUN") && line.includes("deno task build")
+  )
+  assert(build, "the Dockerfile no longer runs deno task build")
+  assert(
+    build.includes("DENO_DEPLOYMENT_ID=${BUILD_ID}"),
+    "the build must run with DENO_DEPLOYMENT_ID=${BUILD_ID}",
+  )
+})
+
+// The build id check reads the live site, so it runs once compose has started
+// the new build and the purge has waited for it.
+Deno.test("the deploy checks the live build id after the purge", () => {
+  const source = read("scripts/deploy.ts")
+  const purge = source.indexOf("await purgeAfterDeploy(")
+  const check = source.indexOf(
+    "await checkLiveBuildId(TARGET.domain, BUILD_ID)",
+  )
+  assert(check >= 0, "scripts/deploy.ts must call checkLiveBuildId")
+  assert(check > purge, "checkLiveBuildId must run after purgeAfterDeploy")
+})
+
 // The purge needs the build that was live before anything is uploaded, and it
 // may only run once compose has started the new build (#268).
 Deno.test("the deploy reads the live build before the upload and purges after compose", () => {

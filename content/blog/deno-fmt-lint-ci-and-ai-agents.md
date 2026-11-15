@@ -286,6 +286,4 @@ doesn't block the merge, fix that before the next pull request, whether a person
 or an agent writes it.
 
 My whole agent setup, rules and hooks included, is public:
-[see how it works](/tools/dotfiles). And if you want a senior engineer to look
-through your codebase and tell you what to fix first, that's my
-[code and security audit](/catalog/codebase-health-audit).
+[see how it works](/tools/dotfiles).

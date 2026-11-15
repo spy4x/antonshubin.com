@@ -17,6 +17,9 @@
  *     Cloudflare: /sw.js plus every static/ file changed since the build that
  *     was live before this deploy (#268). Fails open: a purge problem only
  *     warns. The token comes from .env.deploy, which is never uploaded.
+ *  5. Check that /tools and its client-entry script both carry BUILD_ID, the
+ *     id Fresh versions assets with (#593). Fails the deploy on a mismatch or
+ *     a fetch failure: different ids make hydrated images download twice.
  *
  * `data/` on the server holds the newsletter subscriber list, bind-mounted into
  * the container by compose.yml. Step 1 never deletes or overwrites it, and step
@@ -24,6 +27,7 @@
  * (Docker creates a missing bind-mount source as root). See docs/deploy.md.
  */
 
+import { checkLiveBuildId } from "./build-id-check.ts"
 import { envValue, liveBuildId, purgeAfterDeploy } from "./cloudflare-purge.ts"
 
 // Cloud server (23.88.101.28). antonshubin.com used to run on the home server
@@ -140,6 +144,10 @@ try {
     git,
     token: cloudflareToken,
   })
+
+  // Step 5: server and client bundle share the build id. Fails the deploy.
+  console.log("  build id check...")
+  await checkLiveBuildId(TARGET.domain, BUILD_ID)
 
   console.log(`✅ Deploy to ${TARGET.name} complete`)
 } catch (error) {
