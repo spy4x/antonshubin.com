@@ -119,7 +119,7 @@ test blocks the merge exactly like a red lint.
 ## Environment setup for a new worktree
 
 The age decrypt key is not part of this repo. Encryption is
-`@spy4x/server/env-age64` (jsr:@spy4x/server@1.37.0/env-age64), per-value age64
+`@spy4x/server/env-age64` (jsr:@spy4x/server@1.127.0/env-age64), per-value age64
 in TypeScript — no `sops` binary, no `.sops.yaml`. It reads `.age/key.txt`,
 which lives only in the main checkout: Syncthing replicates it as part of
 `~/sync/code`; keep an offline copy as well. A linked git worktree needs no copy

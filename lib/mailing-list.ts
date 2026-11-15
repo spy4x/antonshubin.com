@@ -57,12 +57,18 @@ let cached: { secret: string; crypto: SubscriptionCrypto } | undefined
 /**
  * Tokens and keyed hashes under `UNSUBSCRIBE_SECRET`. Throws when the secret
  * is missing or unusable (`getUnsubscribeSecret`). Under the same secret the
- * links and marks the site minted before #405 still verify and match.
+ * links and marks the site minted before #405 still verify and match:
+ * `legacyTokens: true` keeps the version 1 unsubscribe links in mail sent
+ * before #405 working, since `@spy4x/server` refuses them by default (#624).
+ * Keep it while any such mail can still be acted on.
  */
 export function subscriptionCrypto(): SubscriptionCrypto {
   const secret = getUnsubscribeSecret()
   if (cached?.secret !== secret) {
-    cached = { secret, crypto: createSubscriptionCrypto({ secret }) }
+    cached = {
+      secret,
+      crypto: createSubscriptionCrypto({ secret, legacyTokens: true }),
+    }
   }
   return cached.crypto
 }

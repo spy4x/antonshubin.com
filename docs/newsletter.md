@@ -182,10 +182,12 @@ confirmation link are dropped on the next write. Requires `UNSUBSCRIBE_SECRET`
 
 Tokens use the ts-libs signed payload codec (#233). A version 1 link (mailed
 before #405, no key) is checked against every listed address; a version 2 link
-carries the row's `key` and is looked up by it. Both keep working. The older
-bare-signature token is no longer accepted (#237); a link carrying one answers
-"link not recognised". A confirm link minted before #405 is refused as invalid;
-it expired within three days anyway.
+carries the row's `key` and is looked up by it. Both keep working: version 1
+links only because `lib/mailing-list.ts` passes `legacyTokens: true` to
+`createSubscriptionCrypto`, which `@spy4x/server` needs to accept them (#624).
+The older bare-signature token is no longer accepted (#237); a link carrying one
+answers "link not recognised". A confirm link minted before #405 is refused as
+invalid; it expired within three days anyway.
 
 ## Backup
 
