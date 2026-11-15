@@ -106,7 +106,7 @@ Deno.test("/tools/rostok keeps the frame and lists every catalog stack under its
     )
     assert(own.length > 0, "no catalog stack is one of the tools")
     assertEquals(
-      count(page, />This tool&#39;s page<|>This tool's page</g),
+      count(page, />This tool(&#39;|')s page</g),
       own.length,
     )
     for (const name of own) {

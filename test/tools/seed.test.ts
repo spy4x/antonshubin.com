@@ -223,3 +223,28 @@ seedTest(
     assert(!/template/i.test(prose), "the page says template")
   },
 )
+
+seedTest(
+  "the Website link opens a new tab and says so, like the page's other outbound Seed links",
+  (page) => {
+    const [website] = linksWith(page, "data-seed-website")
+    assert(website, "no Website link")
+    const others = linksWith(page, "data-seed-try=").concat(
+      linksWith(page, "data-seed-surface="),
+    )
+    assert(others.length > 0, "no other outbound Seed link")
+    const attrs = (tag: string) => [
+      tag.match(/target="[^"]*"/)?.[0],
+      tag.match(/rel="[^"]*"/)?.[0],
+    ]
+    assertEquals(attrs(website), ['target="_blank"', 'rel="noopener"'])
+    for (const tag of others) assertEquals(attrs(tag), attrs(website), tag)
+    const body = page.slice(page.indexOf(website))
+    assert(
+      visibleText(body.slice(0, body.indexOf("</a>"))).endsWith(
+        "(opens in a new tab)",
+      ),
+      "the Website link does not say it opens a new tab",
+    )
+  },
+)

@@ -1,4 +1,6 @@
+import { IconArrowUpRight } from "@spy4x/preact-icons"
 import { FACT_LINK } from "../../FactCard.tsx"
+import { NewTabHint } from "../../NewTabHint.tsx"
 import { QuickStart } from "../../tool-frame/ToolBand.tsx"
 import CopyButton from "../../../islands/CopyButton.tsx"
 import { eventAttrs } from "../../../lib/analytics.ts"
@@ -30,14 +32,19 @@ export function SeedStart({ tool }: { tool: Tool }) {
           Website:{" "}
           <a
             href={tool.website}
+            target="_blank"
+            rel="noopener"
+            data-seed-website
             {...eventAttrs("outbound", {
               to: "website",
               item: tool.slug,
               place: "hero",
             })}
-            class={FACT_LINK}
+            class={`inline-flex items-center gap-1 ${FACT_LINK}`}
           >
             {new URL(tool.website).host}
+            <IconArrowUpRight class="size-4 shrink-0" />
+            <NewTabHint />
           </a>
         </p>
       )}
