@@ -90,7 +90,7 @@ Deno.test("the caldav-tasks-web page renders the frame, five field chips with Ti
     }
     assert(
       text.includes(
-        "1 min 2 s · with captions and music · demo tasks on a local Radicale",
+        "with captions and music: demo tasks on a local Radicale",
       ),
       "clip caption",
     )

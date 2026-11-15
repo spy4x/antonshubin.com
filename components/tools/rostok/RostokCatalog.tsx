@@ -51,11 +51,6 @@ function Stack({ stack }: { stack: RostokStack }) {
         </p>
         <p class="text-graphite">
           Secrets: <Keys keys={stack.secret} />
-          {stack.secret.length > 0 && (
-            <span class="block mt-1">
-              Encrypted into <code>.env.age</code>, so the repo is safe to push.
-            </span>
-          )}
         </p>
         <div class="flex items-center gap-3 rounded-lg border border-rule bg-ink py-2 pl-3 pr-3">
           <code id={id} class="min-w-0 flex-1 text-parchment">

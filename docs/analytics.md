@@ -198,9 +198,9 @@ This file holds the event names and properties and the saved reports
 (`islands/ToolHeroClip.tsx`, `islands/HomeVideo.tsx`, `islands/ToolZoom.tsx`),
 never as `data-umami-event` attributes on the clip's play link: Umami's tracker
 answers a click on a tracked `<a href>` by cancelling it and then opening the
-href, which for the play link is the video file. A `tool-try` on a `<label>`,
-`<summary>` or `<button>` may use `eventAttrs()`; on a link that must not
-navigate, use `track()`.
+href, which for the play link is the video file. A `tool-try` on a `<summary>`
+or `<button>` may use `eventAttrs()` (on a radio, never its label: see below);
+on a link that must not navigate, use `track()`.
 
 ## Tool pages
 

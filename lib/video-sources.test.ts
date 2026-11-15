@@ -35,6 +35,20 @@ Deno.test("no tool clip is described as silent", () => {
   }
 })
 
+Deno.test("every clip caption starts with its length and says captions and music", () => {
+  for (const tool of tools.filter((t) => t.clip)) {
+    const { caption, video } = tool.clip!
+    assert(video, `${tool.slug} has no video length`)
+    const [, m, s] = video.duration.match(/^PT(?:(\d+)M)?(?:(\d+)S)?$/)!
+    const length = [m && `${m} min`, s && `${s} s`]
+      .filter(Boolean).join(" ")
+    assert(
+      caption.startsWith(`${length}, with captions and music: `),
+      `${tool.slug}: "${caption}"`,
+    )
+  }
+})
+
 Deno.test("rawUrl reads a file at the pinned commit", () => {
   const source = VIDEO_SOURCES.find((s) => s.slug === "mig")!
   assertEquals(
