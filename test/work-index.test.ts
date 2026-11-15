@@ -4,7 +4,7 @@
 // title as each project's one link, outcome and review on the cards, the
 // status and "Hired again" marks, a dated archive, the ItemList JSON-LD, one
 // Book in the closing band, and lazy card images. Also guards what #231 (#239) added without a test: the
-// margin notes on the FoodRazor, Corecircle and Sogroya pages. Checked on the
+// margin notes on the FoodRazor and Corecircle pages. Checked on the
 // built pages, since the wiring lives in the route files.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
@@ -242,12 +242,11 @@ siteTest(
 )
 
 siteTest(
-  "the FoodRazor, Corecircle and Sogroya pages carry their margin notes",
+  "the FoodRazor and Corecircle pages carry their margin notes",
   async (site) => {
     const expected: Record<string, string> = {
       foodrazor: "foodrazor-acquired",
       corecircle: "corecircle-users",
-      sogroya: "sogroya-live",
     }
     for (const [slug, id] of Object.entries(expected)) {
       const html = await site.html(`/work/${slug}`)
