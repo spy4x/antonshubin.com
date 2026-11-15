@@ -202,18 +202,18 @@ All four can build a working app. They differ in how much of the result you see,
 and in what they leave to you. Prices from each vendor's own page, checked on 15
 November 2026, monthly billing.
 
-| Tool        | What it is                                                 | Right pick when                                                    | What it leaves to you                                                       | Paid plans from (checked 15 Nov 2026)                                  |
-| ----------- | ---------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Lovable     | An app builder you talk to in the browser                  | You can't code and want a working web app to show people           | Who can see which data, and what an edit breaks elsewhere                   | [$25 a month][lovable] for 100 credits; a free plan with daily credits |
-| Bolt        | An app builder you talk to in the browser                  | The same; try both on your idea and keep the one you like          | The same                                                                    | [$25 a month][bolt]; a free plan with 1M tokens a month                |
-| Claude Code | Anthropic's coding agent, working on code on your computer | You, or someone on your team, can read code and wants full control | Everything: hosting, database, security, and reviewing what the agent wrote | [$20 a month][claude] with Claude Pro; Max from $100                   |
-| Codex       | OpenAI's coding agent, part of ChatGPT plans               | The same, if you already pay for ChatGPT                           | Everything, like Claude Code                                                | Included from [$8 a month][codex] with ChatGPT Go; Plus is $20         |
+| Tool        | Paid plans from (checked 15 Nov 2026)                                  | What it is                                                 | Right pick when                                                    | What it leaves to you                                                       |
+| ----------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Lovable     | [$25 a month][lovable] for 100 credits; a free plan with daily credits | An app builder you talk to in the browser                  | You can't code and want a working web app to show people           | Who can see which data, and what an edit breaks elsewhere                   |
+| Bolt        | [$25 a month][bolt]; a free plan with 1M tokens a month                | An app builder you talk to in the browser                  | The same; try both on your idea and keep the one you like          | The same                                                                    |
+| Claude Code | [$20 a month][claude] with Claude Pro; Max from $100                   | Anthropic's coding agent, working on code on your computer | You, or someone on your team, can read code and wants full control | Everything: hosting, database, security, and reviewing what the agent wrote |
+| Codex       | Included from [$8 a month][codex] with ChatGPT Go; Plus is $20         | OpenAI's coding agent, part of ChatGPT plans               | The same, if you already pay for ChatGPT                           | Everything, like Claude Code                                                |
 
 My honest take: if you can't read code, Lovable or Bolt is the right pick for a
 prototype, because they make the most decisions for you. If you can read code,
-Claude Code or Codex give you much more control, and they are what I use myself.
-None of them decides who may see which data in your app. That decision is still
-yours.
+Claude Code or Codex give you much more control; Claude Code is what I use
+myself. None of them decides who may see which data in your app. That decision
+is still yours.
 
 ## Vibe coding or hiring a developer: when is it worth the money?
 
