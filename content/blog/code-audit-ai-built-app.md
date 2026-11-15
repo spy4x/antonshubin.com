@@ -234,8 +234,3 @@ fixes themselves are a separate job, quoted on their own.
 An older audit is public too: a
 [code review report for a client's Node.js API](/work/code-review), with what
 happened after it.
-
-If your app was built with AI tools and real users, payments or personal data
-are on the way, have a look at the [code audit](/catalog/codebase-health-audit).
-Or tell me about your app first:
-[Send a written brief](/book?service=codebase-health-audit#brief).

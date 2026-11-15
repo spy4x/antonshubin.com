@@ -376,8 +376,6 @@ is the work above: closing sign-up, tuning SQLite, keeping secrets away from
 code that should not see them.
 
 [How I run production](/infrastructure) shows where this CI sits among the rest
-of my servers. If you want this kind of setup for your product, with someone who
-looks after it every week, that is my
-[ongoing work](/catalog/cto-advisory-retainer). Or take the stack from
+of my servers. Take the stack from
 [rostok's catalog](https://github.com/spy4x/rostok/tree/470d152167809ad1bd3c415e4b1961a79fa9eebe/stacks/woodpecker),
 push a tag, and watch your first release build itself.
