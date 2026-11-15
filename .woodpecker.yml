@@ -7,64 +7,119 @@ when:
   - event: cron
 
 steps:
-  check:
+  # One build that every later step shares through the workspace: the Deno
+  # cache (DENO_DIR in .ci/, gitignored), node_modules, _fresh/ and a copy of
+  # this image's deno binary, so the Playwright and ffmpeg images below run
+  # the same Deno 2.9.0 with no download. The steps after it run side by side.
+  build:
     image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
     commands:
-      - deno install
-      # test/lead-form.browser.test.ts, test/a11y.browser.test.ts,
-      # test/contrast.browser.test.ts, test/csp.browser.test.ts,
-      # test/sw-retired.browser.test.ts, test/visual-system.browser.test.ts,
-      # test/notes.browser.test.ts and test/meet-embed.browser.test.ts
-      # (deno task test:browser, run inside "deno task check") drive a real
-      # Chromium. The base image has none,
-      # so install it at the version
-      # pinned in deno.json's "playwright" import (and test/browser.ts), so
-      # the download lands on the browser build that version expects, with
-      # OS deps included, since this container has none of the desktop libs
-      # a headless Chromium needs.
-      - deno run -A npm:playwright@1.63.0 install --with-deps chromium
-      # scripts/video-cut.test.ts renders a generated clip with ffmpeg (libass
-      # burns the captions, so it needs a font); the base image has neither.
-      - apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
-      - deno task check
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir"
+      - mkdir -p .ci/bin && cp "$(command -v deno)" .ci/bin/deno
+      - deno install --frozen
+      - deno task build
+    when:
+      event: [push, pull_request]
+
+  # What `deno task check` runs before the browser tests, minus the build
+  # (done above). scripts/video-cut.test.ts needs ffmpeg and runs in its own
+  # step below.
+  unit:
+    image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir"
+      - deno fmt --check .
+      - deno lint .
+      - deno check
+      - deno task test:unit --ignore=scripts/video-cut.test.ts
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  # The browser-driven tests (every test/**/*.browser.test.ts) in four shards
+  # balanced by their CI times (scripts/browser-shard.ts). The Playwright image
+  # matches deno.json's "playwright" import (1.63.0): it holds the Chromium
+  # build that version launches, its libraries and fonts, so no step downloads
+  # a browser.
+  browser-1:
+    image: &playwright mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - deno run -A scripts/browser-shard.ts 1/4
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  browser-2:
+    image: *playwright
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - deno run -A scripts/browser-shard.ts 2/4
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  browser-3:
+    image: *playwright
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - deno run -A scripts/browser-shard.ts 3/4
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  browser-4:
+    image: *playwright
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - deno run -A scripts/browser-shard.ts 4/4
+    depends_on: [build]
+    when:
+      event: [push, pull_request]
+
+  # scripts/video-cut.test.ts renders a generated clip with ffmpeg and ffprobe
+  # (libass burns the captions, so it needs a font). This image has all of
+  # them, and glibc for the copied deno. It sets LD_LIBRARY_PATH, which Deno
+  # passes to a child process only under a bare --allow-run: hence -A.
+  video-cut:
+    image: jrottenberg/ffmpeg:7.1-ubuntu2404@sha256:292a972c60356abd651d9a4f9c808c13e7473f65ad400b7eb99215f4e571931d
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - deno test -A scripts/video-cut.test.ts
+    depends_on: [build]
     when:
       event: [push, pull_request]
 
   # The Lighthouse budget ("Design gate" in the global agent rules): every
   # page in scripts/lighthouse/lighthouserc.json scores, in Lighthouse mobile,
   # at least 95 for performance and 100 for accessibility, best practices and
-  # SEO. scripts/lighthouse/run.sh serves the built site behind nginx with
-  # gzip, as Cloudflare serves it. After check: both build into _fresh/ in the
-  # shared checkout.
-  # The Playwright image, not the Deno one: Lighthouse CI starts Lighthouse
-  # with `node`, and the image has Node, Chromium and its libraries. Deno is
-  # the release the check step uses, 2.9.0.
+  # SEO. scripts/lighthouse/run.sh serves the build step's _fresh/ behind nginx
+  # with gzip, as Cloudflare serves it. The Playwright image: Lighthouse CI
+  # starts Lighthouse with `node`, and the image has Node, Chromium and its
+  # libraries. It has no nginx, the one package this pipeline installs. One
+  # step, after the browser shards: a busy CPU lowers the performance score.
+  # Pages near the 95 line failed both beside the browser shards and when three
+  # Lighthouse shards ran side by side (pipelines 1998 and 2004).
   lighthouse:
-    image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    image: *playwright
     commands:
-      - |
-          curl -fsSL -o /tmp/deno.zip https://github.com/denoland/deno/releases/download/v2.9.0/deno-x86_64-unknown-linux-gnu.zip
-          echo "96c9c73fc05ea57603bc28d8071d41e861bd40bcf2a9f849dd5969ed1a2c8498  /tmp/deno.zip" | sha256sum -c -
-          apt-get update -qq && apt-get install -y -qq --no-install-recommends unzip nginx
-          unzip -q -o /tmp/deno.zip -d /usr/local/bin
-          chmod +x /usr/local/bin/deno
-      - deno install
-      - deno task build
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
+      - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
       - deno task lighthouse
-    depends_on: [check]
+    depends_on: [browser-1, browser-2, browser-3, browser-4]
     when:
       event: [push, pull_request]
 
   # Sunday numbers report: visitors/pages/referrers/CTA events (Umami), stars
   # (GitHub), subscribers/views (YouTube) — printed as markdown and pushed to
   # NTFY. Fires only on the "weekly-numbers" cron trigger, never on push or
-  # pull_request, so it never runs `deno task check` and `check` never runs on
-  # this trigger. See docs/weekly-numbers.md for the one-time cron setup and
-  # the env vars this step needs.
+  # pull_request, and no build or test step runs on this trigger. See
+  # docs/weekly-numbers.md for the one-time cron setup and the env vars this
+  # step needs.
   weekly-numbers:
     image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
     commands:
-      - deno install
+      - deno install --frozen
       - deno task weekly-numbers
     environment:
       UMAMI_API_URL:

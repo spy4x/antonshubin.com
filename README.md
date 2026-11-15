@@ -33,8 +33,9 @@ All tasks are defined in `deno.json`; this list mirrors it.
 | Command                          | Description                                                                |
 | -------------------------------- | -------------------------------------------------------------------------- |
 | `deno task check`                | fmt --check + lint + type check + test + test:browser                      |
-| `deno task test`                 | Build, then run `deno test`                                                |
-| `deno task test:browser`         | Playwright lead-form, a11y, contrast, CSP and retired-service-worker tests |
+| `deno task test`                 | Build, then run `deno task test:unit`                                      |
+| `deno task test:unit`            | `deno test` without the browser tests; needs a build                       |
+| `deno task test:browser`         | All `test/**/*.browser.test.ts` files (Playwright); needs a build+Chromium |
 | `deno task dev`                  | Dev server (Vite, HMR)                                                     |
 | `deno task build`                | Production build (Vite)                                                    |
 | `deno task start`                | Run the production server                                                  |

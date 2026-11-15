@@ -1,8 +1,8 @@
-// Shared setup for the browser-driven tests (test/*.browser.test.ts, listed in
-// deno.json's test:browser task) — every one launches Chromium through the
-// same pinned Playwright version. An upgrade changes that version here, in
-// deno.json's import map and in .woodpecker.yml's install command
-// (docs/testing.md cites it too). See docs/testing.md "Browser-driven tests"
+// Shared setup for the browser-driven tests (test/**/*.browser.test.ts, run by
+// deno.json's test:browser task through scripts/browser-shard.ts) — every one
+// launches Chromium through the same pinned Playwright version. An upgrade
+// changes that version here, in deno.json's import map and in the Playwright
+// image tag in .woodpecker.yml (docs/testing.md cites it too). See docs/testing.md "Browser-driven tests"
 // for why these tests need Chromium and their own `-A` task instead of the
 // plain `deno task test` glob.
 import { chromium } from "playwright"
@@ -10,7 +10,7 @@ import type { Browser, BrowserContextOptions, Page } from "playwright"
 
 /**
  * Must match the `"playwright"` entry in deno.json's import map and the
- * install command in .woodpecker.yml — a version mismatch downloads a
+ * Playwright image tag in .woodpecker.yml — on a mismatch the image holds a
  * different Chromium build than the one these tests launch.
  */
 export const PLAYWRIGHT_VERSION = "1.63.0"
@@ -22,7 +22,7 @@ export const PLAYWRIGHT_VERSION = "1.63.0"
  */
 export async function launchChromium(): Promise<Browser> {
   try {
-    // CI (Woodpecker/denoland/deno:2.9.0) runs this container as root, and
+    // CI (Woodpecker, the Playwright image) runs this container as root, and
     // Chromium's own sandbox refuses to start as root without this flag.
     // Harmless here: the browser only ever loads the site the calling test
     // just booted, never third-party content.
