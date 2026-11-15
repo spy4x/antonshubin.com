@@ -77,7 +77,7 @@ bad attack adds tens or hundreds of euros, not thousands. For dedicated servers:
 In my [MVP cost post](/blog/how-much-does-a-saas-mvp-cost), my rule of thumb for
 an early product, with a staging copy and backups, is €20 to €50 a month. Then
 it stays there unless you decide otherwise, or a big attack adds a traffic
-charge of tens of euros.
+charge of tens or hundreds of euros.
 
 What happens on a bad day? The bot still comes. The server gets busy, pages slow
 down, and in the worst case the site falls over for a while. That's the honest
