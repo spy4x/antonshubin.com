@@ -8,6 +8,14 @@ import { findTool } from "../../../lib/tools.ts"
 const CHIP =
   "rounded border border-rule bg-ink px-1.5 py-0.5 text-xs text-parchment break-all"
 
+/**
+ * The hidden separator between a category's label and its count, so a screen
+ * reader says "Monitoring, 7 stacks". A constant, because `deno fmt` drops the
+ * trailing space of a literal and Fresh's JSX precompile drops a trailing
+ * `&nbsp;`.
+ */
+const HIDDEN_COMMA = ", "
+
 /** "stack" or "stacks", for a count of `n`. */
 function stackWord(n: number) {
   return n === 1 ? "stack" : "stacks"
@@ -126,7 +134,7 @@ export function RostokCatalog() {
                   class="flex min-h-11 items-center gap-2 rounded-lg border border-rule px-3 text-sm text-parchment hover:bg-lamp lg:min-h-9 lg:justify-between lg:border-transparent"
                 >
                   {g.label}
-                  <span class="sr-only">,{" "}</span>
+                  <span class="sr-only">{HIDDEN_COMMA}</span>
                   <span class="text-graphite">{g.stacks.length}</span>
                   <span class="sr-only">
                     {` ${stackWord(g.stacks.length)}`}
@@ -147,7 +155,7 @@ export function RostokCatalog() {
                 class="flex scroll-mt-8 items-baseline gap-3 text-xl text-parchment"
               >
                 {g.label}
-                <span class="sr-only">,{" "}</span>
+                <span class="sr-only">{HIDDEN_COMMA}</span>
                 <span class="font-sans text-sm font-normal text-graphite">
                   {g.stacks.length} {stackWord(g.stacks.length)}
                 </span>
