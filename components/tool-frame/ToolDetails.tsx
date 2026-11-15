@@ -109,13 +109,13 @@ export function ToolFit({ data }: { data: ToolPageData }) {
   )
 }
 
-/** "The story behind it": each post as a card, with the entry's `storyLine` under its title. */
+/** "Posts about it": each post as a card, with the entry's `storyLine` under its title. */
 export function ToolStory({ data }: { data: ToolPageData }) {
   const { tool, posts } = data
   if (posts.length === 0) return null
   return (
     <section aria-labelledby="posts">
-      <h2 id="posts" class="text-xl text-parchment">The story behind it</h2>
+      <h2 id="posts" class="text-xl text-parchment">Posts about it</h2>
       <ul class="mt-3 space-y-4">
         {posts.map((p) => (
           <li key={p.slug}>

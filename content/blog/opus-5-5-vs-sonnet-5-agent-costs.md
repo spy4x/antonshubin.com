@@ -2,12 +2,12 @@
 title: "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost"
 description: "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
 tldr:
-  - "Update: Sonnet 5.5 later cost 0.57 times as much as Opus 5.5 per merged line, review included, but passed its first review less often, 13% against 33%. My implementers now run on it."
+  - "Update: Sonnet 5.5 later cost 0.57 times as much as Opus 5.5 per merged line but passed its first review less often, 13% against 33%. My implementers tried it, then went back to Opus 5.5."
   - "The original finding still holds for Sonnet 5: like for like, Opus 5.5 cost about 0.45 times as much per changed line, although it lists at twice the price."
   - "In agent work you pay for steps and context, not tokens: cached reads were most of the bill, and they cost the same on both models."
   - "Opus 5.5 replaced Fable 5.1 as my reviewer at about a third of the price, and neither reviewer caught every security bug on its own."
 publishedAt: "2026-09-26"
-updatedAt: "2026-09-30"
+updatedAt: "2026-11-15"
 readTime: 8
 coverImage: "/img/blog/opus-5-5-vs-sonnet-5-agent-costs/cover.png"
 coverAlt: "The Drake meme: Drake turns away from \"Pick the model that is cheaper per token\" and approves \"Pick the model that is cheaper per merged line\"."
@@ -187,7 +187,8 @@ per token.
 ## What I changed
 
 - **Opus 5.5 implements and reviews every diff.** (Implementers moved to Sonnet
-  5.5 on 30 September; see the update below.) Fable stays paused.
+  5.5 on 30 September and back to Opus 5.5 on 11 October; see the updates
+  below.) Fable stays paused.
 - **Medium effort by default.** Reviews of production code run at xhigh, and
   reviews of auth, crypto, secrets, money, deploys and data migrations run at
   max. An implementer only moves up to xhigh for one fix round, when a PR's
@@ -218,6 +219,15 @@ are already inside that 0.57 and both models merged about nine PRs in ten. Opus
 is one night, and Opus used more calls per line that night than earlier in the
 week, so I will rerun it after a week. The findings above are about Sonnet 5 and
 still hold for it; the list above is my setup as of 26 September.
+
+### Update, 15 November 2026: implementers are back on Opus 5.5
+
+On 11 October I moved my implementers back to Opus 5.5. The cheaper runs were
+not worth it: I judged Sonnet 5.5's code worse across my repositories, and a
+paired trial on five issues agreed. Implementers and reviewers now both run on
+Opus 5.5, as the
+["Models" rule in my public agent rules](https://github.com/spy4x/dotfiles/blob/545890e5714d268e0d0fdc5b005e85f801c39f73/ai-harnesses/AGENTS.md#L405-L407)
+says.
 
 ## What this doesn't prove
 

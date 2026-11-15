@@ -17,7 +17,7 @@ import {
 
 export const SITE = "https://antonshubin.com"
 
-/** A post a tool names in `posts`, as "The story behind it" shows it. */
+/** A post a tool names in `posts`, as "Posts about it" shows it. */
 export interface ToolPost {
   slug: string
   title: string
