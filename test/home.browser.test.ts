@@ -189,3 +189,91 @@ for (
     }
   })
 }
+
+/** The poster file both of the facade's `<img>`s show. */
+const POSTER_PATH = "/img/home/video-poster.webp"
+
+/** The poster `<img>` a visitor sees at each width: the thumbnail, or the large `<picture>`. */
+const POSTER_AT = {
+  390: '[data-home-video-play] img[loading="lazy"]',
+  1440: "[data-home-video-play] picture img",
+} as const
+
+/** True once the `<img>` matching `selector` has finished with no picture. */
+function isBroken(selector: string): boolean {
+  const img = document.querySelector<HTMLImageElement>(selector)
+  return Boolean(img?.complete && img.naturalWidth === 0)
+}
+
+for (const when of ["before", "after"] as const) {
+  for (const width of [390, 1440] as const) {
+    Deno.test(`a home video poster that fails ${when} hydration is hidden at ${width}px, leaving the box and the play mark`, async () => {
+      const site = await startSite({ env: { SCHEDULE_URL } })
+      let browser: Browser | undefined
+      try {
+        browser = await launchChromium()
+        const page = await newPage(browser, {
+          viewport: { width, height: 900 },
+        })
+        // "before": scripts wait until the poster has failed, so its error
+        // event fires before the island listens. "after": the poster waits
+        // until the island has hydrated, then fails.
+        let release = () => {}
+        const released = new Promise<void>((resolve) => (release = resolve))
+        await page.route("**/*", async (route) => {
+          const request = route.request()
+          // The URL carries Fresh's `?__frsh_c=` cache key: match the path.
+          if (new URL(request.url()).pathname === POSTER_PATH) {
+            if (when === "after") await released
+            return route.abort()
+          }
+          if (when === "before" && request.resourceType() === "script") {
+            await released
+          }
+          return route.continue()
+        })
+        const poster = page.locator(POSTER_AT[width])
+        if (when === "before") {
+          await page.goto(`${site.origin}/`, { waitUntil: "commit" })
+          await page.waitForFunction(isBroken, POSTER_AT[width], {
+            timeout: WAIT_MS,
+          })
+        } else {
+          await page.goto(`${site.origin}/`, {
+            waitUntil: "domcontentloaded",
+          })
+          // Fresh hydrates in a task it posts with scheduler.postTask while
+          // its module script runs, before DOMContentLoaded; a task posted
+          // now runs after it.
+          await page.evaluate(() =>
+            new Promise((resolve) =>
+              (globalThis as unknown as {
+                scheduler: { postTask: (f: () => void) => void }
+              }).scheduler.postTask(() => resolve(null))
+            )
+          )
+          assertEquals(
+            await page.evaluate(isBroken, POSTER_AT[width]),
+            false,
+            "the poster failed before hydration",
+          )
+        }
+        release()
+        await poster.waitFor({ state: "hidden", timeout: WAIT_MS })
+        assert(
+          await page.locator("[data-home-video-play] svg").isVisible(),
+          "the play mark went with the poster",
+        )
+        const box = await poster.locator("xpath=ancestor::span[1]")
+          .boundingBox()
+        assert(
+          box && box.height > box.width,
+          `no 9:16 box: ${JSON.stringify(box)}`,
+        )
+      } finally {
+        await browser?.close()
+        await site.stop()
+      }
+    })
+  }
+}

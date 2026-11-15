@@ -13,6 +13,20 @@ const BLANK_PIXEL =
   "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 
 /**
+ * Hides a poster whose file failed, so the Lamp box and the play mark stay
+ * without a broken-image icon. `onError` covers a failure after hydration; the
+ * ref covers one before it, when the event fired with no listener attached.
+ */
+const hideBroken = {
+  onError: (event: Event) => {
+    ;(event.currentTarget as HTMLImageElement).hidden = true
+  },
+  ref: (img: HTMLImageElement | null) => {
+    if (img?.complete && img.naturalWidth === 0) img.hidden = true
+  },
+}
+
+/**
  * The home hero's video (#615): a facade that asks YouTube for nothing until
  * it is pressed. The server renders a link to the short on youtube.com, so
  * without JavaScript it opens there. After hydration a plain click (Enter
@@ -92,6 +106,7 @@ export default function HomeVideo(
                 height={POSTER.height}
                 alt=""
                 aria-hidden="true"
+                {...hideBroken}
                 loading="lazy"
                 decoding="async"
                 class="block h-full w-full object-cover lg:hidden"
@@ -108,6 +123,7 @@ export default function HomeVideo(
                   height={POSTER.height}
                   alt=""
                   aria-hidden="true"
+                  {...hideBroken}
                   loading="eager"
                   fetchpriority="high"
                   class="block h-full w-full object-cover"
