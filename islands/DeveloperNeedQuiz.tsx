@@ -49,7 +49,7 @@ export default function DeveloperNeedQuiz({ post }: { post: string }) {
       <div class="flex flex-col gap-6">
         <fieldset
           disabled={!live.value}
-          class="m-0 flex min-w-0 flex-col gap-6 border-0 p-0 noscript:opacity-50"
+          class="m-0 grid min-w-0 gap-6 border-0 p-0 noscript:opacity-50 md:grid-cols-2"
         >
           {GROUPS.map((group) => (
             <fieldset key={group} class="m-0 min-w-0 border-0 p-0">

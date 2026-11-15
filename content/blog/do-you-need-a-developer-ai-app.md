@@ -9,7 +9,7 @@ tldr:
 intro: "I sell developer time, and this post tells you when you don't need to buy any. Founders ask me whether their AI-built app needs a developer, and the honest answer is often \"not yet\". This is the long answer, for anyone who has built something with Lovable, Bolt, Claude Code or Codex, with a quiz at the end that tells you where you stand."
 coverImage: "/img/blog/do-you-need-a-developer-ai-app/cover.png"
 coverAlt: "The Two Buttons meme: a sweating man labelled \"Founder with a working demo\" can't choose between two red buttons, \"Keep prompting\" and \"Hire a developer\"."
-coverSize: "600x908"
+coverSize: "1000x378"
 publishedAt: "2026-11-15"
 readTime: 11
 topic: "founders"
