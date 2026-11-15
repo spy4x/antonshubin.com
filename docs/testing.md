@@ -2,21 +2,34 @@
 
 ## Continuous integration
 
-`.woodpecker.yml` runs on every `push` and `pull_request`: it starts a
-`denoland/deno:2.9.0` container, runs `deno install`, then `deno task check`
-(fmt, lint, type check and `deno test` — a failing test fails the build). There
-is no deploy step in CI — deploying stays a manual, post-merge action (see
+`.woodpecker.yml` runs on every `push` and `pull_request` what `deno task check`
+runs, split into steps that run side by side; a failing test fails the build.
+There is no deploy step in CI — deploying stays a manual, post-merge action (see
 "Deploy" in [AGENTS.md](../AGENTS.md)).
 
-The `check` step also installs Chromium before `deno task check` runs:
-`deno run -A npm:playwright@1.63.0 install --with-deps chromium` — the base
-image has none of the OS libraries a headless Chromium needs. That's for the
-five browser-driven tests under "Browser-driven tests" below. The version must
-match `deno.json`'s `"playwright"` pin exactly, or the install downloads a
-different Chromium build than the one the tests launch.
+- `build` (`denoland/deno:2.9.0`): `deno install --frozen` and
+  `deno task build`, with `DENO_DIR` in `.ci/deno-dir`, and a copy of the deno
+  binary in `.ci/bin/`. The workspace carries both, `node_modules` and `_fresh/`
+  to every later step, so nothing after it installs or builds again.
+- `unit` (same image): fmt, lint, type check and `deno task test:unit`, minus
+  `scripts/video-cut.test.ts`.
+- `browser-1` to `browser-3` (`mcr.microsoft.com/playwright:v1.63.0-noble`):
+  `scripts/browser-shard.ts` splits every `test/**/*.browser.test.ts` into three
+  shards of about equal CI time, by the seconds in its `SECONDS` table, and
+  `scripts/browser-shard.test.ts` fails unless the shards cover every file
+  exactly once. The image holds the Chromium build that Playwright version
+  launches, with its libraries and fonts, so no step downloads a browser. Its
+  tag must match `deno.json`'s `"playwright"` pin exactly.
+- `video-cut` (`jrottenberg/ffmpeg:7.1-ubuntu2404`): the one test that needs
+  ffmpeg, ffprobe, libass and a font.
+- `lighthouse` (the Playwright image): the Lighthouse budget, on the shared
+  build. It installs nginx, the one package the pipeline installs.
+
+When a browser test gets much slower or faster, update its line in
+`scripts/browser-shard.ts`'s `SECONDS` so the shards stay even.
 
 A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
-runs `deno task weekly-numbers`, never `deno task check`; the `check` step's
+runs `deno task weekly-numbers`; every other step's
 `when: event: [push, pull_request]` keeps it from running on that same cron
 trigger. See `docs/weekly-numbers.md` for the env vars it needs and the one-time
 Woodpecker cron setup.
@@ -61,9 +74,9 @@ preconnect links while browsers do. `routes/_app.tsx` makes that decision at
 render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is
 rendered.
 
-`deno task test` is `deno task build && deno test ...` — the site builds once
-per `deno task check` run, before any test starts. `startSite()` never builds
-itself; it throws a clear error naming the missing file and task if
+`deno task test` is `deno task build && deno task test:unit` — the site builds
+once per `deno task check` run, before any test starts. `startSite()` never
+builds itself; it throws a clear error naming the missing file and task if
 `_fresh/server.js` doesn't exist, so running `deno test` directly without a
 prior build fails loudly instead of skipping silently. `deno task test`'s
 permissions are narrow
@@ -71,10 +84,12 @@ permissions are narrow
 and apply to every file it runs. The one outbound host is for
 `test/tools/ts-libs.test.ts`, which reads the ts-libs READMEs at a pinned tag to
 prove the page still quotes them; any other test that looks network-shaped stubs
-`globalThis.fetch` itself. The browser-driven tests below need `-A`, so they're
-excluded via `--ignore` and run separately, also via `deno task test:browser`,
-which doesn't build either — it relies on running after `deno task test` inside
-`check`, and fails loudly (not silently) on its own before a build.
+`globalThis.fetch` itself. The browser-driven tests below need `-A`, so
+`test:unit` ignores every `*.browser.test.ts` and they run separately, via
+`deno task test:browser` (`scripts/browser-shard.ts 1/1`: all of them in one
+process), which doesn't build either — it relies on running after
+`deno task test` inside `check`, and fails loudly (not silently) on its own
+before a build.
 
 **How to add a guard.** Call `startSite()`, fetch with `site.html()`/
 `site.get()`, assert with `count()`/`visibleText()`/`jsonLd()`, then
@@ -87,10 +102,10 @@ Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for every
 file below and fails loudly, naming the install command, if none is found.
 Playwright's version must match exactly across `deno.json`'s import map,
-`.woodpecker.yml`'s install command and `test/browser.ts`'s `PLAYWRIGHT_VERSION`
-— a mismatch downloads a different Chromium build than the one launched. Every
-one calls `startSite()` and run under `deno task test:browser` with `-A`, not
-the narrow `deno task test`.
+`.woodpecker.yml`'s Playwright image tag and `test/browser.ts`'s
+`PLAYWRIGHT_VERSION` — on a mismatch the image holds a different Chromium build
+than the one launched. Every one calls `startSite()` and run under
+`deno task test:browser` with `-A`, not the narrow `deno task test`.
 
 Two rules keep them stable on a busy machine (#219). Open a page with
 `test/browser.ts`'s `newPage(browser, options)`, never `browser.newPage()`: it

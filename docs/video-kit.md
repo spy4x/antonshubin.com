@@ -119,5 +119,6 @@ correct and the fallback is OpenTimelineIO.
 Tests (`scripts/video-cut.test.ts`) generate an 80 s clip with ffmpeg's
 `testsrc` and a sine tone and run the whole flow offline. `deno task test` lets
 a test run only `deno`, so the test starts the script as a child `deno` process
-with its own permissions; CI installs ffmpeg in `.woodpecker.yml`. A machine
-without ffmpeg fails the test, never skips it.
+with its own permissions; CI runs it in its own `video-cut` step, on an ffmpeg
+image (`.woodpecker.yml`). A machine without ffmpeg fails the test, never skips
+it.
