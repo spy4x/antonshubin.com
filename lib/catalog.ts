@@ -277,7 +277,7 @@ export const catalogItems: CatalogItem[] = [
       "Monitoring, backups and security patches after launch",
     ],
     includes: [
-      "Weekly 60-minute strategy call",
+      "Weekly 60-minute planning call",
       "Architecture review and technical decisions",
       "Code review and quality standards",
       "Team structure and hiring guidance",
@@ -459,13 +459,13 @@ export function callVersusSession(): {
 }
 
 /**
- * The llms files' line that keeps the free intro call apart from the paid
- * strategy session (#494), so an answer engine cannot quote a free session.
+ * The llms files' line that keeps the paid strategy session apart from the
+ * free intro call named just before it (#494, #670), so an answer engine
+ * cannot quote a free session.
  */
-export function freeCallPaidSessionLine(): string {
+export function paidSessionLine(): string {
   const session = catalogItem("strategy-call")
-  const call = INTRO_CALL.replace(/^free /, "")
-  return `The ${call} is free. The ${session.shortTitle.toLowerCase()} is paid (${
+  return `The ${session.shortTitle.toLowerCase()} is paid (${
     priceLabel(session)
   }): ${session.summary.charAt(0).toLowerCase()}${session.summary.slice(1)}`
 }

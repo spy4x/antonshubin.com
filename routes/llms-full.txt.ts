@@ -21,8 +21,8 @@ import {
   catalogItem,
   catalogItems,
   catalogPromises,
-  freeCallPaidSessionLine,
   INTRO_CALL,
+  paidSessionLine,
   priceLabel,
 } from "../lib/catalog.ts"
 import { decapitalize, promise, promises } from "../lib/promises.ts"
@@ -185,7 +185,7 @@ ${ABOUT_HOBBIES}, and I've ${ABOUT_TRAVEL}. Invoices come from ${COMPANY.name}, 
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send your idea or current app through the brief form for a free written brief: ${BASE_URL}${WRITE_FALLBACK_HREF}. ${freeCallPaidSessionLine()}
+Start with a ${INTRO_CALL}, or send your idea or current app through the brief form for a free written brief: ${BASE_URL}${WRITE_FALLBACK_HREF}. ${paidSessionLine()}
 
 ${
       catalogItems.map((i, n) =>

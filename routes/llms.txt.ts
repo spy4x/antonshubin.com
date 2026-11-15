@@ -9,8 +9,8 @@ import { hackathons, highlightSlugs } from "../lib/data.ts"
 import { llmsBlogSections } from "../lib/blog.ts"
 import {
   catalogItems,
-  freeCallPaidSessionLine,
   INTRO_CALL,
+  paidSessionLine,
   priceLabel,
 } from "../lib/catalog.ts"
 import { decapitalize, promises } from "../lib/promises.ts"
@@ -112,7 +112,7 @@ export const handler = define.handlers({
 
 ## Services
 
-Start with a ${INTRO_CALL}, or send a written brief (${BASE_URL}/book#brief): I write back with 3 concrete architectural improvements, free, within one working day. ${freeCallPaidSessionLine()}
+Start with a ${INTRO_CALL}, or send a written brief (${BASE_URL}/book#brief): I write back with 3 concrete architectural improvements, free, within one working day. ${paidSessionLine()}
 
 ${services}
 

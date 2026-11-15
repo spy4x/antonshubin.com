@@ -6,7 +6,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "./harness.ts"
 import { formatPeriod, highlightSlugs, projects } from "../lib/data.ts"
-import { freeCallPaidSessionLine } from "../lib/catalog.ts"
+import { INTRO_CALL, paidSessionLine } from "../lib/catalog.ts"
 import { GOOD_FIT } from "../lib/how-i-work.ts"
 import { EMAIL_ADDRESS } from "../lib/profiles.ts"
 
@@ -40,7 +40,7 @@ Deno.test("both llms files keep the free intro call apart from the paid strategy
     for (const llmsPath of ["/llms.txt", "/llms-full.txt"]) {
       const text = await site.html(llmsPath)
       assert(
-        text.includes(freeCallPaidSessionLine()),
+        text.includes(paidSessionLine()),
         `${llmsPath} does not say which call is free`,
       )
       // A line that names the session and says "free" must say "paid" too.
@@ -49,6 +49,16 @@ Deno.test("both llms files keep the free intro call apart from the paid strategy
         if (!/\bfree\b/i.test(line)) continue
         assert(/\bpaid\b/.test(line), `${llmsPath}: ${line}`)
       }
+      // The Services paragraph names the free intro call once (#670).
+      const services = text.split("\n").find((l) =>
+        l.includes(paidSessionLine())
+      )!
+      assertEquals(
+        services.match(/intro call/g)?.length,
+        1,
+        `${llmsPath}: ${services}`,
+      )
+      assert(services.includes(INTRO_CALL), `${llmsPath}: ${services}`)
     }
   } finally {
     await site.stop()
