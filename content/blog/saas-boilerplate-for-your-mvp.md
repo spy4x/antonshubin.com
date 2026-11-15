@@ -158,7 +158,7 @@ between a managed cloud and servers of my own is in
 
 My own products. [Ringmaster](/tools/ringmaster), which runs AI coding agents on
 GitHub issues, and [Financy](/tools/financy), a finance tracker, are both being
-rebuilt on Seed. This site is being rebuilt on it too. No client project on Seed
+rebuilt on Seed. This site will be rebuilt on it too. No client project on Seed
 is public yet, so I won't pretend one is.
 
 That makes me Seed's first and most demanding user. When something in it annoys
