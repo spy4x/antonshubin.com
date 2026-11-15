@@ -31,10 +31,10 @@ const hideBroken = {
  * it is pressed. The server renders a link to the short on youtube.com, so
  * without JavaScript it opens there. After hydration a plain click (Enter
  * included) puts a `youtube-nocookie.com` player in its place, at 9:16, and
- * moves focus into it; the `video` event is sent once with `track()`, never as
- * a `data-umami-event` attribute, which Umami's tracker would follow to
- * youtube.com (docs/analytics.md). "Watch on YouTube" stays under it for a
- * blocked embed.
+ * moves focus into it and scrolls it into view; the `video` event is sent
+ * once with `track()`, never as a `data-umami-event` attribute, which Umami's
+ * tracker would follow to youtube.com (docs/analytics.md). "Watch on YouTube"
+ * stays under it for a blocked embed.
  *
  * Below 1024px it is a row (a 96px thumbnail, the caption and "1 min ·
  * YouTube"), its thumbnail lazy so the H1 stays the first screen's largest
