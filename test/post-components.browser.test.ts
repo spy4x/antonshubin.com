@@ -472,3 +472,62 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
     await site.stop()
   }
 })
+
+Deno.test("the Seed plumbing checklist opens on the post's case, follows the keyboard and sends no tick", async () => {
+  const SEED = "saas-boilerplate-for-your-mvp"
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${SEED}`)
+    assertStringIncludes(
+      html,
+      "Seed already ships 6 of the 7 parts you ticked.",
+    )
+    assert(
+      /id="plumbing-checklist-figure"[^>]*data-live="false"/.test(html),
+      "the checklist is live before any script ran",
+    )
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, SEED, "plumbing-checklist-figure")
+      const result = page.locator("#plumbing-checklist-figure [data-result]")
+      const tick = async (name: string) => {
+        await page.getByRole("checkbox", { name }).focus()
+        await page.keyboard.press("Space")
+      }
+      await tick("An app that works offline")
+      await tick("An Android or desktop app")
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Seed already ships 7 of the 9 parts you ticked.",
+      )
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Not in Seed: an Android or desktop app, your product's own feature.",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertStringIncludes(
+        (await result.textContent()) ?? "",
+        "Tick what your product needs.",
+      )
+      const overflow = await page.evaluate(() =>
+        document.documentElement.scrollWidth > globalThis.innerWidth
+      )
+      assert(!overflow, `${SEED} scrolls sideways at 390px`)
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: SEED, part: "SaasPlumbingChecklist" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
