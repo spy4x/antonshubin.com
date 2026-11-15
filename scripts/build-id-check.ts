@@ -98,7 +98,8 @@ export async function checkLiveBuildId(
   if (problem) {
     throw new Error(
       `Build id check failed on https://${domain}${CHECK_PATH}: ${problem}. ` +
-        "Server and client disagree, so hydrated images download twice (#593).",
+        "Server and client must share one build id, or hydrated images " +
+        "download twice (#593).",
     )
   }
 }

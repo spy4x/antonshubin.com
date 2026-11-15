@@ -81,7 +81,7 @@ Deno.test("checkLiveBuildId reads the page past the edge cache and its script", 
   assertEquals(urls[1], "https://example.com/assets/client-entry-C317UWLz.js")
 })
 
-Deno.test("checkLiveBuildId throws with both ids when they differ", async () => {
+Deno.test("checkLiveBuildId throws naming the page id and the build id", async () => {
   const { fetch } = stubFetch({
     "/tools": () => new Response(page("3238153851")),
     "/assets/client-entry-C317UWLz.js": () => new Response(script(ID)),
@@ -102,7 +102,7 @@ Deno.test("checkLiveBuildId throws when the page answers an error status", async
   assertStringIncludes(String(error), "answered 502")
 })
 
-Deno.test("checkLiveBuildId throws when the network fails", async () => {
+Deno.test("checkLiveBuildId passes a network failure on as a rejection", async () => {
   const { fetch } = stubFetch({})
   await assertRejects(
     () => checkLiveBuildId("example.com", ID, fetch),
