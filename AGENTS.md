@@ -377,23 +377,24 @@ with "How these work" and the Upwork line. The video is `islands/HomeVideo.tsx`,
 a click-to-load facade for `HOME_VIDEO_ID` (a placeholder short until #619;
 `HOME_VIDEO_LABEL` and `HOME_VIDEO_CAPTION` change with it): a link to the short
 on youtube.com, upgraded after hydration to a `youtube-nocookie.com` player with
-focus moved into it and the `video` event, and "Watch on YouTube" always under
-it. From 1024px it takes the right column over both hero rows, 9:16 and 300px
-wide, and its poster (`static/img/home/video-poster.webp`) is the page's one
-eager, `fetchpriority="high"` image, held as a blank pixel until a
-`min-width: 1024px` `<source>` matches; at 390px it is a row after the actions
-with a lazy 96px thumbnail, so the H1 stays the first screen's largest paint.
-DOM order is visual order. No portrait on home (it stays on `/about`), no
-`VideoObject` until the real video exists. Then Client reviews
-(`homeTestimonialIds`), "Why not just use AI?" (the short answer, the link to
-`/why-not-just-ai` and the team set-up line to the brief; no FAQ markup), Client
-work (three picture cards through `components/CardPicture.tsx`, shared with
-`/work`), "How a project runs", Services and prices (four cards, `PRICING_RULE`)
-and the closing band with the brief form. The tools are not on home; the rail
-links them. Every section under the hero is `HomeSection`: the H2 left and its
-one link on the same baseline on the right from 1024px, under the content at
-390px. Book appears twice, in the hero and in the band. Reuse these rather than
-making a copy:
+focus moved into it, scrolled into view (#622) and the `video` event, and "Watch
+on YouTube" always under it. From 1024px it takes the right column over both
+hero rows, 9:16 and 300px wide, and its poster
+(`static/img/home/video-poster.webp`) is the page's one eager,
+`fetchpriority="high"` image, held as a blank pixel until a `min-width: 1024px`
+`<source>` matches; at 390px it is a row after the actions with a lazy 96px
+thumbnail, so the H1 stays the first screen's largest paint. A poster that fails
+to load is hidden, leaving the Lamp box and the play mark. DOM order is visual
+order. No portrait on home (it stays on `/about`), no `VideoObject` until the
+real video exists. Then Client reviews (`homeTestimonialIds`), "Why not just use
+AI?" (the short answer, the link to `/why-not-just-ai` and the team set-up line
+to the brief; no FAQ markup), Client work (three picture cards through
+`components/CardPicture.tsx`, shared with `/work`), "How a project runs",
+Services and prices (four cards, `PRICING_RULE`) and the closing band with the
+brief form. The tools are not on home; the rail links them. Every section under
+the hero is `HomeSection`: the H2 left and its one link on the same baseline on
+the right from 1024px, under the content at 390px. Book appears twice, in the
+hero and in the band. Reuse these rather than making a copy:
 
 - `components/FactCard.tsx`: the fact card's box plus `Fact` rows, used by the
   project page's card and the price and answer cards.

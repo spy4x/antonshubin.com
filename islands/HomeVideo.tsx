@@ -5,7 +5,7 @@ import { eventAttrs, track } from "../lib/analytics.ts"
 import { NewTabHint } from "../components/NewTabHint.tsx"
 import { FACT_LINK } from "../components/FactCard.tsx"
 
-/** The self-hosted 9:16 still, cropped from the short's own thumbnail. */
+/** The self-hosted 9:16 still: the short's thumbnail cropped above YouTube's overlay text. */
 const POSTER = { src: "/img/home/video-poster.webp", width: 540, height: 960 }
 
 /** A 1x1 transparent GIF: the large poster's `<img>` until its 1024px `<source>` matches. */
@@ -13,14 +13,28 @@ const BLANK_PIXEL =
   "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 
 /**
+ * Hides a poster whose file failed, so the Lamp box and the play mark stay
+ * without a broken-image icon. `onError` covers a failure after hydration; the
+ * ref covers one before it, when the event fired with no listener attached.
+ */
+const hideBroken = {
+  onError: (event: Event) => {
+    ;(event.currentTarget as HTMLImageElement).hidden = true
+  },
+  ref: (img: HTMLImageElement | null) => {
+    if (img?.complete && img.naturalWidth === 0) img.hidden = true
+  },
+}
+
+/**
  * The home hero's video (#615): a facade that asks YouTube for nothing until
  * it is pressed. The server renders a link to the short on youtube.com, so
  * without JavaScript it opens there. After hydration a plain click (Enter
  * included) puts a `youtube-nocookie.com` player in its place, at 9:16, and
- * moves focus into it; the `video` event is sent once with `track()`, never as
- * a `data-umami-event` attribute, which Umami's tracker would follow to
- * youtube.com (docs/analytics.md). "Watch on YouTube" stays under it for a
- * blocked embed.
+ * moves focus into it and scrolls it into view; the `video` event is sent
+ * once with `track()`, never as a `data-umami-event` attribute, which Umami's
+ * tracker would follow to youtube.com (docs/analytics.md). "Watch on YouTube"
+ * stays under it for a blocked embed.
  *
  * Below 1024px it is a row (a 96px thumbnail, the caption and "1 min ·
  * YouTube"), its thumbnail lazy so the H1 stays the first screen's largest
@@ -45,8 +59,18 @@ export default function HomeVideo(
   const id = encodeURIComponent(videoId)
   const watchHref = `https://www.youtube.com/shorts/${id}`
 
+  // On a phone the player starts below the fold, so it is scrolled into view;
+  // focus moves into it without a second, instant scroll.
   useEffect(() => {
-    if (playing.value) player.current?.focus()
+    const frame = player.current
+    if (!frame) return
+    frame.focus({ preventScroll: true })
+    frame.scrollIntoView({
+      block: "nearest",
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    })
   }, [playing.value])
 
   const play = (event: MouseEvent) => {
@@ -92,6 +116,7 @@ export default function HomeVideo(
                 height={POSTER.height}
                 alt=""
                 aria-hidden="true"
+                {...hideBroken}
                 loading="lazy"
                 decoding="async"
                 class="block h-full w-full object-cover lg:hidden"
@@ -108,6 +133,7 @@ export default function HomeVideo(
                   height={POSTER.height}
                   alt=""
                   aria-hidden="true"
+                  {...hideBroken}
                   loading="eager"
                   fetchpriority="high"
                   class="block h-full w-full object-cover"
