@@ -83,7 +83,9 @@ The newsletter list is one file, `data/subscribers.json`. It lives on the host,
 not in the container: `compose.yml` bind-mounts the app directory's `data/` at
 `/app/data`, so the container that every deploy recreates never holds the only
 copy. The newsletter's per-post sent log, `data/newsletter-log.json`, sits in
-the same directory and is kept and backed up the same way (docs/newsletter.md).
+the same directory and is kept and backed up the same way (docs/newsletter.md),
+together with its journal, `newsletter-log.json.journal`, which holds the
+recipients recorded since the last rewrite from `@spy4x/server` 1.84.0 on.
 
 On cloudlab the file is `~/apps/antonshubin.com/data/subscribers.json`.
 
@@ -176,8 +178,16 @@ flock "$DST/subscribers.json.lock" \
   mv "$DST/subscribers.json.restore" "$DST/subscribers.json"
 # The sent log only if it was lost too: last night's copy would forget a post
 # announced since then, and a later publish:blog run would mail it again.
-[ -f "$SRC/newsletter-log.json" ] && [ ! -f "$DST/newsletter-log.json" ] &&
+# From @spy4x/server 1.84.0 the newest recipients sit in the log's journal,
+# newsletter-log.json.journal, until the next rewrite: restore it with the log,
+# unless the host still has one, which is newer than the backup.
+if [ -f "$SRC/newsletter-log.json" ] &&
+  [ ! -f "$DST/newsletter-log.json" ]; then
   cp "$SRC/newsletter-log.json" "$DST/newsletter-log.json"
+  [ -f "$SRC/newsletter-log.json.journal" ] &&
+    [ ! -f "$DST/newsletter-log.json.journal" ] &&
+    cp "$SRC/newsletter-log.json.journal" "$DST/newsletter-log.json.journal"
+fi
 rm -rf /tmp/antonshubin-restore
 ```
 
