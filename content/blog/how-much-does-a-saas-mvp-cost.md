@@ -191,7 +191,8 @@ The build is a one-time bill. These come every month:
   [starts at €5.49 a month][hetzner] before VAT. With a staging copy and
   backups, my rule of thumb is €20 to €50 for an early product. If someone
   suggests a setup billed per request with no spending cap, ask what happens
-  when a bot finds your sign-up form.
+  when a bot finds your sign-up form. More in
+  [hosting a small SaaS for a fixed monthly price](/blog/saas-hosting-fixed-monthly-price).
 - **Payment fees.** Stripe takes [2.9% + 30¢][stripe] per US card payment, plus
   0.7% for subscriptions through Stripe Billing. On a $20 subscription, that's
   about $1 a month per customer. Not a reason to skip payments; a reason to
