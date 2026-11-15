@@ -55,19 +55,26 @@ type SubmitStatus =
   | { type: "success" }
   | { type: "error"; message: string; field?: string }
 
+/** Shown when the brief did not reach the server, or the server failed it. */
+const SEND_FAILED =
+  "Your brief didn't send. Try again in a minute, or email me directly."
+
 /** The id of the field a validation error is about, so it can carry aria-invalid/aria-describedby. */
 function validate(
   form: FormState,
   serviceTitle?: string,
 ): { field: string; message: string } | null {
   if (!form.name.trim()) {
-    return { field: "lead-name", message: "Name is required" }
+    return { field: "lead-name", message: "Enter your name" }
   }
   if (!form.email.trim()) {
-    return { field: "lead-email", message: "Email is required" }
+    return { field: "lead-email", message: "Enter your email" }
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    return { field: "lead-email", message: "Please enter a valid email" }
+    return {
+      field: "lead-email",
+      message: "Enter an email like name@example.com",
+    }
   }
   if (isEmptyBrief(form.techStack, serviceTitle)) {
     return {
@@ -124,6 +131,7 @@ export default function LeadForm(
     }
     status.value = { type: "submitting" }
     let reason: BriefErrorReason = "server"
+    let message = SEND_FAILED
     try {
       const resp = await fetch("/api/lead", {
         method: "POST",
@@ -137,19 +145,21 @@ export default function LeadForm(
       })
       if (!resp.ok) {
         const body = await resp.json().catch(() => ({}))
-        // 400 is the server refusing what was typed; anything else is the
-        // server or the network failing (#318).
-        reason = resp.status === 400 ? "invalid" : "server"
-        throw new Error(body?.error || "Something went wrong. Try again.")
+        // 400 is the server refusing what was typed, and its words say what;
+        // anything else is the server or the network failing (#318).
+        if (resp.status === 400) {
+          reason = "invalid"
+          if (typeof body?.error === "string" && body.error) {
+            message = body.error
+          }
+        }
+        throw new Error(message)
       }
       status.value = { type: "success" }
       // Counted only once the server accepted the brief, never on the click.
       track("brief-sent", { service: service?.slug })
-    } catch (err) {
-      status.value = {
-        type: "error",
-        message: err instanceof Error ? err.message : "Something went wrong",
-      }
+    } catch {
+      status.value = { type: "error", message }
       track("brief-error", { reason })
     }
   }
