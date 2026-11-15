@@ -5,7 +5,7 @@ import { eventAttrs, track } from "../lib/analytics.ts"
 import { NewTabHint } from "../components/NewTabHint.tsx"
 import { FACT_LINK } from "../components/FactCard.tsx"
 
-/** The self-hosted 9:16 still, cropped from the short's own thumbnail. */
+/** The self-hosted 9:16 still: the short's thumbnail cropped above YouTube's overlay text. */
 const POSTER = { src: "/img/home/video-poster.webp", width: 540, height: 960 }
 
 /** A 1x1 transparent GIF: the large poster's `<img>` until its 1024px `<source>` matches. */
