@@ -10,8 +10,9 @@ import type { ToolPageData } from "./tool-page.ts"
 /**
  * The tool frame's facts card (#454, part 5): Status, Built on, Version,
  * Licence, Runs on, Website, Live, Code and CI, in that order, each row only
- * when it has a value. Its footer holds one link, "View on GitHub". Every link sends
- * `outbound` with `place: card`.
+ * when it has a value. Its footer holds one link, "View on GitHub". Every link to
+ * another site sends `outbound` with `place: card`; an on-site Live link (mig's
+ * "/book") sends `book` instead.
  */
 export function ToolFacts({ data }: { data: ToolPageData }) {
   const { tool, live, snap, repo } = data
@@ -65,7 +66,13 @@ export function ToolFacts({ data }: { data: ToolPageData }) {
         )}
         {tool.live && (
           <Fact term="Live">
-            <a href={tool.live.href} {...out("live")} class={FACT_LINK}>
+            <a
+              href={tool.live.href}
+              {...(tool.live.href.startsWith("/")
+                ? eventAttrs("book", { place: "card", item: tool.slug })
+                : out("live"))}
+              class={FACT_LINK}
+            >
               {tool.live.label}
             </a>
           </Fact>
