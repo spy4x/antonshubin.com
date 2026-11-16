@@ -1,5 +1,5 @@
 import { useSignal } from "@preact/signals"
-import { useEffect } from "preact/hooks"
+import { useEffect, useRef } from "preact/hooks"
 import { Explorable } from "@spy4x/preact-ui/explorable"
 import { RadioChips } from "@spy4x/preact-ui/radio-chips"
 import Button from "../components/Button.tsx"
@@ -29,6 +29,7 @@ const OPTIONS: { value: QuizAnswer; label: string }[] = [
 export default function DeveloperNeedQuiz({ post }: { post: string }) {
   const answers = useSignal<Readonly<Record<string, QuizAnswer>>>({})
   const live = useSignal(false)
+  const fields = useRef<HTMLFieldSetElement>(null)
   useEffect(() => {
     live.value = true
   }, [])
@@ -48,6 +49,7 @@ export default function DeveloperNeedQuiz({ post }: { post: string }) {
     >
       <div class="flex flex-col gap-6">
         <fieldset
+          ref={fields}
           disabled={!live.value}
           class="m-0 grid min-w-0 gap-6 border-0 p-0 noscript:opacity-50 md:grid-cols-2"
         >
@@ -101,7 +103,10 @@ export default function DeveloperNeedQuiz({ post }: { post: string }) {
             <Button
               class="min-h-11 px-4"
               disabled={!live.value || result.answered === 0}
-              onClick={() => (answers.value = {})}
+              onClick={() => {
+                answers.value = {}
+                fields.current?.querySelector("input")?.focus()
+              }}
             >
               Clear answers
             </Button>

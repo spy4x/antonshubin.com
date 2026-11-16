@@ -1,5 +1,5 @@
 import { useSignal } from "@preact/signals"
-import { useEffect } from "preact/hooks"
+import { useEffect, useRef } from "preact/hooks"
 import { Explorable } from "@spy4x/preact-ui/explorable"
 import Button from "../components/Button.tsx"
 import { trackPostTry } from "../lib/analytics.ts"
@@ -26,6 +26,7 @@ const GROUPS: { key: "red" | "green"; title: string; flags: ProposalFlag[] }[] =
 export default function ProposalChecklist({ post }: { post: string }) {
   const ticked = useSignal<ReadonlySet<string>>(new Set())
   const live = useSignal(false)
+  const fields = useRef<HTMLFieldSetElement>(null)
   useEffect(() => {
     live.value = true
   }, [])
@@ -48,6 +49,7 @@ export default function ProposalChecklist({ post }: { post: string }) {
     >
       <div class="flex flex-col gap-6">
         <fieldset
+          ref={fields}
           disabled={!live.value}
           class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0 noscript:opacity-50"
         >
@@ -96,7 +98,10 @@ export default function ProposalChecklist({ post }: { post: string }) {
             <Button
               class="min-h-11 px-4"
               disabled={!live.value || ticked.value.size === 0}
-              onClick={() => (ticked.value = new Set())}
+              onClick={() => {
+                ticked.value = new Set()
+                fields.current?.querySelector("input")?.focus()
+              }}
             >
               Clear answers
             </Button>
