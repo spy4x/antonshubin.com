@@ -880,7 +880,8 @@ kbd {
 /*
  * Code blocks (UX 4): their own Paper surface with a hairline border, a
  * header row with the language and Copy, 14px mono on phones and 15px from
- * 1024px. A wide line scrolls inside the box, never the page.
+ * 1024px. A long line wraps inside the box (indentation kept, long tokens
+ * broken), so a phone reader never has to scroll sideways to read it.
  */
 .blog-content .code-block {
   margin: 1.5em 0;
@@ -919,7 +920,8 @@ kbd {
 }
 
 .blog-content pre {
-  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.6;
