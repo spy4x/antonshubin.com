@@ -381,7 +381,7 @@ Deno.test("a fenced code block gets a language label, a hidden Copy button and e
   assertEquals(html.includes('"<a>"'), false)
 })
 
-Deno.test("a code line carries its leading indent in columns, tabs to the next multiple of 8", () => {
+Deno.test("a code line carries its leading indent in columns, tabs to the next multiple of 4", () => {
   assertEquals(codeLine(``), `<span class="code-line"></span>`)
   assertEquals(codeLine(`x`), `<span class="code-line">x</span>`)
   assertEquals(
@@ -390,11 +390,11 @@ Deno.test("a code line carries its leading indent in columns, tabs to the next m
   )
   assertEquals(
     codeLine(`  \tb`),
-    `<span class="code-line" style="--indent:8ch">  \tb</span>`,
+    `<span class="code-line" style="--indent:4ch">  \tb</span>`,
   )
   assertEquals(
     codeLine(`\t\t<i>`),
-    `<span class="code-line" style="--indent:16ch">\t\t&lt;i&gt;</span>`,
+    `<span class="code-line" style="--indent:8ch">\t\t&lt;i&gt;</span>`,
   )
 })
 

@@ -475,7 +475,8 @@ function addOutboundEvents(html: string): string {
 /**
  * One source line of a code block, escaped, in its own `.code-line` span
  * (#596). The span's `--indent` is the line's leading whitespace in columns
- * (a tab runs to the next multiple of 8), so a line too long for the box
+ * (a tab runs to the next multiple of 4, the `tab-size` the
+ * CSS sets), so a line too long for the box
  * wraps to 2ch past its own indent instead of column 0, and wrapped YAML
  * keeps its visible structure. The spans add no characters, so the code's
  * `textContent`, which Copy reads, stays the source.
@@ -483,7 +484,7 @@ function addOutboundEvents(html: string): string {
 export function codeLine(line: string): string {
   let indent = 0
   for (const c of /^[ \t]*/.exec(line)![0]) {
-    indent = c === "\t" ? indent + 8 - indent % 8 : indent + 1
+    indent = c === "\t" ? indent + 4 - indent % 4 : indent + 1
   }
   const style = indent ? ` style="--indent:${indent}ch"` : ""
   return `<span class="code-line"${style}>${escapeEncode(line)}</span>`

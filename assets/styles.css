@@ -945,6 +945,7 @@ kbd {
 
 .blog-content pre {
   white-space: pre-wrap;
+  tab-size: 4;
   padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.6;
