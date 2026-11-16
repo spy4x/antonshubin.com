@@ -2,10 +2,19 @@
 
 ## Continuous integration
 
-`.woodpecker/woodpecker.yml` runs on every `push` and `pull_request` what
-`deno task check` runs, split into steps that run side by side; a failing test
-fails the build. There is no deploy step in CI — deploying stays a manual,
-post-merge action (see "Deploy" in [AGENTS.md](../AGENTS.md)).
+`.woodpecker/woodpecker.yml` runs on every push to main and every pull request
+not marked `[WIP]` what `deno task check` runs, split into steps that run side
+by side; a failing test fails the build. There is no deploy step in CI —
+deploying stays a manual, post-merge action (see "Deploy" in
+[AGENTS.md](../AGENTS.md)).
+
+A pull request whose title starts with `[WIP]` runs `.woodpecker/wip.yml`
+instead: one step with install, fmt, lint, type check, build and the unit tests,
+no browser, video-cut or Lighthouse step. It reports `ci/woodpecker/pr/wip`,
+which branch protection does not require, so a `[WIP]` commit cannot merge.
+Removing `[WIP]` from the title starts the full workflow without a push. The top
+of each file explains the conditions; `scripts/ci-workflows.test.ts` checks
+them.
 
 - `build` (`denoland/deno:2.9.0`): `deno install --frozen` and
   `deno task build`, with `DENO_DIR` in `.ci/deno-dir`, and a copy of the deno
@@ -31,8 +40,8 @@ When a browser test gets much slower or faster, update its line in
 `scripts/browser-shard.ts`'s `SECONDS` so the shards stay even.
 
 A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
-runs `deno task weekly-numbers`; every other step's
-`when: event: [push, pull_request]` keeps it from running on that same cron
+runs `deno task weekly-numbers`; every other step's `when: *push_or_pr` (push,
+pull_request and pull_request_metadata) keeps it from running on that same cron
 trigger. See `docs/weekly-numbers.md` for the env vars it needs and the one-time
 Woodpecker cron setup.
 
