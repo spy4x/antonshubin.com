@@ -798,3 +798,78 @@ for (const width of [390, 412]) {
     }
   })
 }
+
+/** The focus ring properties of the focused element, read after a Tab. */
+function focusRing(el: Element): string[] {
+  const s = getComputedStyle(el)
+  return [s.outlineStyle, s.outlineWidth, s.outlineColor, s.outlineOffset]
+}
+
+// #645: the newsletter heading names the form, so it sits right above it.
+for (const width of [390, 1440]) {
+  Deno.test(`a post's band shows the author, then the newsletter heading right above the email field, at ${width}px (#645)`, async () => {
+    const site = await startSite()
+    let browser: Browser | undefined
+    try {
+      browser = await launchChromium()
+      const page = await newPage(browser, { viewport: { width, height: 900 } })
+      await page.goto(`${site.origin}/blog/ship-it-today`, {
+        waitUntil: "networkidle",
+      })
+      await page.evaluate(() => document.fonts.ready)
+      const box = await page.evaluate(() => {
+        const band = document.querySelector("[data-closing-band]")!
+        const rect = (sel: string) =>
+          band.querySelector(sel)!.getBoundingClientRect()
+        return {
+          author: rect("[data-author-box]").bottom,
+          headingTop: rect("h2").top,
+          headingBottom: rect("h2").bottom,
+          ask: rect("[data-newsletter-ask]").top,
+          field: rect('input[type="email"]').top,
+        }
+      })
+      assert(
+        box.author <= box.headingTop,
+        `the author ends at ${box.author}px, the heading starts at ${box.headingTop}px`,
+      )
+      assert(
+        box.headingBottom <= box.ask && box.ask <= box.field,
+        `heading ends ${box.headingBottom}px, ask starts ${box.ask}px, field ${box.field}px`,
+      )
+    } finally {
+      await browser?.close()
+      await site.stop()
+    }
+  })
+}
+
+Deno.test("a post's email field and Subscribe show the same 2px Parchment focus ring (#645)", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    await page.goto(`${site.origin}/blog/ship-it-today`, {
+      waitUntil: "networkidle",
+    })
+    const field = page.locator('[data-closing-band] input[type="email"]')
+    const button = page.locator('[data-closing-band] button[type="submit"]')
+    // Tab from the field to Subscribe and back, so both are keyboard focus.
+    await field.focus()
+    await page.keyboard.press("Tab")
+    assert(await button.evaluate((el) => el.matches(":focus-visible")))
+    const buttonRing = await button.evaluate(focusRing)
+    await page.keyboard.press("Shift+Tab")
+    assert(await field.evaluate((el) => el.matches(":focus-visible")))
+    const fieldRing = await field.evaluate(focusRing)
+    // The site's ring: 2px Parchment, 2px off the edge.
+    assertEquals(buttonRing, ["solid", "2px", "rgb(239, 235, 226)", "2px"])
+    assertEquals(fieldRing, buttonRing)
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

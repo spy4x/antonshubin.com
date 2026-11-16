@@ -1,6 +1,13 @@
 import { useState } from "preact/hooks"
 import { track } from "../lib/analytics.ts"
 
+/**
+ * The site's focus ring, on the field and Subscribe alike (#645): Chromium's
+ * default ring differs between an input and a button.
+ */
+const FOCUS_RING =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-parchment"
+
 /** The newsletter signup; a success counts as `newsletter-signup` (#274, #318). */
 export default function NewsletterForm() {
   const [email, setEmail] = useState("")
@@ -60,12 +67,12 @@ export default function NewsletterForm() {
               aria-describedby={status === "error"
                 ? "newsletter-form-error"
                 : undefined}
-              class="flex-1 min-w-[200px] px-3 py-2 bg-ink border border-rule-strong rounded-lg text-parchment text-sm placeholder-graphite focus:outline-none focus:border-parchment"
+              class={`flex-1 min-w-[200px] px-3 py-2 bg-ink border border-rule-strong rounded-lg text-parchment text-sm placeholder-graphite focus:border-parchment ${FOCUS_RING}`}
             />
             <button
               type="submit"
               disabled={status === "loading"}
-              class="px-4 py-2 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
+              class={`px-4 py-2 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm ${FOCUS_RING}`}
             >
               {status === "loading" ? "..." : "Subscribe"}
             </button>
