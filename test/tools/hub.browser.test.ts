@@ -1,10 +1,12 @@
 // The curated /tools hub (#456) in a browser: axe, no sideways scroll and one
 // <h1> at 390 and 1440px with the archive closed and open; Seed's play button
-// on the first screen at both widths; a card's clip and the spotlight's play
-// from the keyboard, loop and send demo-play without fetching any video before
-// the press; starting a second clip pauses the first where it was. Needs a
-// built site and Chromium; see docs/testing.md
-// "Browser-driven tests".
+// on the first screen at both widths; the spotlight's See button above the
+// phone tab bar at 412 and 390px, and its lede under
+// the actions on a phone but above them, centred beside the clip, at 1440px
+// (#643); a card's clip and the spotlight's play from the keyboard, loop and
+// send demo-play without fetching any video before the press; starting a
+// second clip pauses the first where it was. Needs a built site and Chromium;
+// see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser } from "playwright"
 import { startSite } from "../harness.ts"
@@ -16,6 +18,9 @@ import {
   WAIT_MS,
 } from "../browser.ts"
 import { axeViolations, toolPageProblems } from "../tool-frame.ts"
+
+/** Lighthouse's mobile viewport (a Moto G Power). */
+const PHONE_LIGHTHOUSE = { width: 412, height: 823 }
 
 Deno.test("the hub has no axe violation, sideways scroll or extra h1, with the archive closed or open", async () => {
   const site = await startSite({
@@ -76,6 +81,83 @@ Deno.test("Seed's play button is on the hub's first screen at 390 and 1440px", a
           box.y + box.height / 2 < viewport.height,
           `${viewport.width}px: Seed's play button is below the first screen`,
         )
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+// #643: on a phone the spotlight's "See Seed" sat under the docked tab bar on
+// the first screen, which Lighthouse's target-size audit (at its 412x823
+// phone) reported as an obscured target. axe 4.13's own target-size rule
+// skips this button, so the check is its box against the bar's; the audit
+// itself runs in `deno task lighthouse`, which lists /tools.
+Deno.test("the spotlight's See button clears the phone tab bar at 412 and 390px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of [PHONE_LIGHTHOUSE, { width: 390, height: 844 }]) {
+      const page = await newPage(browser, { viewport })
+      try {
+        await page.goto(`${site.origin}/tools`, { waitUntil: "networkidle" })
+        const see = await page.locator(
+          '[data-hub-spotlight] a[href^="/tools/"]',
+        )
+          .boundingBox()
+        const bar = await page.locator('[data-e2e="rail-shell-tabbar"]')
+          .boundingBox()
+        assert(see && bar, `${viewport.width}px: no See button or tab bar`)
+        assert(
+          see.y + see.height <= bar.y,
+          `${viewport.width}px: See ends at ${
+            see.y + see.height
+          }, the tab bar starts at ${bar.y}`,
+        )
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("the spotlight's lede sits under its actions on a phone and above them, beside the clip, at 1440px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of [PHONE_LIGHTHOUSE, { width: 1440, height: 900 }]) {
+      const page = await newPage(browser, { viewport })
+      try {
+        await page.goto(`${site.origin}/tools`, { waitUntil: "networkidle" })
+        const box = (selector: string) =>
+          page.locator(`[data-hub-spotlight] ${selector}`).first().boundingBox()
+        const see = await box('a[href^="/tools/"]')
+        const lede = await box("> p")
+        const clip = await box("> div:nth-child(2)")
+        assert(see && lede && clip, `${viewport.width}px: a part is missing`)
+        if (viewport.width < 1024) {
+          assert(see.y + see.height <= lede.y, "phone: lede above See")
+        } else {
+          assert(lede.y + lede.height <= see.y, "1440px: lede under See")
+          assert(lede.x + lede.width <= clip.x, "1440px: lede not beside clip")
+          // The text column stays centred on the clip, as before #643.
+          const text = await box("> div:first-child")
+          assert(text, "1440px: no top line")
+          const gapAbove = text.y - clip.y
+          const gapBelow = clip.y + clip.height - (see.y + see.height)
+          assert(
+            Math.abs(gapAbove - gapBelow) <= 2,
+            `1440px: text ${gapAbove}px from the clip's top, ${gapBelow}px from its bottom`,
+          )
+        }
       } finally {
         await page.close()
       }

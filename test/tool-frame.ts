@@ -146,18 +146,26 @@ const VIEWPORTS = [
   { width: 1440, height: 900 },
 ]
 
-/** Rule ids and offending markup of every axe-core WCAG 2 A/AA violation on `page`. */
-export async function axeViolations(page: Page): Promise<string[]> {
+/**
+ * Rule ids and offending markup of every axe-core violation on `page`: of the
+ * WCAG 2 A/AA rules, or only of `rules` when given (for a rule outside those
+ * tags, such as `label-content-name-mismatch`).
+ */
+export async function axeViolations(
+  page: Page,
+  rules?: string[],
+): Promise<string[]> {
   // Injected through page.evaluate, not a <script> tag, so the site's CSP
   // does not block it (see test/contrast.browser.test.ts).
   await page.evaluate(axeCore.source)
-  const results = await page.evaluate(async () => {
+  const runOnly = rules
+    ? { type: "rule", values: rules }
+    : { type: "tag", values: ["wcag2a", "wcag2aa"] }
+  const results = await page.evaluate(async (runOnly) => {
     // deno-lint-ignore no-explicit-any
     const axe = (globalThis as any).axe
-    return await axe.run(document, {
-      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-    })
-  }) as { violations: { id: string; nodes: { html: string }[] }[] }
+    return await axe.run(document, { runOnly })
+  }, runOnly) as { violations: { id: string; nodes: { html: string }[] }[] }
   return results.violations.flatMap((v) =>
     v.nodes.map((n) => `${v.id}: ${n.html.slice(0, 160)}`)
   )
