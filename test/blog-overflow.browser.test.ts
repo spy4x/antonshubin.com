@@ -335,3 +335,181 @@ Deno.test("at 1440px Tab reaches On this page before the post's links, and the s
     await site.stop()
   }
 })
+
+Deno.test("no line of a post's code block hides behind a sideways scroll at 390 and 1440px", async () => {
+  // #596: article code wraps rather than scrolls. The passkey post's first
+  // block scrolled even at 1440px.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const xml = await site.html("/sitemap.xml")
+    const posts = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname)
+      .filter((p) => p.startsWith("/blog/"))
+    const known = "/blog/passkey-autofill-bitwarden-tab-focus"
+    assert(posts.includes(known), `sitemap.xml no longer lists ${known}`)
+    browser = await launchChromium()
+    for (const width of [390, 1440]) {
+      const page = await newPage(browser, {
+        viewport: { width, height: 900 },
+      })
+      try {
+        const hidden: string[] = []
+        let measured = 0
+        for (const path of posts) {
+          await page.goto(`${site.origin}${path}`, { waitUntil: "load" })
+          const widths = await page.$$eval(
+            ".blog-content pre",
+            (pres) => pres.map((p) => [p.scrollWidth, p.clientWidth]),
+          )
+          if (path === known) {
+            assert(
+              widths.length > 0,
+              `${known} has no code block at ${width}px`,
+            )
+          }
+          measured += widths.length
+          widths.forEach(([scroll, client], i) => {
+            if (scroll > client + 1) {
+              hidden.push(`${path} block ${i + 1} (${scroll}px in ${client}px)`)
+            }
+          })
+        }
+        assert(
+          measured > 0,
+          "no .blog-content pre found; the selector is stale",
+        )
+        assertEquals(hidden, [], `code scrolls sideways at ${width}px`)
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("a code line holding one long unbroken token, such as a URL, breaks inside the box at 390px", async () => {
+  // Some posts hold such tokens (the oko post's sha256 image digest), but the
+  // test writes its own into a block so the case stays covered if they change.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    await page.goto(
+      `${site.origin}/blog/passkey-autofill-bitwarden-tab-focus`,
+      { waitUntil: "load" },
+    )
+    const [scroll, client] = await page.locator(".blog-content pre").first()
+      .evaluate((pre) => {
+        pre.querySelector("code")?.append(
+          `\nhttps://example.com/${"a".repeat(200)}`,
+        )
+        return [pre.scrollWidth, pre.clientWidth]
+      })
+    assert(scroll <= client + 1, `the token runs ${scroll}px in ${client}px`)
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("a wrapped code line continues 2ch past its drawn indent at 390px, and lines never double up", async () => {
+  // #596 design gate: wrapped YAML that restarts at column 0 reads as a new
+  // key at the wrong level. The Woodpecker post's YAML is indented with
+  // spaces, the oko post's Go with tabs; both have lines that wrap at 390px.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    for (
+      const slug of ["self-hosted-ci-with-woodpecker", "oko-homelab-dashboard"]
+    ) {
+      await page.goto(`${site.origin}/blog/${slug}`, { waitUntil: "load" })
+      const bad = await page.$$eval(".blog-content pre code", (codes) => {
+        const out: string[] = []
+        let wrapped = 0
+        for (const code of codes) {
+          // The newline between two line spans draws nothing.
+          const lines = [...code.querySelectorAll(".code-line")]
+          const sum = lines.reduce(
+            (n, l) => n + l.getBoundingClientRect().height,
+            0,
+          )
+          const height = code.getBoundingClientRect().height
+          if (Math.abs(height - sum) > 1) {
+            out.push(`a block is ${height}px tall for ${sum}px of lines`)
+          }
+          const probe = document.createElement("span")
+          probe.textContent = "0"
+          code.parentElement!.append(probe)
+          const ch = probe.getBoundingClientRect().width
+          probe.remove()
+          for (const line of lines) {
+            const source = line.textContent!
+            const lead = /^[ \t]*/.exec(source)![0]
+            if (lead.length === source.length) continue
+            // Text rects only: an element's own box sits a few px above the
+            // text it holds and would read as a second row.
+            const rects: DOMRect[] = []
+            const texts = document.createTreeWalker(line, NodeFilter.SHOW_TEXT)
+            for (let n = texts.nextNode(); n; n = texts.nextNode()) {
+              const range = document.createRange()
+              range.selectNodeContents(n)
+              rects.push(
+                ...[...range.getClientRects()].filter((r) => r.width > 0),
+              )
+            }
+            const first = Math.min(...rects.map((r) => r.top))
+            const rest = rects.filter((r) => r.top > first + 1)
+            if (rest.length === 0) continue
+            wrapped++
+            // The first character after the leading tabs and spaces: it must
+            // sit at the indent's column (a tab runs to the next multiple of
+            // the site's tab-size, 4), and wrapped text 2ch past it.
+            const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT)
+            let at = lead.length
+            let node = walker.nextNode() as Text
+            while (at >= node.length) {
+              at -= node.length
+              node = walker.nextNode() as Text
+            }
+            const start = document.createRange()
+            start.setStart(node, at)
+            start.setEnd(node, at + 1)
+            const indent = start.getClientRects()[0].left
+            let columns = 0
+            for (const c of lead) {
+              columns = c === "\t" ? columns + 4 - columns % 4 : columns + 1
+            }
+            const col = code.getBoundingClientRect().left + columns * ch
+            if (Math.abs(indent - col) > 1) {
+              out.push(
+                `${source.trim().slice(0, 40)}: text at ${indent} != ${col}`,
+              )
+            }
+            const want = indent + 2 * ch
+            const left = Math.min(...rest.map((r) => r.left))
+            if (Math.abs(left - want) > 1) {
+              out.push(
+                `${line.textContent!.trim().slice(0, 40)}: ${left} != ${want}`,
+              )
+            }
+          }
+        }
+        return wrapped ? out : [`no code line wraps; the test checks nothing`]
+      })
+      assertEquals(bad, [], slug)
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

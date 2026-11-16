@@ -351,7 +351,7 @@ blogMarked.use({
         }</span>`
         : "<span></span>"
       return `<div class="code-block" role="group" aria-label="${label}"><div class="code-head">${langTag}<button type="button" class="code-copy" data-copy-code aria-label="Copy code" hidden>Copy</button></div><pre tabindex="0"><code${codeClass}>${
-        escapeEncode(text)
+        text.split("\n").map(codeLine).join("\n")
       }\n</code></pre></div>\n`
     },
     /**
@@ -473,17 +473,28 @@ function addOutboundEvents(html: string): string {
 }
 
 /**
- * A `<pre>` wider than its container scrolls horizontally, but marked never
- * puts it in the tab order, so a keyboard user can't reach the scrolled part
- * at all (axe: scrollable-region-focusable). Every `<pre>` marked emits gets
- * `tabindex="0"` uniformly: whether a given block actually overflows depends
- * on the reader's own viewport width, which isn't known at render time, and
- * a `<pre>` that doesn't overflow being one extra (harmless) tab stop is a
- * smaller cost than a keyboard user hitting one they can't reach. A `<pre>`
- * written out literally inside a code span (rare, but possible) is never
- * matched here either, for the same reason as the link hint above: marked
- * escapes it to `&lt;pre&gt;` in that context, so no literal `<pre>`
- * substring exists there.
+ * One source line of a code block, escaped, in its own `.code-line` span
+ * (#596): the leading tabs and spaces in a `.code-indent` span, the rest in a
+ * `.code-text` span. The browser draws the indent, so tabs keep their width,
+ * and a line too long for the box wraps to 2ch past that indent instead of
+ * column 0, so wrapped YAML keeps its visible structure. The spans add no
+ * characters, so the code's `textContent`, which Copy reads, stays the source.
+ */
+export function codeLine(line: string): string {
+  const lead = /^[ \t]*/.exec(line)![0]
+  const text = line.slice(lead.length)
+  return `<span class="code-line">${
+    lead ? `<span class="code-indent">${lead}</span>` : ``
+  }${text ? `<span class="code-text">${escapeEncode(text)}</span>` : ``}</span>`
+}
+
+/**
+ * Every `<pre>` marked emits gets `tabindex="0"`, so a keyboard user can
+ * reach each code block and see its focus ring. Code wraps instead of
+ * scrolling sideways (`.blog-content pre` in `assets/styles.css`), so this is
+ * about reaching the block, not a hidden part of it. A `<pre>` written out
+ * literally inside a code span is never matched: marked escapes it to
+ * `&lt;pre&gt;` there, so no literal `<pre>` substring exists.
  */
 function addPreTabIndex(html: string): string {
   return html.replace(/<pre>/g, '<pre tabindex="0">')

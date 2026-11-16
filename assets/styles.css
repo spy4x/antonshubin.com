@@ -903,7 +903,9 @@ kbd {
 /*
  * Code blocks (UX 4): their own Paper surface with a hairline border, a
  * header row with the language and Copy, 14px mono on phones and 15px from
- * 1024px. A wide line scrolls inside the box, never the page.
+ * 1024px. A long line wraps inside the box, indentation kept, and a long
+ * token breaks through `.blog-content`'s `overflow-wrap`, so no reader has to
+ * scroll sideways to read it.
  */
 .blog-content .code-block {
   margin: 1.5em 0;
@@ -942,7 +944,7 @@ kbd {
 }
 
 .blog-content pre {
-  overflow-x: auto;
+  white-space: pre-wrap;
   padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.6;
@@ -952,6 +954,34 @@ kbd {
 .blog-content pre:focus-visible {
   outline: 2px solid var(--color-parchment);
   outline-offset: -2px;
+}
+
+/*
+ * Each source line is a `.code-line` (lib/markdown.ts `codeLine`): its
+ * leading whitespace, then its text, which wraps 2ch past that indent. The
+ * code is a flex column so the newline between two line spans draws nothing,
+ * while staying in the text that Copy reads; an empty line keeps its height
+ * through `min-height`.
+ */
+.blog-content pre code {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-content .code-line {
+  display: flex;
+  min-height: 1lh;
+}
+
+.blog-content .code-indent {
+  flex: none;
+  white-space: pre;
+}
+
+.blog-content .code-text {
+  min-width: 0;
+  padding-inline-start: 2ch;
+  text-indent: -2ch;
 }
 
 @media (min-width: 1024px) {
