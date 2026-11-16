@@ -234,13 +234,17 @@ page. Never retry a test on this error.
   the old Previous/Next cards were clipped by an ancestor, so only each row's
   own box shows such an overflow. It also runs every axe-core WCAG 2 A/AA rule
   plus a horizontal-scroll check on `/blog` and three sample posts at 390 and
-  1440px, and checks that the post image lightbox, on a phone turned sideways,
+  1440px. At both widths, the tables of the Deno migration and Seed posts fit
+  the column without sideways scroll, and no code name without a space or hyphen
+  in a cell splits across lines (#609). On the Opus post, the short value "Sep
+  20–21" stays on one line at both widths: `lib/markdown.ts` marks body cells of
+  `SHORT_CELL` characters or fewer `nowrap`. At 390 and 1440px no post's code
+  block (`.blog-content pre`) is wider than its box (#596: code wraps rather
+  than scrolls), and a long unbroken token written into a block at 390px breaks
+  inside it. It checks that the post image lightbox, on a phone turned sideways,
   keeps its close button clear of a 47px safe-area inset, closes on a tap beside
-  the image and returns focus to the image button. At 390 and 1440px no post's
-  code block (`.blog-content pre`) is wider than its box (#596: code wraps
-  rather than scrolls), and a long unbroken token written into a block at 390px
-  breaks inside it. It blocks service workers, like every test that opens pages
-  through `newPage()`.
+  the image and returns focus to the image button. It blocks service workers,
+  like every test that opens pages through `newPage()`.
 - `test/post-components.browser.test.ts` (#537): a post's interactive components
   render disabled with the post's own numbers, then hydrate and follow the
   keyboard (the runs calculator on the Trail-code post, the cached share slider

@@ -7,7 +7,7 @@
 // raw markdown syntax into the label instead of its resolved text).
 import { assert, assertEquals, assertMatch } from "jsr:@std/assert@^1.0.0"
 import { marked } from "marked"
-import { renderBlogMarkdown, renderBlogPost } from "./markdown.ts"
+import { renderBlogMarkdown, renderBlogPost, SHORT_CELL } from "./markdown.ts"
 
 /** Strips the `aria-label="..."` this module adds to a checkbox `<input>`, so what's left can be compared against plain marked's own output. */
 function withoutAriaLabel(html: string): string {
@@ -437,4 +437,40 @@ Deno.test("a table sits in a focusable region named after the heading above it",
 Deno.test("a table with no heading above it is labelled Table", async () => {
   const html = await renderBlogMarkdown("| a |\n|---|\n| 1 |\n")
   assertMatch(html, /aria-label="Table"/)
+})
+
+/** The opening `<td>` tag of a one-column table whose only row is `cell`. */
+async function bodyCell(cell: string): Promise<string> {
+  const html = await renderBlogMarkdown(`| Head |\n|---|\n| ${cell} |\n`)
+  return html.match(/<td[^>]*>/)?.[0] ?? `no td`
+}
+
+Deno.test("a short table cell stays on one line and a long one wraps", async () => {
+  // #609: "Sep 20–21" split into three lines once every cell could wrap.
+  assertEquals(await bodyCell(`Sep 20–21`), `<td class="nowrap">`)
+  assertEquals(
+    await bodyCell(`An agent session merges it under my account.`),
+    `<td>`,
+  )
+})
+
+Deno.test("a cell of exactly the threshold length stays whole, one more wraps", async () => {
+  assertEquals(await bodyCell(`x`.repeat(SHORT_CELL)), `<td class="nowrap">`)
+  assertEquals(await bodyCell(`x`.repeat(SHORT_CELL + 1)), `<td>`)
+})
+
+Deno.test("a cell with code or a link is measured by its text, not its HTML", async () => {
+  // 16 and 11 visible characters; their HTML is longer than the threshold.
+  assertEquals(await bodyCell("`prettier --check`"), `<td class="nowrap">`)
+  assertEquals(
+    await bodyCell(`[$25 a month](https://example.com/pricing)`),
+    `<td class="nowrap">`,
+  )
+})
+
+Deno.test("a header cell may wrap however short it is", async () => {
+  // A short header such as "Input $/M" breaks at its space, so a table of
+  // short values fits a phone.
+  const html = await renderBlogMarkdown(`| Input $/M |\n|---|\n| 2 |\n`)
+  assertMatch(html, /<th>Input \$\/M<\/th>/)
 })
