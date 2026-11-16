@@ -173,7 +173,9 @@ go through this list:
    offline. That short list is what a reviewer should look at first.
 
 If all seven pass, you've already closed the holes that cost the most, and you
-did it without a developer.
+did it without a developer. For the security side in more depth, with a
+checklist that ends in a verdict, see
+[is my AI-built app safe to launch?](/blog/is-my-ai-built-app-safe-to-launch).
 
 ![The Surprised Pikachu meme: Pikachu stares with his mouth open. Captions: "Signs in as a second test user" and "Sees the first user's invoices"](/img/blog/do-you-need-a-developer-ai-app/pikachu.webp "Ten minutes, two accounts, one surprise")
 
