@@ -554,8 +554,10 @@ kbd {
     margin-inline: 0;
   }
 
+  /* First in the markup so Tab reaches it before the post (#584). */
   .post-aside {
     display: block;
+    order: 1;
     width: 15rem;
     flex-shrink: 0;
   }
