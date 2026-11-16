@@ -508,6 +508,18 @@ Deno.test("the MVP post's extras table fits a phone and the calculator's result 
           return r.top >= 0 && r.bottom <= innerHeight && el.contains(hit)
         })
         assert(seen, `the result is out of sight after the first tick ${where}`)
+        // The whole result block clears the dock, its fade included.
+        const overlap = await page.evaluate(() => {
+          const dock = document.querySelector("[data-e2e=rail-shell-dock]")
+          const result = document.querySelector(
+            "#mvp-cost-figure [data-result]",
+          )
+          if (!dock || !result || !dock.getClientRects().length) return 0
+          const top = dock.getBoundingClientRect().top
+          if (top >= innerHeight) return 0
+          return Math.max(0, result.getBoundingClientRect().bottom - top)
+        })
+        assertEquals(overlap, 0, `the result runs under the dock ${where}`)
 
         // Tabbing down the extras keeps the focused one clear of the result.
         const boxes = page.locator("#mvp-cost-figure").getByRole("checkbox")
