@@ -40,6 +40,22 @@ async function openPost(page: Page, origin: string, slug: string, id: string) {
   await page.locator(`#${id}[data-live="true"]`).waitFor({ timeout: WAIT_MS })
 }
 
+/**
+ * #610: Clear answers disables itself, so it must hand focus to the figure's
+ * first control instead of dropping it to the page.
+ */
+async function assertFirstControlFocused(
+  page: Page,
+  id: string,
+  role: "checkbox" | "radio",
+) {
+  const first = page.locator(`#${id}`).getByRole(role).first()
+  assert(
+    await first.evaluate((el) => el === document.activeElement),
+    `Clear answers left focus off the first ${role} of #${id}`,
+  )
+}
+
 Deno.test("the server renders each component disabled, with the post's own numbers", async () => {
   const site = await startSite()
   try {
@@ -146,6 +162,11 @@ Deno.test("the cached-share slider and the framework checklist react to the keyb
       )
       const clear = page.getByRole("button", { name: "Clear answers" })
       await clear.click()
+      await assertFirstControlFocused(
+        page,
+        "decision-framework-figure",
+        "checkbox",
+      )
       assertEquals(await box.isChecked(), false)
       assert(
         !((await result.textContent()) ?? "").includes("Your ticks match"),
@@ -215,6 +236,11 @@ Deno.test("the proposal checklist scores ticks from the keyboard and sends no ti
         "Red flags: 2 of 9. Green flags: 3 of 5.",
       )
       await page.getByRole("button", { name: "Clear answers" }).click()
+      await assertFirstControlFocused(
+        page,
+        "proposal-checklist-figure",
+        "checkbox",
+      )
       assertEquals(
         await verdict.textContent(),
         "Tick what you see in the proposal you received.",
@@ -287,6 +313,11 @@ Deno.test("the developer quiz answers from the keyboard, gives each verdict and 
         "Answered 3 of 8.",
       )
       await page.getByRole("button", { name: "Clear answers" }).click()
+      await assertFirstControlFocused(
+        page,
+        "developer-need-quiz-figure",
+        "radio",
+      )
       assertEquals(
         await title.textContent(),
         "Answer a question to see where you stand.",
@@ -342,6 +373,7 @@ Deno.test("the Deno ties checklist starts with Seed's ticks and follows the keyb
         "Never used: the data lives in Postgres and Valkey.",
       )
       await page.getByRole("button", { name: "Clear answers" }).click()
+      await assertFirstControlFocused(page, "deno-ties-figure", "checkbox")
       assertEquals(await kv.isChecked(), false)
       assertStringIncludes(
         (await result.textContent()) ?? "",
@@ -512,6 +544,11 @@ Deno.test("the Seed plumbing checklist opens on the post's case, follows the key
         "Not in Seed: an Android or desktop app, your product's own feature.",
       )
       await page.getByRole("button", { name: "Clear answers" }).click()
+      await assertFirstControlFocused(
+        page,
+        "plumbing-checklist-figure",
+        "checkbox",
+      )
       assertStringIncludes(
         (await result.textContent()) ?? "",
         "Tick what your product needs.",
@@ -571,6 +608,7 @@ Deno.test("the launch check opens on the post's example, gives each verdict from
         "The payment webhook checks its signature",
       )
       await page.getByRole("button", { name: "Clear answers" }).click()
+      await assertFirstControlFocused(page, "launch-check-figure", "checkbox")
       assertStringIncludes(
         (await verdict.textContent()) ?? "",
         "Don't launch yet.",
