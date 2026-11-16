@@ -73,9 +73,9 @@ This is the hole that hurts most, so it gets three checks.
    table, what each rule allows and to whom.
 
 Rules that exist are not enough; they have to say who. That is what
-CVE-2025-48757 is about. In March 2025, Matt Palmer and a colleague found that
-projects built with Lovable could have row-level security policies so weak that
-the CVE record describes them as letting
+CVE-2025-48757 is about. In March 2025, Matt Palmer and his co-researchers found
+that projects built with Lovable could have row-level security policies so weak
+that the CVE record describes them as letting
 [unauthenticated attackers read or write arbitrary tables][cve]. They scanned
 1,645 Lovable projects and found exposed endpoints in 170 of them, and published
 the details in [a statement dated 29 May 2025][palmer]. Lovable disputes the
