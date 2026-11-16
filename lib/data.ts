@@ -301,12 +301,13 @@ export const projects = {
       externalURL: "https://makearoley.com",
       externalURLLabel: "Client's site",
       description:
-        "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Postgres, AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The screenshots on this page are a portfolio re-imagination I built later; the original client's branding wasn't mine to share.",
+        "Multi-video recorder for kids. Pick a script, record scene-by-scene, and the app stitches the clips into a finished movie — with intro/ending credits and 50+ transitions. Full stack: SvelteKit app, ffmpeg.wasm video pipeline, Supabase (Postgres with row-level security, Auth, Storage, Realtime, Edge Functions), AWS S3 + SES, Slack + Mailchimp webhooks. Paired physical craft boxes (scripts, props, costumes) with a digital recorder so the founder's vision of physical play + digital creativity just worked. The screenshots on this page are a portfolio re-imagination I built later; the original client's branding wasn't mine to share.",
       role: "Full-stack",
       tags: [
         "SvelteKit",
         "ffmpeg.wasm",
         "PostgreSQL",
+        "Supabase",
         "AWS S3",
         "AWS SES",
         "TypeScript",
