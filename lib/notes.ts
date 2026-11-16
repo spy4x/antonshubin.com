@@ -35,7 +35,7 @@ export const notes: Note[] = [
   {
     id: "corecircle-users",
     text:
-      "The founder said 200K users in her June 2022 interview. The 2024 acquisition comes from the client's internal project data.",
+      "The founder said 200K users in her June 2022 interview. The founder told me about the acquisition in April 2025.",
     href:
       "https://foundersfeature.substack.com/p/founders-feature-054-corecircle",
   },
