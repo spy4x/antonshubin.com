@@ -1,0 +1,29 @@
+# A pull request whose title starts with `[WIP]` runs only this quick check;
+# woodpecker.yml skips it and runs in full once the title loses `[WIP]` (the
+# top of woodpecker.yml says how). Woodpecker sets `CI_COMMIT_MESSAGE` to the
+# pull request's title on a pull request. This workflow reports
+# `ci/woodpecker/pr/wip`, which branch protection does not require, and leaves
+# out `ci/woodpecker/pr/woodpecker`, which it does, so a commit pushed while the
+# title starts with `[WIP]` cannot merge. Putting `[WIP]` back without a push
+# runs nothing and keeps the earlier `ci/woodpecker/pr/woodpecker` status, so it
+# does not block a merge.
+#
+# One step: woodpecker.yml's `build` and `unit` in a row. The unit tests read
+# the built site, so the build stays. No browser, video-cut or Lighthouse step.
+# scripts/ci-workflows.test.ts checks the conditions and the step list.
+when:
+  - event: pull_request
+    branch: main
+    evaluate: 'CI_COMMIT_MESSAGE startsWith "[WIP]"'
+
+steps:
+  check:
+    image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
+    commands:
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir"
+      - deno install --frozen
+      - deno fmt --check .
+      - deno lint .
+      - deno check
+      - deno task build
+      - deno task test:unit --ignore=scripts/video-cut.test.ts

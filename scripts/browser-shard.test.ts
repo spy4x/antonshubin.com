@@ -6,10 +6,10 @@ import {
   shards,
 } from "./browser-shard.ts"
 
-/** The `<index>/<count>` of every browser shard step in .woodpecker.yml. */
+/** The `<index>/<count>` of every browser shard step in .woodpecker/woodpecker.yml. */
 async function ciShards(): Promise<{ index: number; count: number }[]> {
   const yml = await Deno.readTextFile(
-    new URL("../.woodpecker.yml", import.meta.url),
+    new URL("../.woodpecker/woodpecker.yml", import.meta.url),
   )
   return [...yml.matchAll(/browser-shard\.ts (\d+\/\d+)/g)].map((m) =>
     parseShard(m[1])
@@ -21,7 +21,7 @@ Deno.test("the CI shard steps run every browser test file exactly once", async (
   assert(files.length >= 37, `found only ${files.length} browser test files`)
   const steps = await ciShards()
   const count = steps[0]?.count
-  assert(count > 1, "no browser-shard step in .woodpecker.yml")
+  assert(count > 1, "no browser-shard step in .woodpecker/woodpecker.yml")
   assertEquals(
     steps.map((s) => `${s.index}/${s.count}`).toSorted(),
     Array.from({ length: count }, (_, i) => `${i + 1}/${count}`),

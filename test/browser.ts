@@ -2,7 +2,7 @@
 // deno.json's test:browser task through scripts/browser-shard.ts) — every one
 // launches Chromium through the same pinned Playwright version. An upgrade
 // changes that version here, in deno.json's import map and in the Playwright
-// image tag in .woodpecker.yml (docs/testing.md cites it too). See docs/testing.md "Browser-driven tests"
+// image tag in .woodpecker/woodpecker.yml (docs/testing.md cites it too). See docs/testing.md "Browser-driven tests"
 // for why these tests need Chromium and their own `-A` task instead of the
 // plain `deno task test` glob.
 import { chromium } from "playwright"
@@ -10,7 +10,7 @@ import type { Browser, BrowserContextOptions, Page } from "playwright"
 
 /**
  * Must match the `"playwright"` entry in deno.json's import map and the
- * Playwright image tag in .woodpecker.yml — on a mismatch the image holds a
+ * Playwright image tag in .woodpecker/woodpecker.yml — on a mismatch the image holds a
  * different Chromium build than the one these tests launch.
  */
 export const PLAYWRIGHT_VERSION = "1.63.0"
