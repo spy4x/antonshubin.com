@@ -233,6 +233,22 @@ export default define.page(function BlogPost(ctx) {
       <div
         class={`post-layout py-4 sm:py-8 ${hasToc ? "post-layout--aside" : ""}`}
       >
+        {
+          /* The side column comes first in the markup, so Tab reaches "On this
+             page" before the post's links (#584); CSS puts it on the right. */
+        }
+        {hasToc && (
+          <aside class="post-aside" aria-label="About this post">
+            <div class="post-aside-inner">
+              <nav aria-label="On this page">
+                <p class="text-sm font-semibold text-parchment">
+                  On this page
+                </p>
+                <PostToc items={tocItems} />
+              </nav>
+            </div>
+          </aside>
+        )}
         <article class="post-column">
           <Breadcrumb
             items={getBreadcrumb(head.value.canonical, article.title)}
@@ -475,19 +491,6 @@ export default define.page(function BlogPost(ctx) {
             </section>
           )}
         </article>
-
-        {hasToc && (
-          <aside class="post-aside" aria-label="About this post">
-            <div class="post-aside-inner">
-              <nav aria-label="On this page">
-                <p class="text-sm font-semibold text-parchment">
-                  On this page
-                </p>
-                <PostToc items={tocItems} />
-              </nav>
-            </div>
-          </aside>
-        )}
       </div>
     </Layout>
   )
