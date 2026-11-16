@@ -1,6 +1,6 @@
 ---
 title: "One editor per entity: why Add and Edit share one screen"
-description: "Why New and Edit should open the same form, at /groups/new and /groups/:id: one set of fields and checks, a real address, and ids that let creates work offline."
+description: "Why New and Edit should open one form, at /groups/new and /groups/:id: one set of fields and checks, a real address, and ids that let offline creates work."
 tldr:
   - "In my apps, Add and Edit are one screen: New group opens the group's editor at /groups/new, and an existing group opens the same component at /groups/:id."
   - "One component means one set of fields, one check and one place for the loading, error and offline states, so create and edit cannot drift apart."

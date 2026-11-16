@@ -46,14 +46,14 @@ server on a free port and returns `{ get, html, stop }` — `get` uses
 `jsonLd()` and `count()` for asserting on structure and short phrases, never
 prose — the copy changes often, and a test that pins a paragraph breaks for the
 wrong reason. `test/structure.test.ts` guards site structure (catalog, nav,
-redirects, prices, labels). `test/head-lengths.test.ts` (#494) fails when a
-non-blog sitemap page's `<title>` is over 60 characters before " — Anton Shubin"
-or its meta description over 155. `test/label-in-name.test.ts` (#236) fails when
-an `aria-label`led button or link's visible text is not part of its name, on
-every sitemap page plus `/pay`, and pins that each `/pay` copy button names its
-field. `test/a11y.test.ts` (#160) guards nav `aria-current` and icon-only
-accessible names, from server-rendered HTML only — it doesn't cover the two
-lightboxes' buttons, which only exist after client JS opens them (see
+redirects, prices, labels). `test/head-lengths.test.ts` (#494, #669) fails when
+any sitemap page's `<title>`, a blog post's too, is over 60 characters before "
+— Anton Shubin" or its meta description over 155. `test/label-in-name.test.ts`
+(#236) fails when an `aria-label`led button or link's visible text is not part
+of its name, on every sitemap page plus `/pay`, and pins that each `/pay` copy
+button names its field. `test/a11y.test.ts` (#160) guards nav `aria-current` and
+icon-only accessible names, from server-rendered HTML only — it doesn't cover
+the two lightboxes' buttons, which only exist after client JS opens them (see
 "Browser-driven tests"). The library `Rail` sets `aria-current` on its entries
 from the path `components/Nav.tsx` hands it: "page" on the page, "true" on its
 section, so a nested route passes its own path. Contact is the page on `/book`

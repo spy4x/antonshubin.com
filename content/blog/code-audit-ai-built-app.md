@@ -1,7 +1,7 @@
 ---
 title: "What a code audit checks in an AI-built app: my checklist, run on my own repo"
 seoTitle: "Code audit for an AI-built app: a worked example"
-description: "The checklist my code audit follows, run on mig, an open-source scheduler that coding agents work on: a scanner's 11 alerts triaged, a lost cancellation, a flaky test, and the fix order."
+description: "My code audit checklist, run on mig, an open-source scheduler agents work on: 11 scanner alerts triaged, a lost cancellation, a flaky test, the fix order."
 tldr:
   - "I ran my audit checklist on mig, my open-source scheduler that coding agents work on, and show every finding with its file and line."
   - "The scanner raised 11 advisories. None needs an urgent fix: six are build-time only, and the booking form can't trigger the other five."

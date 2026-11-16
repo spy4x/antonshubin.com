@@ -1,6 +1,7 @@
 ---
 title: "Cost-Disciplined SaaS Infrastructure: Managed Cloud, Dedicated, or Hybrid?"
-description: "A founder-readable framework for choosing managed cloud, dedicated, or hybrid SaaS infrastructure based on workload, team, compliance, recovery, and total cost."
+seoTitle: "SaaS Infrastructure: Managed Cloud, Dedicated, or Hybrid?"
+description: "A founder-readable framework for choosing managed cloud, dedicated or hybrid SaaS infrastructure by workload, team, compliance, recovery and total cost."
 tldr:
   - "Choose managed cloud, dedicated or hybrid infrastructure from the workload, the team, recovery needs, compliance and budget, not from fashion."
   - "Compare total cost of ownership, not the hosting invoice: infrastructure, engineering time, operations, failure risk and migration cost."

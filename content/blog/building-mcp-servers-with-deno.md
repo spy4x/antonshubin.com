@@ -1,6 +1,6 @@
 ---
 title: "Building an MCP server in TypeScript without the SDK"
-description: "How caldav-mcp speaks the Model Context Protocol with about 190 lines of its own JSON-RPC code: tool definitions, stdio and Streamable HTTP, narrow permissions and tests, quoted from the repository."
+description: "How caldav-mcp speaks the Model Context Protocol in about 190 lines of its own JSON-RPC: tools, stdio and Streamable HTTP, narrow permissions and tests."
 tldr:
   - "Update: rewritten against the code caldav-mcp really runs. It uses no MCP SDK and no zod, and it starts on stdio unless you ask for HTTP."
   - "A tools-only MCP server needs five JSON-RPC methods. caldav-mcp answers them in one file of about 190 lines that imports nothing from outside the repository."

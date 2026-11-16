@@ -1,6 +1,7 @@
 ---
 title: "Opus 5.5 vs Sonnet 5: the pricier model wrote my code for about half the cost"
-description: "I priced five days of my coding-agent transcripts across four Claude models: 203 PRs and 411 reviewer agents. Opus 5.5 lists at twice Sonnet 5's price, yet cost about half as much per changed line once I compared like with like. Here is why, and what I changed."
+seoTitle: "Opus 5.5 vs Sonnet 5: why the pricier model cost less"
+description: "I priced five days of my agent transcripts. Opus 5.5 lists at twice Sonnet 5's price yet cost about half as much per changed line. Why, and what I changed."
 tldr:
   - "Update: Sonnet 5.5 later cost 0.57 times as much as Opus 5.5 per merged line but passed its first review less often, 13% against 33%. My implementers tried it, then went back to Opus 5.5."
   - "The original finding still holds for Sonnet 5: like for like, Opus 5.5 cost about 0.45 times as much per changed line, although it lists at twice the price."

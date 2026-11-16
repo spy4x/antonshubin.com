@@ -1,6 +1,6 @@
 ---
 title: "Fixed price or hourly: how I decide for your project"
-description: "I work fixed price when the scope is fixed and hourly when the work is open-ended. When each fits, how a scope change is quoted, and which promises hold either way."
+description: "I work fixed price when the scope is fixed and hourly when it is open-ended. When each fits, how a scope change is quoted, which promises hold either way."
 tldr:
   - "I work fixed price when the scope is fixed, and hourly for staff augmentation, code reviews, or when the work is open-ended."
   - "If the scope changes after we start, you get a quote for the change before I start on it. No surprise costs."

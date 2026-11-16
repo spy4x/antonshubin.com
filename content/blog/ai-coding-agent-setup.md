@@ -1,7 +1,7 @@
 ---
 title: "My AI coding agent setup: one rules file, a worktree per task, and a reviewer that breaks the code"
 seoTitle: "My AI coding agent setup, rules and reviewer"
-description: "How I run several AI coding agents at once: one public rules source for three harnesses, a git worktree per task, and a reviewer that breaks the code to test the tests."
+description: "How I run several AI coding agents at once: one rules source for three harnesses, a worktree per task, and a reviewer that breaks code to test the tests."
 tldr:
   - "My agents' rules, skills and agents live once, in the public spy4x/dotfiles repo. One command renders them into Claude Code, OpenCode and DSH."
   - "Every task runs in its own git worktree, and parallel tasks never touch the same files, so agents can't overwrite each other's work."

@@ -1,7 +1,7 @@
 ---
 title: "Self-hosted CI with Woodpecker: server, pipelines, secrets and releases"
 seoTitle: "Self-hosted CI with Woodpecker: my real setup"
-description: "How I run self-hosted CI with Woodpecker: one server and agent in Docker Compose, a pipeline file per repo, scoped secrets, browser tests and image releases on a tag."
+description: "My self-hosted CI with Woodpecker: server and agent in Docker Compose, a pipeline file per repo, scoped secrets, browser tests and image releases on a tag."
 tldr:
   - "A Woodpecker server and agent in Docker Compose run CI for this site and my open-source tools; each repository keeps its pipeline in .woodpecker.yml."
   - "Give each secret to the steps that need it, for the events that need it, and write shell variables as $$NAME, or Woodpecker blanks them before the shell runs."

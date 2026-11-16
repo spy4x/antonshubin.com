@@ -1,7 +1,7 @@
 ---
 title: "I tried SKILL.state in my coding agents and stopped after four days"
 seoTitle: "SKILL.state in practice: why I stopped after 4 days"
-description: "SKILL.state replaces an AI agent's growing chat history with an explicit execution state. I ran it on real tasks in my Claude Code setup for four days, then stopped. Here is what helped, what got in the way and why the problem went away on its own."
+description: "SKILL.state swaps an AI agent's growing chat history for an explicit state. I ran it in my Claude Code setup for four days, then stopped. Here is why."
 tldr:
   - "SKILL.state swaps an agent's growing chat history for a state file and a fresh step each time. I ran my own version of it on real tasks and stopped after four days."
   - "The briefs were clean, but every run needed hand fixes, such as patches that failed the schema, invented timestamps, and a state folder that broke the linter."

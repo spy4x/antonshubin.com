@@ -1,7 +1,7 @@
 ---
 title: "Seed: the SaaS starter I distilled from {proof:projects} projects, and how I over-engineered v1"
 seoTitle: "Seed SaaS starter: how over-engineering killed v1"
-description: "Seed is the SaaS starter I build client MVPs on: groups as tenancy, CQRS with an outbox, an offline-first client, on web standards. Plus how I over-engineered the first version."
+description: "Seed is the SaaS starter I build client MVPs on: groups as tenancy, CQRS with an outbox, an offline-first client, web standards. How I over-engineered v1."
 tldr:
   - "Seed is the SaaS starter I build client MVPs on: groups from sign-up, billing per member, realtime, an offline app and an admin area, on one server you own."
   - "My first Seed (2019–2022) failed because I over-engineered it: 52 of its 134 commits went to setup, and groups, billing and offline never shipped."
