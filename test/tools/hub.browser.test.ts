@@ -1,11 +1,12 @@
 // The curated /tools hub (#456) in a browser: axe, no sideways scroll and one
 // <h1> at 390 and 1440px with the archive closed and open; Seed's play button
 // on the first screen at both widths; the spotlight's See button above the
-// phone tab bar and axe's target-size at 412 and 390px (#643); a card's clip and the spotlight's play
-// from the keyboard, loop and send demo-play without fetching any video before
-// the press; starting a second clip pauses the first where it was. Needs a
-// built site and Chromium; see docs/testing.md
-// "Browser-driven tests".
+// phone tab bar with axe's target-size at 412 and 390px, and its lede under
+// the actions on a phone but above them, centred beside the clip, at 1440px
+// (#643); a card's clip and the spotlight's play from the keyboard, loop and
+// send demo-play without fetching any video before the press; starting a
+// second clip pauses the first where it was. Needs a built site and Chromium;
+// see docs/testing.md "Browser-driven tests".
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser } from "playwright"
 import { startSite } from "../harness.ts"
@@ -120,6 +121,46 @@ Deno.test("the spotlight's See button clears the phone tab bar and passes axe's 
           [],
           `${viewport.width}px`,
         )
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("the spotlight's lede sits under its actions on a phone and above them, beside the clip, at 1440px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of [PHONE_LIGHTHOUSE, { width: 1440, height: 900 }]) {
+      const page = await newPage(browser, { viewport })
+      try {
+        await page.goto(`${site.origin}/tools`, { waitUntil: "networkidle" })
+        const box = (selector: string) =>
+          page.locator(`[data-hub-spotlight] ${selector}`).first().boundingBox()
+        const see = await box('a[href^="/tools/"]')
+        const lede = await box("> p")
+        const clip = await box("> div:nth-child(2)")
+        assert(see && lede && clip, `${viewport.width}px: a part is missing`)
+        if (viewport.width < 1024) {
+          assert(see.y + see.height <= lede.y, "phone: lede above See")
+        } else {
+          assert(lede.y + lede.height <= see.y, "1440px: lede under See")
+          assert(lede.x + lede.width <= clip.x, "1440px: lede not beside clip")
+          // The text column stays centred on the clip, as before #643.
+          const text = await box("> div:first-child")
+          assert(text, "1440px: no top line")
+          const gapAbove = text.y - clip.y
+          const gapBelow = clip.y + clip.height - (see.y + see.height)
+          assert(
+            Math.abs(gapAbove - gapBelow) <= 2,
+            `1440px: text ${gapAbove}px from the clip's top, ${gapBelow}px from its bottom`,
+          )
+        }
       } finally {
         await page.close()
       }
