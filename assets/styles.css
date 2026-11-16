@@ -870,7 +870,25 @@ kbd {
 
 .blog-content > .table-scroll > table th,
 .blog-content > .table-scroll > table td {
-  @apply px-4 py-2 text-left border-b border-rule whitespace-nowrap;
+  @apply px-4 py-2 text-left border-b border-rule;
+}
+
+/*
+ * Cell text wraps (#609); inline code in a cell does not split mid-name, so
+ * its column keeps the name's width and a table still too wide scrolls. The
+ * outer cells drop their outer padding, so the table lines up with the prose
+ * and a phone gets 32px more for the text.
+ */
+.blog-content > .table-scroll code {
+  overflow-wrap: normal;
+}
+
+.blog-content > .table-scroll > table :is(th, td):first-child {
+  padding-left: 0;
+}
+
+.blog-content > .table-scroll > table :is(th, td):last-child {
+  padding-right: 0;
 }
 
 .blog-content > .table-scroll > table th {
