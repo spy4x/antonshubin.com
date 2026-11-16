@@ -1,7 +1,7 @@
 // The curated /tools hub (#456) in a browser: axe, no sideways scroll and one
 // <h1> at 390 and 1440px with the archive closed and open; Seed's play button
 // on the first screen at both widths; the spotlight's See button above the
-// phone tab bar with axe's target-size at 412 and 390px, and its lede under
+// phone tab bar at 412 and 390px, and its lede under
 // the actions on a phone but above them, centred beside the clip, at 1440px
 // (#643); a card's clip and the spotlight's play from the keyboard, loop and
 // send demo-play without fetching any video before the press; starting a
@@ -91,10 +91,12 @@ Deno.test("Seed's play button is on the hub's first screen at 390 and 1440px", a
   }
 })
 
-// #643: on a phone the spotlight's "See Seed" sat under the fixed tab bar on
-// the first screen, which Lighthouse's target-size audit (axe's rule, at its
-// 412x823 phone) reports as an obscured target.
-Deno.test("the spotlight's See button clears the phone tab bar and passes axe's target-size at 412 and 390px", async () => {
+// #643: on a phone the spotlight's "See Seed" sat under the docked tab bar on
+// the first screen, which Lighthouse's target-size audit (at its 412x823
+// phone) reported as an obscured target. axe 4.13's own target-size rule
+// skips this button, so the check is its box against the bar's; the audit
+// itself runs in `deno task lighthouse`, which lists /tools.
+Deno.test("the spotlight's See button clears the phone tab bar at 412 and 390px", async () => {
   const site = await startSite()
   let browser: Browser | undefined
   try {
@@ -115,11 +117,6 @@ Deno.test("the spotlight's See button clears the phone tab bar and passes axe's 
           `${viewport.width}px: See ends at ${
             see.y + see.height
           }, the tab bar starts at ${bar.y}`,
-        )
-        assertEquals(
-          await axeViolations(page, ["target-size"]),
-          [],
-          `${viewport.width}px`,
         )
       } finally {
         await page.close()

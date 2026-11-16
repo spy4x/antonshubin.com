@@ -240,8 +240,9 @@ export function ToolHubLine(
  * headline as an `<h2>`, its clip (the page's one eager image), "See <name>"
  * and its live link, then its lede. On a phone the clip comes right after the
  * heading and the action row right after the clip, so both are on the first
- * screen and the button clears the fixed tab bar (#643). From `lg` grid rows
- * put the lede back above the action row, beside the clip; the lede holds no
+ * screen and the button clears the docked tab bar (#643). From `lg` grid rows
+ * put the lede back above the action row, beside the clip, and an empty `1fr`
+ * row above and below keeps the text centred on the clip. The lede holds no
  * link, so the tab order is the same at every width.
  */
 export function Spotlight({ tool }: { tool: Tool }) {

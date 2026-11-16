@@ -149,7 +149,7 @@ const VIEWPORTS = [
 /**
  * Rule ids and offending markup of every axe-core violation on `page`: of the
  * WCAG 2 A/AA rules, or only of `rules` when given (for a rule outside those
- * tags, such as `target-size` or `label-content-name-mismatch`).
+ * tags, such as `label-content-name-mismatch`).
  */
 export async function axeViolations(
   page: Page,
