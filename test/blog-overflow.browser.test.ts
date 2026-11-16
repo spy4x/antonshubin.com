@@ -5,7 +5,8 @@
 // /blog and five sample posts have no horizontal scroll and no axe
 // violations at 390 and 1440px, and the image lightbox closes on a tap
 // beside the image. #609: the tables of two posts with long prose cells
-// wrap to fit the column at both widths. Runs under `deno task test:browser`, sharing
+// wrap to fit the column at both widths, and a short value stays on one
+// line. Runs under `deno task test:browser`, sharing
 // test/browser.ts's Chromium launch.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser, Page } from "playwright"
@@ -123,7 +124,7 @@ Deno.test("/blog and five sample posts have no horizontal scroll and no axe viol
   }
 })
 
-Deno.test("prose tables wrap to fit the column at 390 and 1440px, without splitting a code name", async () => {
+Deno.test("prose tables wrap to fit the column at 390 and 1440px, without splitting a code name or a short value", async () => {
   // #609: with nowrap cells these ran 1602px and 931px wide in a 748px column.
   // A code name with no space or hyphen (`Deno.errors.NotFound`) stays on one
   // line: split mid-word, it read as two names.
@@ -163,6 +164,23 @@ Deno.test("prose tables wrap to fit the column at 390 and 1440px, without splitt
             )
           }
         }
+        // A short value keeps its line: with every cell free to wrap, the
+        // column shrank and "Sep 20–21" printed as "Sep" / "20–" / "21".
+        await page.goto(
+          `${site.origin}/blog/opus-5-5-vs-sonnet-5-agent-costs`,
+          {
+            waitUntil: `load`,
+          },
+        )
+        const lines = await page.evaluate(() => {
+          const cell = [...document.querySelectorAll(`.table-scroll td`)]
+            .find((el) => el.textContent === `Sep 20–21`)
+          if (!cell?.firstChild) return -1
+          const range = document.createRange()
+          range.selectNodeContents(cell.firstChild)
+          return range.getClientRects().length
+        })
+        assertEquals(lines, 1, `"Sep 20–21" lines at ${width}px`)
       } finally {
         await page.close()
       }

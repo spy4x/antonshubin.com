@@ -883,6 +883,11 @@ kbd {
   overflow-wrap: normal;
 }
 
+/* A short value stays whole: lib/markdown.ts marks cells of 16 characters or fewer. */
+.blog-content > .table-scroll .nowrap {
+  white-space: nowrap;
+}
+
 .blog-content > .table-scroll > table :is(th, td):first-child {
   padding-left: 0;
 }

@@ -53,6 +53,14 @@ let componentUses: PostComponentUse[] = []
 /** The first bad component tag this render met. */
 let componentError: Error | undefined
 
+/**
+ * The longest table cell text, in characters, kept on one line (#609). The
+ * longest short values in the posts are 15 and 16: "12.7 to 13.1 MB",
+ * "prettier --check". The shortest prose cells are 19 and up ("Passed first
+ * review"), and those wrap.
+ */
+export const SHORT_CELL = 16
+
 /** Stands for the component at index `n` in the rendered HTML. */
 const PLACEHOLDER = /<!--post-component:(\d+)-->\n?/
 
@@ -306,6 +314,22 @@ blogMarked.use({
       return `<div class="table-scroll" tabindex="0" role="region" aria-label="${
         escapeEncode(label)
       }">${Renderer.prototype.table.call(this, token)}</div>\n`
+    },
+    /**
+     * A short cell gets `class="nowrap"` (#609). Cells wrap so a prose table
+     * fits a phone, but the browser then shrinks a column of short values to
+     * its longest word and splits "Sep 20–21" or "about 49 MB" across lines.
+     * The length is of the cell's text, not its HTML, so a link or code
+     * counts only its visible characters.
+     */
+    tablecell(token) {
+      const html = Renderer.prototype.tablecell.call(this, token)
+      const text = decodeEntities(
+        this.parser.parseInline(token.tokens, this.parser.textRenderer),
+      ).trim()
+      return token.header || text.length > SHORT_CELL
+        ? html
+        : html.replace(/^<td/, `<td class="nowrap"`)
     },
     /**
      * A fenced code block (#274, UX 4): a header row with the language and a
