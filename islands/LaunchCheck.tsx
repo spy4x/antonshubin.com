@@ -1,5 +1,5 @@
 import { useSignal } from "@preact/signals"
-import { useEffect } from "preact/hooks"
+import { useEffect, useRef } from "preact/hooks"
 import { Explorable } from "@spy4x/preact-ui/explorable"
 import Button from "../components/Button.tsx"
 import { trackPostTry } from "../lib/analytics.ts"
@@ -28,6 +28,7 @@ const GROUPS = [
 export default function LaunchCheck({ post }: { post: string }) {
   const passes = useSignal<ReadonlySet<string>>(DEFAULT_PASSES)
   const live = useSignal(false)
+  const fields = useRef<HTMLFieldSetElement>(null)
   useEffect(() => {
     live.value = true
   }, [])
@@ -51,6 +52,7 @@ export default function LaunchCheck({ post }: { post: string }) {
     >
       <div class="flex flex-col gap-6">
         <fieldset
+          ref={fields}
           disabled={!live.value}
           class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0 noscript:opacity-50"
         >
@@ -105,7 +107,10 @@ export default function LaunchCheck({ post }: { post: string }) {
             <Button
               class="min-h-11 px-4"
               disabled={!live.value || passes.value.size === 0}
-              onClick={() => (passes.value = new Set())}
+              onClick={() => {
+                passes.value = new Set()
+                fields.current?.querySelector("input")?.focus()
+              }}
             >
               Clear answers
             </Button>
