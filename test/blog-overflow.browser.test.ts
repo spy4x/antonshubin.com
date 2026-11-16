@@ -449,26 +449,52 @@ Deno.test("a wrapped code line continues 2ch past its drawn indent at 390px, and
           }
           const probe = document.createElement("span")
           probe.textContent = "0"
-          code.append(probe)
+          code.parentElement!.append(probe)
           const ch = probe.getBoundingClientRect().width
           probe.remove()
           for (const line of lines) {
-            const text = line.firstChild
-            if (!text) continue
-            const range = document.createRange()
-            range.selectNodeContents(line)
-            const rects = [...range.getClientRects()].filter((r) => r.width > 0)
+            const source = line.textContent!
+            const lead = /^[ \t]*/.exec(source)![0]
+            if (lead.length === source.length) continue
+            // Text rects only: an element's own box sits a few px above the
+            // text it holds and would read as a second row.
+            const rects: DOMRect[] = []
+            const texts = document.createTreeWalker(line, NodeFilter.SHOW_TEXT)
+            for (let n = texts.nextNode(); n; n = texts.nextNode()) {
+              const range = document.createRange()
+              range.selectNodeContents(n)
+              rects.push(
+                ...[...range.getClientRects()].filter((r) => r.width > 0),
+              )
+            }
             const first = Math.min(...rects.map((r) => r.top))
             const rest = rects.filter((r) => r.top > first + 1)
             if (rest.length === 0) continue
             wrapped++
-            // Where the line's text starts after its drawn leading tabs and
-            // spaces, which is what the eye reads as its indent.
-            const lead = /^[ \t]*/.exec(text.textContent!)![0].length
+            // The first character after the leading tabs and spaces: it must
+            // sit at the indent's column (a tab runs to the next multiple of
+            // the site's tab-size, 4), and wrapped text 2ch past it.
+            const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT)
+            let at = lead.length
+            let node = walker.nextNode() as Text
+            while (at >= node.length) {
+              at -= node.length
+              node = walker.nextNode() as Text
+            }
             const start = document.createRange()
-            start.setStart(text, lead)
-            start.setEnd(text, lead + 1)
+            start.setStart(node, at)
+            start.setEnd(node, at + 1)
             const indent = start.getClientRects()[0].left
+            let columns = 0
+            for (const c of lead) {
+              columns = c === "\t" ? columns + 4 - columns % 4 : columns + 1
+            }
+            const col = code.getBoundingClientRect().left + columns * ch
+            if (Math.abs(indent - col) > 1) {
+              out.push(
+                `${source.trim().slice(0, 40)}: text at ${indent} != ${col}`,
+              )
+            }
             const want = indent + 2 * ch
             const left = Math.min(...rest.map((r) => r.left))
             if (Math.abs(left - want) > 1) {

@@ -945,7 +945,6 @@ kbd {
 
 .blog-content pre {
   white-space: pre-wrap;
-  tab-size: 4;
   padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.6;
@@ -958,10 +957,11 @@ kbd {
 }
 
 /*
- * Each source line is a `.code-line` (lib/markdown.ts `codeLine`). A wrapped
- * line continues 2ch past its own indent. The code is a flex column so the
- * newline between two line spans draws nothing, while staying in the text
- * that Copy reads; an empty line keeps its height through `min-height`.
+ * Each source line is a `.code-line` (lib/markdown.ts `codeLine`): its
+ * leading whitespace, then its text, which wraps 2ch past that indent. The
+ * code is a flex column so the newline between two line spans draws nothing,
+ * while staying in the text that Copy reads; an empty line keeps its height
+ * through `min-height`.
  */
 .blog-content pre code {
   display: flex;
@@ -969,9 +969,19 @@ kbd {
 }
 
 .blog-content .code-line {
+  display: flex;
   min-height: 1lh;
-  padding-inline-start: calc(var(--indent, 0ch) + 2ch);
-  text-indent: calc(-1 * (var(--indent, 0ch) + 2ch));
+}
+
+.blog-content .code-indent {
+  flex: none;
+  white-space: pre;
+}
+
+.blog-content .code-text {
+  min-width: 0;
+  padding-inline-start: 2ch;
+  text-indent: -2ch;
 }
 
 @media (min-width: 1024px) {

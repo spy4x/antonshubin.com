@@ -376,25 +376,25 @@ Deno.test("a fenced code block gets a language label, a hidden Copy button and e
   // The code's markup is escaped, never live, and carries no highlighting.
   assertMatch(
     html,
-    /<code class="language-ts"><span class="code-line">const x = &quot;&lt;a&gt;&quot; \/\/ note<\/span>\n<\/code>/,
+    /<code class="language-ts"><span class="code-line"><span class="code-text">const x = &quot;&lt;a&gt;&quot; \/\/ note<\/span><\/span>\n<\/code>/,
   )
   assertEquals(html.includes('"<a>"'), false)
 })
 
-Deno.test("a code line carries its leading indent in columns, tabs to the next multiple of 4", () => {
+Deno.test("a code line splits its leading tabs and spaces from its escaped text", () => {
   assertEquals(codeLine(``), `<span class="code-line"></span>`)
-  assertEquals(codeLine(`x`), `<span class="code-line">x</span>`)
   assertEquals(
-    codeLine(`    - a`),
-    `<span class="code-line" style="--indent:4ch">    - a</span>`,
+    codeLine(`x`),
+    `<span class="code-line"><span class="code-text">x</span></span>`,
   )
   assertEquals(
-    codeLine(`  \tb`),
-    `<span class="code-line" style="--indent:4ch">  \tb</span>`,
+    codeLine(`  \t`),
+    `<span class="code-line"><span class="code-indent">  \t</span></span>`,
   )
   assertEquals(
-    codeLine(`\t\t<i>`),
-    `<span class="code-line" style="--indent:8ch">\t\t&lt;i&gt;</span>`,
+    codeLine(`\t  - <i> a`),
+    `<span class="code-line"><span class="code-indent">\t  </span>` +
+      `<span class="code-text">- &lt;i&gt; a</span></span>`,
   )
 })
 

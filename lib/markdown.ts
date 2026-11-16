@@ -474,20 +474,18 @@ function addOutboundEvents(html: string): string {
 
 /**
  * One source line of a code block, escaped, in its own `.code-line` span
- * (#596). The span's `--indent` is the line's leading whitespace in columns
- * (a tab runs to the next multiple of 4, the `tab-size` the
- * CSS sets), so a line too long for the box
- * wraps to 2ch past its own indent instead of column 0, and wrapped YAML
- * keeps its visible structure. The spans add no characters, so the code's
- * `textContent`, which Copy reads, stays the source.
+ * (#596): the leading tabs and spaces in a `.code-indent` span, the rest in a
+ * `.code-text` span. The browser draws the indent, so tabs keep their width,
+ * and a line too long for the box wraps to 2ch past that indent instead of
+ * column 0, so wrapped YAML keeps its visible structure. The spans add no
+ * characters, so the code's `textContent`, which Copy reads, stays the source.
  */
 export function codeLine(line: string): string {
-  let indent = 0
-  for (const c of /^[ \t]*/.exec(line)![0]) {
-    indent = c === "\t" ? indent + 4 - indent % 4 : indent + 1
-  }
-  const style = indent ? ` style="--indent:${indent}ch"` : ""
-  return `<span class="code-line"${style}>${escapeEncode(line)}</span>`
+  const lead = /^[ \t]*/.exec(line)![0]
+  const text = line.slice(lead.length)
+  return `<span class="code-line">${
+    lead ? `<span class="code-indent">${lead}</span>` : ``
+  }${text ? `<span class="code-text">${escapeEncode(text)}</span>` : ``}</span>`
 }
 
 /**
