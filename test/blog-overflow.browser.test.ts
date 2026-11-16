@@ -4,7 +4,9 @@
 // clipped them, so only each row's own box shows such an overflow). #274:
 // /blog and five sample posts have no horizontal scroll and no axe
 // violations at 390 and 1440px, and the image lightbox closes on a tap
-// beside the image. Runs under `deno task test:browser`, sharing
+// beside the image. #609: the tables of two posts with long prose cells
+// wrap to fit the column at both widths, and a short value stays on one
+// line. Runs under `deno task test:browser`, sharing
 // test/browser.ts's Chromium launch.
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser, Page } from "playwright"
@@ -112,6 +114,73 @@ Deno.test("/blog and five sample posts have no horizontal scroll and no axe viol
           assert(scrollWidth <= clientWidth, `${where}: ${scrollWidth}px`)
           assertEquals(await axeViolations(page), [], where)
         }
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("prose tables wrap to fit the column at 390 and 1440px, without splitting a code name or a short value", async () => {
+  // #609: with nowrap cells these ran 1602px and 931px wide in a 748px column.
+  // A code name with no space or hyphen (`Deno.errors.NotFound`) stays on one
+  // line: split mid-word, it read as two names.
+  const paths = [
+    `/blog/migrate-from-deno-to-node-and-bun`,
+    `/blog/seed-saas-starter`,
+  ]
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const width of [390, 1440]) {
+      const page = await newPage(browser, {
+        viewport: { width, height: 900 },
+      })
+      try {
+        for (const path of paths) {
+          await page.goto(`${site.origin}${path}`, { waitUntil: `load` })
+          const { boxes, split } = await page.evaluate(() => ({
+            boxes: [
+              ...document.querySelectorAll(`.blog-content > .table-scroll`),
+            ].map((el) => [el.scrollWidth, el.clientWidth]),
+            split: [...document.querySelectorAll(`.table-scroll td code`)]
+              .filter((el) =>
+                !/[\s-]/.test(el.textContent ?? ``) &&
+                el.getClientRects().length > 1
+              )
+              .map((el) => el.textContent),
+          }))
+          const where = `${path} at ${width}px`
+          assertEquals(split, [], `${where}: code split across lines`)
+          assert(boxes.length > 0, `${where}: no table found`)
+          for (const [scroll, client] of boxes) {
+            assert(
+              scroll <= client,
+              `${where}: table ${scroll}px > ${client}px`,
+            )
+          }
+        }
+        // A short value keeps its line: with every cell free to wrap, the
+        // column shrank and "Sep 20–21" printed as "Sep" / "20–" / "21".
+        await page.goto(
+          `${site.origin}/blog/opus-5-5-vs-sonnet-5-agent-costs`,
+          {
+            waitUntil: `load`,
+          },
+        )
+        const lines = await page.evaluate(() => {
+          const cell = [...document.querySelectorAll(`.table-scroll td`)]
+            .find((el) => el.textContent === `Sep 20–21`)
+          if (!cell?.firstChild) return -1
+          const range = document.createRange()
+          range.selectNodeContents(cell.firstChild)
+          return range.getClientRects().length
+        })
+        assertEquals(lines, 1, `"Sep 20–21" lines at ${width}px`)
       } finally {
         await page.close()
       }
