@@ -450,6 +450,107 @@ Deno.test("the MVP cost calculator follows the keyboard and sends no pick", asyn
   }
 })
 
+Deno.test("the MVP post's extras table fits a phone and the calculator's result stays in view while you tick", async () => {
+  // #642: at 390px the extras table showed clipped text, and a tick in the
+  // calculator changed a result that sat below the window and the tab bar.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const width of [390, 1440]) {
+      const page = await newPage(browser, {
+        viewport: { width, height: 844 },
+      })
+      try {
+        await openPost(page, site.origin, MVP, "mvp-cost-figure")
+        const where = `at ${width}px`
+        const table = await page.evaluate(() => {
+          const box = [
+            ...document.querySelectorAll(".blog-content > .table-scroll"),
+          ].find((el) => el.textContent?.includes("Working days"))
+          if (!box) return undefined
+          return {
+            box: [box.scrollWidth, box.clientWidth],
+            clipped: [...box.querySelectorAll("th, td")]
+              .filter((c) => c.scrollWidth > c.clientWidth)
+              .map((c) => c.textContent),
+            page: document.documentElement.scrollWidth > innerWidth,
+          }
+        })
+        assert(table, "no extras table with a Working days column")
+        assert(
+          table.box[0] <= table.box[1],
+          `the extras table is ${table.box[0]}px in a ${
+            table.box[1]
+          }px box ${where}`,
+        )
+        assertEquals(table.clipped, [], `clipped cells ${where}`)
+        assert(!table.page, `${MVP} scrolls sideways ${where}`)
+
+        const estimate = page.locator("#mvp-cost-figure [data-estimate]")
+        const before = await estimate.textContent()
+        const first = page.locator("#mvp-cost-figure").getByRole("checkbox")
+          .first()
+        await first.focus()
+        await first.evaluate((el) => el.scrollIntoView({ block: "center" }))
+        await page.keyboard.press("Space")
+        assert(
+          (await estimate.textContent()) !== before,
+          `the first extra did not change the result ${where}`,
+        )
+        // Visible means in the window and not under the phone's tab bar.
+        const seen = await estimate.evaluate((el) => {
+          const r = el.getBoundingClientRect()
+          const hit = document.elementFromPoint(
+            r.left + r.width / 2,
+            r.top + r.height / 2,
+          )
+          return r.top >= 0 && r.bottom <= innerHeight && el.contains(hit)
+        })
+        assert(seen, `the result is out of sight after the first tick ${where}`)
+        // The whole result block clears the dock, its fade included.
+        const overlap = await page.evaluate(() => {
+          const dock = document.querySelector("[data-e2e=rail-shell-dock]")
+          const result = document.querySelector(
+            "#mvp-cost-figure [data-result]",
+          )
+          if (!dock || !result || !dock.getClientRects().length) return 0
+          const top = dock.getBoundingClientRect().top
+          if (top >= innerHeight) return 0
+          return Math.max(0, result.getBoundingClientRect().bottom - top)
+        })
+        assertEquals(overlap, 0, `the result runs under the dock ${where}`)
+
+        // Tabbing down the extras keeps the focused one clear of the result.
+        const boxes = page.locator("#mvp-cost-figure").getByRole("checkbox")
+        const count = await boxes.count()
+        for (let i = 1; i < count; i++) await page.keyboard.press("Tab")
+        const last = boxes.last()
+        assert(
+          await last.evaluate((el) => el === document.activeElement),
+          `Tab did not reach the last extra ${where}`,
+        )
+        const [focused, result] = await Promise.all([
+          last.boundingBox(),
+          page.locator("#mvp-cost-figure [data-result]").boundingBox(),
+        ])
+        assert(focused && result, "the last extra or the result has no box")
+        assert(
+          focused.y + focused.height <= result.y,
+          `the focused extra ends at ${
+            focused.y + focused.height
+          }px, under the result at ${result.y}px ${where}`,
+        )
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("every component box has no axe violation at 390 and 1440px", async () => {
   const site = await startSite()
   let browser: Browser | undefined
