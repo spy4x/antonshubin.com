@@ -1,6 +1,7 @@
 // The curated /tools hub (#456) in a browser: axe, no sideways scroll and one
 // <h1> at 390 and 1440px with the archive closed and open; Seed's play button
-// on the first screen at both widths; a card's clip and the spotlight's play
+// on the first screen at both widths; the spotlight's See button above the
+// phone tab bar and axe's target-size at 412 and 390px (#643); a card's clip and the spotlight's play
 // from the keyboard, loop and send demo-play without fetching any video before
 // the press; starting a second clip pauses the first where it was. Needs a
 // built site and Chromium; see docs/testing.md
@@ -16,6 +17,9 @@ import {
   WAIT_MS,
 } from "../browser.ts"
 import { axeViolations, toolPageProblems } from "../tool-frame.ts"
+
+/** Lighthouse's mobile viewport (a Moto G Power). */
+const PHONE_LIGHTHOUSE = { width: 412, height: 823 }
 
 Deno.test("the hub has no axe violation, sideways scroll or extra h1, with the archive closed or open", async () => {
   const site = await startSite({
@@ -75,6 +79,46 @@ Deno.test("Seed's play button is on the hub's first screen at 390 and 1440px", a
         assert(
           box.y + box.height / 2 < viewport.height,
           `${viewport.width}px: Seed's play button is below the first screen`,
+        )
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+// #643: on a phone the spotlight's "See Seed" sat under the fixed tab bar on
+// the first screen, which Lighthouse's target-size audit (axe's rule, at its
+// 412x823 phone) reports as an obscured target.
+Deno.test("the spotlight's See button clears the phone tab bar and passes axe's target-size at 412 and 390px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    for (const viewport of [PHONE_LIGHTHOUSE, { width: 390, height: 844 }]) {
+      const page = await newPage(browser, { viewport })
+      try {
+        await page.goto(`${site.origin}/tools`, { waitUntil: "networkidle" })
+        const see = await page.locator(
+          '[data-hub-spotlight] a[href^="/tools/"]',
+        )
+          .boundingBox()
+        const bar = await page.locator('[data-e2e="rail-shell-tabbar"]')
+          .boundingBox()
+        assert(see && bar, `${viewport.width}px: no See button or tab bar`)
+        assert(
+          see.y + see.height <= bar.y,
+          `${viewport.width}px: See ends at ${
+            see.y + see.height
+          }, the tab bar starts at ${bar.y}`,
+        )
+        assertEquals(
+          await axeViolations(page, ["target-size"]),
+          [],
+          `${viewport.width}px`,
         )
       } finally {
         await page.close()

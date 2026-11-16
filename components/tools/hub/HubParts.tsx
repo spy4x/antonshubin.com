@@ -237,9 +237,12 @@ export function ToolHubLine(
 
 /**
  * The spotlight that opens the hub: the launched tool's top line, its
- * headline as an `<h2>`, its clip (the page's one eager image), its lede,
- * "See <name>" and its live link. On a phone the clip comes right after the
- * heading, so the moving picture is on the first screen.
+ * headline as an `<h2>`, its clip (the page's one eager image), "See <name>"
+ * and its live link, then its lede. On a phone the clip comes right after the
+ * heading and the action row right after the clip, so both are on the first
+ * screen and the button clears the fixed tab bar (#643). From `lg` grid rows
+ * put the lede back above the action row, beside the clip; the lede holds no
+ * link, so the tab order is the same at every width.
  */
 export function Spotlight({ tool }: { tool: Tool }) {
   const clip = tool.clip
@@ -248,9 +251,9 @@ export function Spotlight({ tool }: { tool: Tool }) {
       aria-labelledby="spotlight"
       data-tool={tool.slug}
       data-hub-spotlight
-      class="mt-10 grid gap-6 rounded-xl border border-rule bg-desk p-5 sm:p-8 lg:grid-cols-12 lg:gap-x-10 lg:items-center"
+      class="mt-10 grid gap-6 rounded-xl border border-rule bg-desk p-5 sm:p-8 lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_auto_1fr] lg:gap-x-10 lg:gap-y-0 lg:items-center"
     >
-      <div class="min-w-0 lg:col-span-5 lg:row-start-1 lg:self-end">
+      <div class="min-w-0 lg:col-span-5 lg:row-start-2">
         <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-graphite">
           <span class="font-semibold text-parchment">{tool.name}</span>
           <span aria-hidden="true">·</span>
@@ -266,7 +269,7 @@ export function Spotlight({ tool }: { tool: Tool }) {
         </h2>
       </div>
       {clip?.video && (
-        <div class="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
+        <div class="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-5 lg:row-start-1">
           <MediaFrame>
             <ToolHeroClip
               item={tool.slug}
@@ -286,36 +289,36 @@ export function Spotlight({ tool }: { tool: Tool }) {
           </MediaFrame>
         </div>
       )}
-      <div class="min-w-0 lg:col-span-5 lg:row-start-2 lg:self-start">
-        <p class="text-parchment leading-relaxed">{toolLede(tool)}</p>
-        <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <Button
-            href={`/tools/${tool.slug}`}
-            {...eventAttrs("cta", {
+      <div class="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-4 lg:col-span-5 lg:row-start-4 lg:mt-6">
+        <Button
+          href={`/tools/${tool.slug}`}
+          {...eventAttrs("cta", {
+            place: "hero",
+            target: `/tools/${tool.slug}`,
+          })}
+          class="gap-2 px-5 py-3 text-base"
+        >
+          See {tool.name}
+          <IconArrowRight class="size-4" />
+        </Button>
+        {tool.live && (
+          <a
+            href={tool.live.href}
+            {...eventAttrs("outbound", {
+              to: "live",
+              item: tool.slug,
               place: "hero",
-              target: `/tools/${tool.slug}`,
             })}
-            class="gap-2 px-5 py-3 text-base"
+            class={`inline-flex items-center gap-1 ${FACT_LINK}`}
           >
-            See {tool.name}
-            <IconArrowRight class="size-4" />
-          </Button>
-          {tool.live && (
-            <a
-              href={tool.live.href}
-              {...eventAttrs("outbound", {
-                to: "live",
-                item: tool.slug,
-                place: "hero",
-              })}
-              class={`inline-flex items-center gap-1 ${FACT_LINK}`}
-            >
-              {tool.live.label}
-              <IconArrowUpRight class="size-4 shrink-0" />
-            </a>
-          )}
-        </div>
+            {tool.live.label}
+            <IconArrowUpRight class="size-4 shrink-0" />
+          </a>
+        )}
       </div>
+      <p class="min-w-0 text-parchment leading-relaxed lg:col-span-5 lg:row-start-3 lg:mt-6">
+        {toolLede(tool)}
+      </p>
     </section>
   )
 }
