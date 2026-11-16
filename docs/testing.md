@@ -236,8 +236,10 @@ page. Never retry a test on this error.
   plus a horizontal-scroll check on `/blog` and three sample posts at 390 and
   1440px, and checks that the post image lightbox, on a phone turned sideways,
   keeps its close button clear of a 47px safe-area inset, closes on a tap beside
-  the image and returns focus to the image button. It blocks service workers,
-  like every test that opens pages through `newPage()`.
+  the image and returns focus to the image button. At 390 and 1440px no post's
+  code block (`.blog-content pre`) is wider than its box (#596: code wraps
+  rather than scrolls). It blocks service workers, like every test that opens
+  pages through `newPage()`.
 - `test/post-components.browser.test.ts` (#537): a post's interactive components
   render disabled with the post's own numbers, then hydrate and follow the
   keyboard (the runs calculator on the Trail-code post, the cached share slider
