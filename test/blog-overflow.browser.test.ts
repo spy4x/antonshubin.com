@@ -417,3 +417,52 @@ Deno.test("a code line holding one long unbroken token, such as a URL, breaks in
     await site.stop()
   }
 })
+
+Deno.test("a wrapped code line continues 2ch past its own indent at 390px, never at column 0", async () => {
+  // #596 design gate: wrapped YAML that restarts at column 0 reads as a new
+  // key at the wrong level. The Woodpecker post's database line wraps.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    await page.goto(`${site.origin}/blog/self-hosted-ci-with-woodpecker`, {
+      waitUntil: "load",
+    })
+    const bad = await page.$$eval(".blog-content .code-line", (lines) => {
+      const out: string[] = []
+      let wrapped = 0
+      for (const line of lines) {
+        const probe = document.createElement("span")
+        probe.textContent = "0"
+        line.closest("pre")!.append(probe)
+        const ch = probe.getBoundingClientRect().width
+        probe.remove()
+        const range = document.createRange()
+        range.selectNodeContents(line)
+        const rects = [...range.getClientRects()].filter((r) => r.width > 0)
+        const first = Math.min(...rects.map((r) => r.top))
+        const rest = rects.filter((r) => r.top > first + 1)
+        if (rest.length === 0) continue
+        wrapped++
+        const indent = parseInt(
+          (line as HTMLElement).style.getPropertyValue("--indent") || "0",
+        )
+        const want = line.getBoundingClientRect().left + (indent + 2) * ch
+        const left = Math.min(...rest.map((r) => r.left))
+        if (left < want - 1) {
+          out.push(
+            `${line.textContent!.trim().slice(0, 40)}: ${left} < ${want}`,
+          )
+        }
+      }
+      return wrapped ? out : [`no code line wraps; the test checks nothing`]
+    })
+    assertEquals(bad, [])
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

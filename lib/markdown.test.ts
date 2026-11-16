@@ -7,7 +7,12 @@
 // raw markdown syntax into the label instead of its resolved text).
 import { assert, assertEquals, assertMatch } from "jsr:@std/assert@^1.0.0"
 import { marked } from "marked"
-import { renderBlogMarkdown, renderBlogPost, SHORT_CELL } from "./markdown.ts"
+import {
+  codeLine,
+  renderBlogMarkdown,
+  renderBlogPost,
+  SHORT_CELL,
+} from "./markdown.ts"
 
 /** Strips the `aria-label="..."` this module adds to a checkbox `<input>`, so what's left can be compared against plain marked's own output. */
 function withoutAriaLabel(html: string): string {
@@ -371,9 +376,35 @@ Deno.test("a fenced code block gets a language label, a hidden Copy button and e
   // The code's markup is escaped, never live, and carries no highlighting.
   assertMatch(
     html,
-    /<code class="language-ts">const x = &quot;&lt;a&gt;&quot; \/\/ note\n<\/code>/,
+    /<code class="language-ts"><span class="code-line">const x = &quot;&lt;a&gt;&quot; \/\/ note<\/span>\n<\/code>/,
   )
   assertEquals(html.includes('"<a>"'), false)
+})
+
+Deno.test("a code line carries its leading indent in columns, tabs to the next multiple of 8", () => {
+  assertEquals(codeLine(``), `<span class="code-line"></span>`)
+  assertEquals(codeLine(`x`), `<span class="code-line">x</span>`)
+  assertEquals(
+    codeLine(`    - a`),
+    `<span class="code-line" style="--indent:4ch">    - a</span>`,
+  )
+  assertEquals(
+    codeLine(`  \tb`),
+    `<span class="code-line" style="--indent:8ch">  \tb</span>`,
+  )
+  assertEquals(
+    codeLine(`\t\t<i>`),
+    `<span class="code-line" style="--indent:16ch">\t\t&lt;i&gt;</span>`,
+  )
+})
+
+Deno.test("a code block's text is the source, line for line, after the line spans", async () => {
+  const src = `a:\n  - b\n\n\tc <d>`
+  const html = await renderBlogMarkdown("```yaml\n" + src + "\n```\n")
+  const code = /<code[^>]*>([\s\S]*?)<\/code>/.exec(html)![1]
+  const text = code.replace(/<[^>]+>/g, ``).replaceAll(`&lt;`, `<`)
+    .replaceAll(`&gt;`, `>`)
+  assertEquals(text, src + "\n")
 })
 
 Deno.test("an image on its own line becomes a figure with a lightbox button and caption", async () => {

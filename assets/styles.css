@@ -956,6 +956,23 @@ kbd {
   outline-offset: -2px;
 }
 
+/*
+ * Each source line is a `.code-line` (lib/markdown.ts `codeLine`). A wrapped
+ * line continues 2ch past its own indent. The code is a flex column so the
+ * newline between two line spans draws nothing, while staying in the text
+ * that Copy reads; an empty line keeps its height through `min-height`.
+ */
+.blog-content pre code {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-content .code-line {
+  min-height: 1lh;
+  padding-inline-start: calc(var(--indent, 0ch) + 2ch);
+  text-indent: calc(-1 * (var(--indent, 0ch) + 2ch));
+}
+
 @media (min-width: 1024px) {
   .blog-content pre {
     font-size: 0.9375rem;
