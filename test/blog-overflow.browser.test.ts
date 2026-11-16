@@ -391,7 +391,8 @@ Deno.test("no line of a post's code block hides behind a sideways scroll at 390 
 })
 
 Deno.test("a code line holding one long unbroken token, such as a URL, breaks inside the box at 390px", async () => {
-  // No post has such a token today, so the test writes one into a block.
+  // Some posts hold such tokens (the oko post's sha256 image digest), but the
+  // test writes its own into a block so the case stays covered if they change.
   const site = await startSite()
   let browser: Browser | undefined
   try {
