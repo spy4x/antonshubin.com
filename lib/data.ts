@@ -285,7 +285,7 @@ export const projects = {
       madeForName: "Nastassia Ponomarenko",
       madeForURL: "https://www.linkedin.com/in/nastassia-ponomarenko/",
       period: { from: 2021 },
-      outcome: "Scaled to 200K+ users; acquired in 2024",
+      outcome: "Scaled to 200K+ users; acquired in 2025",
       outcomeNote: "corecircle-users",
     },
     {
