@@ -1,7 +1,7 @@
 ---
 title: "oko: a homelab dashboard that takes its status from Gatus"
 seoTitle: "oko: a homelab dashboard with Gatus status"
-description: "oko: a small self-hosted dashboard. One JSON file lists your services, each card shows status and 30-day uptime from Gatus. How it compares with Homepage."
+description: "oko is a small self-hosted dashboard: one JSON file lists your services, each card shows its Gatus status and 30-day uptime. How it compares with Homepage."
 tldr:
   - "oko is a homelab dashboard: you list services in one JSON file, and each card shows whether Gatus sees it up and its 30-day uptime."
   - "It never checks a service itself. When Gatus has no answer, the card says unknown, never green."
