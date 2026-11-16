@@ -181,6 +181,44 @@ Deno.test("no rendered image has an empty or missing alt", async (t) => {
   }
 })
 
+/**
+ * Every `<th>` whose text, tags stripped, is blank (#601). A screen reader
+ * announces such a column with no name, and axe reports it as
+ * `empty-table-header`; a Markdown table with a blank first header cell
+ * renders one.
+ */
+function emptyTableHeaders(html: string): string[] {
+  const cells = html.match(/<th\b[^>]*>[\s\S]*?<\/th>/gi) ?? []
+  return cells.filter((cell) => !visibleText(cell).trim())
+}
+
+Deno.test("no rendered table has an empty header cell", async (t) => {
+  const site = await startSite()
+  try {
+    const paths = await sitemapPaths(site)
+    assert(
+      paths.length > 0,
+      "sitemap.xml is empty — the loop below would pass vacuously",
+    )
+    let headers = 0
+    for (const path of paths) {
+      await t.step(path, async () => {
+        const body = await site.html(path)
+        headers += count(body, /<th\b/gi)
+        const empty = emptyTableHeaders(body)
+        assertEquals(
+          empty,
+          [],
+          `${path} has an empty <th>: ${empty.join(", ")}`,
+        )
+      })
+    }
+    assert(headers > 0, "no <th> found on any page — the guard checked nothing")
+  } finally {
+    await site.stop()
+  }
+})
+
 interface FaqEntry {
   name: string
   acceptedAnswer: { text: string }

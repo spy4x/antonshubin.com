@@ -190,7 +190,7 @@ better count of shipped work than pull requests.
 
 Subscription money only:
 
-|                         | M3 months | Claude Code month |
+| Cost                    | M3 months | Claude Code month |
 | ----------------------- | --------: | ----------------: |
 | Subscription            |   3 × $50 |          1 × $200 |
 | Per merged pull request |     $0.51 |             $0.11 |
