@@ -320,3 +320,30 @@ Deno.test("no line of a post's code block hides behind a sideways scroll at 390 
     await site.stop()
   }
 })
+
+Deno.test("a code line holding one long unbroken token, such as a URL, breaks inside the box at 390px", async () => {
+  // No post has such a token today, so the test writes one into a block.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    await page.goto(
+      `${site.origin}/blog/passkey-autofill-bitwarden-tab-focus`,
+      { waitUntil: "load" },
+    )
+    const [scroll, client] = await page.locator(".blog-content pre").first()
+      .evaluate((pre) => {
+        pre.querySelector("code")?.append(
+          `\nhttps://example.com/${"a".repeat(200)}`,
+        )
+        return [pre.scrollWidth, pre.clientWidth]
+      })
+    assert(scroll <= client + 1, `the token runs ${scroll}px in ${client}px`)
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

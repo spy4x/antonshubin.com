@@ -181,12 +181,14 @@ Deno.test("a post's code Copy button copies a wrapped long line as written, with
     const lines = await page.locator(".blog-content pre").first().evaluate(
       (pre) => {
         const style = getComputedStyle(pre)
-        return pre.clientHeight / parseFloat(style.lineHeight)
+        const padding = parseFloat(style.paddingTop) +
+          parseFloat(style.paddingBottom)
+        return (pre.clientHeight - padding) / parseFloat(style.lineHeight)
       },
     )
     const sourceLines = block.split("\n").length
     assert(
-      lines > sourceLines + 1,
+      Math.round(lines) > sourceLines,
       `the first block shows ${lines} lines for ${sourceLines} in the source; nothing wrapped`,
     )
     const button = page.locator("[data-copy-code]").first()
