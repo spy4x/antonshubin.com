@@ -20,6 +20,7 @@ export default define.page(function ServerError() {
         <div class="flex flex-wrap justify-center gap-4">
           <a
             href="/"
+            aria-current="false"
             class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-rule-strong text-parchment hover:bg-lamp font-semibold rounded-lg transition-colors"
           >
             ← Back to home

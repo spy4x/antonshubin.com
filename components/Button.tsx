@@ -95,12 +95,15 @@ export default function Button(
     class: join(SITE_VARIANT[variant], className),
   }
   if (href !== undefined) {
+    // A button is never "you are here" (#561, #692): without this, Fresh's
+    // renderer marks one to `/` or to the page's section current.
     return (
       <LibraryButton
         {...(rest as Omit<AnchorProps, "href" | keyof SharedProps>)}
         {...marker}
         {...look}
         href={href}
+        aria-current="false"
       />
     )
   }

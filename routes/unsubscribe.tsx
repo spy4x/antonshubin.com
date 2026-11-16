@@ -130,6 +130,7 @@ function Body(data: PageData) {
           </h1>
           <a
             href="/"
+            aria-current="false"
             class="text-parchment underline decoration-rule-strong underline-offset-4 hover:decoration-parchment font-medium"
           >
             ← Back to home
