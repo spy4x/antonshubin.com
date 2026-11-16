@@ -55,9 +55,11 @@ const VIDEO_SIZES = "(min-width: 1024px) 46rem, calc(100vw - 2rem)"
  * Seed's admin panel as a video (#521: visitors get no admin sign-in), then
  * the demo note. From 1024px the two cards stack in the first column and the
  * video fills the other two; from 640px the cards sit side by side above
- * it. A card's shot sits inside the link, so the lightbox leaves it alone;
- * the link is named by its "Open …" line and described by the card's title
- * and line.
+ * it. A card's shot sits inside the link, so the lightbox leaves it alone.
+ * The link is named by its visible text in visible order (host, title, line,
+ * "Open …"), so a voice-control user who says any of it reaches the link
+ * (#643); the shot's alt is left out of the name, and the spaces between the
+ * parts keep axe's label-content-name-mismatch from reading them as one word.
  */
 export function SeedRunning() {
   return (
@@ -68,16 +70,15 @@ export function SeedRunning() {
       <ul class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {SURFACES.map((s) => {
           const host = new URL(s.href).host
+          const nameIds = ["host", "title", ...(s.line ? ["line"] : []), "open"]
+            .map((part) => `running-${s.id}-${part}`)
           return (
             <li key={s.id} class="min-w-0">
               <a
                 href={s.href}
                 target="_blank"
                 rel="noopener"
-                aria-labelledby={`running-${s.id}-open`}
-                aria-describedby={`running-${s.id}-title${
-                  s.line ? ` running-${s.id}-line` : ""
-                }`}
+                aria-labelledby={nameIds.join(" ")}
                 data-seed-surface={s.to}
                 {...eventAttrs("outbound", {
                   to: s.to,
@@ -98,20 +99,23 @@ export function SeedRunning() {
                   class="block aspect-[16/10] w-full border-b border-rule object-cover object-top"
                 />
                 <div class="flex flex-1 flex-col p-4 sm:p-5">
-                  <span class="block truncate text-sm text-graphite">
+                  <span
+                    id={`running-${s.id}-host`}
+                    class="block truncate text-sm text-graphite"
+                  >
                     {host}
-                  </span>
+                  </span>{" "}
                   <h3
                     id={`running-${s.id}-title`}
                     class="mt-1 text-lg text-parchment"
                   >
                     {s.title}
-                  </h3>
+                  </h3>{" "}
                   {s.line && (
                     <p id={`running-${s.id}-line`} class="mt-1 text-graphite">
                       {s.line}
                     </p>
-                  )}
+                  )}{" "}
                   <span
                     id={`running-${s.id}-open`}
                     class="mt-auto inline-flex items-center gap-1 pt-4 text-sm text-parchment underline decoration-rule-strong underline-offset-4 group-hover:decoration-parchment"

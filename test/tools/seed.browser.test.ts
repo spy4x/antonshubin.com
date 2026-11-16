@@ -1,6 +1,6 @@
 // Seed's own page (#455) in a browser: the shared check (axe, no sideways
 // scroll, one <h1> at 390 and 1440px) with "The next commands" closed and
-// open. Needs a built site and Chromium; see docs/testing.md "Browser-driven
+// open, plus axe's label-content-name-mismatch (#643). Needs a built site and Chromium; see docs/testing.md "Browser-driven
 // tests".
 import { assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser } from "playwright"
@@ -8,7 +8,7 @@ import { startSite } from "../harness.ts"
 import { launchChromium, newPage } from "../browser.ts"
 import { axeViolations, toolPageProblems } from "../tool-frame.ts"
 
-Deno.test("the Seed page has no axe violation, sideways scroll or extra h1, with the next commands closed or open", async () => {
+Deno.test("the Seed page has no axe violation (label-in-name included), sideways scroll or extra h1, with the next commands closed or open", async () => {
   const site = await startSite({
     // Book renders only with a booking URL; RFC 2606 host.
     env: { SCHEDULE_URL: "https://meet.example.com/book" },
@@ -43,7 +43,13 @@ Deno.test("the Seed page has no axe violation, sideways scroll or extra h1, with
             problems.push(`${at}: #${id} scrolls by ${inner}px`)
           }
         }
-        for (const v of await axeViolations(page)) problems.push(`${at}: ${v}`)
+        for (
+          const v of [
+            ...await axeViolations(page),
+            // Off in the WCAG tags; #643: the Open links named by "Open …" only.
+            ...await axeViolations(page, ["label-content-name-mismatch"]),
+          ]
+        ) problems.push(`${at}: ${v}`)
       }
       assertEquals(problems, [])
     } finally {
