@@ -225,3 +225,44 @@ Deno.test("a post's cover fills the phone's column and opens whole in the lightb
     await site.stop()
   }
 })
+
+Deno.test("at 1440px Tab reaches On this page before the post's links, and the side column stays on the right", async () => {
+  // #584: the side column sits beside the post's top, so the keyboard
+  // reaches it before the article's own links, not after "Read next".
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    await page.goto(`${site.origin}/blog/building-mcp-servers-with-deno`, {
+      waitUntil: "load",
+    })
+    const [aside, article] = await Promise.all([
+      page.locator(".post-aside").boundingBox(),
+      page.locator("article.post-column").boundingBox(),
+    ])
+    assert(aside && article, "the post has no side column")
+    assert(
+      aside.x >= article.x + article.width,
+      `the side column starts at ${aside.x}px, left of the post's end at ${
+        article.x + article.width
+      }px`,
+    )
+    let reached = ""
+    for (let i = 0; i < 80 && !reached; i++) {
+      await page.keyboard.press("Tab")
+      reached = await page.evaluate(() => {
+        const el = document.activeElement
+        if (el?.closest('nav[aria-label="On this page"]')) return "toc"
+        if (el?.closest("article")) return "article"
+        return ""
+      })
+    }
+    assertEquals(reached, "toc", "Tab reached the post before On this page")
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
