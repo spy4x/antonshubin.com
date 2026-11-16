@@ -1,7 +1,7 @@
 ---
 title: "Designing screens with AI expert roles: what each one caught"
 seoTitle: "Designing UI with AI agents in expert roles"
-description: "Before an AI agent builds a screen, four AI roles review the plan and a fifth checks the result in a browser. Here is what each one caught on a real redesign, with links."
+description: "Before an AI agent builds a screen, four AI roles review the plan; a fifth checks the result in a browser. What each caught on a real redesign, with links."
 tldr:
   - "I don't ask one AI to design a screen. A product designer, a product lead, a UX writer and a psychologist advise in parallel, and a lead merges one spec."
   - "The spec ends with a table: every recommendation, the role that gave it, and whether it was adopted or dropped. That table is where weak ideas get cut."

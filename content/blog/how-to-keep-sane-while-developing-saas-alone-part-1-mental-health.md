@@ -1,5 +1,6 @@
 ---
 title: "How to Keep Sane When Developing a SaaS Startup Solo? Part 1: Mindset and Mental Health"
+seoTitle: "How to Keep Sane Developing a SaaS Solo: Mental Health"
 description: "Take care of yourself first and work hard then"
 tldr:
   - "Building a SaaS alone is stressful, so look after your mental health first and make time for what restores you."

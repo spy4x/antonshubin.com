@@ -1,6 +1,6 @@
 ---
 title: "Tasks.org in the browser: a self-hosted CalDAV web UI"
-description: "caldav-tasks-web is a self-hosted CalDAV web UI: your task lists in a browser, read from and written to the server your phone already syncs with. Made for Tasks.org on Android."
+description: "caldav-tasks-web is a self-hosted CalDAV web UI: your task lists in a browser, synced with the server your phone uses. Made for Tasks.org on Android."
 tldr:
   - "Update: rewritten for the rebuilt app. It has no database and no accounts; one install serves one person."
   - "caldav-tasks-web opens your Tasks.org lists in a browser, straight from the CalDAV server your phone syncs with. No second account, no second copy."

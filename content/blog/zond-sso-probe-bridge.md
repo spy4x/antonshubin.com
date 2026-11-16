@@ -1,7 +1,7 @@
 ---
 title: "zond: a probe bridge so Gatus can see through your SSO proxy"
 seoTitle: "zond: Gatus health checks behind an SSO proxy"
-description: "Behind Authelia or Authentik, Gatus gets the same 302 to the login page from every service, up or down. zond runs beside your containers, probes them directly and answers 200 ok or 503 unreachable, with no monitoring login."
+description: "Behind Authelia or Authentik, Gatus gets the same 302 to the login page from every service. zond probes your containers directly, with no monitoring login."
 tldr:
   - "Behind an SSO proxy, Gatus gets the same 302 to the login page from every service, whether the service runs or not."
   - "zond runs on the same Docker network as your services, sends each one a plain HTTP GET and answers 200 ok or 503 unreachable. No login, no auth bypass."

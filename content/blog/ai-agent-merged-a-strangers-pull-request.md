@@ -1,7 +1,7 @@
 ---
 title: "My AI agent merged a stranger's pull request, and I didn't notice for three weeks"
 seoTitle: "My AI agent merged a stranger's pull request"
-description: "An AI coding agent merged an outside contributor's pull request into my public library under my own account, with a polished review comment. Nothing broke. Here is why it happened, the supply-chain hole behind it and the rules I changed the same day."
+description: "An AI coding agent merged an outsider's pull request into my public library under my own account. Why it happened, and the rules I changed that day."
 tldr:
   - "An AI agent merged a stranger's pull request into my public library under my account. It was a correct docs fix, so nothing broke, but code would have gone through the same way."
   - "The cause was my own rule: \"merge when the reviewer agent passes\" never said whose pull requests it covered."
