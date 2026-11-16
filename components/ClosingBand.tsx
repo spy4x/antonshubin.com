@@ -27,13 +27,21 @@ export const DEFAULT_BAND_PROMISES = ["refund", "first-milestone"]
  * `/catalog` link and How I work plus Infrastructure in `links`. `children`
  * is for a page that needs its own block inside the band (the home page's
  * lead form, the tools page's two halves, the blog's author box), and
- * `heading` for a band that carries a title.
+ * `heading` for a band that carries a title at its top. The blog's author box
+ * puts its own heading under the author instead, so it passes that heading
+ * as `label` to keep the band named by it.
  */
 export interface ClosingBandProps {
   /** The catalog item, project, tool or post the page is about: Book's `item` property. */
   bookItem?: string
   /** An `<h2>` at the top of the band; none by default. */
   heading?: string
+  /**
+   * The band's accessible name when its title is not at the top (the blog's
+   * author box renders its own `<h2>` in `children`); defaults to `heading`,
+   * then "Next step".
+   */
+  label?: string
   /** `lib/promises.ts` ids, in order; an empty list shows no promise line. */
   promiseIds?: string[]
   /** Page-specific content, rendered after the promises. */
@@ -70,6 +78,7 @@ export function ClosingBand(
   {
     bookItem,
     heading,
+    label,
     promiseIds = DEFAULT_BAND_PROMISES,
     children,
     book = true,
@@ -87,7 +96,7 @@ export function ClosingBand(
     <section
       data-closing-band
       {...sectionAttrs}
-      aria-label={heading ?? "Next step"}
+      aria-label={label ?? heading ?? "Next step"}
       class="mt-16 bg-desk border border-rule rounded-xl p-6 sm:p-8"
     >
       {heading && <h2 class="text-2xl text-parchment mb-4">{heading}</h2>}

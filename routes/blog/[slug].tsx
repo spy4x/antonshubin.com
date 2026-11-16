@@ -103,14 +103,15 @@ const QUIET_LINK =
 /**
  * The author box at the end of every post (#191, #274, #390), built on the
  * shared closing band (#270): who wrote the post and the #249 positioning
- * line, the newsletter form, then one line that invites a reply by email.
+ * line, then the newsletter heading right above its form (#645), then one
+ * line that invites a reply by email.
  * A post never ends in a sales pitch (AGENTS.md "Blog posts"): no Book, no
  * priced service link.
  */
 function AuthorBox({ article }: { article: BlogArticle }) {
   return (
     <ClosingBand
-      heading={NEWSLETTER_HEADING}
+      label={NEWSLETTER_HEADING}
       promiseIds={[]}
       book={false}
       after={
@@ -144,6 +145,7 @@ function AuthorBox({ article }: { article: BlogArticle }) {
         </div>
         <p class="mt-4 text-graphite">{AUTHOR_LINE}</p>
       </div>
+      <h2 class="text-2xl text-parchment mb-4">{NEWSLETTER_HEADING}</h2>
       <NewsletterAsk />
     </ClosingBand>
   )
