@@ -32,6 +32,7 @@ const DENO = "migrate-from-deno-to-node-and-bun"
 const HIRE = "hire-developer-take-over-ai-built-app"
 const MVP = "how-much-does-a-saas-mvp-cost"
 const NEED = "do-you-need-a-developer-ai-app"
+const LAUNCH = "is-my-ai-built-app-safe-to-launch"
 
 /** Loads a post and waits until the figure with `id` has hydrated. */
 async function openPost(page: Page, origin: string, slug: string, id: string) {
@@ -441,6 +442,7 @@ Deno.test("every component box has no axe violation at 390 and 1440px", async ()
             [HIRE, "proposal-checklist-figure"],
             [MVP, "mvp-cost-figure"],
             [NEED, "developer-need-quiz-figure"],
+            [LAUNCH, "launch-check-figure"],
           ]
         ) {
           await openPost(page, site.origin, slug, id)
@@ -522,6 +524,65 @@ Deno.test("the Seed plumbing checklist opens on the post's case, follows the key
       assertEquals(new URL(page.url()).hash, "")
       assertEquals(await trackedCalls(page), [
         ["post-try", { item: SEED, part: "SaasPlumbingChecklist" }],
+      ])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("the launch check opens on the post's example, gives each verdict from the keyboard and sends no tick", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const html = await site.html(`/blog/${LAUNCH}`)
+    assertStringIncludes(html, "Fix first. Nothing stops the launch")
+    assert(
+      /id="launch-check-figure"[^>]*data-live="false"/.test(html),
+      "the checklist is live before any script ran",
+    )
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await recordUmami(page)
+      await openPost(page, site.origin, LAUNCH, "launch-check-figure")
+      const verdict = page.locator("#launch-check-figure [data-verdict]")
+      const toggle = async (name: string) => {
+        await page.getByRole("checkbox", { name }).focus()
+        await page.keyboard.press("Space")
+      }
+      await toggle("Sign-up and the AI feature have a rate limit")
+      await toggle("You have restored a backup once")
+      await toggle("Someone gets an alert when the app goes down")
+      assertStringIncludes((await verdict.textContent()) ?? "", "Launch.")
+      await toggle("The payment webhook checks its signature")
+      assertStringIncludes(
+        (await verdict.textContent()) ?? "",
+        "Don't launch yet.",
+      )
+      assertStringIncludes(
+        (await page.locator("#launch-check-figure [data-failed]")
+          .textContent()) ?? "",
+        "The payment webhook checks its signature",
+      )
+      await page.getByRole("button", { name: "Clear answers" }).click()
+      assertStringIncludes(
+        (await verdict.textContent()) ?? "",
+        "Don't launch yet.",
+      )
+      const overflow = await page.evaluate(() =>
+        document.documentElement.scrollWidth > globalThis.innerWidth
+      )
+      assert(!overflow, `${LAUNCH} scrolls sideways at 390px`)
+      assertEquals(new URL(page.url()).search, "")
+      assertEquals(new URL(page.url()).hash, "")
+      assertEquals(await trackedCalls(page), [
+        ["post-try", { item: LAUNCH, part: "LaunchCheck" }],
       ])
     } finally {
       await page.close()
