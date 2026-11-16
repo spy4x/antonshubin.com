@@ -157,7 +157,7 @@ siteTest(
     const main = pageBody(html)
     const buttons = [
       ...main.matchAll(
-        /<a href="([^"]+)" class="[^"]*border-rule-strong[^"]*"[^>]*>([^<]*)</g,
+        /<a\b[^>]*? href="([^"]+)" class="[^"]*border-rule-strong[^"]*"[^>]*>([^<]*)</g,
       ),
     ].map((m) => [m[1], m[2]])
     assertEquals(buttons, [
@@ -171,7 +171,7 @@ siteTest(
     const inBlog = await (await site.get("/blog/no-such-post")).text()
     const blogMain = pageBody(inBlog)
     const first = blogMain.match(
-      /<a href="([^"]+)" class="[^"]*border-rule-strong[^"]*"[^>]*>([^<]*)</,
+      /<a\b[^>]*? href="([^"]+)" class="[^"]*border-rule-strong[^"]*"[^>]*>([^<]*)</,
     )
     assertEquals([first?.[1], first?.[2]], ["/blog", "Back to Writing"])
     assertEquals(

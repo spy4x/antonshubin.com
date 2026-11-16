@@ -8,6 +8,7 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import { type Site, startSite } from "./harness.ts"
 import {
+  mainContent,
   moreSheet,
   phoneHeader,
   railBottom,
@@ -224,6 +225,51 @@ Deno.test("every page has exactly one current mark on desktop and one on a phone
       const phone = currentEntries(tabBar(html) + phoneHeader(html))
       assertEquals(phone.length, expected, `${path}: phone ${phone}`)
     }
+  } finally {
+    await site.stop()
+  }
+})
+
+/**
+ * The links of the page and the footer (`mainContent`) that carry a current
+ * mark, as `{ path, tag }`. Fresh's renderer marks a link with no
+ * `aria-current` of its own, so these must set "false" (#692).
+ */
+function currentOutsideNav(path: string, html: string): string[] {
+  return currentEntries(mainContent(html)).map((tag) => `${path}: ${tag}`)
+}
+
+Deno.test("no link in the page or the footer is marked current, on any page", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL } })
+  try {
+    const paths = await allPaths(site)
+    // The body link home on /infrastructure, the footer's Contact on /book.
+    for (const path of ["/infrastructure", "/book"]) {
+      assert(paths.includes(path), `${path} is no longer a page`)
+    }
+    const marked = []
+    for (const path of paths) {
+      marked.push(...currentOutsideNav(path, await site.html(path)))
+    }
+    assertEquals(marked, [])
+  } finally {
+    await site.stop()
+  }
+})
+
+Deno.test("the not-found page's buttons are not marked current", async () => {
+  const site = await startSite({ env: { SCHEDULE_URL } })
+  try {
+    // "/no-such-page" renders a Home button (`/`); "/work/no-such-case" puts
+    // "Back to Work" (`/work`) first, a section of the requested path.
+    const marked = []
+    for (const path of ["/no-such-page", "/work/no-such-case"]) {
+      const res = await site.get(path)
+      assertEquals(res.status, 404, path)
+      const html = await res.text()
+      marked.push(...currentOutsideNav(path, html))
+    }
+    assertEquals(marked, [])
   } finally {
     await site.stop()
   }

@@ -94,8 +94,10 @@ export function Footer({ canBook }: { canBook: boolean }) {
                 const external = l.href.startsWith("http")
                 return (
                   <li>
+                    {/* Never current (#561, #692): the nav holds the mark. */}
                     <a
                       href={l.href}
+                      aria-current="false"
                       target={external ? "_blank" : undefined}
                       rel={external ? "noopener noreferrer" : undefined}
                     >

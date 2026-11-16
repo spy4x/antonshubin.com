@@ -241,6 +241,7 @@ export default define.page(function BlogPost(ctx) {
             <p class="text-sm text-graphite">
               <a
                 href={`/blog#${postTopic.id}`}
+                aria-current="false"
                 class="hover:text-parchment underline-offset-4 hover:underline"
               >
                 {postTopic.title}
@@ -262,6 +263,7 @@ export default define.page(function BlogPost(ctx) {
               />
               <a
                 href="/"
+                aria-current="false"
                 class="text-parchment font-semibold hover:underline underline-offset-4"
               >
                 Anton Shubin

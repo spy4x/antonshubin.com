@@ -24,8 +24,10 @@ export function Breadcrumb({ items }: { items: Crumb[] }) {
 
   return (
     <nav aria-label="Breadcrumb" class="mb-4 text-sm">
+      {/* The parent, never current (#692): the rail marks the section. */}
       <a
         href={parent.href}
+        aria-current="false"
         class="inline-flex min-h-10 items-center gap-1 text-graphite hover:text-parchment"
       >
         <span aria-hidden="true">‹</span>

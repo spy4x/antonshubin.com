@@ -96,6 +96,7 @@ function Lane({ lane }: { lane: InfraLane }) {
               >
                 <a
                   href={n.href}
+                  aria-current="false"
                   {...(n.external
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}

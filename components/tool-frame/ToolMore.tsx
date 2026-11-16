@@ -49,6 +49,7 @@ export function ToolMore(
           href="/tools"
           {...eventAttrs("cta", { place: "body", target: "/tools" })}
           class={FACT_LINK}
+          aria-current="false"
         >
           All tools
         </a>

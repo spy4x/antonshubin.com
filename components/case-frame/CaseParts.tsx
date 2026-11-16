@@ -173,6 +173,7 @@ export function CaseMore({ related }: { related: Project[] }) {
       </ul>
       <a
         href={WORK_PATH}
+        aria-current="false"
         {...linkEvent(WORK_PATH, { place: "body" })}
         class={`${LINK} mt-4`}
       >

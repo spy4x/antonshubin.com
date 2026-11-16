@@ -71,15 +71,17 @@ An entry that is not current carries `aria-current="false"`, so Fresh's renderer
 leaves the rail's links to `/` (the portrait and the More sheet's Home row)
 alone; Fresh would otherwise mark every link to `/` as the current section on
 every page. The phone header's two links are never current and carry a fixed
-`aria-current="false"` for the same reason. `test/a11y.test.ts` checks all three
-home links. `test/nav.test.ts` checks Contact on every page (the rail's bottom
-slot, the More sheet and the phone header), one current mark per screen size on
-every page, the tab bar's order, the More sheet's links and the portrait's top
-slot. `test/html.ts` slices the rail's parts (`railColumn`, `railTop`, `tabBar`,
-`moreSheet`) and the page (`pageBody` stops at the footer, `mainContent` at the
-phone dock), because the footer follows `<main>` in the same column and the dock
-follows both. `lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no
-server needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
+`aria-current="false"` for the same reason, as do the footer's links and the
+page's links to `/` or to its own section (#692). `test/a11y.test.ts` checks all
+three home links. `test/nav.test.ts` checks Contact on every page (the rail's
+bottom slot, the More sheet and the phone header), one current mark per screen
+size on every page, no current mark in the page or the footer, the tab bar's
+order, the More sheet's links and the portrait's top slot. `test/html.ts` slices
+the rail's parts (`railColumn`, `railTop`, `tabBar`, `moreSheet`) and the page
+(`pageBody` stops at the footer, `mainContent` at the phone dock), because the
+footer follows `<main>` in the same column and the dock follows both.
+`lib/markdown.test.ts` (#160) tests `lib/markdown.ts` directly, no server
+needed. `test/bot-filter.test.ts` (#179) boots the site with placeholder
 `UMAMI_URL`/`UMAMI_ID` and checks that known crawlers get no Umami script or
 preconnect links while browsers do. `routes/_app.tsx` makes that decision at
 render time with `lib/bots.ts`'s `isBot()`; nothing rewrites HTML after it is
