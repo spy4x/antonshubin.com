@@ -1,7 +1,7 @@
 ---
 title: "Is my AI-built app safe to launch? A 15-minute check"
 seoTitle: "Is my AI-built app safe to launch? 15-minute self-check"
-description: "Is my AI-built app safe to launch? Twelve browser checks, no code reading, that end in your own verdict: launch, fix first or don't launch."
+description: "A 12-point security checklist for a vibe-coded app from Lovable, Bolt or Cursor. No code reading. It ends in your verdict: launch, fix first or don't."
 tldr:
   - "You can catch the worst holes in an AI-built app without reading code: sign in as a second user, change an id in a link, search the page for secret keys."
   - "Six checks stop the launch when they fail: other people's data, open database rules, secret keys in the browser, payments the page decides and unsigned webhooks."
@@ -24,10 +24,10 @@ in the page, a bill someone else runs up, paid features for free, and no way
 back when something breaks. Six of them stop the launch when they fail; six can
 wait a week. At the end, a checklist turns your answers into a verdict.
 
-This is for a founder with a working app from Lovable, Bolt, Replit, v0, Base44,
-Cursor, Claude Code or Codex, before launch or before turning on payments. I
-sell code audits, so you may expect me to say your app is unsafe. The checklist
-below can say "launch", and when it does, I mean it.
+This is for a founder with a working vibe-coded app from Lovable, Bolt, Replit,
+v0, Base44, Cursor, Claude Code or Codex, before launch or before turning on
+payments. I sell code audits, so you may expect me to say your app is unsafe.
+The checklist below can say "launch", and when it does, I mean it.
 
 ## Can you tell without reading code?
 
@@ -40,8 +40,7 @@ What a browser check can't see is everything the code does where you can't
 click: an admin route nobody linked, a background job, a file upload, the code's
 own dependencies. That gets its own section at the end, so this post never
 claims more than it checks. Reading that part is what a
-[code and security audit][audit] is for. I sell one, and this post is the free
-part.
+[code and security audit][audit] is for.
 
 The holes themselves are rarely the tool's fault. Every platform below can be
 set up safely; the trouble comes from how one app was set up, usually by an AI
@@ -74,15 +73,15 @@ This is the hole that hurts most, so it gets three checks.
    table, what each rule allows and to whom.
 
 Rules that exist are not enough; they have to say who. That is what
-CVE-2025-48757 is about. In March 2025, researcher Matt Palmer and his team
-found that projects built with Lovable could have row-level security policies so
-weak that the CVE record describes them as letting
-[unauthenticated attackers read or write arbitrary tables][cve]. His team
-scanned 1,645 Lovable projects and found exposed endpoints in 170 of them, and
-published the details in [a statement dated 29 May 2025][palmer]. Lovable
-disputes the CVE, saying each customer is responsible for protecting their own
-app's data. Whoever is right about the blame, the fix sits in the same place:
-the rules on each table.
+CVE-2025-48757 is about. In March 2025, Matt Palmer and a colleague found that
+projects built with Lovable could have row-level security policies so weak that
+the CVE record describes them as letting
+[unauthenticated attackers read or write arbitrary tables][cve]. They scanned
+1,645 Lovable projects and found exposed endpoints in 170 of them, and published
+the details in [a statement dated 29 May 2025][palmer]. Lovable disputes the
+CVE, saying each customer is responsible for protecting their own app's data.
+Whoever is right about the blame, the fix sits in the same place: the rules on
+each table.
 
 ![The Gru's Plan meme: Gru presents four boards. "Build the app with AI", "It works in the demo", "Change 41 to 42 in the URL", and on the last one, staring back at his own board, "See a stranger's invoice".](/img/blog/is-my-ai-built-app-safe-to-launch/gru-url-id.webp "The plan was flawless until the fourth board")
 
@@ -194,7 +193,7 @@ costs you an hour or your users' data.
 
 ![The Batman Slapping Robin meme: Robin starts "The host does backups" and Batman slaps him mid-sentence: "Have you restored one?"](/img/blog/is-my-ai-built-app-safe-to-launch/batman-backup.webp "Restore once, then believe it")
 
-## What's your verdict?
+## The launch checklist: what's your verdict?
 
 The rule is simple. If any stop-the-launch check fails, or you don't know the
 answer, don't launch yet: fix it first, then run the check again. If all six
