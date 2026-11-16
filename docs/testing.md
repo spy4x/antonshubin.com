@@ -2,10 +2,10 @@
 
 ## Continuous integration
 
-`.woodpecker.yml` runs on every `push` and `pull_request` what `deno task check`
-runs, split into steps that run side by side; a failing test fails the build.
-There is no deploy step in CI — deploying stays a manual, post-merge action (see
-"Deploy" in [AGENTS.md](../AGENTS.md)).
+`.woodpecker/woodpecker.yml` runs on every `push` and `pull_request` what
+`deno task check` runs, split into steps that run side by side; a failing test
+fails the build. There is no deploy step in CI — deploying stays a manual,
+post-merge action (see "Deploy" in [AGENTS.md](../AGENTS.md)).
 
 - `build` (`denoland/deno:2.9.0`): `deno install --frozen` and
   `deno task build`, with `DENO_DIR` in `.ci/deno-dir`, and a copy of the deno
@@ -104,7 +104,7 @@ Some behaviour only exists after client JS runs — hydration, focus, a
 `<dialog>`. `test/browser.ts`'s `launchChromium()` launches Chromium for every
 file below and fails loudly, naming the install command, if none is found.
 Playwright's version must match exactly across `deno.json`'s import map,
-`.woodpecker.yml`'s Playwright image tag and `test/browser.ts`'s
+`.woodpecker/woodpecker.yml`'s Playwright image tag and `test/browser.ts`'s
 `PLAYWRIGHT_VERSION` — on a mismatch the image holds a different Chromium build
 than the one launched. Every one calls `startSite()` and run under
 `deno task test:browser` with `-A`, not the narrow `deno task test`.

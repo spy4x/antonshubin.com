@@ -32,4 +32,4 @@ node_modules/
 todos.md
 vendor/
 .ci/
-# CI: the Deno cache and binary the build step shares with later steps (.woodpecker.yml)
+# CI: the Deno cache and binary the build step shares with later steps (.woodpecker/woodpecker.yml)

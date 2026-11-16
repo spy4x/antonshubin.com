@@ -6,7 +6,7 @@ rate, the goals, every event, Book clicks by place, posts read to the end, top
 pages, referrers and campaigns; stars per repo from GitHub; subscribers and
 views from YouTube — and sends a short summary to NTFY. It is meant to run every
 Sunday from a Woodpecker cron, defined as the `weekly-numbers` step in
-`.woodpecker.yml`.
+`.woodpecker/woodpecker.yml`.
 
 Each data source is independent and optional: if its env vars are missing, that
 source is skipped with a warning in the report instead of failing the whole run.
@@ -85,10 +85,10 @@ All of these are in `.env.example` as empty placeholders.
 
 ## One-time Woodpecker setup (cannot be done from this repo)
 
-`.woodpecker.yml` only defines what the `weekly-numbers` step runs and which
-event triggers it (`event: cron`, `cron: weekly-numbers`). Two things live in
-Woodpecker's own configuration, not in this repo, and have to be set once by
-hand:
+`.woodpecker/woodpecker.yml` only defines what the `weekly-numbers` step runs
+and which event triggers it (`event: cron`, `cron: weekly-numbers`). Two things
+live in Woodpecker's own configuration, not in this repo, and have to be set
+once by hand:
 
 1. **The cron trigger itself** — Woodpecker → this repo → Cron → Add cron job,
    name `weekly-numbers`, schedule `0 9 * * 0` (Sunday, 09:00, per issue #124;

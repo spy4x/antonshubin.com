@@ -5,7 +5,7 @@
 # built site (`deno task build` first) on port 48420, nginx with gzip in front of it on 48421
 # (nginx.conf), and Lighthouse CI. The Umami script is blocked during the runs: its `/umami` proxy
 # exists only in production, and its 404 would cost best practices. Reports land in .lighthouseci/.
-# CI runs this script (.woodpecker.yml); run it the same way on a machine, from the repository root.
+# CI runs this script (.woodpecker/woodpecker.yml); run it the same way on a machine, from the repository root.
 # Needs nginx, and a Chromium: `CHROME_PATH`, or the newest one Playwright installed.
 set -euo pipefail
 

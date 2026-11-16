@@ -6,7 +6,7 @@
  * source and sends a short summary (visitors, conversions, conversion rate)
  * to NTFY. The event names are the ones in docs/analytics.md (#318).
  *
- * Run from a Woodpecker cron on Sunday (see `.woodpecker.yml`, the
+ * Run from a Woodpecker cron on Sunday (see `.woodpecker/woodpecker.yml`, the
  * `weekly-numbers` step).
  *
  * This is a reporting script, so per the repo's fail-open rule for
