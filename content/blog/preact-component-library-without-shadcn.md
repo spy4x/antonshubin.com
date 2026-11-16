@@ -1,6 +1,6 @@
 ---
 title: "preact-components: a Preact component library without shadcn or Radix"
-description: "Why I own my UI components instead of using shadcn, Radix or MUI: a Preact component library in ten JSR packages, rendered on the server, keyboard handling written by hand, with a live guide. What is in it, how to try it, and what is not done yet."
+description: "Why I own my UI components instead of using shadcn, Radix or MUI: a Preact library in ten JSR packages, server-rendered, keyboard handling written by hand."
 tldr:
   - "preact-components is my open-source Preact component library: ten JSR packages, rendered on the server, with roles, keyboard handling and focus written by hand."
   - "I own my components instead of using shadcn, Radix or MUI, because working around their styling, upgrades and limits cost me more than owning them."

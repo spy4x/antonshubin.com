@@ -1,5 +1,6 @@
 ---
 title: "Why you have to ship your idea today and with shittiest code possible"
+seoTitle: "Ship your idea today, with the shittiest code possible"
 description: "Or why so many developers abandon their attempts to release a product"
 tldr:
   - "Build something small that solves a real itch, ideally your own, and check that other people have it too."

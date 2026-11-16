@@ -1,5 +1,6 @@
 ---
 title: "How ChatGPT Can Help You Design System Architecture for Your Applications"
+seoTitle: "How ChatGPT Can Help You Design System Architecture"
 description: "ChatGPT as your architecture copilot: generate system diagrams, compare databases, spot security gaps before they ship. Real prompts that work."
 tldr:
   - "Describe your planned architecture to ChatGPT in detail and ask for pros and cons; it spotted scaling and data sync problems in my browser extension design."

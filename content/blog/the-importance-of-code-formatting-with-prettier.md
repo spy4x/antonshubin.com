@@ -1,6 +1,7 @@
 ---
 title: "Dev tricks, Part 1: The Importance of Code Formatting with Prettier"
-description: "Are you tired of staring at messy, unformatted code that looks like it was written by a herd of chaotic monkeys? Fear not, because Prettier is here to save the day!"
+seoTitle: "The Importance of Code Formatting with Prettier"
+description: "Tired of messy code that looks like a herd of chaotic monkeys wrote it? Prettier formats it for you. Why formatting matters and four ways to run Prettier."
 tldr:
   - "Let Prettier format your code, so code reviews stop arguing about style."
   - "Run it on save in your editor, in a pre-commit hook with Husky and lint-staged, and as a check in CI."

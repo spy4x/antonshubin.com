@@ -1,7 +1,7 @@
 ---
 title: "What your SaaS needs before its first feature, and why you shouldn't pay for it twice"
 seoTitle: "Should you use a SaaS boilerplate for your MVP?"
-description: "Should you use a SaaS boilerplate for your MVP? If it has accounts, teams or payments, usually yes. The plumbing every SaaS needs, what Seed covers, and when to skip one."
+description: "Should your MVP use a SaaS boilerplate? With accounts, teams or payments, usually yes. What every SaaS needs, what Seed covers, and when to skip one."
 tldr:
   - "Every SaaS needs the same plumbing before its first feature: sign-in, teams and roles, billing, emails, an admin area, backups and monitoring. Your users see none of it."
   - "When I built that plumbing for my first starter, 52 of its 134 commits went to setup, and groups, billing and offline never shipped."

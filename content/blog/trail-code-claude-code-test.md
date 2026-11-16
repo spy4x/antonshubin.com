@@ -1,7 +1,7 @@
 ---
 title: "I tested Trail-code on my Claude Code agents. They ignored the map."
 seoTitle: "Trail-code on Claude Code: a test on 10 real PRs"
-description: "Trail-code promises cheaper, faster coding agents through a code map. I replayed 10 merged PRs with and without it, in both of its modes, with blind reviews. My agents barely touched the map, and the cost differences stayed inside run-to-run noise."
+description: "Trail-code promises cheaper coding agents through a code map. I replayed 10 merged PRs with and without it, reviewed blind. My agents barely used the map."
 tldr:
   - "Trail-code's code map changed nothing for my Opus 5.5 agents over 10 tasks: 7 map calls in one mode, none in the other."
   - "Its prompt hook matched only 2 of 10 issue-sized briefs, so in most runs nothing was pushed to the agent."

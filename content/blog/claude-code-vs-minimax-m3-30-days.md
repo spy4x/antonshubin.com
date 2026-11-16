@@ -1,7 +1,7 @@
 ---
 title: "Claude Code vs MiniMax M3: 30 days against 3 months, in merged pull requests"
 seoTitle: "Claude Code vs MiniMax M3: 30 days of real numbers"
-description: "I counted my GitHub output for three months on MiniMax M3 and my first 30 days on Claude Code: 19 times more merged pull requests a day. Here is what that number hides, what actually shipped, and how to count your own."
+description: "Three months on MiniMax M3, then 30 days on Claude Code: 19 times more merged PRs a day. What that number hides, what shipped, and how to count your own."
 tldr:
   - "My first 30 days on Claude Code merged 1,845 pull requests, 61.5 a day. The three months on MiniMax M3 before it merged 295, 3.2 a day: about 19 times fewer."
   - "Much of the jump is not the model alone. My agents worked 6.3 times as many hours, and I stopped reviewing every pull request myself."

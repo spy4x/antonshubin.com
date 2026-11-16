@@ -1,7 +1,7 @@
 ---
 title: "Code formatting and linting in 2026: deno fmt, deno lint, a CI gate, and AI agents held to it"
 seoTitle: "Code formatting and linting in 2026: my setup"
-description: "My formatting and linting setup: deno fmt and deno lint, a CI step that blocks the merge, AI agents held to the same check, and what to pick on Node or Bun."
+description: "My formatting and linting setup: deno fmt and deno lint, a CI step that blocks the merge, AI agents held to the same check, what to pick on Node or Bun."
 tldr:
   - "On Deno, deno fmt and deno lint replace Prettier and ESLint: no packages, a few lines in deno.json."
   - "deno fmt reads .editorconfig for indentation, line width and line endings; deno.json wins, and quote_type is ignored."

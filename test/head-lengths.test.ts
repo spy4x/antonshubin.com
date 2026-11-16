@@ -1,7 +1,6 @@
-// Guards the length of every non-blog sitemap page's <title> and meta
-// description (#494): a search result cuts a title at about 60 characters and
-// a description at about 155, so a longer one loses its end. Blog posts keep
-// their own rule (`postTitleTag()` in lib/blog.ts) and are left out.
+// Guards the length of every sitemap page's <title> and meta description,
+// blog posts included (#494, #669): a search result cuts a title at about 60
+// characters and a description at about 155, so a longer one loses its end.
 import { assert } from "jsr:@std/assert@^1.0.0"
 import { startSite } from "./harness.ts"
 import { visibleText } from "./html.ts"
@@ -12,14 +11,13 @@ const TITLE_MAX = 60
 const SUFFIX = " — Anton Shubin"
 
 Deno.test(
-  "every non-blog sitemap page has a title of at most 60 characters before the name and a description of at most 155",
+  "every sitemap page has a title of at most 60 characters before the name and a description of at most 155",
   async () => {
     const site = await startSite()
     try {
       const xml = await site.html("/sitemap.xml")
       const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
         .map((m) => new URL(m[1]).pathname)
-        .filter((p) => !p.startsWith("/blog/"))
       assert(paths.length > 30, `only ${paths.length} pages in the sitemap`)
       const problems: string[] = []
       for (const path of paths) {
