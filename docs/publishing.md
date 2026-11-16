@@ -71,7 +71,7 @@ draft against the brief before the pull request opens.
    ```markdown
    ---
    title: "The post's title"
-   description: "One or two sentences; the first 150 characters carry the point"
+   description: "One or two sentences, at most 155 characters (test/head-lengths.test.ts)"
    tldr: # required; two to four lines, each at most 200 characters
      - "The one result the reader takes away."
      - "The next thing they can act on."
@@ -85,7 +85,7 @@ draft against the brief before the pull request opens.
    topic: "ai-mcp" # founders, developers, ai-mcp, self-hosting or scars
    relatedTool: "mig" # optional; a lib/tools.ts slug
    catalogSlug: "strategy-call" # optional; a lib/catalog.ts slug
-   seoTitle: "Short title" # optional; <title> only, for a title over 55 characters
+   seoTitle: "Short title" # at most 60 characters; needed for a title over 60
    youtubeVideoId: "abc123" # optional; its /blog row then says "Video"
    utmCampaign: "short-campaign" # optional; defaults to the slug (docs/utm.md)
    ---
