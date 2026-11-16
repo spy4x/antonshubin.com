@@ -32,7 +32,7 @@ export const SECONDS: Record<string, number> = {
   "test/meet-embed.browser.test.ts": 28,
   "test/frame.browser.test.ts": 22,
   "test/tools/preact-components.browser.test.ts": 21,
-  "test/blog-overflow.browser.test.ts": 17,
+  "test/blog-overflow.browser.test.ts": 26,
   "test/tool-frame.browser.test.ts": 16,
   "test/contrast.browser.test.ts": 15,
   "test/lead-form.browser.test.ts": 12,

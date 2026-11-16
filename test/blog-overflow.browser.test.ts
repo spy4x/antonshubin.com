@@ -266,3 +266,57 @@ Deno.test("at 1440px Tab reaches On this page before the post's links, and the s
     await site.stop()
   }
 })
+
+Deno.test("no line of a post's code block hides behind a sideways scroll at 390 and 1440px", async () => {
+  // #596: article code wraps rather than scrolls. The passkey post's first
+  // block scrolled even at 1440px.
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    const xml = await site.html("/sitemap.xml")
+    const posts = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname)
+      .filter((p) => p.startsWith("/blog/"))
+    const known = "/blog/passkey-autofill-bitwarden-tab-focus"
+    assert(posts.includes(known), `sitemap.xml no longer lists ${known}`)
+    browser = await launchChromium()
+    for (const width of [390, 1440]) {
+      const page = await newPage(browser, {
+        viewport: { width, height: 900 },
+      })
+      try {
+        const hidden: string[] = []
+        let measured = 0
+        for (const path of posts) {
+          await page.goto(`${site.origin}${path}`, { waitUntil: "load" })
+          const widths = await page.$$eval(
+            ".blog-content pre",
+            (pres) => pres.map((p) => [p.scrollWidth, p.clientWidth]),
+          )
+          if (path === known) {
+            assert(
+              widths.length > 0,
+              `${known} has no code block at ${width}px`,
+            )
+          }
+          measured += widths.length
+          widths.forEach(([scroll, client], i) => {
+            if (scroll > client + 1) {
+              hidden.push(`${path} block ${i + 1} (${scroll}px in ${client}px)`)
+            }
+          })
+        }
+        assert(
+          measured > 0,
+          "no .blog-content pre found; the selector is stale",
+        )
+        assertEquals(hidden, [], `code scrolls sideways at ${width}px`)
+      } finally {
+        await page.close()
+      }
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

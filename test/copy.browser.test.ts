@@ -168,3 +168,33 @@ Deno.test("a post's code Copy button reads Copied when the clipboard API rejects
     },
   )
 })
+
+Deno.test("a post's code Copy button copies a wrapped long line as written, with no added line break", async () => {
+  // #596: code wraps on a phone through CSS only, so the copied text must
+  // still be the fenced block from the post's source, line for line.
+  const slug = "passkey-autofill-bitwarden-tab-focus"
+  const source = await Deno.readTextFile(`content/blog/${slug}.md`)
+  const block = /```[^\n]*\n([\s\S]*?)\n```/.exec(source)?.[1]
+  assert(block, `content/blog/${slug}.md has no fenced code block`)
+  await withPage("async-ok", `/blog/${slug}`, async (page) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    const lines = await page.locator(".blog-content pre").first().evaluate(
+      (pre) => {
+        const style = getComputedStyle(pre)
+        return pre.clientHeight / parseFloat(style.lineHeight)
+      },
+    )
+    const sourceLines = block.split("\n").length
+    assert(
+      lines > sourceLines + 1,
+      `the first block shows ${lines} lines for ${sourceLines} in the source; nothing wrapped`,
+    )
+    const button = page.locator("[data-copy-code]").first()
+    await button.waitFor({ state: "visible" })
+    await button.click()
+    await page.waitForFunction(() =>
+      document.querySelector("[data-copy-code]")?.textContent === "Copied"
+    )
+    assertEquals(await copied(page), [block])
+  })
+})
