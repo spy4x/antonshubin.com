@@ -48,6 +48,10 @@ AI-built apps tend to break in the same few places:
 - **No safety net.** No staging copy, no backups you have restored once, no
   tests.
 
+You can check most of these yourself before you hire anyone:
+[is my AI-built app safe to launch?](/blog/is-my-ai-built-app-safe-to-launch)
+walks through them in about 15 minutes.
+
 So the person you want reads first, judges second and writes third. They keep
 what works, which is most of it. A developer whose first idea is "let's rewrite
 it from scratch" is offering to throw away the one thing you have that already

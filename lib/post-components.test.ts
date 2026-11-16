@@ -207,6 +207,7 @@ const POSTS_WITH_COMPONENTS: Record<string, string[]> = {
     "RunsCalculator",
   ],
   "saas-boilerplate-for-your-mvp": ["SaasPlumbingChecklist"],
+  "is-my-ai-built-app-safe-to-launch": ["LaunchCheck"],
 }
 
 Deno.test("toDevToMarkdown leaves a post without components byte for byte", async () => {

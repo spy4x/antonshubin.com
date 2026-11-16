@@ -30,6 +30,8 @@ import { denoTiesMarkdown } from "./deno-ties.ts"
 import { taskCostMarkdown } from "./task-cost.ts"
 import SaasPlumbingChecklist from "../islands/SaasPlumbingChecklist.tsx"
 import { plumbingChecklistMarkdown } from "./saas-plumbing.ts"
+import LaunchCheck from "../islands/LaunchCheck.tsx"
+import { launchCheckMarkdown } from "./launch-check.ts"
 
 /** What the post page passes to every component besides its own props. */
 export interface PostComponentContext {
@@ -134,6 +136,12 @@ export const POST_COMPONENTS: PostComponentRegistry = {
     component: SaasPlumbingChecklist,
     anchor: "plumbing-checklist",
     toMarkdown: () => plumbingChecklistMarkdown(),
+  }),
+  LaunchCheck: postComponent({
+    props: noProps,
+    component: LaunchCheck,
+    anchor: "launch-check",
+    toMarkdown: () => launchCheckMarkdown(),
   }),
 }
 
