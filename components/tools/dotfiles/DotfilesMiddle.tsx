@@ -51,9 +51,10 @@ export function HarnessMap() {
         </caption>
         <thead>
           <tr class="border-b border-rule-strong">
+            {/* pl-2 matches the row headers', which keep the tint off the text. */}
             <th
               scope="col"
-              class="w-1/4 py-3 pr-4 font-semibold text-parchment"
+              class="w-1/4 py-3 pl-2 pr-4 font-semibold text-parchment"
             >
               Source
             </th>
