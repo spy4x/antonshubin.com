@@ -3,7 +3,7 @@
 // only its note, with JavaScript on and off (the switch is CSS on native
 // radios). Needs a built site and Chromium; see docs/testing.md
 // "Browser-driven tests".
-import { assertEquals } from "jsr:@std/assert@^1.0.0"
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0"
 import type { Browser, Page } from "playwright"
 import { startSite } from "../harness.ts"
 import { launchChromium, newPage, WAIT_MS } from "../browser.ts"
@@ -92,3 +92,87 @@ for (const javaScriptEnabled of [true, false]) {
     }
   })
 }
+
+Deno.test("Same file, two apps: the file follows the chips at 390px with the note after it, and the note sits under the chips beside the file at 1440px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser)
+    try {
+      for (const width of [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 })
+        await page.goto(`${site.origin}/tools/caldav-tasks-web`)
+        const box = (selector: string) =>
+          page.locator(`[data-same-file] ${selector}`).first().evaluate((
+            el,
+          ) => el.getBoundingClientRect().toJSON() as DOMRect)
+        const chips = await box("fieldset")
+        const file = await box("figure")
+        const note = await box("[data-note=title]")
+        if (width === 390) {
+          // Only the section's 24px gap between the chips and the file.
+          assert(
+            file.top - chips.bottom <= 24.5,
+            `${width}: file starts ${
+              file.top - chips.bottom
+            }px under the chips`,
+          )
+          assert(
+            note.top >= file.bottom,
+            `${width}: note top ${note.top}, file bottom ${file.bottom}`,
+          )
+        } else {
+          assert(
+            note.top >= chips.bottom && note.right <= file.left,
+            `${width}: note ${
+              JSON.stringify(note)
+            }, chips bottom ${chips.bottom}, file left ${file.left}`,
+          )
+          assert(
+            note.top - chips.bottom <= 24.5,
+            `${width}: note starts ${
+              note.top - chips.bottom
+            }px under the chips`,
+          )
+        }
+      }
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("What was tested: both tables put the status column at the same x at 390 and 1440px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser)
+    try {
+      for (const width of [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 })
+        await page.goto(`${site.origin}/tools/caldav-tasks-web`)
+        const lefts = await page.$$eval(
+          "section[aria-labelledby=tested] tbody td",
+          (cells) => cells.map((c) => c.getBoundingClientRect().left),
+        )
+        assert(lefts.length > 2, `${width}: ${lefts.length} status cells`)
+        for (const left of lefts) {
+          assert(
+            Math.abs(left - lefts[0]) <= 1,
+            `${width}: status cells at ${JSON.stringify(lefts)}`,
+          )
+        }
+      }
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

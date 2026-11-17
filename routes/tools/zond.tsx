@@ -10,9 +10,17 @@ import CopyButton from "../../islands/CopyButton.tsx"
 // diagram, the "Ask zond" simulator and the README's quick start. Every
 // sentence and block comes from zond's README.
 
-/** zond's README diagram (docs/diagram-dark.svg) and its alt text. */
+/**
+ * zond's README diagram (docs/diagram-dark.svg), its alt text, and the same
+ * diagram stacked in one column for phones (`narrow`, drawn for this page).
+ */
 const DIAGRAM = {
   src: "/img/tools/zond/diagram.svg",
+  narrow: {
+    src: "/img/tools/zond/diagram-narrow.svg",
+    width: 360,
+    height: 650,
+  },
   alt:
     "You reach metube through the SSO proxy. Gatus, in the cloud, asks zond for /health/metube instead. zond runs on the same Docker network as metube, sends it a plain HTTP GET without logging in, and answers Gatus with 200 ok or 503.",
   width: 1000,
@@ -48,15 +56,28 @@ function ProblemPicture() {
         The problem, in one picture
       </h2>
       <figure class="mt-6">
-        <img
-          src={DIAGRAM.src}
-          alt={DIAGRAM.alt}
-          width={DIAGRAM.width}
-          height={DIAGRAM.height}
-          loading="lazy"
-          decoding="async"
-          class="mx-auto block h-auto w-full max-w-[800px]"
-        />
+        {
+          /* Below 640px the wide diagram's labels shrink to about 5px, so a
+          phone gets the same diagram stacked in one column at about its own
+          size. */
+        }
+        <picture>
+          <source
+            media="(max-width: 639px)"
+            srcset={DIAGRAM.narrow.src}
+            width={DIAGRAM.narrow.width}
+            height={DIAGRAM.narrow.height}
+          />
+          <img
+            src={DIAGRAM.src}
+            alt={DIAGRAM.alt}
+            width={DIAGRAM.width}
+            height={DIAGRAM.height}
+            loading="lazy"
+            decoding="async"
+            class="mx-auto block h-auto w-full max-w-[800px] max-sm:max-w-[400px]"
+          />
+        </picture>
         <figcaption class="mx-auto mt-4 max-w-3xl text-graphite leading-relaxed">
           Put an SSO proxy such as Authelia or Authentik in front of your
           services, and an outside monitor like Gatus sees a <code>302</code>

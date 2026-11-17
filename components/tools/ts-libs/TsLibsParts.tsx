@@ -59,11 +59,18 @@ export function RunExample({ id, repo }: { id: string; repo: string }) {
         aria-labelledby={`${id}-label`}
         class="mt-2 flex items-start gap-3 rounded-lg border border-rule bg-paper py-2.5 pl-3 pr-3"
       >
-        <pre
-          tabIndex={0}
-          aria-label="Commands"
-          class="min-w-0 flex-1 overflow-x-auto py-1.5 text-sm leading-relaxed text-parchment"
-        ><code id={id}>{TS_LIBS_QUICK_START}</code></pre>
+        {
+          /* Each line wraps inside the box with a 2ch hanging indent, like a
+          blog code block, and a long token breaks anywhere, so nothing hides
+          past the right edge. The "\n" between the line spans keeps the
+          copied text; a flex column draws nothing for it. */
+        }
+        <pre class="min-w-0 flex-1 whitespace-pre-wrap py-1.5 text-sm leading-relaxed text-parchment [overflow-wrap:anywhere]"><code id={id} class="flex flex-col">{TS_LIBS_QUICK_START.split("\n").map((line, i) => (
+          <Fragment key={i}>
+            {i > 0 && "\n"}
+            <span class="pl-[2ch] -indent-[2ch]">{line}</span>
+          </Fragment>
+        ))}</code></pre>
         <CopyButton
           elementId={id}
           label="Copy"
@@ -105,11 +112,12 @@ function PackageItem({ pkg, open }: { pkg: TsLibsPackage; open: boolean }) {
       {
         /* Umami counts a click on the element that carries the event, so the
         summary's children let clicks through to it: a click on the name or
-        the chevron still counts as the summary's. */
+        the chevron still counts as the summary's. -mx-2 px-2 keeps the
+        text where it was and the focus ring 8px clear of the name. */
       }
       <summary
         {...eventAttrs("tool-try", { item: SLUG, part: pkg.name })}
-        class="flex cursor-pointer list-none items-start gap-4 rounded-md py-4 [&::-webkit-details-marker]:hidden [&>*]:pointer-events-none focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-parchment"
+        class="-mx-2 flex cursor-pointer list-none items-start gap-4 rounded-md px-2 py-4 [&::-webkit-details-marker]:hidden [&>*]:pointer-events-none focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-parchment"
       >
         <h3 class="min-w-0 flex-1 text-base">
           <code class="block text-parchment">{full}</code>

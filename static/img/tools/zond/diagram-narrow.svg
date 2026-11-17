@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 650" width="360"
+  height="650" role="img" aria-labelledby="title desc"
+  font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <!-- diagram.svg (zond's docs/diagram-dark.svg) stacked into one column for
+  phones, with the same boxes, words and colours. -->
+  <title id="title">How zond checks a service behind an SSO proxy</title>
+  <desc
+    id="desc">People reach metube through the SSO proxy. Gatus, in the cloud, asks zond for /health/metube instead. zond runs on the same Docker network as metube, sends it a plain HTTP GET without logging in, and answers Gatus with 200 ok or 503 unreachable.</desc>
+  <defs>
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5"
+      markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9198a1" />
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5"
+      markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4493f8" />
+    </marker>
+  </defs>
+
+  <!-- Home server: one Docker network -->
+  <rect x="8" y="100" width="344" height="430" rx="16" fill="none"
+    stroke="#3d444d" stroke-width="2" stroke-dasharray="8 6" />
+  <text x="24" y="124" font-size="14" fill="#9198a1">Home server ·</text>
+  <text x="24" y="142" font-size="14" fill="#9198a1">one Docker network</text>
+
+  <!-- Outside, above: a person -->
+  <rect x="100" y="12" width="200" height="68" rx="10" fill="#151b23"
+    stroke="#3d444d" stroke-width="2" />
+  <text x="200" y="42" font-size="18" font-weight="600" fill="#f0f6fc"
+    text-anchor="middle">You</text>
+  <text x="200" y="64" font-size="14" fill="#9198a1"
+    text-anchor="middle">in a browser</text>
+
+  <!-- Inside: SSO proxy, the service, zond -->
+  <rect x="100" y="160" width="200" height="68" rx="10" fill="#151b23"
+    stroke="#3d444d" stroke-width="2" />
+  <text x="200" y="190" font-size="18" font-weight="600" fill="#f0f6fc"
+    text-anchor="middle">SSO proxy</text>
+  <text x="200" y="212" font-size="14" fill="#9198a1"
+    text-anchor="middle">Authelia, Authentik</text>
+
+  <rect x="100" y="278" width="200" height="68" rx="10" fill="#151b23"
+    stroke="#3d444d" stroke-width="2" />
+  <text x="200" y="308" font-size="18" font-weight="600" fill="#f0f6fc"
+    text-anchor="middle">metube</text>
+  <text x="200" y="330" font-size="14" fill="#9198a1" text-anchor="middle"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">hl-metube:8081</text>
+
+  <rect x="100" y="430" width="200" height="68" rx="10" fill="#0c2d6b"
+    stroke="#4493f8" stroke-width="2" />
+  <text x="200" y="460" font-size="18" font-weight="600" fill="#f0f6fc"
+    text-anchor="middle">zond</text>
+  <text x="200" y="482" font-size="14" fill="#9198a1"
+    text-anchor="middle">beside the service</text>
+
+  <!-- Outside, below: Gatus -->
+  <rect x="100" y="570" width="200" height="68" rx="10" fill="#151b23"
+    stroke="#3d444d" stroke-width="2" />
+  <text x="200" y="600" font-size="18" font-weight="600" fill="#f0f6fc"
+    text-anchor="middle">Gatus</text>
+  <text x="200" y="622" font-size="14" fill="#9198a1"
+    text-anchor="middle">monitoring, in the cloud</text>
+
+  <!-- People: browser -> SSO proxy -> service -->
+  <line x1="200" y1="80" x2="200" y2="156" stroke="#9198a1" stroke-width="2"
+    marker-end="url(#arrow-muted)" />
+  <text x="210" y="122" font-size="13" fill="#9198a1">log in</text>
+  <line x1="200" y1="228" x2="200" y2="274" stroke="#9198a1" stroke-width="2"
+    marker-end="url(#arrow-muted)" />
+
+  <!-- Health check: Gatus -> zond -> service, no login -->
+  <line x1="176" y1="570" x2="176" y2="502" stroke="#4493f8" stroke-width="2.5"
+    marker-end="url(#arrow-accent)" />
+  <text x="164" y="554" font-size="13" fill="#4493f8" text-anchor="end"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">GET /health/metube</text>
+  <line x1="224" y1="498" x2="224" y2="566" stroke="#4493f8" stroke-width="2.5"
+    marker-end="url(#arrow-accent)" />
+  <text x="238" y="554" font-size="13" fill="#4493f8"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">200 ok / 503</text>
+
+  <line x1="200" y1="430" x2="200" y2="350" stroke="#4493f8" stroke-width="2.5"
+    marker-end="url(#arrow-accent)" />
+  <text x="210" y="384" font-size="13" fill="#4493f8">plain HTTP GET,</text>
+  <text x="210" y="402" font-size="13" fill="#4493f8">no login</text>
+</svg>

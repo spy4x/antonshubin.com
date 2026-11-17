@@ -32,6 +32,46 @@ Deno.test("the dotfiles page has no axe violation, sideways scroll or extra h1 a
   }
 })
 
+Deno.test("at 1440px the Source column's paths start at the same x as its header", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 1440, height: 900 },
+    })
+    try {
+      await page.goto(`${site.origin}/tools/dotfiles`)
+      // The left edge of each cell's text: the header's text node, each row
+      // header's <code>.
+      const [head, ...rows] = await page.evaluate(() => {
+        const table = document.querySelector("[data-harness-map] table")!
+        const th = table.querySelector("thead th")!
+        const range = document.createRange()
+        range.selectNodeContents(th.firstChild!)
+        return [
+          range.getBoundingClientRect().left,
+          ...[...table.querySelectorAll("tbody th code")].map((c) =>
+            c.getBoundingClientRect().left
+          ),
+        ]
+      })
+      assertEquals(rows.length, HARNESS_MAP.length)
+      for (const left of rows) {
+        assert(
+          Math.abs(left - head) <= 1,
+          `row text at ${left}, header text at ${head}`,
+        )
+      }
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
 Deno.test("Where each file goes is a table at 1440px and disclosures that open on a press at 390px", async () => {
   const site = await startSite()
   let browser: Browser | undefined

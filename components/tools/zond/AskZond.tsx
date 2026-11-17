@@ -266,8 +266,10 @@ export function AskZond() {
             {REQUESTS.map((q) => (
               <span key={q.id} data-resp={q.id} class="block">
                 <code class="block whitespace-pre-wrap break-words leading-relaxed text-parchment">
+                  {/* A narrow box breaks before the path, never inside a word. */}
                   <span class="text-graphite">
-                    $ curl -i https://zond.example.com{q.path}
+                    $ curl -i https://zond.example.com<wbr />
+                    {q.path}
                   </span>
                   {"\n"}
                   {q.id === "all" ? <AllTargets /> : q.id === "jellyfin"
