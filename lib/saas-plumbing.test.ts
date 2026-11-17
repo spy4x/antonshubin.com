@@ -6,6 +6,7 @@ import {
   PARTS,
   plumbingChecklistMarkdown,
   plumbingScore,
+  TOTAL_DAYS,
 } from "./saas-plumbing.ts"
 
 const POST = Deno.readTextFileSync(
@@ -40,8 +41,12 @@ Deno.test("the default ticks are the case the post describes: six parts Seed shi
   const s = plumbingScore(DEFAULT_TICKS)
   assertEquals(s.covered.length, 6)
   assertEquals(s.missing, ["Your product's own feature"])
-  assertEquals(s.summary, "Seed already ships 6 of the 7 parts you ticked.")
+  assertEquals(
+    s.summary,
+    "Seed already ships 6 of the 7 parts you ticked. From scratch, those parts take one senior developer about 33 working days.",
+  )
   assert(POST.includes("Seed ships six of the seven"))
+  assert(POST.includes("about 33 working days"))
 })
 
 Deno.test("with nothing ticked the result asks for ticks and counts zero", () => {
@@ -49,6 +54,7 @@ Deno.test("with nothing ticked the result asks for ticks and counts zero", () =>
     ticked: 0,
     covered: [],
     missing: [],
+    days: 0,
     summary: EMPTY_SUMMARY,
   })
 })
@@ -56,13 +62,16 @@ Deno.test("with nothing ticked the result asks for ticks and counts zero", () =>
 Deno.test("when Seed ships every ticked part the result says all of them", () => {
   const s = plumbingScore(new Set(["sign-in", "offline", "jobs"]))
   assertEquals(s.missing, [])
-  assertEquals(s.summary, "Seed already ships all 3 parts you ticked.")
+  assertEquals(
+    s.summary,
+    "Seed already ships all 3 parts you ticked. From scratch, those parts take one senior developer about 18 working days.",
+  )
 })
 
 Deno.test("one ticked part that Seed ships reads as the one part", () => {
   assertEquals(
     plumbingScore(new Set(["files"])).summary,
-    "Seed already ships the one part you ticked.",
+    "Seed already ships the one part you ticked. From scratch, that part takes one senior developer about 3 working days.",
   )
 })
 
@@ -87,7 +96,10 @@ Deno.test("a mix counts the parts Seed ships and lists the rest in checklist ord
     "An Android or desktop app",
     "Your product's own feature",
   ])
-  assertEquals(s.summary, "Seed already ships 1 of the 3 parts you ticked.")
+  assertEquals(
+    s.summary,
+    "Seed already ships 1 of the 3 parts you ticked. From scratch, that part takes one senior developer about 7 working days.",
+  )
 })
 
 Deno.test("the missing line names the parts Seed lacks in running text, and is empty when it lacks none", () => {
@@ -102,15 +114,39 @@ Deno.test("an unknown id counts as nothing", () => {
   assertEquals(plumbingScore(new Set(["nope"])).summary, EMPTY_SUMMARY)
 })
 
-Deno.test("no part, summary or fallback names a time or a price", () => {
-  const all = plumbingScore(new Set(PARTS.map((p) => p.id)))
-  const text = [plumbingChecklistMarkdown(), all.summary].join("\n")
-  assertEquals(text.match(/\b(day|days|hour|hours|week|weeks)\b|[$€]/gi), null)
+Deno.test("every part Seed ships has its days, the others none, and the post states the total", () => {
+  assertEquals(
+    Object.fromEntries(PARTS.map((p) => [p.id, p.days])),
+    {
+      "sign-in": 5,
+      teams: 6,
+      billing: 7,
+      emails: 2,
+      admin: 8,
+      live: 4,
+      offline: 10,
+      files: 3,
+      jobs: 3,
+      ops: 5,
+      native: 0,
+      feature: 0,
+    },
+  )
+  assertEquals(TOTAL_DAYS, 53)
+  assertEquals(plumbingScore(new Set(PARTS.map((p) => p.id))).days, 53)
+  assert(POST.includes("about 53 working days"))
 })
 
-Deno.test("the Dev.to fallback is a table with every part and whether Seed ships it", () => {
+Deno.test("no part, summary or fallback names a price", () => {
+  const all = plumbingScore(new Set(PARTS.map((p) => p.id)))
+  const text = [plumbingChecklistMarkdown(), all.summary].join("\n")
+  assertEquals(text.match(/[$€£]/g), null)
+})
+
+Deno.test("the Dev.to fallback is a table with every part, whether Seed ships it, its days and the total", () => {
   const rows = plumbingChecklistMarkdown().split("\n")
-  assertEquals(rows.length, PARTS.length + 2)
-  assert(rows.includes("| Sign-in with a second factor | Yes |"))
-  assert(rows.includes("| Your product's own feature | No |"))
+  assertEquals(rows.length, PARTS.length + 3)
+  assert(rows.includes("| Sign-in with a second factor | Yes | 5 |"))
+  assert(rows.includes("| Your product's own feature | No | – |"))
+  assertEquals(rows.at(-1), "| All the parts Seed ships | | 53 |")
 })
