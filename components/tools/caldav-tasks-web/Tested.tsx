@@ -6,15 +6,23 @@ import { BROWSERS, SERVERS, type TestedRow } from "./data.ts"
 const COMPATIBILITY =
   "https://github.com/spy4x/caldav-tasks-web/blob/main/docs/compatibility.md"
 
-/** One table of "What was tested": a name, its status word and the evidence. */
+/**
+ * One table of "What was tested": a name, its status word and the evidence.
+ * Fixed layout and a set status column, so both tables put the status at the
+ * same x; 10rem holds the longest word, "In daily use, not in CI".
+ */
 function Table(
   { caption, rows }: { caption: string; rows: readonly TestedRow[] },
 ) {
   return (
-    <table class="w-full text-left text-sm">
+    <table class="w-full table-fixed text-left text-sm">
       <caption class="pb-2 text-left font-semibold text-parchment">
         {caption}
       </caption>
+      <colgroup>
+        <col />
+        <col class="w-40" />
+      </colgroup>
       <thead class="sr-only">
         <tr>
           <th scope="col">Name</th>

@@ -62,8 +62,13 @@ export function SameFile() {
         app writes them back in the form Tasks.org wrote them, so nothing the
         phone stored is lost when you edit in the browser.
       </p>
-      <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-        <div class="min-w-0">
+      {
+        /* On a phone the file follows the chips, so the lit lines show right
+        under them, and the note comes after the file; from 1024px the note
+        sits under the chips, beside the file. */
+      }
+      <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:grid-rows-[auto_1fr]">
+        <div class="min-w-0 lg:col-start-1 lg:row-start-1">
           <RadioChips
             legend="Pick a field Tasks.org shows"
             legendClass="text-parchment font-semibold"
@@ -80,30 +85,8 @@ export function SameFile() {
               }),
             }))}
           />
-          {TASK_FIELDS.map((f) => (
-            <dl
-              key={f.id}
-              data-note={f.id}
-              class="mt-5 space-y-3 text-sm text-graphite"
-            >
-              <div>
-                <dt class="font-semibold text-parchment">In the file</dt>
-                <dd class="mt-1">
-                  <Cell text={f.inFile} />
-                </dd>
-              </div>
-              <div>
-                <dt class="font-semibold text-parchment">
-                  Covered by the fixtures and tests
-                </dt>
-                <dd class="mt-1">
-                  <Cell text={f.covered} />
-                </dd>
-              </div>
-            </dl>
-          ))}
         </div>
-        <figure class="min-w-0">
+        <figure class="min-w-0 lg:col-start-2 lg:row-start-1 lg:row-span-2">
           <figcaption class="text-sm text-graphite">
             <code class="text-parchment">Buy seeds.ics</code>{" "}
             · a made-up task in Tasks.org's form
@@ -122,6 +105,30 @@ export function SameFile() {
             </span>
           ))}</code></pre>
         </figure>
+        <div class="min-w-0 lg:col-start-1 lg:row-start-2">
+          {TASK_FIELDS.map((f) => (
+            <dl
+              key={f.id}
+              data-note={f.id}
+              class="space-y-3 text-sm text-graphite"
+            >
+              <div>
+                <dt class="font-semibold text-parchment">In the file</dt>
+                <dd class="mt-1">
+                  <Cell text={f.inFile} />
+                </dd>
+              </div>
+              <div>
+                <dt class="font-semibold text-parchment">
+                  Covered by the fixtures and tests
+                </dt>
+                <dd class="mt-1">
+                  <Cell text={f.covered} />
+                </dd>
+              </div>
+            </dl>
+          ))}
+        </div>
       </div>
       <p class="mt-5 text-graphite">
         An edit in the browser leaves the rest of the text as it was.{" "}
