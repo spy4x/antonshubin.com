@@ -80,7 +80,8 @@ export function plumbingScore(ticked: ReadonlySet<string>): PlumbingScore {
   const all = n === 1 ? "the one part" : `all ${n} parts`
   const those = covered.length === 1 ? "that part takes" : "those parts take"
   const saved = ` From scratch, ${those} one senior developer about ${days}` +
-    ` working days.`
+    // A no-break space keeps the number on the line of its unit.
+    `\u00a0working days.`
   const counts = n === 0
     ? EMPTY_SUMMARY
     : missing.length === 0

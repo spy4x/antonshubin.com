@@ -13,8 +13,9 @@ import {
 /**
  * The Seed founders post's checklist. The reader ticks what their product
  * needs; the result says how many of those parts Seed already ships, how many
- * working days they take from scratch, and lists the ones it doesn't. It opens with the post's own case ticked. The
- * checkboxes sit in a fieldset that stays disabled until the island runs.
+ * working days they take from scratch, and lists the ones it doesn't. It
+ * opens with the post's own case ticked. The checkboxes sit in a fieldset that
+ * stays disabled until the island runs.
  * Nothing the reader ticks is sent, stored or put in the URL: the only event
  * is one `post-try`.
  */

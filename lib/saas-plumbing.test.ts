@@ -43,7 +43,7 @@ Deno.test("the default ticks are the case the post describes: six parts Seed shi
   assertEquals(s.missing, ["Your product's own feature"])
   assertEquals(
     s.summary,
-    "Seed already ships 6 of the 7 parts you ticked. From scratch, those parts take one senior developer about 33 working days.",
+    "Seed already ships 6 of the 7 parts you ticked. From scratch, those parts take one senior developer about 33\u00a0working days.",
   )
   assert(POST.includes("Seed ships six of the seven"))
   assert(POST.includes("about 33 working days"))
@@ -64,14 +64,14 @@ Deno.test("when Seed ships every ticked part the result says all of them", () =>
   assertEquals(s.missing, [])
   assertEquals(
     s.summary,
-    "Seed already ships all 3 parts you ticked. From scratch, those parts take one senior developer about 18 working days.",
+    "Seed already ships all 3 parts you ticked. From scratch, those parts take one senior developer about 18\u00a0working days.",
   )
 })
 
 Deno.test("one ticked part that Seed ships reads as the one part", () => {
   assertEquals(
     plumbingScore(new Set(["files"])).summary,
-    "Seed already ships the one part you ticked. From scratch, that part takes one senior developer about 3 working days.",
+    "Seed already ships the one part you ticked. From scratch, that part takes one senior developer about 3\u00a0working days.",
   )
 })
 
@@ -98,7 +98,7 @@ Deno.test("a mix counts the parts Seed ships and lists the rest in checklist ord
   ])
   assertEquals(
     s.summary,
-    "Seed already ships 1 of the 3 parts you ticked. From scratch, that part takes one senior developer about 7 working days.",
+    "Seed already ships 1 of the 3 parts you ticked. From scratch, that part takes one senior developer about 7\u00a0working days.",
   )
 })
 
