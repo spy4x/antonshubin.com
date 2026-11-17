@@ -189,3 +189,99 @@ Deno.test("Ask zond's first answer is a 503 with grafana KO, and the keyboard ch
     await site.stop()
   }
 })
+
+Deno.test("at 390px each request's curl line wraps between words, never inside one", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser, {
+      viewport: { width: 390, height: 844 },
+    })
+    try {
+      await page.goto(`${site.origin}/tools/zond`)
+      const broken: string[] = []
+      let lines = 0
+      for (const q of REQUESTS) {
+        await page.locator(`#zond-q-${q}`).check({ force: true })
+        // Each word of the visible curl line: the tops of its characters'
+        // boxes, which differ when the word is split across two lines.
+        const words = await page.locator(`[data-resp=${q}] code > span`)
+          .first().evaluate((span) => {
+            const out: { word: string; tops: number[] }[] = []
+            const walker = document.createTreeWalker(span, NodeFilter.SHOW_TEXT)
+            const range = document.createRange()
+            for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+              const text = n.textContent ?? ""
+              for (const m of text.matchAll(/\S+/g)) {
+                const tops = new Set<number>()
+                for (let i = m.index; i < m.index + m[0].length; i++) {
+                  range.setStart(n, i)
+                  range.setEnd(n, i + 1)
+                  tops.add(Math.round(range.getBoundingClientRect().top))
+                }
+                out.push({ word: m[0], tops: [...tops] })
+              }
+            }
+            return out
+          })
+        for (const w of words) {
+          if (w.tops.length > 1) broken.push(`${q}: ${w.word}`)
+        }
+        lines = Math.max(
+          lines,
+          new Set(words.flatMap((w) => w.tops)).size,
+        )
+      }
+      assertEquals(broken, [])
+      // The check means something only while the line is too long for one row.
+      assertEquals(lines, 2, "the longest curl line no longer wraps at 390px")
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
+
+Deno.test("at 390px the problem diagram is the one-column version with labels at least 12px tall, and the wide one from 640px", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser)
+    try {
+      for (const width of [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 })
+        await page.goto(`${site.origin}/tools/zond`)
+        const img = page.locator("section[aria-labelledby=problem] img")
+        await img.scrollIntoViewIfNeeded()
+        await img.evaluate((el: HTMLImageElement) =>
+          el.complete ? null : new Promise((ok) => (el.onload = ok))
+        )
+        const { src, shown } = await img.evaluate((el: HTMLImageElement) => ({
+          src: new URL(el.currentSrc).pathname,
+          shown: el.getBoundingClientRect().width,
+        }))
+        if (width === 1440) {
+          assertEquals(src, "/img/tools/zond/diagram.svg")
+          continue
+        }
+        assertEquals(src, "/img/tools/zond/diagram-narrow.svg")
+        const svg = await (await fetch(`${site.origin}${src}`)).text()
+        const drawn = Number(svg.match(/viewBox="0 0 (\d+) /)![1])
+        const smallest = Math.min(
+          ...[...svg.matchAll(/font-size="(\d+)"/g)].map((m) => Number(m[1])),
+        )
+        const px = smallest * shown / drawn
+        assertEquals(px >= 12, true, `smallest label ${px.toFixed(1)}px`)
+      }
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})
