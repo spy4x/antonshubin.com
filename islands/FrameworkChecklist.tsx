@@ -40,7 +40,7 @@ export default function FrameworkChecklist({ post }: { post: string }) {
       id="decision-framework-figure"
       live={live.value}
       title="Try the framework on your product"
-      lead="Tick what is true for your product. Each can be correct."
+      lead="Tick what is true for your product. Each can be correct. Your result is below the list."
       noScriptNote="Turn on JavaScript to tick the boxes. The five steps above are the same checklist."
       caption="This reflects only this article's general framework, not advice on your system. Your answers stay in this page."
     >
