@@ -121,8 +121,12 @@ If you'd rather have me build your MVP on it, that's my
 ### Tick what your product needs
 
 The checklist counts how many of the parts you tick Seed already ships, and
-names the ones it doesn't. With the plumbing from the top of this post and your
-own feature ticked, Seed ships six of the seven. The seventh is yours.
+names the ones it doesn't. It also adds up the working days one senior developer
+needs to build those parts from an empty folder. The days are my own rough
+estimates, not a quote: all ten parts come to about 53 working days, roughly ten
+weeks. With the plumbing from the top of this post and your own feature ticked,
+Seed ships six of the seven, about 33 working days you don't pay for. The
+seventh is yours.
 
 <SaasPlumbingChecklist />
 

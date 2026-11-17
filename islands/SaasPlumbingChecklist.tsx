@@ -12,9 +12,10 @@ import {
 
 /**
  * The Seed founders post's checklist. The reader ticks what their product
- * needs; the result says how many of those parts Seed already ships and lists
- * the ones it doesn't. It opens with the post's own case ticked. The
- * checkboxes sit in a fieldset that stays disabled until the island runs.
+ * needs; the result says how many of those parts Seed already ships, how many
+ * working days they take from scratch, and lists the ones it doesn't. It
+ * opens with the post's own case ticked. The checkboxes sit in a fieldset that
+ * stays disabled until the island runs.
  * Nothing the reader ticks is sent, stored or put in the URL: the only event
  * is one `post-try`.
  */
@@ -40,7 +41,7 @@ export default function SaasPlumbingChecklist({ post }: { post: string }) {
       title="What does your product need?"
       lead="Tick every part your product needs, the plumbing and your own feature."
       noScriptNote="Turn on JavaScript to tick the boxes. The lists above say which parts Seed ships."
-      caption="Every part marked as in Seed is in its README today. Your ticks stay in this page."
+      caption="Every part marked as in Seed is in its README today. The days are my estimates. Your ticks stay in this page."
     >
       <div class="flex flex-col gap-6">
         <fieldset
