@@ -273,6 +273,17 @@ page. Never retry a test on this error.
 - `test/book-contact.browser.test.ts` (#445): from 320 to 1440px, the `/book`
   contact card keeps the email address on one line inside its column, with no
   sideways scroll.
+- Tool page layout (#675), measured as box edges:
+  `test/tool-frame.browser.test.ts` (every tool page's top line is one line at
+  1440px, 12px above the `<h1>`, clear of the hero media),
+  `test/tools/zond.browser.test.ts` (at 390px no curl line breaks inside a word,
+  and the diagram is the one-column version with labels at least 12px tall),
+  `test/tools/caldav-tasks-web.browser.test.ts` (the task file follows the chips
+  at 390px with the note after it; both "What was tested" tables put the status
+  at one x), `test/tools/ts-libs.browser.test.ts` ("Run the example" wraps
+  inside its box with the copied text unchanged; the package focus ring stays
+  clear of the name) and `test/tools/dotfiles.browser.test.ts` (the Source
+  column starts where its header does).
 - `test/analytics.browser.test.ts` (#318): `post-read` counts once, only when
   the end of a post has been on screen and 15 s have passed (Playwright's fake
   clock), and the not-found page counts `not-found`. It, `lead-form` (brief

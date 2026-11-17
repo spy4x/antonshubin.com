@@ -79,7 +79,8 @@ export default define.page(async function OkoPage(ctx) {
 `SoftwareSourceCode`, `SoftwareApplication` for a `deployable` tool, and a
 `VideoObject` once `clip.video` is set), the "‹ Tools" back link, `ToolHero`
 (the top line `name · job · StatusMark` above a `headline`, and only the
-`StatusMark` when the `<h1>` is "name: job", so neither is said twice; the
+`StatusMark` when the `<h1>` is "name: job", so neither is said twice; beside
+media it spans both columns from 1024px, so a long job stays on one line; the
 `<h1>`; the lede, which `toolLede()` takes from `lede`, `usedFor`, `standing` or
 the summary's first sentences, and which "What it is" never repeats; at most one
 secondary button for `live` with "View on GitHub", the hero media and an
