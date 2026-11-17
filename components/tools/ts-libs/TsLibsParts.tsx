@@ -117,7 +117,7 @@ function PackageItem({ pkg, open }: { pkg: TsLibsPackage; open: boolean }) {
       }
       <summary
         {...eventAttrs("tool-try", { item: SLUG, part: pkg.name })}
-        class="-mx-2 flex cursor-pointer list-none items-start gap-4 rounded-md px-2 py-4[&::-webkit-details-marker]:hidden [&>*]:pointer-events-none focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-parchment"
+        class="-mx-2 flex cursor-pointer list-none items-start gap-4 rounded-md px-2 py-4 [&::-webkit-details-marker]:hidden [&>*]:pointer-events-none focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-parchment"
       >
         <h3 class="min-w-0 flex-1 text-base">
           <code class="block text-parchment">{full}</code>

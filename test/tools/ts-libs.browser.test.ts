@@ -107,6 +107,10 @@ Deno.test("at 390px a package's focus ring stays clear of its name", async () =>
         r.name.left - r.box.left >= 6,
         `name ${r.name.left - r.box.left}px from the ring's inner edge`,
       )
+      assert(
+        r.name.top - r.box.top >= 12,
+        `name ${r.name.top - r.box.top}px below the ring's top edge`,
+      )
     } finally {
       await page.close()
     }
