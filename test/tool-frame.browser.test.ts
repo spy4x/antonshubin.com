@@ -296,3 +296,52 @@ Deno.test("every boxed block of copyable code on the hub and every tool page hol
     await site.stop()
   }
 })
+
+Deno.test("on every tool page the top line is one line at 1440px, sits 12px above the h1 at 390 and 1440px, and never overlaps the hero media", async () => {
+  const site = await startSite()
+  let browser: Browser | undefined
+  try {
+    browser = await launchChromium()
+    const page = await newPage(browser)
+    try {
+      const problems: string[] = []
+      for (const width of [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 })
+        for (const { slug } of tools) {
+          await page.goto(`${site.origin}/tools/${slug}`)
+          const r = await page.evaluate(() => {
+            const box = (s: string) =>
+              document.querySelector(s)?.getBoundingClientRect()
+            const top = box("[data-tool-eyebrow]")!
+            const line = parseFloat(
+              getComputedStyle(document.querySelector("[data-tool-eyebrow]")!)
+                .lineHeight,
+            )
+            const media = box("[data-tool-media]")
+            return {
+              lines: top.height / line,
+              gap: box("[data-tool-hero] h1")!.top - top.bottom,
+              mediaGap: media ? media.top - top.bottom : null,
+            }
+          })
+          const at = `${width} ${slug}`
+          if (width === 1440 && r.lines > 1.5) {
+            problems.push(`${at}: top line is ${r.lines.toFixed(1)} lines`)
+          }
+          if (Math.abs(r.gap - 12) > 1) {
+            problems.push(`${at}: ${r.gap}px from the top line to the h1`)
+          }
+          if (r.mediaGap !== null && r.mediaGap < 0) {
+            problems.push(`${at}: media overlaps the top line`)
+          }
+        }
+      }
+      assertEquals(problems, [])
+    } finally {
+      await page.close()
+    }
+  } finally {
+    await browser?.close()
+    await site.stop()
+  }
+})

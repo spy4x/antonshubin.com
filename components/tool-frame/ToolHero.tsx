@@ -43,7 +43,8 @@ export interface ToolHeroProps {
  * "name: job"), the claim `<h1>`, the lede,
  * at most one secondary button and "View on GitHub", then the hero media.
  * On a phone the media follows the actions and the page's own line comes
- * last; from 1024px the media sits in the right column beside both.
+ * last; from 1024px the top line spans both columns and the media sits in
+ * the right column beside the rest.
  */
 export function ToolHero(
   { data, action, showJob = true, media, children }: ToolHeroProps,
@@ -71,39 +72,46 @@ export function ToolHero(
         ? "grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center"
         : "grid gap-y-8 max-w-3xl"}
     >
-      <div class="min-w-0 lg:col-start-1 lg:row-start-1">
-        <p
-          data-tool-eyebrow
-          class="text-sm text-graphite leading-relaxed"
-        >
-          {
-            /* Inline, so a long job wraps like text; each separator stays with
+      {
+        /* The top line is the grid's first row and spans both columns from
+        1024px, so a long job is not squeezed into the text column. -mb-5 turns the
+        grid's 32px gap into the 12px a heading's top line keeps. */
+      }
+      <p
+        data-tool-eyebrow
+        class={`-mb-5 text-sm text-graphite leading-relaxed ${
+          hasMedia ? "lg:col-span-2" : ""
+        }`}
+      >
+        {
+          /* Inline, so a long job wraps like text; each separator stays with
             the item after it, and the status stays with the job's last word
             (one nowrap span), so it never wraps onto a line alone. */
-          }
-          {named && (
-            <span class="font-semibold text-parchment">{tool.name}</span>
-          )}
-          {last !== undefined && (
-            <>
-              {" "}
-              <span aria-hidden="true">·</span>{" "}
-              <span data-tool-job>{words.map((w) => `${w} `).join("")}</span>
-            </>
-          )}
-          <span class="whitespace-nowrap">
-            {last}
-            {named && " "}
-            <span
-              data-tool-status={tool.status}
-              class="inline-flex items-center gap-2 align-middle"
-            >
-              {named && <span aria-hidden="true">·</span>}
-              <StatusMark status={tool.status} />
-            </span>
+        }
+        {named && <span class="font-semibold text-parchment">{tool.name}</span>}
+        {last !== undefined && (
+          <>
+            {" "}
+            <span aria-hidden="true">·</span>{" "}
+            <span data-tool-job>{words.map((w) => `${w} `).join("")}</span>
+          </>
+        )}
+        <span class="whitespace-nowrap">
+          {last}
+          {named && " "}
+          <span
+            data-tool-status={tool.status}
+            class="inline-flex items-center gap-2 align-middle"
+          >
+            {named && <span aria-hidden="true">·</span>}
+            <StatusMark status={tool.status} />
           </span>
-        </p>
-        <h1 class="mt-3 text-3xl sm:text-5xl text-parchment text-balance leading-tight">
+        </span>
+      </p>
+      <div
+        class={`min-w-0 ${hasMedia ? "lg:col-start-1 lg:row-start-2" : ""}`}
+      >
+        <h1 class="text-3xl sm:text-5xl text-parchment text-balance leading-tight">
           {tool.headline ?? `${tool.name}: ${tool.job}`}
         </h1>
         <p
@@ -145,13 +153,17 @@ export function ToolHero(
       {hasMedia && (
         <div
           data-tool-media
-          class="min-w-0 lg:col-start-2 lg:row-start-1 lg:row-span-2"
+          class="min-w-0 lg:col-start-2 lg:row-start-2 lg:row-span-2"
         >
           {media === undefined ? <ToolHeroMedia tool={tool} /> : media}
         </div>
       )}
       {children && (
-        <div class="min-w-0 lg:col-start-1 lg:row-start-2 lg:self-start">
+        <div
+          class={`min-w-0 ${
+            hasMedia ? "lg:col-start-1 lg:row-start-3 lg:self-start" : ""
+          }`}
+        >
           {children}
         </div>
       )}
