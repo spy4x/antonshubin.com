@@ -14,6 +14,10 @@
 # commit pushed while the title starts with `[WIP]` cannot merge. Putting
 # `[WIP]` back without a push runs nothing and keeps the earlier statuses.
 # scripts/ci-workflows.test.ts checks these conditions.
+#
+# A push to main runs `build` and `unit` only. The `nightly` cron on main runs
+# every step but weekly-numbers and pushes to NTFY when one fails
+# (docs/testing.md, "Continuous integration").
 when:
   - event: push
     branch: main
@@ -38,8 +42,10 @@ steps:
       - mkdir -p .ci/bin && cp "$(command -v deno)" .ci/bin/deno
       - deno install --frozen
       - deno task build
-    when: &push_or_pr
-      event: [push, pull_request, pull_request_metadata]
+    when: &every_event
+      - event: [push, pull_request, pull_request_metadata]
+      - event: cron
+        cron: nightly
 
   # What `deno task check` runs before the browser tests, minus the build
   # (done above). scripts/video-cut.test.ts needs ffmpeg and runs in its own
@@ -53,20 +59,26 @@ steps:
       - deno check
       - deno task test:unit --ignore=scripts/video-cut.test.ts
     depends_on: [build]
-    when: *push_or_pr
+    when: *every_event
 
   # The browser-driven tests (every test/**/*.browser.test.ts) in four shards
   # balanced by their CI times (scripts/browser-shard.ts). The Playwright image
   # matches deno.json's "playwright" import (1.63.0): it holds the Chromium
   # build that version launches, its libraries and fonts, so no step downloads
   # a browser.
+  # These, video-cut and lighthouse run on pull requests and the nightly cron,
+  # never on a push to main: the merged commit's pull request already ran them,
+  # and a run after the merge cannot stop it (#720).
   browser-1:
     image: &playwright mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
     commands:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - deno run -A scripts/browser-shard.ts 1/4
     depends_on: [build]
-    when: *push_or_pr
+    when: &pr_or_nightly
+      - event: [pull_request, pull_request_metadata]
+      - event: cron
+        cron: nightly
 
   browser-2:
     image: *playwright
@@ -74,7 +86,7 @@ steps:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - deno run -A scripts/browser-shard.ts 2/4
     depends_on: [build]
-    when: *push_or_pr
+    when: *pr_or_nightly
 
   browser-3:
     image: *playwright
@@ -82,7 +94,7 @@ steps:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - deno run -A scripts/browser-shard.ts 3/4
     depends_on: [build]
-    when: *push_or_pr
+    when: *pr_or_nightly
 
   browser-4:
     image: *playwright
@@ -90,7 +102,7 @@ steps:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - deno run -A scripts/browser-shard.ts 4/4
     depends_on: [build]
-    when: *push_or_pr
+    when: *pr_or_nightly
 
   # scripts/video-cut.test.ts renders a generated clip with ffmpeg and ffprobe
   # (libass burns the captions, so it needs a font). This image has all of
@@ -102,7 +114,7 @@ steps:
       - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" PATH="$${CI_WORKSPACE}/.ci/bin:$${PATH}"
       - deno test -A scripts/video-cut.test.ts
     depends_on: [build]
-    when: *push_or_pr
+    when: *pr_or_nightly
 
   # The Lighthouse budget ("Design gate" in the global agent rules): every
   # page in scripts/lighthouse/lighthouserc.json scores, in Lighthouse mobile,
@@ -121,7 +133,29 @@ steps:
       - apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx
       - deno task lighthouse
     depends_on: [browser-1, browser-2, browser-3, browser-4]
-    when: *push_or_pr
+    when: *pr_or_nightly
+
+  # A red nightly run blocks nothing, so it pushes to NTFY instead: the same
+  # secrets as weekly-numbers. Runs only when an earlier step failed.
+  notify-nightly:
+    image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
+    commands:
+      - >-
+          deno eval 'const e = (k) => Deno.env.get(k);
+          const r = await fetch(e("NTFY_URL").replace(/\/$/, "") + "/" + e("NTFY_TOPIC"),
+          { method: "POST", headers: { Title: "antonshubin.com: nightly CI failed" },
+          body: e("CI_PIPELINE_URL") });
+          if (!r.ok) throw new Error(r.status + " " + r.statusText)'
+    environment:
+      NTFY_URL:
+        from_secret: ntfy_url
+      NTFY_TOPIC:
+        from_secret: ntfy_topic
+    depends_on: [unit, video-cut, lighthouse]
+    when:
+      event: cron
+      cron: nightly
+      status: [failure]
 
   # Sunday numbers report: visitors/pages/referrers/CTA events (Umami), stars
   # (GitHub), subscribers/views (YouTube) — printed as markdown and pushed to

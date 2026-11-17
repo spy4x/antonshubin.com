@@ -2,11 +2,11 @@
 
 ## Continuous integration
 
-`.woodpecker/woodpecker.yml` runs on every push to main and every pull request
-not marked `[WIP]` what `deno task check` runs, split into steps that run side
-by side; a failing test fails the build. There is no deploy step in CI —
-deploying stays a manual, post-merge action (see "Deploy" in
-[AGENTS.md](../AGENTS.md)).
+`.woodpecker/woodpecker.yml` runs on every pull request not marked `[WIP]` what
+`deno task check` runs, split into steps that run side by side; a failing test
+fails the build. A push to main and the nightly run use it too (below). There is
+no deploy step in CI — deploying stays a manual, post-merge action (see "Deploy"
+in [AGENTS.md](../AGENTS.md)).
 
 A pull request whose title starts with `[WIP]` runs `.woodpecker/wip.yml`
 instead: one step with install, fmt, lint, type check, build and the unit tests,
@@ -39,11 +39,21 @@ them.
 When a browser test gets much slower or faster, update its line in
 `scripts/browser-shard.ts`'s `SECONDS` so the shards stay even.
 
-A separate `weekly-numbers` step runs only on the Sunday `cron` event and only
-runs `deno task weekly-numbers`; every other step's `when: *push_or_pr` (push,
-pull_request and pull_request_metadata) keeps it from running on that same cron
-trigger. See `docs/weekly-numbers.md` for the env vars it needs and the one-time
-Woodpecker cron setup.
+A push to main runs `build` and `unit` only: the merged commit's pull request
+already ran the rest, and a run after the merge cannot stop it (#720). The
+browser shards, `video-cut` and `lighthouse` run on pull requests and in the
+nightly run instead.
+
+The nightly run is a Woodpecker cron named `nightly` on branch `main`, schedule
+`0 2 * * *` (02:00 UTC), created once in the repository's settings, **Crons**,
+as in Seed. It runs every step above; when one fails, `notify-nightly` pushes
+the pipeline's link to NTFY with the `ntfy_url` and `ntfy_topic` secrets, which
+must be allowed on the `cron` event. A red nightly run blocks nothing.
+
+A separate `weekly-numbers` step runs only on the Sunday `weekly-numbers` cron
+and only runs `deno task weekly-numbers`; every other step names the `nightly`
+cron, so none runs on that trigger. See `docs/weekly-numbers.md` for the env
+vars it needs and the one-time Woodpecker cron setup.
 
 ## Rendered-page tests
 

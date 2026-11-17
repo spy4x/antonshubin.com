@@ -9,9 +9,10 @@ interface Workflow {
   when: Condition[]
   steps: Record<
     string,
-    { when?: Condition; image: string; commands: string[] }
+    { when?: Condition | Condition[]; image: string; commands: string[] }
   >
 }
+type Step = Workflow["steps"][string]
 
 const read = async (name: string) =>
   parse(
@@ -21,6 +22,8 @@ const full = await read("woodpecker.yml")
 const wip = await read("wip.yml")
 const on = (w: Workflow, event: string) =>
   w.when.find((c) => [c.event].flat().includes(event))
+const runsOn = (s: Step, event: string) =>
+  [s.when ?? []].flat().some((c) => [c.event].flat().includes(event))
 
 Deno.test("a pull request runs exactly one of the two workflows", () => {
   const isWip = on(wip, "pull_request")?.evaluate
@@ -39,15 +42,22 @@ Deno.test("removing [WIP] from the title starts the full workflow", () => {
 
 Deno.test("every full step that runs on pull_request runs on a title edit too", () => {
   const prSteps = Object.entries(full.steps).filter(([, s]) =>
-    [s.when?.event].flat().includes("pull_request")
+    runsOn(s, "pull_request")
   )
   assert(prSteps.length > 1, "no step runs on pull_request")
   for (const [name, step] of prSteps) {
     assert(
-      [step.when?.event].flat().includes("pull_request_metadata"),
+      runsOn(step, "pull_request_metadata"),
       `${name} skips pull_request_metadata`,
     )
   }
+})
+
+Deno.test("a push to main runs only build and unit", () => {
+  const pushSteps = Object.keys(full.steps).filter((name) =>
+    runsOn(full.steps[name], "push")
+  )
+  assertEquals(pushSteps, ["build", "unit"])
 })
 
 Deno.test("the WIP workflow runs no browser, video-cut or Lighthouse step", () => {
