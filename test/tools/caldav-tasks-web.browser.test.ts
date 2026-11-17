@@ -130,8 +130,10 @@ Deno.test("Same file, two apps: the file follows the chips at 390px with the not
             }, chips bottom ${chips.bottom}, file left ${file.left}`,
           )
           assert(
-            note.top < file.bottom,
-            `${width}: the note sits below the file, not beside it`,
+            note.top - chips.bottom <= 24.5,
+            `${width}: note starts ${
+              note.top - chips.bottom
+            }px under the chips`,
           )
         }
       }
