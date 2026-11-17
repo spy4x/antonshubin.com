@@ -73,9 +73,10 @@ export function ToolHero(
         : "grid gap-y-8 max-w-3xl"}
     >
       {
-        /* The top line is the grid's first row and spans both columns from
-        1024px, so a long job is not squeezed into the text column. -mb-5 turns the
-        grid's 32px gap into the 12px a heading's top line keeps. */
+        /* The top line is the grid's first row. Beside media it spans both
+        columns from 1024px, so a long job is not squeezed into the text
+        column; a one-column hero would only gain an empty column. -mb-5
+        turns the grid's 32px gap into the 12px a heading's top line keeps. */
       }
       <p
         data-tool-eyebrow
@@ -108,9 +109,7 @@ export function ToolHero(
           </span>
         </span>
       </p>
-      <div
-        class={`min-w-0 ${hasMedia ? "lg:col-start-1 lg:row-start-2" : ""}`}
-      >
+      <div class="min-w-0 lg:col-start-1 lg:row-start-2">
         <h1 class="text-3xl sm:text-5xl text-parchment text-balance leading-tight">
           {tool.headline ?? `${tool.name}: ${tool.job}`}
         </h1>
@@ -159,11 +158,7 @@ export function ToolHero(
         </div>
       )}
       {children && (
-        <div
-          class={`min-w-0 ${
-            hasMedia ? "lg:col-start-1 lg:row-start-3 lg:self-start" : ""
-          }`}
-        >
+        <div class="min-w-0 lg:col-start-1 lg:row-start-3 lg:self-start">
           {children}
         </div>
       )}
