@@ -197,7 +197,7 @@ function afterArticle(html: string): string {
 }
 
 siteTest(
-  "after the article every post has exactly one button, the newsletter form's, under the author",
+  "after the article every post has exactly one button, the newsletter form's, under the author and right under the heading that names the band",
   async (site) => {
     for (const article of blogArticles) {
       const html = await site.html(`/blog/${article.slug}`)
@@ -221,6 +221,26 @@ siteTest(
       assert(
         box.indexOf("data-author-box") < box.indexOf(found[0]),
         `${article.slug}: the author must come before the ask`,
+      )
+      // #645: the heading names the ask, so it sits right above it, after
+      // the author block, and still names the band.
+      const heading =
+        `<h2 class="text-2xl text-parchment mb-4">${NEWSLETTER_HEADING}</h2>`
+      const at = box.indexOf(heading)
+      assert(at !== -1, `${article.slug}: no newsletter heading in the band`)
+      assert(
+        box.indexOf("data-author-box") < at,
+        `${article.slug}: the author must come before the newsletter heading`,
+      )
+      assert(
+        box.slice(at + heading.length).trimStart().startsWith(
+          "<div data-newsletter-ask",
+        ),
+        `${article.slug}: something stands between the heading and the ask`,
+      )
+      assert(
+        box.includes(`aria-label="${NEWSLETTER_HEADING}"`),
+        `${article.slug}: the band is not named by the newsletter heading`,
       )
       // One set of links after the post, not five (Mkt 1, 8, 9).
       assert(
