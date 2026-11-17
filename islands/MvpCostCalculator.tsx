@@ -13,9 +13,17 @@ import {
 
 const LABEL =
   "flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm text-parchment"
+// scroll-mb-32: a control focused from the keyboard scrolls clear of the
+// pinned result, not behind it.
 const INPUT =
-  "mt-0.5 size-5 shrink-0 cursor-pointer accent-parchment [color-scheme:dark] disabled:cursor-not-allowed"
+  "mt-0.5 size-5 shrink-0 scroll-mb-32 cursor-pointer accent-parchment [color-scheme:dark] disabled:cursor-not-allowed"
 const LEGEND = "mb-1 p-0 text-sm font-semibold text-parchment"
+// #642: the result stays pinned to the bottom of the window while the
+// calculator is on screen, so a tick far above it still shows the new price.
+// Below md it sits on the phone tab bar's dock (the 64px bar, its 1px rule
+// and the 24px fade above it, plus the bottom safe area).
+const RESULT =
+  "sticky bottom-0 max-md:bottom-[calc(5.5rem+1px+env(safe-area-inset-bottom,0px))] flex flex-col gap-2 border-t border-rule bg-paper pt-5 pb-3 text-sm"
 
 /**
  * The SaaS MVP cost post's calculator. The reader picks the core feature's
@@ -144,7 +152,7 @@ export default function MvpCostCalculator({ post }: { post: string }) {
           </fieldset>
         </fieldset>
         <div
-          class="flex flex-col gap-2 border-t border-rule pt-5 text-sm"
+          class={RESULT}
           aria-live="polite"
           data-result
         >

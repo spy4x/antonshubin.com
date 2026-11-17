@@ -100,7 +100,7 @@ Here is what should make you close a proposal before the second paragraph:
   great. A video instead of a written answer means you can't skim it, compare it
   or forward it to a technical friend.
 
-![The Is This a Pigeon meme: a man points at a butterfly labelled "Dear", then an unfilled client-name placeholder, and asks, "Is this a proposal written for me?"](/img/blog/hire-developer-take-over-ai-built-app/placeholder.webp "Bespoke, hand-crafted, copy-pasted")
+![The Is This a Pigeon meme: a man points at a butterfly labelled with one greeting, "Dear" followed by a client-name placeholder nobody filled in, and asks, "Is this a proposal written for me?"](/img/blog/hire-developer-take-over-ai-built-app/placeholder.webp "Bespoke, hand-crafted, copy-pasted")
 
 ## What do green flags look like?
 
