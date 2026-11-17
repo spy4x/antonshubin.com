@@ -23,6 +23,7 @@
         "http://127.0.0.1:48421/tools/ts-libs",
         "http://127.0.0.1:48421/tools/zond",
         "http://127.0.0.1:48421/blog",
+        "http://127.0.0.1:48421/blog/seed-saas-starter",
         "http://127.0.0.1:48421/blog/zond-sso-probe-bridge",
         "http://127.0.0.1:48421/blog/opus-5-5-vs-sonnet-5-agent-costs",
         "http://127.0.0.1:48421/blog/trail-code-claude-code-test"
