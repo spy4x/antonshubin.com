@@ -191,6 +191,33 @@ Deno.test("sendNtfy skips without a network call when NTFY_URL or NTFY_TOPIC is 
   assertEquals(calls, 0)
 })
 
+Deno.test("sendNtfy signs the push with NTFY_TOKEN, because the topic refuses anonymous ones", async () => {
+  const env = {
+    NTFY_URL: "https://ntfy.example.com/",
+    NTFY_TOPIC: "topic",
+    NTFY_TOKEN: "placeholder",
+  }
+  const before = Object.keys(env).map((name) =>
+    [name, Deno.env.get(name)] as const
+  )
+  const original = globalThis.fetch
+  let auth: string | null = null
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+    auth = new Headers(init?.headers).get("Authorization")
+    return Promise.resolve(new Response("{}"))
+  }) as typeof fetch
+  Object.entries(env).forEach(([name, value]) => Deno.env.set(name, value))
+  try {
+    await sendNtfy("test message")
+  } finally {
+    globalThis.fetch = original
+    before.forEach(([name, value]) =>
+      value === undefined ? Deno.env.delete(name) : Deno.env.set(name, value)
+    )
+  }
+  assertEquals(auth, "Bearer placeholder")
+})
+
 // --- Umami requests, against a stubbed fetch ---
 // Each of these sets placeholder Umami env vars (restoring the previous
 // values afterwards), builds the run's source at a fixed time, answers every

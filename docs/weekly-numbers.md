@@ -80,6 +80,7 @@ campaign numbers are reviewed, is in `docs/utm.md`.
 | `YOUTUBE_CHANNEL_ID` | The channel's id, from YouTube Studio → Settings → Channel → Advanced   |
 | `NTFY_URL`           | The NTFY server's base URL (e.g. `https://ntfy.sh` or self-hosted)      |
 | `NTFY_TOPIC`         | The topic to push the summary to                                        |
+| `NTFY_TOKEN`         | Access token that may publish to the topic                              |
 
 All of these are in `.env.example` as empty placeholders.
 
@@ -97,4 +98,4 @@ once by hand:
 2. **The secrets** referenced by the step's `from_secret` entries — Woodpecker →
    this repo → Secrets: `umami_api_url`, `umami_api_token`, `umami_id`,
    `weekly_numbers_github_repos`, `youtube_api_key`, `youtube_channel_id`,
-   `ntfy_url`, `ntfy_topic`. Same values as the table above.
+   `ntfy_url`, `ntfy_topic`, `ntfy_token`. Same values as the table above.

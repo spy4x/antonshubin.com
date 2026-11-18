@@ -708,6 +708,7 @@ export async function fetchYoutubeSection(): Promise<Section> {
 export async function sendNtfy(message: string): Promise<void> {
   const url = Deno.env.get("NTFY_URL")
   const topic = Deno.env.get("NTFY_TOPIC")
+  const token = Deno.env.get("NTFY_TOKEN")
   if (!url || !topic) {
     console.warn("  ⚠ NTFY_URL or NTFY_TOPIC not set — skipped the push")
     return
@@ -715,7 +716,10 @@ export async function sendNtfy(message: string): Promise<void> {
   try {
     const res = await fetch(`${url.replace(/\/$/, "")}/${topic}`, {
       method: "POST",
-      headers: { Title: "Weekly numbers" },
+      headers: {
+        Title: "Weekly numbers",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: message,
     })
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
