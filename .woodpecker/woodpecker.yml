@@ -49,15 +49,17 @@ steps:
 
   # What `deno task check` runs before the browser tests, minus the build
   # (done above). scripts/video-cut.test.ts needs ffmpeg and runs in its own
-  # step below.
+  # step below. Woodpecker starts `lighthouse` only when every step of this
+  # stage has ended, `unit` included, so the test files run two at a time:
+  # not more, as the four browser shards share the host.
   unit:
     image: denoland/deno:2.9.0@sha256:8d24854de78a79c56e74b49aa4c5996c60e1fe3730efba8fbdd2692c582e6e29
     commands:
-      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir"
+      - export DENO_DIR="$${CI_WORKSPACE}/.ci/deno-dir" DENO_JOBS=2
       - deno fmt --check .
       - deno lint .
       - deno check
-      - deno task test:unit --ignore=scripts/video-cut.test.ts
+      - deno task test:unit --parallel --ignore=scripts/video-cut.test.ts
     depends_on: [build]
     when: *every_event
 
@@ -120,9 +122,10 @@ steps:
   # page in scripts/lighthouse/lighthouserc.json scores, in Lighthouse mobile,
   # at least 95 for performance and 100 for accessibility, best practices and
   # SEO. scripts/lighthouse/run.sh serves the build step's _fresh/ behind nginx
-  # with gzip, as Cloudflare serves it. The Playwright image: Lighthouse CI
-  # starts Lighthouse with `node`, and the image has Node, Chromium and its
-  # libraries. It has no nginx, the one package this pipeline installs. One
+  # with gzip, as Cloudflare serves it, and scripts/lighthouse/runner.ts runs
+  # Lighthouse under Deno in one Chromium. The Playwright image provides that
+  # Chromium and its libraries. It has no nginx, the one package this pipeline
+  # installs. One
   # step, after the browser shards: a busy CPU lowers the performance score.
   # Pages near the 95 line failed both beside the browser shards and when three
   # Lighthouse shards ran side by side (pipelines 1998 and 2004).
