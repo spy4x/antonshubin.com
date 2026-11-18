@@ -145,7 +145,7 @@ steps:
     commands:
       - >-
           deno eval 'const e = (k) => Deno.env.get(k);
-          const r = await fetch(e("NTFY_URL").replace(/\/$/, "") + "/" + e("NTFY_TOPIC"),
+          const r = await fetch(e("NTFY_URL").replace(/[/]$$/, "") + "/" + e("NTFY_TOPIC"),
           { method: "POST", headers: { Title: "antonshubin.com: nightly CI failed", Authorization: "Bearer " + e("NTFY_TOKEN") },
           body: e("CI_PIPELINE_URL") });
           if (!r.ok) throw new Error(r.status + " " + r.statusText)'
