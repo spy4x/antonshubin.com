@@ -3,8 +3,10 @@
 # score, in Lighthouse mobile, at least 95 for performance and 100 for accessibility, best
 # practices and SEO, the median of three runs ("Design gate" in the global agent rules). Starts the
 # built site (`deno task build` first) on port 48420, nginx with gzip in front of it on 48421
-# (nginx.conf), and Lighthouse CI. The Umami script is blocked during the runs: its `/umami` proxy
-# exists only in production, and its 404 would cost best practices. Reports land in .lighthouseci/.
+# (nginx.conf), and runner.ts, which drives Lighthouse in one Chromium and skips a page's third
+# run when the first two already settle every median (verdict.ts). The Umami script is blocked
+# during the runs: its `/umami` proxy exists only in production, and its 404 would cost best
+# practices. Each run's report lands in .lighthouseci/reports/.
 # CI runs this script (.woodpecker/woodpecker.yml); run it the same way on a machine, from the repository root.
 # Needs nginx, and a Chromium: `CHROME_PATH`, or the newest one Playwright installed.
 set -euo pipefail
@@ -54,10 +56,9 @@ PIDS+=($!)
 wait_for nginx "${PIDS[-1]}" http://127.0.0.1:48421/
 
 # Run from the scratch folder, outside deno.json, deno.lock and node_modules: a tool for this check
-# only, pinned here, with the repository's minimum dependency age. Lighthouse runs as a Node
-# subprocess, which needs a node_modules folder: it goes in the scratch folder too.
+# only, pinned in runner.ts, with the repository's minimum dependency age. The packages stay in
+# the Deno cache: no node_modules folder.
 ROOT=$PWD
-(cd "$SCRATCH" && deno run -A --no-config --no-lock --node-modules-dir=auto \
-  --minimum-dependency-age=1440 npm:@lhci/cli@0.15.1 autorun \
-  --config="$ROOT/$HERE/lighthouserc.json" \
-  --upload.outputDir="$ROOT/.lighthouseci/reports")
+(cd "$SCRATCH" && deno run -A --no-config --no-lock --node-modules-dir=none \
+  --minimum-dependency-age=1440 "$ROOT/$HERE/runner.ts" \
+  "$ROOT/$HERE/lighthouserc.json" "$ROOT/.lighthouseci/reports")

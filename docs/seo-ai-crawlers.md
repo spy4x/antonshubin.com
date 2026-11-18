@@ -417,5 +417,8 @@ https://github.com/spy4x/antonshubin.com/issues/377.
 measures the pages in `scripts/lighthouse/lighthouserc.json` in Lighthouse
 mobile, on the built site behind nginx with gzip, and fails below the budget of
 the global agent rules: 95 for performance, 100 for accessibility, best
-practices and SEO. On 2026-10-21 every page scored 96 or more for performance
-and 100 for the rest.
+practices and SEO, the median of three runs. `scripts/lighthouse/runner.ts`
+drives Lighthouse in one Chromium and skips a page's third run when the first
+two already settle every median (`scripts/lighthouse/verdict.ts`); each run's
+report lands in `.lighthouseci/reports/`. On 2026-10-21 every page scored 96 or
+more for performance and 100 for the rest.

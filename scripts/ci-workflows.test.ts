@@ -72,3 +72,9 @@ Deno.test("the WIP workflow runs no browser, video-cut or Lighthouse step", () =
     assert(!run.includes(slow), `the WIP check runs ${slow}`)
   }
 })
+
+Deno.test("the unit step runs test files two at a time", () => {
+  const run = full.steps.unit.commands.join("\n")
+  assert(run.includes(" DENO_JOBS=2"), "unit sets no DENO_JOBS=2")
+  assert(run.includes("deno task test:unit --parallel"), "unit runs serially")
+})
