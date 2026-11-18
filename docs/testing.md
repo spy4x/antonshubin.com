@@ -21,7 +21,9 @@ them.
   binary in `.ci/bin/`. The workspace carries both, `node_modules` and `_fresh/`
   to every later step, so nothing after it installs or builds again.
 - `unit` (same image): fmt, lint, type check and `deno task test:unit`, minus
-  `scripts/video-cut.test.ts`.
+  `scripts/video-cut.test.ts`, two test files at a time (`--parallel`,
+  `DENO_JOBS=2`). Woodpecker starts `lighthouse` only after `unit` has ended
+  too, so a slow `unit` delays it.
 - `browser-1` to `browser-4` (`mcr.microsoft.com/playwright:v1.63.0-noble`):
   `scripts/browser-shard.ts` splits every `test/**/*.browser.test.ts` into four
   shards of about equal CI time, by the seconds in its `SECONDS` table, and
@@ -34,7 +36,10 @@ them.
 - `lighthouse` (the Playwright image): the Lighthouse budget on the shared
   build, alone after the browser shards, since a busy CPU lowers the performance
   score; split into shards side by side, pages fell below 95. It installs nginx,
-  the one package the pipeline installs.
+  the one package the pipeline installs. `scripts/lighthouse/runner.ts` runs
+  Lighthouse under Deno in the image's Chromium, launched once, and stops a page
+  after two runs when they settle every category's median of three
+  (`scripts/lighthouse/verdict.ts`).
 
 When a browser test gets much slower or faster, update its line in
 `scripts/browser-shard.ts`'s `SECONDS` so the shards stay even.
