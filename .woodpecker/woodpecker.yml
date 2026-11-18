@@ -146,7 +146,7 @@ steps:
       - >-
           deno eval 'const e = (k) => Deno.env.get(k);
           const r = await fetch(e("NTFY_URL").replace(/\/$/, "") + "/" + e("NTFY_TOPIC"),
-          { method: "POST", headers: { Title: "antonshubin.com: nightly CI failed" },
+          { method: "POST", headers: { Title: "antonshubin.com: nightly CI failed", Authorization: "Bearer " + e("NTFY_TOKEN") },
           body: e("CI_PIPELINE_URL") });
           if (!r.ok) throw new Error(r.status + " " + r.statusText)'
     environment:
@@ -154,6 +154,8 @@ steps:
         from_secret: ntfy_url
       NTFY_TOPIC:
         from_secret: ntfy_topic
+      NTFY_TOKEN:
+        from_secret: ntfy_token
     depends_on: [unit, video-cut, lighthouse]
     when:
       event: cron
@@ -188,6 +190,8 @@ steps:
         from_secret: ntfy_url
       NTFY_TOPIC:
         from_secret: ntfy_topic
+      NTFY_TOKEN:
+        from_secret: ntfy_token
     when:
       event: cron
       cron: weekly-numbers

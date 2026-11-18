@@ -80,6 +80,7 @@ campaign numbers are reviewed, is in `docs/utm.md`.
 | `YOUTUBE_CHANNEL_ID` | The channel's id, from YouTube Studio → Settings → Channel → Advanced   |
 | `NTFY_URL`           | The NTFY server's base URL (e.g. `https://ntfy.sh` or self-hosted)      |
 | `NTFY_TOPIC`         | The topic to push the summary to                                        |
+| `NTFY_TOKEN`         | Access token that may publish to the topic                              |
 
 All of these are in `.env.example` as empty placeholders.
 
