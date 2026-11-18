@@ -98,4 +98,4 @@ once by hand:
 2. **The secrets** referenced by the step's `from_secret` entries — Woodpecker →
    this repo → Secrets: `umami_api_url`, `umami_api_token`, `umami_id`,
    `weekly_numbers_github_repos`, `youtube_api_key`, `youtube_channel_id`,
-   `ntfy_url`, `ntfy_topic`. Same values as the table above.
+   `ntfy_url`, `ntfy_topic`, `ntfy_token`. Same values as the table above.
