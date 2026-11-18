@@ -53,7 +53,8 @@ The nightly run is a Woodpecker cron named `nightly` on branch `main`, schedule
 `0 2 * * *` (02:00 UTC), created once in the repository's settings, **Crons**,
 as in Seed. It runs every step above; when one fails, `notify-nightly` pushes
 the pipeline's link to NTFY with the `ntfy_url`, `ntfy_topic` and `ntfy_token`
-secrets, which must be allowed on the `cron` event. A red nightly run blocks nothing.
+secrets, which must be allowed on the `cron` event. A red nightly run blocks
+nothing.
 
 A separate `weekly-numbers` step runs only on the Sunday `weekly-numbers` cron
 and only runs `deno task weekly-numbers`; every other step names the `nightly`
