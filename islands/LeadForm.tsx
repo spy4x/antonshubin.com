@@ -334,7 +334,7 @@ export default function LeadForm(
           {source.value === OTHER_SOURCE && (
             <div>
               <label for="lead-source-other" class="sr-only">
-                {SOURCE_LABEL}
+                Where else did you find me? (optional)
               </label>
               <input
                 id="lead-source-other"
