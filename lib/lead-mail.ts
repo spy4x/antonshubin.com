@@ -8,6 +8,8 @@ export interface Lead {
   techStack: string
   /** The catalog item the visitor came from (`/book?service=<slug>`), when it is a real one. */
   service?: { slug: string; shortTitle: string }
+  /** Where the visitor found the site, as `leadSource()` worded it. */
+  source?: string
 }
 
 /** What {@link notifyOwner} sends with; `sender` is `null` when SMTP is not configured. */
@@ -50,6 +52,7 @@ export async function notifyOwner(
       (lead.service
         ? `Service: ${lead.service.shortTitle} (${lead.service.slug})\n\n`
         : "") +
+      (lead.source ? `Found me via: ${lead.source}\n\n` : "") +
       lead.techStack,
   })
   if (!result.ok) {

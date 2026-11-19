@@ -927,9 +927,14 @@ siteTest(
     // back to printing the bare string ("target", "search", ...)
     // would otherwise slip through unnoticed, since the names read as
     // plausible words rather than obviously broken markup.
+    // The brief form's "Where did you find me?" options say "search
+    // engine" on purpose (#729), so they are left out.
     const iconNames = catalogItems.map((i) => i.icon)
     for (const path of ["/", "/catalog"]) {
-      const html = await site.html(path)
+      const html = (await site.html(path)).replace(
+        /<select\b[\s\S]*?<\/select>/g,
+        "",
+      )
       const text = visibleText(html).toLowerCase()
       for (const name of iconNames) {
         assert(

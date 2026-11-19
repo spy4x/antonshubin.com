@@ -48,12 +48,12 @@ export default define.page(function Privacy(ctx) {
         <Section title="The brief form">
           <p>
             The form asks for your name, your email address and a description of
-            your tech stack, and it can carry the service you chose. Sending it
-            emails those answers to me. The site writes no database record for
-            them. If the mail cannot be sent, the brief is appended to a file on
-            the server so it is not lost, and the site's log says that it was
-            kept. If the site's mail is not set up, the whole brief is written
-            to the server's log instead.
+            your tech stack, and it can carry the service you chose and where
+            you found me, if you say. Sending it emails those answers to me. The
+            site writes no database record for them. If the mail cannot be sent,
+            the brief is appended to a file on the server so it is not lost, and
+            the site's log says that it was kept. If the site's mail is not set
+            up, the whole brief is written to the server's log instead.
           </p>
         </Section>
 
