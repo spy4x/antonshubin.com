@@ -3,6 +3,7 @@
 // mail relay.
 import { catalogItem } from "./catalog.ts"
 import { isEmptyBrief } from "./brief-prefill.ts"
+import { leadSource } from "./lead-source.ts"
 import { parseBareAddress } from "@spy4x/email/address"
 import { type Lead, type LeadMailDeps, notifyOwner } from "./lead-mail.ts"
 
@@ -81,6 +82,7 @@ export function validateLead(
   ) {
     return { ok: false, error: "Tech stack description is required" }
   }
+  const source = leadSource(body.source, body.sourceOther)
   return {
     ok: true,
     data: {
@@ -88,6 +90,7 @@ export function validateLead(
       email,
       techStack: body.techStack.trim(),
       ...(service ? { service } : {}),
+      ...(source ? { source } : {}),
     },
   }
 }

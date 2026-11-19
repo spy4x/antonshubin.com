@@ -137,3 +137,27 @@ Deno.test("refuses a filled honeypot and accepts an empty, missing or blank one"
   assertEquals(validateLead({ ...lead, _website: "" }, now).ok, true)
   assertEquals(validateLead({ ...lead }, now).ok, true)
 })
+
+Deno.test("mails where the visitor found me on its own line, and nothing for an unknown choice", async () => {
+  for (
+    const [source, line] of [
+      ["other", "Found me via: Other: A podcast\n\n"],
+      ["<b>x</b>", ""],
+    ]
+  ) {
+    const { relay, deps } = setup()
+    const outcome = acceptLead({
+      ...LEAD,
+      email: "jane@example.com",
+      source,
+      sourceOther: "A podcast",
+    }, deps)
+    await outcome.mail
+    assertEquals(outcome.status, 200)
+    assertEquals(
+      relay.mails[0].text,
+      `New audit request from Jane Doe (jane@example.com):\n\n${line}Deno`,
+      source,
+    )
+  }
+})

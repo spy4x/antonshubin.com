@@ -426,6 +426,12 @@ Deno.test("a brief counts as sent only once the server accepts it, with its serv
       assertEquals(await briefEvents(page), [
         ["brief-error", { reason: "server" }],
       ])
+      // Where the visitor found me is optional: the first send went without
+      // it. "Other" reveals a text box, and both reach the server (#729).
+      assertEquals(await page.locator("#lead-source-other").count(), 0)
+      await page.selectOption("#lead-source", "other")
+      await page.fill("#lead-source-other", "A podcast")
+      const posted = page.waitForRequest("**/api/lead")
 
       answer = 200
       await clickSubmitButtonWithoutScrolling(page)
@@ -438,6 +444,8 @@ Deno.test("a brief counts as sent only once the server accepts it, with its serv
         ["brief-error", { reason: "server" }],
         ["brief-sent", { service: slug }],
       ])
+      const body = (await posted).postDataJSON()
+      assertEquals([body.source, body.sourceOther], ["other", "A podcast"])
     } finally {
       await page.close()
     }

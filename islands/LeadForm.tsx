@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "preact/hooks"
 import {
   IconArrowRight as ArrowRightIcon,
   IconCheck as CheckIcon,
+  IconChevronDown,
 } from "@spy4x/preact-icons"
 import { honeypotField } from "@spy4x/preact-ui/honeypot"
 import { NewTabHint } from "../components/NewTabHint.tsx"
@@ -12,6 +13,12 @@ import { briefPrefill, isEmptyBrief } from "../lib/brief-prefill.ts"
 import { type BriefErrorReason, eventAttrs, track } from "../lib/analytics.ts"
 import { BOOK_LABEL, BRIEF_LABEL } from "../lib/nav.ts"
 import { decapitalize } from "../lib/promises.ts"
+import {
+  LEAD_SOURCES,
+  OTHER_SOURCE,
+  SOURCE_LABEL,
+  SOURCE_OTHER_MAX,
+} from "../lib/lead-source.ts"
 
 /** The calendar island's component, loaded only when the success panel needs it. */
 type MeetEmbedComponent = typeof import("./MeetEmbed.tsx").default
@@ -48,6 +55,10 @@ interface FormState {
   email: string
   techStack: string
 }
+
+/** The classes every text field of the form shares. */
+const FIELD_CLASS =
+  "w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent disabled:opacity-50"
 
 type SubmitStatus =
   | { type: "idle" }
@@ -98,6 +109,8 @@ export default function LeadForm(
   const techStack = useSignal(
     service ? briefPrefill(service.shortTitle) : "",
   )
+  const source = useSignal("")
+  const sourceOther = useSignal("")
   const status = useSignal<SubmitStatus>({ type: "idle" })
 
   // Set page-load timestamp on mount
@@ -139,6 +152,10 @@ export default function LeadForm(
         body: JSON.stringify({
           ...form,
           ...(service ? { service: service.slug } : {}),
+          ...(source.value ? { source: source.value } : {}),
+          ...(source.value === OTHER_SOURCE && sourceOther.value.trim()
+            ? { sourceOther: sourceOther.value }
+            : {}),
           _t: pageLoad.value,
           [HONEYPOT_FIELD]: trap?.value ?? "",
         }),
@@ -207,7 +224,7 @@ export default function LeadForm(
         style={{
           opacity: isSuccess ? 0 : 1,
           transform: isSuccess ? "translateY(-12px)" : "translateY(0)",
-          maxHeight: isSuccess ? "0px" : "800px",
+          maxHeight: isSuccess ? "0px" : "1000px",
           overflow: "hidden",
         }}
       >
@@ -237,7 +254,7 @@ export default function LeadForm(
               aria-describedby={errorField === "lead-name"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent disabled:opacity-50"
+              class={FIELD_CLASS}
               required
             />
           </div>
@@ -256,7 +273,7 @@ export default function LeadForm(
               aria-describedby={errorField === "lead-email"
                 ? "lead-form-error"
                 : undefined}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent disabled:opacity-50"
+              class={FIELD_CLASS}
               required
             />
           </div>
@@ -277,10 +294,61 @@ export default function LeadForm(
                 ? "lead-form-error"
                 : undefined}
               rows={4}
-              class="w-full px-4 py-3 bg-lamp border border-rule-strong rounded-lg text-parchment placeholder-graphite focus:outline-none focus:ring-2 focus:ring-parchment focus:border-transparent resize-y disabled:opacity-50"
+              class={`${FIELD_CLASS} resize-y`}
               required
             />
           </div>
+
+          {
+            /* Optional (#729). The empty choice is the placeholder, muted like
+              the others until something is picked. A revealed "Other" box is
+              the next Tab stop; focus never moves on its own, because arrow
+              keys on a closed select fire `change` on every step. */
+          }
+          <div class="relative">
+            <label for="lead-source" class="sr-only">
+              {SOURCE_LABEL} (optional)
+            </label>
+            <select
+              id="lead-source"
+              value={source}
+              onChange={(e) =>
+                source.value = (e.target as HTMLSelectElement).value}
+              disabled={status.value.type === "submitting"}
+              class={`${FIELD_CLASS} appearance-none pr-10 scheme-dark [&_option]:bg-lamp [&_option]:text-parchment ${
+                source.value ? "" : "text-graphite!"
+              }`}
+              data-lead-source
+            >
+              <option value="">{SOURCE_LABEL} (optional)</option>
+              {LEAD_SOURCES.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+            <IconChevronDown
+              aria-hidden="true"
+              class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-graphite"
+            />
+          </div>
+
+          {source.value === OTHER_SOURCE && (
+            <div>
+              <label for="lead-source-other" class="sr-only">
+                Where else did you find me? (optional)
+              </label>
+              <input
+                id="lead-source-other"
+                type="text"
+                placeholder="Where? A podcast, a newsletter, a blog…"
+                maxLength={SOURCE_OTHER_MAX}
+                value={sourceOther}
+                onInput={(e) =>
+                  sourceOther.value = (e.target as HTMLInputElement).value}
+                disabled={status.value.type === "submitting"}
+                class={FIELD_CLASS}
+              />
+            </div>
+          )}
 
           {status.value.type === "error" && (
             <p
@@ -376,7 +444,7 @@ export default function LeadForm(
           Raising MAX_EMBED_HEIGHT_PX means raising this maxHeight too, or a
           taller-than-expected frame gets clipped by this panel's
           `overflow: hidden` before the iframe's own height ever comes into
-          play. Taller than the form section's maxHeight (800px) for the
+          play. Taller than the form section's maxHeight (1000px) for the
           same reason. `inert` until success, so the new-tab link can't be
           Tab'd to while this panel is collapsed to `maxHeight: 0` and
           `opacity: 0`. The calendar itself mounts only on success.
