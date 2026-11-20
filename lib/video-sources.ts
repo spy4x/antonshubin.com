@@ -40,7 +40,7 @@ export const VIDEO_SOURCES: readonly VideoSource[] = [
   demo("oko", "d93c6b329fcd47d4a9bef91533fdbe0c52f45cf1"),
   demo("zond", "7744aaab8e64f31379bda47626aeaeaee911ecd5"),
   demo("caldav-mcp", "54b014cd5306aa11824f085a7cd07141d55cb259"),
-  demo("caldav-tasks-web", "8f13fae44eb5450ba28c0a40876e6f776770b651"),
+  demo("caldav-tasks-web", "1a8c7f84f0db43628f0d9c8a9b17ea7dad7e9109"),
   demo("preact-components", "3a58c15a05d1aa6c293587b77d7bea1213b2772d"),
   demo("rostok", "892f7057b71e6b7bdb7f167863a896db818c6ae1"),
   demo("ts-libs", "d58a2176f21c78a366aa13dfd837aefe5405362b"),

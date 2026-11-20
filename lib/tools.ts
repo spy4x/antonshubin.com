@@ -1283,19 +1283,19 @@ export const tools: Tool[] = [
     },
     clip: {
       title:
-        "caldav-tasks-web: quick add, subtasks, a repeating task, complete and undo",
+        "caldav-tasks-web: quick add, subtasks, keyboard reorder, a repeating task, complete and undo",
       caption:
-        "1\u00a0min 2\u00a0s, with captions and music: demo tasks on a local Radicale, with a quick add, subtasks, a repeating task, and a task completed and undone.",
+        "46\u00a0s, with captions and music: demo tasks on a local Radicale, with a quick add, subtasks reordered from the keyboard, a repeating task, a task completed and undone, and the shortcut list.",
       poster: {
         src: "/video/tools/caldav-tasks-web/poster.webp",
         srcset:
           "/video/tools/caldav-tasks-web/poster-640.webp 640w, /video/tools/caldav-tasks-web/poster.webp 1280w",
         alt:
-          "The Today view of caldav-tasks-web on Wednesday, 21 October 2026: the Add a task box above two flagged overdue tasks, Fix the gate in Home and Call the plumber in Errands.",
+          "The Today view of caldav-tasks-web on Tuesday, 17 November 2026: the Add a task box above two flagged overdue tasks, Fix the gate in Home and Call the plumber in Errands.",
         width: 1280,
         height: 800,
       },
-      video: { duration: "PT1M2S", uploadDate: "2026-10-21" },
+      video: { duration: "PT46S", uploadDate: "2026-11-20" },
     },
   },
   {
