@@ -61,7 +61,7 @@ backfill never needs to run again for that.
 
 | Method | Path                           | Description                                                                                      |
 | ------ | ------------------------------ | ------------------------------------------------------------------------------------------------ |
-| POST   | `/api/subscribe`               | Mail a confirmation link (JSON: `{"email":"..."}`); stores nothing                               |
+| POST   | `/api/subscribe`               | Mail a confirmation link (JSON: `{"email":"...","hp-field":""}`); stores nothing                 |
 | GET    | `/subscribe/confirm?token=...` | Confirm page for a signed link: shows the address, stores nothing                                |
 | POST   | `/subscribe/confirm`           | Adds the address the `token` (form body or query) confirms, then sends the welcome mail          |
 | GET    | `/unsubscribe?token=...`       | Confirm page for a signed unsubscribe link — shows the address, removes nothing                  |
@@ -271,6 +271,18 @@ One address is sent at most three confirmation mails an hour, whichever client
 asks (#428): `flowDeps()` passes the package's `limits.recipient` an in-memory
 limiter, keyed by the package on the address's keyed hash. A request over it
 answers 200 like any other and no mail goes out.
+
+The site as a whole sends at most 30 confirmation mails an hour, across all
+addresses (#733): `lib/mailing-list.ts` checks a site-wide in-memory limiter
+after the per-recipient one. A request over it also answers 200 with no mail,
+and the address gets its per-recipient slot back. The count lives in memory, so
+a restart clears it.
+
+Both forms carry a honeypot, a hidden field a person never fills (#733).
+`/api/subscribe` answers 400 with no mail when `hp-field` (the shared
+`honeypotField()`) is missing or filled; `/api/lead` refuses a post whose
+`_website` is missing or filled. A bot that posts straight to the endpoint
+without loading the form leaves the field out.
 
 ## Outgoing mail
 
