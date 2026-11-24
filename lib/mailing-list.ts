@@ -21,7 +21,10 @@ import {
   type FileSubscriberStore,
 } from "@spy4x/server/subscribers/file"
 import type { SendLog } from "@spy4x/server/subscribers"
-import { createMemoryRateLimiter } from "@spy4x/platform/rate-limit/memory"
+import {
+  createMemoryRateLimiter,
+  type RateLimiter,
+} from "@spy4x/platform/rate-limit/memory"
 import { BASE_URL, getUnsubscribeSecret } from "./config.ts"
 
 /** The subscriber list unless `SUBSCRIBERS_FILE` says otherwise. Its
@@ -98,12 +101,41 @@ const RECIPIENT_LIMITER = createMemoryRateLimiter({
   windowMs: CONFIRM_MAIL_WINDOW_MS,
 })
 
+/** Confirmation mails the whole site may send per {@link CONFIRM_MAIL_WINDOW_MS},
+ * to all addresses together (#733). */
+export const CONFIRM_MAILS_PER_SITE = 30
+
+const SITE_LIMITER = createMemoryRateLimiter({
+  limit: CONFIRM_MAILS_PER_SITE,
+  windowMs: CONFIRM_MAIL_WINDOW_MS,
+})
+
 /**
- * Everything the package's flows need, with the limit per recipient (#428):
- * whoever asks and from wherever, one address is sent at most
- * {@link CONFIRM_MAILS_PER_RECIPIENT} confirmation mails an hour. A request
- * over it gets the same answer and no mail. Throws when `UNSUBSCRIBE_SECRET` is
- * unusable; each route turns that into the answer it gave before.
+ * The package's recipient limit, with the site-wide cap behind it: a bot that
+ * posts a new address from a new IP each time passes both per-key limits, so
+ * the site as a whole sends at most {@link CONFIRM_MAILS_PER_SITE} confirm mails
+ * an hour. A mail the cap holds back gives its recipient's slot back.
+ */
+const CONFIRM_LIMITER: RateLimiter = {
+  async check(key) {
+    const recipient = await RECIPIENT_LIMITER.check(key)
+    if (!recipient.allowed) return recipient
+    const site = await SITE_LIMITER.check(`site`)
+    if (site.allowed) return recipient
+    await RECIPIENT_LIMITER.refund?.(key, recipient.at)
+    console.warn(`[SUBSCRIBE] site-wide confirm mail cap reached`)
+    return site
+  },
+  reset: (key) => RECIPIENT_LIMITER.reset(key),
+}
+
+/**
+ * Everything the package's flows need, with the confirm mail limits: whoever
+ * asks and from wherever, one address is sent at most
+ * {@link CONFIRM_MAILS_PER_RECIPIENT} confirmation mails an hour (#428), and the
+ * site at most {@link CONFIRM_MAILS_PER_SITE} (#733). A request over either gets
+ * the same answer and no mail. Throws when `UNSUBSCRIBE_SECRET` is unusable;
+ * each route turns that into the answer it gave before.
  */
 export function flowDeps(
   sendMail: (mail: SubscriberMail) => Promise<MailOutcome>,
@@ -113,6 +145,6 @@ export function flowDeps(
     store: subscriberStore(),
     links: { confirm: confirmUrl, unsubscribe: unsubscribeUrl },
     sendMail,
-    limits: { recipient: RECIPIENT_LIMITER },
+    limits: { recipient: CONFIRM_LIMITER },
   }
 }

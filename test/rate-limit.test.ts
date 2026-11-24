@@ -115,3 +115,55 @@ Deno.test("one address asked for by seven clients is sent three confirmation mai
     await Deno.remove(dir, { recursive: true })
   }
 })
+
+Deno.test("the site sends at most 30 confirmation mails an hour across all addresses, and the 31st asker gets the same answer", async () => {
+  const dir = await Deno.makeTempDir()
+  const file = `${dir}/subscribers.json`
+  const relay = countingRelay()
+  try {
+    await Deno.writeTextFile(file, "[]")
+    const site = await startSite({
+      env: {
+        SUBSCRIBERS_FILE: file,
+        UNSUBSCRIBE_SECRET: "t".repeat(32),
+        SMTP_HOST: "127.0.0.1",
+        SMTP_PORT: String(relay.port),
+        SMTP_USERNAME: "site@example.com",
+        SMTP_PASSWORD: "not-a-real-password",
+      },
+    })
+    try {
+      // A new client and a new address each time, as the bots post: neither
+      // the per-client nor the per-recipient limit answers.
+      const answers = []
+      for (let n = 1; n <= 31; n++) {
+        const res = await site.get("/api/subscribe", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-real-ip": `203.0.113.${n}`,
+          },
+          body: JSON.stringify({
+            email: `reader${n}@example.com`,
+            "hp-field": "",
+          }),
+        })
+        answers.push({ status: res.status, body: await res.json() })
+      }
+      assertEquals(answers, Array(31).fill({ status: 200, body: { ok: true } }))
+
+      // Mail goes out after the answer: wait for 30 connections (10 s cap),
+      // then long enough for a 31st to show.
+      for (let i = 0; i < 100 && relay.connections() < 30; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      assertEquals(relay.connections(), 30)
+    } finally {
+      await site.stop()
+    }
+  } finally {
+    await relay.close()
+    await Deno.remove(dir, { recursive: true })
+  }
+})
