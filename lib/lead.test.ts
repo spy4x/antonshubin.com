@@ -21,7 +21,8 @@ function setup() {
   return { relay, deps }
 }
 
-const LEAD = { name: "Jane Doe", techStack: "Deno" }
+// `_website` is the honeypot the form always sends empty (#733).
+const LEAD = { name: "Jane Doe", techStack: "Deno", _website: "" }
 
 Deno.test("answers 400 to an email field with a display name, and mails nothing", async () => {
   const refused = [
@@ -126,7 +127,7 @@ Deno.test("refuses a brief that holds only the service prefill, and mails nothin
   assertEquals(relay.mails.length, 1)
 })
 
-Deno.test("refuses a filled honeypot and accepts an empty, missing or blank one", () => {
+Deno.test("refuses a filled honeypot and accepts an empty or blank one", () => {
   const now = Date.now()
   const lead = { ...LEAD, email: "jane@example.com" }
   assertEquals(
@@ -135,7 +136,20 @@ Deno.test("refuses a filled honeypot and accepts an empty, missing or blank one"
   )
   assertEquals(validateLead({ ...lead, _website: "   " }, now).ok, true)
   assertEquals(validateLead({ ...lead, _website: "" }, now).ok, true)
-  assertEquals(validateLead({ ...lead }, now).ok, true)
+})
+
+Deno.test("refuses a lead posted without the honeypot field, and mails nothing", async () => {
+  const { relay, deps } = setup()
+  const { _website: _, ...withoutTrap } = LEAD
+  const outcome = acceptLead(
+    { ...withoutTrap, email: "jane@example.com" },
+    deps,
+  )
+  await outcome.mail
+  assertEquals([outcome.status, outcome.body], [400, {
+    error: "Invalid request",
+  }])
+  assertEquals(relay.mails.length, 0)
 })
 
 Deno.test("mails where the visitor found me on its own line, and nothing for an unknown choice", async () => {
