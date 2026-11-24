@@ -1,4 +1,6 @@
 import { useState } from "preact/hooks"
+import { honeypotField } from "@spy4x/preact-ui/honeypot"
+import { HONEYPOT_FIELD_NAME } from "@spy4x/platform/universal/honeypot"
 import { track } from "../lib/analytics.ts"
 
 /**
@@ -19,12 +21,20 @@ export default function NewsletterForm() {
   const submit = async (e: Event) => {
     e.preventDefault()
     if (!email) return
+    // Read before the first `await`: `currentTarget` is gone afterwards.
+    const trap = (e.currentTarget as HTMLFormElement).elements.namedItem(
+      HONEYPOT_FIELD_NAME,
+    ) as HTMLInputElement | null
     setStatus("loading")
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        // The route refuses a body without the honeypot field (#733).
+        body: JSON.stringify({
+          email,
+          [HONEYPOT_FIELD_NAME]: trap?.value ?? "",
+        }),
       })
       if (res.ok) {
         setStatus("done")
@@ -56,6 +66,7 @@ export default function NewsletterForm() {
         )
         : (
           <>
+            {honeypotField()}
             <input
               type="email"
               required

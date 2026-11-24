@@ -94,7 +94,7 @@ Deno.test("the site's own forms pass the guard, and a one-click unsubscribe with
       site,
       "/api/subscribe",
       { "sec-fetch-site": "same-origin" },
-      JSON.stringify({ email: "reader@example.com" }),
+      JSON.stringify({ email: "reader@example.com", "hp-field": "" }),
     )
     await own.body?.cancel()
     assertEquals(own.status, 200)

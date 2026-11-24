@@ -1,8 +1,10 @@
 // Rendered-site guards for the rate limits of the public forms: per client
-// (#252) and, for the subscribe form, per recipient (#428). Each boots the
+// (#252) and, for the subscribe form, per recipient (#428) and for the whole
+// site (#733). Each boots the
 // built site through test/harness.ts with a temp SUBSCRIBERS_FILE. X-Real-IP
 // stands in for the value Traefik writes in production.
 import { assertEquals } from "jsr:@std/assert@^1.0.0"
+import { countingRelay } from "./counting-relay.ts"
 import { startSite } from "./harness.ts"
 
 Deno.test("both forms answer 429 on the fourth post even when the first X-Forwarded-For hop rotates", async () => {
@@ -55,34 +57,6 @@ Deno.test("both forms answer 429 on the fourth post even when the first X-Forwar
   }
 })
 
-/**
- * A stand-in for the mail relay that only counts connections. The site opens
- * one connection per mail it tries to send; this closes each at once, so the
- * send fails and is logged, which the visitor's answer never shows.
- */
-function countingRelay(): {
-  port: number
-  connections: () => number
-  close: () => Promise<void>
-} {
-  const listener = Deno.listen({ hostname: "127.0.0.1", port: 0 })
-  let connections = 0
-  const accepting = (async () => {
-    for await (const conn of listener) {
-      connections++
-      conn.close()
-    }
-  })().catch(() => {})
-  return {
-    port: listener.addr.port,
-    connections: () => connections,
-    close: async () => {
-      listener.close()
-      await accepting
-    },
-  }
-}
-
 Deno.test("one address asked for by seven clients is sent three confirmation mails, and every client gets the same answer", async () => {
   const dir = await Deno.makeTempDir()
   const file = `${dir}/subscribers.json`
@@ -109,7 +83,7 @@ Deno.test("one address asked for by seven clients is sent three confirmation mai
             "content-type": "application/json",
             "x-real-ip": `203.0.113.${client}`,
           },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email, "hp-field": "" }),
         })
         return { status: res.status, body: await res.json() }
       }
