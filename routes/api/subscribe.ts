@@ -1,4 +1,5 @@
 import { parseBareAddress } from "@spy4x/email/address"
+import { HONEYPOT_FIELD_NAME } from "@spy4x/platform/universal/honeypot"
 import { requestSubscription } from "@spy4x/server/subscribers"
 import { define } from "../../lib/utils.ts"
 import {
@@ -37,7 +38,14 @@ export const handler = define.handlers({
     if (!read.ok) {
       return Response.json({ error: read.error }, { status: read.status })
     }
-    const body = read.value as { email?: unknown } | null
+    const body = read.value as Record<string, unknown> | null
+
+    // The form always sends its honeypot field empty (#733). A bot that posts
+    // only `email`, or fills every field, gets the bad-address answer and no
+    // mail.
+    if (body?.[HONEYPOT_FIELD_NAME] !== "") {
+      return Response.json(BODIES[400], { status: 400 })
+    }
 
     // Only a confirmation link is mailed, after the answer; the address joins
     // the list on /subscribe/confirm (#253). The flow logs failures, with the

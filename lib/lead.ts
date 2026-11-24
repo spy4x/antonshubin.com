@@ -50,11 +50,9 @@ export function validateLead(
   }
   const body = payload as Record<string, unknown>
 
-  // Honeypot: _website must be empty (bots fill it)
-  if (
-    body._website && typeof body._website === "string" &&
-    body._website.trim() !== ""
-  ) {
+  // Honeypot: the form always sends _website, empty or blank; a bot fills it
+  // or, posting only the visible fields, leaves it out (#733).
+  if (typeof body._website !== "string" || body._website.trim() !== "") {
     return { ok: false, error: "Invalid request" }
   }
 

@@ -29,6 +29,7 @@ Deno.test("a lead whose mail cannot be sent is kept in the failed-leads file", a
           name: "Jane Doe",
           email: "jane@example.com",
           techStack: "Deno and Postgres",
+          _website: "",
         }),
       })
       assertEquals(res.status, 200)
