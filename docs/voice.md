@@ -42,6 +42,8 @@ real", "Why Drone CI is cool".
 Every post starts with one (Anton, 30 September 2026: he is annoyed by articles
 without one). It is the front matter's `tldr` list, and the page shows it under
 the header, as the first block of the post body (docs/publishing.md, step 3).
+This block and its label are the one exception to the skill's "No label such as
+TL;DR".
 
 - Two to four lines. Each is one plain claim a skimming reader can act on or
   remember: the result, the decision, the rule, the catch.
@@ -136,6 +138,8 @@ text". These also turn up in Anton's own posts and stay out of new drafts:
   and easy-to-use".
 - Rhetorical sales questions stacked at the start ("Are you tired of...?
   Does...? Are you frustrated...?").
+- Bullet lists where every item starts with the same verb pattern and says
+  nothing specific.
 - Sign-offs such as "Trust me, it's worth it!" and "Good luck!".
 - Emoji (the site's `test/no-emoji.test.ts` fails on them anyway).
 

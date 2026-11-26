@@ -32,13 +32,11 @@ Anton's goals, not whether it is interesting.
   fit this reader, which decides which channel texts in step 4 are worth
   writing.
 - **Psychologist.** What makes this reader start, keep reading and trust the
-  author? Open with the reader's problem or a concrete result, not with
-  background, then say what the post is and who it is for, as
-  [voice.md](voice.md) "How a post opens" describes. Show proof through
-  specifics: code, screenshots, what went wrong, and numbers under AGENTS.md
-  "Content rule" only. Answer the reader's likely doubt before they raise it. No
-  fake urgency, invented scarcity, flattery or other manipulation: trust is the
-  point, and one trick costs it.
+  author? Open as [voice.md](voice.md) "How a post opens" describes. Show proof
+  through specifics: code, screenshots, what went wrong, and numbers under
+  AGENTS.md "Content rule" only. Answer the reader's likely doubt before they
+  raise it. No fake urgency, invented scarcity, flattery or other manipulation:
+  trust is the point, and one trick costs it.
 - **Personal-brand adviser.** Does the post make Anton look like what he sells:
   a senior full-stack engineer and tech lead who ships, owns outcomes and
   explains plainly? Does it add to a theme he wants to be known for, so posts
