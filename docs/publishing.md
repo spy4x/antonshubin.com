@@ -32,13 +32,11 @@ Anton's goals, not whether it is interesting.
   fit this reader, which decides which channel texts in step 4 are worth
   writing.
 - **Psychologist.** What makes this reader start, keep reading and trust the
-  author? Open with the reader's problem or a concrete result, not with
-  background, then say what the post is and who it is for, as
-  [voice.md](voice.md) "How a post opens" describes. Show proof through
-  specifics: code, screenshots, what went wrong, and numbers under AGENTS.md
-  "Content rule" only. Answer the reader's likely doubt before they raise it. No
-  fake urgency, invented scarcity, flattery or other manipulation: trust is the
-  point, and one trick costs it.
+  author? Open as [voice.md](voice.md) "How a post opens" describes. Show proof
+  through specifics: code, screenshots, what went wrong, and numbers under
+  AGENTS.md "Content rule" only. Answer the reader's likely doubt before they
+  raise it. No fake urgency, invented scarcity, flattery or other manipulation:
+  trust is the point, and one trick costs it.
 - **Personal-brand adviser.** Does the post make Anton look like what he sells:
   a senior full-stack engineer and tech lead who ships, owns outcomes and
   explains plainly? Does it add to a theme he wants to be known for, so posts
@@ -53,16 +51,15 @@ request body, and the reviewer checks the draft against it. The repository is
 public, and so is everything a post produces. The ai-memory files are for
 understanding the goals, never a source to quote: the brief, the post, the
 channel texts and the newsletter never copy a number or a private detail from
-them. A figure comes from Anton in the session (AGENTS.md "Content rule") or,
-for Upwork figures, from `lib/proof.ts` through `proof(id)`. Where the harness
-has them, the `marketing-seo` and `psychologist` agents can read the finished
-draft against the brief before the pull request opens.
+them. A figure follows AGENTS.md "Content rule" or, for Upwork figures, comes
+from `lib/proof.ts` through `proof(id)`. Where the harness has them, the
+`marketing-seo` and `psychologist` agents can read the finished draft against
+the brief before the pull request opens.
 
 ## 1. Draft
 
-1. Read [voice.md](voice.md) first, and AGENTS.md "Content rule": no client,
-   number, prize, testimonial or guarantee unless Anton gave it as fact in the
-   session.
+1. Read [voice.md](voice.md) first, and AGENTS.md "Content rule" on what a post
+   may claim.
 2. Write `content/blog/<slug>.md`. Its front matter is the only place the post's
    metadata is written (#191): `lib/blog-posts.ts` reads every file in
    `content/blog/` and `lib/data.ts` re-exports the list as `blogArticles`, so

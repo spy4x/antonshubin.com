@@ -12,9 +12,11 @@ It describes the five oldest posts, by `publishedAt` in `lib/data.ts`:
 | `setting-up-your-own-ci-cd-server-with-drone-ci`                    | 2023-02-12 |
 
 The examples below are short pieces of those posts, quoted as written. This
-guide describes a style; it is not a source of facts. AGENTS.md "Content rule"
-applies to every draft: no client, number, prize, testimonial or guarantee
-unless Anton gave it as fact in the session.
+guide describes a style; it is not a source of facts. What a draft may claim is
+AGENTS.md "Content rule". The rules for every text in Anton's name (the point
+first, plain words, short paragraphs, nothing that reads as generated) are the
+global `owner-voice` skill, "Every text"; this guide adds only what is specific
+to his posts.
 
 ## Two kinds of post
 
@@ -40,11 +42,13 @@ real", "Why Drone CI is cool".
 Every post starts with one (Anton, 30 September 2026: he is annoyed by articles
 without one). It is the front matter's `tldr` list, and the page shows it under
 the header, as the first block of the post body (docs/publishing.md, step 3).
+This block and its label are the one exception to the skill's "No label such as
+TL;DR".
 
 - Two to four lines. Each is one plain claim a skimming reader can act on or
   remember: the result, the decision, the rule, the catch.
 - Write it last, from the finished post. Every line says only what the post
-  says: no new claim, number or name (AGENTS.md "Content rule").
+  says: no new claim, number or name.
 - The post's own voice: "I" where the post is first person, "you" for the
   reader. Short sentences; each line is at most 200 characters.
 - Not a teaser and not the description again. "Opus 5.5 cost about half as much
@@ -57,17 +61,24 @@ the header, as the first block of the post body (docs/publishing.md, step 3).
 
 ## How a post opens
 
-- It says what the post is and who it is for, plainly, often under the headings
-  "What is it about?" and "Who is it for?". Example: "Today I'll share my
-  approach to shipping an app idea."
-- It links back to an earlier post when the topic continues one: "In my previous
-  blog post, I shared my opinion on why you should be brave..."
-- It promises the reader something concrete: "I'll motivate you to start right
-  where you are".
+The first paragraph under the TL;DR is the event, the finding or the answer
+itself, in the reader's words. Who the post is for shows in that first line,
+through the problem it names: "If Authelia guards your services, Gatus can't
+tell a dead one from a live one." beats "This post is for people who run their
+own services… I'll show what zond does…".
+
+- A post never opens with a paragraph about the post, a preview of its sections,
+  or its title repeated as a question. The old "What is it about?" and "Who is
+  it for?" openings and "Today I'll share my approach to…" are the shape to
+  avoid.
+- A disclaimer (a bias, the method, a pinned commit) goes below the first
+  screen, in one line next to the claim it qualifies.
+- A post that continues an earlier one links back in its first paragraph, after
+  the point: "In my previous blog post, I shared my opinion on why you should be
+  brave..."
 
 ## Sentences
 
-- Short and direct. Many paragraphs are one to three sentences.
 - "I" for what Anton did, "you" for the reader. "We" means real people who were
   there ("we were on a Skype call for 9 hours every day"), and also opens some
   articles ("we'll explore what Drone CI is"); in a new draft, prefer "I'll
@@ -90,8 +101,7 @@ self-irony:
 - Lessons drawn from what clients did, without naming them: "Many of my clients
   spent years developing a fully functioning app".
 - Numbers he actually had, laid out plainly, one line per year: hourly rate,
-  hours worked and monthly income. Only use numbers Anton gives you for the new
-  post.
+  hours worked and monthly income.
 
 ## Structure
 
@@ -121,16 +131,16 @@ ends with is in AGENTS.md "Blog posts". Two shapes from Anton's own posts:
 
 ## Phrases to keep out of new drafts
 
-Some stock phrases turn up in the posts. They are not what makes the voice
-recognisable, and today they read as generated text, so leave them out:
+The list of what reads as generated is the global `owner-voice` skill, "Every
+text". These also turn up in Anton's own posts and stay out of new drafts:
 
-- "In conclusion", "It's important to", "crucial", "essential for success",
-  "vast library", "powerful, flexible, and easy-to-use".
+- "In conclusion", "essential for success", "vast library", "powerful, flexible,
+  and easy-to-use".
 - Rhetorical sales questions stacked at the start ("Are you tired of...?
   Does...? Are you frustrated...?").
 - Bullet lists where every item starts with the same verb pattern and says
   nothing specific.
-- Filler reassurance: "Trust me, it's worth it!", "Good luck!".
+- Sign-offs such as "Trust me, it's worth it!" and "Good luck!".
 - Emoji (the site's `test/no-emoji.test.ts` fails on them anyway).
 
 ## Channel texts

@@ -58,10 +58,8 @@ Constraints every review and spec keeps:
 
 - **Visual system** (below): the `@theme` tokens only, the accent fill only on
   Book buttons in the page body, `Button`/`buttonClass`, and `font-semibold`.
-- **Content rule** (below): no new claim, number, quote or name. Wording comes
-  from the `lib/*.ts` data files or from facts Anton supplied. When a
-  recommendation needs data that doesn't exist, the spec says what the page
-  shows without it.
+- **Content rule** (below). Wording comes from the `lib/*.ts` data files or from
+  facts Anton supplied.
 - **Speed and access:** home LCP is no worse (`deno task lcp --ab`, plus
   `--path` for the page itself), and a hero image is the only eager,
   high-priority image. There are 0 axe violations and no horizontal scroll.
@@ -720,10 +718,10 @@ booking P.S. `test/blog.test.ts` checks every post page.
 
 ## Content rule
 
-No client name, number, prize, testimonial or guarantee goes on the site unless
-the owner supplied it as fact in that session. If a claim needs a source you
-don't have, leave the existing wording alone and ask him for the real facts
-instead of inventing or estimating one.
+What the site and its posts may claim is the global `owner-voice` skill,
+"Marketing", which says when a missing fact may be a flagged guess and what is
+never guessed. Stricter here: a number a post presents as measured comes from
+that measurement, never from a guess.
 
 ## Shared libraries
 
